@@ -75,11 +75,11 @@ public class ChipStructs {
   }
 
   public static class DescriptorClusterDeviceTypeStruct {
-    public Long type;
+    public Long deviceType;
     public Integer revision;
 
-    public DescriptorClusterDeviceTypeStruct(Long type, Integer revision) {
-      this.type = type;
+    public DescriptorClusterDeviceTypeStruct(Long deviceType, Integer revision) {
+      this.deviceType = deviceType;
       this.revision = revision;
     }
 
@@ -87,8 +87,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("DescriptorClusterDeviceTypeStruct {\n");
-      output.append("\ttype: ");
-      output.append(type);
+      output.append("\tdeviceType: ");
+      output.append(deviceType);
       output.append("\n");
       output.append("\trevision: ");
       output.append(revision);
@@ -172,14 +172,14 @@ public class ChipStructs {
     }
   }
 
-  public static class AccessControlClusterAccessControlEntry {
+  public static class AccessControlClusterAccessControlEntryStruct {
     public Integer privilege;
     public Integer authMode;
     public @Nullable ArrayList<Object> subjects;
     public @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets;
     public Integer fabricIndex;
 
-    public AccessControlClusterAccessControlEntry(
+    public AccessControlClusterAccessControlEntryStruct(
         Integer privilege,
         Integer authMode,
         @Nullable ArrayList<Object> subjects,
@@ -195,7 +195,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AccessControlClusterAccessControlEntry {\n");
+      output.append("AccessControlClusterAccessControlEntryStruct {\n");
       output.append("\tprivilege: ");
       output.append(privilege);
       output.append("\n");
@@ -216,11 +216,11 @@ public class ChipStructs {
     }
   }
 
-  public static class AccessControlClusterExtensionEntry {
+  public static class AccessControlClusterAccessControlExtensionStruct {
     public byte[] data;
     public Integer fabricIndex;
 
-    public AccessControlClusterExtensionEntry(byte[] data, Integer fabricIndex) {
+    public AccessControlClusterAccessControlExtensionStruct(byte[] data, Integer fabricIndex) {
       this.data = data;
       this.fabricIndex = fabricIndex;
     }
@@ -228,7 +228,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AccessControlClusterExtensionEntry {\n");
+      output.append("AccessControlClusterAccessControlExtensionStruct {\n");
       output.append("\tdata: ");
       output.append(Arrays.toString(data));
       output.append("\n");
@@ -325,11 +325,11 @@ public class ChipStructs {
     }
   }
 
-  public static class BasicClusterCapabilityMinimaStruct {
+  public static class BasicInformationClusterCapabilityMinimaStruct {
     public Integer caseSessionsPerFabric;
     public Integer subscriptionsPerFabric;
 
-    public BasicClusterCapabilityMinimaStruct(
+    public BasicInformationClusterCapabilityMinimaStruct(
         Integer caseSessionsPerFabric, Integer subscriptionsPerFabric) {
       this.caseSessionsPerFabric = caseSessionsPerFabric;
       this.subscriptionsPerFabric = subscriptionsPerFabric;
@@ -338,7 +338,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BasicClusterCapabilityMinimaStruct {\n");
+      output.append("BasicInformationClusterCapabilityMinimaStruct {\n");
       output.append("\tcaseSessionsPerFabric: ");
       output.append(caseSessionsPerFabric);
       output.append("\n");
@@ -616,7 +616,7 @@ public class ChipStructs {
     }
   }
 
-  public static class GeneralDiagnosticsClusterNetworkInterfaceType {
+  public static class GeneralDiagnosticsClusterNetworkInterface {
     public String name;
     public Boolean isOperational;
     public @Nullable Boolean offPremiseServicesReachableIPv4;
@@ -626,7 +626,7 @@ public class ChipStructs {
     public ArrayList<byte[]> IPv6Addresses;
     public Integer type;
 
-    public GeneralDiagnosticsClusterNetworkInterfaceType(
+    public GeneralDiagnosticsClusterNetworkInterface(
         String name,
         Boolean isOperational,
         @Nullable Boolean offPremiseServicesReachableIPv4,
@@ -648,7 +648,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterNetworkInterfaceType {\n");
+      output.append("GeneralDiagnosticsClusterNetworkInterface {\n");
       output.append("\tname: ");
       output.append(name);
       output.append("\n");
@@ -678,14 +678,14 @@ public class ChipStructs {
     }
   }
 
-  public static class SoftwareDiagnosticsClusterThreadMetrics {
+  public static class SoftwareDiagnosticsClusterThreadMetricsStruct {
     public Long id;
     public Optional<String> name;
     public Optional<Long> stackFreeCurrent;
     public Optional<Long> stackFreeMinimum;
     public Optional<Long> stackSize;
 
-    public SoftwareDiagnosticsClusterThreadMetrics(
+    public SoftwareDiagnosticsClusterThreadMetricsStruct(
         Long id,
         Optional<String> name,
         Optional<Long> stackFreeCurrent,
@@ -701,7 +701,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterThreadMetrics {\n");
+      output.append("SoftwareDiagnosticsClusterThreadMetricsStruct {\n");
       output.append("\tid: ");
       output.append(id);
       output.append("\n");
@@ -1262,11 +1262,11 @@ public class ChipStructs {
     }
   }
 
-  public static class ModeSelectClusterSemanticTag {
+  public static class ModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public ModeSelectClusterSemanticTag(Integer mfgCode, Integer value) {
+    public ModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1274,7 +1274,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ModeSelectClusterSemanticTag {\n");
+      output.append("ModeSelectClusterSemanticTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1289,12 +1289,12 @@ public class ChipStructs {
   public static class ModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.ModeSelectClusterSemanticTag> semanticTags;
+    public ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags;
 
     public ModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.ModeSelectClusterSemanticTag> semanticTags) {
+        ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags) {
       this.label = label;
       this.mode = mode;
       this.semanticTags = semanticTags;
@@ -1821,6 +1821,36 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tapplicationId: ");
       output.append(applicationId);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ClientMonitoringClusterMonitoringRegistration {
+    public Long clientNodeId;
+    public Long ICid;
+    public Integer fabricIndex;
+
+    public ClientMonitoringClusterMonitoringRegistration(
+        Long clientNodeId, Long ICid, Integer fabricIndex) {
+      this.clientNodeId = clientNodeId;
+      this.ICid = ICid;
+      this.fabricIndex = fabricIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ClientMonitoringClusterMonitoringRegistration {\n");
+      output.append("\tclientNodeId: ");
+      output.append(clientNodeId);
+      output.append("\n");
+      output.append("\tICid: ");
+      output.append(ICid);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();

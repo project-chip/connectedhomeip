@@ -15,11 +15,12 @@
 #    limitations under the License.
 #
 
-import os
-from pathlib import Path
-import sys
-import subprocess
 import argparse
+import multiprocessing
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
@@ -59,7 +60,18 @@ def runArgumentsParser():
         description='Convert all .zap files to the current zap version')
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
+    parser.add_argument('--parallel', action='store_true')
+    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
+    parser.set_defaults(parallel=True)
+
     return parser.parse_args()
+
+
+def convertOne(target):
+    """
+    Helper method that may be run in parallel to convert a single target.
+    """
+    subprocess.check_call(['./scripts/tools/zap/convert.py'] + target)
 
 
 def main():
@@ -72,8 +84,16 @@ def main():
     os.chdir(CHIP_ROOT_DIR)
 
     targets = getTargets()
-    for target in targets:
-        subprocess.check_call(['./scripts/tools/zap/convert.py'] + target)
+
+    if args.parallel:
+        # Ensure each zap run is independent
+        os.environ['ZAP_TEMPSTATE'] = '1'
+        with multiprocessing.Pool() as pool:
+            for _ in pool.imap_unordered(convertOne, targets):
+                pass
+    else:
+        for target in targets:
+            generateOne(target)
 
 
 if __name__ == '__main__':

@@ -23,7 +23,7 @@
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/ScopedBuffer.h>
 
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 
 #include <cstdint>
 

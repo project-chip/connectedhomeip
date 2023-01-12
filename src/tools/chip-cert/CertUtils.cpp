@@ -567,13 +567,13 @@ exit:
 
 } // namespace
 
-bool ReadCert(const char * fileNameOrStr, X509 * cert)
+bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert)
 {
     CertFormat origCertFmt;
     return ReadCert(fileNameOrStr, cert, origCertFmt);
 }
 
-bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & certFmt)
+bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert, CertFormat & certFmt)
 {
     bool res         = true;
     uint32_t certLen = 0;
@@ -628,7 +628,8 @@ bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & certFmt)
         std::unique_ptr<BIO, void (*)(BIO *)> certBIO(
             BIO_new_mem_buf(static_cast<const void *>(certBuf.get()), static_cast<int>(certLen)), &BIO_free_all);
 
-        if (PEM_read_bio_X509(certBIO.get(), &cert, nullptr, nullptr) == nullptr)
+        cert.reset(PEM_read_bio_X509(certBIO.get(), nullptr, nullptr, nullptr));
+        if (cert.get() == nullptr)
         {
             ReportOpenSSLErrorAndExit("PEM_read_bio_X509", res = false);
         }
@@ -639,7 +640,8 @@ bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & certFmt)
 
         const uint8_t * outCert = certBuf.get();
 
-        if (d2i_X509(&cert, &outCert, static_cast<int>(certLen)) == nullptr)
+        cert.reset(d2i_X509(nullptr, &outCert, static_cast<int>(certLen)));
+        if (cert.get() == nullptr)
         {
             ReportOpenSSLErrorAndExit("d2i_X509", res = false);
         }
@@ -667,7 +669,8 @@ bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & certFmt)
 
         VerifyOrReturnError(chip::CanCastTo<int>(x509Cert.size()), false);
 
-        if (d2i_X509(&cert, &outCert, static_cast<int>(x509Cert.size())) == nullptr)
+        cert.reset(d2i_X509(nullptr, &outCert, static_cast<int>(x509Cert.size())));
+        if (cert.get() == nullptr)
         {
             ReportOpenSSLErrorAndExit("d2i_X509", res = false);
         }
@@ -680,9 +683,9 @@ exit:
 bool ReadCertDER(const char * fileNameOrStr, MutableByteSpan & cert)
 {
     bool res = true;
-    std::unique_ptr<X509, void (*)(X509 *)> certX509(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> certX509(nullptr, &X509_free);
 
-    VerifyOrReturnError(ReadCert(fileNameOrStr, certX509.get()), false);
+    VerifyOrReturnError(ReadCert(fileNameOrStr, certX509), false);
 
     uint8_t * certPtr = cert.data();
     int certLen       = i2d_X509(certX509.get(), &certPtr);
@@ -730,9 +733,9 @@ bool LoadChipCert(const char * fileNameOrStr, bool isTrused, ChipCertificateSet 
     bool res = true;
     CHIP_ERROR err;
     BitFlags<CertDecodeFlags> decodeFlags;
-    std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
 
-    res = ReadCert(fileNameOrStr, cert.get());
+    res = ReadCert(fileNameOrStr, cert);
     VerifyTrueOrExit(res);
 
     res = X509ToChipCert(cert.get(), chipCert);
@@ -987,10 +990,9 @@ exit:
     return res;
 }
 
-CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
-                           const struct tm & validFrom, uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts,
-                           uint8_t futureExtsCount, X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig,
-                           MutableByteSpan & chipCert)
+CHIP_ERROR MakeCertTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
+                       uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount,
+                       X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig, MutableByteSpan & chipCert)
 {
     TLVWriter writer;
     TLVType containerType;

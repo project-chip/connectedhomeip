@@ -21,7 +21,6 @@
 if CHIP
 
 config LOG
-    bool
     default y
 
 if LOG
@@ -35,157 +34,129 @@ choice MATTER_LOG_LEVEL_CHOICE
 endchoice
 
 config LOG_DEFAULT_LEVEL
-    int
     default 2
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+    default y
 
 endif
 
 config PRINTK_SYNC
-    bool
     default y
 
 config ASSERT
-    bool
     default y
 
 config HW_STACK_PROTECTION
-    bool
     default y
 
 config FPU
-    bool
     default y
 
 config SHELL
-    bool
     default y
 
-# Enable getting reboot reasons information
-config HWINFO
+config PTHREAD_IPC
     bool
-    default y
+    default n
 
 # Generic networking options
 config NET_SOCKETS_POSIX_NAMES
-    bool
     default n
 
 # Application stack size
 config MAIN_STACK_SIZE
-    int
     default 8192
 
 config INIT_STACKS
-    bool
     default y
 
-config CHIP_DEVICE_VENDOR_ID
-	int
-	default 65521
-
-config CHIP_DEVICE_PRODUCT_ID
-	int
-	default 32768
-
-# Disable certain parts of Zephyr IPv6 stack
-config NET_IPV6_NBR_CACHE
-    bool
-    default n
-
 config NET_IPV6_MLD
-    bool
     default y
 
 config NET_IF_MCAST_IPV6_ADDR_COUNT
-    int 
     default 14
 
 # Network buffers
 config NET_PKT_RX_COUNT
-    int
     default 16
 
 config NET_PKT_TX_COUNT
-    int
     default 16
 
 config NET_BUF_RX_COUNT
-    int
     default 80
 
 config NET_BUF_TX_COUNT
-    int
     default 80
 
 # Bluetooth Low Energy configs
 
 config BT
-    bool
     default y
 
 config BT_PERIPHERAL
-    bool
     default y
 
 config BT_PERIPHERAL_PREF_MIN_INT
-    int
     default 36
 
 config BT_PERIPHERAL_PREF_MAX_INT
-    int
     default 36
 
 config BT_GAP_AUTO_UPDATE_CONN_PARAMS
-    bool
     default y
 
 config BT_GATT_DYNAMIC_DB
-    bool
     default y
 
 config BT_DEVICE_NAME_DYNAMIC
-    bool
     default y
 
 config BT_DEVICE_NAME_MAX
-    int
     default 15
 
 config BT_MAX_CONN
-    int
-    default 1
+    default 2 # a workaround for non-unreferenced BLE connection object
+              # when restaring the BLE advertising in disconnect callback
+              # TODO: analyze and revert to 1 if proper fix exists
 
 config BT_L2CAP_TX_MTU
-    int
     default 247
 
 config BT_BUF_ACL_RX_SIZE
-    int
     default 251
 
 config BT_BUF_ACL_TX_SIZE
-    int
     default 251
 
 config BT_RX_STACK_SIZE
-    int
     default 1200
+
+config BT_CTLR_ECDH
+    bool
+    default n
+
+config BT_CTLR_LE_ENC
+    bool
+    default n
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+    bool
+    default n
 
 # Enable NFC support
 
 config CHIP_NFC_COMMISSIONING
-    bool
     default y
 
 config CHIP_OTA_REQUESTOR
-    bool
     default y
 
 # All boards besides nRF7002DK use QSPI NOR external flash
 if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
 
 config CHIP_QSPI_NOR
-    bool
     default y
 
 endif # BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
@@ -195,35 +166,34 @@ endif # BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
 if BOARD_NRF7002DK_NRF5340_CPUAPP
 
 config CHIP_SPI_NOR
-    bool
     default y
 
 endif # BOARD_NRF7002DK_NRF5340_CPUAPP
 
 # Enable extended discovery
 config CHIP_EXTENDED_DISCOVERY
-    bool
     default y
 
 config NVS_LOOKUP_CACHE
-    bool
     default y
 
 config NVS_LOOKUP_CACHE_SIZE
-    int
     default 512
 
 # Enable OpenThread
 
 config NET_L2_OPENTHREAD
-    bool
     default y if !WIFI_NRF700X
 
 if NET_L2_OPENTHREAD
 
+# Disable certain parts of Zephyr IPv6 stack
+config NET_IPV6_NBR_CACHE
+    bool
+    default n
+
 # Increase the default RX stack size
 config IEEE802154_NRF5_RX_STACK_SIZE
-    int
     default 1024
 
 endif
@@ -231,50 +201,39 @@ endif
 if CHIP_WIFI
 
 config NRF_WIFI_LOW_POWER
-    bool
     default n
 
 config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
-    bool
     default n
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
-    int
-    default 1120
+    default 2048
 
 # align these numbers to match the OpenThread config
 config NET_IF_UNICAST_IPV6_ADDR_COUNT
-    int
     default 6
 
 config NET_IF_MCAST_IPV6_ADDR_COUNT
-    int
     default 8
 
 config NET_SOCKETS_POSIX_NAMES
-    bool
     default n
 
 config MBEDTLS_SSL_OUT_CONTENT_LEN
-    int
     default 900
 
 # options managed by IP4/IP6 simultaneous support
 # aligned here to match OpenThread config
 config NET_MAX_ROUTERS
-    int
     default 1
 
 config NET_MAX_CONN
-    int
     default 4
 
 config SHELL_STACK_SIZE
-    int
     default 2616
 
 config HEAP_MEM_POOL_SIZE
-    int
     default 200000
 
 endif
@@ -287,183 +246,136 @@ choice OPENTHREAD_SECURITY
 endchoice
 
 config PSA_CRYPTO_DRIVER_CC3XX
-	bool
 	default n
 
 config OBERON_BACKEND
-    bool
     default y
 
 config MBEDTLS_ENABLE_HEAP
-    bool
     default y
 
 config MBEDTLS_HEAP_SIZE
-    int
     default 15360
 
 config MBEDTLS_TLS_LIBRARY
-    bool
     default y
 
 config NRF_SECURITY_ADVANCED
-    bool
     default y
 
 config MBEDTLS_AES_C
-    bool
     default y
 
 config MBEDTLS_ECP_C
-    bool
     default y
 
 config MBEDTLS_ECP_DP_SECP256R1_ENABLED
-    bool
     default y
 
 config MBEDTLS_CTR_DRBG_C
-    bool
     default y
 
 config MBEDTLS_CIPHER_MODE_CTR
-    bool
     default y
 
 config MBEDTLS_ECJPAKE_C
-    bool
     default y
 
 config MBEDTLS_SHA256_C
-    bool
     default y
 
 config MBEDTLS_PK_C
-    bool
     default y
 
 config MBEDTLS_PK_WRITE_C
-    bool
     default y
 
 config MBEDTLS_X509_CREATE_C
-    bool
     default y if !CHIP_CRYPTO_PSA
 
 config MBEDTLS_X509_CSR_WRITE_C
-    bool
     default y if !CHIP_CRYPTO_PSA
 
 # Disable unneeded crypto operations
 
 config MBEDTLS_SHA384_C
-    bool
     default n
 
 config MBEDTLS_SHA512_C
-    bool
     default n
 
 config MBEDTLS_CIPHER_MODE_XTS
-    bool
     default n
 
 config MBEDTLS_CHACHA20_C
-    bool
     default n
 
 config MBEDTLS_POLY1305_C
-    bool
     default n
 
 config MBEDTLS_CHACHAPOLY_C
-    bool
     default n
 
 config MBEDTLS_GCM_C
-    bool
     default n
 
 config MBEDTLS_RSA_C
-    bool
-    default n
-
-config PSA_WANT_KEY_TYPE_ARIA
-    bool
     default n
 
 config PSA_WANT_KEY_TYPE_CHACHA20
-    bool
     default n
 
 config PSA_WANT_ALG_GCM
-    bool
     default n
 
 config PSA_WANT_ALG_CHACHA20_POLY1305
-    bool
     default n
 
 config PSA_WANT_ALG_SHA_1
-    bool
     default n
 
 config PSA_WANT_ALG_SHA_224
-    bool
     default n
 
 config PSA_WANT_ALG_SHA_384
-    bool
     default n
 
 config PSA_WANT_ALG_SHA_512
-    bool
     default n
 
 config PSA_WANT_ALG_RIPEMD160
-    bool
     default n
 
 config PSA_WANT_ALG_MD5
-    bool
     default n
 
 config PSA_WANT_ALG_CFB
-    bool
     default n
 
 config PSA_WANT_ALG_OFB
-    bool
     default n
 
 # Disable not used shell modules
 
 config SENSOR_SHELL
-    bool
     default n
 
 config DEVICE_SHELL
-    bool
     default n
 
 config DATE_SHELL
-    bool
     default n
 
 config DEVMEM_SHELL
-    bool
     default n
 
 config MCUBOOT_SHELL
-    bool
     default n
 
 config CLOCK_CONTROL_NRF_SHELL
-    bool
     default n
 
 config FLASH_SHELL
-    bool
     default n
 
 # SoC series related configuration
@@ -472,7 +384,6 @@ if SOC_SERIES_NRF52X
 
 # Increase maximum data length of PDU supported in the Controller
 config BT_CTLR_DATA_LENGTH_MAX
-    int
     default 251
 
 endif # SOC_SERIES_NRF52X
@@ -480,7 +391,6 @@ endif # SOC_SERIES_NRF52X
 if SOC_SERIES_NRF53X
 
 config UPDATEABLE_IMAGE_NUMBER
-    int
     default 2
 
 # Generate random numbers using Xoroshiro algorithm instead of direct calls

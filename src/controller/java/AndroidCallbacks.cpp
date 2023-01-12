@@ -113,7 +113,8 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
     JniClass controllerExceptionJniCls(controllerExceptionCls);
 
     jmethodID exceptionConstructor = env->GetMethodID(controllerExceptionCls, "<init>", "(ILjava/lang/String;)V");
-    jobject exception = env->NewObject(controllerExceptionCls, exceptionConstructor, error, env->NewStringUTF(ErrorStr(error)));
+    jobject exception =
+        env->NewObject(controllerExceptionCls, exceptionConstructor, error.AsInteger(), env->NewStringUTF(ErrorStr(error)));
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);

@@ -571,7 +571,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Attributes {
 
 namespace DataModelRevision {
@@ -675,7 +675,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 namespace Attributes {
@@ -706,9 +706,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace OtaSoftwareUpdateRequestor {
 namespace Attributes {
 
-namespace DefaultOtaProviders {
+namespace DefaultOTAProviders {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace DefaultOtaProviders
+} // namespace DefaultOTAProviders
 
 namespace UpdatePossible {
 static constexpr AttributeId Id = 0x00000001;
@@ -1176,9 +1176,9 @@ namespace TotalOperationalHours {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace TotalOperationalHours
 
-namespace BootReasons {
+namespace BootReason {
 static constexpr AttributeId Id = 0x00000004;
-} // namespace BootReasons
+} // namespace BootReason
 
 namespace ActiveHardwareFaults {
 static constexpr AttributeId Id = 0x00000005;
@@ -1292,13 +1292,13 @@ namespace OverrunCount {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace OverrunCount
 
-namespace NeighborTableList {
+namespace NeighborTable {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace NeighborTableList
+} // namespace NeighborTable
 
-namespace RouteTableList {
+namespace RouteTable {
 static constexpr AttributeId Id = 0x00000008;
-} // namespace RouteTableList
+} // namespace RouteTable
 
 namespace PartitionId {
 static constexpr AttributeId Id = 0x00000009;

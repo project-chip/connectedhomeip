@@ -11,9 +11,7 @@
         "darwin/Framework/CHIP/templates/helper.js"
     ],
     "resources": {
-        "pics-metafile": "../../../../app/tests/suites/certification/PICS.yaml",
-        "certification-metadir": "../../../../app/tests/suites/certification",
-        "test-metadir": "../../../../app/tests/suites"
+        "availability-data": "availability.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
@@ -44,6 +42,14 @@
         {
             "name": "attribute_data_callback_name",
             "path": "partials/attribute_data_callback_name.zapt"
+        },
+        {
+            "name": "struct_field_decl",
+            "path": "partials/struct_field_decl.zapt"
+        },
+        {
+            "name": "renamed_struct_field_impl",
+            "path": "partials/renamed_struct_field_impl.zapt"
         }
     ],
     "templates": [

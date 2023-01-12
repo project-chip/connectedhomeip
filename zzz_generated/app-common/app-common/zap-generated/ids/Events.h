@@ -53,7 +53,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Events {
 
 namespace StartUp {
@@ -73,7 +73,7 @@ static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
 } // namespace Events
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateRequestor {
 namespace Events {
@@ -92,6 +92,24 @@ static constexpr EventId Id = 0x00000002;
 
 } // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
+
+namespace PowerSource {
+namespace Events {
+
+namespace WiredFaultChange {
+static constexpr EventId Id = 0x00000000;
+} // namespace WiredFaultChange
+
+namespace BatFaultChange {
+static constexpr EventId Id = 0x00000001;
+} // namespace BatFaultChange
+
+namespace BatChargeFaultChange {
+static constexpr EventId Id = 0x00000002;
+} // namespace BatChargeFaultChange
+
+} // namespace Events
+} // namespace PowerSource
 
 namespace GeneralDiagnostics {
 namespace Events {

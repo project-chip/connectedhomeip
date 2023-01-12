@@ -23,7 +23,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0000</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -101,7 +101,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0010</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -179,7 +179,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0100</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -257,7 +257,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0110</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -335,7 +335,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0200</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -470,7 +470,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0210</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -605,7 +605,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0220</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -740,7 +740,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0800</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -774,7 +774,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0810</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -819,7 +819,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0820</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -852,7 +852,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0830</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -896,7 +896,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0840</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>
@@ -941,7 +941,7 @@ limitations under the License.
     <profileId editable="false">0x0104</profileId>
     <deviceId editable="false">0x0850</deviceId>
     <clusters lockOthers="true">
-      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+      <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>VERSION</requireAttribute>
         <requireAttribute>APPLICATION_VERSION</requireAttribute>
         <requireAttribute>STACK_VERSION</requireAttribute>

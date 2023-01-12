@@ -30,4 +30,4 @@ tests:
     - label: "DUT reads LabelList from the TH"
       PICS: FLABEL.C.A0000
       wait: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"

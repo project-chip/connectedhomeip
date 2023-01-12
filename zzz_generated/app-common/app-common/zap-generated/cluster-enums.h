@@ -245,12 +245,23 @@ namespace Binding {
 
 namespace AccessControl {
 
-// Enum for AuthMode
-enum class AuthMode : uint8_t
+// Enum for AccessControlEntryAuthModeEnum
+enum class AccessControlEntryAuthModeEnum : uint8_t
 {
     kPase             = 0x01,
     kCase             = 0x02,
     kGroup            = 0x03,
+    kUnknownEnumValue = 0,
+};
+
+// Enum for AccessControlEntryPrivilegeEnum
+enum class AccessControlEntryPrivilegeEnum : uint8_t
+{
+    kView             = 0x01,
+    kProxyView        = 0x02,
+    kOperate          = 0x03,
+    kManage           = 0x04,
+    kAdminister       = 0x05,
     kUnknownEnumValue = 0,
 };
 
@@ -261,17 +272,6 @@ enum class ChangeTypeEnum : uint8_t
     kAdded            = 0x01,
     kRemoved          = 0x02,
     kUnknownEnumValue = 3,
-};
-
-// Enum for Privilege
-enum class Privilege : uint8_t
-{
-    kView             = 0x01,
-    kProxyView        = 0x02,
-    kOperate          = 0x03,
-    kManage           = 0x04,
-    kAdminister       = 0x05,
-    kUnknownEnumValue = 0,
 };
 } // namespace AccessControl
 
@@ -335,8 +335,8 @@ enum class CommandBits : uint16_t
 };
 } // namespace Actions
 
-namespace Basic {
-} // namespace Basic
+namespace BasicInformation {
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 
@@ -622,7 +622,7 @@ enum class NetworkCommissioningFeature : uint32_t
 enum class WiFiSecurity : uint8_t
 {
     kUnencrypted  = 0x1,
-    kWepPersonal  = 0x2,
+    kWep          = 0x2,
     kWpaPersonal  = 0x4,
     kWpa2Personal = 0x8,
     kWpa3Personal = 0x10,
@@ -662,8 +662,8 @@ enum class LogsTransferProtocol : uint8_t
 
 namespace GeneralDiagnostics {
 
-// Enum for BootReasonType
-enum class BootReasonType : uint8_t
+// Enum for BootReasonEnum
+enum class BootReasonEnum : uint8_t
 {
     kUnspecified             = 0x00,
     kPowerOnReboot           = 0x01,
@@ -678,8 +678,8 @@ enum class BootReasonType : uint8_t
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for HardwareFaultType
-enum class HardwareFaultType : uint8_t
+// Enum for HardwareFault
+enum class HardwareFault : uint8_t
 {
     kUnspecified            = 0x00,
     kRadio                  = 0x01,
@@ -695,8 +695,8 @@ enum class HardwareFaultType : uint8_t
     kUnknownEnumValue       = 11,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HardwareFaultType                                                                = EmberAfHardwareFaultType;
-static HardwareFaultType __attribute__((unused)) kHardwareFaultTypekUnknownEnumValue   = static_cast<HardwareFaultType>(11);
+using HardwareFault                                                                    = EmberAfHardwareFault;
+static HardwareFault __attribute__((unused)) kHardwareFaultkUnknownEnumValue           = static_cast<HardwareFault>(11);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -737,8 +737,8 @@ static NetworkFaultType __attribute__((unused)) kNetworkFaultTypekUnknownEnumVal
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for RadioFaultType
-enum class RadioFaultType : uint8_t
+// Enum for RadioFault
+enum class RadioFault : uint8_t
 {
     kUnspecified      = 0x00,
     kWiFiFault        = 0x01,
@@ -750,8 +750,8 @@ enum class RadioFaultType : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultType                                                                   = EmberAfRadioFaultType;
-static RadioFaultType __attribute__((unused)) kRadioFaultTypekUnknownEnumValue         = static_cast<RadioFaultType>(7);
+using RadioFault                                                                       = EmberAfRadioFault;
+static RadioFault __attribute__((unused)) kRadioFaultkUnknownEnumValue                 = static_cast<RadioFault>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 
@@ -765,6 +765,14 @@ enum class SoftwareDiagnosticsFeature : uint32_t
 } // namespace SoftwareDiagnostics
 
 namespace ThreadNetworkDiagnostics {
+
+// Enum for ConnectionStatusEnum
+enum class ConnectionStatusEnum : uint8_t
+{
+    kConnected        = 0x00,
+    kNotConnected     = 0x01,
+    kUnknownEnumValue = 2,
+};
 
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
@@ -795,14 +803,6 @@ enum class RoutingRole : uint8_t
 using RoutingRole                                                                      = EmberAfRoutingRole;
 static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue               = static_cast<RoutingRole>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-
-// Enum for ThreadConnectionStatus
-enum class ThreadConnectionStatus : uint8_t
-{
-    kConnected        = 0x00,
-    kNotConnected     = 0x01,
-    kUnknownEnumValue = 2,
-};
 
 // Bitmap for ThreadNetworkDiagnosticsFeature
 enum class ThreadNetworkDiagnosticsFeature : uint32_t
@@ -859,12 +859,12 @@ enum class WiFiConnectionStatus : uint8_t
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
-    k80211a           = 0x00,
-    k80211b           = 0x01,
-    k80211g           = 0x02,
-    k80211n           = 0x03,
-    k80211ac          = 0x04,
-    k80211ax          = 0x05,
+    kA                = 0x00,
+    kB                = 0x01,
+    kG                = 0x02,
+    kN                = 0x03,
+    kAc               = 0x04,
+    kAx               = 0x05,
     kUnknownEnumValue = 6,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -878,24 +878,24 @@ namespace EthernetNetworkDiagnostics {
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for PHYRateType
-enum class PHYRateType : uint8_t
+// Enum for PHYRate
+enum class PHYRate : uint8_t
 {
-    k10m              = 0x00,
-    k100m             = 0x01,
-    k1000m            = 0x02,
-    k25g              = 0x03,
-    k5g               = 0x04,
-    k10g              = 0x05,
-    k40g              = 0x06,
-    k100g             = 0x07,
-    k200g             = 0x08,
-    k400g             = 0x09,
+    kRate10M          = 0x00,
+    kRate100M         = 0x01,
+    kRate1G           = 0x02,
+    kRate25g          = 0x03,
+    kRate5G           = 0x04,
+    kRate10G          = 0x05,
+    kRate40G          = 0x06,
+    kRate100G         = 0x07,
+    kRate200G         = 0x08,
+    kRate400G         = 0x09,
     kUnknownEnumValue = 10,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRateType                                                                      = EmberAfPHYRateType;
-static PHYRateType __attribute__((unused)) kPHYRateTypekUnknownEnumValue               = static_cast<PHYRateType>(10);
+using PHYRate                                                                          = EmberAfPHYRate;
+static PHYRate __attribute__((unused)) kPHYRatekUnknownEnumValue                       = static_cast<PHYRate>(10);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace EthernetNetworkDiagnostics
 

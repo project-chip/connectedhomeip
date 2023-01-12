@@ -628,7 +628,7 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate)
+CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRate & pHYRate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -658,34 +658,34 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::
     switch (speed)
     {
     case 10:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_M;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE10_M;
         break;
     case 100:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_100_M;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE100_M;
         break;
     case 1000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_1000_M;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE1_G;
         break;
     case 25000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_2__5_G;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE2_5_G;
         break;
     case 5000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_5_G;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE5_G;
         break;
     case 10000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_G;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE10_G;
         break;
     case 40000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_40_G;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE40_G;
         break;
     case 100000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_100_G;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE100_G;
         break;
     case 200000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_200_G;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE200_G;
         break;
     case 400000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_400_G;
+        pHYRate = EmberAfPHYRate::EMBER_ZCL_PHY_RATE_RATE400_G;
         break;
     default:
         ChipLogError(DeviceLayer, "Undefined speed! (%d)\n", speed);

@@ -242,12 +242,7 @@
     "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
     "WindowCovering": ["Test_TC_WNCV_6_1", "Test_TC_WNCV_7_1"],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
-    "OccupancySensing": [
-        "Test_TC_OCC_2_2",
-        "Test_TC_OCC_2_3",
-        "Test_TC_OCC_2_4",
-        "Test_TC_OCC_3_1"
-    ],
+    "OccupancySensing": ["Test_TC_OCC_3_1"],
     "PowerSource": ["Test_TC_PS_2_2"],
     "BooleanState": ["Test_TC_BOOL_2_2"],
     "ColorControl": [
@@ -272,7 +267,7 @@
         "Test_TC_DRLK_3_2",
         "Test_TC_DRLK_3_3"
     ],
-    "LocalizationConfiguration": ["Test_TC_LCFG_2_1", "Test_TC_LCFG_3_1"],
+    "LocalizationConfiguration": ["Test_TC_LCFG_2_1"],
     "LevelControl": ["Test_TC_LVL_2_3", "Test_TC_LVL_7_1", "Test_TC_LVL_8_1"],
     "OnOff": ["Test_TC_OO_2_3", "Test_TC_OO_3_1", "Test_TC_OO_3_2"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
@@ -294,11 +289,7 @@
         "Test_TC_LTIME_2_1",
         "Test_TC_LTIME_3_1"
     ],
-    "UnitLocalization": [
-        "Test_TC_LUNIT_1_1",
-        "Test_TC_LUNIT_2_1",
-        "Test_TC_LUNIT_3_1"
-    ],
+    "UnitLocalization": [],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
         "Test_TC_S_1_1",
@@ -309,15 +300,12 @@
     ],
     "PumpConfigurationControl": ["Test_TC_PCC_3_1"],
     "AccessControl": [
-        "Test_TC_ACL_2_4",
         "Test_TC_ACL_2_5",
         "Test_TC_ACL_2_6",
-        "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
-        "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10"
     ],
-    "UserLabel": ["Test_TC_ULABEL_3_1"],
+    "UserLabel": [],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"

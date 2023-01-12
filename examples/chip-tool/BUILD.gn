@@ -58,6 +58,9 @@ static_library("chip-tool-utils") {
     "commands/common/Commands.cpp",
     "commands/common/Commands.h",
     "commands/common/CredentialIssuerCommands.h",
+    "commands/common/HexConversion.h",
+    "commands/delay/SleepCommand.cpp",
+    "commands/delay/WaitForCommissioneeCommand.cpp",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
@@ -82,7 +85,12 @@ static_library("chip-tool-utils") {
   deps = []
 
   if (config_use_interactive_mode) {
-    sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+    sources += [
+      "commands/interactive/InteractiveCommands.cpp",
+      "commands/interactive/WebSocketServer.cpp",
+      "commands/interactive/WebSocketServer.h",
+      "commands/interactive/WebSocketServerDelegate.h",
+    ]
     deps += [ "${editline_root}:editline" ]
   }
 
@@ -105,6 +113,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
+    "${chip_root}/third_party/libwebsockets",
   ]
 
   public_configs = [ ":config" ]

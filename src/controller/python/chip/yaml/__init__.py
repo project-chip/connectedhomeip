@@ -20,4 +20,5 @@
 #      Provides Python APIs for Matter.
 
 """Provides yaml parser Python APIs for Matter."""
-from . import parser
+
+from . import runner

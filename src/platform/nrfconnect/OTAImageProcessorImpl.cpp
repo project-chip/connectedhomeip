@@ -28,15 +28,15 @@
 #if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 #include <credentials/CertificationDeclaration.h>
 #include <platform/Zephyr/ZephyrConfig.h>
-#include <settings/settings.h>
+#include <zephyr/settings/settings.h>
 #endif
 
 #include <dfu/dfu_multi_image.h>
 #include <dfu/dfu_target.h>
 #include <dfu/dfu_target_mcuboot.h>
-#include <dfu/mcuboot.h>
-#include <logging/log.h>
-#include <pm/device.h>
+#include <zephyr/dfu/mcuboot.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/pm/device.h>
 
 #if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 // Cd globals are needed to be accessed from dfu image writer lambdas

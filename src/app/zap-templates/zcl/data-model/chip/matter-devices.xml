@@ -40,7 +40,7 @@ limitations under the License.
                 <requireAttribute>ACL</requireAttribute>
                 <requireAttribute>EXTENSION</requireAttribute>
             </include>
-            <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DATA_MODEL_REVISION</requireAttribute>
                 <requireAttribute>VENDOR_NAME</requireAttribute>
                 <requireAttribute>VENDOR_ID</requireAttribute>
