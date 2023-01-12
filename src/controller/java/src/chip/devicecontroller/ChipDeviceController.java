@@ -123,6 +123,14 @@ public class ChipDeviceController {
     setDeviceAttestationDelegate(deviceControllerPtr, failSafeExpiryTimeoutSecs, failureCallback);
   }
 
+  /**
+   * Set delegate for attestation trust store for device attestation verifiers.
+   *
+   * <p>It will replace the built-in attestation trust store, please make sure you have the required
+   * paa certificate before commissioning.
+   *
+   * @param attestationTrustStoreDelegate Delegate for attestation trust store
+   */
   public void setAttestationTrustStoreDelegate(
       AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
     setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
