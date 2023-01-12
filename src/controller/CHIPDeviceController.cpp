@@ -1652,7 +1652,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
             proxy  = mDeviceBeingCommissioned;
             if (mCommissioningStage == kThreadNetworkEnable || mCommissioningStage == kWiFiNetworkEnable)
             {
-                ReleaseCommissioneeDevice(reinterpret_cast<CommissioneeDeviceProxy *>(proxy));
+                ReleaseCommissioneeDevice(FindCommissioneeDevice(nodeId));
                 proxy = nullptr;
             }
         }
