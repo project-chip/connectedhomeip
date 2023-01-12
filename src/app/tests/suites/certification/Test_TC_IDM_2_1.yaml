@@ -770,7 +770,7 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882403.876372][2715:2720] CHIP:DMG: }
           [1657882403.876514][2715:2720] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 737072536
-          [1657882403.876595][2715:2720] CHIP:TOO:   occupancy sensor type: 0
+          [1657882403.876595][2715:2720] CHIP:TOO:   OccupancySensorType: 0
           [1657882403.876679][2715:2720] CHIP:EM: Sending Standalone Ack for MessageCounter:153370776 on exchange 37640i
       disabled: true
 
