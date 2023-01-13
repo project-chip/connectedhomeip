@@ -86,9 +86,9 @@ template("chip_data_model") {
     #
     #       This logic has been carried over from previous code during compile
     #       time codegen addition, however the rationale of why pregenerated
-    #       dir controls IMClusterCommandHandler needs to be explained and 
+    #       dir controls IMClusterCommandHandler needs to be explained and
     #       potentially controlled by a clearer variable (is this for controllers?
-    #       is this during app compile but not others? I am unclear what 
+    #       is this during app compile but not others? I am unclear what
     #       zap_pregenerated_dir is supposed to convey. Existence of a directory
     #       does not obviously map to "need command handler cpp compiled in").
     if (defined(invoker.zap_pregenerated_dir)) {

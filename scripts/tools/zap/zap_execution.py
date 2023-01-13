@@ -39,6 +39,7 @@ class ZapEnsureVersionCheckWorks:
     This is to help with zap version checking: version checking of development
     zap only works when ZAP_SKIP_REAL_VERSION is not set.
     """
+
     def __init__(self):
         self.real_version_skip = None
 
@@ -47,11 +48,12 @@ class ZapEnsureVersionCheckWorks:
         if 'ZAP_DEVELOPMENT_PATH' in os.environ:
             if 'ZAP_SKIP_REAL_VERSION' in os.environ:
                 self.real_version_skip = os.environ['ZAP_SKIP_REAL_VERSION']
-                del(os.environ['ZAP_SKIP_REAL_VERSION'])
+                del (os.environ['ZAP_SKIP_REAL_VERSION'])
 
     def __exit__(self, *args):
         if self.real_version_skip is not None:
-           os.environ['ZAP_SKIP_REAL_VERSION'] = self.real_version_skip
+            os.environ['ZAP_SKIP_REAL_VERSION'] = self.real_version_skip
+
 
 class ZapTool:
     def __init__(self):
@@ -64,8 +66,8 @@ class ZapTool:
         if 'ZAP_DEVELOPMENT_PATH' in os.environ:
             self.zap_start = ['node', 'src-script/zap-start.js']
             self.working_directory = os.environ['ZAP_DEVELOPMENT_PATH']
-            # When using ZAP_DEVELOPMENT_PATH, we should generally not need to 
-            # setup a version (dirties the tree and conflicts with parallel 
+            # When using ZAP_DEVELOPMENT_PATH, we should generally not need to
+            # setup a version (dirties the tree and conflicts with parallel
             # execution
             # HOWEVER, if the intent is exactly to check the version, this should not be done
             # and this set should be reverted
