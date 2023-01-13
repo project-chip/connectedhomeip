@@ -30,7 +30,6 @@ from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
-
 # isort: off
 
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
@@ -39,15 +38,14 @@ import chip.CertificateAuthority
 
 # isort: on
 import chip.clusters as Clusters
-from chip.interaction_model import Status, InteractionModelError
 import chip.logging
 import chip.native
 from chip.ChipStack import *
+from chip.interaction_model import InteractionModelError, Status
 from chip.storage import PersistentStorage
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts, base_test, logger, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
-
 from mobly.test_runner import TestRunner
 
 # TODO: Add utility to commission a device if needed

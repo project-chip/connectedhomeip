@@ -15,13 +15,14 @@
 #    limitations under the License.
 #
 
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
-from chip.interaction_model import Status, InteractionModelError
+import logging
+import sys
+
 import chip.clusters as Clusters
 import chip.clusters.Objects
-import logging
+from chip.interaction_model import InteractionModelError, Status
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-import sys
 
 # This test requires several addition command line arguments
 # run with
