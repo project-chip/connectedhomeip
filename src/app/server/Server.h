@@ -27,6 +27,9 @@
 #include <app/FailSafeContext.h>
 #include <app/OperationalSessionSetupPool.h>
 #include <app/TestEventTriggerDelegate.h>
+#ifdef CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS
+#include <app/GenericReadHandlerCallback.h>
+#endif
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -522,6 +525,10 @@ private:
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;
     Inet::InterfaceId mInterfaceId;
+
+#ifdef CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS
+    app::GenericReadHandlerCallback genericReadHandlerCallback;
+#endif
 };
 
 } // namespace chip

@@ -21,6 +21,11 @@ config("server_config") {
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
+
+  # Temporary config to enable default read handler
+  if (chip_use_default_read_handler_callbacks) {
+    defines += [ "CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS=1" ]
+  }
 }
 
 static_library("server") {
