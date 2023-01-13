@@ -137,7 +137,8 @@
             "ProductLabel",
             "SerialNumber",
             "UniqueID",
-            "CapabilityMinima"
+            "CapabilityMinima",
+            "ProductAppearance"
         ],
         "Descriptor": ["ClusterRevision"],
         "Ethernet Network Diagnostics": [
