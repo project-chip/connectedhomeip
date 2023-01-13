@@ -180,7 +180,7 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: betaIndex,
+                      FabricIndex: gammaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: [commissionerNodeId],
