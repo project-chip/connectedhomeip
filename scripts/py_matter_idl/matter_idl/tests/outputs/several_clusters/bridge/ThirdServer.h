@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BridgeGlobalStructs.h"
-#include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/GeneratedClusters.h"
+#include "GeneratedClusters.h"
 
 namespace clusters {
 struct ThirdCluster : public GeneratedCluster
