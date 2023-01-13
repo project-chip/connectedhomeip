@@ -92,7 +92,7 @@ public:
     struct SubscriptionList
     {
         size_t mSize;
-        SubscriptionInfo mSubscriptions[CHIP_IM_MAX_NUM_SUBSCRIPTIONS];
+        std::unique_ptr<SubscriptionInfo[]> mSubscriptions = std::make_unique<SubscriptionInfo[]>(CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
     };
 
     /**
