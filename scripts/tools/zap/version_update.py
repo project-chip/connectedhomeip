@@ -54,9 +54,14 @@ FILES_DEPENDING_ON_ZAP_VERSION = [
     '.github/workflows/fuzzing-build.yaml',
     '.github/workflows/tests.yaml',
     'integrations/docker/images/chip-build/Dockerfile',
-    'integrations/docker/images/chip-build/version',
     'integrations/docker/images/chip-cert-bins/Dockerfile',
 ]
+
+# NOTE: you likely need to also update
+#   integrations/docker/images/chip-build/version
+#
+# in PRs that update chip-build Dockerfiles. This update is not automated in
+# this script.
 
 # Apart from the above files which contain an exact ZAP version, the zap
 # execution script contains the mimimal zap execution version, which generally
