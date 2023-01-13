@@ -35,7 +35,8 @@ CHIP_ERROR CurrentFabricRemover::RemoveCurrentFabric(NodeId remoteNodeId, Callba
     return mController->GetConnectedDevice(remoteNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
-CHIP_ERROR CurrentFabricRemover::ReadCurrentFabricIndex(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+CHIP_ERROR CurrentFabricRemover::ReadCurrentFabricIndex(Messaging::ExchangeManager & exchangeMgr,
+                                                        const SessionHandle & sessionHandle)
 {
     using TypeInfo = chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo;
     OperationalCredentialsCluster cluster(exchangeMgr, sessionHandle, kRootEndpointId);
@@ -43,7 +44,8 @@ CHIP_ERROR CurrentFabricRemover::ReadCurrentFabricIndex(Messaging::ExchangeManag
     return cluster.ReadAttribute<TypeInfo>(this, OnSuccessReadCurrentFabricIndex, OnReadAttributeFailure);
 }
 
-CHIP_ERROR CurrentFabricRemover::SendRemoveFabricIndex(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+CHIP_ERROR CurrentFabricRemover::SendRemoveFabricIndex(Messaging::ExchangeManager & exchangeMgr,
+                                                       const SessionHandle & sessionHandle)
 {
     if (mFabricIndex == kUndefinedFabricIndex)
     {
@@ -59,7 +61,7 @@ CHIP_ERROR CurrentFabricRemover::SendRemoveFabricIndex(Messaging::ExchangeManage
 }
 
 void CurrentFabricRemover::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                               SessionHandle & sessionHandle)
+                                               const SessionHandle & sessionHandle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto * self    = static_cast<CurrentFabricRemover *>(context);
