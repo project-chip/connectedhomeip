@@ -8765,7 +8765,7 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(
  * @brief Account Login Cluster GetSetupPINResponse Command callback (from server)
  */
 bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                           chip::CharSpan setupPIN);
+                                                           chip::CharSpan SetupPIN);
 /**
  * @brief Account Login Cluster Login Command callback (from client)
  */

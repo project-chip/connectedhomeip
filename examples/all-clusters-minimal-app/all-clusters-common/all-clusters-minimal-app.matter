@@ -2476,7 +2476,7 @@ server cluster TemperatureMeasurement = 1026 {
 
 server cluster PressureMeasurement = 1027 {
   bitmap PressureFeature : BITMAP32 {
-    kExt = 0x1;
+    kExtended = 0x1;
   }
 
   readonly attribute nullable int16s measuredValue = 0;
