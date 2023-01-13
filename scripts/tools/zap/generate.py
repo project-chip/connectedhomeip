@@ -202,17 +202,13 @@ def runClangPrettifier(templates_file, output_dir):
             filepath)[1] in listOfSupportedFileExtensions, outputs))
 
         if len(clangOutputs) > 0:
-            # The "clang-format" pigweed comes with is now version 15, which
-            # changed behavior from version 13 and earlier regarding some
-            # whitespace formatting.  Unfortunately, all the CI bits run
-            # clang-format 13 or earlier, so we get styling mismatches.
+            # NOTE: clang-format may differ in time. Currently pigweed comes
+            #       with clang-format 15. CI may have clang-format-10 installed
+            #       on linux. 
             #
-            # Try some older clang-format versions just in case they are
-            # installed.  In particular, clang-format-13 is available on various
-            # Linux distributions and clang-format-11 is available via homebrew
-            # on Mac.  If all else fails, fall back to clang-format.
-            clang_formats = ['clang-format-13', 'clang-format-12',
-                             'clang-format-11', 'clang-format']
+            #       We generally want consistent formatting, so use the
+            #       at this point attempt to use clang-format 15.
+            clang_formats = ['clang-format-15', 'clang-format']
             for clang_format in clang_formats:
                 args = [clang_format, '-i']
                 args.extend(clangOutputs)
