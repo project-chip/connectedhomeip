@@ -204,7 +204,7 @@ def runClangPrettifier(templates_file, output_dir):
         if len(clangOutputs) > 0:
             # NOTE: clang-format may differ in time. Currently pigweed comes
             #       with clang-format 15. CI may have clang-format-10 installed
-            #       on linux. 
+            #       on linux.
             #
             #       We generally want consistent formatting, so use the
             #       at this point attempt to use clang-format 15.
