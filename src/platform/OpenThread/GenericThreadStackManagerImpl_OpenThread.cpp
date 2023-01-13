@@ -1902,14 +1902,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiv
             return err;
         }
 
-        ChipLogError(DeviceLayer, "Failed to postponed Idle Mode with error %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to postponed Idle Mode with error %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return SEDChangeMode();
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDChangeMode(void)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDChangeMode()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ConnectivityManager::SEDIntervalMode mode;
@@ -1926,10 +1926,9 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeChange(chip::System::Layer * apSystemLayer,
                                                                                void * apAppState)
 {
-
     if (apAppState != nullptr)
     {
-        ((GenericThreadStackManagerImpl_OpenThread *) apAppState)->SEDChangeMode();
+        static_cast<GenericThreadStackManagerImpl_OpenThread *>(apAppState)->SEDChangeMode();
     }
 }
 #endif
