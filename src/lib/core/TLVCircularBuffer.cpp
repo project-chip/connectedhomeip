@@ -30,7 +30,7 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <lib/core/CHIPCircularTLVBuffer.h>
+#include <lib/core/TLVCircularBuffer.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
@@ -47,7 +47,7 @@ using namespace chip::Encoding;
 
 /**
  * @brief
- *   CHIPCircularTLVBuffer constructor
+ *   TLVCircularBuffer constructor
  *
  * @param[in] inBuffer       A pointer to the backing store for the queue
  *
@@ -56,7 +56,7 @@ using namespace chip::Encoding;
  * @param[in] inHead         Initial point for the head.  The @a inHead pointer is must fall within the backing store for the
  * circular buffer, i.e. within @a inBuffer and &(@a inBuffer[@a inBufferLength])
  */
-CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength, uint8_t * inHead)
+TLVCircularBuffer::TLVCircularBuffer(uint8_t * inBuffer, uint32_t inBufferLength, uint8_t * inHead)
 {
     mQueue       = inBuffer;
     mQueueSize   = inBufferLength;
@@ -74,26 +74,26 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBuff
 
 /**
  * @brief
- *   CHIPCircularTLVBuffer constructor
+ *   TLVCircularBuffer constructor
  *
  * @param[in] inBuffer       A pointer to the backing store for the queue
  *
  * @param[in] inBufferLength Length, in bytes, of the backing store
  */
-CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength)
+TLVCircularBuffer::TLVCircularBuffer(uint8_t * inBuffer, uint32_t inBufferLength)
 {
     Init(inBuffer, inBufferLength);
 }
 
 /**
  * @brief
- *   CHIPCircularTLVBuffer Init function
+ *   TLVCircularBuffer Init function
  *
  * @param[in] inBuffer       A pointer to the backing store for the queue
  *
  * @param[in] inBufferLength Length, in bytes, of the backing store
  */
-void CHIPCircularTLVBuffer::Init(uint8_t * inBuffer, uint32_t inBufferLength)
+void TLVCircularBuffer::Init(uint8_t * inBuffer, uint32_t inBufferLength)
 {
     mQueue       = inBuffer;
     mQueueSize   = inBufferLength;
@@ -111,7 +111,7 @@ void CHIPCircularTLVBuffer::Init(uint8_t * inBuffer, uint32_t inBufferLength)
 
 /**
  * @brief
- *   Evicts the oldest top-level TLV element in the CHIPCircularTLVBuffer
+ *   Evicts the oldest top-level TLV element in the TLVCircularBuffer
  *
  * This function removes the oldest top level TLV element in the
  * buffer.  The function will call the callback registered at
@@ -119,7 +119,7 @@ void CHIPCircularTLVBuffer::Init(uint8_t * inBuffer, uint32_t inBufferLength)
  * If the callback returns anything but #CHIP_NO_ERROR, the element
  * is not removed.  Similarly, if any other error occurs -- no
  * elements within the buffer, etc -- the underlying
- * #CHIPCircularTLVBuffer remains unchanged.
+ * #TLVCircularBuffer remains unchanged.
  *
  *  @retval #CHIP_NO_ERROR On success.
  *
@@ -127,7 +127,7 @@ void CHIPCircularTLVBuffer::Init(uint8_t * inBuffer, uint32_t inBufferLength)
  *                         or by the TLVReader.
  *
  */
-CHIP_ERROR CHIPCircularTLVBuffer::EvictHead()
+CHIP_ERROR TLVCircularBuffer::EvictHead()
 {
     CircularTLVReader reader;
     uint8_t * newHead;
@@ -169,7 +169,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::EvictHead()
  * @brief
  *  Implements TLVBackingStore::OnInit(TLVWriter) for circular buffers.
  */
-CHIP_ERROR CHIPCircularTLVBuffer::OnInit(TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen)
+CHIP_ERROR TLVCircularBuffer::OnInit(TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen)
 {
     return GetNewBuffer(writer, bufStart, bufLen);
 }
@@ -192,7 +192,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::OnInit(TLVWriter & writer, uint8_t *& bufStart
  *                         top-level TLV element.
  */
 
-CHIP_ERROR CHIPCircularTLVBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& outBufStart, uint32_t & outBufLen)
+CHIP_ERROR TLVCircularBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& outBufStart, uint32_t & outBufLen)
 {
     uint8_t * tail = QueueTail();
 
@@ -219,7 +219,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& 
 
 /**
  * @brief
- *   FinalizeBuffer adjust the `CHIPCircularTLVBuffer` state on
+ *   FinalizeBuffer adjust the `TLVCircularBuffer` state on
  *   completion of output from the TLVWriter.  This function affects
  *   the position of the queue tail.
  *
@@ -234,7 +234,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& 
  * @retval #CHIP_NO_ERROR Unconditionally.
  */
 
-CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBuffer(TLVWriter & ioWriter, uint8_t * inBufStart, uint32_t inBufLen)
+CHIP_ERROR TLVCircularBuffer::FinalizeBuffer(TLVWriter & ioWriter, uint8_t * inBufStart, uint32_t inBufLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t * tail = inBufStart + inBufLen;
@@ -256,7 +256,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBuffer(TLVWriter & ioWriter, uint8_t *
  * @brief
  *  Implements TLVBackingStore::OnInit(TVLReader) for circular buffers.
  */
-CHIP_ERROR CHIPCircularTLVBuffer::OnInit(TLVReader & reader, const uint8_t *& bufStart, uint32_t & bufLen)
+CHIP_ERROR TLVCircularBuffer::OnInit(TLVReader & reader, const uint8_t *& bufStart, uint32_t & bufLen)
 {
     return GetNextBuffer(reader, bufStart, bufLen);
 }
@@ -265,7 +265,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::OnInit(TLVReader & reader, const uint8_t *& bu
  * @brief
  *   Get additional space for the TLVReader.
  *
- *  The storage provided by the CHIPCircularTLVBuffer may be
+ *  The storage provided by the TLVCircularBuffer may be
  *  wraparound within the buffer.  This function provides us with an
  *  ability to match the buffering of the circular buffer to the
  *  TLVReader constraints.  The reader will read at most `mQueueSize`
@@ -282,7 +282,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::OnInit(TLVReader & reader, const uint8_t *& bu
  *
  * @retval #CHIP_NO_ERROR      Succeeds unconditionally.
  */
-CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader & ioReader, const uint8_t *& outBufStart, uint32_t & outBufLen)
+CHIP_ERROR TLVCircularBuffer::GetNextBuffer(TLVReader & ioReader, const uint8_t *& outBufStart, uint32_t & outBufLen)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     uint8_t * tail              = QueueTail();
