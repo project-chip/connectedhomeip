@@ -7682,17 +7682,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("temperature display mode", 1, value);
+            return DataModelLogger::LogValue("TemperatureDisplayMode", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("keypad lockout", 1, value);
+            return DataModelLogger::LogValue("KeypadLockout", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("schedule programming visibility", 1, value);
+            return DataModelLogger::LogValue("ScheduleProgrammingVisibility", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
