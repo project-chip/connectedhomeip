@@ -268,7 +268,7 @@ struct MessageTestEntry theMessageTestVector[] = {
         .expectedMessageCount = 1,
     },
     {
-        .name     = "secure group message (no privacy)",
+        .name     = "secure group message (no privacy, drop replay)",
         .peerAddr = "::1",
 
         .payload = "",
