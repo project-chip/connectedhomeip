@@ -188,12 +188,30 @@ public:
 
     DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge() { return mDeviceAttestationDelegateBridge; }
 
+    void ClearDeviceAttestationDelegateBridge()
+    {
+        if (mDeviceAttestationDelegateBridge != nullptr)
+        {
+            delete mDeviceAttestationDelegateBridge;
+            mDeviceAttestationDelegateBridge = nullptr;
+        }
+    }
+
     void SetAttestationTrustStoreBridge(AttestationTrustStoreBridge * attestationTrustStoreBridge)
     {
         mAttestationTrustStoreBridge = attestationTrustStoreBridge;
     }
 
     AttestationTrustStoreBridge * GetAttestationTrustStoreBridge() { return mAttestationTrustStoreBridge; }
+
+    void ClearAttestationTrustStoreBridge()
+    {
+        if (mAttestationTrustStoreBridge != nullptr)
+        {
+            delete mAttestationTrustStoreBridge;
+            mAttestationTrustStoreBridge = nullptr;
+        }
+    }
 
     void SetDeviceAttestationVerifier(chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier)
     {
@@ -202,12 +220,12 @@ public:
 
     chip::Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() { return mDeviceAttestationVerifier; }
 
-    void ClearDeviceAttestationDelegateBridge()
+    void ClearDeviceAttestationVerifier()
     {
-        if (mDeviceAttestationDelegateBridge != nullptr)
+        if (mDeviceAttestationVerifier != nullptr)
         {
-            delete mDeviceAttestationDelegateBridge;
-            mDeviceAttestationDelegateBridge = nullptr;
+            delete mDeviceAttestationVerifier;
+            mDeviceAttestationVerifier = nullptr;
         }
     }
 

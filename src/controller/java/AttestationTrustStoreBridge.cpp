@@ -47,7 +47,7 @@ CHIP_ERROR AttestationTrustStoreBridge::GetProductAttestationAuthorityCert(const
 
     VerifyOrReturnError(skid.size() == chip::Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
 
-    paaDerBuffer   = MutableByteSpan(paaCert.Get(), paaCertAllocatedLen);
+    paaDerBuffer = MutableByteSpan(paaCert.Get(), paaCertAllocatedLen);
     ReturnErrorOnFailure(GetPaaCertFromJava(skid, paaDerBuffer));
 
     uint8_t skidBuf[chip::Crypto::kSubjectKeyIdentifierLength] = { 0 };
