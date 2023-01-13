@@ -5320,6 +5320,9 @@
                   - WPAPersonal
                   - WPA2Personal
                   - WPA3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  - Extended
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5428,6 +5431,9 @@
                   - WpaPersonal
                   - Wpa2Personal
                   - Wpa3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  - EXT
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5603,3 +5609,6 @@
                   WPAPersonal: WpaPersonal
                   WPA2Personal: Wpa2Personal
                   WPA3Personal: Wpa3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  Extended: EXT

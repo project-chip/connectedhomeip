@@ -52,7 +52,7 @@ protected:
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
     CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
     CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
     bool _IsThreadAttached(void);
     bool _IsThreadProvisioned(void);
     void _ErasePersistentInfo(void);
@@ -130,7 +130,7 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetSEDInt
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_RequestSEDActiveMode(bool onOff)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
