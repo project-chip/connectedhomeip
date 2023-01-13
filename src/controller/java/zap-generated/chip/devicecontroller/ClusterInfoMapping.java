@@ -6544,10 +6544,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(String setupPIN) {
+    public void onSuccess(String SetupPIN) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("setupPIN", "String");
-      responseValues.put(setupPINResponseValue, setupPIN);
+      CommandResponseInfo SetupPINResponseValue = new CommandResponseInfo("SetupPIN", "String");
+      responseValues.put(SetupPINResponseValue, SetupPIN);
       callback.onSuccess(responseValues);
     }
 
