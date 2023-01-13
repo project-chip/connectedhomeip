@@ -31,6 +31,28 @@ from typing import Tuple
 MIN_ZAP_VERSION = '2021.1.9'
 
 
+class ZapEnsureVersionCheckWorks:
+    """
+    Provides a scoped environment where ZAP_SKIP_REAL_VERSION is NOT set in
+    os.environ.
+
+    This is to help with zap version checking: version checking of development
+    zap only works when ZAP_SKIP_REAL_VERSION is not set.
+    """
+    def __init__(self):
+        self.real_version_skip = None
+
+    def __enter__(self):
+        self.real_version_skip = None
+        if 'ZAP_DEVELOPMENT_PATH' in os.environ:
+            if 'ZAP_SKIP_REAL_VERSION' in os.environ:
+                self.real_version_skip = os.environ['ZAP_SKIP_REAL_VERSION']
+                del(os.environ['ZAP_SKIP_REAL_VERSION'])
+
+    def __exit__(self, *args):
+        if self.real_version_skip is not None:
+           os.environ['ZAP_SKIP_REAL_VERSION'] = self.real_version_skip
+
 class ZapTool:
     def __init__(self):
         # Accepted environment variables, in order:
@@ -42,7 +64,11 @@ class ZapTool:
         if 'ZAP_DEVELOPMENT_PATH' in os.environ:
             self.zap_start = ['node', 'src-script/zap-start.js']
             self.working_directory = os.environ['ZAP_DEVELOPMENT_PATH']
-            # Make sure we don't try to munge the package.json in the ZAP repo.
+            # When using ZAP_DEVELOPMENT_PATH, we should generally not need to 
+            # setup a version (dirties the tree and conflicts with parallel 
+            # execution
+            # HOWEVER, if the intent is exactly to check the version, this should not be done
+            # and this set should be reverted
             os.environ['ZAP_SKIP_REAL_VERSION'] = '1'
         elif 'ZAP_INSTALL_PATH' in os.environ:
             self.zap_start = [os.path.join(
@@ -59,15 +85,18 @@ class ZapTool:
         try:
             version = ''
             version_re = re.compile(r'Version:\s*(\d+\.\d+\.\d+)')
-            for line in subprocess.check_output(self.zap_start + ['--version'], cwd=self.working_directory).splitlines():
-                try:
-                    m = version_re.match(line.decode('utf-8'))
-                    if m:
-                        version = m.group(1)
-                        break
-                except UnicodeDecodeError:
-                    # Version line will not be unicode ... skip over odd lines
-                    pass
+
+            with ZapEnsureVersionCheckWorks() as _:
+                for line in subprocess.check_output(self.zap_start + ['--version'], cwd=self.working_directory).splitlines():
+                    try:
+                        m = version_re.match(line.decode('utf-8'))
+                        if m:
+                            version = m.group(1)
+                            break
+                    except UnicodeDecodeError:
+                        # Version line will not be unicode ... skip over odd lines
+                        pass
+
             if not version:
                 print(
                     f"Failed to find `Version: ....` line from {self.zap_start} --version")
