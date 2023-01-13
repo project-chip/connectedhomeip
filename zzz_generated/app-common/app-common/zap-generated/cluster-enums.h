@@ -1934,7 +1934,7 @@ namespace PressureMeasurement {
 // Bitmap for PressureFeature
 enum class PressureFeature : uint32_t
 {
-    kExt = 0x1,
+    kExtended = 0x1,
 };
 } // namespace PressureMeasurement
 

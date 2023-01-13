@@ -1,5 +1,8 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +17,30 @@
  *    limitations under the License.
  */
 
-// This hack is needed because Ameba SDK is not linking against libstdc++ correctly.
+#pragma once
+
+// ---- Door lock Example App Config ----
+
+#define APP_TASK_NAME "Lock"
+
+// Time it takes in ms for the simulated actuator to move from one
+// state to another.
+#define ACTUATOR_MOVEMENT_PERIOS_MS 10
+
+// EFR Logging
+#ifdef __cplusplus
 extern "C" {
-void * __dso_handle = 0;
+#endif
+
+void silabsInitLog(void);
+
+void efr32Log(const char * aFormat, ...);
+#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
+void appError(int err);
+
+#ifdef __cplusplus
 }
+
+#include <lib/core/CHIPError.h>
+void appError(CHIP_ERROR error);
+#endif

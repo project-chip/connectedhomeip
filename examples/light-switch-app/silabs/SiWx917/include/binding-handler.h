@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,8 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-// This hack is needed because Ameba SDK is not linking against libstdc++ correctly.
-extern "C" {
-void * __dso_handle = 0;
-}
+#include "app-common/zap-generated/ids/Clusters.h"
+#include "app-common/zap-generated/ids/Commands.h"
+#include "lib/core/CHIPError.h"
+
+CHIP_ERROR InitBindingHandler();
+void SwitchWorkerFunction(intptr_t context);
+void BindingWorkerFunction(intptr_t context);
+
+struct BindingCommandData
+{
+    chip::EndpointId localEndpointId = 1;
+    chip::CommandId commandId;
+    chip::ClusterId clusterId;
+    bool isGroup = false;
+};

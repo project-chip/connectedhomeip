@@ -42,7 +42,6 @@ list(
     ${matter_example_path}//main/CHIPDeviceManager.cpp
     ${matter_example_path}//main/Globals.cpp
     ${matter_example_path}//main/LEDWidget.cpp
-    ${matter_example_path}//main/DsoHack.cpp
 
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
