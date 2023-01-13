@@ -76,6 +76,7 @@ CHIP_ERROR AttestationTrustStoreBridge::GetPaaCertFromJava(const chip::ByteSpan 
     JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/AttestationTrustStoreDelegate",
                                              attestationTrustStoreDelegateCls);
     VerifyOrReturnError(attestationTrustStoreDelegateCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    JniClass attestationTrustStoreDelegateJniCls(attestationTrustStoreDelegateCls);
 
     JniReferences::GetInstance().FindMethod(env, mAttestationTrustStoreDelegate, "getProductAttestationAuthorityCert", "([B)[B",
                                             &getProductAttestationAuthorityCertMethod);

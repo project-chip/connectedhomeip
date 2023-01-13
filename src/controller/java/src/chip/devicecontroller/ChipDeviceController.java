@@ -642,8 +642,8 @@ public class ChipDeviceController {
   /**
    * Extract skid from paa cert.
    *
-   * @param paaCert
-   * @return
+   * @param paaCert The product attestation authority (PAA) cert
+   * @return The subject key identifier (SKID)
    */
   public native byte[] extractSkidFromPaaCert(byte[] paaCert);
 

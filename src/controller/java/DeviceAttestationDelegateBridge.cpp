@@ -77,11 +77,14 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
             env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationCompletionCallback", completionCallbackCls);
         VerifyOrReturn(completionCallbackCls != nullptr,
                        ChipLogError(Controller, "Could not find device attestation completion callback class."));
+        JniClass completionCallbackJniCls(completionCallbackCls);
+
         jclass failureCallbackCls = nullptr;
         JniReferences::GetInstance().GetClassRef(
             env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationFailureCallback", failureCallbackCls);
         VerifyOrReturn(failureCallbackCls != nullptr,
                        ChipLogError(Controller, "Could not find device attestation failure callback class."));
+        JniClass failureCallbackJniCls(failureCallbackCls);
 
         if (env->IsInstanceOf(mDeviceAttestationDelegate, completionCallbackCls))
         {
