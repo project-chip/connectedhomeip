@@ -350,6 +350,13 @@ jobs:
                   scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-0.0-py3-none-any.whl'
                   scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
 
+            - name: Run Python Setup Payload Generator Test
+              timeout-minutes: 10
+              run: |
+                scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
+                scripts/run_in_build_env.sh 'pip3 install -r src/setup_payload/python/requirements.txt'
+                scripts/run_in_build_env.sh 'python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool'
+
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
         timeout-minutes: 200
