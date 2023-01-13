@@ -101,12 +101,12 @@ class TC_ACE_1_4(MatterBaseTest):
         self.print_step(1, "Commissioning, already done")
 
         self.print_step(2, "TH1 writes ACL all clusters view on all endpoints")
-        admin_acl = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kAdminister,
-                                                                      authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                                                                      authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                                                                       subjects=[],
                                                                       targets=[Clusters.AccessControl.Structs.Target(endpoint=0, cluster=Clusters.AccessControl.id)])
-        all_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
-                                                                     authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        all_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+                                                                     authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                                                                      subjects=[],
                                                                      targets=[])
         acl = [admin_acl, all_view]
@@ -122,9 +122,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_success()
 
         self.print_step(6, "TH1 writes ACL descriptor view all endpoints")
-        descriptor_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        descriptor_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(cluster=Clusters.Descriptor.id)])
 
@@ -141,9 +141,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_unsupported_access()
 
         self.print_step(10, "TH1 writes ACL PIXIT.ACE.APPCLUSTER view on all endpoints")
-        appcluster_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        appcluster_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(cluster=self.cluster.id)])
 
@@ -160,9 +160,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_success()
 
         self.print_step(14, "TH1 writes ACL descriptor view on PIXIT.ACE.APPENDPOINT")
-        descriptor_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        descriptor_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(endpoint=self.endpoint, cluster=Clusters.Descriptor.id)])
 
@@ -179,9 +179,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_unsupported_access()
 
         self.print_step(18, "TH1 writes ACL appcluster view on PIXIT.ACE.APPENDPOINT")
-        appcluster_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        appcluster_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(endpoint=self.endpoint, cluster=self.cluster.id)])
 
@@ -198,9 +198,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_success()
 
         self.print_step(22, "TH1 writes ACL all clusters view on PIXIT.ACE.APPENDPOINT")
-        allclusters_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        allclusters_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(endpoint=self.endpoint)])
 
@@ -217,9 +217,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_success()
 
         self.print_step(26, "TH1 writes ACL rootnode device type view on all endpoints")
-        rootnode_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        rootnode_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(deviceType=0x0016)])
 
@@ -236,9 +236,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_unsupported_access()
 
         self.print_step(30, "TH1 writes ACL PIXIT.ACE.APPDEVTYPE view on all endpoints")
-        appdevtype_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        appdevtype_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(deviceType=self.devtype)])
 
@@ -255,9 +255,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_success()
 
         self.print_step(34, "TH1 writes ACL descriptor cluster on appdevtype on all endpoints")
-        descriptor_appdevtype_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        descriptor_appdevtype_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(cluster=0x001d, deviceType=self.devtype)])
 
@@ -274,9 +274,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_unsupported_access()
 
         self.print_step(38, "TH1 writes ACL PIXIT.ACE.APPCLUSTER view on PIXIT.ACE.APPDEVTYPE")
-        appcluster_appdevtype_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        appcluster_appdevtype_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(cluster=self.cluster.id, deviceType=self.devtype)])
 
@@ -293,9 +293,9 @@ class TC_ACE_1_4(MatterBaseTest):
         await self.read_appcluster_expect_success()
 
         self.print_step(42, "TH1 writes ACL multi-target view")
-        multitarget_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        multitarget_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
             targets=[Clusters.AccessControl.Structs.Target(cluster=Clusters.Descriptor.id, endpoint=0),
                      Clusters.AccessControl.Structs.Target(cluster=self.cluster.id, endpoint=self.endpoint)])
@@ -329,9 +329,9 @@ class TC_ACE_1_4(MatterBaseTest):
         self.check_read_success(appcluster_wildcard, self.endpoint, self.cluster, self.attribute)
 
         self.print_step(48, "TH1 resets ACL")
-        descriptor_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntry(
-            privilege=Clusters.AccessControl.Enums.Privilege.kView,
-            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+        descriptor_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[self.matter_test_config.controller_node_id],
             targets=[])
 
