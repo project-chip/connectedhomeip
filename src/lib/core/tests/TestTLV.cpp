@@ -26,9 +26,9 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include <lib/core/CHIPCircularTLVBuffer.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
+#include <lib/core/TLVCircularBuffer.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
@@ -2278,7 +2278,7 @@ void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
     ReadEncoding1(inSuite, reader);
 }
 
-CHIP_ERROR CountEvictedMembers(CHIPCircularTLVBuffer & inBuffer, void * inAppData, TLVReader & inReader)
+CHIP_ERROR CountEvictedMembers(TLVCircularBuffer & inBuffer, void * inAppData, TLVReader & inReader)
 {
     TestTLVContext * context = static_cast<TestTLVContext *>(inAppData);
     CHIP_ERROR err;
@@ -2307,7 +2307,7 @@ void CheckCircularTLVBufferSimple(nlTestSuite * inSuite, void * inContext)
     CircularTLVWriter writer;
     CircularTLVReader reader;
     TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
-    CHIPCircularTLVBuffer buffer(backingStore, 30);
+    TLVCircularBuffer buffer(backingStore, 30);
     writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
@@ -2357,7 +2357,7 @@ void CheckCircularTLVBufferStartMidway(nlTestSuite * inSuite, void * inContext)
     CircularTLVWriter writer;
     CircularTLVReader reader;
     TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
-    CHIPCircularTLVBuffer buffer(backingStore, 30, &(backingStore[15]));
+    TLVCircularBuffer buffer(backingStore, 30, &(backingStore[15]));
     writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
@@ -2408,7 +2408,7 @@ void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite * inSuite, void * in
     uint8_t backingStore[30];
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    CHIPCircularTLVBuffer buffer(backingStore, 30);
+    TLVCircularBuffer buffer(backingStore, 30);
     writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
@@ -2470,8 +2470,8 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
     CircularTLVReader reader;
     TLVWriter writer1;
 
-    CHIPCircularTLVBuffer buffer(backingStore, sizeof(backingStore));
-    CHIPCircularTLVBuffer buffer1(backingStore1, sizeof(backingStore1));
+    TLVCircularBuffer buffer(backingStore, sizeof(backingStore));
+    TLVCircularBuffer buffer1(backingStore1, sizeof(backingStore1));
     writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
@@ -2703,7 +2703,7 @@ void CheckTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     uint8_t backingStore[bufsize];
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    CHIPCircularTLVBuffer buffer(backingStore, bufsize);
+    TLVCircularBuffer buffer(backingStore, bufsize);
     size_t num     = 1;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -2797,7 +2797,7 @@ void CheckTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
     // Any pair of reader and writer would work here, either PacketBuffer based or CircularTLV based.
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    CHIPCircularTLVBuffer buffer(backingStore, bufsize);
+    TLVCircularBuffer buffer(backingStore, bufsize);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     writer.Init(buffer);

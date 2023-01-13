@@ -26,16 +26,16 @@ tests:
 
     - label: "Read attribute MeasuredValue"
       wait: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
 
     - label: "Read attribute MinMeasuredValue"
       wait: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
 
     - label: "Read attribute MaxMeasuredValue"
       wait: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
 
     - label: "Read attribute Tolerance"
       wait: "readAttribute"
-      attribute: "tolerance"
+      attribute: "Tolerance"
