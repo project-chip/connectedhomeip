@@ -102,13 +102,13 @@ class TC_ACE_1_4(MatterBaseTest):
 
         self.print_step(2, "TH1 writes ACL all clusters view on all endpoints")
         admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                                                                      authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                                                                      subjects=[],
-                                                                      targets=[Clusters.AccessControl.Structs.Target(endpoint=0, cluster=Clusters.AccessControl.id)])
+                                                                            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                                                                            subjects=[],
+                                                                            targets=[Clusters.AccessControl.Structs.Target(endpoint=0, cluster=Clusters.AccessControl.id)])
         all_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-                                                                     authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                                                                     subjects=[],
-                                                                     targets=[])
+                                                                           authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                                                                           subjects=[],
+                                                                           targets=[])
         acl = [admin_acl, all_view]
         await self.write_acl(acl)
 
