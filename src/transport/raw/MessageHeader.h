@@ -326,6 +326,12 @@ public:
         return *this;
     }
 
+    /**
+     * Returns a pointer to the start of the privacy header
+     * given a pointer to the start of the message.
+     */
+    uint8_t * PrivacyHeader(uint8_t * msgBuf) const { return msgBuf + PacketHeader::kPrivacyHeaderOffset; }
+
     size_t PrivacyHeaderLength() const
     {
         size_t length = kPrivacyHeaderMinLength;

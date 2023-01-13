@@ -759,15 +759,16 @@ void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, c
  * Helper function to implement a single attempt to decrypt a groupcast message
  * using the given group key and privacy setting.
  *
- * @param[in] packetHeader
- * @param[out] packetHeaderCopy
- * @param[out] payloadHeader
- * @param[in] applyPrivacy
- * @param[out] msgCopy
- * @param[in] mac
- * @param[in] groupContext
- * @return true
- * @return false
+ * @param[in] packetHeader The partial packet header of the non-obfuscated fields of the message header
+ * @param[out] packetHeaderCopy A copy of the packet header, to be filled with privacy decrypted fields
+ * @param[out] payloadHeader The payload header of the decrypted message
+ * @param[in] applyPrivacy Whether to apply privacy deobfuscation
+ * @param[out] msgCopy A copy of the message, to be filled with the decrypted message
+ * @param[in] mac The MAC of the message
+ * @param[in] groupContext The group context to use for decryption key material
+ *
+ * @return true if the message was decrypted successfully
+ * @return false if the message could not be decrypted
  */
 static bool GroupKeyDecryptAttempt(PacketHeader & packetHeader, PacketHeader & packetHeaderCopy, PayloadHeader & payloadHeader,
                                    bool applyPrivacy, System::PacketBufferHandle & msgCopy, MessageAuthenticationCode & mac,
@@ -779,7 +780,7 @@ static bool GroupKeyDecryptAttempt(PacketHeader & packetHeader, PacketHeader & p
     if (applyPrivacy)
     {
         // Perform privacy deobfuscation, if applicable.
-        uint8_t * privacyHeader = msgCopy->Start() + PacketHeader::kPrivacyHeaderOffset;
+        uint8_t * privacyHeader = packetHeader.PrivacyHeader(msgCopy->Start());
         size_t privacyLength    = packetHeader.PrivacyHeaderLength();
         if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac))
         {
