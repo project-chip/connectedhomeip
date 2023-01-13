@@ -24,16 +24,18 @@ namespace app {
 
 class GenericReadHandlerCallback : public ReadHandler::ApplicationCallback
 {
-     CHIP_ERROR OnSubscriptionRequested(ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession)  override
-     {
+    CHIP_ERROR OnSubscriptionRequested(ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession) override
+    {
         uint16_t interval_u16 = 0;
-        uint32_t interval_u32 = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL.count() / 1000; 
+        uint32_t interval_u32 = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL.count() / 1000;
 
         // Avoid overflow when converting to uint16_t
-        interval_u32 = interval_u32 > std::numeric_limits<std::uint16_t>::max() ? std::numeric_limits<std::uint16_t>::max() : interval_u32;
+        interval_u32 =
+            interval_u32 > std::numeric_limits<std::uint16_t>::max() ? std::numeric_limits<std::uint16_t>::max() : interval_u32;
 
         interval_u16 = static_cast<uint16_t>(interval_u32);
-        interval_u16 = interval_u16 > kSubscriptionMaxIntervalPublisherLimit ? kSubscriptionMaxIntervalPublisherLimit : interval_u16;
+        interval_u16 =
+            interval_u16 > kSubscriptionMaxIntervalPublisherLimit ? kSubscriptionMaxIntervalPublisherLimit : interval_u16;
 
         aReadHandler.SetReportingIntervals(interval_u16);
 
@@ -41,5 +43,5 @@ class GenericReadHandlerCallback : public ReadHandler::ApplicationCallback
     }
 };
 
-} // app
-} // chip
+} // namespace app
+} // namespace chip
