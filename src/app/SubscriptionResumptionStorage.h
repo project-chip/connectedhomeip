@@ -101,7 +101,7 @@ public:
     struct SubscriptionIndex
     {
         size_t mSize;
-        ScopedNodeId mNodes[CHIP_IM_MAX_NUM_SUBSCRIPTIONS];
+        std::unique_ptr<ScopedNodeId[]> mNodes = std::make_unique<ScopedNodeId[]>(CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
     };
 
     virtual ~SubscriptionResumptionStorage(){};
