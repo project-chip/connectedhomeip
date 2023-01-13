@@ -87,8 +87,8 @@ struct CommonAttributeAccessInterface : public chip::app::AttributeAccessInterfa
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, TLV::TLVWriter & writer);
 
-    void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath);
-    void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful);
+    void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override;
+    void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override;
 };
 
 CommonCluster * CommonAttributeAccessInterface::FindCluster(const chip::app::ConcreteClusterPath & path)
