@@ -96,17 +96,9 @@ public final class CommandManager {
     // need skip over binary and command name and only get arguments
     String[] temp = Arrays.copyOfRange(args, 2, args.length);
 
-    try {
-      command.initArguments(temp.length, temp);
-      command.run();
-    } catch (IllegalArgumentException e) {
-      System.out.println("Run command failed with exception: " + e.getMessage());
-      showCommand(args[0], command);
-      throw e;
-    } catch (Exception e) {
-      logger.log(Level.INFO, "Run command failed with exception: " + e.getMessage());
-      throw e;
-    }
+    command.initArguments(temp.length, temp);
+    showCommand(args[0], command);
+    command.run();
   }
 
   private boolean isAttributeCommand(String commandName) {
