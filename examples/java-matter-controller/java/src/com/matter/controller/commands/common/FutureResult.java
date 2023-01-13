@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * raised.
  */
 public class FutureResult {
-  private Optional<RealResult> realResult;
+  private Optional<RealResult> realResult = Optional.empty();
   private long timeoutMs = 0;
   private static Logger logger = Logger.getLogger(FutureResult.class.getName());
 
