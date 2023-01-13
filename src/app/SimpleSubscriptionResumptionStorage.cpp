@@ -202,7 +202,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::FindByScopedNodeId(ScopedNodeId 
         if (pathCount)
         {
             subscriptions.mSubscriptions[i].mAttributePaths.Calloc(pathCount);
-            for (uint8_t j = 0; j < pathCount; j++)
+            for (uint16_t j = 0; j < pathCount; j++)
             {
                 ReturnErrorOnFailure(reader.Next(kEndpointIdTag));
                 ReturnErrorOnFailure(reader.Get(subscriptions.mSubscriptions[i].mAttributePaths[j].mEndpointId));
@@ -224,7 +224,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::FindByScopedNodeId(ScopedNodeId 
         if (pathCount)
         {
             subscriptions.mSubscriptions[i].mEventPaths.Calloc(pathCount);
-            for (uint8_t j = 0; j < pathCount; j++)
+            for (uint16_t j = 0; j < pathCount; j++)
             {
                 EventPathType eventPathType;
                 ReturnErrorOnFailure(reader.Next(kPathTypeTag));
@@ -423,30 +423,29 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Delete(const SubscriptionInfo & 
     {
         if (subscriptions.mSize)
         {
+            ChipLogProgress(DataManagement, "JEFFTEST:  - save smaller set");
             return SaveSubscriptions(subscriptionNode, subscriptions);
         }
-        else
-        {
-            // Remove node from index
-            SubscriptionIndex subscriptionIndex;
-            LoadIndex(subscriptionIndex);
-            for (size_t i = 0; i < subscriptionIndex.mSize; i++)
-            {
-                if (subscriptionNode == subscriptionIndex.mNodes[i])
-                {
-                    subscriptionIndex.mSize--;
-                    // if not last element, move last element here, essentially deleting this
-                    if (i < subscriptionIndex.mSize)
-                    {
-                        subscriptionIndex.mNodes[i] = std::move(subscriptionIndex.mNodes[subscriptionIndex.mSize]);
-                    }
-                    break;
-                }
-            }
-            SaveIndex(subscriptionIndex);
 
-            return mStorage->SyncDeleteKeyValue(GetStorageKey(subscriptionNode).KeyName());
+        // Remove node from index
+        SubscriptionIndex subscriptionIndex;
+        LoadIndex(subscriptionIndex);
+        for (size_t i = 0; i < subscriptionIndex.mSize; i++)
+        {
+            if (subscriptionNode == subscriptionIndex.mNodes[i])
+            {
+                subscriptionIndex.mSize--;
+                // if not last element, move last element here, essentially deleting this
+                if (i < subscriptionIndex.mSize)
+                {
+                    subscriptionIndex.mNodes[i] = std::move(subscriptionIndex.mNodes[subscriptionIndex.mSize]);
+                }
+                break;
+            }
         }
+        SaveIndex(subscriptionIndex);
+
+        return mStorage->SyncDeleteKeyValue(GetStorageKey(subscriptionNode).KeyName());
     }
 
     return CHIP_NO_ERROR;
