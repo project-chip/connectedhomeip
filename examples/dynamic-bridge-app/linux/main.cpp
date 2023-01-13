@@ -222,9 +222,9 @@ CHIP_ERROR TLVWriteValue(chip::TLV::TLVWriter & wr, const T & v)
 
 CHIP_ERROR WriteValueToBuffer(const bool & value, chip::Span<uint8_t> buffer)
 {
-    if (buffer.size() == 0)
+    if (buffer.size() != 1)
     {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     *(buffer.data()) = value ? 1 : 0;
     return CHIP_NO_ERROR;
@@ -234,9 +234,9 @@ template <typename T>
 CHIP_ERROR WriteValueToBuffer(const T & value, chip::Span<uint8_t> buffer)
 {
     size_t value_size = sizeof(value);
-    if (buffer.size() < value_size)
+    if (buffer.size() != value_size)
     {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     memcpy(buffer.data(), &value, value_size);
     return CHIP_NO_ERROR;
