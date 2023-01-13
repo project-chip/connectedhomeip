@@ -2,7 +2,7 @@ package com.google.chip.chiptool.setuppayloadscanner
 
 import android.os.Parcelable
 import chip.setuppayload.OptionalQRCodeInfo.OptionalQRCodeInfoType
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize data class QrCodeInfo(
     val tag: Int,
