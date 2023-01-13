@@ -86,10 +86,6 @@ private:
     static void FunctionHandler(const AppEvent & event);
     static void StartBLEAdvertisementAndLightActionEventHandler(const AppEvent & event);
 
-#ifdef CONFIG_MCUMGR_SMP_BT
-    static void RequestSMPAdvertisingStart(void);
-#endif
-
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
     PWMDevice mPWMDevice;

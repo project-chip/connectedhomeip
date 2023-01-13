@@ -127,9 +127,7 @@ config BT_DEVICE_NAME_MAX
     default 15
 
 config BT_MAX_CONN
-    default 2 # a workaround for non-unreferenced BLE connection object
-              # when restaring the BLE advertising in disconnect callback
-              # TODO: analyze and revert to 1 if proper fix exists
+    default 1
 
 config BT_L2CAP_TX_MTU
     default 247

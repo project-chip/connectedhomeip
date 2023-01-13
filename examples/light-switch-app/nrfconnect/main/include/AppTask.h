@@ -84,10 +84,6 @@ private:
     static void StartTimer(Timer, uint32_t);
     static void CancelTimer(Timer);
 
-#ifdef CONFIG_MCUMGR_SMP_BT
-    static void RequestSMPAdvertisingStart(void);
-#endif
-
     FunctionEvent mFunction = FunctionEvent::NoneSelected;
 
 #if CONFIG_CHIP_FACTORY_DATA
