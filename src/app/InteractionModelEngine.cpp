@@ -1590,6 +1590,8 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     CHIP_ERROR err = mpSubscriptionResumptionStorage->LoadIndex(subscriberIndex);
     ChipLogProgress(InteractionModel, "%u subscriber nodes to resume.. (error %" CHIP_ERROR_FORMAT ")",
                     static_cast<unsigned>(subscriberIndex.mSize), err.Format());
+    ReturnErrorOnFailure(err);
+
     for (size_t i = 0; i < subscriberIndex.mSize; i++)
     {
         SubscriptionResumptionStorage::SubscriptionList subscriptions;
@@ -1599,6 +1601,8 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
         ChipLogProgress(
             InteractionModel, "\tNode " ChipLogFormatScopedNodeId ": Loaded %u subscriptions.. (error %" CHIP_ERROR_FORMAT ")",
             ChipLogValueScopedNodeId(subscriberIndex.mNodes[i]), static_cast<unsigned>(subscriptions.mSize), err.Format());
+
+        ReturnErrorOnFailure(err);
 
         for (size_t j = 0; j < subscriptions.mSize; j++)
         {

@@ -88,10 +88,10 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::LoadIndex(SubscriptionIndex & in
 
     uint16_t len = static_cast<uint16_t>(MaxIndexSize());
 
+    index.mSize = 0;
     if (mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName(), backingBuffer.Get(), len) !=
         CHIP_NO_ERROR)
     {
-        index.mSize = 0;
         return CHIP_NO_ERROR;
     }
 
