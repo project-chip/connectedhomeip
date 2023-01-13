@@ -116,9 +116,9 @@ def version_update(log_level, new_version):
                 if version == new_version:
                     logging.warning("Nothing to replace. Version already %s", version)
                     break
-                file_data = file_data[:m.start()] + new_version + file_data[m.end()+1:]
+                file_data = file_data[:m.start()] + new_version + file_data[m.end():]
                 need_replace = True
-                search_pos = m.end()
+                search_pos = m.end() # generally ok since our versions are fixed length
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
 
             if need_replace:
