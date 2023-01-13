@@ -706,6 +706,10 @@ namespace CapabilityMinima {
 static constexpr AttributeId Id = 0x00000013;
 } // namespace CapabilityMinima
 
+namespace ProductAppearance {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace ProductAppearance
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
