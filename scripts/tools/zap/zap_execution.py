@@ -22,12 +22,9 @@ from typing import Tuple
 # Since this is ordered as such, alphabetical sorting will be used to check
 # validity
 #
-# This version MUST be changed together with `${ZAP_VERSION}` in
-#    - integrations/docker/images/chip-build/Dockerfile
+# Use scripts/tools/zap/version_update.py to manage ZAP versioning as many
+# files may need updating for versions
 #
-# Potentially also change:
-#    - integrations/docker/images/chip-cert-bins/Dockerfile (in case new cert
-#      binaries also require a zap update)
 MIN_ZAP_VERSION = '2021.1.9'
 
 
