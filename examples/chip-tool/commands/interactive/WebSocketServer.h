@@ -18,4 +18,14 @@
 
 #pragma once
 
-#define LWS_HAVE_SYS_RESOURCE_H
+#include "WebSocketServerDelegate.h"
+
+#include <lib/core/Optional.h>
+#include <lib/support/CHIPMem.h>
+#include <libwebsockets.h>
+
+class WebSocketServer
+{
+public:
+    CHIP_ERROR Run(chip::Optional<uint16_t> port, WebSocketServerDelegate * delegate);
+};

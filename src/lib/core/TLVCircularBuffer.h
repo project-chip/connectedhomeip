@@ -42,23 +42,23 @@ namespace chip {
 namespace TLV {
 
 /**
- * @class CHIPCircularTLVBuffer
+ * @class TLVCircularBuffer
  *
  * @brief
- *    CHIPCircularTLVBuffer provides circular storage for the
+ *    TLVCircularBuffer provides circular storage for the
  *    chip::TLV::TLVWriter and chip::TLVTLVReader.  chip::TLV::TLVWriter is able to write an
- *    unbounded number of TLV entries to the CHIPCircularTLVBuffer
+ *    unbounded number of TLV entries to the TLVCircularBuffer
  *    as long as each individual TLV entry fits entirely within the
  *    provided storage.  The chip::TLV::TLVReader will read at most the size of
  *    the buffer, but will accommodate the wraparound within the
  *    buffer.
  *
  */
-class DLL_EXPORT CHIPCircularTLVBuffer : public chip::TLV::TLVBackingStore
+class DLL_EXPORT TLVCircularBuffer : public chip::TLV::TLVBackingStore
 {
 public:
-    CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength);
-    CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength, uint8_t * inHead);
+    TLVCircularBuffer(uint8_t * inBuffer, uint32_t inBufferLength);
+    TLVCircularBuffer(uint8_t * inBuffer, uint32_t inBufferLength, uint8_t * inHead);
 
     void Init(uint8_t * inBuffer, uint32_t inBufferLength);
     inline uint8_t * QueueHead() const { return mQueueHead; }
@@ -78,10 +78,10 @@ public:
     CHIP_ERROR FinalizeBuffer(TLVWriter & ioWriter, uint8_t * inBufStart, uint32_t inBufLen) override;
 
     /**
-     *  @typedef CHIP_ERROR (*ProcessEvictedElementFunct)(CHIPCircularTLVBuffer &inBuffer, void * inAppData, TLVReader &inReader)
+     *  @typedef CHIP_ERROR (*ProcessEvictedElementFunct)(TLVCircularBuffer &inBuffer, void * inAppData, TLVReader &inReader)
      *
      *  A function that is called to process a TLV element prior to it
-     *  being evicted from the chip::TLV::CHIPCircularTLVBuffer
+     *  being evicted from the chip::TLV::TLVCircularBuffer
      *
      *  Functions of this type are used to process a TLV element about
      *  to be evicted from the buffer.  The function will be given a
@@ -89,14 +89,14 @@ public:
      *  well as void * context where the user may have provided
      *  additional environment for the callback.  If the function
      *  processed the element successfully, it must return
-     *  #CHIP_NO_ERROR ; this signifies to the CHIPCircularTLVBuffer
+     *  #CHIP_NO_ERROR ; this signifies to the TLVCircularBuffer
      *  that the element may be safely evicted.  Any other return
      *  value is treated as an error and will prevent the
-     *  #CHIPCircularTLVBuffer from evicting the element under
+     *  #TLVCircularBuffer from evicting the element under
      *  consideration.
      *
      *  Note: This callback may be used to force
-     *  CHIPCircularTLVBuffer to not evict the element.  This may be
+     *  TLVCircularBuffer to not evict the element.  This may be
      *  useful in a number of circumstances, when it is desired to
      *  have an underlying circular buffer, but not to override any
      *  elements within it.
@@ -119,7 +119,7 @@ public:
      *                       triggered this element eviction will
      *                       fail.
      */
-    typedef CHIP_ERROR (*ProcessEvictedElementFunct)(CHIPCircularTLVBuffer & inBuffer, void * inAppData, TLVReader & inReader);
+    typedef CHIP_ERROR (*ProcessEvictedElementFunct)(TLVCircularBuffer & inBuffer, void * inAppData, TLVReader & inReader);
 
     uint32_t mImplicitProfileId;
     void * mAppData; /**< An optional, user supplied context to be used with the callback processing the evicted element. */
@@ -140,17 +140,17 @@ class DLL_EXPORT CircularTLVReader : public TLVReader
 public:
     /**
      * @brief
-     *   Initializes a TLVReader object to read from a single CHIPCircularTLVBuffer
+     *   Initializes a TLVReader object to read from a single TLVCircularBuffer
      *
      * Parsing begins at the start of the buffer (obtained by the
      * buffer->Start() position) and continues until the end of the buffer
      * Parsing may wraparound within the buffer (on any element).  At most
      * buffer->GetQueueSize() bytes are read out.
      *
-     * @param[in]    buf   A pointer to a fully initialized CHIPCircularTLVBuffer
+     * @param[in]    buf   A pointer to a fully initialized TLVCircularBuffer
      *
      */
-    void Init(CHIPCircularTLVBuffer & buf) { TLVReader::Init(buf, buf.DataLength()); }
+    void Init(TLVCircularBuffer & buf) { TLVReader::Init(buf, buf.DataLength()); }
 };
 
 class DLL_EXPORT CircularTLVWriter : public TLVWriter
@@ -158,7 +158,7 @@ class DLL_EXPORT CircularTLVWriter : public TLVWriter
 public:
     /**
      * @brief
-     *   Initializes a TLVWriter object to write from a single CHIPCircularTLVBuffer
+     *   Initializes a TLVWriter object to write from a single TLVCircularBuffer
      *
      * Writing begins at the last byte of the buffer.  The number of bytes
      * to be written is not constrained by the underlying circular buffer:
@@ -168,10 +168,10 @@ public:
      * 7 byte buffer will work indefinitely, but writing an 8-byte TLV
      * structure will result in an error.
      *
-     * @param[in]    buf   A pointer to a fully initialized CHIPCircularTLVBuffer
+     * @param[in]    buf   A pointer to a fully initialized TLVCircularBuffer
      *
      */
-    void Init(CHIPCircularTLVBuffer & buf) { TLVWriter::Init(buf, UINT32_MAX); }
+    void Init(TLVCircularBuffer & buf) { TLVWriter::Init(buf, UINT32_MAX); }
 };
 
 } // namespace TLV
