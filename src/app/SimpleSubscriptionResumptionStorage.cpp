@@ -105,7 +105,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::LoadIndex(SubscriptionIndex & in
     CHIP_ERROR err;
     while ((err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
-        if (count >= ArraySize(index.mNodes))
+        if (count >= CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
         {
             return CHIP_ERROR_NO_MEMORY;
         }
