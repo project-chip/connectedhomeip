@@ -179,13 +179,10 @@ RUN set -x \
 # Install a known ZAP release
 # Only keep the cli version, since `zap` is 143MB and not usable (UI)
 #
-# If you change this, make sure you also change (once used)
-#   - scripts/tools/zap/zap_execution.py
-#   - .github/workflows/build.yaml
-#   - .github/workflows/darwin-tests.yaml
-#   - .github/workflows/darwin.yaml
-#   - .github/workflows/fuzzing-build.yaml
-#   - .github/workflows/tests.yaml
+# NOTE: zap version occurs in several files (CI and docker)
+#       for a uniform update, a separate update script exists:
+#
+#       scripts/tools/zap/version_update.py
 ENV ZAP_VERSION=v2023.01.09-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
