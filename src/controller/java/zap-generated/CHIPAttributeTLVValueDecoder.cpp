@@ -3100,6 +3100,56 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                    value_caseSessionsPerFabric, value_subscriptionsPerFabric);
             return value;
         }
+        case Attributes::ProductAppearance::Id: {
+            using TypeInfo = Attributes::ProductAppearance::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            jobject value_finish;
+            std::string value_finishClassName     = "java/lang/Integer";
+            std::string value_finishCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_finishClassName.c_str(),
+                                                                          value_finishCtorSignature.c_str(),
+                                                                          static_cast<uint8_t>(cppValue.finish), value_finish);
+            jobject value_primaryColor;
+            if (cppValue.primaryColor.IsNull())
+            {
+                value_primaryColor = nullptr;
+            }
+            else
+            {
+                std::string value_primaryColorClassName     = "java/lang/Integer";
+                std::string value_primaryColorCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    value_primaryColorClassName.c_str(), value_primaryColorCtorSignature.c_str(),
+                    static_cast<uint8_t>(cppValue.primaryColor.Value()), value_primaryColor);
+            }
+
+            jclass productAppearanceStructStructClass_0;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$BasicInformationClusterProductAppearanceStruct",
+                productAppearanceStructStructClass_0);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$BasicInformationClusterProductAppearanceStruct");
+                return nullptr;
+            }
+            jmethodID productAppearanceStructStructCtor_0 =
+                env->GetMethodID(productAppearanceStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            if (productAppearanceStructStructCtor_0 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$BasicInformationClusterProductAppearanceStruct constructor");
+                return nullptr;
+            }
+
+            value = env->NewObject(productAppearanceStructStructClass_0, productAppearanceStructStructCtor_0, value_finish,
+                                   value_primaryColor);
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -8787,6 +8837,57 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             jobject value;
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
+            return value;
+        }
+        case Attributes::ProductAppearance::Id: {
+            using TypeInfo = Attributes::ProductAppearance::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            jobject value_finish;
+            std::string value_finishClassName     = "java/lang/Integer";
+            std::string value_finishCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_finishClassName.c_str(),
+                                                                          value_finishCtorSignature.c_str(),
+                                                                          static_cast<uint8_t>(cppValue.finish), value_finish);
+            jobject value_primaryColor;
+            if (cppValue.primaryColor.IsNull())
+            {
+                value_primaryColor = nullptr;
+            }
+            else
+            {
+                std::string value_primaryColorClassName     = "java/lang/Integer";
+                std::string value_primaryColorCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    value_primaryColorClassName.c_str(), value_primaryColorCtorSignature.c_str(),
+                    static_cast<uint8_t>(cppValue.primaryColor.Value()), value_primaryColor);
+            }
+
+            jclass productAppearanceStructStructClass_0;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$BridgedDeviceBasicInformationClusterProductAppearanceStruct",
+                productAppearanceStructStructClass_0);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$BridgedDeviceBasicInformationClusterProductAppearanceStruct");
+                return nullptr;
+            }
+            jmethodID productAppearanceStructStructCtor_0 =
+                env->GetMethodID(productAppearanceStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            if (productAppearanceStructStructCtor_0 == nullptr)
+            {
+                ChipLogError(Zcl,
+                             "Could not find ChipStructs$BridgedDeviceBasicInformationClusterProductAppearanceStruct constructor");
+                return nullptr;
+            }
+
+            value = env->NewObject(productAppearanceStructStructClass_0, productAppearanceStructStructCtor_0, value_finish,
+                                   value_primaryColor);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
