@@ -51,7 +51,7 @@
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -78,7 +78,7 @@
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -105,7 +105,7 @@
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@
     512, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    516, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
+    516, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
@@ -143,7 +143,7 @@
     32, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     27, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     28, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    1, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
+    1, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -161,7 +161,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
