@@ -64,6 +64,7 @@ FILES_DEPENDING_ON_ZAP_VERSION = [
 #
 # That line is of the form "MIN_ZAP_VERSION = '2021.1.9'"
 ZAP_EXECUTION_SCRIPT = 'scripts/tools/zap/zap_execution.py'
+ZAP_EXECUTION_MIN_RE = re.compile(r'(MIN_ZAP_VERSION = .)(\d\d\d\d\.\d\d?\.\d\d?)(.)')
 
 CHIP_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
@@ -118,7 +119,7 @@ def version_update(log_level, new_version):
                     break
                 file_data = file_data[:m.start()] + new_version + file_data[m.end():]
                 need_replace = True
-                search_pos = m.end() # generally ok since our versions are fixed length
+                search_pos = m.end()  # generally ok since our versions are fixed length
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
 
             if need_replace:
@@ -126,7 +127,20 @@ def version_update(log_level, new_version):
 
                 with open(os.path.join(CHIP_ROOT_DIR, name), 'wt') as f:
                     f.write(file_data)
-            # FIXME
+
+    # Finally, check zap_execution for any version update
+    with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'rt') as f:
+        file_data = f.read()
+
+    m = ZAP_EXECUTION_MIN_RE.search(file_data)
+    logging.info("Min version %s in %s", m.group(2), ZAP_EXECUTION_SCRIPT)
+    if new_version:
+        new_min_version = ("%d.%d.%d" % zap_min_version)
+        file_data = file_data[:m.start()] + m.group(1) + new_min_version + m.group(3) + file_data[m.end():]
+        logging.info('Updating min version to %s in %s', new_min_version, ZAP_EXECUTION_SCRIPT)
+
+        with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'wt') as f:
+            f.write(file_data)
 
 
 if __name__ == '__main__':
