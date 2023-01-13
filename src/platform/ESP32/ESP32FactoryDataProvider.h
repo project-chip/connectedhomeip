@@ -32,7 +32,7 @@ class ESP32FactoryDataProvider : public CommissionableDataProvider,
                                  public Credentials::DeviceAttestationCredentialsProvider
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     ,
-                                 public Internal::GenericDeviceInstanceInfoProvider<Internal::ESP32Config>
+                                 public DeviceInstanceInfoProvider
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 {
 public:
@@ -40,8 +40,8 @@ public:
         CommissionableDataProvider(), Credentials::DeviceAttestationCredentialsProvider()
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
         ,
-        Internal::GenericDeviceInstanceInfoProvider<Internal::ESP32Config>(ConfigurationManagerImpl::GetDefaultInstance())
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+        DeviceInstanceInfoProvider()
+#endif
     {}
 
     // ===== Members functions that implement the CommissionableDataProvider
@@ -70,6 +70,10 @@ public:
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 };
 
