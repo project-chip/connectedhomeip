@@ -1437,7 +1437,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     uint8_t buffer[1024];
     writer.Init(buffer, sizeof(buffer));
 
-    CHIP_ERROR error = originalData.Encode(writer, chip::TLV::Tag(1));
+    CHIP_ERROR error = originalData.Encode(writer, chip::TLV::CommonTag(1));
     if (error != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Error: Data encoding failed: %s", error.AsString());
         return nil;
@@ -1456,8 +1456,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
         return nil;
     }
     __auto_type tag = reader.GetTag();
-    if (tag != chip::TLV::Tag(1)) {
-        MTR_LOG_ERROR("Error: TLV reader did not read the tag correctly: %llu", tag.mVal);
+    if (tag != chip::TLV::CommonTag(1)) {
+        MTR_LOG_ERROR("Error: TLV reader did not read the tag correctly: %x.%u", chip::TLV::ProfileIdFromTag(tag),
+            chip::TLV::TagNumFromTag(tag));
         return nil;
     }
     MTRDataValueDictionaryDecodableType decodedData;

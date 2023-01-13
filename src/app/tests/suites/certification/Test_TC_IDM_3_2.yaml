@@ -301,7 +301,7 @@ tests:
 
           ./chip-tool any read-by-id 0x0204 0 1 1
           [1655201353.941835][3634:3639] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 263686993
-          [1655201353.941926][3634:3639] CHIP:TOO: temperature display mode: 1
+          [1655201353.941926][3634:3639] CHIP:TOO: TemperatureDisplayMode: 1
           [1655201353.942030][3634:3639] CHIP:EM: Sending Standalone Ack for MessageCounter:58103180 on exchange 16578i
       disabled: true
 

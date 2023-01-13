@@ -39,6 +39,25 @@ public:
     ~OnOffCluster() {}
 };
 
+class DLL_EXPORT LocalizationConfigurationCluster : public ClusterBase
+{
+public:
+    LocalizationConfigurationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                     EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::LocalizationConfiguration::Id, endpoint)
+    {}
+    ~LocalizationConfigurationCluster() {}
+};
+
+class DLL_EXPORT UnitLocalizationCluster : public ClusterBase
+{
+public:
+    UnitLocalizationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::UnitLocalization::Id, endpoint)
+    {}
+    ~UnitLocalizationCluster() {}
+};
+
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:

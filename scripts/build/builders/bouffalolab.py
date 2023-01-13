@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import platform
-import logging
 from enum import Enum, auto
 
 from .gn import GnBuilder
@@ -89,7 +89,8 @@ class BouffalolabBuilder(GnBuilder):
 
         self.argsOpt = []
         self.chip_name = bouffalo_chip
-        toolchain = os.path.join(root, '../../examples/platform/bouffalolab/common/toolchain')
+
+        toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/bouffalolab/toolchain')
         toolchain = 'custom_toolchain="{}:riscv_gcc"'.format(toolchain)
         if toolchain:
             self.argsOpt.append(toolchain)

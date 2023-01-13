@@ -319,7 +319,8 @@
 
 // Commands for cluster: Client Monitoring
 #define ZCL_REGISTER_CLIENT_MONITORING_COMMAND_ID (0x00)
-#define ZCL_STAY_AWAKE_REQUEST_COMMAND_ID (0x01)
+#define ZCL_UNREGISTER_CLIENT_MONITORING_COMMAND_ID (0x01)
+#define ZCL_STAY_AWAKE_REQUEST_COMMAND_ID (0x02)
 
 // Commands for cluster: Unit Testing
 #define ZCL_TEST_COMMAND_ID (0x00)

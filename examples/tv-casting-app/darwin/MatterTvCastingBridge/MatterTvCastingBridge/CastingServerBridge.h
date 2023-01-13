@@ -54,7 +54,7 @@
 
  @param clientQueue Queue to dispatch the call to the discoveredCommissionerHandler on
 
- @param discoveredCommissionerHandler Handler to call after a discovered commissioner has been retrieved
+ @param discoveredCommissionerHandler Handler called synchronously after a discovered commissioner has been retrieved
  */
 - (void)getDiscoveredCommissioner:(int)index
                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
@@ -183,6 +183,22 @@
  @param requestSentHandler Called after the request has been sent
  */
 - (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
+
+/**
+ @brief Start the Matter server and reconnect to a previously connected Video Player (if any). This API is async
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param startMatterServerCompletionCallback Called after the Matter server has started and connected (or failed to connect) to a
+ previously connected video player (if any) are complete
+ */
+- (void)startMatterServer:(dispatch_queue_t _Nonnull)clientQueue
+    startMatterServerCompletionCallback:(nullable void (^)(MatterError * _Nonnull))startMatterServerCompletionCallback;
+
+/**
+ @brief Stop the Matter server
+ */
+- (void)stopMatterServer;
 
 /*!
  @brief Send a ContentLauncher:LaunchURL request to a TV

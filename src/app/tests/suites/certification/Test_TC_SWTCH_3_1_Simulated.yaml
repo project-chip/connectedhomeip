@@ -26,12 +26,12 @@ tests:
 
     - label: "Read NumberOfPositions attribute"
       wait: "readAttribute"
-      attribute: "number of positions"
+      attribute: "NumberOfPositions"
 
     - label: "Read CurrentPosition attribute"
       wait: "readAttribute"
-      attribute: "current position"
+      attribute: "CurrentPosition"
 
     - label: "Read MultiPressMax attribute"
       wait: "readAttribute"
-      attribute: "multi press max"
+      attribute: "MultiPressMax"

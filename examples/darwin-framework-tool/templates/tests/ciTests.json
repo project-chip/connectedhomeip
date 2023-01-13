@@ -1,6 +1,7 @@
 {
     "include": "../../../../src/app/tests/suites/ciTests.json",
     "disable": [
+        "TestClientMonitoringCluster",
         "Test_TC_SC_4_2",
         "TestClusterComplexTypes",
         "TestEvents",
@@ -23,6 +24,9 @@
         "Test_TC_G_2_1",
         "Test_TC_FLABEL_2_1",
         "Test_TC_TSTAT_2_1",
-        "Test_TC_TSTAT_2_2"
+        "Test_TC_TSTAT_2_2",
+        "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_7",
+        "Test_TC_ACL_2_9"
     ]
 }

@@ -24,13 +24,12 @@ import argparse
 import os
 import pathlib
 import re
-import sys
 import zlib
+from collections import OrderedDict
+from struct import pack, unpack
 
 import leb128
-from collections import OrderedDict
 from intelhex import IntelHex
-from struct import pack, unpack
 
 THREAD_FACTORY_KEY_BASE = 0x2000
 MATTER_FACTORY_KEY_BASE = 0x2100

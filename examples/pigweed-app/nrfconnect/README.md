@@ -3,10 +3,8 @@
 The nRF Connect Pigweed Example demonstrates the usage of Pigweed module
 functionalities in an application.
 
-<p align="center">
-  <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
-  <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
-</p>
+<img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
+<img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip), the
@@ -29,7 +27,7 @@ the following features are available:
 
 -   [Overview](#overview)
 -   [Requirements](#requirements)
-    -   [Supported devices](#supported_devices)
+    -   [Supported devices](#supported-devices)
 -   [Device UI](#device-ui)
 -   [Setting up the environment](#setting-up-the-environment)
     -   [Using Docker container for setup](#using-docker-container-for-setup)
@@ -37,13 +35,11 @@ the following features are available:
 -   [Building](#building)
 -   [Configuring the example](#configuring-the-example)
 -   [Flashing and debugging](#flashing-and-debugging)
-    -   [Flashing on the nRF52840 DK](#nrf52840dk_flashing)
-    -   [Flashing on the nRF52840 Dongle](#nrf52840dongle_flashing)
+    -   [Flashing on the nRF52840 DK](#flashing-on-the-nrf52840-dk)
+    -   [Flashing on the nRF52840 Dongle](#flashing-on-the-nrf52840-dongle)
 -   [Testing the example](#testing-the-example)
 
 <hr>
-
-<a name="overview"></a>
 
 ## Overview
 
@@ -61,15 +57,11 @@ other cases.
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements
 
 The application requires a specific revision of the nRF Connect SDK to work
 correctly. See [Setting up the environment](#setting-up-the-environment) for
 more information.
-
-<a name="supported_devices"></a>
 
 ### Supported devices
 
@@ -81,8 +73,6 @@ The example supports building and running on the following devices:
 | [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | `nrf52840dk_nrf52840`     | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details>        |
 
 <hr>
-
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -124,7 +114,7 @@ image that has the tools pre-installed.
 If you are a macOS user, you won't be able to use the Docker container to flash
 the application onto a Nordic development kit due to
 [certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
-Use the [native shell](#using-native-shell) for building instead.
+Use the [native shell](#using-native-shell-for-setup) for building instead.
 
 ### Using Docker container for setup
 
@@ -207,8 +197,6 @@ Now you can proceed with the [Building](#building) instruction.
 
 <hr>
 
-<a name="building"></a>
-
 ## Building
 
 Complete the following steps, regardless of the method used for setting up the
@@ -244,8 +232,6 @@ following command:
     $ rm -r build
 
 <hr>
-
-<a name="configuring"></a>
 
 ## Configuring the example
 
@@ -285,14 +271,10 @@ page.
 
 <hr>
 
-<a name="flashing"></a>
-
 ## Flashing and debugging
 
 The flashing and debugging procedure is different for the nRF52840 DK and the
 nRF52840 Dongle.
-
-<a name="nrf52840dk_flashing"></a>
 
 ### Flashing on the nRF52840 DK
 
@@ -309,8 +291,6 @@ directory:
 
         $ west debug
 
-<a name="nrf52840dongle_flashing"></a>
-
 ### Flashing on the nRF52840 Dongle
 
 Visit
@@ -318,8 +298,6 @@ Visit
 to read more about flashing on the nRF52840 Dongle.
 
 <hr>
-
-<a name="currently-implemented-features"></a>
 
 ## Testing the example
 

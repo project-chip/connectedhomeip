@@ -97,7 +97,10 @@ android_library("java") {
     "java/chip/platform/ServiceResolver.java",
   ]
 
-  javac_flags = [ "-Xlint:deprecation" ]
+  javac_flags = [
+    "-Xlint:deprecation",
+    "-parameters",  # Store infomation about method parameters
+  ]
 }
 
 java_prebuilt("android_sdk") {

@@ -19,7 +19,7 @@
 #include "CustomCSRResponseOperationalKeyStore.h"
 
 #include <credentials/FabricTable.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {

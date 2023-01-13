@@ -15,22 +15,22 @@
 #    limitations under the License.
 #
 
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
-import chip.clusters as Clusters
-import chip.FabricAdmin
-import chip.CertificateAuthority
-import logging
-from mobly import asserts
-from chip.utils import CommissioningBuildingBlocks
-from chip.clusters.Attribute import TypedAttributePath, SubscriptionTransaction, AttributeStatus
-from chip.interaction_model import Status as StatusEnum
-import queue
 import asyncio
+import logging
+import queue
+import random
+import time
 from binascii import hexlify
 from threading import Event
-import time
-import random
 
+import chip.CertificateAuthority
+import chip.clusters as Clusters
+import chip.FabricAdmin
+from chip.clusters.Attribute import AttributeStatus, SubscriptionTransaction, TypedAttributePath
+from chip.interaction_model import Status as StatusEnum
+from chip.utils import CommissioningBuildingBlocks
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic
@@ -116,7 +116,7 @@ class TC_RR_1_1(MatterBaseTest):
         client_list.append(dev_ctrl)
 
         if num_controllers_per_fabric > 1:
-            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id, catTags=[0x0001_0001])
+            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=self.dut_node_id, catTags=[0x0001_0001])
             for controller in new_controllers:
                 controller.name = all_names.pop(0)
             client_list.extend(new_controllers)
@@ -135,7 +135,7 @@ class TC_RR_1_1(MatterBaseTest):
 
             if num_controllers_per_fabric > 1:
                 new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=new_fabric_admin, adminDevCtrl=new_admin_ctrl,
-                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id, catTags=[0x0001_0001])
+                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=self.dut_node_id, catTags=[0x0001_0001])
                 for controller in new_controllers:
                     controller.name = all_names.pop(0)
 
@@ -407,10 +407,10 @@ class TC_RR_1_1(MatterBaseTest):
             Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC00, deviceType=0xFFF1_BC30),
             Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC01, deviceType=0xFFF1_BC31)
         ]
-        admin_acl_entry = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kAdminister,
-                                                                            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
-                                                                            subjects=admin_subjects,
-                                                                            targets=admin_targets)
+        admin_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                                                                                  authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                                                                                  subjects=admin_subjects,
+                                                                                  targets=admin_targets)
         acl.append(admin_acl_entry)
 
         # Manage ACL entry
@@ -421,10 +421,10 @@ class TC_RR_1_1(MatterBaseTest):
             Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC02, deviceType=0xFFF1_BC22)
         ]
 
-        manage_acl_entry = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kManage,
-                                                                             authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
-                                                                             subjects=manage_subjects,
-                                                                             targets=manage_targets)
+        manage_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage,
+                                                                                   authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                                                                                   subjects=manage_subjects,
+                                                                                   targets=manage_targets)
         acl.append(manage_acl_entry)
 
         # Operate ACL entry
@@ -435,10 +435,10 @@ class TC_RR_1_1(MatterBaseTest):
             Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC42, deviceType=0xFFF1_BC42)
         ]
 
-        operate_acl_entry = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kOperate,
-                                                                              authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
-                                                                              subjects=operate_subjects,
-                                                                              targets=operate_targets)
+        operate_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                                                                                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                                                                                    subjects=operate_subjects,
+                                                                                    targets=operate_targets)
         acl.append(operate_acl_entry)
 
         return acl

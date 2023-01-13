@@ -1,8 +1,9 @@
 import argparse
-import sys
 import os
-import serial
+import sys
+
 import pw_tokenizer
+import serial
 
 
 def parse_args():
@@ -75,8 +76,8 @@ def decode_serial(serialport, outfile, database):
     if input:
 
         try:
-            while(True):
-                if(input.in_waiting > 0):
+            while (True):
+                if (input.in_waiting > 0):
                     # read line from serial port and ascii decode
                     line = input.readline().decode('ascii').strip()
                     # find token start and detokenize

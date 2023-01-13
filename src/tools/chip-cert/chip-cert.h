@@ -417,8 +417,8 @@ extern bool Cmd_PrintCert(int argc, char * argv[]);
 extern bool Cmd_PrintCD(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
-extern bool ReadCert(const char * fileNameOrStr, X509 * cert);
-extern bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & origCertFmt);
+extern bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert);
+extern bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert, CertFormat & origCertFmt);
 extern bool ReadCertDER(const char * fileNameOrStr, chip::MutableByteSpan & cert);
 extern bool LoadChipCert(const char * fileNameOrStr, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
                          chip::MutableByteSpan & chipCert);
@@ -429,10 +429,10 @@ extern bool WriteChipCert(const char * fileName, const chip::ByteSpan & cert, Ce
 extern bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
                      uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount,
                      X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
-extern CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
-                                  const struct tm & validFrom, uint32_t validDays, int pathLen,
-                                  const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount, X509 * x509Cert,
-                                  EVP_PKEY * newKey, CertStructConfig & certConfig, chip::MutableByteSpan & chipCert);
+extern CHIP_ERROR MakeCertTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
+                              const struct tm & validFrom, uint32_t validDays, int pathLen,
+                              const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount, X509 * x509Cert,
+                              EVP_PKEY * newKey, CertStructConfig & certConfig, chip::MutableByteSpan & chipCert);
 extern bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey);
 
 extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,

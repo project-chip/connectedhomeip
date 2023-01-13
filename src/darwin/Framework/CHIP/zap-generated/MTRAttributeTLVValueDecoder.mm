@@ -1274,7 +1274,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                     auto & entry_0 = iter_0.GetValue();
                     MTRDescriptorClusterDeviceTypeStruct * newElement_0;
                     newElement_0 = [MTRDescriptorClusterDeviceTypeStruct new];
-                    newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
+                    newElement_0.deviceType = [NSNumber numberWithUnsignedInt:entry_0.deviceType];
                     newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
                     [array_0 addObject:newElement_0];
                 }
@@ -1643,8 +1643,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRAccessControlClusterAccessControlEntry * newElement_0;
-                    newElement_0 = [MTRAccessControlClusterAccessControlEntry new];
+                    MTRAccessControlClusterAccessControlEntryStruct * newElement_0;
+                    newElement_0 = [MTRAccessControlClusterAccessControlEntryStruct new];
                     newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
                     newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
                     if (entry_0.subjects.IsNull()) {
@@ -1727,8 +1727,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRAccessControlClusterExtensionEntry * newElement_0;
-                    newElement_0 = [MTRAccessControlClusterExtensionEntry new];
+                    MTRAccessControlClusterAccessControlExtensionStruct * newElement_0;
+                    newElement_0 = [MTRAccessControlClusterAccessControlExtensionStruct new];
                     newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
                     newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
@@ -2525,8 +2525,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
     case Clusters::OtaSoftwareUpdateRequestor::Id: {
         using namespace Clusters::OtaSoftwareUpdateRequestor;
         switch (aPath.mAttributeId) {
-        case Attributes::DefaultOtaProviders::Id: {
-            using TypeInfo = Attributes::DefaultOtaProviders::TypeInfo;
+        case Attributes::DefaultOTAProviders::Id: {
+            using TypeInfo = Attributes::DefaultOTAProviders::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -4301,8 +4301,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRGeneralDiagnosticsClusterNetworkInterfaceType * newElement_0;
-                    newElement_0 = [MTRGeneralDiagnosticsClusterNetworkInterfaceType new];
+                    MTRGeneralDiagnosticsClusterNetworkInterface * newElement_0;
+                    newElement_0 = [MTRGeneralDiagnosticsClusterNetworkInterface new];
                     newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                                  length:entry_0.name.size()
                                                                encoding:NSUTF8StringEncoding];
@@ -4398,15 +4398,15 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
-        case Attributes::BootReasons::Id: {
-            using TypeInfo = Attributes::BootReasons::TypeInfo;
+        case Attributes::BootReason::Id: {
+            using TypeInfo = Attributes::BootReason::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ActiveHardwareFaults::Id: {
@@ -4423,7 +4423,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
                     NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -4449,7 +4449,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
                     NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -4475,7 +4475,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
                     NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -4620,8 +4620,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
-                    newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetrics new];
+                    MTRSoftwareDiagnosticsClusterThreadMetricsStruct * newElement_0;
+                    newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetricsStruct new];
                     newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
                     if (entry_0.name.HasValue()) {
                         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
@@ -4901,8 +4901,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedLongLong:cppValue];
             return value;
         }
-        case Attributes::NeighborTableList::Id: {
-            using TypeInfo = Attributes::NeighborTableList::TypeInfo;
+        case Attributes::NeighborTable::Id: {
+            using TypeInfo = Attributes::NeighborTable::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -4949,8 +4949,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             }
             return value;
         }
-        case Attributes::RouteTableList::Id: {
-            using TypeInfo = Attributes::RouteTableList::TypeInfo;
+        case Attributes::RouteTable::Id: {
+            using TypeInfo = Attributes::RouteTable::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -7750,9 +7750,9 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                         auto iter_2 = entry_0.semanticTags.begin();
                         while (iter_2.Next()) {
                             auto & entry_2 = iter_2.GetValue();
-                            MTRModeSelectClusterSemanticTag * newElement_2;
-                            newElement_2 = [MTRModeSelectClusterSemanticTag new];
-                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:entry_2.mfgCode];
+                            MTRModeSelectClusterSemanticTagStruct * newElement_2;
+                            newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
+                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                             newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                             [array_2 addObject:newElement_2];
                         }

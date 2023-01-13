@@ -30,144 +30,144 @@ tests:
 
     - label: "Write fan mode"
       command: "writeAttribute"
-      attribute: "fan mode"
+      attribute: "FanMode"
       arguments:
           value: 3
 
     - label: "Read back fan mode"
       command: "readAttribute"
-      attribute: "fan mode"
+      attribute: "FanMode"
       response:
           value: 3
 
     - label: "Write fan mode sequence"
       command: "writeAttribute"
-      attribute: "fan mode sequence"
+      attribute: "FanModeSequence"
       arguments:
           value: 5
 
     - label: "Read back fan mode sequence"
       command: "readAttribute"
-      attribute: "fan mode sequence"
+      attribute: "FanModeSequence"
       response:
           value: 5
 
     - label: "Write percent setting"
       command: "writeAttribute"
-      attribute: "percent setting"
+      attribute: "PercentSetting"
       arguments:
           value: 84
 
     - label: "Read back percent setting"
       command: "readAttribute"
-      attribute: "percent setting"
+      attribute: "PercentSetting"
       response:
           value: 84
 
     - label: "Read back speed setting"
       command: "readAttribute"
-      attribute: "speed setting"
+      attribute: "SpeedSetting"
       response:
           value: 84
 
     - label: "Read back speed current"
       command: "readAttribute"
-      attribute: "speed current"
+      attribute: "SpeedCurrent"
       response:
           value: 84
 
     - label: "Write percent setting"
       command: "writeAttribute"
-      attribute: "percent setting"
+      attribute: "PercentSetting"
       arguments:
           value: null
 
     - label: "Read back percent setting"
       command: "readAttribute"
-      attribute: "percent setting"
+      attribute: "PercentSetting"
       response:
           value: 84
 
     - label: "Write speed setting"
       command: "writeAttribute"
-      attribute: "speed setting"
+      attribute: "SpeedSetting"
       arguments:
           value: 73
 
     - label: "Read back speed setting"
       command: "readAttribute"
-      attribute: "speed setting"
+      attribute: "SpeedSetting"
       response:
           value: 73
 
     - label: "Read back percent setting"
       command: "readAttribute"
-      attribute: "percent setting"
+      attribute: "PercentSetting"
       response:
           value: 73
 
     - label: "Read back percent current"
       command: "readAttribute"
-      attribute: "percent current"
+      attribute: "PercentCurrent"
       response:
           value: 73
 
     - label: "Write speed setting"
       command: "writeAttribute"
-      attribute: "speed setting"
+      attribute: "SpeedSetting"
       arguments:
           value: null
 
     - label: "Read back speed setting"
       command: "readAttribute"
-      attribute: "speed setting"
+      attribute: "SpeedSetting"
       response:
           value: 73
 
     - label: "Write fan mode"
       command: "writeAttribute"
-      attribute: "fan mode"
+      attribute: "FanMode"
       arguments:
           value: 0x00
 
     - label: "Read back percent setting"
       command: "readAttribute"
-      attribute: "percent setting"
+      attribute: "PercentSetting"
       response:
           value: 0
 
     - label: "Read back percent current"
       command: "readAttribute"
-      attribute: "percent current"
+      attribute: "PercentCurrent"
       response:
           value: 0
 
     - label: "Read back speed setting"
       command: "readAttribute"
-      attribute: "speed setting"
+      attribute: "SpeedSetting"
       response:
           value: 0
 
     - label: "Read back speed current"
       command: "readAttribute"
-      attribute: "speed current"
+      attribute: "SpeedCurrent"
       response:
           value: 0
 
     - label: "Write fan mode"
       command: "writeAttribute"
-      attribute: "fan mode"
+      attribute: "FanMode"
       arguments:
           value: 0x05
 
     - label: "Read back percent setting"
       command: "readAttribute"
-      attribute: "percent setting"
+      attribute: "PercentSetting"
       response:
           value: null
 
     - label: "Read back speed setting"
       command: "readAttribute"
-      attribute: "speed setting"
+      attribute: "SpeedSetting"
       response:
           value: null

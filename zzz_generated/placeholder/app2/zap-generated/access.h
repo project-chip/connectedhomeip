@@ -40,6 +40,7 @@
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
@@ -52,9 +53,18 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied threshold, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied threshold, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied threshold, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -70,6 +80,7 @@
     5, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     6, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
@@ -82,9 +93,18 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied threshold, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied threshold, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied threshold, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -100,6 +120,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
@@ -112,9 +133,18 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied threshold, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied threshold, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact occupied to unoccupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied delay, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied threshold, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +157,7 @@
     40, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    65, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
     512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
     512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
@@ -139,9 +170,18 @@
     513, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    516, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    516, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
+    516, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
+    516, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
     768, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: PIR occupied to unoccupied delay, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied delay, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied threshold, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: ultrasonic occupied to unoccupied delay, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied delay, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied threshold, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: physical contact occupied to unoccupied delay, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied delay, Privilege: manage */ \
+    1030, /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied threshold, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
@@ -152,6 +192,7 @@
     16, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    0, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
     21, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
     23, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
@@ -164,9 +205,18 @@
     25, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     27, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     28, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    1, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    2, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
+    1, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
+    2, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
     16400, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
+    16, /* Cluster: Occupancy Sensing, Attribute: PIR occupied to unoccupied delay, Privilege: manage */ \
+    17, /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied delay, Privilege: manage */ \
+    18, /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied threshold, Privilege: manage */ \
+    32, /* Cluster: Occupancy Sensing, Attribute: ultrasonic occupied to unoccupied delay, Privilege: manage */ \
+    33, /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied delay, Privilege: manage */ \
+    34, /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied threshold, Privilege: manage */ \
+    48, /* Cluster: Occupancy Sensing, Attribute: physical contact occupied to unoccupied delay, Privilege: manage */ \
+    49, /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied delay, Privilege: manage */ \
+    50, /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied threshold, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -177,6 +227,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
@@ -189,9 +240,18 @@
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: PIR occupied to unoccupied delay, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied delay, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: PIR unoccupied to occupied threshold, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: ultrasonic occupied to unoccupied delay, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied delay, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: ultrasonic unoccupied to occupied threshold, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: physical contact occupied to unoccupied delay, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied delay, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Occupancy Sensing, Attribute: physical contact unoccupied to occupied threshold, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

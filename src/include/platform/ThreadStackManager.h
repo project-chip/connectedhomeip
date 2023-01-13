@@ -182,7 +182,7 @@ private:
      *
      * @param[in]  onOff  true if active mode should be enabled and false otherwise.
      */
-    CHIP_ERROR RequestSEDActiveMode(bool onOff);
+    CHIP_ERROR RequestSEDActiveMode(bool onOff, bool delayIdle = false);
 #endif
 
     bool HaveMeshConnectivity();
@@ -402,9 +402,9 @@ inline CHIP_ERROR ThreadStackManager::SetSEDIntervalsConfig(const ConnectivityMa
     return static_cast<ImplClass *>(this)->_SetSEDIntervalsConfig(intervalsConfig);
 }
 
-inline CHIP_ERROR ThreadStackManager::RequestSEDActiveMode(bool onOff)
+inline CHIP_ERROR ThreadStackManager::RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
-    return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff);
+    return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff, delayIdle);
 }
 #endif
 

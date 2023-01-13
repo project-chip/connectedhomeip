@@ -17,7 +17,7 @@
  */
 
 #include "SetupPayloadGenerateCommand.h"
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>

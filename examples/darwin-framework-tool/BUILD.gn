@@ -62,14 +62,14 @@ action("build-darwin-framework") {
     "Matter Framework",
     "--log_path",
     rebase_path("${root_build_dir}/darwin_framework_build.log", root_build_dir),
+    "--target_arch",
+    mac_target_arch,
   ]
 
   if (sdk != "macosx") {
     args += [
       "--target_sdk",
       sdk,
-      "--target_arch",
-      mac_target_arch,
     ]
   }
 
@@ -124,6 +124,7 @@ executable("darwin-framework-tool") {
     "${chip_root}/examples/chip-tool/commands/common/Command.h",
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Commands.h",
+    "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
@@ -245,4 +246,10 @@ if (chip_codesign) {
     output_name = "codesign_log.txt"
     outputs = [ "${root_build_dir}/${output_name}" ]
   }
+}
+
+# Make sure we only build darwin-framework-tool, and not extraneous
+# things like address-resolve, by default.
+group("default") {
+  deps = [ ":darwin-framework-tool" ]
 }

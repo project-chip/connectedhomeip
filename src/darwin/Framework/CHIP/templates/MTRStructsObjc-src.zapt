@@ -12,7 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
     {{#zcl_struct_items}}
+    {{#unless (wasRemoved (asUpperCamelCase parent.parent.name preserveAcronyms=true) struct=(asUpperCamelCase parent.name preserveAcronyms=true) structField=(asStructPropertyName label))}}
     {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+    {{/unless}}
     {{/zcl_struct_items}}
   }
   return self;
@@ -23,7 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
   auto other = [[{{interfaceName}} alloc] init];
 
   {{#zcl_struct_items}}
+  {{#unless (wasRemoved (asUpperCamelCase parent.parent.name preserveAcronyms=true) struct=(asUpperCamelCase parent.name preserveAcronyms=true) structField=(asStructPropertyName label))}}
   other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/unless}}
   {{/zcl_struct_items}}
 
   return other;
@@ -31,36 +35,64 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_struct_items}}{{asStructPropertyName label}}:%@; {{/zcl_struct_items}}>", NSStringFromClass([self class]){{#zcl_struct_items}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_struct_items}}];
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_struct_items~}}
+  {{~#unless (wasRemoved (asUpperCamelCase parent.parent.name preserveAcronyms=true) struct=(asUpperCamelCase parent.name preserveAcronyms=true) structField=(asStructPropertyName label))~}}
+  {{~asStructPropertyName label}}:%@; {{!Just here to keep the preceding space}}
+  {{~/unless~}}
+  {{~/zcl_struct_items}}>", NSStringFromClass([self class]){{#zcl_struct_items~}}
+  {{~#unless (wasRemoved (asUpperCamelCase parent.parent.name preserveAcronyms=true) struct=(asUpperCamelCase parent.name preserveAcronyms=true) structField=(asStructPropertyName label))~}}
+  ,{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}
+  {{~/unless~}}
+  {{~/zcl_struct_items}}];
   return descriptionString;
 }
+{{#zcl_struct_items}}
+{{#if (and (hasOldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))
+           (not (wasRemoved (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label)))))}}
+
+{{> renamed_struct_field_impl cluster=../../name type=type newName=label oldName=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_struct_items}}
 
 @end
 {{/inline}}
 
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true))}}
 {{> interfaceImpl interfaceName=(concat "MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true))}}
+{{/unless}}
 
-{{!Backwards compat for now: Add a DeviceType thing that is API-compatible with DeviceTypeStruct. }}
-{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
-{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
-{{> interfaceImpl interfaceName="MTRDescriptorClusterDeviceType"}}
-{{/if}}
-{{else}}
-{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
-@implementation MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
+{{! Takes the name of the struct to use as structName. }}
+{{#*inline "oldNameImpl"}}
+{{#unless (wasRemoved (compatClusterNameRemapping parent.name) struct=structName)}}
+@implementation MTR{{compatClusterNameRemapping parent.name}}Cluster{{structName}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
 {{/unless}}
+{{/inline}}
+{{! Takes the old name of the struct, if any, as oldStructName. }}
+{{#*inline "oldNameCheck"}}
+{{#if (or oldStructName
+          (hasOldName (asUpperCamelCase parent.name preserveAcronyms=true)))}}
+{{#if oldStructName}}
+{{> oldNameImpl structName=oldStructName}}
+{{else}}
+{{> oldNameImpl structName=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/if}}
+{{/if}}
+{{/inline}}
+{{> oldNameCheck oldStructName=(oldName (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true))}}
 
 {{/zcl_structs}}
 
 {{#zcl_events}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
 - (instancetype)init
 {
   if (self = [super init]) {
     {{#zcl_event_fields}}
+    {{#unless (wasRemoved (asUpperCamelCase parent.parent.name preserveAcronyms=true) event=(asUpperCamelCase parent.name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
     {{>init_struct_member label=name type=type cluster=parent.parent.name}}
+    {{/unless}}
     {{/zcl_event_fields}}
   }
   return self;
@@ -71,7 +103,9 @@ NS_ASSUME_NONNULL_BEGIN
   auto other = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event alloc] init];
 
   {{#zcl_event_fields}}
+  {{#unless (wasRemoved (asUpperCamelCase parent.parent.name preserveAcronyms=true) event=(asUpperCamelCase parent.name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
   other.{{asStructPropertyName name}} = self.{{asStructPropertyName name}};
+  {{/unless}}
   {{/zcl_event_fields}}
 
   return other;
@@ -79,31 +113,47 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_event_fields}}{{asStructPropertyName name}}:%@; {{/zcl_event_fields}}>", NSStringFromClass([self class]){{#zcl_event_fields}},{{#if isArray}}_{{asStructPropertyName name}}{{else if (isOctetString type)}}[_{{asStructPropertyName name}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName name}}{{/if}}{{/zcl_event_fields}}];
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_event_fields~}}
+  {{~#unless (wasRemoved (asUpperCamelCase parent.parent.name preserveAcronyms=true) event=(asUpperCamelCase parent.name preserveAcronyms=true) eventField=(asStructPropertyName name))~}}
+  {{asStructPropertyName name}}:%@; {{!Just here to keep the preceding space}}
+  {{~/unless~}}
+  {{~/zcl_event_fields}}>", NSStringFromClass([self class]){{#zcl_event_fields~}}
+  {{~#unless (wasRemoved (asUpperCamelCase parent.parent.name preserveAcronyms=true) event=(asUpperCamelCase parent.name preserveAcronyms=true) eventField=(asStructPropertyName name))~}}
+  ,{{#if isArray}}_{{asStructPropertyName name}}{{else if (isOctetString type)}}[_{{asStructPropertyName name}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName name}}{{/if}}
+  {{~/unless~}}
+  {{~/zcl_event_fields}}];
   return descriptionString;
 }
 
-{{#if (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) "Switch")}}
-{{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "MultiPressComplete")}}
-{{! Workaround for the name being mis-spelled in XML previously }}
-- (void)setNewPosition:(NSNumber * _Nonnull)newPosition
-{
-  self.previousPosition = newPosition;
-}
+{{#zcl_event_fields}}
+{{#if (and (hasOldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))
+           (not (wasRemoved (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(oldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name)))))}}
 
-- (NSNumber * _Nonnull)newPosition
-{
-  return self.previousPosition;
-}
-
+{{> renamed_struct_field_impl cluster=../parent.name type=type newName=name oldName=(oldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
 {{/if}}
-{{/if}}
-@end
-{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
-
-@implementation MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
+{{/zcl_event_fields}}
 @end
 {{/unless}}
+{{! Takes the name of the event to use as eventName. }}
+{{#*inline "oldNameImpl"}}
+{{#unless (wasRemoved (compatClusterNameRemapping parent.name) event=eventName)}}
+
+@implementation MTR{{compatClusterNameRemapping parent.name}}Cluster{{eventName}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
+@end
+{{/unless}}
+{{/inline}}
+{{! Takes the old name of the event, if any, as oldEventName. }}
+{{#*inline "oldNameCheck"}}
+{{#if (or oldEventName
+          (hasOldName (asUpperCamelCase parent.name preserveAcronyms=true)))}}
+{{#if oldEventName}}
+{{> oldNameImpl eventName=oldEventName}}
+{{else}}
+{{> oldNameImpl eventName=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/if}}
+{{/inline}}
+{{> oldNameCheck oldEventName=(oldName (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
 
 {{/zcl_events}}
 

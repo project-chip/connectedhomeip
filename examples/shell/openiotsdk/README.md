@@ -6,7 +6,7 @@ execution. There is a set of common shell commands which perform basic device
 operations.
 
 For more details see
-[Common shell commands](../README.md#chip-shell-command-details).
+[Common shell commands](../README.md#matter-shell-command-details).
 
 ## Build and run
 
@@ -34,7 +34,7 @@ supports common Matter shell commands. They are used to control the basic
 functionalities of the device.
 
 For more details read:
-[Common shell commands](../README.md#chip-shell-command-details)
+[Common shell commands](../README.md#matter-shell-command-details)
 
 Example:
 

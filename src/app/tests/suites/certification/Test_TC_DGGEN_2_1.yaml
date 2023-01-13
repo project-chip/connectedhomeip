@@ -144,7 +144,7 @@ tests:
     - label: "TH reads BootReason attribute value from DUT."
       PICS: DGGEN.S.A0004
       command: "readAttribute"
-      attribute: "BootReasons"
+      attribute: "BootReason"
       response:
           constraints:
               minValue: 0

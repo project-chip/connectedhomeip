@@ -44,9 +44,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::AppPlatform;
+using namespace chip::DeviceLayer;
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 ContentAppFactoryImpl gFactory;
@@ -407,6 +409,20 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
 {
     if (endpointId == kLocalVideoPlayerEndpointId)
     {
+        if (GetVendorPrivilege(vendorId) == Access::Privilege::kAdminister)
+        {
+            ChipLogProgress(DeviceLayer,
+                            "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint priviledged vendor accessible clusters "
+                            "being returned.");
+            return { chip::app::Clusters::Descriptor::Id,         chip::app::Clusters::OnOff::Id,
+                     chip::app::Clusters::WakeOnLan::Id,          chip::app::Clusters::MediaPlayback::Id,
+                     chip::app::Clusters::LowPower::Id,           chip::app::Clusters::KeypadInput::Id,
+                     chip::app::Clusters::ContentLauncher::Id,    chip::app::Clusters::AudioOutput::Id,
+                     chip::app::Clusters::ApplicationLauncher::Id };
+        }
+        ChipLogProgress(
+            DeviceLayer,
+            "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint operator vendor accessible clusters being returned.");
         return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
                  chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
                  chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
@@ -477,4 +493,17 @@ EndpointId RemoveContentApp(EndpointId epId)
 void ReportAttributeChange(EndpointId epId, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
     MatterReportingAttributeChangeCallback(epId, clusterId, attributeId);
+}
+
+void AddSelfVendorAsAdmin()
+{
+    uint16_t value;
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Discovery, "AppImpl addSelfVendorAsAdmin Vendor ID not known");
+    }
+    else
+    {
+        gFactory.AddAdminVendorId(value);
+    }
 }

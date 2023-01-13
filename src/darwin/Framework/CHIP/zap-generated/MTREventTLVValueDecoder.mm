@@ -162,11 +162,11 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 value.changeType = memberValue;
             } while (0);
             do {
-                MTRAccessControlClusterAccessControlEntry * _Nullable memberValue;
+                MTRAccessControlClusterAccessControlEntryStruct * _Nullable memberValue;
                 if (cppValue.latestValue.IsNull()) {
                     memberValue = nil;
                 } else {
-                    memberValue = [MTRAccessControlClusterAccessControlEntry new];
+                    memberValue = [MTRAccessControlClusterAccessControlEntryStruct new];
                     memberValue.privilege =
                         [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().privilege)];
                     memberValue.authMode =
@@ -272,11 +272,11 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 value.changeType = memberValue;
             } while (0);
             do {
-                MTRAccessControlClusterExtensionEntry * _Nullable memberValue;
+                MTRAccessControlClusterAccessControlExtensionStruct * _Nullable memberValue;
                 if (cppValue.latestValue.IsNull()) {
                     memberValue = nil;
                 } else {
-                    memberValue = [MTRAccessControlClusterExtensionEntry new];
+                    memberValue = [MTRAccessControlClusterAccessControlExtensionStruct new];
                     memberValue.data = [NSData dataWithBytes:cppValue.latestValue.Value().data.data()
                                                       length:cppValue.latestValue.Value().data.size()];
                     memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
@@ -609,6 +609,165 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
     case Clusters::PowerSource::Id: {
         using namespace Clusters::PowerSource;
         switch (aPath.mEventId) {
+
+        case Events::WiredFaultChange::Id: {
+            Events::WiredFaultChange::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+
+            __auto_type * value = [MTRPowerSourceClusterWiredFaultChangeEvent new];
+
+            do {
+                NSArray * _Nonnull memberValue;
+                { // Scope for our temporary variables
+                    auto * array_0 = [NSMutableArray new];
+                    auto iter_0 = cppValue.current.begin();
+                    while (iter_0.Next()) {
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
+                    }
+                    CHIP_ERROR err = iter_0.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_0;
+                }
+                value.current = memberValue;
+            } while (0);
+            do {
+                NSArray * _Nonnull memberValue;
+                { // Scope for our temporary variables
+                    auto * array_0 = [NSMutableArray new];
+                    auto iter_0 = cppValue.previous.begin();
+                    while (iter_0.Next()) {
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
+                    }
+                    CHIP_ERROR err = iter_0.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_0;
+                }
+                value.previous = memberValue;
+            } while (0);
+
+            return value;
+        }
+
+        case Events::BatFaultChange::Id: {
+            Events::BatFaultChange::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+
+            __auto_type * value = [MTRPowerSourceClusterBatFaultChangeEvent new];
+
+            do {
+                NSArray * _Nonnull memberValue;
+                { // Scope for our temporary variables
+                    auto * array_0 = [NSMutableArray new];
+                    auto iter_0 = cppValue.current.begin();
+                    while (iter_0.Next()) {
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
+                    }
+                    CHIP_ERROR err = iter_0.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_0;
+                }
+                value.current = memberValue;
+            } while (0);
+            do {
+                NSArray * _Nonnull memberValue;
+                { // Scope for our temporary variables
+                    auto * array_0 = [NSMutableArray new];
+                    auto iter_0 = cppValue.previous.begin();
+                    while (iter_0.Next()) {
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
+                    }
+                    CHIP_ERROR err = iter_0.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_0;
+                }
+                value.previous = memberValue;
+            } while (0);
+
+            return value;
+        }
+
+        case Events::BatChargeFaultChange::Id: {
+            Events::BatChargeFaultChange::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+
+            __auto_type * value = [MTRPowerSourceClusterBatChargeFaultChangeEvent new];
+
+            do {
+                NSArray * _Nonnull memberValue;
+                { // Scope for our temporary variables
+                    auto * array_0 = [NSMutableArray new];
+                    auto iter_0 = cppValue.current.begin();
+                    while (iter_0.Next()) {
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
+                    }
+                    CHIP_ERROR err = iter_0.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_0;
+                }
+                value.current = memberValue;
+            } while (0);
+            do {
+                NSArray * _Nonnull memberValue;
+                { // Scope for our temporary variables
+                    auto * array_0 = [NSMutableArray new];
+                    auto iter_0 = cppValue.previous.begin();
+                    while (iter_0.Next()) {
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
+                    }
+                    CHIP_ERROR err = iter_0.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_0;
+                }
+                value.previous = memberValue;
+            } while (0);
+
+            return value;
+        }
 
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;

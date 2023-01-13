@@ -45,7 +45,7 @@ limitations under the License.
     <command source="client" code="0x00" name="OpenCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>
       <arg name="CommissioningTimeout" type="INT16U"/>
-      <arg name="PAKEVerifier" type="OCTET_STRING"/>
+      <arg name="PAKEPasscodeVerifier" type="OCTET_STRING"/>
       <arg name="Discriminator" type="INT16U"/>
       <arg name="Iterations" type="INT32U"/>
       <arg name="Salt" type="OCTET_STRING"/>

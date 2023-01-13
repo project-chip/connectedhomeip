@@ -288,5 +288,9 @@
 [submodule "bouffalolab_sdk"]
 	path = third_party/bouffalolab/repo
 	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
-        branch = main
-        platforms = bouffalolab
+	branch = main
+	platforms = bouffalolab
+[submodule "third_party/libwebsockets/repo"]
+	path = third_party/libwebsockets/repo
+	url = https://github.com/warmcat/libwebsockets
+	platforms = linux,darwin

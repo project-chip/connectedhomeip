@@ -2,8 +2,6 @@
 
 ## Overview
 
----
-
 It is convenient to follow some naming and build conventions for Chef tool due
 to the large volume of sample apps that may be created and the ambiguity that
 may result from arbitrary names.
@@ -22,8 +20,6 @@ The convention proposed here should be adopted by the zap files provided in
 
 ## Limitations
 
----
-
 The largest filename that can be used on MacOS and Linux is 255 characters. If a
 sample app name would exceed this limit by following this convention, then the
 sample app should be given an arbitrary name.
@@ -32,8 +28,6 @@ This limitation is called out, but, with the given naming conventions, this
 should rarely happen.
 
 ## Convention
-
----
 
 ### Sample App Naming Convention
 
@@ -144,8 +138,9 @@ The metadata files have a structure as follows:
 - <endpoint_1_name>: ...
 ```
 
-For an example, see [sample_zap_file.yaml](test_files/sample_zap_file.yaml)
-which was generated from [sample_zap_file.zap](test_files/sample_zap_file.zap).
+For an example, see
+[sample_zap_file_hashmeta.yaml](test_files/sample_zap_file_hashmeta.yaml) which
+was generated from [sample_zap_file.zap](test_files/sample_zap_file.zap).
 
 Note that it is more readable in `yaml` format. Since hashes are generated from
 the metadata info, additional conventions are needed to ensure consistency for
@@ -166,8 +161,6 @@ As an example, take a look at
 
 ## Utility Usage
 
----
-
 There are a few primary usage cases for the utility
 [sample_app_util.py](sample_app_util.py). Details are provided by using
 `python sample_app_util.py zap --help`. Below is a summary.
@@ -179,8 +172,6 @@ There are a few primary usage cases for the utility
 | `python sample_app_util.py zap <zap_file> --generate-metadata [output_path]` | Generates the metadata file adjacent to the zap file with `.yaml` extension. If `[output_path]` is provided then the metadata file will be stored at the location specified. |
 
 ## Running Tests
-
----
 
 Navigate to the base directory of this README.
 
