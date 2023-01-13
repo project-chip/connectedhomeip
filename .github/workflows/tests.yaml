@@ -242,8 +242,8 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
-            # NOTE: zap version should be kept in sync with the image used by 
-            # Docker, currently connectedhomeip/chip-build:0.6.31 
+            # NOTE: Generally kept in sync within the repo using
+            #       scripts/tools/zap/version_update.py
             ZAP_VERSION: v2023.01.09-nightly
             ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 
@@ -526,8 +526,8 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
-            # NOTE: zap version should be kept in sync with the image used by 
-            # Docker, currently connectedhomeip/chip-build:0.6.31 
+            # NOTE: Generally kept in sync within the repo using
+            #       scripts/tools/zap/version_update.py
             ZAP_VERSION: v2023.01.09-nightly
             ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 

@@ -32,8 +32,8 @@ jobs:
         runs-on: macos-latest
 
         env:
-          # NOTE: zap version should be kept in sync with the image used by 
-            # Docker, currently connectedhomeip/chip-build:0.6.31 
+            # NOTE: Generally kept in sync within the repo using
+            #       scripts/tools/zap/version_update.py
             ZAP_VERSION: v2023.01.09-nightly
             ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 
