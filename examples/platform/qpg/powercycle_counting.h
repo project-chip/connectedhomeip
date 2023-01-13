@@ -1,5 +1,7 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +16,20 @@
  *    limitations under the License.
  */
 
-// This hack is needed because Ameba SDK is not linking against libstdc++ correctly.
+#ifndef _POWERCYCLE_COUNTING_H_
+#define _POWERCYCLE_COUNTING_H_
+
+#include "inttypes.h"
+
+#ifdef __cplusplus
 extern "C" {
-void * __dso_handle = 0;
+#endif
+void gpAppFramework_Reset_Init(void);
+uint8_t gpAppFramework_Reset_GetResetCount(void);
+void gpAppFramework_Reset_cbTriggerResetCountCompleted(void);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif // _POWERCYCLE_COUNTING_H_

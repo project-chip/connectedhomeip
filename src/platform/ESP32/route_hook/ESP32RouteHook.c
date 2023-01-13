@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "esp_route_hook.h"
+#include <platform/ESP32/route_hook/ESP32RouteHook.h>
 
+#include <platform/ESP32/route_hook/ESP32RouteTable.h>
 #include <stdint.h>
 #include <string.h>
 
 #include "esp_check.h"
 #include "esp_err.h"
 #include "esp_netif.h"
-#include "esp_route_table.h"
 
 #include "lwip/icmp6.h"
 #include "lwip/mld6.h"
@@ -25,8 +25,6 @@
 #define HOPLIM_MAX 255
 #define PIO_FLAG_ON_LINK (1 << 7)
 #define PIO_FLAG_AUTO_CONFIG (1 << 6)
-
-#define TAG "ROUTE_HOOK"
 
 typedef struct esp_route_hook_t
 {
@@ -137,12 +135,12 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
 
     if (p->tot_len != p->len)
     {
-        ESP_LOGW(TAG, "Ignore segmented ICMP packet");
+        ESP_LOGI(TAG, "Ignore segmented ICMP packet");
         return 0;
     }
     if (p->tot_len <= sizeof(struct ip6_hdr) + sizeof(struct icmp6_hdr))
     {
-        ESP_LOGW(TAG, "Ignore invalid ICMP packet");
+        ESP_LOGI(TAG, "Ignore invalid ICMP packet");
         return 0;
     }
     if (!ip6_addr_islinklocal(&dest) && !ip6_addr_isallnodes_linklocal(&dest) && !ip6_addr_isallrouters_linklocal(&dest))
