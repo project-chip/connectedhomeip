@@ -209,6 +209,17 @@ CHIP_ERROR ESP32FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
     return err;
 }
 
+CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+{
+    ChipError err   = CHIP_NO_ERROR;
+    uint32_t valInt = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_HardwareVersion, valInt);
+    ReturnErrorOnFailure(err);
+    hardwareVersion = static_cast<uint16_t>(valInt);
+    return err;
+}
+
 CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
