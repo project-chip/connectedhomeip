@@ -463,8 +463,6 @@ jobs:
                       build \
                    "
             - name: Run Discover Tests
-              # temporarily disable the failing test, would re-enable it later
-              if: false
               timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
