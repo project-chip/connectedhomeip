@@ -300,7 +300,7 @@ CHIP_ERROR TLVReader::Get(ByteSpan & v)
 
 CHIP_ERROR TLVReader::Get(CharSpan & v)
 {
-    constexpr int kAsciiUnitSeparator = 0x1F;
+    constexpr int kUnicodeInformationSeparator1 = 0x1F;
 
     if (!TLVTypeIsUTF8String(ElementType()))
     {
@@ -312,9 +312,9 @@ CHIP_ERROR TLVReader::Get(CharSpan & v)
 
     uint32_t len = GetLength();
 
-    // If ASCII Unit Separator (0x1f) is present in the string then method returns string ending
-    // at first appearance of Unit Separator.
-    const uint8_t * unitSeparator = reinterpret_cast<const uint8_t *>(memchr(bytes, kAsciiUnitSeparator, len));
+    // If Unicode Information Separator 1 (0x1f) is present in the string then method returns
+    // string ending at first appearance of the Information Separator 1.
+    const uint8_t * unitSeparator = reinterpret_cast<const uint8_t *>(memchr(bytes, kUnicodeInformationSeparator1, len));
     if (unitSeparator != nullptr)
     {
         len = static_cast<uint32_t>(unitSeparator - bytes);

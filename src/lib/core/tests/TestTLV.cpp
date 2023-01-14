@@ -2804,6 +2804,7 @@ void CheckTLVCharSpan(nlTestSuite * inSuite, void * inContext)
         {  "This is a test case #0",                                     "This is a test case #0"  },
         {  "This is a test case #1\x1fTest Localized String Identifier", "This is a test case #1"  },
         {  "This is a test case #2 \x1f abc \x1f def",                   "This is a test case #2 " },
+        {  "This is a test case #3\x1f",                                 "This is a test case #3"  },
     };
     // clang-format on
 
