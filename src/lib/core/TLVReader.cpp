@@ -314,10 +314,10 @@ CHIP_ERROR TLVReader::Get(CharSpan & v)
 
     // If Unicode Information Separator 1 (0x1f) is present in the string then method returns
     // string ending at first appearance of the Information Separator 1.
-    const uint8_t * unitSeparator = reinterpret_cast<const uint8_t *>(memchr(bytes, kUnicodeInformationSeparator1, len));
-    if (unitSeparator != nullptr)
+    const uint8_t * infoSeparator = reinterpret_cast<const uint8_t *>(memchr(bytes, kUnicodeInformationSeparator1, len));
+    if (infoSeparator != nullptr)
     {
-        len = static_cast<uint32_t>(unitSeparator - bytes);
+        len = static_cast<uint32_t>(infoSeparator - bytes);
     }
 
     v = CharSpan(Uint8::to_const_char(bytes), len);
