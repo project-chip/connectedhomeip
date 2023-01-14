@@ -48,23 +48,13 @@ void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsD
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     mParams = params;
-    if (params.GetFailsafeTimerSeconds().HasValue())
-    {
-        ChipLogProgress(Controller, "Setting failsafe timer from parameters");
-        mParams.SetFailsafeTimerSeconds(params.GetFailsafeTimerSeconds().Value());
-    }
 
-    if (params.GetCASEFailsafeTimerSeconds().HasValue())
-    {
-        ChipLogProgress(Controller, "Setting CASE failsafe timer from parameters");
-        mParams.SetCASEFailsafeTimerSeconds(params.GetCASEFailsafeTimerSeconds().Value());
-    }
+    // Make sure any members that point to buffers that we are not pointing to
+    // our own buffers are not going to dangle.
+    mParams.ClearExternalBufferDependentValues();
 
-    if (params.GetAdminSubject().HasValue())
-    {
-        ChipLogProgress(Controller, "Setting adminSubject from parameters");
-        mParams.SetAdminSubject(params.GetAdminSubject().Value());
-    }
+    // For members of params that point to some sort of buffer, we have to copy
+    // the data over into our own buffers.
 
     if (params.GetThreadOperationalDataset().HasValue())
     {
@@ -77,12 +67,6 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         memcpy(mThreadOperationalDataset, dataset.data(), dataset.size());
         ChipLogProgress(Controller, "Setting thread operational dataset from parameters");
         mParams.SetThreadOperationalDataset(ByteSpan(mThreadOperationalDataset, dataset.size()));
-    }
-
-    if (params.GetAttemptThreadNetworkScan().HasValue())
-    {
-        ChipLogProgress(Controller, "Setting attempt thread scan from parameters");
-        mParams.SetAttemptThreadNetworkScan(params.GetAttemptThreadNetworkScan().Value());
     }
 
     if (params.GetWiFiCredentials().HasValue())
@@ -101,12 +85,6 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
             WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
 
-    if (params.GetAttemptWiFiNetworkScan().HasValue())
-    {
-        ChipLogProgress(Controller, "Setting attempt wifi scan from parameters");
-        mParams.SetAttemptWiFiNetworkScan(params.GetAttemptWiFiNetworkScan().Value());
-    }
-
     if (params.GetCountryCode().HasValue())
     {
         auto code = params.GetCountryCode().Value();
@@ -118,6 +96,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         else
         {
             ChipLogError(Controller, "Country code is too large: %u", static_cast<unsigned>(code.size()));
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
 
@@ -147,12 +126,6 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
-
-    if (params.GetSkipCommissioningComplete().HasValue())
-    {
-        ChipLogProgress(Controller, "Setting PASE-only commissioning from parameters");
-        mParams.SetSkipCommissioningComplete(params.GetSkipCommissioningComplete().Value());
-    }
 
     return CHIP_NO_ERROR;
 }

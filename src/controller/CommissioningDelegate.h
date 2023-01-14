@@ -425,6 +425,26 @@ public:
         return *this;
     }
 
+    // Clear all members that depend on some sort of external buffer.  Can be
+    // used to make sure that we are not holding any dangling pointers.
+    void ClearExternalBufferDependentValues()
+    {
+        mCSRNonce.ClearValue();
+        mAttestationNonce.ClearValue();
+        mWiFiCreds.ClearValue();
+        mCountryCode.ClearValue();
+        mThreadOperationalDataset.ClearValue();
+        mNOCChainGenerationParameters.ClearValue();
+        mRootCert.ClearValue();
+        mNoc.ClearValue();
+        mIcac.ClearValue();
+        mIpk.ClearValue();
+        mAttestationElements.ClearValue();
+        mAttestationSignature.ClearValue();
+        mPAI.ClearValue();
+        mDAC.ClearValue();
+    }
+
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
