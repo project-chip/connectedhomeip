@@ -28,6 +28,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/AttributePathParams.h>
+#include <app/CASESessionManager.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>
 #include <app/EventPathParams.h>
@@ -166,14 +167,16 @@ public:
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      *
-     *  Constructor for resuming a persisted subscription
+     *  Constructor in preparation for resuming a persisted subscription
      *
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback, SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
+    ReadHandler(ManagementCallback & apCallback);
+#endif
 
     const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
     const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
@@ -252,6 +255,15 @@ private:
      *
      */
     void OnInitialRequest(System::PacketBufferHandle && aPayload);
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     *
+     *  Resume a persisted subscription
+     *
+     */
+    void ResumeSubscription(CASESessionManager *caseSessionManager, SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
+#endif
 
     /**
      *  Send ReportData to initiator
@@ -372,6 +384,7 @@ private:
      *  @param    keepPersisted             Keep the subscription persisted in storage for later resumption
      */
     void Close(bool keepPersisted = false);
+    void CloseButKeepPersisted() { Close(true); }
 
     static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);

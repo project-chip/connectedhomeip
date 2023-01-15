@@ -354,7 +354,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    err = chip::app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
+    ResumeSubscriptions();
 #endif
 
     PlatformMgr().HandleServerStarted();
@@ -480,5 +480,17 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+void Server::ResumeSubscriptions()
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Error when trying to resume subscriptions : %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    }
+#endif
+}
 
 } // namespace chip

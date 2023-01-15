@@ -378,6 +378,9 @@ private:
 
     void InitFailSafe();
 
+    /**
+     * @brief Called at Server::Init time to resume persisted subscriptions if the feature flag is enabled
+     */
     void ResumeSubscriptions();
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
@@ -443,6 +446,7 @@ private:
         {
             (void) fabricTable;
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
+            ClearSubscriptinoResumptionStateOnFabricChange(fabricIndex);
 
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
@@ -496,10 +500,13 @@ private:
                              "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
                              static_cast<unsigned>(fabricIndex), err.Format());
             }
+        }
 
+        void ClearSubscriptinoResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
+        {
             auto * subscriptionResumptionStorage = mServer->GetSubscriptionResumptionStorage();
             VerifyOrReturn(subscriptionResumptionStorage != nullptr);
-            err = subscriptionResumptionStorage->DeleteAll(fabricIndex);
+            CHIP_ERROR err = subscriptionResumptionStorage->DeleteAll(fabricIndex);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer,

@@ -59,6 +59,8 @@ public:
 private:
     CHIP_ERROR SaveIndex(const SubscriptionIndex & index);
     CHIP_ERROR SaveSubscriptions(const ScopedNodeId & node, const SubscriptionList & subscriptions);
+    CHIP_ERROR LoadIndex(SubscriptionIndex & index, size_t allocateExtraSpace);
+    CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions, size_t allocateExtraSpace);
 
     static constexpr size_t MaxScopedNodeIdSize() { return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex)); }
 

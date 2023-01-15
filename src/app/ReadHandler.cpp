@@ -62,17 +62,23 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
 }
 
-ReadHandler::ReadHandler(ManagementCallback & apCallback, SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo) :
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+ReadHandler::ReadHandler(ManagementCallback & apCallback) :
     mExchangeCtx(*this), mManagementCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     mInteractionType         = InteractionType::Subscribe;
+    mFlags.ClearAll();
+}
+
+void ReadHandler::ResumeSubscription(CASESessionManager *caseSessionManager, SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
+{
     mSubscriptionId          = subscriptionInfo.mSubscriptionId;
     mMinIntervalFloorSeconds = subscriptionInfo.mMinInterval;
     mMaxInterval             = subscriptionInfo.mMaxInterval;
     SetStateFlag(ReadHandlerFlags::FabricFiltered, subscriptionInfo.mFabricFiltered);
 
+    // Move dynamically allocated attributes and events from the SubscriptionInfo struct into the object pool managed by the IM engine
     CHIP_ERROR err;
     for (size_t i = 0; i < subscriptionInfo.mAttributePaths.AllocatedCount(); i++)
     {
@@ -95,21 +101,12 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, SubscriptionResumption
         }
     }
 
-    // Ask IM engine to start case with
-    auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
-    if (caseSessionManager)
-    {
-        ScopedNodeId peerNode = ScopedNodeId(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex);
-        caseSessionManager->FindOrEstablishSession(peerNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
-    }
-    else
-    {
-        // TODO: Investigate if need to consider if caseSessionManager does not exist
-        Close();
-    }
+    // Ask IM engine to start CASE session with subscriber
+    ScopedNodeId peerNode = ScopedNodeId(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex);
+    caseSessionManager->FindOrEstablishSession(peerNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+}
 
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-}
 
 ReadHandler::~ReadHandler()
 {
@@ -371,7 +368,7 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
                  ChipLogValueExchange(apExchangeContext));
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     // TODO: Have a retry mechanism tied to wake interval for IC devices
-    Close(true);
+    CloseButKeepPersisted();
 #else
     Close();
 #endif

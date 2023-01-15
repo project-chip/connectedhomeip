@@ -68,6 +68,3 @@
 #ifndef CHIP_CONFIG_MAX_FABRICS
 #define CHIP_CONFIG_MAX_FABRICS 5
 #endif
-
-// Disable subscription persistence and resumption until memory issues get sorted out
-#define CHIP_CONFIG_PERSIST_SUBSCRIPTIONS 0
