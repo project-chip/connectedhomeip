@@ -487,8 +487,7 @@ void Server::ResumeSubscriptions()
     CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Error when trying to resume subscriptions : %" CHIP_ERROR_FORMAT,
-                     err.Format());
+        ChipLogError(AppServer, "Error when trying to resume subscriptions : %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif
 }

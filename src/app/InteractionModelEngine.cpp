@@ -1598,14 +1598,15 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
         err = mpSubscriptionResumptionStorage->FindByScopedNodeId(subscriberIndex.mNodes[currentNodeIndex], subscriptions);
         ReturnLogErrorOnFailure(err);
 
-        ChipLogProgress(
-            InteractionModel, "\tNode " ChipLogFormatScopedNodeId ": Loaded %u subscriptions..",
-            ChipLogValueScopedNodeId(subscriberIndex.mNodes[currentNodeIndex]), static_cast<unsigned>(subscriptions.mSize));
+        ChipLogProgress(InteractionModel, "\tNode " ChipLogFormatScopedNodeId ": Loaded %u subscriptions..",
+                        ChipLogValueScopedNodeId(subscriberIndex.mNodes[currentNodeIndex]),
+                        static_cast<unsigned>(subscriptions.mSize));
         for (size_t currentSubscriptionIndex = 0; currentSubscriptionIndex < subscriptions.mSize; currentSubscriptionIndex++)
         {
-            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = subscriptions.mSubscriptions[currentSubscriptionIndex];
-            auto requestedAttributePathCount                                   = subscriptionInfo.mAttributePaths.AllocatedCount();
-            auto requestedEventPathCount                                       = subscriptionInfo.mEventPaths.AllocatedCount();
+            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo =
+                subscriptions.mSubscriptions[currentSubscriptionIndex];
+            auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedCount();
+            auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedCount();
             if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
             {
                 ChipLogProgress(InteractionModel, "no resource for Subscription resumption");

@@ -67,18 +67,20 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback) :
     mExchangeCtx(*this), mManagementCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
-    mInteractionType         = InteractionType::Subscribe;
+    mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
 }
 
-void ReadHandler::ResumeSubscription(CASESessionManager *caseSessionManager, SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
+void ReadHandler::ResumeSubscription(CASESessionManager * caseSessionManager,
+                                     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
 {
     mSubscriptionId          = subscriptionInfo.mSubscriptionId;
     mMinIntervalFloorSeconds = subscriptionInfo.mMinInterval;
     mMaxInterval             = subscriptionInfo.mMaxInterval;
     SetStateFlag(ReadHandlerFlags::FabricFiltered, subscriptionInfo.mFabricFiltered);
 
-    // Move dynamically allocated attributes and events from the SubscriptionInfo struct into the object pool managed by the IM engine
+    // Move dynamically allocated attributes and events from the SubscriptionInfo struct into the object pool managed by the IM
+    // engine
     CHIP_ERROR err;
     for (size_t i = 0; i < subscriptionInfo.mAttributePaths.AllocatedCount(); i++)
     {

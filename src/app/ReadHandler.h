@@ -37,6 +37,7 @@
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/SubscriptionResumptionStorage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
@@ -262,7 +263,8 @@ private:
      *  Resume a persisted subscription
      *
      */
-    void ResumeSubscription(CASESessionManager *caseSessionManager, SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
+    void ResumeSubscription(CASESessionManager * caseSessionManager,
+                            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
 #endif
 
     /**

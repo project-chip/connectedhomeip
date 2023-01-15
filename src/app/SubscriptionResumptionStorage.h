@@ -93,8 +93,8 @@ public:
     {
         size_t mSize;
         std::unique_ptr<SubscriptionInfo[]> mSubscriptions;
-        SubscriptionInfo &operator[](size_t index) { return mSubscriptions[index]; }
-        const SubscriptionInfo &operator[](size_t index) const { return mSubscriptions[index]; }
+        SubscriptionInfo & operator[](size_t index) { return mSubscriptions[index]; }
+        const SubscriptionInfo & operator[](size_t index) const { return mSubscriptions[index]; }
     };
 
     /**
@@ -104,8 +104,8 @@ public:
     {
         size_t mSize;
         std::unique_ptr<ScopedNodeId[]> mNodes;
-        ScopedNodeId &operator[](size_t index) { return mNodes[index]; }
-        const ScopedNodeId &operator[](size_t index) const { return mNodes[index]; }
+        ScopedNodeId & operator[](size_t index) { return mNodes[index]; }
+        const ScopedNodeId & operator[](size_t index) const { return mNodes[index]; }
     };
 
     virtual ~SubscriptionResumptionStorage(){};
