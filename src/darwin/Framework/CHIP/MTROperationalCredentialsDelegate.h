@@ -79,7 +79,7 @@ public:
     CHIP_ERROR GenerateNOC(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & noc);
 
-    const chip::Crypto::AesCcm128KeySpan GetIPK() { return mIPK.Span(); }
+    const chip::Crypto::IdentityProtectionKeySpan GetIPK() { return mIPK.Span(); }
 
     // Get the root/intermediate X.509 DER certs as a ByteSpan.
     chip::ByteSpan RootCertSpan() const;
@@ -133,7 +133,7 @@ private:
 
     ChipP256KeypairPtr mIssuerKey;
 
-    chip::Crypto::AesCcm128Key mIPK;
+    chip::Crypto::IdentityProtectionKey mIPK;
 
     static const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
 
