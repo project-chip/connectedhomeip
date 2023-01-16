@@ -35,21 +35,20 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [112233],
                       Targets:
-                          [
-                              { Cluster: null, Endpoint: 0, DeviceType: null }
-                          ]
-                  }
-                ]
+                          [{ Cluster: null, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
 
-    - label: "Read the NOC attribute (Node operational credentials - requires administer)"
+    - label:
+          "Read the NOC attribute (Node operational credentials - requires
+          administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
       attribute: "NOCs"
@@ -65,7 +64,9 @@ tests:
       arguments:
           value: "XX"
 
-    - label: "Send the UpdateFabricLabel command (Node operational credentials - requires administer)"
+    - label:
+          "Send the UpdateFabricLabel command (Node operational credentials -
+          requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
       arguments:
@@ -102,31 +103,28 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [112233],
                       Targets:
-                          [
-                              { Cluster: 0x001F, Endpoint: 0, DeviceType: null }
-                          ]
+                          [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 4, # manage
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [112233],
                       Targets:
-                          [
-                              { Cluster: null, Endpoint: 0, DeviceType: null }
-                          ]
-                  }
-                ]
+                          [{ Cluster: null, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
 
-    - label: "Read the NOC attribute (Node operational credentials - requires administer)"
+    - label:
+          "Read the NOC attribute (Node operational credentials - requires
+          administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
       attribute: "NOCs"
@@ -142,7 +140,9 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Send the UpdateFabricLabel command (Node operational credentials - requires administer)"
+    - label:
+          "Send the UpdateFabricLabel command (Node operational credentials -
+          requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
       arguments:
@@ -181,31 +181,28 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [112233],
                       Targets:
-                          [
-                              { Cluster: 0x001F, Endpoint: 0, DeviceType: null }
-                          ]
+                          [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 3, # operate
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [112233],
                       Targets:
-                          [
-                              { Cluster: null, Endpoint: 0, DeviceType: null }
-                          ]
-                  }
-                ]
+                          [{ Cluster: null, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
 
-    - label: "Read the NOC attribute (Node operational credentials - requires administer)"
+    - label:
+          "Read the NOC attribute (Node operational credentials - requires
+          administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
       attribute: "NOCs"
@@ -221,7 +218,9 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Send the UpdateFabricLabel command (Node operational credentials - requires administer)"
+    - label:
+          "Send the UpdateFabricLabel command (Node operational credentials -
+          requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
       arguments:
@@ -262,31 +261,28 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [112233],
                       Targets:
-                          [
-                              { Cluster: 0x001F, Endpoint: 0, DeviceType: null }
-                          ]
+                          [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [112233],
                       Targets:
-                          [
-                              { Cluster: null, Endpoint: 0, DeviceType: null }
-                          ]
-                  }
-                ]
+                          [{ Cluster: null, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
 
-    - label: "Read the NOC attribute (Node operational credentials - requires administer)"
+    - label:
+          "Read the NOC attribute (Node operational credentials - requires
+          administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
       attribute: "NOCs"
@@ -302,7 +298,9 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Send the UpdateFabricLabel command (Node operational credentials - requires administer)"
+    - label:
+          "Send the UpdateFabricLabel command (Node operational credentials -
+          requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
       arguments:
@@ -343,21 +341,20 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [112233],
                       Targets:
-                          [
-                              { Cluster: 0x001F, Endpoint: 0, DeviceType: null }
-                          ]
+                          [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
                   },
-                ]
+              ]
 
-    - label: "Read the NOC attribute (Node operational credentials - requires administer)"
+    - label:
+          "Read the NOC attribute (Node operational credentials - requires
+          administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
       attribute: "NOCs"
@@ -373,7 +370,9 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Send the UpdateFabricLabel command (Node operational credentials - requires administer)"
+    - label:
+          "Send the UpdateFabricLabel command (Node operational credentials -
+          requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
       arguments:
@@ -415,13 +414,12 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
-                      Targets: null
-                  }
-                ]
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+              ]
