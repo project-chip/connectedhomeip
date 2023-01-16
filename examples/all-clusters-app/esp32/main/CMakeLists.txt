@@ -93,10 +93,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
 )
 
-set(EXCLUDE_SRCS_LIST
-                     # "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/esp32/main/LockAppCommandDelegate.cpp"
-)
-
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
