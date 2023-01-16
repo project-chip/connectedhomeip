@@ -282,24 +282,6 @@ jobs:
             #       # objdirs are big; don't hold on to them too long.
             #       retention-days: 5
 
-            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
-            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find out -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove dbus binaries for CodeQL Analysis
-            #   run: find out -type d -name "dbus" -exec rm -rf {} +
-            # - name: Remove nrfxlib binaries for CodeQL Analysis
-            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
-            # - name: Perform CodeQL Analysis
-            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-            #   uses: github/codeql-action/analyze@v1
-
     build_linux_python_lib:
         name: Build on Linux (python_lib)
         timeout-minutes: 60
@@ -449,12 +431,6 @@ jobs:
             #   uses: github/codeql-action/analyze@v1
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
 
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
@@ -471,14 +447,6 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - name: Dump GitHub context
-              env:
-                  GITHUB_CONTEXT: ${{ toJSON(github) }}
-              run: echo "$GITHUB_CONTEXT"
-            - name: Dump Concurrency context
-              env:
-                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-              run: echo "$CONCURRENCY_CONTEXT"
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
@@ -489,11 +457,6 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
-            - name: Try to ensure the directories for core dumping exist and we
-                  can write them.
-              run: |
-                  mkdir /tmp/cores || true
-                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
