@@ -32,13 +32,14 @@ An example showing the use of CHIP on the Silicon Labs SiWx917 SoC device.
 ## Introduction
 
 The SiWx917 light switch example provides a baseline demonstration of an on-off
-light switch device, built using Matter, the Silicon Labs Gecko SDK, and the Silicon Labs WiseMCU SDK. It can be controlled
-by a Chip controller over a Wi-Fi network.
+light switch device, built using Matter, the Silicon Labs Gecko SDK, and the
+Silicon Labs WiseMCU SDK. It can be controlled by a Chip controller over a Wi-Fi
+network.
 
-The SiWx917 device can be commissioned over Bluetooth Low Energy where the device
-and the Chip controller will exchange security information with the rendezvous
-procedure. Wi-Fi Network credentials are then provided to the
-SiWx917 device which will then join the Wi-Fi network.
+The SiWx917 device can be commissioned over Bluetooth Low Energy where the
+device and the Chip controller will exchange security information with the
+rendezvous procedure. Wi-Fi Network credentials are then provided to the SiWx917
+device which will then join the Wi-Fi network.
 
 If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
@@ -89,10 +90,12 @@ Silicon Labs platform.
 
 ## Flashing the Application
 
--   Flashing requires the SiWx917 SoC device to be configured in the Ozone Debugger.
--   Once it's configured, it can be run with the Ozone Debugger by loading the .out file.
-    -   > For detailed instructions, please refer to 
-        > [Running the Matter Demo on SiWx917 SoC](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/wifi/RUN_DEMO_SiWx917_SoC.md) 
+-   Flashing requires the SiWx917 SoC device to be configured in the Ozone
+    Debugger.
+-   Once it's configured, it can be run with the Ozone Debugger by loading the
+    .out file.
+    -   > For detailed instructions, please refer to
+        > [Running the Matter Demo on SiWx917 SoC](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/wifi/RUN_DEMO_SiWx917_SoC.md)
         > in the Silicon Labs Matter Github Repo
 
 ## Viewing Logging Output
@@ -106,7 +109,7 @@ The example application's logging output can be viewed in the Ozone Debugger.
     [lighting app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/lighting-app/silabs/SiWx917/README.md)
     commissioned on the same Wi-Fi network
 
-*   You can provision and control the Chip device using the 
+*   You can provision and control the Chip device using the
     [chip-tool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
     standalone
 
@@ -150,10 +153,10 @@ The example application's logging output can be viewed in the Ozone Debugger.
 
 ### Notes
 
--   Depending on your network settings your router might not provide native IPv6 
-    addresses to your devices (Router / PC). If this is the case, you
-    need to add a static IPv6 addresses on both devices and then an IPv6 route to
-    the border router on your PC
+-   Depending on your network settings your router might not provide native IPv6
+    addresses to your devices (Router / PC). If this is the case, you need to
+    add a static IPv6 addresses on both devices and then an IPv6 route to the
+    border router on your PC
 
 #### On PC(Linux):
 
@@ -168,15 +171,15 @@ While most of the RAM usage in CHIP is static, allowing easier debugging and
 optimization with symbols analysis, we still need some HEAP for the crypto and
 Wi-Fi stack. Size of the HEAP can be modified by changing the value of the
 `configTOTAL_HEAP_SIZE` define inside of the FreeRTOSConfig.h file of this
-example. Please take note that a HEAP size smaller than 13k can and will cause an
-Mbedtls failure during the BLE rendezvous or CASE session
+example. Please take note that a HEAP size smaller than 13k can and will cause
+an Mbedtls failure during the BLE rendezvous or CASE session
 
 To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/silabs/SiWx917/MemMonitoring.cpp` to add your own memory
-tracking code inside the `trackAlloc` and `trackFree` function
+modify `examples/platform/silabs/SiWx917/MemMonitoring.cpp` to add your own
+memory tracking code inside the `trackAlloc` and `trackFree` function
 
 ## Building options
 

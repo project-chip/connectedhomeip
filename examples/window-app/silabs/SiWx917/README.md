@@ -27,14 +27,15 @@ An example showing the use of CHIP on the Silicon Labs SiWx917 SoC device.
 
 ## Introduction
 
-The SiWx917 window-covering example provides a baseline demonstration of a Window
-Covering device, built using Matter, the Silicon Labs Gecko SDK, and the Silicon Labs WiseMCU SDK. It can be controlled
-by a Chip controller over a Wi-Fi network.
+The SiWx917 window-covering example provides a baseline demonstration of a
+Window Covering device, built using Matter, the Silicon Labs Gecko SDK, and the
+Silicon Labs WiseMCU SDK. It can be controlled by a Chip controller over a Wi-Fi
+network.
 
-The SiWx917 device can be commissioned over Bluetooth Low Energy where the device
-and the Chip controller will exchange security information with the rendezvous
-procedure. The Wi-Fi Network credentials are provided to
-the SiWx917 device which will then join the Wi-Fi network.
+The SiWx917 device can be commissioned over Bluetooth Low Energy where the
+device and the Chip controller will exchange security information with the
+rendezvous procedure. The Wi-Fi Network credentials are provided to the SiWx917
+device which will then join the Wi-Fi network.
 
 If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
@@ -84,10 +85,12 @@ Silicon Labs platform.
 
 ## Flashing the Application
 
--   Flashing requires the SiWx917 SoC device to be configured in the Ozone Debugger.
--   Once it's configured, it can be run with the Ozone Debugger by loading the .out file.
-    -   > For detailed instructions, please refer to 
-        > [Running the Matter Demo on SiWx917 SoC](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/wifi/RUN_DEMO_SiWx917_SoC.md) 
+-   Flashing requires the SiWx917 SoC device to be configured in the Ozone
+    Debugger.
+-   Once it's configured, it can be run with the Ozone Debugger by loading the
+    .out file.
+    -   > For detailed instructions, please refer to
+        > [Running the Matter Demo on SiWx917 SoC](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/wifi/RUN_DEMO_SiWx917_SoC.md)
         > in the Silicon Labs Matter Github Repo
 
 ## Viewing Logging Output
@@ -119,9 +122,9 @@ The example application's logging output can be viewed in the Ozone Debugger.
 ### Notes
 
 -   Depending on your network settings your router might not provide native IPv6
-    addresses to your devices (Router / PC). If this is the case, you
-    need to add a static IPv6 addresses on both devices and then an IPv6 route to
-    the border router on your PC
+    addresses to your devices (Router / PC). If this is the case, you need to
+    add a static IPv6 addresses on both devices and then an IPv6 route to the
+    border router on your PC
 
           # On PC (Linux) :
           $ sudo ip addr add dev <Network interface> 2002::1/64
