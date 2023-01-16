@@ -386,15 +386,6 @@ limitations under the License.
     <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="AlarmMode" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LampAlarmMode</attribute>
     <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampBurnHoursTripPoint</attribute>
   </cluster>
-  <bitmap name="BallastStatus" type="BITMAP8">
-    <cluster code="0x0301"/>
-    <field name="BallastNonOperational" mask="0x1"/>
-    <field name="LampFailure" mask="0x2"/>
-  </bitmap>
-  <bitmap name="AlarmMode" type="BITMAP8">
-    <cluster code="0x0301"/>
-    <field name="LampBurnHours" mask="0x1"/>
-  </bitmap>
   <cluster>
     <name>Occupancy Sensing</name>
     <domain>Measurement &amp; Sensing</domain>
