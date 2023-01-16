@@ -49,7 +49,6 @@ inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip
     static const chip::KeysetId kKeySet2 = 0x01a2;
     static const chip::KeysetId kKeySet3 = 0x01a3;
 
-
     // Groups
 
     const chip::Credentials::GroupDataProvider::GroupInfo group1(kGroup1, "Group #1");
