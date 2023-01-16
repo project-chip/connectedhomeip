@@ -65,10 +65,10 @@ def main(argv):
                       ] + extra_args + [options.input_file]
         subprocess.check_call(gdbus_args)
         sed_args = ["sed", "-i",
-                    "s/config\.h/BuildConfig.h/g", options.output_c]
+                    r"s/config\.h/BuildConfig.h/g", options.output_c]
         if sys.platform == "darwin":
             sed_args = ["sed", "-i", "",
-                        "s/config\.h/BuildConfig.h/g", options.output_c]
+                        r"s/config\.h/BuildConfig.h/g", options.output_c]
         subprocess.check_call(sed_args)
 
     if options.output_h:

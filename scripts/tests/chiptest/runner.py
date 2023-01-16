@@ -56,8 +56,8 @@ class LogPipe(threading.Thread):
         return False, len(self.captured_logs)
 
     def FindLastMatchingLine(self, matcher):
-        for l in reversed(self.captured_logs):
-            match = re.match(matcher, l)
+        for line in reversed(self.captured_logs):
+            match = re.match(matcher, line)
             if match:
                 return match
         return None

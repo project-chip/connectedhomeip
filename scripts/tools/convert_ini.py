@@ -99,8 +99,16 @@ def load_ini_into_dict(ini_file: str, json_dict: typing.Dict, replace_suffix: st
 
 
 @click.command()
-@click.option('--ini-dir', type=click.Path(exists=True), show_default=True, default='/tmp', help='Path to directory containing INI files that chip-tool uses for its tests')
-@click.option('--json-path', type=click.Path(exists=False), show_default=True, default='/tmp/repl-storage.json', help='Path to JSON file used by Python infrastructure')
+@click.option('--ini-dir',
+              type=click.Path(exists=True),
+              show_default=True,
+              default='/tmp',
+              help='Path to directory containing INI files that chip-tool uses for its tests')
+@click.option('--json-path',
+              type=click.Path(exists=False),
+              show_default=True,
+              default='/tmp/repl-storage.json',
+              help='Path to JSON file used by Python infrastructure')
 def main(ini_dir: str, json_path: str):
     convert_ini_to_json(ini_dir, json_path)
     return 0

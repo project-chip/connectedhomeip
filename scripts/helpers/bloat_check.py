@@ -357,7 +357,7 @@ def main():
             # Output processed.
             a.delete()
 
-        except Exception as e:
+        except Exception:
             tb = traceback.format_exc()
             logging.warning('Failed to process bloat report: %s', tb)
 

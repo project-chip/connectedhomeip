@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import enum
 import itertools
 import logging
 import multiprocessing
@@ -25,8 +24,7 @@ import click
 
 try:
     from pregenerate import FindPregenerationTargets, TargetFilter
-except:
-    import os
+except ImportError:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
     from pregenerate import FindPregenerationTargets, TargetFilter
 
@@ -36,7 +34,7 @@ from pregenerate.types import IdlFileType
 try:
     import coloredlogs
     _has_coloredlogs = True
-except:
+except ImportError:
     _has_coloredlogs = False
 
 # Supported log levels, mapping string values required for argument

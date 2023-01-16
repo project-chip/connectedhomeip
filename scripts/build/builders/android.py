@@ -366,8 +366,6 @@ class AndroidBuilder(Builder):
                     title="Accepting NDK licenses @ tools",
                 )
 
-            app_dir = os.path.join(self.root, "examples/", self.app.AppName())
-
     def _build(self):
         if self.board.IsIde():
             # App compilation IDE

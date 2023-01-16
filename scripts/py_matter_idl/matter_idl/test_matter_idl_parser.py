@@ -16,15 +16,20 @@
 
 try:
     from .matter_idl_parser import CreateParser
-    from .matter_idl_types import *
-except:
+    from .matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
+                                   Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
+                                   Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
+                                   ServerClusterInstantiation, Struct, StructQuality, StructTag)
+except ImportError:
     import os
     import sys
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
     from matter_idl_parser import CreateParser
-    from matter_idl_types import *
-
+    from matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
+                                  Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
+                                  Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
+                                  ServerClusterInstantiation, Struct, StructQuality, StructTag)
 import unittest
 
 

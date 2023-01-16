@@ -267,7 +267,9 @@ def write_to_output(data: bytes,
     NXP_CHIP_REGEX = r"\[(?P<time>\d+)\]\[(?P<level>[EPDF])\]\[(?P<mod>[a-z\-A-Z]+)\](?P<msg>.*)"
     NXP_APP_REGEX = r"\[(?P<time>\d+)\]\[(?P<mod>[a-z\-A-Z]+)\](?P<msg>.*)"
 
-    LINUX_REGEX = r".*(?P<level>INF|DBG|ERR).*\s+\[(?P<time>[0-9]+\.?[0-9]*)\]\[(?P<pid>\d+)\:(?P<tid>\d+)\] CHIP:(?P<mod>[a-z\-A-Z]+)\: (?P<msg>.*)"
+    LINUX_REGEX = (
+        r".*(?P<level>INF|DBG|ERR).*\s+\[(?P<time>[0-9]+"
+        r"\.?[0-9]*)\]\[(?P<pid>\d+)\:(?P<tid>\d+)\] CHIP:(?P<mod>[a-z\-A-Z]+)\: (?P<msg>.*)")
 
     LogRegexes = [RegexStruct("ESP", "CHIP", re.compile(ESP_CHIP_REGEX), 4),
                   RegexStruct("ESP", "APP", re.compile(ESP_APP_REGEX), 4),
@@ -304,11 +306,11 @@ def write_to_output(data: bytes,
 
 def _read_raw_serial(read: Callable[[], bytes], output):
     """Continuously read and pass to output."""
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor():
         while True:
             try:
                 data = read()
-            except Exception as exc:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 continue
             if data:
                 output(data)

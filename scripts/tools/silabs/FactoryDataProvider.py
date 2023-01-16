@@ -15,12 +15,9 @@
 #
 
 import argparse
-import base64
 import datetime
 import os
-import struct
 import subprocess
-import sys
 
 
 class FactoryDataWriter:
@@ -102,7 +99,8 @@ class FactoryDataWriter:
         kPaddingFieldLengthInBits = 4
 
         kTotalPayloadDataSizeInBits = (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits +
-                                       kCommissioningFlowFieldLengthInBits + kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits +
+                                       kCommissioningFlowFieldLengthInBits + kRendezvousInfoFieldLengthInBits +
+                                       kPayloadDiscriminatorFieldLengthInBits +
                                        kSetupPINCodeFieldLengthInBits + kPaddingFieldLengthInBits)
 
         offset = 0
@@ -154,7 +152,8 @@ class FactoryDataWriter:
         if self._args.vendor_name:
             assert (len(self._args.vendor_name) <= kMaxVendorNameLength), "Vendor name exceeds the size limit"
         if self._args.hw_version_str:
-            assert (len(self._args.hw_version_str) <= kMaxHardwareVersionStringLength), "Hardware version string exceeds the size limit"
+            assert (
+                len(self._args.hw_version_str) <= kMaxHardwareVersionStringLength), "Hardware version string exceeds the size limit"
         if self._args.serial_number:
             assert (len(self._args.serial_number) <= kMaxSerialNumberLength), "Serial number exceeds the size limit"
         if self._args.manufacturing_date:
@@ -185,7 +184,7 @@ class FactoryDataWriter:
             cmdList.extend(["--serialno", self._args.jtagSerial])
 
     def create_nvm3injected_image(self):
-        """ Use commander command lines create a binary flashable to the EFR32 
+        """ Use commander command lines create a binary flashable to the EFR32
             containing the factory commissioning data in NVM3 section
         """
         isDeviceConnected = True
@@ -212,7 +211,7 @@ class FactoryDataWriter:
                     inputImage = self.BASE_MG24_FILE
                 else:
                     raise Exception('Invalid MCU')
-            except:
+            except Exception:
                 isDeviceConnected = False
                 print("Device not connected")
                 # When no device is connected user needs to provide the mcu family for which those credentials are to be created
@@ -347,7 +346,8 @@ def main():
     parser.add_argument("--part_number", type=str,
                         help="[string] Provide part number [optional]")
     parser.add_argument("--commissioning_flow", type=all_int_format, default=0,
-                        help="[int| hex] Provide Commissioning Flow: 0=Standard, 1=kUserActionRequired, 2=Custom (Default:Standard)")
+                        help="[int| hex] Provide Commissioning Flow: 0=Standard, "
+                             "1=kUserActionRequired, 2=Custom (Default:Standard)")
     parser.add_argument("--rendezvous_flag", type=all_int_format, default=2,
                         help="[int| hex] Provide Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Default=BLE Only)")
 

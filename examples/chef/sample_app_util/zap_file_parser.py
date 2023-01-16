@@ -35,7 +35,7 @@ import hashlib
 import json
 import os
 import re
-from typing import Dict, List, Literal, Optional, Sequence, TypedDict, Union
+from typing import Dict, List, Optional, Sequence, TypedDict, Union
 
 try:
     import yaml

@@ -60,15 +60,15 @@ def main():
     print("%s and %s have unexpected differences." % (base_name, ext_name))
     print("Differences between expected and actual:")
 
-    for l in difflib.unified_diff(
+    for line in difflib.unified_diff(
         json.dumps(ext_data, indent=2).split('\n'),
         json.dumps(base_data, indent=2).split('\n'),
         fromfile=ext_name,
         tofile="<Expected extension file content>",
     ):
-        if l.endswith('\n'):
-            l = l[:-1]
-        print(l)
+        if line.endswith('\n'):
+            line = line[:-1]
+        print(line)
 
     return 1
 

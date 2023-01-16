@@ -158,7 +158,8 @@ class IMXBuilder(GnBuilder):
             'import(\"//build_overrides/build.gni\")',
             'custom_toolchain=\"${build_root}/toolchain/custom\"',
             'sysroot="%s"' % sdk_target_sysroot,
-            'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
+            'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", '
+            '"-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
             'target_cc="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,
                                                                             cc),
             'target_cxx="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,

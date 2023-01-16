@@ -64,7 +64,9 @@ def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
                         if inspect.isclass(command):
                             for name, field in inspect.getmembers(command):
                                 if ('__dataclass_fields__' in name):
-                                    if (field['cluster_id'].default == path.ClusterId) and (field['command_id'].default == path.CommandId) and (field['is_client'].default == isClientSideCommand):
+                                    if ((field['cluster_id'].default == path.ClusterId) and
+                                            (field['command_id'].default == path.CommandId) and
+                                            (field['is_client'].default == isClientSideCommand)):
                                         return eval('chip.clusters.Objects.' + clusterName + '.Commands.' + commandName)
     return None
 
@@ -106,7 +108,7 @@ class AsyncCommandTransaction:
             try:
                 self._future.set_exception(
                     chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus)))
-            except Exception as e2:
+            except Exception:
                 logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure))
@@ -126,7 +128,8 @@ _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
 
 
 @_OnCommandSenderResponseCallbackFunct
-def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int, command: int, imStatus: int, clusterStatus: int, payload, size):
+def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int,
+                                     command: int, imStatus: int, clusterStatus: int, payload, size):
     data = ctypes.string_at(payload, size)
     closure.handleResponse(CommandPath(endpoint, cluster, command), Status(
         imStatus, clusterStatus), data[:])
@@ -142,7 +145,10 @@ def _OnCommandSenderDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
+def SendCommand(future: Future, eventLoop,
+                responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand,
+                timedRequestTimeoutMs: Union[None, int] = None,
+                interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)

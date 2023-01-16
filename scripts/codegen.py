@@ -139,10 +139,10 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
     if expected_outputs:
         with open(expected_outputs, 'rt') as fin:
             expected = set()
-            for l in fin.readlines():
-                l = l.strip()
-                if l:
-                    expected.add(l)
+            for line in fin.readlines():
+                line = line.strip()
+                if line:
+                    expected.add(line)
 
             if expected != storage.generated_paths:
                 logging.fatal("expected and generated files do not match.")

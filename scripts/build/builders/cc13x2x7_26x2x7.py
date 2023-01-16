@@ -81,7 +81,7 @@ class cc13x2x7_26x2x7Builder(GnBuilder):
             'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT'],
         ]
 
-        if self.openthread_ftd == None:
+        if self.openthread_ftd is None:
             pass
         elif self.openthread_ftd:
             args.append('chip_openthread_ftd=true')
@@ -98,7 +98,8 @@ class cc13x2x7_26x2x7Builder(GnBuilder):
                 or self.app == cc13x2x7_26x2x7App.PUMP_CONTROLLER):
             extensions = [".out", ".bin", ".out.map", "-bim.hex"]
 
-        elif self.app == cc13x2x7_26x2x7App.ALL_CLUSTERS or cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL or self.app == cc13x2x7_26x2x7App.SHELL:
+        elif (self.app == cc13x2x7_26x2x7App.ALL_CLUSTERS or
+              cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL or self.app == cc13x2x7_26x2x7App.SHELL):
             extensions = [".out", ".out.map"]
 
         else:

@@ -25,10 +25,9 @@
 
 from __future__ import absolute_import, print_function
 
-from ctypes import *
+from ctypes import CDLL, POINTER, c_void_p, pointer
 
-from .ChipStack import *
-from .exceptions import *
+from .ChipStack import ChipStack
 from .native import PyChipError
 
 __all__ = ["ChipCommissionableNodeController"]
@@ -62,7 +61,7 @@ class ChipCommissionableNodeController(object):
         self._ChipStack.commissionableNodeCtrl = commissionableNodeCtrl
 
     def __del__(self):
-        if self.commissionableNodeCtrl != None:
+        if self.commissionableNodeCtrl is not None:
             self._dmLib.pychip_CommissionableNodeController_DeleteController(
                 self.commissionableNodeCtrl)
             self.commissionableNodeCtrl = None

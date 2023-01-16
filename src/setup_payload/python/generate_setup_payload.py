@@ -21,7 +21,6 @@ import sys
 
 import Base38
 from bitarray import bitarray
-from bitarray.util import ba2int
 from stdnum.verhoeff import calc_check_digit
 
 # See section 5.1.4.1 Manual Pairing Code in the Matter specification v1.0
@@ -61,6 +60,10 @@ INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
 
 
+def _bitwiseOr(firstBit, secondBit):
+    return firstBit | secondBit
+
+
 class CommissioningFlow(enum.IntEnum):
     Standard = 0,
     UserIntent = 1,
@@ -82,13 +85,19 @@ class SetupPayload:
         discriminator_mask = (1 << MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_LEN) - 1
         discriminator_chunk = (self.short_discriminator >> discriminator_shift) & discriminator_mask
         vid_pid_present_flag = 0 if self.flow == CommissioningFlow.Standard else 1
-        return (discriminator_chunk << MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_POS) | (vid_pid_present_flag << MANUAL_CHUNK1_VID_PID_PRESENT_BIT_POS)
+        return _bitwiseOr(
+            (discriminator_chunk << MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_POS),
+            (vid_pid_present_flag << MANUAL_CHUNK1_VID_PID_PRESENT_BIT_POS)
+        )
 
     def manual_chunk2(self):
         discriminator_mask = (1 << MANUAL_CHUNK2_DISCRIMINATOR_LSBITS_LEN) - 1
         pincode_mask = (1 << MANUAL_CHUNK2_PINCODE_LSBITS_LEN) - 1
         discriminator_chunk = self.short_discriminator & discriminator_mask
-        return ((self.pincode & pincode_mask) << MANUAL_CHUNK2_PINCODE_LSBITS_POS) | (discriminator_chunk << MANUAL_CHUNK2_DISCRIMINATOR_LSBITS_POS)
+        return _bitwiseOr(
+            ((self.pincode & pincode_mask) << MANUAL_CHUNK2_PINCODE_LSBITS_POS),
+            (discriminator_chunk << MANUAL_CHUNK2_DISCRIMINATOR_LSBITS_POS)
+        )
 
     def manual_chunk3(self):
         pincode_shift = PINCODE_LEN - MANUAL_CHUNK3_PINCODE_MSBITS_LEN

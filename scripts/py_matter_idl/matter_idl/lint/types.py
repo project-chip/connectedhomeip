@@ -198,7 +198,8 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
 
                     if check.code not in attribute_codes:
                         self._AddLintError("EP%d:%s does not expose %s(%d) attribute" %
-                                           (endpoint.number, cluster.name, check.name, check.code), self._ParseLocation(cluster.parse_meta))
+                                           (endpoint.number, cluster.name, check.name, check.code),
+                                           self._ParseLocation(cluster.parse_meta))
 
             for requirement in self._mandatory_clusters:
                 if requirement.endpoint_id != endpoint.number:

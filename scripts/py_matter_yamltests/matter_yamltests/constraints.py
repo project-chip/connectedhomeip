@@ -187,7 +187,7 @@ class BaseConstraint(ABC):
             raise ConstraintNotValueError(self._context, reason)
         else:
             # This should not happens.
-            raise ConstraintParseError(f'Unknown constraint instance.')
+            raise ConstraintParseError('Unknown constraint instance.')
 
 
 class _ConstraintHasValue(BaseConstraint):
@@ -211,7 +211,7 @@ class _ConstraintHasValue(BaseConstraint):
 
     def get_reason(self, value, value_type_name) -> str:
         if self._has_value:
-            return f"The constraint expects a value but there isn't one."
+            return "The constraint expects a value but there isn't one."
         return f"The response contains the value ({value}), but wasn't expecting any value."
 
 
@@ -540,7 +540,7 @@ class _ConstraintIsHexString(BaseConstraint):
             chars = []
 
             for char in value:
-                if not char in string.hexdigits:
+                if char not in string.hexdigits:
                     chars.append(char)
 
             if len(chars) == 1:

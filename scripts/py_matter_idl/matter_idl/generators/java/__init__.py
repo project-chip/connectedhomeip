@@ -17,7 +17,6 @@ import enum
 import logging
 from typing import List, Set, Union
 
-from matter_idl import matter_idl_types
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                          ParseDataType, TypeLookupContext)

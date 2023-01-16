@@ -567,8 +567,8 @@ def get_and_validate_args():
 
     parser = argparse.ArgumentParser(description='Manufacuring partition generator tool',
                                      formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=50))
-    mandatory_args = parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate JSON file")
-    optional_args = parser.add_argument_group("Optional keys", "These arguments are optional and they depend on the user-purpose")
+    parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate JSON file")
+    parser.add_argument_group("Optional keys", "These arguments are optional and they depend on the user-purpose")
 
     # General options
     general_args = parser.add_argument_group('General options')
@@ -587,7 +587,8 @@ def get_and_validate_args():
     general_args.add_argument("--in-tree", action="store_true", default=False,
                               help="Use it only when building factory data from Matter source code.")
     general_args.add_argument("--enable-key", type=str,
-                              help="[hex string] [128-bit hex-encoded] The Enable Key is a 128-bit value that triggers manufacturer-specific action while invoking the TestEventTrigger Command."
+                              help="[hex string] [128-bit hex-encoded] The Enable Key is a 128-bit value that triggers "
+                              "manufacturer-specific action while invoking the TestEventTrigger Command."
                               "This value is used during Certification Tests, and should not be present on production devices.")
     # Commissioning options
     commissioning_args = parser.add_argument_group('Commisioning options')
@@ -617,7 +618,8 @@ def get_and_validate_args():
     dev_inst_args.add_argument('--enable-rotating-device-id', action='store_true',
                                help='Enable Rotating device id in the generated binaries')
     dev_inst_args.add_argument('--rd-id-uid', type=str, required=False,
-                               help='128-bit unique identifier for generating rotating device identifier, provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
+                               help='128-bit unique identifier for generating rotating device identifier, '
+                                    'provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
 
     dac_args = parser.add_argument_group('Device attestation credential options')
     # If DAC is present then PAI key is not required, so it is marked as not required here

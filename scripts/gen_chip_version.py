@@ -36,7 +36,7 @@ TEMPLATE = '''/*
  */
 
 /**
- *    \@file
+ *    @file
  *      This file defines constants and macros for introspecting and
  *      manipulating CHIP versions.
  *
@@ -49,13 +49,13 @@ TEMPLATE = '''/*
  *      example, conditionally-compile older, newer, or changed CHIP
  *      APIs based on the CHIP version. For example:
  *
- *          \@code
+ *          @code
  *          #if CHIP_VERSION_CODE >= CHIP_VERSION_CODE_ENCODE(1, 5, 0)
  *              ...
  *          #else
  *              ...
  *          #endif
- *          \@endcode
+ *          @endcode
  *
  */
 
@@ -75,23 +75,23 @@ TEMPLATE = '''/*
 #define _CHIP_VERSION_CODE_PATCH_SHIFT     8
 
 /**
- *  \@def CHIP_VERSION_CODE_ENCODE(major, minor, patch)
+ *  @def CHIP_VERSION_CODE_ENCODE(major, minor, patch)
  *
- *  \@brief
- *    Encode a CHIP version code from its constituent \@a major, \@a minor, and \@a patch
+ *  @brief
+ *    Encode a CHIP version code from its constituent @a major, @a minor, and @a patch
  *    components.
  *
  *    This macro may be used in conjunction with CHIP_VERSION_CODE to, for
  *    example, conditionally-compile older, newer, or changed CHIP APIs based
  *    on the CHIP version. For example:
  *
- *        \@code
+ *        @code
  *        #if CHIP_VERSION_CODE >= CHIP_VERSION_CODE_ENCODE(1, 5, 0)
  *            ...
  *        #else
  *            ...
  *        #endif
- *        \@endcode
+ *        @endcode
  *
  */
 #define CHIP_VERSION_CODE_ENCODE(major, minor, patch)                                    \\
@@ -100,81 +100,81 @@ TEMPLATE = '''/*
      (((patch)  & _CHIP_VERSION_CODE_PATCH_MASK)  << _CHIP_VERSION_CODE_PATCH_SHIFT))
 
 /**
- *  \@def CHIP_VERSION_CODE_DECODE_MAJOR(code)
+ *  @def CHIP_VERSION_CODE_DECODE_MAJOR(code)
  *
- *  \@brief
- *    Decode a CHIP major version component from a CHIP version \@a code.
+ *  @brief
+ *    Decode a CHIP major version component from a CHIP version @a code.
  *
  */
 #define CHIP_VERSION_CODE_DECODE_MAJOR(code)  (((code) >> _CHIP_VERSION_CODE_MAJOR_SHIFT)  & _CHIP_VERSION_CODE_MAJOR_MASK)
 
 /**
- *  \@def CHIP_VERSION_CODE_DECODE_MINOR(code)
+ *  @def CHIP_VERSION_CODE_DECODE_MINOR(code)
  *
- *  \@brief
- *    Decode a CHIP minor version component from a CHIP version \@a code.
+ *  @brief
+ *    Decode a CHIP minor version component from a CHIP version @a code.
  *
  */
 #define CHIP_VERSION_CODE_DECODE_MINOR(code)  (((code) >> _CHIP_VERSION_CODE_MINOR_SHIFT)  & _CHIP_VERSION_CODE_MINOR_MASK)
 
 /**
- *  \@def CHIP_VERSION_CODE_DECODE_PATCH(code)
+ *  @def CHIP_VERSION_CODE_DECODE_PATCH(code)
  *
- *  \@brief
- *    Decode a CHIP patch version component from a CHIP version \@a code.
+ *  @brief
+ *    Decode a CHIP patch version component from a CHIP version @a code.
  *
  */
 #define CHIP_VERSION_CODE_DECODE_PATCH(code)  (((code) >> _CHIP_VERSION_CODE_PATCH_SHIFT)  & _CHIP_VERSION_CODE_PATCH_MASK)
 
 /**
- *  \@def CHIP_VERSION_MAJOR
+ *  @def CHIP_VERSION_MAJOR
  *
- *  \@brief
+ *  @brief
  *    The CHIP version major component, as an unsigned integer.
  *
  */
 #define CHIP_VERSION_MAJOR               %(chip_major)d
 
 /**
- *  \@def CHIP_VERSION_MINOR
+ *  @def CHIP_VERSION_MINOR
  *
- *  \@brief
+ *  @brief
  *    The CHIP version minor component, as an unsigned integer.
  *
  */
 #define CHIP_VERSION_MINOR               %(chip_minor)d
 
 /**
- *  \@def CHIP_VERSION_PATCH
+ *  @def CHIP_VERSION_PATCH
  *
- *  \@brief
+ *  @brief
  *    The CHIP version patch component, as an unsigned integer.
  *
  */
 #define CHIP_VERSION_PATCH               %(chip_patch)d
 
 /**
- *  \@def CHIP_VERSION_EXTRA
+ *  @def CHIP_VERSION_EXTRA
  *
- *  \@brief
+ *  @brief
  *    The CHIP version extra component, as a quoted C string.
  *
  */
 #define CHIP_VERSION_EXTRA               \"%(chip_extra)s\"
 
 /**
- *  \@def CHIP_VERSION_STRING
+ *  @def CHIP_VERSION_STRING
  *
- *  \@brief
+ *  @brief
  *    The CHIP version, as a quoted C string.
  *
  */
 #define CHIP_VERSION_STRING              \"%(chip_version)s\"
 
 /**
- *  \@def CHIP_VERSION_CODE
+ *  @def CHIP_VERSION_CODE
  *
- *  \@brief
+ *  @brief
  *    The CHIP version, including the major, minor, and patch components,
  *    encoded as an unsigned integer.
  *
@@ -182,13 +182,13 @@ TEMPLATE = '''/*
  *    to, for example, conditionally-compile older, newer, or changed CHIP
  *    APIs based on the CHIP version. For example:
  *
- *        \@code
+ *        @code
  *        #if CHIP_VERSION_CODE >= CHIP_VERSION_CODE_ENCODE(1, 5, 0)
  *            ...
  *        #else
  *            ...
  *        #endif
- *        \@endcode
+ *        @endcode
  *
  */
 #define CHIP_VERSION_CODE                CHIP_VERSION_CODE_ENCODE( \\

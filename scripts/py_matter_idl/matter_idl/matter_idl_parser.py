@@ -2,19 +2,24 @@
 
 import functools
 import logging
-from enum import Enum
 
 from lark import Lark
 from lark.visitors import Transformer, v_args
 
 try:
-    from .matter_idl_types import *
-except:
+    from .matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
+                                   AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
+                                   DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                   ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+except ImportError:
     import os
     import sys
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-    from matter_idl_types import *
+    from matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
+                                  AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
+                                  DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                  ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -382,7 +387,8 @@ class MatterIdlTransformer(Transformer):
                 attributes.append(item)
             else:
                 events.add(item)
-        return AddServerClusterToEndpointTransform(ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events))
+        return AddServerClusterToEndpointTransform(
+            ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events))
 
     @v_args(inline=True, meta=True)
     def cluster(self, meta, side, name, code, *content):
@@ -448,7 +454,8 @@ def CreateParser(skip_meta: bool = False):
     #    - 0.39s LALR parsing of all-clusters-app.matter
     #    - 2.26s Earley parsing of the same thing.
     # For this reason, every attempt should be made to make the grammar context free
-    return ParserWithLines(Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True), skip_meta)
+    return ParserWithLines(Lark.open(
+        'matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True), skip_meta)
 
 
 if __name__ == '__main__':

@@ -15,7 +15,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from matter_idl import matter_idl_types  # to explicitly say 'Enum'
 from matter_idl.matter_idl_types import DataType

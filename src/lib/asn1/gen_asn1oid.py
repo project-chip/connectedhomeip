@@ -83,13 +83,14 @@ oids = [
 
     # !!! WARNING !!!
     #
-    # The enumerated values associated with individual object IDs are used in Matter TLV encodings (notably the Matter Certificate object).
+    # The enumerated values associated with individual object IDs are used in Matter TLV encodings
+    # (notably the Matter Certificate object).
     # Because of this, the Enum Values assigned to object IDs in this table MUST NOT BE CHANGED once in use.
 
 
     #                                              Enum
     # Category          Name                       Value    Object ID
-    # ----------------- -------------------------- -------- ------------------------------------------------------------------------------------------------
+    # ----------------- -------------------------- -------- ------------------------------------------------
 
     # Public Key Algorithms
     ("PubKeyAlgo",     "ECPublicKey",             1,       [

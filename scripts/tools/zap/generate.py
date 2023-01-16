@@ -119,9 +119,11 @@ def runArgumentsParser() -> CmdLineArgs:
         description='Generate artifacts from .zapt templates')
     parser.add_argument('zap', help='Path to the application .zap file')
     parser.add_argument('-t', '--templates', default=default_templates,
-                        help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
+                        help='Path to the .zapt templates records to use for generating artifacts '
+                             '(default: "' + default_templates + '")')
     parser.add_argument('-z', '--zcl',
-                        help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
+                        help='Path to the zcl templates records to use for generating artifacts '
+                             '(default: autodetect read from zap file)')
     parser.add_argument('-o', '--output-dir', default=None,
                         help='Output directory for the generated files (default: a temporary directory in out)')
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
@@ -173,7 +175,7 @@ def runArgumentsParser() -> CmdLineArgs:
     )
 
 
-def extractGeneratedIdl(self, output_dir, zap_config_path):
+def extractGeneratedIdl(output_dir, zap_config_path):
     """Find a file Clusters.matter in the output directory and
        place it along with the input zap file.
 
@@ -187,7 +189,7 @@ def extractGeneratedIdl(self, output_dir, zap_config_path):
     if not target_path.endswith(".matter"):
         # We expect "something.zap" and don't handle corner cases of
         # multiple extensions. This is to work with existing codebase only
-        raise Exception("Unexpected input zap file  %s" % self.zap_config)
+        raise Exception("Unexpected input zap file  %s" % zap_config_path)
 
     shutil.move(idl_path, target_path)
 
@@ -263,7 +265,8 @@ def runJavaPrettifier(templates_file, output_dir):
             filter(lambda filepath: os.path.splitext(filepath)[1] == ".java", outputs))
 
         if len(javaOutputs) > 0:
-            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
+            # Keep this version in sync with what restyler uses
+            # (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
             google_java_format_version = "1.6"
             google_java_format_url = 'https://github.com/google/google-java-format/releases/download/google-java-format-' + \
                 google_java_format_version + '/'
@@ -300,11 +303,12 @@ class LockFileSerializer:
         fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
         self.lock_file = self.lock_file.close()
 
+
 def main():
     checkPythonVersion()
     cmdLineArgs = runArgumentsParser()
 
-    with LockFileSerializer(cmdLineArgs.lock_file) as lock:
+    with LockFileSerializer(cmdLineArgs.lock_file):
         if cmdLineArgs.runBootstrap:
             subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 

@@ -26,7 +26,6 @@ import os
 import re
 import subprocess
 import sys
-from contextlib import nullcontext
 
 import click
 import requests
@@ -123,12 +122,17 @@ def use_dcld(dcld, production, cmdlist):
 @click.command()
 @click.help_option('-h', '--help')
 @optgroup.group('Input data sources', cls=RequiredMutuallyExclusiveOptionGroup)
-@optgroup.option('--use-main-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring MainNet.")
-@optgroup.option('--use-test-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring TestNet.")
-@optgroup.option('--use-main-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public MainNet observer.")
-@optgroup.option('--use-test-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public TestNet observer.")
+@optgroup.option('--use-main-net-dcld', type=str, default='', metavar='PATH',
+                 help="Location of `dcld` binary, to use `dcld` for mirroring MainNet.")
+@optgroup.option('--use-test-net-dcld', type=str, default='', metavar='PATH',
+                 help="Location of `dcld` binary, to use `dcld` for mirroring TestNet.")
+@optgroup.option('--use-main-net-http', is_flag=True, type=str,
+                 help="Use RESTful API with HTTPS against public MainNet observer.")
+@optgroup.option('--use-test-net-http', is_flag=True, type=str,
+                 help="Use RESTful API with HTTPS against public TestNet observer.")
 @optgroup.group('Optional arguments')
-@optgroup.option('--paa-trust-store-path', default='paa-root-certs', type=str, metavar='PATH', help="PAA trust store path (default: paa-root-certs)")
+@optgroup.option('--paa-trust-store-path', default='paa-root-certs', type=str, metavar='PATH',
+                 help="PAA trust store path (default: paa-root-certs)")
 def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path):
     """DCL PAA mirroring tools"""
 
@@ -163,7 +167,8 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
         if use_rest:
             response = requests.get(
-                f"{rest_node_url}/dcl/pki/certificates/{paa['subject']}/{paa['subjectKeyId']}").json()["approvedCertificates"]["certs"][0]
+                f"{rest_node_url}/dcl/pki/certificates/"
+                f"{paa['subject']}/{paa['subjectKeyId']}").json()["approvedCertificates"]["certs"][0]
             certificate = response["pemCert"]
             subject = response["subjectAsText"]
         else:
