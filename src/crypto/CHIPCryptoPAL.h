@@ -228,68 +228,120 @@ public:
                                                      const Sig & signature) const                                              = 0;
 };
 
-template <size_t Cap>
-class CapacityBoundBuffer
+template <size_t kCapacity>
+class SensitiveDataBuffer
 {
 public:
-    ~CapacityBoundBuffer()
+    ~SensitiveDataBuffer()
     {
         // Sanitize after use
-        ClearSecretData(&bytes[0], Cap);
+        ClearSecretData(mBytes);
     }
 
-    CapacityBoundBuffer & operator=(const CapacityBoundBuffer & other)
+    SensitiveDataBuffer & operator=(const SensitiveDataBuffer & other)
     {
         // Guard self assignment
         if (this == &other)
             return *this;
 
-        ClearSecretData(&bytes[0], Cap);
+        ClearSecretData(mBytes);
         SetLength(other.Length());
-        ::memcpy(Bytes(), other.Bytes(), other.Length());
+        ::memcpy(Bytes(), other.ConstBytes(), other.Length());
         return *this;
     }
 
-    /** @brief Set current length of the buffer that's being used
-     * @return Returns error if new length is > capacity
-     **/
-    CHIP_ERROR SetLength(size_t len)
+    /**
+     * @brief Set current length of the buffer
+     * @return Error if new length is exceeds capacity of the buffer
+     */
+    CHIP_ERROR SetLength(size_t length)
     {
-        VerifyOrReturnError(len <= sizeof(bytes), CHIP_ERROR_INVALID_ARGUMENT);
-        length = len;
+        VerifyOrReturnError(length <= kCapacity, CHIP_ERROR_INVALID_ARGUMENT);
+        mLength = length;
         return CHIP_NO_ERROR;
     }
 
-    /** @brief Returns current length of the buffer that's being used
-     * @return Returns 0 if SetLength() was never called
-     **/
-    size_t Length() const { return length; }
+    /**
+     * @brief Returns current length of the buffer
+     */
+    size_t Length() const { return mLength; }
 
-    /** @brief Returns max capacity of the buffer
-     **/
-    static constexpr size_t Capacity() { return sizeof(bytes); }
+    /**
+     * @brief Returns non-const pointer to start of the underlying buffer
+     */
+    uint8_t * Bytes() { return &mBytes[0]; }
 
-    /** @brief Returns pointer to start of underlying buffer
-     **/
-    uint8_t * Bytes() { return &bytes[0]; }
+    /**
+     * @brief Returns const pointer to start of the underlying buffer
+     */
+    const uint8_t * ConstBytes() const { return &mBytes[0]; }
 
-    /** @brief Returns const pointer to start of underlying buffer
-     **/
-    const uint8_t * ConstBytes() const { return &bytes[0]; }
+    /**
+     * @brief Constructs span from the underlying buffer
+     */
+    ByteSpan Span() const { return ByteSpan(ConstBytes(), Length()); }
 
-    /** @brief Returns buffer pointer
-     **/
-    operator uint8_t *() { return bytes; }
-    operator const uint8_t *() const { return bytes; }
+    /**
+     * @brief Returns capacity of the buffer
+     */
+    static constexpr size_t Capacity() { return kCapacity; }
 
 private:
-    uint8_t bytes[Cap];
-    size_t length = 0;
+    uint8_t mBytes[kCapacity];
+    size_t mLength = 0;
 };
 
-typedef CapacityBoundBuffer<kMax_ECDSA_Signature_Length> P256ECDSASignature;
+template <size_t kCapacity>
+class SensitiveDataFixedBuffer
+{
+public:
+    SensitiveDataFixedBuffer() = default;
 
-typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
+    constexpr explicit SensitiveDataFixedBuffer(const uint8_t (&rawValue)[kCapacity])
+    {
+        memcpy(&mBytes[0], &rawValue[0], kCapacity);
+    }
+
+    constexpr explicit SensitiveDataFixedBuffer(const FixedByteSpan<kCapacity> & value)
+    {
+        memcpy(&mBytes[0], value.data(), kCapacity);
+    }
+
+    ~SensitiveDataFixedBuffer()
+    {
+        // Sanitize after use
+        ClearSecretData(mBytes);
+    }
+
+    /**
+     * @brief Returns fixed length of the buffer
+     */
+    constexpr size_t Length() const { return kCapacity; }
+
+    /**
+     * @brief Returns non-const pointer to start of the underlying buffer
+     */
+    uint8_t * Bytes() { return &mBytes[0]; }
+
+    /**
+     * @brief Returns const pointer to start of the underlying buffer
+     */
+    const uint8_t * ConstBytes() const { return &mBytes[0]; }
+
+    /**
+     * @brief Constructs fixed span from the underlying buffer
+     */
+    FixedByteSpan<kCapacity> Span() const { return FixedByteSpan<kCapacity>(mBytes); }
+
+private:
+    uint8_t mBytes[kCapacity];
+};
+
+using P256ECDSASignature    = SensitiveDataBuffer<kMax_ECDSA_Signature_Length>;
+using P256ECDHDerivedSecret = SensitiveDataBuffer<kMax_ECDH_Secret_Length>;
+
+using IdentityProtectionKey     = SensitiveDataFixedBuffer<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
+using IdentityProtectionKeySpan = FixedByteSpan<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
 
 class P256PublicKey : public ECPKey<P256ECDSASignature>
 {
@@ -382,7 +434,7 @@ struct alignas(size_t) P256KeypairContext
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
 
-typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
+using P256SerializedKeypair = SensitiveDataBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length>;
 
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
@@ -475,47 +527,6 @@ protected:
     P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
     bool mInitialized = false;
-};
-
-/**
- *  @brief  A data structure for holding an AES CCM128 symmetric key, without the ownership of it.
- */
-using AesCcm128KeySpan = FixedByteSpan<Crypto::kAES_CCM128_Key_Length>;
-
-class AesCcm128Key
-{
-public:
-    AesCcm128Key() {}
-
-    ~AesCcm128Key()
-    {
-        // Sanitize after use
-        ClearSecretData(&bytes[0], Length());
-    }
-
-    template <size_t N>
-    constexpr AesCcm128Key(const uint8_t (&raw_value)[N])
-    {
-        static_assert(N == kAES_CCM128_Key_Length, "Can only array-initialize from proper bounds");
-        memcpy(&bytes[0], &raw_value[0], N);
-    }
-
-    template <size_t N>
-    constexpr AesCcm128Key(const FixedByteSpan<N> & value)
-    {
-        static_assert(N == kAES_CCM128_Key_Length, "Can only initialize from proper sized byte span");
-        memcpy(&bytes[0], value.data(), N);
-    }
-
-    size_t Length() const { return sizeof(bytes); }
-    operator uint8_t *() { return bytes; }
-    operator const uint8_t *() const { return bytes; }
-    const uint8_t * ConstBytes() const { return &bytes[0]; }
-    AesCcm128KeySpan Span() const { return AesCcm128KeySpan(bytes); }
-    uint8_t * Bytes() { return &bytes[0]; }
-
-private:
-    uint8_t bytes[kAES_CCM128_Key_Length];
 };
 
 /**
@@ -1414,8 +1425,6 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
  */
 CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKey, uint64_t fabricId,
                                       uint64_t & compressedFabricId);
-
-typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
 
 enum class CertificateChainValidationResult
 {

@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/build/chip/tests.gni")
 
 if (!build_java_matter_controller) {
   import("${build_root}/config/android_abi.gni")
@@ -87,6 +88,37 @@ shared_library("jni") {
   }
 
   ldflags = [ "-Wl,--gc-sections" ]
+}
+
+if (chip_link_tests) {
+  shared_library("jni_for_test") {
+    sources = [ "AndroidCallbacks-ForTestJNI.cpp" ]
+    output_name = "libCHIPForTestController"
+
+    public_configs = [ "${chip_root}/src:includes" ]
+
+    deps = [
+      ":jni",
+      "${chip_root}/src/messaging/tests:helpers",
+    ]
+
+    if (build_java_matter_controller) {
+      defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
+      include_dirs = java_matter_controller_dependent_paths
+
+      deps += [ "${chip_root}/src/platform/Linux" ]
+
+      cflags = [ "-Wno-unknown-pragmas" ]
+
+      output_dir = "${root_out_dir}/lib/jni"
+    } else {
+      deps += [ "${chip_root}/src/platform/android" ]
+
+      output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+    }
+
+    ldflags = [ "-Wl,--gc-sections" ]
+  }
 }
 
 android_library("java") {
@@ -161,6 +193,74 @@ android_library("java") {
 
   # TODO: add classpath support (we likely need to add something like
   #  ..../platforms/android-21/android.jar to access BLE items)
+}
+
+if (chip_link_tests) {
+  android_library("java_for_test") {
+    output_name = "CHIPControllerForTest.jar"
+
+    deps = [ "${chip_root}/third_party/java_deps:annotation" ]
+
+    data_deps = [
+      ":jni",
+      ":jni_for_test",
+    ]
+
+    sources = [
+      "src/chip/devicecontroller/GetConnectedDeviceCallbackForTestJni.java",
+    ]
+
+    if (build_java_matter_controller) {
+      deps += [
+        "${chip_root}/third_party/java_deps:json",
+        "${chip_root}/third_party/java_deps/stub_src",
+      ]
+    } else {
+      deps += [ ":android" ]
+
+      data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
+    }
+
+    javac_flags = [ "-Xlint:deprecation" ]
+
+    # TODO: add classpath support (we likely need to add something like
+    #  ..../platforms/android-21/android.jar to access BLE items)
+  }
+
+  android_library("tests") {
+    output_name = "CHIPControllerTests.jar"
+
+    deps = [
+      ":java_for_test",
+      "${chip_root}/src/messaging/tests/java",
+      "${chip_root}/third_party/java_deps:annotation",
+    ]
+
+    data_deps = [
+      ":jni",
+      ":jni_for_test",
+      "${chip_root}/src/messaging/tests/java:jni",
+    ]
+
+    sources =
+        [ "tests/chip/devicecontroller/GetConnectedDeviceCallbackJniTest.java" ]
+
+    if (build_java_matter_controller) {
+      deps += [
+        "${chip_root}/third_party/java_deps:json",
+        "${chip_root}/third_party/java_deps/stub_src",
+      ]
+    } else {
+      deps += [ ":android" ]
+
+      data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
+    }
+
+    javac_flags = [ "-Xlint:deprecation" ]
+
+    # TODO: add classpath support (we likely need to add something like
+    #  ..../platforms/android-21/android.jar to access BLE items)
+  }
 }
 
 if (!build_java_matter_controller) {
