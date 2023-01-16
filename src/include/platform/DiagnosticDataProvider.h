@@ -43,7 +43,7 @@ constexpr size_t kMaxIPv6AddrSize  = 16;
 constexpr size_t kMaxIPv4AddrCount = 4;
 constexpr size_t kMaxIPv6AddrCount = 8;
 
-using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonType;
+using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonEnum;
 
 struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type
 {
@@ -51,7 +51,7 @@ struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::Threa
     ThreadMetrics * Next; /* Pointer to the next structure.  */
 };
 
-struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
+struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type
 {
     char Name[Inet::InterfaceId::kMaxIfNameLength];
     uint8_t MacAddress[kMaxHardwareAddrSize];

@@ -35,7 +35,7 @@
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/UnitTestRegistration.h>

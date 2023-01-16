@@ -96,7 +96,8 @@ def try_add_yaml_support_for_scientific_notation_without_dot(loader):
 # accessory. But this state may not exist in the runner (as in it prevent to have multiple node ids
 # associated to a fabric...) so the 'nodeId' needs to be added back manually.
 def try_update_yaml_node_id_test_runner_state(tests, config):
-    identities = {'alpha': None if 'nodeId' not in config else config['nodeId']}
+    identities = {
+        'alpha': None if 'nodeId' not in config else config['nodeId']}
 
     for test in tests:
         if not test.is_enabled:
@@ -106,9 +107,9 @@ def try_update_yaml_node_id_test_runner_state(tests, config):
 
         if test.cluster == 'CommissionerCommands':
             if test.command == 'PairWithCode':
-                for item in test.arguments['values']:
+                for item in test.arguments_with_placeholders['values']:
                     if item['name'] == 'nodeId':
                         identities[identity] = item['value']
         elif identity is not None and identity in identities:
-            nodeId = identities[identity]
-            test.nodeId = nodeId
+            node_id = identities[identity]
+            test.node_id = node_id

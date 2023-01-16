@@ -8765,7 +8765,7 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(
  * @brief Account Login Cluster GetSetupPINResponse Command callback (from server)
  */
 bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                           chip::CharSpan setupPIN);
+                                                           chip::CharSpan SetupPIN);
 /**
  * @brief Account Login Cluster Login Command callback (from client)
  */
@@ -8809,6 +8809,12 @@ bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(
 bool emberAfClientMonitoringClusterRegisterClientMonitoringCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::DecodableType & commandData);
+/**
+ * @brief Client Monitoring Cluster UnregisterClientMonitoring Command callback (from client)
+ */
+bool emberAfClientMonitoringClusterUnregisterClientMonitoringCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::DecodableType & commandData);
 /**
  * @brief Client Monitoring Cluster StayAwakeRequest Command callback (from client)
  */

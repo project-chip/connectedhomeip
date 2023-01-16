@@ -30,7 +30,7 @@
 #include "access/RequestPath.h"
 #include "access/SubjectDescriptor.h"
 #include <app/RequiredPrivilege.h>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 
 extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);

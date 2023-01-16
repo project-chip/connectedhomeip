@@ -18,7 +18,7 @@
 
 #include <protocols/secure_channel/PairingSession.h>
 
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {

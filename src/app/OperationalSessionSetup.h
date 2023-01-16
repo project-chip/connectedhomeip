@@ -115,7 +115,7 @@ private:
  * application code does incorrectly hold onto this information so do not follow those incorrect
  * implementations as an example.
  */
-typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
 /**

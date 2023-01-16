@@ -237,7 +237,9 @@
         "TestFanControl",
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
-        "TestCommissioningWindow"
+        "TestCommissioningWindow",
+        "TestCommissionerNodeId",
+        "TestClientMonitoringCluster"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
