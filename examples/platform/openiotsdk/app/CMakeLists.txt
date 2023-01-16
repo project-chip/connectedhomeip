@@ -31,5 +31,5 @@ target_include_directories(openiotsdk-app
 target_link_libraries(openiotsdk-app 
     PUBLIC
         openiotsdk-chip
-        cmsis-rtos-implementation
+        $<TARGET_OBJECTS:iotsdk-serial-retarget>
 )

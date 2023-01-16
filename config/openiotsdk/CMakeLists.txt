@@ -97,20 +97,10 @@ endif()
 set(GN_ROOT_TARGET ${CHIP_ROOT}/config/openiotsdk/chip-gn)
 
 # Prepare compiler flags
-# All Open IoT SDK targets
-list(APPEND ALL_SDK_TARGETS)
-
-foreach(source_dir ${SDK_SOURCES_BINARY_DIRS})
-    get_all_cmake_targets(SDK_TARGETS ${source_dir})
-    list(APPEND ALL_SDK_TARGETS ${SDK_TARGETS})
-endforeach()
-
-# Exclude unnecessary targets
-list(FILTER ALL_SDK_TARGETS EXCLUDE REGEX "^.*linker.*|.*example.*|.*apps.*|.*doc.*|dist|lib$")
-
-foreach(target ${ALL_SDK_TARGETS})
-    get_target_common_compile_flags(SDK_TARGET_CFLAGS ${target})
-    list(APPEND CHIP_CFLAGS ${SDK_TARGET_CFLAGS})
+# Get compiler flags from external targets
+foreach(target ${EXTERNAL_TARGETS})
+    get_target_common_compile_flags(EXTERNAL_TARGET_CFLAGS ${target})
+    list(APPEND CHIP_CFLAGS ${EXTERNAL_TARGET_CFLAGS})
 endforeach()
 
 # Remove duplicated flags
@@ -249,30 +239,9 @@ target_include_directories(openiotsdk-chip INTERFACE
 target_link_directories(openiotsdk-chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
 target_link_libraries(openiotsdk-chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
 target_link_libraries(openiotsdk-chip INTERFACE
-    $<$<TARGET_EXISTS:mcu-driver-hal>:mcu-driver-hal>
-    $<$<TARGET_EXISTS:mcu-driver-bootstrap>:mcu-driver-bootstrap>
-    $<$<TARGET_EXISTS:mdh-reference-platforms-for-arm>:mdh-reference-platforms-for-arm>
-    $<$<TARGET_EXISTS:mbedtls>:mbedtls>
-    $<$<TARGET_EXISTS:lwipcore>:lwipcore>
-    $<$<TARGET_EXISTS:iotsdk-ip-network-api>:iotsdk-ip-network-api>
-    $<$<TARGET_EXISTS:iotsdk-tdbstore>:iotsdk-tdbstore>
-    $<$<TARGET_EXISTS:iotsdk-blockdevice>:iotsdk-blockdevice>
-    $<$<TARGET_EXISTS:iotsdk-serial-retarget>:$<TARGET_OBJECTS:iotsdk-serial-retarget>>
+    ${EXTERNAL_TARGETS}
 )
 add_dependencies(openiotsdk-chip chip-gn)
-
-# ==============================================================================
-# Add additional Open IoT SDK port components
-# ==============================================================================
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/storage storage_build)
-
-target_link_libraries(openiotsdk-chip INTERFACE
-    openiotsdk-storage
-)
-
-target_include_directories(openiotsdk-chip INTERFACE
-    ${CHIP_ROOT}/config/openiotsdk/mbedtls
-)
 
 if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     target_compile_definitions(openiotsdk-chip INTERFACE
