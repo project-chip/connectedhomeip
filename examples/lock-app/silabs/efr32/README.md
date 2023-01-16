@@ -4,20 +4,20 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 
 <hr>
 
-- [Matter EFR32 Lock Example](#matter-efr32-lock-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Notes](#notes)
-  - [Memory settings](#memory-settings)
-  - [OTA Software Update](#ota-software-update)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [Disabling LCD](#disabling-lcd)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter EFR32 Lock Example](#matter-efr32-lock-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -42,9 +42,9 @@ If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The lock example is intended to serve both as a means to explore the
-workings of Matter as well as a template for creating real products based on the
-Silicon Labs platform.
+The lock example is intended to serve both as a means to explore the workings of
+Matter as well as a template for creating real products based on the Silicon
+Labs platform.
 
 ## Building
 
