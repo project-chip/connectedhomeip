@@ -13,8 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    19.1.1. [TC-SC-5.1] Adding member to a group
+name: 19.1.1. [TC-SC-5.1] Adding member to a group
 
 config:
     nodeId: 0x12344321
@@ -37,31 +36,33 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-        value: [
+          value:
+              [
                   {
-                    FabricIndex: 1,
-                    Privilege: 5,
-                    AuthMode: 2,
-                    Subjects: [commissionerNodeId],
-                    Targets: null,
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
                   },
                   {
-                    FabricIndex: 1,
-                    Privilege: 3,
-                    AuthMode: 3,
-                    Subjects: [0x0103],
-                    Targets: null,
-                  }
-               ]
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [0x0103],
+                      Targets: null,
+                  },
+              ]
 
     - label: "TH sends KeySetWrite command with incorrect key"
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
       arguments:
-        values:
-            - name: GroupKeySet
-              value: {
+          values:
+              - name: GroupKeySet
+                value:
+                    {
                         GroupKeySetID: 0x01a3,
                         GroupKeySecurityPolicy: 0,
                         EpochKey0: "0x00000000000000000000000000000001",
@@ -70,16 +71,17 @@ tests:
                         EpochStartTime1: 222,
                         EpochKey2: "0x00000000000000000000000000000003",
                         EpochStartTime2: 333,
-                     }
+                    }
 
     - label: "TH sends KeySetWrite command with TH key"
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
       arguments:
-        values:
-            - name: GroupKeySet
-              value: {
+          values:
+              - name: GroupKeySet
+                value:
+                    {
                         GroupKeySetID: 0x01a3,
                         GroupKeySecurityPolicy: 0,
                         EpochKey0: "0xd0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
@@ -88,7 +90,7 @@ tests:
                         EpochStartTime1: 2220001,
                         EpochKey2: "0xd2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 2220002,
-                     }
+                    }
 
     - label: "TH binds GroupId to GroupKeySet"
       cluster: "Group Key Management"
@@ -96,13 +98,7 @@ tests:
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
-        value: [
-                  {
-                    FabricIndex: 1,
-                    GroupId: 0x0103,
-                    GroupKeySetID: 0x01a3,
-                  },
-               ]
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
 
     - label: "TH sends RemoveAllGroups command"
       command: "RemoveAllGroups"
@@ -110,65 +106,66 @@ tests:
     - label: "TH sends AddGroup command"
       command: "AddGroup"
       arguments:
-        values:
-          - name: GroupID
-            value: 0x0103
-          - name: GroupName
-            value: "Test Group"
+          values:
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: "Test Group"
 
     - label: "TH sends ViewGroup command"
       PICS: G.S.F00
       command: "ViewGroup"
       arguments:
-        values:
-            - name: GroupID
-              value: 0x0103
+          values:
+              - name: GroupID
+                value: 0x0103
       response:
-        values:
-          - name: Status
-            value: 0
-          - name: GroupId
-            value: 0x0103
-          - name: GroupName
-            value: "Test Group"
+          values:
+              - name: Status
+                value: 0
+              - name: GroupId
+                value: 0x0103
+              - name: GroupName
+                value: "Test Group"
 
     - label: "TH sends ViewGroup command"
       PICS: "!(G.S.F00)"
       command: "ViewGroup"
       arguments:
-        values:
-            - name: GroupID
-              value: 0x0103
+          values:
+              - name: GroupID
+                value: 0x0103
       response:
-        values:
-          - name: Status
-            value: 0
-          - name: GroupId
-            value: 0x0103
-          - name: GroupName
-            value: ""
+          values:
+              - name: Status
+                value: 0
+              - name: GroupId
+                value: 0x0103
+              - name: GroupName
+                value: ""
 
     - label: "TH sends KeySetRead"
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetRead"
       arguments:
-        values:
-          - name: GroupKeySetID
-            value: 0x01a3
+          values:
+              - name: GroupKeySetID
+                value: 0x01a3
       response:
-        values:
-          - name: GroupKeySet
-            value: {
-                      GroupKeySetID: 0x01a3,
-                      GroupKeySecurityPolicy: 0,
-                      EpochKey0: null,
-                      EpochStartTime0: 2220000,
-                      EpochKey1: null,
-                      EpochStartTime1: 2220001,
-                      EpochKey2: null,
-                      EpochStartTime2: 2220002,
-                   }
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 2220000,
+                        EpochKey1: null,
+                        EpochStartTime1: 2220001,
+                        EpochKey2: null,
+                        EpochStartTime2: 2220002,
+                    }
 
     - label: "TH reads GroupTable attribute"
       cluster: "Group Key Management"
@@ -177,12 +174,14 @@ tests:
       command: "readAttribute"
       attribute: "GroupTable"
       response:
-          value: [ {
+          value:
+              [
+                  {
                       GroupId: 0x0103,
                       Endpoints: [endpoint],
                       GroupName: "Test Group",
-                    }
-                 ]
+                  },
+              ]
 
     - label: "TH reads GroupTable attribute"
       cluster: "Group Key Management"
@@ -191,21 +190,16 @@ tests:
       command: "readAttribute"
       attribute: "GroupTable"
       response:
-          value: [ {
-                      GroupId: 0x0103,
-                      Endpoints: [endpoint],
-                      GroupName: "",
-                    }
-                 ]
+          value: [{ GroupId: 0x0103, Endpoints: [endpoint], GroupName: "" }]
 
     - label: "TH removes the GroupKeySet"
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetRemove"
       arguments:
-        values:
-          - name: GroupKeySetID
-            value: 0x01a3
+          values:
+              - name: GroupKeySetID
+                value: 0x01a3
 
     - label: "TH verifies the corresponding GroupKeyMap entry has been removed"
       cluster: "Group Key Management"
@@ -213,7 +207,7 @@ tests:
       command: "readAttribute"
       attribute: "GroupKeyMap"
       response:
-        value: []
+          value: []
 
     - label: "TH cleans up groups using RemoveAllGroups command"
       command: "RemoveAllGroups"
@@ -224,7 +218,7 @@ tests:
       command: "readAttribute"
       attribute: "GroupTable"
       response:
-        value: []
+          value: []
 
     - label: "TH removes ACL Operate privileges for Group 0x0103"
       cluster: "Access Control"
@@ -232,12 +226,13 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-        value: [
+          value:
+              [
                   {
-                    FabricIndex: 1,
-                    Privilege: 5,
-                    AuthMode: 2,
-                    Subjects: [commissionerNodeId],
-                    Targets: null,
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
                   },
-               ]
+              ]
