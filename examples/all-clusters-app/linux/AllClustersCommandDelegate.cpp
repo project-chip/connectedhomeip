@@ -183,13 +183,13 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
 
 #if CHIP_CONFIG_TEST
         // On Linux Simulation, set following hardware faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_RADIO));
+        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_POWER_SOURCE));
 
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_RADIO));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_SENSOR));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_POWER_SOURCE));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_USER_INTERFACE_FAULT));
 #endif
         Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
     }
@@ -200,13 +200,13 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
 
 #if CHIP_CONFIG_TEST
         // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_WI_FI_FAULT));
+        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_THREAD_FAULT));
 
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_WI_FI_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_CELLULAR_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_THREAD_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_NFC_FAULT));
 #endif
         Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(previous, current);
     }

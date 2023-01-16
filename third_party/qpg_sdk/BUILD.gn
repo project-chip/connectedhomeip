@@ -29,6 +29,20 @@ group("qpg_sdk") {
     ":freertos",
     qpg_sdk_target,
   ]
+  public_configs = [ ":qpg_include_paths_config" ]
+}
+
+config("qpg_include_paths_config") {
+  include_dirs = [
+    "${qpg_sdk_root}/Components/Qorvo/BaseUtils/gpNvm/inc",
+    "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpLog/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpReset/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpSched/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpAssert/inc",
+    "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB",
+    "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
+  ]
 }
 
 config("qpg_freertos_config") {

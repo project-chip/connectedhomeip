@@ -46,7 +46,7 @@
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
@@ -54,7 +54,7 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -76,7 +76,7 @@
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
@@ -84,7 +84,7 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -106,7 +106,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
@@ -114,7 +114,7 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    65, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
@@ -137,7 +137,7 @@
     513, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    516, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
+    516, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
@@ -150,7 +150,7 @@
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    0, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     21, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
     22, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
     23, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
@@ -158,7 +158,7 @@
     25, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     27, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     28, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    1, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
+    1, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -171,7 +171,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
@@ -179,7 +179,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -71,10 +71,6 @@ config MAIN_STACK_SIZE
 config INIT_STACKS
     default y
 
-# Disable certain parts of Zephyr IPv6 stack
-config NET_IPV6_NBR_CACHE
-    default n
-
 config NET_IPV6_MLD
     default y
 
@@ -121,7 +117,9 @@ config BT_DEVICE_NAME_MAX
     default 15
 
 config BT_MAX_CONN
-    default 1
+    default 2 # a workaround for non-unreferenced BLE connection object
+              # when restaring the BLE advertising in disconnect callback
+              # TODO: analyze and revert to 1 if proper fix exists
 
 config BT_L2CAP_TX_MTU
     default 247
@@ -189,6 +187,11 @@ config NET_L2_OPENTHREAD
 
 if NET_L2_OPENTHREAD
 
+# Disable certain parts of Zephyr IPv6 stack
+config NET_IPV6_NBR_CACHE
+    bool
+    default n
+
 # Increase the default RX stack size
 config IEEE802154_NRF5_RX_STACK_SIZE
     default 1024
@@ -204,7 +207,7 @@ config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
     default n
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
-    default 1120
+    default 2048
 
 # align these numbers to match the OpenThread config
 config NET_IF_UNICAST_IPV6_ADDR_COUNT
@@ -317,9 +320,6 @@ config MBEDTLS_GCM_C
     default n
 
 config MBEDTLS_RSA_C
-    default n
-
-config PSA_WANT_KEY_TYPE_ARIA
     default n
 
 config PSA_WANT_KEY_TYPE_CHACHA20

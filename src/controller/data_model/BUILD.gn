@@ -172,6 +172,8 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/ElectricalMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/UnitTestingClient-ReadImpl.cpp",
       "jni/UnitTestingClient-InvokeSubscribeImpl.cpp",
+      "jni/ClientMonitoringClient-ReadImpl.cpp",
+      "jni/ClientMonitoringClient-InvokeSubscribeImpl.cpp",
     ]
 
     deps = [

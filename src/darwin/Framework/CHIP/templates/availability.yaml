@@ -4723,6 +4723,8 @@
           WiFiNetworkDiagnostics:
               - BSSID
               - RSSI
+          GeneralDiagnostics:
+              - BootReason
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -4769,6 +4771,7 @@
               - TestEmitTestFabricScopedEventRequest
           ClientMonitoring:
               - RegisterClientMonitoring
+              - UnregisterClientMonitoring
               - StayAwakeRequest
       command fields:
           UnitTesting:
@@ -4925,6 +4928,9 @@
               RegisterClientMonitoring:
                   - clientNodeId
                   - iCid
+              UnregisterClientMonitoring:
+                  - clientNodeId
+                  - iCid
           Groups:
               AddGroup:
                   - groupID
@@ -4947,6 +4953,9 @@
               RetrieveLogsResponse:
                   - logContent
                   - utcTimeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakePasscodeVerifier
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -4967,6 +4976,10 @@
               - AccessControlExtensionStruct
           SoftwareDiagnostics:
               - ThreadMetricsStruct
+          GeneralDiagnostics:
+              - NetworkInterface
+          ModeSelect:
+              - SemanticTagStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5051,6 +5064,20 @@
                   - stackFreeCurrent
                   - stackFreeMinimum
                   - stackSize
+          GeneralDiagnostics:
+              NetworkInterface:
+                  - name
+                  - isOperational
+                  - offPremiseServicesReachableIPv4
+                  - offPremiseServicesReachableIPv6
+                  - hardwareAddress
+                  - iPv4Addresses
+                  - iPv6Addresses
+                  - type
+          ModeSelect:
+              SemanticTagStruct:
+                  - mfgCode
+                  - value
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5131,6 +5158,10 @@
               - ConnectionStatusEnum
           EthernetNetworkDiagnostics:
               - PHYRate
+          GeneralDiagnostics:
+              - HardwareFault
+              - RadioFault
+              - BootReasonEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5215,6 +5246,35 @@
                   - Rate100G
                   - Rate200G
                   - Rate400G
+          GeneralDiagnostics:
+              HardwareFault:
+                  - Unspecified
+                  - Radio
+                  - Sensor
+                  - ResettableOverTemp
+                  - NonResettableOverTemp
+                  - PowerSource
+                  - VisualDisplayFault
+                  - AudioOutputFault
+                  - UserInterfaceFault
+                  - NonVolatileMemoryError
+                  - TamperDetected
+              RadioFault:
+                  - Unspecified
+                  - WiFiFault
+                  - CellularFault
+                  - ThreadFault
+                  - NFCFault
+                  - BLEFault
+                  - EthernetFault
+              BootReasonEnum:
+                  - Unspecified
+                  - PowerOnReboot
+                  - BrownOutReset
+                  - SoftwareWatchdogReset
+                  - HardwareWatchdogReset
+                  - SoftwareUpdateCompleted
+                  - SoftwareReset
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5260,6 +5320,9 @@
                   - WPAPersonal
                   - WPA2Personal
                   - WPA3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  - Extended
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5282,6 +5345,8 @@
           WiFiNetworkDiagnostics:
               - Bssid
               - Rssi
+          GeneralDiagnostics:
+              - BootReasons
       command fields:
           Groups:
               AddGroup:
@@ -5305,6 +5370,9 @@
               RetrieveLogsResponse:
                   - content
                   - timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakeVerifier
       structs:
           Descriptor:
               - DeviceType
@@ -5317,6 +5385,10 @@
               - BatChargeFaultChangeType
           SoftwareDiagnostics:
               - ThreadMetrics
+          GeneralDiagnostics:
+              - NetworkInterfaceType
+          ModeSelect:
+              - SemanticTag
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5333,6 +5405,10 @@
               - ThreadConnectionStatus
           EthernetNetworkDiagnostics:
               - PHYRateType
+          GeneralDiagnostics:
+              - HardwareFaultType
+              - RadioFaultType
+              - BootReasonType
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5355,10 +5431,16 @@
                   - WpaPersonal
                   - Wpa2Personal
                   - Wpa3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  - EXT
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
   removed:
+      clusters:
+          # Not ready to be public API yet.
+          - ClientMonitoring
       commands:
           BasicInformation:
               - MfgSpecificPing
@@ -5413,6 +5495,8 @@
           WiFiNetworkDiagnostics:
               BSSID: Bssid
               RSSI: Rssi
+          GeneralDiagnostics:
+              BootReason: BootReasons
       commands:
           OTASoftwareUpdateRequestor:
               AnnounceOTAProvider: AnnounceOtaProvider
@@ -5447,12 +5531,19 @@
               RetrieveLogsResponse:
                   logContent: content
                   utcTimeStamp: timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  pakePasscodeVerifier: pakeVerifier
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
               AccessControlExtensionStruct: ExtensionEntry
           SoftwareDiagnostics:
               ThreadMetricsStruct: ThreadMetrics
+          GeneralDiagnostics:
+              NetworkInterface: NetworkInterfaceType
+          ModeSelect:
+              SemanticTagStruct: SemanticTag
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5469,6 +5560,10 @@
               ConnectionStatusEnum: ThreadConnectionStatus
           EthernetNetworkDiagnostics:
               PHYRate: PHYRateType
+          GeneralDiagnostics:
+              HardwareFault: HardwareFaultType
+              RadioFault: RadioFaultType
+              BootReasonEnum: BootReasonType
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5514,3 +5609,6 @@
                   WPAPersonal: WpaPersonal
                   WPA2Personal: Wpa2Personal
                   WPA3Personal: Wpa3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  Extended: EXT

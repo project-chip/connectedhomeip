@@ -20,7 +20,7 @@
 
 #include "PigweedLogger.h"
 #include "pigweed/RpcService.h"
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 namespace chip {
 namespace rpc {

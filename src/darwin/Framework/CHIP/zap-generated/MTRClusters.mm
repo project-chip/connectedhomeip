@@ -5448,7 +5448,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterBasic
 @end
 
@@ -5757,7 +5756,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterOtaSoftwareUpdateProvider
 @end
 
@@ -5988,7 +5986,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterOtaSoftwareUpdateRequestor
 @end
 
@@ -8005,11 +8002,11 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeBootReasonsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeBootReasonWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID)
                                              params:params];
 }
 
@@ -8104,6 +8101,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                       expectedValues:expectedDataValueDictionaries
                expectedValueInterval:expectedValueIntervalMs
                           completion:completionHandler];
+}
+- (NSDictionary<NSString *, id> *)readAttributeBootReasonsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeBootReasonWithParams:params];
 }
 @end
 
@@ -9812,7 +9813,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     timedInvokeTimeoutMs.SetValue(10000);
                 }
                 request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
-                request.PAKEVerifier = [self asByteSpan:params.pakeVerifier];
+                request.PAKEPasscodeVerifier = [self asByteSpan:params.pakePasscodeVerifier];
                 request.discriminator = params.discriminator.unsignedShortValue;
                 request.iterations = params.iterations.unsignedIntValue;
                 request.salt = [self asByteSpan:params.salt];
@@ -20595,7 +20596,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterWakeOnLan
 @end
 
@@ -29994,7 +29994,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterTestCluster
 @end
 

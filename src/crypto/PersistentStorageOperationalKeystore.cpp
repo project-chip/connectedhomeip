@@ -18,8 +18,8 @@
 #include <crypto/OperationalKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -57,8 +57,8 @@ CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegat
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (storage != nullptr) && (keypair != nullptr),
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Use a CapacityBoundBuffer to get RAII secret data clearing on scope exit.
-    Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
+    // Use a SensitiveDataBuffer to get RAII secret data clearing on scope exit.
+    Crypto::SensitiveDataBuffer<OpKeyTLVMaxSize()> buf;
     TLV::TLVWriter writer;
 
     writer.Init(buf.Bytes(), buf.Capacity());
@@ -80,7 +80,7 @@ CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegat
 
     const auto opKeyLength = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(opKeyLength), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorOnFailure(storage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf,
+    ReturnErrorOnFailure(storage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf.ConstBytes(),
                                                   static_cast<uint16_t>(opKeyLength)));
 
     return CHIP_NO_ERROR;
@@ -107,8 +107,8 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
 
     // Scope 1: Load up the keypair data from storage
     {
-        // Use a CapacityBoundBuffer to get RAII secret data clearing on scope exit.
-        Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
+        // Use a SensitiveDataBuffer to get RAII secret data clearing on scope exit.
+        Crypto::SensitiveDataBuffer<OpKeyTLVMaxSize()> buf;
 
         // Load up the operational key structure from storage
         uint16_t size = static_cast<uint16_t>(buf.Capacity());
@@ -177,8 +177,8 @@ bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fab
     //               properly enforcing CHIP_ERROR_BUFFER_TOO_SMALL behavior needed by
     //               PersistentStorageDelegate. Very unfortunate, needs fixing ASAP.
 
-    // Use a CapacityBoundBuffer to get RAII secret data clearing on scope exit.
-    Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
+    // Use a SensitiveDataBuffer to get RAII secret data clearing on scope exit.
+    Crypto::SensitiveDataBuffer<OpKeyTLVMaxSize()> buf;
 
     uint16_t keySize = static_cast<uint16_t>(buf.Capacity());
     CHIP_ERROR err =

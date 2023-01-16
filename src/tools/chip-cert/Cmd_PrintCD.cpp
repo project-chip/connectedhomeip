@@ -26,7 +26,7 @@
 #include "chip-cert.h"
 
 #include <credentials/CertificationDeclaration.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/BytesToHex.h>
 
 namespace {

@@ -317,7 +317,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
             VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
         }
 
-        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt),
+        ReturnErrorOnFailure(session.InitFromSecret(mSharedSecret.Span(), ByteSpan(msg_salt),
                                                     CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
 
         return CHIP_NO_ERROR;
@@ -333,7 +333,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
             VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
         }
 
-        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt),
+        ReturnErrorOnFailure(session.InitFromSecret(mSharedSecret.Span(), ByteSpan(msg_salt),
                                                     CryptoContext::SessionInfoType::kSessionResumption, mRole));
 
         return CHIP_NO_ERROR;
@@ -745,8 +745,8 @@ CHIP_ERROR CASESession::SendSigma2()
 
     HKDF_sha_crypto mHKDF;
     uint8_t sr2k[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR2Info,
-                                           kKDFInfoLength, sr2k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(),
+                                           kKDFSR2Info, kKDFInfoLength, sr2k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
 
     // Construct Sigma2 TBS Data
     size_t msg_r2_signed_len =
@@ -791,7 +791,7 @@ CHIP_ERROR CASESession::SendSigma2()
         nocCert = MutableByteSpan{};
     }
 
-    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(kTag_TBEData_Signature), tbsData2Signature,
+    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(kTag_TBEData_Signature), tbsData2Signature.ConstBytes(),
                                             static_cast<uint32_t>(tbsData2Signature.Length())));
 
     // Generate a new resumption ID
@@ -992,7 +992,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
         SuccessOrExit(err);
 
         HKDF_sha_crypto mHKDF;
-        err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR2Info,
+        err = mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR2Info,
                                 kKDFInfoLength, sr2k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         SuccessOrExit(err);
     }
@@ -1057,7 +1057,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     VerifyOrExit(TLV::TagNumFromTag(decryptedDataTlvReader.GetTag()) == kTag_TBEData_Signature, err = CHIP_ERROR_INVALID_TLV_TAG);
     VerifyOrExit(tbsData2Signature.Capacity() >= decryptedDataTlvReader.GetLength(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     tbsData2Signature.SetLength(decryptedDataTlvReader.GetLength());
-    SuccessOrExit(err = decryptedDataTlvReader.GetBytes(tbsData2Signature, tbsData2Signature.Length()));
+    SuccessOrExit(err = decryptedDataTlvReader.GetBytes(tbsData2Signature.Bytes(), tbsData2Signature.Length()));
 
     // Validate signature
     SuccessOrExit(err = responderPublicKey.ECDSA_validate_msg_signature(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature));
@@ -1163,7 +1163,7 @@ CHIP_ERROR CASESession::SendSigma3()
             nocCert = MutableByteSpan{};
         }
 
-        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(kTag_TBEData_Signature), tbsData3Signature,
+        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(kTag_TBEData_Signature), tbsData3Signature.ConstBytes(),
                                                static_cast<uint32_t>(tbsData3Signature.Length())));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize());
@@ -1177,7 +1177,7 @@ CHIP_ERROR CASESession::SendSigma3()
         SuccessOrExit(err);
 
         HKDF_sha_crypto mHKDF;
-        err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR3Info,
+        err = mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR3Info,
                                 kKDFInfoLength, sr3k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         SuccessOrExit(err);
     }
@@ -1299,7 +1299,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
         SuccessOrExit(err);
 
         HKDF_sha_crypto mHKDF;
-        err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR3Info,
+        err = mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR3Info,
                                 kKDFInfoLength, sr3k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         SuccessOrExit(err);
     }
@@ -1347,7 +1347,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     VerifyOrExit(TLV::TagNumFromTag(decryptedDataTlvReader.GetTag()) == kTag_TBEData_Signature, err = CHIP_ERROR_INVALID_TLV_TAG);
     VerifyOrExit(tbsData3Signature.Capacity() >= decryptedDataTlvReader.GetLength(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     tbsData3Signature.SetLength(decryptedDataTlvReader.GetLength());
-    SuccessOrExit(err = decryptedDataTlvReader.GetBytes(tbsData3Signature, tbsData3Signature.Length()));
+    SuccessOrExit(err = decryptedDataTlvReader.GetBytes(tbsData3Signature.Bytes(), tbsData3Signature.Length()));
 
     // TODO - Validate message signature prior to validating the received operational credentials.
     //        The op cert check requires traversal of cert chain, that is a more expensive operation.
@@ -1450,8 +1450,8 @@ CHIP_ERROR CASESession::ConstructSigmaResumeKey(const ByteSpan & initiatorRandom
     VerifyOrReturnError(bbuf.Fit(saltWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     HKDF_sha_crypto mHKDF;
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), salt, saltWritten, skInfo.data(), skInfo.size(),
-                                           resumeKey.data(), CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), salt, saltWritten, skInfo.data(),
+                                           skInfo.size(), resumeKey.data(), CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
     resumeKey.reduce_size(CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
     return CHIP_NO_ERROR;
 }

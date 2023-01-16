@@ -731,6 +731,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_MISSING_URI_SEPARATOR.AsInteger():
         desc = "The URI separator is missing";
         break;
+    case CHIP_ERROR_HANDLER_NOT_SET.AsInteger():
+        desc = "Callback function or callable object is not set";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
