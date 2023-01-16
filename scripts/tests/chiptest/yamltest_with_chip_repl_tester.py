@@ -96,7 +96,7 @@ def main(setup_code, yaml_path, node_id):
 
         # Parsing YAML test and setting up chip-repl yamltests runner.
         yaml = TestParser(yaml_path, None, clusters_definitions)
-        runner = ReplTestRunner(clusters_definitions, dev_ctrl)
+        runner = ReplTestRunner(clusters_definitions, certificate_authority_manager)
 
         # Executing and validating test
         for test_step in yaml.tests:
