@@ -143,7 +143,8 @@ private:
         Callback::Callback<OnDeviceConnectionFailure> * GetOnDeviceConnectionFailure() { return &mOnConnectionFailureCallback; }
 
     private:
-        static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+        static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                          const SessionHandle & sessionHandle)
         {
             ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
             _this->mBindingManager.HandleDeviceConnected(exchangeMgr, sessionHandle);
@@ -169,7 +170,7 @@ private:
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     BindingManagerInitParams mInitParams;
 
-    void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Used to keep track of synchronous failures from FindOrEstablishSession.

@@ -33,7 +33,7 @@ struct GetConnectedDeviceCallback
     GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback);
     ~GetConnectedDeviceCallback();
 
-    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;

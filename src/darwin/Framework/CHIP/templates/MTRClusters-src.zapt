@@ -37,6 +37,7 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
@@ -169,6 +170,9 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
+{{#unless (and (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
+               (wasRemoved (compatClusterNameRemapping parent.name) command=(compatAttributeNameRemapping parent.name name)))}}
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
@@ -195,15 +199,20 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 
 {{/if}}
 
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end
+{{/unless}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
-
+{{#unless (wasRemoved (compatClusterNameRemapping name))}}
 @implementation MTRCluster{{compatClusterNameRemapping name}}
 @end
 {{/unless}}
+{{/unless}}
 
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+           (not (wasRemoved (compatClusterNameRemapping name))))}}
 @implementation MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
@@ -241,7 +250,8 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/chip_cluster_commands}}
 {{~#chip_server_cluster_attributes}}
 {{~#*inline "attributeImpls"}}
-{{#unless (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))}}
+{{#unless (or (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))
+              (wasRemoved (compatClusterNameRemapping parent.name) attribute=attribute))}}
 - (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params
 {
   return [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:params];
@@ -261,6 +271,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{> attributeImpls attribute=(compatAttributeNameRemapping parent.name name)}}
 {{/chip_server_cluster_attributes}}
 @end
+{{/if}}
 
 {{/chip_client_clusters}}
 

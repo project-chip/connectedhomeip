@@ -48,7 +48,7 @@
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -74,8 +74,8 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -111,7 +111,7 @@
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -137,8 +137,8 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -174,7 +174,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -200,8 +200,8 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -230,7 +230,7 @@
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    65, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -256,8 +256,8 @@
     513, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    516, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    516, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
+    516, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
+    516, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
     768, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
     768, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
     768, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
@@ -284,7 +284,7 @@
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    0, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     4, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     5, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     6, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -310,8 +310,8 @@
     25, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     27, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     28, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    1, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    2, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
+    1, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
+    2, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
     48, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
     49, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
     50, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
@@ -338,7 +338,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -364,8 +364,8 @@
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \

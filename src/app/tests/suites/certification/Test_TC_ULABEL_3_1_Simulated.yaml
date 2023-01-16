@@ -30,11 +30,11 @@ tests:
     - label: "Read attribute: LabelList"
       PICS: ULABEL.C.A0000
       wait: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
 
     - label: "write attribute: LabelList"
       PICS: ULABEL.C.A0000
       wait: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:

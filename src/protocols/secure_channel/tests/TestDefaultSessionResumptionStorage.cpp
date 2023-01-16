@@ -92,7 +92,8 @@ void TestSave(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.FindByScopedNodeId(vector.node, outResumptionId, outSharedSecret, outCats) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(vector.resumptionId.data(), outResumptionId.data(), vector.resumptionId.size()) == 0);
-        NL_TEST_ASSERT(inSuite, memcmp(vector.sharedSecret.ConstBytes(), outSharedSecret, vector.sharedSecret.Length()) == 0);
+        NL_TEST_ASSERT(inSuite,
+                       memcmp(vector.sharedSecret.ConstBytes(), outSharedSecret.ConstBytes(), vector.sharedSecret.Length()) == 0);
         NL_TEST_ASSERT(inSuite, vector.cats.values[0] == outCats.values[0]);
         NL_TEST_ASSERT(inSuite, vector.cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vector.cats.values[2] == outCats.values[2]);
@@ -101,7 +102,8 @@ void TestSave(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.FindByResumptionId(vector.resumptionId, outNode, outSharedSecret, outCats) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, vector.node == outNode);
-        NL_TEST_ASSERT(inSuite, memcmp(vector.sharedSecret.Bytes(), outSharedSecret, vector.sharedSecret.Length()) == 0);
+        NL_TEST_ASSERT(inSuite,
+                       memcmp(vector.sharedSecret.Bytes(), outSharedSecret.ConstBytes(), vector.sharedSecret.Length()) == 0);
         NL_TEST_ASSERT(inSuite, vector.cats.values[0] == outCats.values[0]);
         NL_TEST_ASSERT(inSuite, vector.cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vector.cats.values[2] == outCats.values[2]);
@@ -173,7 +175,9 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
                            CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite,
                        memcmp(vectors[i].resumptionId.data(), outResumptionId.data(), vectors[i].resumptionId.size()) == 0);
-        NL_TEST_ASSERT(inSuite, memcmp(vectors[i].sharedSecret.Bytes(), outSharedSecret, vectors[i].sharedSecret.Length()) == 0);
+        NL_TEST_ASSERT(
+            inSuite,
+            memcmp(vectors[i].sharedSecret.ConstBytes(), outSharedSecret.ConstBytes(), vectors[i].sharedSecret.Length()) == 0);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[0] == outCats.values[0]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[2] == outCats.values[2]);
@@ -183,7 +187,9 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
                        sessionStorage.FindByResumptionId(vectors[i].resumptionId, outNode, outSharedSecret, outCats) ==
                            CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, vectors[i].node == outNode);
-        NL_TEST_ASSERT(inSuite, memcmp(vectors[i].sharedSecret.Bytes(), outSharedSecret, vectors[i].sharedSecret.Length()) == 0);
+        NL_TEST_ASSERT(
+            inSuite,
+            memcmp(vectors[i].sharedSecret.ConstBytes(), outSharedSecret.ConstBytes(), vectors[i].sharedSecret.Length()) == 0);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[0] == outCats.values[0]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[2] == outCats.values[2]);
@@ -211,7 +217,9 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
                            CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite,
                        memcmp(vectors[i].resumptionId.data(), outResumptionId.data(), vectors[i].resumptionId.size()) == 0);
-        NL_TEST_ASSERT(inSuite, memcmp(vectors[i].sharedSecret.Bytes(), outSharedSecret, vectors[i].sharedSecret.Length()) == 0);
+        NL_TEST_ASSERT(
+            inSuite,
+            memcmp(vectors[i].sharedSecret.ConstBytes(), outSharedSecret.ConstBytes(), vectors[i].sharedSecret.Length()) == 0);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[0] == outCats.values[0]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[2] == outCats.values[2]);
@@ -221,7 +229,9 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
                        sessionStorage.FindByResumptionId(vectors[i].resumptionId, outNode, outSharedSecret, outCats) ==
                            CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, vectors[i].node == outNode);
-        NL_TEST_ASSERT(inSuite, memcmp(vectors[i].sharedSecret.Bytes(), outSharedSecret, vectors[i].sharedSecret.Length()) == 0);
+        NL_TEST_ASSERT(
+            inSuite,
+            memcmp(vectors[i].sharedSecret.ConstBytes(), outSharedSecret.ConstBytes(), vectors[i].sharedSecret.Length()) == 0);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[0] == outCats.values[0]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[2] == outCats.values[2]);
