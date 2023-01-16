@@ -116,4 +116,34 @@ std::optional<chip::ClusterId> device_translator::get_matter_cluster_id(const st
     return std::nullopt;
 }
 
+std::optional<chip::CommandId> device_translator::get_matter_command_id(const std::string & cluster_name,
+                                                                 const std::string & command_name) const
+{
+    const auto command_map = matter_command_id_map.find(cluster_name);
+    if (command_map != matter_command_id_map.end())
+    {
+        const auto command_id = command_map->second.find(command_name);
+        if (command_id != command_map->second.end())
+        {
+            return command_id->second;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<chip::AttributeId> device_translator::get_matter_attribute_id(const std::string & cluster_name,
+                                                                     const std::string & attribute_name) const
+{
+    const auto attribute_map = matter_attribute_id_map.find(cluster_name);
+    if (attribute_map != matter_attribute_id_map.end())
+    {
+        auto attribute_id = attribute_map->second.find(attribute_name);
+        if (attribute_id != attribute_map->second.end())
+        {
+            return attribute_id->second;
+        }
+    }
+    return std::nullopt;
+}
+
 } // namespace unify::matter_bridge

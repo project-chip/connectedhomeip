@@ -32,30 +32,33 @@
 
 static unify::matter_bridge::device_translator dev_translator;
 
-static uint8_t compare_clusters(chip::ClusterId cluster_id, const std::vector<DeviceClusterData> & matter_device_clusters, bool only_count_required_clusters)
+static uint8_t compare_clusters(chip::ClusterId cluster_id, const std::vector<DeviceClusterData> & matter_device_clusters,
+                                bool only_count_required_clusters)
 {
     bool it_was_required_cluster_match = false;
-    const auto it =
-        std::find_if(matter_device_clusters.begin(), matter_device_clusters.end(), [cluster_id, &it_was_required_cluster_match](const DeviceClusterData & cluster) {
-            auto device_cluster_id = dev_translator.get_matter_cluster_id(cluster.cluster_name);
-            if (!device_cluster_id.has_value())
-            {
-                return false;
-            }
-            if (cluster_id == device_cluster_id.value())
-            {
-                it_was_required_cluster_match = cluster.is_mandatory;
-                return true;
-            }
+    const auto it                      = std::find_if(matter_device_clusters.begin(), matter_device_clusters.end(),
+                                 [cluster_id, &it_was_required_cluster_match](const DeviceClusterData & cluster) {
+                                     auto device_cluster_id = dev_translator.get_matter_cluster_id(cluster.cluster_name);
+                                     if (!device_cluster_id.has_value())
+                                     {
+                                         return false;
+                                     }
+                                     if (cluster_id == device_cluster_id.value())
+                                     {
+                                         it_was_required_cluster_match = cluster.is_mandatory;
+                                         return true;
+                                     }
 
-            return false;
-        });
+                                     return false;
+                                 });
     if (it != matter_device_clusters.end())
     {
         if (only_count_required_clusters && it_was_required_cluster_match)
         {
             return 1;
-        } else if (!only_count_required_clusters) {
+        }
+        else if (!only_count_required_clusters)
+        {
             return 1;
         }
     }
@@ -63,7 +66,8 @@ static uint8_t compare_clusters(chip::ClusterId cluster_id, const std::vector<De
 }
 
 static uint8_t score_comparisons_of_cluster_lists(const std::vector<EmberAfCluster> & matter_clusters,
-                                                  const std::vector<DeviceClusterData> & matter_device_clusters, bool only_count_required_clusters)
+                                                  const std::vector<DeviceClusterData> & matter_device_clusters,
+                                                  bool only_count_required_clusters)
 {
     uint8_t count = 0;
     for (const auto & matter_cluster : matter_clusters)
@@ -74,7 +78,7 @@ static uint8_t score_comparisons_of_cluster_lists(const std::vector<EmberAfClust
 }
 
 static int8_t check_if_cluster_in_array_of_clusters(const chip::ClusterId matter_cluster,
-                                             const std::vector<EmberAfCluster> & matter_clusters)
+                                                    const std::vector<EmberAfCluster> & matter_clusters)
 {
     const auto it = std::find_if(matter_clusters.begin(), matter_clusters.end(),
                                  [matter_cluster](EmberAfCluster cluster) { return matter_cluster == cluster.clusterId; });
@@ -85,23 +89,77 @@ static int8_t check_if_cluster_in_array_of_clusters(const chip::ClusterId matter
     return -1;
 }
 
-static bool compare_attributes(const EmberAfAttributeMetadata * cluster_attributes,
-                        const std::vector<std::string> & required_cluster_attributes)
+bool compare_attributes(const EmberAfAttributeMetadata * attributes, const uint16_t attribute_count,
+                        const std::string required_cluster_name, const std::vector<std::string> & required_attributes)
 {
-    // TODO: Make a comparison of the cluster attributes with the required attributes
+    for (const auto & required_attribute : required_attributes)
+    {
+        bool required_attribute_found = false;
+        auto attribute_id = dev_translator.get_matter_attribute_id(required_cluster_name, required_attribute);
+        
+        if (!attribute_id.has_value())
+        {
+            return false;
+        }
+
+        for (uint8_t i = 0; i < attribute_count; i++)
+        {
+            if (attributes[i].attributeId == attribute_id.value())
+            {
+                required_attribute_found = true;
+                break;
+            }
+        }
+
+
+        if (!required_attribute_found)
+        {
+            return false;
+        }
+    }
     return true;
 }
 
-static bool compare_commands(const chip::CommandId * commands, const std::vector<std::string> & required_commands)
+bool compare_commands(const chip::CommandId * commands, const std::string required_cluster_name,
+                      const std::vector<std::string> & required_commands)
 {
-    // TODO: Make a comparison of the cluster commands with the required commands
+
+    uint8_t commands_count = sizeof(commands);
+    uint8_t end_of_vector  = -1;
+    for (const auto & required_command : required_commands)
+    {
+        bool required_command_found = false;
+        auto command_id = dev_translator.get_matter_command_id(required_cluster_name, required_command);
+        if (!command_id.has_value())
+        {
+            return false;
+        }
+
+        for (uint8_t i = 0; i < commands_count; i++)
+        {
+            if (commands[i] == end_of_vector)
+            {
+                // End of array
+                break;
+            }
+            if (commands[i] == command_id.value())
+            {
+                required_command_found = true;
+                break;
+            }
+        }
+        if (!required_command_found)
+        {
+            return false;
+        }
+    }
     return true;
 }
 
-static bool matter_clusters_conform_to_device_type(const std::vector<EmberAfCluster> & matter_cluster_list,
-                                            const std::vector<DeviceClusterData> & device_type_cluster_data,
-                                            bool conform_to_spec_for_clusters, bool conform_to_spec_for_attributes,
-                                            bool conform_to_spec_for_commands)
+bool matter_clusters_conform_to_device_type(const std::vector<EmberAfCluster> & matter_cluster_list,
+                                                   const std::vector<DeviceClusterData> & device_type_cluster_data,
+                                                   bool conform_to_spec_for_clusters, bool conform_to_spec_for_attributes,
+                                                   bool conform_to_spec_for_commands)
 {
     for (const auto & matter_device_cluster_data : device_type_cluster_data)
     {
@@ -128,6 +186,8 @@ static bool matter_clusters_conform_to_device_type(const std::vector<EmberAfClus
                 if (conform_to_spec_for_attributes)
                 {
                     if (!compare_attributes(matter_cluster_list.at(matter_cluster_index).attributes,
+                                            matter_cluster_list.at(matter_cluster_index).attributeCount,
+                                            matter_device_cluster_data.cluster_name,
                                             matter_device_cluster_data.required_attributes))
                     {
                         return false;
@@ -137,7 +197,7 @@ static bool matter_clusters_conform_to_device_type(const std::vector<EmberAfClus
                 if (conform_to_spec_for_commands)
                 {
                     if (!compare_commands(matter_cluster_list.at(matter_cluster_index).acceptedCommandList,
-                                          matter_device_cluster_data.required_commands))
+                                          matter_device_cluster_data.cluster_name, matter_device_cluster_data.required_commands))
                     {
                         return false;
                     }
@@ -165,12 +225,13 @@ std::vector<cluster_score> compute_device_type_match_score(const std::vector<Emb
         {
             continue;
         }
-        uint8_t clusters_matched = score_comparisons_of_cluster_lists(matter_cluster_list, matter_device.clusters, false);
+        uint8_t clusters_matched          = score_comparisons_of_cluster_lists(matter_cluster_list, matter_device.clusters, false);
         uint8_t required_clusters_matched = score_comparisons_of_cluster_lists(matter_cluster_list, matter_device.clusters, true);
 
         unsigned int addtional_matter_clusters = matter_cluster_list.size() - clusters_matched;
         unsigned int matter_device_miss_count  = matter_device.clusters.size() - clusters_matched;
-        device_type_match_score.emplace_back(addtional_matter_clusters, matter_device_miss_count, required_clusters_matched, matter_device_type_id);
+        device_type_match_score.emplace_back(addtional_matter_clusters, matter_device_miss_count, required_clusters_matched,
+                                             matter_device_type_id);
     }
     std::sort(device_type_match_score.begin(), device_type_match_score.end(), [](const cluster_score & a, const cluster_score & b) {
         // Sorting algorithm first sort based on matter_miss_count, if that
@@ -212,7 +273,7 @@ std::vector<chip::DeviceTypeId> select_possible_device_types_on_score(std::vecto
     sl_log_debug(LOG_TAG, "Selecting device types based on score");
     // Select possible device types based on score list.
     std::vector<chip::DeviceTypeId> possible_device_list;
-    auto best_score = device_type_match_score.begin();
+    auto best_score                      = device_type_match_score.begin();
     const uint8_t skew_score_computation = 20;
     if (best_score != device_type_match_score.end())
     {
@@ -222,8 +283,10 @@ std::vector<chip::DeviceTypeId> select_possible_device_types_on_score(std::vecto
         ++iter;
         for (; iter != device_type_match_score.end(); ++iter)
         {
-            uint8_t best_numerical_score = skew_score_computation + best_score->matter_miss_count + best_score->extra_matter_clusters_count - best_score->required_matter_clusters_count;
-            uint8_t iter_numerical_score = skew_score_computation + iter->matter_miss_count + iter->extra_matter_clusters_count - iter->required_matter_clusters_count;
+            uint8_t best_numerical_score = skew_score_computation + best_score->matter_miss_count +
+                best_score->extra_matter_clusters_count - best_score->required_matter_clusters_count;
+            uint8_t iter_numerical_score = skew_score_computation + iter->matter_miss_count + iter->extra_matter_clusters_count -
+                iter->required_matter_clusters_count;
             if (best_numerical_score >= iter_numerical_score)
             {
                 best_score = iter;

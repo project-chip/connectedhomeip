@@ -39,6 +39,10 @@ function hardcodedClusterCodeFilter(clusterCode) {
   }
 }
 
+function nameNotNull(name) {
+  return this.name != null
+}
+
 function hardcodedCommandCodeFilter(commandCode) {
   return commandCode
 }
@@ -50,7 +54,6 @@ function hardcodedAttributeCodeFilter(attributeCode) {
 function matterSupportedClusterFiltered(clusterID) {
   newClusterID = hardcodedClusterCodeFilter(clusterID)
   supported_cluster = matterHelper.matterSupportedCluster(newClusterID)
-  console.log("matterSupportedClusterFiltered: " + clusterID + " -> " + newClusterID + " -> " + supported_cluster)
   return supported_cluster
 }
 
@@ -92,17 +95,17 @@ function isMandatoryCluster() {
 
 function deviceTypeClusterSpecConformance(deviceType) {
   let name = cleanDeviceTypeName(deviceType)
-  return deviceTypeConformance.model[name]["clusterSpecConformance"]
+  return deviceTypeConformance.model[name]["clusterSpecConformance"] == true
 }
 
 function deviceTypeAttributeSpecConformance(deviceType) {
   let name = cleanDeviceTypeName(deviceType)
-  return deviceTypeConformance.model[name]["attributeSpecConformance"]
+  return deviceTypeConformance.model[name]["attributeSpecConformance"] == true
 }
 
 function deviceTypeCommandSpecConformance(deviceType) {
   let name = cleanDeviceTypeName(deviceType)
-  return deviceTypeConformance.model[name]["commandSpecConformance"]
+  return deviceTypeConformance.model[name]["commandSpecConformance"] == true
 }
 
 function stupidLog(label) {
@@ -111,6 +114,7 @@ function stupidLog(label) {
   
 exports.stupidLog = stupidLog
 exports.listComma = listComma
+exports.nameNotNull = nameNotNull
 exports.supportedDeviceTypes = supportedDeviceTypes
 exports.cleanDeviceTypeName = cleanDeviceTypeName
 exports.isMandatoryCluster = isMandatoryCluster

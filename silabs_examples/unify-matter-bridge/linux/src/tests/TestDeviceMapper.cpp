@@ -1,8 +1,8 @@
 #include "TestDeviceMapperSelection.hpp"
 #include "matter_cluster_interactor.hpp"
 #include "matter_device_translator.hpp"
-#include "matter_device_types_clusters_list.inc"
 #include "cluster_emulator.hpp"
+
 // Chip components
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -213,12 +213,180 @@ void TestDeviceMapperPrioritizationConformingToSpec(nlTestSuite * inSuite, void 
     NL_TEST_ASSERT(inSuite, output_device == "dimmablelight");
 
     // 8 Test switch device mapping
-    clusters      = { { "Groups", groups_cluster },
-                 { "Identify", identify_cluster },
-                 { "OnOff", on_off_cluster },
-                 { "Scenes", scenes_cluster } };
+    clusters = {
+        { "Groups", groups_cluster }, { "Identify", identify_cluster }, { "OnOff", on_off_cluster }, { "Scenes", scenes_cluster }
+    };
     output_device = getFirstPrioritizedDevice(clusters);
     NL_TEST_ASSERT(inSuite, output_device == "onoffpluginunit");
+}
+
+void TestDeviceMapperSpecCommands(nlTestSuite * inSuite, void * aContext)
+{
+    auto onoff_cluster               = unify_monitor::cluster("OnOff");
+    onoff_cluster.attributes         = { "OnOff" };
+    onoff_cluster.supported_commands = { "Off", "Toggle", "On" };
+
+    std::unordered_map<std::string, unify_monitor::cluster> clusters = { { "OnOff", onoff_cluster } };
+
+    matter_endpoint_builder builder;
+    ClusterEmulator emulator;
+    cluster_interactor cluster_interactor(emulator, obj, builder);
+    cluster_interactor.build_matter_cluster(clusters);
+
+    bool state =
+        compare_commands(cluster_interactor.endpoint_builder.clusters[0].acceptedCommandList, "OnOff", { "On", "Off", "Toggle" });
+    NL_TEST_ASSERT(inSuite, state == true);
+
+    state = compare_commands(cluster_interactor.endpoint_builder.clusters[0].acceptedCommandList, "OnOff",
+                             { "On", "Off", "Toggle", "RandomNonesenseRequiredCommand" });
+    NL_TEST_ASSERT(inSuite, state == false);
+}
+
+void TestDeviceMapperSpecCommandsFail(nlTestSuite * inSuite, void * aContext)
+{
+    auto new_onoff_cluster               = unify_monitor::cluster("OnOff");
+    new_onoff_cluster.attributes         = { "OnOff" };
+    new_onoff_cluster.supported_commands = { "Off", "Toggle" };
+
+    std::unordered_map<std::string, unify_monitor::cluster> new_clusters = { { "OnOff", new_onoff_cluster } };
+
+    matter_endpoint_builder new_builder;
+    ClusterEmulator emulator;
+    cluster_interactor cluster_interactor(emulator, obj, new_builder);
+    cluster_interactor.build_matter_cluster(new_clusters);
+
+    bool state =
+        compare_commands(cluster_interactor.endpoint_builder.clusters[0].acceptedCommandList, "OnOff", { "On", "Off", "Toggle" });
+    NL_TEST_ASSERT(inSuite, state == false);
+    state = compare_commands(cluster_interactor.endpoint_builder.clusters[0].acceptedCommandList, "OnOff", { "Off" });
+    NL_TEST_ASSERT(inSuite, state == true);
+    state = compare_commands(cluster_interactor.endpoint_builder.clusters[0].acceptedCommandList, "OnOff", { "Off", "Toggle" });
+    NL_TEST_ASSERT(inSuite, state == true);
+}
+
+void TestDeviceMapperSpecAttributes(nlTestSuite * inSuite, void * aContext)
+{
+    auto onoff_cluster       = unify_monitor::cluster("OnOff");
+    onoff_cluster.attributes = { "OnOff", "OnTime", "OffWaitTime" };
+
+    std::unordered_map<std::string, unify_monitor::cluster> clusters = { { "OnOff", onoff_cluster } };
+
+    matter_endpoint_builder builder;
+    ClusterEmulator emulator;
+    cluster_interactor cluster_interactor(emulator, obj, builder);
+    cluster_interactor.build_matter_cluster(clusters);
+
+    bool state = compare_attributes(cluster_interactor.endpoint_builder.clusters[0].attributes,
+                                    cluster_interactor.endpoint_builder.clusters[0].attributeCount, "OnOff",
+                                    { "OnOff", "OnTime", "OffWaitTime" });
+    NL_TEST_ASSERT(inSuite, state == true);
+
+    state = compare_attributes(cluster_interactor.endpoint_builder.clusters[0].attributes,
+                               cluster_interactor.endpoint_builder.clusters[0].attributeCount, "OnOff",
+                               { "OnOff", "OnTime", "OffWaitTime", "RandomNonesenseRequiredAttribute" });
+    NL_TEST_ASSERT(inSuite, state == false);
+}
+
+void TestDeviceMapperSpecAttributesFail(nlTestSuite * inSuite, void * aContext)
+{
+    auto new_onoff_cluster       = unify_monitor::cluster("OnOff");
+    new_onoff_cluster.attributes = { "OnOff", "OnTime" };
+
+    std::unordered_map<std::string, unify_monitor::cluster> new_clusters = { { "OnOff", new_onoff_cluster } };
+
+    matter_endpoint_builder new_builder;
+    ClusterEmulator emulator;
+    cluster_interactor cluster_interactor(emulator, obj, new_builder);
+    cluster_interactor.build_matter_cluster(new_clusters);
+
+    bool state = compare_attributes(cluster_interactor.endpoint_builder.clusters[0].attributes,
+                                    cluster_interactor.endpoint_builder.clusters[0].attributeCount, "OnOff",
+                                    { "OnOff", "OnTime", "OffWaitTime" });
+    NL_TEST_ASSERT(inSuite, state == false);
+    state = compare_attributes(cluster_interactor.endpoint_builder.clusters[0].attributes,
+                               cluster_interactor.endpoint_builder.clusters[0].attributeCount, "OnOff", { "OnOff", "OnTime" });
+    NL_TEST_ASSERT(inSuite, state == true);
+    state = compare_attributes(cluster_interactor.endpoint_builder.clusters[0].attributes,
+                               cluster_interactor.endpoint_builder.clusters[0].attributeCount, "OnOff", { "OnOff" });
+    NL_TEST_ASSERT(inSuite, state == true);
+}
+
+void TestDeviceMapperSpecOnOffDeviceFail(nlTestSuite * inSuite, void * aContext)
+{
+    // None compliant OnOffplugin unit device
+    auto new_onoff_cluster       = unify_monitor::cluster("OnOff");
+    new_onoff_cluster.attributes = { "OnOff", "OnTime", "Global" };
+
+    std::unordered_map<std::string, unify_monitor::cluster> new_clusters = { { "OnOff", new_onoff_cluster } };
+
+    matter_endpoint_builder new_builder;
+    ClusterEmulator emulator;
+    cluster_interactor cluster_interactor(emulator, obj, new_builder);
+    cluster_interactor.build_matter_cluster(new_clusters);
+
+    chip::DeviceTypeId onoff_pluginunit = 0x010A;
+
+    const DeviceTypeData onoff_plugin_unit_requirements = matter_device_type_vs_clusters_map.at(onoff_pluginunit);
+
+    bool compliance = matter_clusters_conform_to_device_type(cluster_interactor.endpoint_builder.clusters,
+                                                             onoff_plugin_unit_requirements.clusters, true, true, true);
+
+    NL_TEST_ASSERT(inSuite, compliance == false);
+}
+
+void TestDeviceMapperSpecOnOffDeviceComplying(nlTestSuite * inSuite, void * aContext)
+{
+    // Compliant OnOffplugin unit device
+    auto identify_cluster               = unify_monitor::cluster("Identify");
+    identify_cluster.attributes         = { "IdentifyTime", "IdentifyType" };
+    identify_cluster.supported_commands = { "Identify", "TriggerEffect" };
+    auto onoff_cluster                  = unify_monitor::cluster("OnOff");
+    onoff_cluster.attributes            = { "OnOff", "GlobalSceneControl", "OnTime", "OffWaitTime", "StartUpOnOff" };
+    onoff_cluster.supported_commands    = { "Off", "On", "Toggle", "OffWithEffect", "OnWithRecallGlobalScene", "OnWithTimedOff" };
+    auto scenes_cluster                 = unify_monitor::cluster("Scenes");
+    scenes_cluster.supported_commands   = { "AddScene",
+                                          "AddSceneResponse",
+                                          "ViewScene",
+                                          "ViewSceneResponse",
+                                          "RemoveScene",
+                                          "RemoveSceneResponse",
+                                          "RemoveAllScenes",
+                                          "RemoveAllScenesResponse",
+                                          "StoreScene",
+                                          "StoreSceneResponse",
+                                          "RecallScene",
+                                          "GetSceneMembership",
+                                          "GetSceneMembershipResponse" };
+    scenes_cluster.attributes           = { "SceneCount", "CurrentScene", "CurrentGroup", "SceneValid", "NameSupport" };
+    auto groups_cluster                 = unify_monitor::cluster("Groups");
+    groups_cluster.supported_commands   = { "AddGroup",           "AddGroupResponse",           "ViewGroup",   "ViewGroupResponse",
+                                          "GetGroupMembership", "GetGroupMembershipResponse", "RemoveGroup", "RemoveGroupResponse",
+                                          "RemoveAllGroups",    "AddGroupIfIdentifying" };
+    groups_cluster.attributes           = { "NameSupport" };
+
+    std::unordered_map<std::string, unify_monitor::cluster> new_clusters = {
+        { "OnOff", onoff_cluster },
+        { "Identify", identify_cluster },
+        { "Scenes", scenes_cluster },
+        { "Groups", groups_cluster },
+    };
+
+    matter_endpoint_builder new_builder;
+    ClusterEmulator emulator;
+    cluster_interactor cluster_interactor(emulator, obj, new_builder);
+    cluster_interactor.build_matter_cluster(new_clusters);
+
+    chip::DeviceTypeId onoff_pluginunit = 0x010A;
+
+    const DeviceTypeData onoff_plugin_unit_requirements = matter_device_type_vs_clusters_map.at(onoff_pluginunit);
+
+    // This wont comply to spec before following attributes and commands are
+    // properly mapped or emulated: 
+    // Attribute: IdentifyType
+    // Whole cluster Scenes
+    bool compliance = matter_clusters_conform_to_device_type(cluster_interactor.endpoint_builder.clusters,
+                                                             onoff_plugin_unit_requirements.clusters, true, true, true);
+    NL_TEST_ASSERT(inSuite, compliance == false);
 }
 
 void TestDeviceMapperGetDeviceType(nlTestSuite * inSuite, void * aContext)
@@ -297,6 +465,12 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestMatterDeviceScore", TestMatterDeviceScore),
     NL_TEST_DEF("TestDeviceMapperPrioritization", TestDeviceMapperPrioritization),
     NL_TEST_DEF("TestDeviceMapperPrioritizationConformingToSpec", TestDeviceMapperPrioritizationConformingToSpec),
+    NL_TEST_DEF("TestDeviceMapperSpecCommands", TestDeviceMapperSpecCommands),
+    NL_TEST_DEF("TestDeviceMapperSpecCommandsFail", TestDeviceMapperSpecCommandsFail),
+    NL_TEST_DEF("TestDeviceMapperSpecAttributes", TestDeviceMapperSpecAttributes),
+    NL_TEST_DEF("TestDeviceMapperSpecAttributesFail", TestDeviceMapperSpecAttributesFail),
+    NL_TEST_DEF("TestDeviceMapperSpecOnOffDeviceFail", TestDeviceMapperSpecOnOffDeviceFail),
+    NL_TEST_DEF("TestDeviceMapperSpecOnOffDeviceComplying", TestDeviceMapperSpecOnOffDeviceComplying),
     NL_TEST_DEF("TestDeviceMapperGetDeviceType", TestDeviceMapperGetDeviceType),
     NL_TEST_DEF("TestDeviceMapperGetClusterId", TestDeviceMapperGetClusterId),
     NL_TEST_DEF("TestDeviceMapperGetAttributeIdAndCommandId", TestDeviceMapperGetAttributeIdAndCommandId),

@@ -33,7 +33,8 @@ config("unify-config") {
     "include",
     "zap-generated/data_model_translator",
     "zap-generated/data_model_translator/device-type-mapper",
-    "zap-generated/unify-data-model-templates/device-type-mapper"
+    "zap-generated/unify-data-model-templates/device-type-mapper",
+    "zap-generated/device_spec_compliance/device-type-mapper"
   ]
   ldflags = [ "-lboost_system" ] 
   cflags = ["-Wno-unused-const-variable"]

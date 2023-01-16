@@ -1,39 +1,13 @@
+// This file is for manipulating a device type if it should conform to spec when
+// mapped from Unify devices. There are three levels of conformance:
+// 1. Cluster conformance: If a cluster is not supported by Matter, it will be
+//    removed from the device.
+// 2. Attribute conformance: If an attribute is not supported by Matter, it will
+//    be removed from the device.
+// 3. Command conformance: If a command is not supported by Matter, it will be
+//    removed from the device.
+
 exports.model = {
-    "orphan": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "rootdevice": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "powersource": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "otarequestor": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "otaprovider": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "aggregator": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "bridgeddevice": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
     "onofflight": {
         "clusterSpecConformance": false,
         "attributeSpecConformance": false,
@@ -64,37 +38,12 @@ exports.model = {
         "attributeSpecConformance": false,
         "commandSpecConformance": false
     },
-    "pump": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
     "onofflightswitch": {
         "clusterSpecConformance": false,
         "attributeSpecConformance": false,
         "commandSpecConformance": false
     },
     "dimmerswitch": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "colordimmerswitch": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "controlbridge": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "pumpcontroller": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "genericswitch": {
         "clusterSpecConformance": false,
         "attributeSpecConformance": false,
         "commandSpecConformance": false
@@ -129,11 +78,6 @@ exports.model = {
         "attributeSpecConformance": false,
         "commandSpecConformance": false
     },
-    "humiditysensor": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
     "onoffsensor": {
         "clusterSpecConformance": false,
         "attributeSpecConformance": false,
@@ -144,77 +88,12 @@ exports.model = {
         "attributeSpecConformance": false,
         "commandSpecConformance": false
     },
-    "doorlockcontroller": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
     "windowcovering": {
         "clusterSpecConformance": false,
         "attributeSpecConformance": false,
         "commandSpecConformance": false
     },
-    "windowcoveringcontroller": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "heatcool": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
     "thermostat": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "fan": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "casting-videoplayer": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "basic-videoplayer": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "casting-videoclient": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "video-remotecontrol": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "speaker": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "contentapp": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "modeselect": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "all-clusters-app": {
-        "clusterSpecConformance": false,
-        "attributeSpecConformance": false,
-        "commandSpecConformance": false
-    },
-    "secondary-network-commissioning": {
         "clusterSpecConformance": false,
         "attributeSpecConformance": false,
         "commandSpecConformance": false

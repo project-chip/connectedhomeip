@@ -29,8 +29,8 @@
 #define MATTER_DEVICE_TRANSLATOR_HPP
 
 // Matter library
-#include <app-common/zap-generated/ids/Clusters.h>
 #include "matter.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 
 // Unify library
 #include "unify_node_state_monitor.hpp"
@@ -100,6 +100,26 @@ public:
      * @return std::optional containing the cluster id or std::nullopt_t.
      */
     virtual std::optional<chip::ClusterId> get_matter_cluster_id(const std::string & matter_cluster_name) const;
+
+    /**
+     * @brief Get the command id given a matter cluster name and command name.
+     *
+     * @param matter_cluster_name
+     * @param matter_command_name
+     * @return std::optional containg the attribute id or std::nullopt_t.
+     */
+    virtual std::optional<chip::CommandId> get_matter_command_id(const std::string & matter_cluster_name,
+                                                                 const std::string & matter_command_name) const;
+
+    /**
+     * @brief Get the attribute id given a matter cluster name and attribute name.
+     *
+     * @param matter_cluster_name
+     * @param matter_attribute_name
+     * @return std::optional containing the attribute id or std::nullopt_t.
+     */
+    virtual std::optional<chip::AttributeId> get_matter_attribute_id(const std::string & cluster_name,
+                                                                     const std::string & attribute_name) const;
 
     virtual ~device_translator() = default;
 

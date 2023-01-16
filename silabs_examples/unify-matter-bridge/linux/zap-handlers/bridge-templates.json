@@ -72,11 +72,6 @@
             "output": "zcl_global_types.hpp"
         },
         {
-            "path": "device-type-mapper/matter_device_types_clusters_list.inc.zapt",
-            "name": "Matter Device Types Mapping Data Model",
-            "output": "device-type-mapper/matter_device_types_clusters_list.inc"
-        },
-        {
             "path": "device-type-mapper/matter_id_model.inc.zapt",
             "name": "Matter IDs Mapping Data Model",
             "output": "device-type-mapper/matter_id_model.inc"
