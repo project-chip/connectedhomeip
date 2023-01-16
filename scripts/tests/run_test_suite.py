@@ -274,7 +274,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 sys.exit(2)
 
     apps_register.uninit()
-    chiptest.linux.ShutdownNamespaceForTestExecution()
+    if sys.platform == 'linux':
+        chiptest.linux.ShutdownNamespaceForTestExecution()
 
 
 # On linux, allow an execution shell to be prepared
