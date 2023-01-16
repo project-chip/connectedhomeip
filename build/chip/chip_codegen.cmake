@@ -185,7 +185,7 @@ function(chip_zapgen TARGET_NAME)
         #
         # find_package(Python3 REQUIRED)
         #
-        # TODO: lock file support should be removed as this serializes zap
+        # TODO: lockfile support should be removed as this serializes zap
         # (slower), however this is currently done because on Darwin zap startup
         # may conflict and error out with:
         #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
@@ -196,7 +196,7 @@ function(chip_zapgen TARGET_NAME)
                 "--no-prettify-output"
                 "--templates" "${TEMPLATE_PATH}"
                 "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
-                "--lock-file", "${CMAKE_BINARY_DIR}/zap_gen.lock",
+                "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
                 "--parallel"
                 "${ARG_INPUT}"
             DEPENDS
