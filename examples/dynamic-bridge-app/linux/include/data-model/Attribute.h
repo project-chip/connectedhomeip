@@ -53,7 +53,7 @@ struct Attribute : public AttributeInterface
     {
         return chip::app::DataModel::Encode(aPath, aEncoder, mData);
     }
-   
+
     template <typename T = Type, std::enable_if_t<chip::app::DataModel::IsList<std::decay_t<T>>::value, bool> = true>
     CHIP_ERROR ReadValue(const chip::app::ConcreteReadAttributePath & aPath, chip::TLV::TLVWriter & writer, Type & value)
     {

@@ -419,7 +419,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 
     // read from `buffer` and write to `data`
 
-    // buffer size will not be used in this code path, so we set it to 0. See `PerformTLVBufferConversion` 
+    // buffer size will not be used in this code path, so we set it to 0. See `PerformTLVBufferConversion`
     CHIP_ERROR err = PerformTLVBufferConversionForType(&tlvData, chip::Span<uint8_t>(buffer, 0), attributeMetadata->attributeType, BUFFER_TO_TLV);
     if (err != CHIP_NO_ERROR)
     {
