@@ -78,6 +78,7 @@ exclude:
     - "scripts/run_codegen_targets.sh" # shellharden breaks for loops over command outputs
     - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.h" # Too big?
     - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm" # Too big?
+    - "zzz_generated/**/*" # already clang-formatted by our zap tooling
 
 
 changed_paths:
