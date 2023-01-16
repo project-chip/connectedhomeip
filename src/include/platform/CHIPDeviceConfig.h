@@ -97,7 +97,7 @@
  * Enable support for background event processing.
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
-#define CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING 1
+#define CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING 0
 #endif
 
 
@@ -134,7 +134,7 @@
  * The maximum number of events that can be held in the chip background event queue.
  */
 #ifndef CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE
-#define CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE 10
+#define CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE 1
 #endif
 
 /**

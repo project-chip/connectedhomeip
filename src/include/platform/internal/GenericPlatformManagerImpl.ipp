@@ -220,7 +220,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct w
 {
     ChipDeviceEvent event{
         .Type = DeviceEventType::kCallWorkFunct,
-        .CallWorkFunct {.Arg = arg, .WorkFunct = workFunct}
+        .CallWorkFunct {.WorkFunct = workFunct, .Arg = arg}
     };
 
     CHIP_ERROR err = Impl()->PostEvent(&event);
@@ -237,7 +237,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleBackgroundWork(AsyncW
 {
     ChipDeviceEvent event{
         .Type = DeviceEventType::kCallWorkFunct,
-        .CallWorkFunct {.Arg = arg, .WorkFunct = workFunct}
+        .CallWorkFunct {.WorkFunct = workFunct, .Arg = arg}
     };
     auto err = Impl()->PostEvent(&event);
     if (err != CHIP_NO_ERROR)

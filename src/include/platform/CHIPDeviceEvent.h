@@ -366,8 +366,8 @@ struct ChipDeviceEvent final
         LambdaBridge LambdaEvent;
         struct
         {
-            intptr_t Arg;
             AsyncWorkFunct WorkFunct;
+            intptr_t Arg;
         } CallWorkFunct;
         struct
         {

@@ -219,6 +219,9 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
     ReturnErrorOnFailure(Init(sessionManager, policy, delegate, previouslyEstablishedPeer));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Sequence number used to coordinate foreground/background work for a
+    // particular session establishment.
     mSequence++;
 
     SuccessOrExit(err = fabricTable->AddFabricDelegate(this));
@@ -1270,7 +1273,8 @@ struct CASESession::Sigma3Work
     // Session to use after background processing.
     CASESession * session;
 
-    // Sequence number used for coordination.
+    // Sequence number used to coordinate foreground/background work for a
+    // particular session establishment.
     int sequence;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;

@@ -288,6 +288,8 @@ private:
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
+    // Sequence number used to coordinate foreground/background work for a
+    // particular session establishment.
     int mSequence = 0;
 
     State mState;

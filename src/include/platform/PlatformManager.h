@@ -204,7 +204,8 @@ public:
 
     // These functions should be gated by CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     // but the PlatformManagerImpl header (included below) makes that tricky
-    // so always declare them here even if the are not defined by the platform implementation.
+    // so always declare them here even if they are not defined by the platform implementation
+    // (by using #if 1).
 #if 1 || defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     CHIP_ERROR ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
     CHIP_ERROR PostBackgroundEvent(const ChipDeviceEvent * event);
