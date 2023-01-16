@@ -125,7 +125,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
 }
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging::ExchangeManager & exchangeMgr,
-                                                                      SessionHandle & sessionHandle)
+                                                                      const SessionHandle & sessionHandle)
 {
     ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, mNodeId);
 
@@ -259,7 +259,7 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowFailure(void * context,
 }
 
 void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                                          SessionHandle & sessionHandle)
+                                                          const SessionHandle & sessionHandle)
 {
     auto * self = static_cast<CommissioningWindowOpener *>(context);
 

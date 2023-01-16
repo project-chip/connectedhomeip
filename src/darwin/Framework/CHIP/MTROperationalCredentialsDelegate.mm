@@ -249,7 +249,7 @@ void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
                 return;
             }
 
-            AesCcm128KeySpan ipk = commissioningParameters.Value().GetIpk().ValueOr(GetIPK());
+            IdentityProtectionKeySpan ipk = commissioningParameters.Value().GetIpk().ValueOr(GetIPK());
 
             Optional<NodeId> adminSubject;
             if (info.adminSubject != nil) {

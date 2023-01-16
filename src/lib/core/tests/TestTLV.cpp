@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -2789,6 +2789,53 @@ void CheckTLVByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(readerSpan.data(), bytesBuffer, sizeof(bytesBuffer)) == 0);
 }
 
+void CheckTLVCharSpan(nlTestSuite * inSuite, void * inContext)
+{
+    struct CharSpanTestCase
+    {
+        const char * testString;
+        const char * expectedString;
+    };
+
+    // clang-format off
+    static CharSpanTestCase sCharSpanTestCases[] = {
+        // Test String                                                   Expected String from Get()
+        // =========================================================================================
+        {  "This is a test case #0",                                     "This is a test case #0"  },
+        {  "This is a test case #1\x1fTest Localized String Identifier", "This is a test case #1"  },
+        {  "This is a test case #2 \x1f abc \x1f def",                   "This is a test case #2 " },
+        {  "This is a test case #3\x1f",                                 "This is a test case #3"  },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCharSpanTestCases)
+    {
+        uint8_t backingStore[100];
+        TLVWriter writer;
+        TLVReader reader;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        writer.Init(backingStore);
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), testCase.testString);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        chip::CharSpan readerSpan;
+        err = reader.Get(readerSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, strlen(testCase.expectedString) == readerSpan.size());
+        NL_TEST_ASSERT(inSuite, memcmp(readerSpan.data(), testCase.expectedString, strlen(testCase.expectedString)) == 0);
+    }
+}
+
 void CheckTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40; // large enough s.t. 2 elements fit, 3rd causes eviction
@@ -4466,6 +4513,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckTLVPutStringFCircular),
     NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckTLVSkipCircular),
     NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckTLVByteSpan),
+    NL_TEST_DEF("CHIP TLV CharSpan",                   CheckTLVCharSpan),
     NL_TEST_DEF("CHIP TLV Scoped Buffer",              CheckTLVScopedBuffer),
     NL_TEST_DEF("CHIP TLV Check reserve",              CheckCloseContainerReserve),
     NL_TEST_DEF("CHIP TLV Reader Fuzz Test",           TLVReaderFuzzTest),
