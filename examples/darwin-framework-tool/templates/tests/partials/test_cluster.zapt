@@ -23,10 +23,17 @@ class {{filename}}: public TestCommandBridge
     {
     }
 
+    // Allow yaml to access the current commissioner node id.
+    // Default to 0 (undefined node id) so we know if this isn't
+    // set correctly.
+    // Reset on every step in case it changed.
+    chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
       CHIP_ERROR err = CHIP_NO_ERROR;
+      commissionerNodeId = mCommissionerNodeId.ValueOr(0);
 
       if (0 == mTestIndex)
       {
@@ -136,6 +143,7 @@ class {{filename}}: public TestCommandBridge
         return {{command}}("{{identity}}", value);
         {{else}}
         MTRBaseDevice * device = GetDevice("{{identity}}");
+        commissionerNodeId = mCommissionerNodeId.ValueOr(0);
         __auto_type * cluster = [[MTRBaseCluster{{>cluster}} alloc] initWithDevice:device endpointID:@({{endpoint}}) queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
