@@ -215,7 +215,9 @@ def runClangPrettifier(templates_file, output_dir):
                 try:
                     subprocess.check_call(args)
                     err = None
-                    print('Formatted using %s: %s' % (clang_format, subprocess.check_output([clang_format, '--version'])))
+                    print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
+                    for outputName in clangOutputs:
+                        print('  - %s' % outputName)
                     break
                 except Exception as thrown:
                     err = thrown

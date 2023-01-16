@@ -27,7 +27,6 @@ namespace Clusters {
 
 // Matter does not have global commands
 
-
 namespace Identify {
 namespace Commands {
 
@@ -200,7 +199,6 @@ static constexpr CommandId Id = 0x00000042;
 } // namespace Commands
 } // namespace OnOff
 
-
 namespace LevelControl {
 namespace Commands {
 
@@ -242,11 +240,6 @@ static constexpr CommandId Id = 0x00000008;
 
 } // namespace Commands
 } // namespace LevelControl
-
-
-
-
-
 
 namespace Actions {
 namespace Commands {
@@ -347,11 +340,6 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor
-
-
-
-
-
 
 namespace GeneralCommissioning {
 namespace Commands {
@@ -499,8 +487,6 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace TimeSynchronization
 
-
-
 namespace AdministratorCommissioning {
 namespace Commands {
 
@@ -602,12 +588,6 @@ static constexpr CommandId Id = 0x00000005;
 
 } // namespace Commands
 } // namespace GroupKeyManagement
-
-
-
-
-
-
 
 namespace ModeSelect {
 namespace Commands {
@@ -769,7 +749,6 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace BarrierControl
 
-
 namespace Thermostat {
 namespace Commands {
 
@@ -795,8 +774,6 @@ static constexpr CommandId Id = 0x00000003;
 
 } // namespace Commands
 } // namespace Thermostat
-
-
 
 namespace ColorControl {
 namespace Commands {
@@ -879,14 +856,6 @@ static constexpr CommandId Id = 0x0000004C;
 
 } // namespace Commands
 } // namespace ColorControl
-
-
-
-
-
-
-
-
 
 namespace Channel {
 namespace Commands {
@@ -1077,7 +1046,6 @@ static constexpr CommandId Id = 0x00000003;
 
 } // namespace Commands
 } // namespace ApplicationLauncher
-
 
 namespace AccountLogin {
 namespace Commands {

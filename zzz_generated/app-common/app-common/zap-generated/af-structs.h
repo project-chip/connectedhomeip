@@ -30,79 +30,16 @@
 
 #include "enums.h"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Struct for ApplicationBasicApplication
-typedef struct _ApplicationBasicApplication {
-  uint16_t catalogVendorId;
-  chip::CharSpan applicationId;
+typedef struct _ApplicationBasicApplication
+{
+    uint16_t catalogVendorId;
+    chip::CharSpan applicationId;
 } ApplicationBasicApplication;
 
-
-
-
-
-
-
 // Struct for DlCredential
-typedef struct _DlCredential {
-  uint8_t CredentialType;
-  uint16_t CredentialIndex;
+typedef struct _DlCredential
+{
+    uint8_t CredentialType;
+    uint16_t CredentialIndex;
 } DlCredential;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
