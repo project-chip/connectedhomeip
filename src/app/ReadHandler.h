@@ -39,6 +39,7 @@
 #include <app/ObjectList.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/SubscriptionResumptionStorage.h>
+#include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
