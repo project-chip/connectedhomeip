@@ -15,15 +15,24 @@
 #    limitations under the License.
 #
 
-from aenum import IntEnum
-from aenum import extend_enum
+from aenum import IntEnum, extend_enum
 
+# Flag on whether we should map unknown enum values to kUnknownEnumValue.
 _map_missing_enum_to_unknown_enum_value = True
+# Count that is used to append the end of placeholder enum names in
+# MatterIntEnum.extend_enum_if_value_doesnt_exist.
 _placeholder_count = 0
 
 
 class MatterIntEnum(IntEnum):
+    '''Matter implementation of integer enum.
 
+    This provides flexibility so that we don't have to rely on the strongly typed
+    nature of built in enum. By default, globally, all unknown enum mapping are
+    turned into kUnknownEnumValue. This also give capability of extending the enum
+    at runtime allowing for test code to test behaviour of sending out out of scope
+    enum values.
+    '''
     @classmethod
     def _missing_(cls, value):
         global _map_missing_enum_to_unknown_enum_value
@@ -46,5 +55,6 @@ class MatterIntEnum(IntEnum):
 
 
 def set_map_missing_enum_to_unknown_enum_value(value: bool):
+    '''Sets flag that handles what to do on unknown enum value type.'''
     global _map_missing_enum_to_unknown_enum_value
     _map_missing_enum_to_unknown_enum_value = value

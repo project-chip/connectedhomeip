@@ -198,7 +198,6 @@ chip_python_wheel_action("chip-core") {
         "chip/ChipCommissionableNodeCtrl.py",
         "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipStack.py",
-        "chip/enum.py",
         "chip/FabricAdmin.py",
         "chip/__init__.py",
         "chip/ble/__init__.py",
@@ -214,6 +213,7 @@ chip_python_wheel_action("chip-core") {
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
         "chip/discovery/types.py",
+        "chip/enum.py",
         "chip/exceptions/__init__.py",
         "chip/interaction_model/__init__.py",
         "chip/interaction_model/delegate.py",
@@ -290,6 +290,7 @@ chip_python_wheel_action("chip-core") {
   }
 
   py_package_reqs = [
+    "aenum",
     "coloredlogs",
     "construct",
     "dacite",
