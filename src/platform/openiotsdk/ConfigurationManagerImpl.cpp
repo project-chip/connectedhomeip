@@ -28,7 +28,11 @@
 
 #include <platform/ConfigurationManager.h>
 
+#ifdef CHIP_OPEN_IOT_SDK_USE_TFM
+#include "tfm_platform_api.h"
+#else
 #include "cmsis.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -149,7 +153,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
+#ifdef CHIP_OPEN_IOT_SDK_USE_TFM
+    tfm_platform_system_reset();
+#else
+    __disable_irq();
     NVIC_SystemReset();
+#endif
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

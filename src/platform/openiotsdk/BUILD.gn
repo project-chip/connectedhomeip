@@ -14,9 +14,24 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "openiotsdk")
+
+declare_args() {
+  # Add Trusted Firmware-M (TF-M) support
+  chip_openiotsdk_use_tfm = false
+}
+
+buildconfig_header("openiotsdk_buildconfig") {
+  header = "OpenIoTSDKConfig.h"
+  header_dir = "ois"
+
+  if (chip_openiotsdk_use_tfm) {
+    defines = [ "CHIP_OPEN_IOT_SDK_USE_TFM=1" ]
+  }
+}
 
 static_library("openiotsdk") {
   sources = [

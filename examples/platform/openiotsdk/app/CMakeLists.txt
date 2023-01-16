@@ -33,3 +33,10 @@ target_link_libraries(openiotsdk-app
         openiotsdk-chip
         $<TARGET_OBJECTS:iotsdk-serial-retarget>
 )
+
+if(TFM_SUPPORT)
+    target_compile_definitions(openiotsdk-app 
+        PUBLIC
+            TFM_SUPPORT
+    )
+endif()

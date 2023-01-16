@@ -44,6 +44,12 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif // USE_CHIP_DATA_MODEL
 
+#ifdef TFM_SUPPORT
+#include "psa/fwu_config.h"
+#include "psa/update.h"
+#include "tfm_ns_interface.h"
+#endif // TFM_SUPPORT
+
 using namespace ::chip;
 using namespace ::chip::Platform;
 using namespace ::chip::DeviceLayer;
@@ -59,6 +65,13 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 static osEventFlagsId_t event_flags_id;
 
 static DeviceLayer::DeviceInfoProviderImpl gDeviceInfoProvider;
+
+#ifdef TFM_SUPPORT
+extern "C" {
+// RTOS-specific initialization that is not declared in any header file
+uint32_t tfm_ns_interface_init(void);
+}
+#endif // TFM_SUPPORT
 
 /** Wait for specific event and check error */
 static int wait_for_event(uint32_t event)
@@ -122,6 +135,36 @@ static void network_state_callback(network_state_callback_event_t event)
     }
 }
 
+#ifdef TFM_SUPPORT
+static int get_psa_images_details()
+{
+    psa_status_t status;
+    psa_fwu_component_info_t image_info;
+
+    status = psa_fwu_query(FWU_COMPONENT_ID_SECURE, &image_info);
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "Failed to query secure firmware information. Error %ld", status);
+        return EXIT_FAILURE;
+    }
+
+    ChipLogProgress(NotSpecified, "Secure firmware version: %u.%u.%u-%lu\r\n", image_info.version.major, image_info.version.minor,
+                    image_info.version.patch, image_info.version.build);
+
+    status = psa_fwu_query(FWU_COMPONENT_ID_NONSECURE, &image_info);
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "Failed to query non-secure firmware information. Error %ld", status);
+        return EXIT_FAILURE;
+    }
+
+    ChipLogProgress(NotSpecified, "Non-secure firmware version: %u.%u.%u-%lu\r\n", image_info.version.major,
+                    image_info.version.minor, image_info.version.patch, image_info.version.build);
+
+    return EXIT_SUCCESS;
+}
+#endif // TFM_SUPPORT
+
 int openiotsdk_platform_init(void)
 {
     int ret;
@@ -133,6 +176,22 @@ int openiotsdk_platform_init(void)
         ChipLogError(NotSpecified, "Mbed TLS platform initialization failed: %d", ret);
         return EXIT_FAILURE;
     }
+
+#ifdef TFM_SUPPORT
+    ret = tfm_ns_interface_init();
+    if (ret != 0)
+    {
+        ChipLogError(NotSpecified, "TF-M initialization failed: %d", ret);
+        return EXIT_FAILURE;
+    }
+
+    ret = get_psa_images_details();
+    if (ret != 0)
+    {
+        ChipLogError(NotSpecified, "Get PSA image details failed: %d", ret);
+        return EXIT_FAILURE;
+    }
+#endif // TFM_SUPPORT
 
     ret = osKernelInitialize();
     if (ret != osOK)

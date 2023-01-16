@@ -34,6 +34,13 @@ set(CONFIG_CHIP_ERROR_LOGGING YES CACHE BOOL "Enable logging at error level")
 # Add CHIP sources
 add_subdirectory(${OPEN_IOT_SDK_CONFIG} ./chip_build)
 
+# Additional openiotsdk-chip target configuration
+
+# TF-M support requires the right order of generating targets
+if(TFM_SUPPORT)
+    add_dependencies(chip-gn tfm-ns-interface)
+endif()
+
 function(chip_add_data_model target scope model_name)
     target_include_directories(${target} 
         PUBLIC
