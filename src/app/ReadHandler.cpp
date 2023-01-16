@@ -878,7 +878,8 @@ void ReadHandler::ClearStateFlag(ReadHandlerFlags aFlag)
     SetStateFlag(aFlag, false);
 }
 
-void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                        const SessionHandle & sessionHandle)
 {
     ReadHandler * const _this = static_cast<ReadHandler *>(context);
 

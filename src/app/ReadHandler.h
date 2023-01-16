@@ -412,7 +412,8 @@ private:
     void ClearStateFlag(ReadHandlerFlags aFlag);
 
     // Helpers for continuing the subscription resumption
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                      const SessionHandle & sessionHandle);
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
