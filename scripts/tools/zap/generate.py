@@ -24,6 +24,7 @@ import tempfile
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from zap_execution import ZapTool
 
@@ -38,6 +39,7 @@ class CmdLineArgs:
     parallel: bool = True
     prettify_output: bool = True
     version_check: bool = True
+    lock_file: Optional[str] = None
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -112,6 +114,7 @@ def runArgumentsParser() -> CmdLineArgs:
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
+    parser.add_argument('--lock-file', help='serialize zap invocations by using the specified lock file.')
     parser.add_argument('--prettify-output', action='store_true')
     parser.add_argument('--no-prettify-output',
                         action='store_false', dest='prettify_output')
@@ -121,6 +124,7 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.set_defaults(parallel=True)
     parser.set_defaults(prettify_output=True)
     parser.set_defaults(version_check=True)
+    parser.set_defaults(lock_file=None)
     args = parser.parse_args()
 
     # By default, this script assumes that the global CHIP template is used with
@@ -255,29 +259,50 @@ def runJavaPrettifier(templates_file, output_dir):
         print('google-java-format error:', err)
 
 
+class LockFileSerializer:
+    def __init__(self, path):
+        self.lock_file_path = path
+        self.lock_file = None
+
+    def __enter__(self):
+        if not self.lock_file_path:
+            return
+
+        self.lock_file = open(self.lock_file_path, 'wb')
+        fcntl.lockf(self.lock_file, fcntl.LOCK_EX)
+
+    def __exit__(self, *args):
+        if not self.lock_file:
+            return
+
+        fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
+        close(self.lock_file)
+        self.lock_file = None
+
+
 def main():
     checkPythonVersion()
     cmdLineArgs = runArgumentsParser()
 
-    if cmdLineArgs.runBootstrap:
-        subprocess.check_call(getFilePath(
-            "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+    with LockFileSerializer(cmdLineArgs.lock_file) as lock:
+        if cmdLineArgs.runBootstrap:
+            subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
-    # The maximum memory usage is over 4GB (#15620)
-    os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
+        # The maximum memory usage is over 4GB (#15620)
+        os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
 
-    # `zap-cli` may extract things into a temporary directory. ensure extraction
-    # does not conflict.
-    with tempfile.TemporaryDirectory(prefix='zap') as temp_dir:
-        old_temp = os.environ['TEMP'] if 'TEMP' in os.environ else None
-        os.environ['TEMP'] = temp_dir
+        # `zap-cli` may extract things into a temporary directory. ensure extraction
+        # does not conflict.
+        with tempfile.TemporaryDirectory(prefix='zap') as temp_dir:
+            old_temp = os.environ['TEMP'] if 'TEMP' in os.environ else None
+            os.environ['TEMP'] = temp_dir
 
-        runGeneration(cmdLineArgs)
+            runGeneration(cmdLineArgs)
 
-        if old_temp:
-            os.environ['TEMP'] = old_temp
-        else:
-            del os.environ['TEMP']
+            if old_temp:
+                os.environ['TEMP'] = old_temp
+            else:
+                del os.environ['TEMP']
 
     if cmdLineArgs.prettify_output:
         prettifiers = [

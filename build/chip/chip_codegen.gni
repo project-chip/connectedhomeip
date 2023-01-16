@@ -159,6 +159,13 @@ template("_chip_build_time_zapgen") {
       _template_path,
       "--output-dir",
       rebase_path(target_gen_dir) + "/zap_pregen/" + _output_subdir,
+
+      # TODO: lock file support should be removed as this serializes zap
+      # (slower), however this is currently done because on Darwin zap startup
+      # may conflict and error out with:
+      #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
+      "--lock-file",
+      rebase_path("${root_out_dir}/zap_gen.lock"),
       "--parallel",
       _idl_file,
     ]
