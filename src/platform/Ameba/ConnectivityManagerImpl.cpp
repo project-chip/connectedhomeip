@@ -152,7 +152,10 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
-        DHCPProcess();
+        if (rtw_join_status & JOIN_HANDSHAKE_DONE)
+        {
+            DHCPProcess();
+        }
         DriveStationState();
     }
     if (event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent)
