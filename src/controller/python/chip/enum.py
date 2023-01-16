@@ -15,33 +15,34 @@
 #    limitations under the License.
 #
 
-from aenum import IntEnum as AenumsIntEnum
+from aenum import IntEnum
 from aenum import extend_enum
 
-_add_missing_enum_value_as_is = False
 _map_missing_enum_to_unknown_enum_value = True
-_dummy_count = 0
+_placeholder_count = 0
 
 
-class IntEnum(AenumsIntEnum):
+class MatterIntEnum(IntEnum):
+
     @classmethod
     def _missing_(cls, value):
-        global _add_missing_enum_value_as_is
-        if _add_missing_enum_value_as_is:
-            global _dummy_count
-            return_value = extend_enum(cls, f'kDummy{_dummy_count}', value)
-            _dummy_count = _dummy_count + 1
-            return return_value
         global _map_missing_enum_to_unknown_enum_value
         if _map_missing_enum_to_unknown_enum_value:
             return cls.kUnknownEnumValue
-
         return None
 
+    @classmethod
+    def extend_enum_if_value_doesnt_exist(cls, value):
+        try:
+            return_value = cls(value)
+        except ValueError:
+            return_value = None
 
-def set_add_missing_enum_value_as_is(value: bool):
-    global _add_missing_enum_value_as_is
-    _add_missing_enum_value_as_is = value
+        if return_value is None or return_value.value != value:
+            global _placeholder_count
+            return_value = extend_enum(cls, f'kUnknownPlaceholder{_placeholder_count}', value)
+            _placeholder_count = _placeholder_count + 1
+        return return_value
 
 
 def set_map_missing_enum_to_unknown_enum_value(value: bool):

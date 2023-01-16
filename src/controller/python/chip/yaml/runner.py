@@ -26,7 +26,6 @@ import chip.yaml.format_converter as Converter
 import stringcase
 from chip import ChipDeviceCtrl
 from chip.clusters.Attribute import AttributeStatus, ValueDecodeFailure
-from chip.enum import set_add_missing_enum_value_as_is
 from chip.yaml.errors import ParsingError, UnexpectedParsingError
 
 from .data_model_lookup import *
@@ -266,7 +265,6 @@ class ReplTestRunner:
     '''
 
     def __init__(self, test_spec_definition, dev_ctrl):
-        set_add_missing_enum_value_as_is(True)
         self._test_spec_definition = test_spec_definition
         self._dev_ctrl = dev_ctrl
         self._context = _ExecutionContext(data_model_lookup=PreDefinedDataModelLookup())
