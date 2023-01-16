@@ -253,19 +253,21 @@ CHIP_ERROR WriteValueToBuffer(chip::TLV::TLVReader & reader, chip::Span<uint8_t>
 // Describes a conversion direction between:
 // - A binary buffer (passed from ember internals)
 // - A TLV data buffer (used by TLVWriter and TLVReader)
-enum ConversionDirection {
+enum ConversionDirection
+{
     BUFFER_TO_TLV,
     TLV_TO_BUFFER
 };
 
 template <typename T>
-CHIP_ERROR PerformTLVBufferConversion(std::vector<uint8_t> * tlvData, chip::Span<uint8_t> buffer, ConversionDirection convert_direction)
+CHIP_ERROR PerformTLVBufferConversion(std::vector<uint8_t> * tlvData, chip::Span<uint8_t> buffer,
+                                      ConversionDirection convert_direction)
 {
     CHIP_ERROR err;
     if (convert_direction == BUFFER_TO_TLV)
     {
-	// buffer.size() is ignored here, because it was called from the external write ember callback,
-	// which does not provide a buffer size
+        // buffer.size() is ignored here, because it was called from the external write ember callback,
+        // which does not provide a buffer size
         chip::TLV::TLVWriter wr;
         wr.Init(tlvData->data(), tlvData->size());
         T value;
@@ -284,8 +286,8 @@ CHIP_ERROR PerformTLVBufferConversion(std::vector<uint8_t> * tlvData, chip::Span
     return err;
 }
 
-CHIP_ERROR PerformTLVBufferConversionForType(std::vector<uint8_t> * tlvData, chip::Span<uint8_t> buffer,
-		                             EmberAfAttributeType type, ConversionDirection convert_direction)
+CHIP_ERROR PerformTLVBufferConversionForType(std::vector<uint8_t> * tlvData, chip::Span<uint8_t> buffer, EmberAfAttributeType type,
+                                             ConversionDirection convert_direction)
 {
     switch (type)
     {
@@ -371,7 +373,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
                          ->Read(chip::app::ConcreteDataAttributePath(endpoint, clusterId, attributeMetadata->attributeId), writer);
     if (err != CHIP_NO_ERROR)
     {
-	ChipLogError(DeviceLayer, "%" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "%" CHIP_ERROR_FORMAT, err.Format());
         ChipLogError(DeviceLayer, "Attribute access interface failed to read attribute %d, for endpoint %d cluster %d",
                      attributeMetadata->attributeId, endpoint, clusterId);
         return EMBER_ZCL_STATUS_FAILURE;
@@ -382,10 +384,11 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     // read from `data` and write to `buffer`
 
     // maxReadLength here is the maximum number of bytes to read from the attribute value and to write into the buffer.
-    err = PerformTLVBufferConversionForType(&tlvData, chip::Span<uint8_t>(buffer, maxReadLength), attributeMetadata->attributeType, TLV_TO_BUFFER);
+    err = PerformTLVBufferConversionForType(&tlvData, chip::Span<uint8_t>(buffer, maxReadLength), attributeMetadata->attributeType,
+                                            TLV_TO_BUFFER);
     if (err != CHIP_NO_ERROR)
     {
-	ChipLogError(DeviceLayer, "%" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "%" CHIP_ERROR_FORMAT, err.Format());
         ChipLogError(DeviceLayer, "Failed to write attribute to buffer. Endpoint %d, Cluster %d, Attribute %d", endpoint, clusterId,
                      attributeMetadata->attributeId);
         return EMBER_ZCL_STATUS_FAILURE;
@@ -420,10 +423,11 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     // read from `buffer` and write to `data`
 
     // buffer size will not be used in this code path, so we set it to 0. See `PerformTLVBufferConversion`
-    CHIP_ERROR err = PerformTLVBufferConversionForType(&tlvData, chip::Span<uint8_t>(buffer, 0), attributeMetadata->attributeType, BUFFER_TO_TLV);
+    CHIP_ERROR err = PerformTLVBufferConversionForType(&tlvData, chip::Span<uint8_t>(buffer, 0), attributeMetadata->attributeType,
+                                                       BUFFER_TO_TLV);
     if (err != CHIP_NO_ERROR)
     {
-	ChipLogError(DeviceLayer, "%" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "%" CHIP_ERROR_FORMAT, err.Format());
         ChipLogError(DeviceLayer, "Failed to read value from buffer: Endpoint %d, Cluster %d, Attribute %d", endpoint, clusterId,
                      attributeMetadata->attributeId);
         return EMBER_ZCL_STATUS_FAILURE;
@@ -438,7 +442,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
         accessInterface->Write(chip::app::ConcreteReadAttributePath(endpoint, clusterId, attributeMetadata->attributeId), decoder);
     if (err != CHIP_NO_ERROR)
     {
-	ChipLogError(DeviceLayer, "%" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "%" CHIP_ERROR_FORMAT, err.Format());
         ChipLogError(DeviceLayer,
                      "Attribute access interface failed to write attribute value. Endpoint %d, Cluster %d, Attribute %d", endpoint,
                      clusterId, attributeMetadata->attributeId);
