@@ -209,6 +209,7 @@ CHIP_ERROR TLVWriteValue(chip::TLV::TLVWriter & wr, const Span<const char> & v)
 {
     return wr.PutString(chip::TLV::AnonymousTag(), v);
 }
+
 CHIP_ERROR TLVWriteValue(chip::TLV::TLVWriter & wr, const bool & v)
 {
     return wr.PutBoolean(chip::TLV::AnonymousTag(), v);
