@@ -91,12 +91,10 @@ protected:
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     CHIP_ERROR _PostBackgroundEvent(const ChipDeviceEvent * event);
     void _RunBackgroundEventLoop(void);
     CHIP_ERROR _StartBackgroundEventLoopTask(void);
     CHIP_ERROR _StopBackgroundEventLoopTask();
-#endif
 
     // ===== Methods available to the implementation subclass.
 
