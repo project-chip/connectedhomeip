@@ -210,7 +210,7 @@ def runClangPrettifier(templates_file, output_dir):
             #       with clang-format 15. CI may have clang-format-10 installed
             #       on linux.
             #
-            #       We generally want consistent formatting, so use the
+            #       We generally want consistent formatting, so
             #       at this point attempt to use clang-format 15.
             clang_formats = ['clang-format-15', 'clang-format']
             for clang_format in clang_formats:
