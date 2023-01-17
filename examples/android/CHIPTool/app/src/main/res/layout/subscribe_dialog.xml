@@ -35,7 +35,7 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/minIntervalEd" />
   <TextView
-      android:id="@+id/titleKeepSubscriptionsEd"
+      android:id="@+id/titleKeepSubscriptions"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:text="@string/subscribe_dialog_keep_subscriptions_hint"
@@ -45,7 +45,7 @@
       app:layout_constraintTop_toBottomOf="@id/maxIntervalEd"
       />
   <Spinner
-      android:id="@+id/keepSubscriptionsEd"
+      android:id="@+id/keepSubscriptionsSp"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:hint="@string/subscribe_dialog_keep_subscriptions_hint"
@@ -55,21 +55,21 @@
       android:textSize="16sp"
       android:layout_marginTop="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/titleKeepSubscriptionsEd" />
+      app:layout_constraintTop_toBottomOf="@id/titleKeepSubscriptions" />
 
   <TextView
-      android:id="@+id/titleIsFabricFilteredEd"
+      android:id="@+id/titleIsFabricFilter"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:text="@string/subscribe_dialog_is_fabric_filtered_hint"
       android:textSize="16sp"
       android:layout_marginTop="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/keepSubscriptionsEd"
+      app:layout_constraintTop_toBottomOf="@id/keepSubscriptionsSp"
       />
 
   <Spinner
-      android:id="@+id/isFabricFilteredEd"
+      android:id="@+id/isFabricFilteredSp"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:hint="@string/subscribe_dialog_is_fabric_filtered_hint"
@@ -79,7 +79,7 @@
       android:textSize="16sp"
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/titleIsFabricFilteredEd"
+      app:layout_constraintTop_toBottomOf="@id/titleIsFabricFilter"
       app:layout_constraintBottom_toTopOf="@+id/subscribeBtn"/>
 
   <Button
