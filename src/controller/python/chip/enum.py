@@ -35,7 +35,6 @@ class MatterIntEnum(IntEnum):
     '''
     @classmethod
     def _missing_(cls, value):
-        global _map_missing_enum_to_unknown_enum_value
         if _map_missing_enum_to_unknown_enum_value:
             return cls.kUnknownEnumValue
         return None
