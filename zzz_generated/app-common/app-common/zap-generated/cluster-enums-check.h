@@ -937,9 +937,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnostics::PHYRate val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnostics::PHYRateEnum val)
 {
-    using EnumType = EthernetNetworkDiagnostics::PHYRate;
+    using EnumType = EthernetNetworkDiagnostics::PHYRateEnum;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
@@ -956,16 +956,16 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     case EnumType::kRate200G:
     case EnumType::kRate400G:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_PHY_RATE_RATE10_M:
-    case EMBER_ZCL_PHY_RATE_RATE100_M:
-    case EMBER_ZCL_PHY_RATE_RATE1_G:
-    case EMBER_ZCL_PHY_RATE_RATE2_5_G:
-    case EMBER_ZCL_PHY_RATE_RATE5_G:
-    case EMBER_ZCL_PHY_RATE_RATE10_G:
-    case EMBER_ZCL_PHY_RATE_RATE40_G:
-    case EMBER_ZCL_PHY_RATE_RATE100_G:
-    case EMBER_ZCL_PHY_RATE_RATE200_G:
-    case EMBER_ZCL_PHY_RATE_RATE400_G:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_M:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_M:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE1_G:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE2_5_G:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE5_G:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_G:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE40_G:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_G:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE200_G:
+    case EMBER_ZCL_PHY_RATE_ENUM_RATE400_G:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:

@@ -11413,7 +11413,7 @@ CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::~CHIPEthernetNetworkDiag
 }
 
 void CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

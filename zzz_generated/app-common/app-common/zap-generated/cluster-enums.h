@@ -870,8 +870,8 @@ namespace EthernetNetworkDiagnostics {
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for PHYRate
-enum class PHYRate : uint8_t
+// Enum for PHYRateEnum
+enum class PHYRateEnum : uint8_t
 {
     kRate10M          = 0x00,
     kRate100M         = 0x01,
@@ -886,8 +886,8 @@ enum class PHYRate : uint8_t
     kUnknownEnumValue = 10,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRate                                                                          = EmberAfPHYRate;
-static PHYRate __attribute__((unused)) kPHYRatekUnknownEnumValue                       = static_cast<PHYRate>(10);
+using PHYRateEnum                                                                      = EmberAfPHYRateEnum;
+static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue               = static_cast<PHYRateEnum>(10);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace EthernetNetworkDiagnostics
 
