@@ -20,7 +20,7 @@
 #import "MTRError_Internal.h"
 
 void MTRDeviceConnectionBridge::OnConnected(
-    void * context, chip::Messaging::ExchangeManager & exchangeMgr, chip::SessionHandle & sessionHandle)
+    void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
     object->mCompletionHandler(&exchangeMgr, chip::MakeOptional<chip::SessionHandle>(*sessionHandle->AsSecureSession()), nil);

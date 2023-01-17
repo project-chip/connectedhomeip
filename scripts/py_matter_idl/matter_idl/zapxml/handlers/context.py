@@ -14,9 +14,9 @@
 
 import logging
 import xml.sax.xmlreader
+from typing import List, Optional
 
-from matter_idl.matter_idl_types import Idl, ParseMetaData, Attribute
-from typing import Optional, List
+from matter_idl.matter_idl_types import Attribute, Idl, ParseMetaData
 
 
 class IdlPostProcessor:
@@ -59,13 +59,13 @@ class ProcessingPath:
 
 class Context:
     """
-    Contains a processing state during XML reading. 
+    Contains a processing state during XML reading.
 
     The purpose of this is to allow elements to interact with each other, share
     data and defer processing.
 
     Usage:
-      - globally shared data: 
+      - globally shared data:
          > locator: parsing location, for error reporting
          > path: current ProcessingPath for any logging of where we are located
       - shared data:

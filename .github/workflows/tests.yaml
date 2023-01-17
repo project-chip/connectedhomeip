@@ -47,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.27
+            image: connectedhomeip/chip-build:0.6.30
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -184,6 +184,7 @@ jobs:
             - name: Build Apps
               timeout-minutes: 45
               run: |
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
@@ -202,6 +203,23 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+            - name: Run Tests using chip-repl
+              timeout-minutes: 5
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --run-yamltests-with-chip-repl \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -352,7 +370,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.27
+            image: connectedhomeip/chip-build:0.6.30
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -426,7 +444,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.27
+            image: connectedhomeip/chip-build:0.6.30
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -452,7 +470,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Build Java Mattter Controller and all clusters app
+            - name: Build Java Matter Controller and all clusters app
               timeout-minutes: 50
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
@@ -463,7 +481,7 @@ jobs:
                       build \
                    "
             - name: Run Discover Tests
-              timeout-minutes: 65
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -475,7 +493,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Tests
-              timeout-minutes: 65
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \

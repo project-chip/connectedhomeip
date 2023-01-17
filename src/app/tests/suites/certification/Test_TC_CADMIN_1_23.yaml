@@ -66,8 +66,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "Wait for commissioning Window to 181 seconds"
       cluster: "DelayCommands"
@@ -95,8 +93,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 179
-              - name: "discriminator"
-                value: discriminator
       response:
           error: INVALID_COMMAND
 

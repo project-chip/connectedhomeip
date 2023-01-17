@@ -16,14 +16,13 @@
 #
 
 import argparse
-import os
-from pathlib import Path
-import sys
-import subprocess
 import logging
 import multiprocessing
-
+import os
+import subprocess
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))

@@ -35,7 +35,7 @@ struct Attribute : public AttributeInterface
 {
     Attribute(chip::CharSpan name, chip::AttributeId id, EmberAfAttributeMask mask, EmberAfAttributeType type, size_t size,
               Type value = Type()) :
-        mMetadata(EmberAfAttributeMetadata{ id, type, (uint16_t) size, mask, ZAP_EMPTY_DEFAULT() }),
+        mMetadata(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), id, (uint16_t) size, type, mask }),
         mData(value), mName(name)
     {}
 

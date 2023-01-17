@@ -18,11 +18,9 @@
 import os
 import os.path
 import re
-
 from typing import IO
 
 import pandas as pd  # type: ignore
-
 from memdf.df import DFs, StackDF
 from memdf.util.config import Config, ConfigDescription
 

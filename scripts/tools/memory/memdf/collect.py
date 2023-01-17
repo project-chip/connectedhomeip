@@ -16,11 +16,7 @@
 """Collect information from various sources into Memory Map DataFrames."""
 
 import bisect
-
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
-
-from elftools.elf.constants import SH_FLAGS  # type: ignore
-import pandas as pd  # type: ignore
 
 import memdf.collector.bloaty
 import memdf.collector.csv
@@ -30,9 +26,9 @@ import memdf.collector.su
 import memdf.name
 import memdf.select
 import memdf.util.config
-
-from memdf import (Config, ConfigDescription, DF, DFs, SymbolDF, SectionDF,
-                   ExtentDF)
+import pandas as pd  # type: ignore
+from elftools.elf.constants import SH_FLAGS  # type: ignore
+from memdf import DF, Config, ConfigDescription, DFs, ExtentDF, SectionDF, SymbolDF
 from memdf.collector.util import simplify_source
 
 PREFIX_CONFIG: ConfigDescription = {

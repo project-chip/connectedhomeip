@@ -38,7 +38,7 @@
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>

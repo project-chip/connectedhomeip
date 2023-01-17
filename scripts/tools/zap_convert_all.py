@@ -15,12 +15,12 @@
 #    limitations under the License.
 #
 
-import os
-from pathlib import Path
-import sys
-import subprocess
 import argparse
 import multiprocessing
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))

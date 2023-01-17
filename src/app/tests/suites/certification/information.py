@@ -15,11 +15,11 @@
 #    limitations under the License.
 #
 
-from os import listdir
-from os import path
-from enum import Enum
 import argparse
 import sys
+from enum import Enum
+from os import listdir, path
+
 import yaml
 
 # Test status description:

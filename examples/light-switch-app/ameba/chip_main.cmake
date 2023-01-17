@@ -157,7 +157,6 @@ list(
     ${chip_dir}/examples/light-switch-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/light-switch-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/light-switch-app/ameba/main/LEDWidget.cpp
-    ${chip_dir}/examples/light-switch-app/ameba/main/DsoHack.cpp
 
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )

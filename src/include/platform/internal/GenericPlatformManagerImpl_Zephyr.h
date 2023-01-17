@@ -27,7 +27,7 @@
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <sys/select.h>
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -28,12 +28,10 @@ Use `--output-format=help` to see available output formats.
 
 import sys
 
-import numpy  # type: ignore
-
 import memdf.collect
 import memdf.report
 import memdf.select
-
+import numpy  # type: ignore
 from memdf import Config, DFs, SymbolDF
 
 

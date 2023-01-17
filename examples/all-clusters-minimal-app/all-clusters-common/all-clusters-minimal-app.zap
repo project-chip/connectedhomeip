@@ -3415,11 +3415,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BootReasons",
+              "name": "BootReason",
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BootReasonEnum",
               "included": 0,
               "storageOption": "External",
               "singleton": 0,
@@ -5329,7 +5329,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "number of positions",
+              "name": "NumberOfPositions",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5345,7 +5345,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current position",
+              "name": "CurrentPosition",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -5361,7 +5361,7 @@
               "reportableChange": 0
             },
             {
-              "name": "multi press max",
+              "name": "MultiPressMax",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6001,7 +6001,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6067,7 +6067,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -7857,7 +7857,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "measured value",
+              "name": "MeasuredValue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -7873,7 +7873,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min measured value",
+              "name": "MinMeasuredValue",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7889,7 +7889,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max measured value",
+              "name": "MaxMeasuredValue",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -7905,7 +7905,7 @@
               "reportableChange": 0
             },
             {
-              "name": "tolerance",
+              "name": "Tolerance",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -11803,7 +11803,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "number of positions",
+              "name": "NumberOfPositions",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -11819,7 +11819,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current position",
+              "name": "CurrentPosition",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -11835,7 +11835,7 @@
               "reportableChange": 0
             },
             {
-              "name": "multi press max",
+              "name": "MultiPressMax",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -12003,7 +12003,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -12069,7 +12069,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -14753,7 +14753,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "fan mode",
+              "name": "FanMode",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -14769,7 +14769,7 @@
               "reportableChange": 0
             },
             {
-              "name": "fan mode sequence",
+              "name": "FanModeSequence",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -14785,7 +14785,7 @@
               "reportableChange": 0
             },
             {
-              "name": "percent setting",
+              "name": "PercentSetting",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -14801,7 +14801,7 @@
               "reportableChange": 0
             },
             {
-              "name": "percent current",
+              "name": "PercentCurrent",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -14817,7 +14817,7 @@
               "reportableChange": 0
             },
             {
-              "name": "speed max",
+              "name": "SpeedMax",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -14833,7 +14833,7 @@
               "reportableChange": 0
             },
             {
-              "name": "speed setting",
+              "name": "SpeedSetting",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -14849,7 +14849,7 @@
               "reportableChange": 0
             },
             {
-              "name": "speed current",
+              "name": "SpeedCurrent",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -14865,7 +14865,7 @@
               "reportableChange": 0
             },
             {
-              "name": "rock support",
+              "name": "RockSupport",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -14881,7 +14881,7 @@
               "reportableChange": 0
             },
             {
-              "name": "rock setting",
+              "name": "RockSetting",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -14897,7 +14897,7 @@
               "reportableChange": 0
             },
             {
-              "name": "wind support",
+              "name": "WindSupport",
               "code": 9,
               "mfgCode": null,
               "side": "server",
@@ -14913,7 +14913,7 @@
               "reportableChange": 0
             },
             {
-              "name": "wind setting",
+              "name": "WindSetting",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -15045,7 +15045,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "temperature display mode",
+              "name": "TemperatureDisplayMode",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -15061,7 +15061,7 @@
               "reportableChange": 0
             },
             {
-              "name": "keypad lockout",
+              "name": "KeypadLockout",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -15077,7 +15077,7 @@
               "reportableChange": 0
             },
             {
-              "name": "schedule programming visibility",
+              "name": "ScheduleProgrammingVisibility",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -16791,7 +16791,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "measured value",
+              "name": "MeasuredValue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -16807,7 +16807,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min measured value",
+              "name": "MinMeasuredValue",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -16823,7 +16823,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max measured value",
+              "name": "MaxMeasuredValue",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -16839,7 +16839,7 @@
               "reportableChange": 0
             },
             {
-              "name": "tolerance",
+              "name": "Tolerance",
               "code": 3,
               "mfgCode": null,
               "side": "server",

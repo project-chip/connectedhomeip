@@ -43,7 +43,6 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     chip::Logging::Platform::LogV(module, category, msg, args);
     ClearLine();
 }
-} // namespace
 
 char * GetCommand(char * command)
 {
@@ -63,6 +62,20 @@ char * GetCommand(char * command)
     }
 
     return command;
+}
+} // namespace
+
+CHIP_ERROR InteractiveServerCommand::RunCommand()
+{
+    ReturnErrorOnFailure(mWebSocketServer.Run(mPort, this));
+
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+
+bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
+{
+    return ParseCommand(msg);
 }
 
 CHIP_ERROR InteractiveStartCommand::RunCommand()
@@ -93,7 +106,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-bool InteractiveStartCommand::ParseCommand(char * command)
+bool InteractiveCommand::ParseCommand(char * command)
 {
     if (strcmp(command, kInteractiveModeStopCommand) == 0)
     {

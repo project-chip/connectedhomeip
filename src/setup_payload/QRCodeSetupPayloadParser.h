@@ -26,7 +26,7 @@
 #include "SetupPayload.h"
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 #include <string>
 #include <utility>

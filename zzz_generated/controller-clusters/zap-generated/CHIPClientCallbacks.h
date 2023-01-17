@@ -192,14 +192,14 @@ typedef void (*DiagnosticLogsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*GeneralDiagnosticsNetworkInterfacesListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType> &
+        data);
 typedef void (*GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
-typedef void (*GeneralDiagnosticsActiveRadioFaultsListAttributeCallback)(void * context,
-                                                                         const chip::app::DataModel::DecodableList<uint8_t> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & data);
+typedef void (*GeneralDiagnosticsActiveRadioFaultsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> & data);
 typedef void (*GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & data);
 typedef void (*GeneralDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GeneralDiagnosticsAcceptedCommandListListAttributeCallback)(
@@ -496,6 +496,16 @@ typedef void (*ElectricalMeasurementGeneratedCommandListListAttributeCallback)(
 typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ClientMonitoringExpectedClientsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType> & data);
+typedef void (*ClientMonitoringGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ClientMonitoringAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ClientMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*UnitTestingListInt8uListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<uint8_t> & data);

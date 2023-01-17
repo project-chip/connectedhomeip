@@ -14,10 +14,30 @@
 #    limitations under the License.
 #
 
+import os
 import subprocess
+from pathlib import Path
 
 from . import linux, runner
 from .test_definition import ApplicationPaths, TestDefinition, TestTarget
+
+_DEFAULT_CHIP_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+_YAML_TEST_SUITE_PATH = os.path.abspath(
+    os.path.join(_DEFAULT_CHIP_ROOT, "src/app/tests/suites"))
+
+
+def _FindYamlTestPath(name: str):
+    yaml_test_suite_path = Path(_YAML_TEST_SUITE_PATH)
+    if not yaml_test_suite_path.exists():
+        raise FileNotFoundError(f"Expected directory {_YAML_TEST_SUITE_PATH} to exist")
+    for path in yaml_test_suite_path.rglob(name):
+        if not path.is_file():
+            continue
+        if path.name != name:
+            continue
+        return str(path)
+    return None
 
 
 def target_for_name(name: str):
@@ -53,7 +73,29 @@ def tests_with_command(chip_tool: str, is_manual: bool):
         )
 
 
-def AllTests(chip_tool: str):
+# TODO We will move away from hardcoded list of yamltests to run all file when yamltests
+# parser/runner reaches parity with the code gen version.
+def _hardcoded_python_yaml_tests():
+    currently_supported_yaml_tests = ["TestConstraints.yaml"]
+
+    for name in currently_supported_yaml_tests:
+        yaml_test_path = _FindYamlTestPath(name)
+        if not yaml_test_path:
+            raise FileNotFoundError(f"Could not find YAML test {name}")
+
+        target = target_for_name(name)
+
+        yield TestDefinition(
+            run_name=yaml_test_path, name=name, target=target, is_manual=False, use_chip_repl_yaml_tester=True
+        )
+
+
+def AllTests(chip_tool: str, run_yamltests_with_chip_repl: bool):
+    if run_yamltests_with_chip_repl:
+        for test in _hardcoded_python_yaml_tests():
+            yield test
+        return
+
     for test in tests_with_command(chip_tool, is_manual=False):
         yield test
 

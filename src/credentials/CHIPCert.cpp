@@ -37,7 +37,7 @@
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -296,7 +296,7 @@ CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert,
 
     VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(signature.SetLength(cert->mSignature.size()));
-    memcpy(signature, cert->mSignature.data(), cert->mSignature.size());
+    memcpy(signature.Bytes(), cert->mSignature.data(), cert->mSignature.size());
 
     memcpy(caPublicKey, caCert->mPublicKey.data(), caCert->mPublicKey.size());
 

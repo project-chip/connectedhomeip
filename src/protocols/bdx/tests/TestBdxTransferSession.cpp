@@ -6,7 +6,7 @@
 
 #include <nlunit-test.h>
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -28,7 +28,7 @@ const TLV::Tag tlvListTag = TLV::ProfileTag(7777, 8888);
 } // anonymous namespace
 
 // Helper method for generating a complete TLV structure with a list containing a single tag and string
-CHIP_ERROR WriteChipTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uint32_t & written)
+CHIP_ERROR WriteTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uint32_t & written)
 {
     written = 0;
     TLV::TLVWriter writer;
@@ -387,7 +387,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     uint8_t tlvBuf[64]    = { 0 };
     char metadataStr[11]  = { "hi_dad.txt" };
     uint32_t bytesWritten = 0;
-    err                   = WriteChipTLVString(tlvBuf, sizeof(tlvBuf), metadataStr, bytesWritten);
+    err                   = WriteTLVString(tlvBuf, sizeof(tlvBuf), metadataStr, bytesWritten);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     uint16_t metadataSize = static_cast<uint16_t>(bytesWritten & 0x0000FFFF);
 
@@ -474,7 +474,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     uint8_t tlvBuf[64]    = { 0 };
     char metadataStr[11]  = { "hi_dad.txt" };
     uint32_t bytesWritten = 0;
-    err                   = WriteChipTLVString(tlvBuf, sizeof(tlvBuf), metadataStr, bytesWritten);
+    err                   = WriteTLVString(tlvBuf, sizeof(tlvBuf), metadataStr, bytesWritten);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     uint16_t metadataSize = static_cast<uint16_t>(bytesWritten & 0x0000FFFF);
 

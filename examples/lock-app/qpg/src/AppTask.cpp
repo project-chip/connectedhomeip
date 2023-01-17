@@ -28,6 +28,8 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -43,9 +45,9 @@
 
 using namespace ::chip;
 using namespace ::chip::app;
-using namespace chip::TLV;
-using namespace chip::Credentials;
-using namespace chip::DeviceLayer;
+using namespace ::chip::TLV;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -53,7 +55,7 @@ using namespace chip::DeviceLayer;
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define OTA_START_TRIGGER_TIMEOUT 1500
 
-#define APP_TASK_STACK_SIZE (2 * 1024)
+#define APP_TASK_STACK_SIZE (3 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define QPG_LOCK_ENDPOINT_ID (1)
@@ -62,9 +64,14 @@ namespace {
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sHaveBLEConnections  = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
+bool sIsBLEAdvertisingEnabled = false;
+
+// NOTE! This key is for test/certification only and should not be available in production devices!
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 
@@ -124,6 +131,12 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+
+    // Use GenericFaultTestEventTriggerDelegate to inject faults
+    static GenericFaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+
     chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -469,7 +482,7 @@ void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aA
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
-    if (sAppEventQueue != NULL)
+    if (sAppEventQueue != nullptr)
     {
         if (!xQueueSend(sAppEventQueue, aEvent, 1))
         {
@@ -478,7 +491,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
     else
     {
-        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
+        ChipLogError(NotSpecified, "Event Queue is nullptr should never happen");
     }
 }
 
@@ -504,7 +517,8 @@ void AppTask::UpdateClusterState(void)
 
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
-    EmberAfStatus status = DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, newValue);
+    EmberAfStatus status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
@@ -525,14 +539,19 @@ void AppTask::UpdateLEDs(void)
     // Otherwise, blink the LED ON for a very short time.
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
+        qvIO_LedSet(SYSTEM_STATE_LED, true);
     }
     else if (sHaveBLEConnections)
     {
         qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
     }
+    else if (sIsBLEAdvertisingEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
+    }
     else
     {
+        // not commisioned yet
         qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
     }
 }
@@ -561,6 +580,12 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 
     case DeviceEventType::kCHIPoBLEConnectionClosed: {
         sHaveBLEConnections = false;
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kCHIPoBLEAdvertisingChange: {
+        sIsBLEAdvertisingEnabled = (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started);
         UpdateLEDs();
         break;
     }

@@ -625,6 +625,27 @@ CHIP_ERROR CastingServer::LevelControl_SubscribeToMaxLevel(
 }
 
 /**
+ * @brief OnOff cluster
+ */
+CHIP_ERROR CastingServer::OnOff_On(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mOnCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mOnCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::OnOff_Off(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mOffCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mOffCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::OnOff_Toggle(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mToggleCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mToggleCommand.Invoke(responseCallback);
+}
+
+/**
  * @brief Media Playback cluster
  */
 CHIP_ERROR CastingServer::MediaPlayback_Play(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)

@@ -7,7 +7,6 @@ The all-clusters-app server may be invoked and managed via the Matter Shell CLI.
 -   [help](#help)
 -   [clusters](#clusters)
 -   [endpoints](#endpoints)
--   [exchanges](#exchanges)
 -   [port](#port)
 -   [sessions](#sessions)
 -   [start](#start)
