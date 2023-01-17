@@ -10,6 +10,7 @@
 import typing
 from dataclasses import dataclass, field
 from enum import IntEnum
+from enum import IntFlag
 
 from chip import ChipUtility
 from chip.tlv import float32, uint
@@ -55,6 +56,17 @@ class {{asUpperCamelCase name}}(Cluster):
 {{/zcl_enum_items}}
 
 {{/zcl_enums}}
+
+{{#zcl_bitmaps}}
+{{#first}}
+    class Bitmaps:
+{{/first}}
+        class {{asType label}}(IntFlag):
+{{#zcl_bitmap_items}}
+            k{{asUpperCamelCase label}} = {{asHex mask}}
+{{/zcl_bitmap_items}}
+
+{{/zcl_bitmaps}}
 
 {{#zcl_structs}}
 {{#first}}
