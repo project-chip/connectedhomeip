@@ -446,7 +446,7 @@ private:
         {
             (void) fabricTable;
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
-            ClearSubscriptinoResumptionStateOnFabricChange(fabricIndex);
+            ClearSubscriptionResumptionStateOnFabricChange(fabricIndex);
 
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
@@ -502,7 +502,7 @@ private:
             }
         }
 
-        void ClearSubscriptinoResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
+        void ClearSubscriptionResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
         {
             auto * subscriptionResumptionStorage = mServer->GetSubscriptionResumptionStorage();
             VerifyOrReturn(subscriptionResumptionStorage != nullptr);

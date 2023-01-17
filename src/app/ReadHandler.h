@@ -261,10 +261,11 @@ private:
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      *
-     *  Resume a persisted subscription
+     *  @brief Resume a persisted subscription
      *
+     *  Used after ReadHandler(ManagementCallback & apCallback). This
      */
-    void ResumeSubscription(CASESessionManager * caseSessionManager,
+    void ResumeSubscription(CASESessionManager & caseSessionManager,
                             SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
 #endif
 
@@ -384,7 +385,9 @@ private:
      * Called internally to signal the completion of all work on this objecta and signal to a registered callback that it's
      * safe to release this object.
      *
-     *  @param    keepPersisted             Keep the subscription persisted in storage for later resumption
+     *  @param    keepPersisted             Keep the subscription persisted in storage for later resumption. Ignored if
+     * CHIP_CONFIG_PERSIST_SUBSCRIPTIONS not enabled
+     *
      */
     void Close(bool keepPersisted = false);
     void CloseButKeepPersisted() { Close(true); }

@@ -1622,7 +1622,7 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
                 return CHIP_ERROR_NO_MEMORY;
             }
 
-            handler->ResumeSubscription(mpCASESessionMgr, subscriptionInfo);
+            handler->ResumeSubscription(*mpCASESessionMgr, subscriptionInfo);
         }
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
