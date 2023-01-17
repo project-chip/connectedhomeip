@@ -15,9 +15,8 @@
  *    limitations under the License.
  */
 
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/JniReferences.h>
-#include <vector>
+#include <lib/support/Span.h>
 
 class AttestationTrustStoreBridge : public chip::Credentials::AttestationTrustStore
 {
