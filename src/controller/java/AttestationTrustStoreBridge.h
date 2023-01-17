@@ -29,7 +29,7 @@ public:
     CHIP_ERROR GetProductAttestationAuthorityCert(const chip::ByteSpan & skid,
                                                   chip::MutableByteSpan & outPaaDerBuffer) const override;
 
-private:
+protected:
     jobject mAttestationTrustStoreDelegate = nullptr;
 
     CHIP_ERROR GetPaaCertFromJava(const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const;
