@@ -20,6 +20,7 @@ import logging
 import os
 import re
 import sys
+from enum import Flag, auto
 
 import click
 import coloredlogs
@@ -47,15 +48,40 @@ ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)-nightly')
 #
 # Set as a separate list to not pay the price of a full grep as the list of
 # files is not likely to change often
-FILES_DEPENDING_ON_ZAP_VERSION = [
+USAGE_FILES_DEPENDING_ON_ZAP_VERSION = [
     '.github/workflows/build.yaml',
     '.github/workflows/darwin-tests.yaml',
     '.github/workflows/darwin.yaml',
     '.github/workflows/fuzzing-build.yaml',
     '.github/workflows/tests.yaml',
-    'integrations/docker/images/chip-build/Dockerfile',
     'integrations/docker/images/chip-cert-bins/Dockerfile',
 ]
+
+# Note that chip-cert-bits is assumed USAGE on purpose (it compiles code)
+#
+# The chip-build image change will affect all other images as they extend
+# chip-build
+DOCKER_FILES_DEPENDING_ON_ZAP_VERSION = [
+    'integrations/docker/images/chip-build/Dockerfile',
+]
+
+
+class UpdateChoice(Flag):
+    # Usage updates the CI, chip-cert and execution logic. Generally everything
+    # that would make use of the updated zap version
+    USAGE = auto()
+
+    # Docker updates just the chip-build (and as a side-effect underlying)
+    # image(s). This is a pre-requisite to be able to start using the new
+    # version.
+    DOCKER = auto()
+
+
+__UPDATE_CHOICES__ = {
+    'docker': UpdateChoice.DOCKER,
+    'usage': UpdateChoice.USAGE,
+    'all': UpdateChoice.DOCKER | UpdateChoice.USAGE,
+}
 
 # NOTE: you likely need to also update
 #   integrations/docker/images/chip-build/version
@@ -81,11 +107,18 @@ CHIP_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
+    '--update',
+    default='docker',
+    type=click.Choice(__UPDATE_CHOICES__.keys(), case_sensitive=False),
+    help='What to update: docker, usage, all. Default is "docker".')
+@click.option(
     '--new-version',
     default=None,
     help='What version of ZAP to update to (like "v2023.01.09-nightly". If not set, versions will just be printed.')
-def version_update(log_level, new_version):
+def version_update(log_level, update, new_version):
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+
+    update = __UPDATE_CHOICES__[update]
 
     if new_version:
         parsed = ZAP_VERSION_RE.match(new_version)
@@ -99,7 +132,14 @@ def version_update(log_level, new_version):
         # so for 'v2023.01.11-nightly' this gets (2023, 1, 11)
         zap_min_version = tuple(map(lambda x: int(x, 10), parsed.groups()))
 
-    for name in FILES_DEPENDING_ON_ZAP_VERSION:
+    files_to_update = []
+    if UpdateChoice.USAGE in update:
+        files_to_update += USAGE_FILES_DEPENDING_ON_ZAP_VERSION
+
+    if UpdateChoice.DOCKER in update:
+        files_to_update += DOCKER_FILES_DEPENDING_ON_ZAP_VERSION
+
+    for name in files_to_update:
         with open(os.path.join(CHIP_ROOT_DIR, name), 'rt') as f:
             file_data = f.read()
 
@@ -134,18 +174,19 @@ def version_update(log_level, new_version):
                     f.write(file_data)
 
     # Finally, check zap_execution for any version update
-    with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'rt') as f:
-        file_data = f.read()
+    if UpdateChoice.USAGE in update:
+        with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'rt') as f:
+            file_data = f.read()
 
-    m = ZAP_EXECUTION_MIN_RE.search(file_data)
-    logging.info("Min version %s in %s", m.group(2), ZAP_EXECUTION_SCRIPT)
-    if new_version:
-        new_min_version = ("%d.%d.%d" % zap_min_version)
-        file_data = file_data[:m.start()] + m.group(1) + new_min_version + m.group(3) + file_data[m.end():]
-        logging.info('Updating min version to %s in %s', new_min_version, ZAP_EXECUTION_SCRIPT)
+        m = ZAP_EXECUTION_MIN_RE.search(file_data)
+        logging.info("Min version %s in %s", m.group(2), ZAP_EXECUTION_SCRIPT)
+        if new_version:
+            new_min_version = ("%d.%d.%d" % zap_min_version)
+            file_data = file_data[:m.start()] + m.group(1) + new_min_version + m.group(3) + file_data[m.end():]
+            logging.info('Updating min version to %s in %s', new_min_version, ZAP_EXECUTION_SCRIPT)
 
-        with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'wt') as f:
-            f.write(file_data)
+            with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'wt') as f:
+                f.write(file_data)
 
 
 if __name__ == '__main__':
