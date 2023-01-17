@@ -47,7 +47,7 @@ class ZapTool:
             # HOWEVER, if the intent is exactly to check the version, this should not be done
             # and this set should be reverted
             os.environ['ZAP_SKIP_REAL_VERSION'] = '1'
-            self.check_version = False # cannot check versions without dirtying tree
+            self.check_version = False  # cannot check versions without dirtying tree
         elif 'ZAP_INSTALL_PATH' in os.environ:
             self.zap_start = [os.path.join(
                 os.environ['ZAP_INSTALL_PATH'], 'zap-cli')]
