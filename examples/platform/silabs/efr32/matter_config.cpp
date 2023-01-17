@@ -54,6 +54,15 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include "EFR32DeviceDataProvider.h"
+#include <app/InteractionModelEngine.h>
+
+#ifdef CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS
+#include "GenericReadHandlerCallback.h"
+#endif
+
+#ifdef CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS
+static GenericReadHandlerCallback gEfr32ReadHandlerCallback;
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -189,6 +198,11 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
+
+#ifdef CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gEfr32ReadHandlerCallback);
+#endif // CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     ReturnErrorOnFailure(err);

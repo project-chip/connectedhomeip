@@ -186,10 +186,6 @@ static_library("app") {
     "reporting/reporting.h",
   ]
 
-  if (chip_use_default_read_handler_callbacks) {
-    sources += [ "GenericReadHandlerCallback.h" ]
-  }
-
   public_deps = [
     ":app_config",
     "${chip_root}/src/access",

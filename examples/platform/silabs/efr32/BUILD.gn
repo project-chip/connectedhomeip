@@ -85,6 +85,10 @@ config("attestation-credentials-config") {
   ]
 }
 
+config("default-read-handler-config") {
+  defines = [ "CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS=1" ]
+}
+
 source_set("efr32-attestation-credentials") {
   sources = [
     "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.cpp",
@@ -110,6 +114,16 @@ source_set("efr32-factory-data-provider") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/setup_payload",
   ]
-
-  #public_configs = [ "" ]
 }
+
+source_set("efr32-default-read-handler") {
+  sources = [
+    "../GenericReadHandlerCallback.cpp",
+    "../GenericReadHandlerCallback.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/app:app" ]
+
+  public_configs = [ ":default-read-handler-config" ]
+}
+#public_configs = [ "" ]

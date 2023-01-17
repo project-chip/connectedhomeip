@@ -307,11 +307,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager);
     SuccessOrExit(err);
 
-// The callback is configured here temporarly until it's final location is decided
-#ifdef CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&genericReadHandlerCallback);
-#endif // CHIP_CONFIG_USE_DEFAULT_READ_HANDLER_CALLBACKS
-
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them
     //
