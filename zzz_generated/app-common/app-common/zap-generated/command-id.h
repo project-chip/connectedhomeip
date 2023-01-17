@@ -156,7 +156,7 @@
 // Commands for cluster: Time Synchronization
 #define ZCL_SET_UTC_TIME_COMMAND_ID (0x00)
 
-// Commands for cluster: AdministratorCommissioning
+// Commands for cluster: Administrator Commissioning
 #define ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID (0x00)
 #define ZCL_OPEN_BASIC_COMMISSIONING_WINDOW_COMMAND_ID (0x01)
 #define ZCL_REVOKE_COMMISSIONING_COMMAND_ID (0x02)

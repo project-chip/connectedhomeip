@@ -6407,7 +6407,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case AdministratorCommissioning::Attributes::WindowStatus::Id: {
-            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value;
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WindowStatus", 1, value);
         }
