@@ -245,8 +245,12 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
 
+#if CONFIG_OTA_AUTO_REBOOT_ON_APPLY
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CONFIG_OTA_AUTO_REBOOT_DELAY_MS), HandleRestart, nullptr);
+#else
+    ESP_LOGI(TAG, "Please reboot the device manually to apply the new image");
+#endif
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)

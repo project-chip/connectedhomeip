@@ -34,7 +34,7 @@ if (chip_crypto == "") {
 chip_device_platform = "efr32"
 
 #Net work configuration OpenThread
-lwip_platform = "efr32"
+lwip_platform = "silabs"
 chip_mdns = "platform"
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_tcp_endpoint = false

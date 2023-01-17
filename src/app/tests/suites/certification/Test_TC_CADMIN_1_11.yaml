@@ -79,11 +79,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     #Check for DNS-SD advertisement CM is not possible in YAML
@@ -148,11 +148,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -188,11 +188,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label:
@@ -209,11 +209,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
@@ -228,9 +228,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId3 },
-                  { Label: "", nodeID: nodeId2 },
+                  { Label: "", NodeId: nodeId },
+                  { Label: "", NodeId: nodeId3 },
+                  { Label: "", NodeId: nodeId2 },
               ]
           constraints:
               type: list
@@ -256,8 +256,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=1"
@@ -294,8 +292,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
       response:
           error: FAILURE
           clusterError: 2
@@ -319,9 +315,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId3 },
-                  { Label: "", nodeID: nodeId2 },
+                  { Label: "", NodeId: nodeId },
+                  { Label: "", NodeId: nodeId3 },
+                  { Label: "", NodeId: nodeId2 },
               ]
           constraints:
               type: list
@@ -335,8 +331,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label:
           "Before the expiration of PIXIT.CADMIN.CwDuration seconds that was set
@@ -351,8 +345,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
       response:
           error: FAILURE
           clusterError: 2

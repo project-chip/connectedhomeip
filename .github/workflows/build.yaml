@@ -282,24 +282,6 @@ jobs:
             #       # objdirs are big; don't hold on to them too long.
             #       retention-days: 5
 
-            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
-            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find out -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove dbus binaries for CodeQL Analysis
-            #   run: find out -type d -name "dbus" -exec rm -rf {} +
-            # - name: Remove nrfxlib binaries for CodeQL Analysis
-            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
-            # - name: Perform CodeQL Analysis
-            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-            #   uses: github/codeql-action/analyze@v1
-
     build_linux_python_lib:
         name: Build on Linux (python_lib)
         timeout-minutes: 60
@@ -456,9 +438,44 @@ jobs:
             #   uses: github/codeql-action/analyze@v1
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
+
+    build_linux_gcc_coverage:
+        name: Build on Linux (coverage)
+        timeout-minutes: 85
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: connectedhomeip/chip-build:0.6.30
+            volumes:
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - uses: Wandalen/wretry.action@v1.0.36
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v3
+              if: ${{ always() && !env.ACT }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log           
+            - name: Run Build Coverage
+              timeout-minutes: 20
+              run: ./scripts/build_coverage.sh
+           

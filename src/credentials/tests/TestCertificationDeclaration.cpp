@@ -363,7 +363,7 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
     // Test with known key
     P256Keypair keypair2;
     P256SerializedKeypair serializedKeypair;
-    memcpy(serializedKeypair, sTestCMS_SignerSerializedKeypair, sizeof(sTestCMS_SignerSerializedKeypair));
+    memcpy(serializedKeypair.Bytes(), sTestCMS_SignerSerializedKeypair, sizeof(sTestCMS_SignerSerializedKeypair));
     serializedKeypair.SetLength(sizeof(sTestCMS_SignerSerializedKeypair));
     cdContentIn   = ByteSpan(sTestCMS_CDContent02);
     signedMessage = MutableByteSpan(signedMessageBuf);
