@@ -674,16 +674,18 @@
             { ZAP_SIMPLE_DEFAULT(5), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                    \
-            { ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxPressure */              \
-            { ZAP_EMPTY_DEFAULT(), 0x00000001, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxSpeed */                 \
-            { ZAP_EMPTY_DEFAULT(), 0x00000002, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxFlow */                  \
+            { ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) },        /* MaxPressure */       \
+            { ZAP_EMPTY_DEFAULT(), 0x00000001, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) },        /* MaxSpeed */          \
+            { ZAP_EMPTY_DEFAULT(), 0x00000002, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) },        /* MaxFlow */           \
+            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000003, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstPressure */  \
+            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000004, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstPressure */  \
             { ZAP_EMPTY_DEFAULT(), 0x00000011, 1, ZAP_TYPE(ENUM8), 0 },                             /* EffectiveOperationMode */   \
             { ZAP_EMPTY_DEFAULT(), 0x00000012, 1, ZAP_TYPE(ENUM8), 0 },                             /* EffectiveControlMode */     \
             { ZAP_EMPTY_DEFAULT(), 0x00000013, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Capacity */                 \
             { ZAP_MIN_MAX_DEFAULTS_INDEX(4), 0x00000020, 1, ZAP_TYPE(ENUM8),                                                       \
               ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) },  /* OperationMode */                                   \
-            { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                      \
-            { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
+            { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                      \
+            { ZAP_SIMPLE_DEFAULT(4), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thermostat (server) */                                                                        \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LocalTemperature */         \
