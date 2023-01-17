@@ -317,11 +317,6 @@ enum OtaState
     kOtaApplyFailed,
 };
 
-/**
- * A pointer to a function that performs work asynchronously.
- */
-typedef void (*AsyncWorkFunct)(intptr_t arg);
-
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
 {
     if (prevState == newState)
@@ -330,6 +325,11 @@ inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
         return kConnectivity_Established;
     return kConnectivity_Lost;
 }
+
+/**
+ * A pointer to a function that performs work asynchronously.
+ */
+typedef void (*AsyncWorkFunct)(intptr_t arg);
 
 } // namespace DeviceLayer
 } // namespace chip
