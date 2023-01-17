@@ -294,11 +294,11 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * ar
     // Or somehow get our caller to do it once this thread is joined?
 }
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostBackgroundEvent(const ChipDeviceEvent * event)
 {
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     if (mBackgroundEventQueue == NULL)
     {
         return CHIP_ERROR_INTERNAL;
@@ -314,11 +314,16 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostBackgroundEvent(
         return CHIP_ERROR(chip::ChipError::Range::kOS, status);
     }
     return CHIP_NO_ERROR;
+#else
+    // Use foreground event loop for background events
+    return _PostEvent(event);
+#endif
 }
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunBackgroundEventLoop(void)
 {
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     bool oldShouldRunBackgroundEventLoop = false;
     if (!mShouldRunBackgroundEventLoop.compare_exchange_strong(oldShouldRunBackgroundEventLoop /* expected */, true /* desired */))
     {
@@ -336,11 +341,15 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunBackgroundEventLoop(voi
             eventReceived = xQueueReceive(mBackgroundEventQueue, &event, portMAX_DELAY) == pdTRUE;
         }
     }
+#else
+    // Use foreground event loop for background events
+#endif
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartBackgroundEventLoopTask(void)
 {
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
     mBackgroundEventLoopTask = xTaskCreateStatic(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME, ArraySize(mBackgroundEventLoopStack), this,
                                                  CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, mBackgroundEventLoopStack, &mBackgroundEventLoopTaskStruct);
@@ -349,11 +358,16 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartBackgroundEvent
                 this, CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, &mBackgroundEventLoopTask);
 #endif
     return (mBackgroundEventLoopTask != NULL) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+#else
+    // Use foreground event loop for background events
+    return CHIP_NO_ERROR;
+#endif
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopBackgroundEventLoopTask(void)
 {
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     bool oldShouldRunBackgroundEventLoop = true;
     if (mShouldRunBackgroundEventLoop.compare_exchange_strong(oldShouldRunBackgroundEventLoop /* expected */, false /* desired */))
     {
@@ -361,15 +375,19 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopBackgroundEventL
         xQueueSendToBack(mBackgroundEventQueue, &noop, 0);
     }
     return CHIP_NO_ERROR;
+#else
+    // Use foreground event loop for background events
+    return CHIP_NO_ERROR;
+#endif
 }
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::BackgroundEventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP background task running");
     static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunBackgroundEventLoop();
 }
-
 #endif
 
 template <class ImplClass>

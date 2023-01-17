@@ -202,17 +202,11 @@ public:
      */
     CHIP_ERROR StopEventLoopTask();
 
-    // These functions should be gated by CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
-    // but the PlatformManagerImpl header (included below) makes that tricky
-    // so always declare them here even if they are not defined by the platform implementation
-    // (by using #if 1).
-#if 1 || defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     CHIP_ERROR ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
     CHIP_ERROR PostBackgroundEvent(const ChipDeviceEvent * event);
     void RunBackgroundEventLoop();
     CHIP_ERROR StartBackgroundEventLoopTask();
     CHIP_ERROR StopBackgroundEventLoopTask();
-#endif
 
 private:
     bool mInitialized                   = false;
@@ -445,8 +439,6 @@ inline CHIP_ERROR PlatformManager::StopEventLoopTask()
     return static_cast<ImplClass *>(this)->_StopEventLoopTask();
 }
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
-
 inline CHIP_ERROR PlatformManager::ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
     return static_cast<ImplClass *>(this)->_ScheduleBackgroundWork(workFunct, arg);
@@ -471,8 +463,6 @@ inline CHIP_ERROR PlatformManager::StopBackgroundEventLoopTask()
 {
     return static_cast<ImplClass *>(this)->_StopBackgroundEventLoopTask();
 }
-
-#endif
 
 inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 {

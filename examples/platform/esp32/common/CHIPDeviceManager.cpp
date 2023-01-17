@@ -79,10 +79,8 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     // Start a task to run the CHIP Device background event loop.
     ReturnErrorOnFailure(PlatformMgr().StartBackgroundEventLoopTask());
-#endif
 
     // Start a task to run the CHIP Device event loop.
     return PlatformMgr().StartEventLoopTask();

@@ -58,9 +58,7 @@ protected:
     void _HandleServerStarted();
     void _HandleServerShuttingDown();
     CHIP_ERROR _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg);
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     CHIP_ERROR _ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg);
-#endif
     void _DispatchEvent(const ChipDeviceEvent * event);
 
     // ===== Support methods that can be overridden by the implementation subclass.

@@ -1317,16 +1317,10 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     auto * workPtr = new Sigma3Work();
     VerifyOrExit(workPtr != nullptr, err = CHIP_ERROR_NO_MEMORY);
     {
         auto & work = *workPtr;
-#else
-    Sigma3Work* workPtr = nullptr;
-    {
-        Sigma3Work work;
-#endif
 
         // Used to call back into the session after background event processing.
         // It happens that there's only one pairing session (in CASEServer)
@@ -1445,17 +1439,12 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             }
         }
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
         SuccessOrExit(err = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(
             [](intptr_t arg) { HandleSigma3b(*reinterpret_cast<Sigma3Work*>(arg)); },
             reinterpret_cast<intptr_t>(&work)));
         workPtr = nullptr; // scheduling succeeded, so don't delete
         mExchangeCtxt->WillSendMessage();
         mState = State::kBackgroundPending;
-#else
-        HandleSigma3b(work);
-        SuccessOrExit(HandleSigma3c(work));
-#endif
     }
 
 exit:
@@ -1503,7 +1492,6 @@ void CASESession::HandleSigma3b(Sigma3Work & work)
 exit:
     work.status = err;
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     auto err2 = DeviceLayer::PlatformMgr().ScheduleWork(
         [](intptr_t arg) {
             auto & work2 = *reinterpret_cast<Sigma3Work*>(arg);
@@ -1515,7 +1503,6 @@ exit:
     {
         delete &work; // scheduling failed, so delete
     }
-#endif
 }
 
 CHIP_ERROR CASESession::HandleSigma3c(Sigma3Work & work)
@@ -1523,15 +1510,11 @@ CHIP_ERROR CASESession::HandleSigma3c(Sigma3Work & work)
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool ignoreFailure = true;
 
-    ChipLogError(SecureChannel, "########## IN PART C");
-
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     // Special case: if for whatever reason not in expected state or sequence,
     // don't do anything, including sending a status report or aborting the
     // pending establish.
     VerifyOrExit(mState == State::kBackgroundPending, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSequence == work.sequence, err = CHIP_ERROR_INCORRECT_STATE);
-#endif
 
     ignoreFailure = false;
 
@@ -1564,19 +1547,15 @@ CHIP_ERROR CASESession::HandleSigma3c(Sigma3Work & work)
     Finish();
 
 exit:
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     delete &work;
-#endif
 
     if (err != CHIP_NO_ERROR && !ignoreFailure)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
         // Abort the pending establish, which is normally done by the caller,
         // but in the background processing case must be done here.
         DiscardExchange();
         AbortPendingEstablish(err);
-#endif
     }
 
     return err;
@@ -1674,24 +1653,6 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
 
     ReturnErrorOnFailure(AES_CCM_decrypt(nullptr, 0, nullptr, 0, resumeMIC.data(), resumeMIC.size(), resumeKey.data(),
                                          resumeKey.size(), nonce.data(), nonce.size(), nullptr));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CASESession::ValidatePeerIdentity(const ByteSpan & peerNOC, const ByteSpan & peerICAC, NodeId & peerNodeId,
-                                             Crypto::P256PublicKey & peerPublicKey)
-{
-    ReturnErrorCodeIf(mFabricsTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
-    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(SetEffectiveTime());
-
-    CompressedFabricId unused;
-    FabricId peerFabricId;
-    ReturnErrorOnFailure(mFabricsTable->VerifyCredentials(mFabricIndex, peerNOC, peerICAC, mValidContext, unused, peerFabricId,
-                                                          peerNodeId, peerPublicKey));
-    VerifyOrReturnError(fabricInfo->GetFabricId() == peerFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
     return CHIP_NO_ERROR;
 }
