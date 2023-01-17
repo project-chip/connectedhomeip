@@ -15,11 +15,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
 
-#include <app/ReadHandler.h>
+#include "ICDSubscribtionCallback.h"
+#include <platform/CHIPDeviceConfig.h>
 
-class GenericReadHandlerCallback : public chip::app::ReadHandler::ApplicationCallback
+CHIP_ERROR ICDSubscribtionCallback::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler, chip::Transport::SecureSession & aSecureSession)
 {
-    CHIP_ERROR OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler, chip::Transport::SecureSession & aSecureSession) override;
-};
+    using namespace chip::System::Clock;
+
+    Seconds32 interval_s32 = std::chrono::duration_cast<Seconds32>(CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL);
+
+    if(interval_s32 > Seconds16::max())
+    {
+        interval_s32 = Seconds16::max();
+    }
+
+    Seconds16 interval_s16 = interval_s32;
+
+    return aReadHandler.SetReportingIntervals(interval_s16.count());
+}

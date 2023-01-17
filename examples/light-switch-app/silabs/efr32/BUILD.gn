@@ -260,7 +260,7 @@ efr32_executable("light_switch_app") {
 
   # Default Read handler for SED
   if (chip_use_default_read_handler_callbacks) {
-    deps += [ "${examples_plat_dir}:efr32-default-read-handler" ]
+    deps += [ "${examples_plat_dir}:efr32-ICD-subscription-callback" ]
   }
 
   if (chip_enable_ota_requestor) {
