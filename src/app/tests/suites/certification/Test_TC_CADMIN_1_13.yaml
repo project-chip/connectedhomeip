@@ -75,7 +75,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -85,7 +85,7 @@ tests:
                 value: 180
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -228,7 +228,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -259,7 +259,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -270,7 +270,7 @@ tests:
 
     - label: "TH_CR1 opens a 2nd commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -317,7 +317,7 @@ tests:
 
     - label: "TH_CR1 re-opens new commissioning window on DUT_CE using ECM"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -335,7 +335,7 @@ tests:
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -372,7 +372,7 @@ tests:
 
     - label: "TH_CR3 opens a 2nd commissioning window on DUT_CE"
       identity: "gamma"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -419,7 +419,7 @@ tests:
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -438,7 +438,7 @@ tests:
 
     - label: "TH_CR2 opens a 2nd commissioning window on DUT_CE using ECM"
       identity: "beta"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -467,7 +467,7 @@ tests:
                 value: 180000
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -475,7 +475,7 @@ tests:
           value: 0
 
     - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "AdminFabricIndex"
       PICS: CADMIN.S.A0001
@@ -483,7 +483,7 @@ tests:
           value: null
 
     - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "AdminVendorId"
       PICS: CADMIN.S.A0002

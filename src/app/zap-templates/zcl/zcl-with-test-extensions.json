@@ -108,7 +108,7 @@
             "TargetsPerAccessControlEntry",
             "AccessControlEntriesPerFabric"
         ],
-        "AdministratorCommissioning": [
+        "Administrator Commissioning": [
             "WindowStatus",
             "AdminFabricIndex",
             "AdminVendorId"
