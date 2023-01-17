@@ -203,7 +203,20 @@ public:
     CHIP_ERROR StopEventLoopTask();
 
     CHIP_ERROR ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
+
+    /**
+     * Posts an event for background processing.
+     * 
+     * If CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING is not true, will delegate
+     * to PostEvent.
+     * 
+     * Only accepts events of type kCallWorkFunct or kNoOp.
+     * 
+     * Returns CHIP_ERROR_INVALID_ARGUMENT if the event type is not acceptable.
+     * Returns CHIP_ERROR_NO_MEMORY if resources are exhausted.
+     */
     CHIP_ERROR PostBackgroundEvent(const ChipDeviceEvent * event);
+
     void RunBackgroundEventLoop();
     CHIP_ERROR StartBackgroundEventLoopTask();
     CHIP_ERROR StopBackgroundEventLoopTask();

@@ -234,7 +234,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct w
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     ChipDeviceEvent event{
         .Type = DeviceEventType::kCallWorkFunct,
         .CallWorkFunct {.WorkFunct = workFunct, .Arg = arg}
@@ -245,10 +244,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleBackgroundWork(AsyncW
         ChipLogError(DeviceLayer, "Failed to schedule background work: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
-#else
-    // Use foreground event loop for background events
-    return _ScheduleWork(workFunct, arg);
-#endif
 }
 
 template <class ImplClass>

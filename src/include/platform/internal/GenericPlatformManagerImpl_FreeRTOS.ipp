@@ -311,7 +311,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostBackgroundEvent(
     if (status != pdTRUE)
     {
         ChipLogError(DeviceLayer, "Failed to post event to CHIP background event queue");
-        return CHIP_ERROR(chip::ChipError::Range::kOS, status);
+        return CHIP_ERROR_NO_MEMORY;
     }
     return CHIP_NO_ERROR;
 #else
