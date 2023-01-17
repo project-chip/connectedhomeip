@@ -19,13 +19,14 @@
 #include "ICDSubscribtionCallback.h"
 #include <platform/CHIPDeviceConfig.h>
 
-CHIP_ERROR ICDSubscribtionCallback::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler, chip::Transport::SecureSession & aSecureSession)
+CHIP_ERROR ICDSubscribtionCallback::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
+                                                            chip::Transport::SecureSession & aSecureSession)
 {
     using namespace chip::System::Clock;
 
     Seconds32 interval_s32 = std::chrono::duration_cast<Seconds32>(CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL);
 
-    if(interval_s32 > Seconds16::max())
+    if (interval_s32 > Seconds16::max())
     {
         interval_s32 = Seconds16::max();
     }

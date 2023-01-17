@@ -196,6 +196,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     err = chip::Server::GetInstance().Init(initParams);
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+    // Register ICD subscription callback to match subscription max intervals to its idle time interval
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&mICDSubscriptionHandler);
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
