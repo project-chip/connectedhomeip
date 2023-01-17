@@ -33,6 +33,8 @@ set(CONFIG_CHIP_ERROR_LOGGING YES CACHE BOOL "Enable logging at error level")
 
 set(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS NO CACHE BOOL "Enable using PSA Protected Storage")
 set(CONFIG_CHIP_CRYPTO "mbedtls" CACHE STRING "Matter crypto backend. Mbedtls as default")
+set(CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION "0" CACHE STRING "Software version number")
+set(CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION_STRING ${TFM_NS_APP_VERSION} CACHE STRING "Software version in string format x.x.x")
 
 if(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS AND NOT TFM_SUPPORT)
     message( FATAL_ERROR "You can not use PSA Protected Storage without TF-M support" )

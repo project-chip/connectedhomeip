@@ -63,6 +63,8 @@ matter_add_gn_arg_bool  ("chip_error_logging"                   CONFIG_CHIP_ERRO
 matter_add_gn_arg_bool  ("chip_openiotsdk_use_tfm"              TFM_SUPPORT)
 matter_add_gn_arg_bool  ("chip_openiotsdk_use_psa_ps"           CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS)
 matter_add_gn_arg_string("chip_crypto"                          "${CONFIG_CHIP_CRYPTO}")
+matter_add_gn_arg_string("chip_openiotsdk_software_version"           "${CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION}")
+matter_add_gn_arg_string("chip_openiotsdk_software_version_string"    "${CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION_STRING}")
 if (TARGET cmsis-rtos-api)
     matter_add_gn_arg_string("target_os"                        "cmsis-rtos")
 endif()

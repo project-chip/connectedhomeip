@@ -26,7 +26,6 @@ list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 set(APP_TARGET chip-openiotsdk-shell-example_ns)
 
 set(TFM_SUPPORT YES)
-set(TFM_NS_APP_VERSION "0.0.1")
 
 # Toolchain files need to exist before first call to project
 include(toolchain)

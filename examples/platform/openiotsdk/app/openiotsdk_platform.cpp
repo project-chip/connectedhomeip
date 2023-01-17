@@ -300,6 +300,9 @@ int openiotsdk_chip_run(void)
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif // USE_CHIP_DATA_MODEL
 
+    ChipLogProgress(NotSpecified, "Current software version: [%ld] %s", uint32_t(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION),
+                    CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
     return EXIT_SUCCESS;
 }
 

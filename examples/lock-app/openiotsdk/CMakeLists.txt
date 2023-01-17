@@ -28,7 +28,6 @@ set(APP_TARGET chip-openiotsdk-lock-app-example_ns)
 
 set(TFM_SUPPORT YES)
 set(TFM_PROJECT_CONFIG_HEADER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/tf-m-config/TfmProjectConfig.h")
-set(TFM_NS_APP_VERSION "0.0.1")
 
 # Toolchain files need to exist before first call to project
 include(toolchain)

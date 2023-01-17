@@ -45,6 +45,8 @@ KVS_STORAGE_TYPE="tdb"
 KVS_STORAGE_FILE=""
 NO_ACTIVATE=""
 CRYPTO_BACKEND="mbedtls"
+APP_VERSION="1"
+APP_VERSION_STR="0.0.1"
 
 declare -A tdb_storage_param=([instance]=sram [memspace]=0 [address]=0x0 [size]=0x100000)
 declare -A ps_storage_param=([instance]=qspi_sram [memspace]=0 [address]=0x660000 [size]=0x12000)
@@ -72,6 +74,8 @@ Options:
     -p,--path       <build_path>        Build path <build_path - default is example_dir/build>
     -K,--kvsfile    <kvs_storage_file>  Path to KVS storage file which will be used to ensure persistence <kvs_storage_file - default is empty which means disable persistence>
     -n,--network    <network_name>      FVP network interface name <network_name - default is "user" which means user network mode>
+    -v,--version    <version_number>    Application version number <version_number - default is 1>
+    -V,--versionStr <version_str>       Application version string <version_strr - default is "0.0.1">
     --no-activate                       Do not activate the chip build environment
 Examples:
 EOF
@@ -122,6 +126,8 @@ function build_with_cmake() {
     fi
 
     BUILD_OPTIONS=(-DCMAKE_SYSTEM_PROCESSOR=cortex-m55)
+    BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION="$APP_VERSION")
+    BUILD_OPTIONS+=(-DTFM_NS_APP_VERSION="$APP_VERSION_STR")
 
     if "$DEBUG"; then
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
@@ -273,8 +279,8 @@ function run_test() {
     fi
 }
 
-SHORT=C:,p:,d:,l:,b:,n:,k:,K:,c,s,h
-LONG=command:,path:,debug:,lwipdebug:,backend:,network:,kvsstore:,kvsfile:,clean,scratch,help,no-activate
+SHORT=C:,p:,d:,l:,b:,n:,k:,K:,v:,V:,c,s,h
+LONG=command:,path:,debug:,lwipdebug:,backend:,network:,kvsstore:,kvsfile:,version:,versionStr:,clean,scratch,help,no-activate
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"
@@ -328,6 +334,14 @@ while :; do
         --no-activate)
             NO_ACTIVATE='YES'
             shift
+            ;;
+        -v | --version)
+            APP_VERSION=$2
+            shift 2
+            ;;
+        -V | --versionStr)
+            APP_VERSION_STR=$2
+            shift 2
             ;;
         -* | --*)
             shift

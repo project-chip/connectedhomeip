@@ -25,6 +25,12 @@ declare_args() {
 
   # By default use flash block device storage
   chip_openiotsdk_use_psa_ps = false
+
+  # Default value of software version
+  chip_openiotsdk_software_version = "0"
+
+  # Default value of software version in string
+  chip_openiotsdk_software_version_string = "0.0.0"
 }
 
 buildconfig_header("openiotsdk_buildconfig") {
@@ -44,6 +50,8 @@ buildconfig_header("openiotsdk_buildconfig") {
   defines = [
     "CHIP_OPEN_IOT_SDK_KV_STORE_CONFIG_INCLUDE=${_chip_openiotsdk_kv_store_config_include}",
     "CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE=${_chip_openiotsdk_persisted_storage_key_type}",
+    "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_openiotsdk_software_version_string}\"",
+    "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_openiotsdk_software_version}",
   ]
 
   if (chip_openiotsdk_use_tfm) {
