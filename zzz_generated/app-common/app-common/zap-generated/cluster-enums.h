@@ -670,8 +670,8 @@ enum class BootReasonEnum : uint8_t
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for HardwareFault
-enum class HardwareFault : uint8_t
+// Enum for HardwareFaultEnum
+enum class HardwareFaultEnum : uint8_t
 {
     kUnspecified            = 0x00,
     kRadio                  = 0x01,
@@ -687,15 +687,15 @@ enum class HardwareFault : uint8_t
     kUnknownEnumValue       = 11,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HardwareFault                                                                    = EmberAfHardwareFault;
-static HardwareFault __attribute__((unused)) kHardwareFaultkUnknownEnumValue           = static_cast<HardwareFault>(11);
+using HardwareFaultEnum                                                                = EmberAfHardwareFaultEnum;
+static HardwareFaultEnum __attribute__((unused)) kHardwareFaultEnumkUnknownEnumValue   = static_cast<HardwareFaultEnum>(11);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for InterfaceType
-enum class InterfaceType : uint8_t
+// Enum for InterfaceTypeEnum
+enum class InterfaceTypeEnum : uint8_t
 {
     kUnspecified      = 0x00,
     kWiFi             = 0x01,
@@ -705,15 +705,15 @@ enum class InterfaceType : uint8_t
     kUnknownEnumValue = 5,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using InterfaceType                                                                    = EmberAfInterfaceType;
-static InterfaceType __attribute__((unused)) kInterfaceTypekUnknownEnumValue           = static_cast<InterfaceType>(5);
+using InterfaceTypeEnum                                                                = EmberAfInterfaceTypeEnum;
+static InterfaceTypeEnum __attribute__((unused)) kInterfaceTypeEnumkUnknownEnumValue   = static_cast<InterfaceTypeEnum>(5);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for NetworkFaultType
-enum class NetworkFaultType : uint8_t
+// Enum for NetworkFaultEnum
+enum class NetworkFaultEnum : uint8_t
 {
     kUnspecified      = 0x00,
     kHardwareFailure  = 0x01,
@@ -722,15 +722,15 @@ enum class NetworkFaultType : uint8_t
     kUnknownEnumValue = 4,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkFaultType                                                                 = EmberAfNetworkFaultType;
-static NetworkFaultType __attribute__((unused)) kNetworkFaultTypekUnknownEnumValue     = static_cast<NetworkFaultType>(4);
+using NetworkFaultEnum                                                                 = EmberAfNetworkFaultEnum;
+static NetworkFaultEnum __attribute__((unused)) kNetworkFaultEnumkUnknownEnumValue     = static_cast<NetworkFaultEnum>(4);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for RadioFault
-enum class RadioFault : uint8_t
+// Enum for RadioFaultEnum
+enum class RadioFaultEnum : uint8_t
 {
     kUnspecified      = 0x00,
     kWiFiFault        = 0x01,
@@ -742,8 +742,8 @@ enum class RadioFault : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFault                                                                       = EmberAfRadioFault;
-static RadioFault __attribute__((unused)) kRadioFaultkUnknownEnumValue                 = static_cast<RadioFault>(7);
+using RadioFaultEnum                                                                   = EmberAfRadioFaultEnum;
+static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue         = static_cast<RadioFaultEnum>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 

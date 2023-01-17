@@ -4142,7 +4142,7 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBrid
 }
 
 void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4180,7 +4180,7 @@ void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionB
 }
 
 void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4218,7 +4218,7 @@ void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBrid
 }
 
 void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15110,15 +15110,15 @@ void MTRNullableGeneralDiagnosticsClusterBootReasonEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFault value)
+void MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15133,8 +15133,8 @@ void MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & value)
+void MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15145,7 +15145,7 @@ void MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15160,15 +15160,15 @@ void MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackSubscript
     }
 }
 
-void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceType value)
+void MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15183,8 +15183,8 @@ void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceType> & value)
+void MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15195,7 +15195,7 @@ void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15210,15 +15210,15 @@ void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscript
     }
 }
 
-void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultType value)
+void MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15233,8 +15233,8 @@ void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & value)
+void MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15245,7 +15245,7 @@ void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15260,15 +15260,15 @@ void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscr
     }
 }
 
-void MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::RadioFault value)
+void MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15283,8 +15283,8 @@ void MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFault> & value)
+void MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15295,7 +15295,7 @@ void MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

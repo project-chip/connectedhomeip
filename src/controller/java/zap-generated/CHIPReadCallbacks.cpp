@@ -7906,7 +7906,7 @@ CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback::~CHIPGeneralDiagnos
 }
 
 void CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7977,7 +7977,7 @@ CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback::~CHIPGeneralDiagnostic
 }
 
 void CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8048,7 +8048,7 @@ CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::~CHIPGeneralDiagnost
 }
 
 void CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

@@ -7685,7 +7685,7 @@ public:
     chip::ByteSpan hardwareAddress;
     DataModel::List<const chip::ByteSpan> IPv4Addresses;
     DataModel::List<const chip::ByteSpan> IPv6Addresses;
-    InterfaceType type = static_cast<InterfaceType>(0);
+    InterfaceTypeEnum type = static_cast<InterfaceTypeEnum>(0);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -7702,7 +7702,7 @@ public:
     chip::ByteSpan hardwareAddress;
     DataModel::DecodableList<chip::ByteSpan> IPv4Addresses;
     DataModel::DecodableList<chip::ByteSpan> IPv6Addresses;
-    InterfaceType type = static_cast<InterfaceType>(0);
+    InterfaceTypeEnum type = static_cast<InterfaceTypeEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -7827,9 +7827,10 @@ struct TypeInfo
 namespace ActiveHardwareFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::GeneralDiagnostics::HardwareFault>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveHardwareFaults::Id; }
@@ -7839,9 +7840,9 @@ struct TypeInfo
 namespace ActiveRadioFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::GeneralDiagnostics::RadioFault>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveRadioFaults::Id; }
@@ -7851,9 +7852,9 @@ struct TypeInfo
 namespace ActiveNetworkFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::GeneralDiagnostics::NetworkFaultType>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaults::Id; }
@@ -7947,8 +7948,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const HardwareFault> current;
-    DataModel::List<const HardwareFault> previous;
+    DataModel::List<const HardwareFaultEnum> current;
+    DataModel::List<const HardwareFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -7960,8 +7961,8 @@ public:
     static constexpr EventId GetEventId() { return Events::HardwareFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
-    DataModel::DecodableList<HardwareFault> current;
-    DataModel::DecodableList<HardwareFault> previous;
+    DataModel::DecodableList<HardwareFaultEnum> current;
+    DataModel::DecodableList<HardwareFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -7983,8 +7984,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const RadioFault> current;
-    DataModel::List<const RadioFault> previous;
+    DataModel::List<const RadioFaultEnum> current;
+    DataModel::List<const RadioFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -7996,8 +7997,8 @@ public:
     static constexpr EventId GetEventId() { return Events::RadioFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
-    DataModel::DecodableList<RadioFault> current;
-    DataModel::DecodableList<RadioFault> previous;
+    DataModel::DecodableList<RadioFaultEnum> current;
+    DataModel::DecodableList<RadioFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8019,8 +8020,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const NetworkFaultType> current;
-    DataModel::List<const NetworkFaultType> previous;
+    DataModel::List<const NetworkFaultEnum> current;
+    DataModel::List<const NetworkFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8032,8 +8033,8 @@ public:
     static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
-    DataModel::DecodableList<NetworkFaultType> current;
-    DataModel::DecodableList<NetworkFaultType> previous;
+    DataModel::DecodableList<NetworkFaultEnum> current;
+    DataModel::DecodableList<NetworkFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

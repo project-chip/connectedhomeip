@@ -17657,12 +17657,28 @@ typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsInterfaceType) {
     MTRGeneralDiagnosticsInterfaceTypeThread API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsNetworkFault) {
+    MTRGeneralDiagnosticsNetworkFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRGeneralDiagnosticsNetworkFaultHardwareFailure MTR_NEWLY_AVAILABLE = 0x01,
+    MTRGeneralDiagnosticsNetworkFaultNetworkJammed MTR_NEWLY_AVAILABLE = 0x02,
+    MTRGeneralDiagnosticsNetworkFaultConnectionFailed MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsNetworkFaultType) {
-    MTRGeneralDiagnosticsNetworkFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRGeneralDiagnosticsNetworkFaultTypeHardwareFailure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRGeneralDiagnosticsNetworkFaultTypeNetworkJammed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRGeneralDiagnosticsNetworkFaultTypeConnectionFailed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRGeneralDiagnosticsNetworkFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFaultUnspecified")
+    = 0x00,
+    MTRGeneralDiagnosticsNetworkFaultTypeHardwareFailure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFaultHardwareFailure")
+    = 0x01,
+    MTRGeneralDiagnosticsNetworkFaultTypeNetworkJammed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFaultNetworkJammed")
+    = 0x02,
+    MTRGeneralDiagnosticsNetworkFaultTypeConnectionFailed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFaultConnectionFailed")
+    = 0x03,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFault");
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsRadioFault) {
     MTRGeneralDiagnosticsRadioFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,

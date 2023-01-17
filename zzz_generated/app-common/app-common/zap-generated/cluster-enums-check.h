@@ -685,9 +685,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Boo
         return static_cast<EnumType>(7);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::HardwareFault val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::HardwareFaultEnum val)
 {
-    using EnumType = GeneralDiagnostics::HardwareFault;
+    using EnumType = GeneralDiagnostics::HardwareFaultEnum;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
@@ -705,26 +705,26 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Har
     case EnumType::kNonVolatileMemoryError:
     case EnumType::kTamperDetected:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_HARDWARE_FAULT_UNSPECIFIED:
-    case EMBER_ZCL_HARDWARE_FAULT_RADIO:
-    case EMBER_ZCL_HARDWARE_FAULT_SENSOR:
-    case EMBER_ZCL_HARDWARE_FAULT_RESETTABLE_OVER_TEMP:
-    case EMBER_ZCL_HARDWARE_FAULT_NON_RESETTABLE_OVER_TEMP:
-    case EMBER_ZCL_HARDWARE_FAULT_POWER_SOURCE:
-    case EMBER_ZCL_HARDWARE_FAULT_VISUAL_DISPLAY_FAULT:
-    case EMBER_ZCL_HARDWARE_FAULT_AUDIO_OUTPUT_FAULT:
-    case EMBER_ZCL_HARDWARE_FAULT_USER_INTERFACE_FAULT:
-    case EMBER_ZCL_HARDWARE_FAULT_NON_VOLATILE_MEMORY_ERROR:
-    case EMBER_ZCL_HARDWARE_FAULT_TAMPER_DETECTED:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_UNSPECIFIED:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_RADIO:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_SENSOR:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_RESETTABLE_OVER_TEMP:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_NON_RESETTABLE_OVER_TEMP:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_POWER_SOURCE:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_VISUAL_DISPLAY_FAULT:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_AUDIO_OUTPUT_FAULT:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_USER_INTERFACE_FAULT:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_NON_VOLATILE_MEMORY_ERROR:
+    case EMBER_ZCL_HARDWARE_FAULT_ENUM_TAMPER_DETECTED:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(11);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::InterfaceType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::InterfaceTypeEnum val)
 {
-    using EnumType = GeneralDiagnostics::InterfaceType;
+    using EnumType = GeneralDiagnostics::InterfaceTypeEnum;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
@@ -736,20 +736,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Int
     case EnumType::kCellular:
     case EnumType::kThread:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED:
-    case EMBER_ZCL_INTERFACE_TYPE_WI_FI:
-    case EMBER_ZCL_INTERFACE_TYPE_ETHERNET:
-    case EMBER_ZCL_INTERFACE_TYPE_CELLULAR:
-    case EMBER_ZCL_INTERFACE_TYPE_THREAD:
+    case EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED:
+    case EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI:
+    case EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET:
+    case EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR:
+    case EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::NetworkFaultType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::NetworkFaultEnum val)
 {
-    using EnumType = GeneralDiagnostics::NetworkFaultType;
+    using EnumType = GeneralDiagnostics::NetworkFaultEnum;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
@@ -760,19 +760,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Net
     case EnumType::kNetworkJammed:
     case EnumType::kConnectionFailed:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_NETWORK_FAULT_TYPE_UNSPECIFIED:
-    case EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE:
-    case EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED:
-    case EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED:
+    case EMBER_ZCL_NETWORK_FAULT_ENUM_UNSPECIFIED:
+    case EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE:
+    case EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED:
+    case EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::RadioFault val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::RadioFaultEnum val)
 {
-    using EnumType = GeneralDiagnostics::RadioFault;
+    using EnumType = GeneralDiagnostics::RadioFaultEnum;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
@@ -786,13 +786,13 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     case EnumType::kBLEFault:
     case EnumType::kEthernetFault:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_RADIO_FAULT_UNSPECIFIED:
-    case EMBER_ZCL_RADIO_FAULT_WI_FI_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_CELLULAR_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_THREAD_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_NFC_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_BLE_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ETHERNET_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_ENUM_UNSPECIFIED:
+    case EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_ENUM_CELLULAR_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_ENUM_ETHERNET_FAULT:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
