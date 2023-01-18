@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_has_user_clusters side='client'}}
 #include "CHIPCallbackTypes.h"
 #include "CHIPInvokeCallbacks.h"
 
@@ -73,4 +73,4 @@ void CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callbac
 {{/all_incoming_commands_for_cluster}}
 {{/all_user_clusters}}
 } // namespace chip
-{{/if}}
+{{/if_has_user_clusters}}

@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_has_user_clusters side='client'}}
 #include "CHIPCallbackTypes.h"
 
 #include <controller/java/AndroidCallbacks.h>
@@ -71,4 +71,4 @@ private:
 {{/zcl_attributes_server}}
 {{/all_user_clusters}}
 
-{{/if}}
+{{/if_has_user_clusters}}

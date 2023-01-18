@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_has_user_clusters side='client'}}
 
 package chip.devicecontroller;
 
@@ -46,4 +46,4 @@ public class ClusterReadMapping {
   }
 }
 
-{{/if}}
+{{/if_has_user_clusters}}

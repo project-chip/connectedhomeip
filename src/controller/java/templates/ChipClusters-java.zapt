@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_has_user_clusters side='client'}}
 
 package chip.devicecontroller;
 
@@ -234,4 +234,4 @@ public class ChipClusters {
   {{/not_last}}
   {{/all_user_clusters}}
 }
-{{/if}}
+{{/if_has_user_clusters}}

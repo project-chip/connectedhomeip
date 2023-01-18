@@ -1,6 +1,6 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
+{{#if_has_user_clusters side='client'}}
 #pragma once
 
 #include <app/InteractionModelEngine.h>
@@ -22,4 +22,4 @@ typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttr
 {{/all_user_cluster_attributes_irrespective_of_manufatucuring_specification}}
 {{/all_user_clusters}}
 
-{{/if}}
+{{/if_has_user_clusters}}

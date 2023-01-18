@@ -20,9 +20,15 @@ class ChipClusters:
                     "commandId": {{asHex code 8}},
                     "commandName": "{{asUpperCamelCase name}}",
                     "args": {
-{{#chip_cluster_command_arguments_with_structs_expanded}}
-                        "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
-{{/chip_cluster_command_arguments_with_structs_expanded}}
+    {{#zcl_command_arguments}}
+                        {{#if_is_struct type}}
+                        {{#zcl_struct_items_by_struct_name type}}
+                        "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{as_underlying_language_specific_zcl_type type language='python' boolean="bool" BOOLEAN="bool"}}{{/if}}",
+                        {{/zcl_struct_items_by_struct_name}}
+                        {{else}}
+                        "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{as_underlying_language_specific_zcl_type type language='python' boolean="bool" BOOLEAN="bool"}}{{/if}}",
+                        {{/if_is_struct}}
+    {{/zcl_command_arguments}}
                     },
                 },
 {{/all_outgoing_commands_for_cluster}}
