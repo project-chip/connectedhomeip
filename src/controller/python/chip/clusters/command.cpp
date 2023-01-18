@@ -35,7 +35,8 @@ using PyObject = void *;
 extern "C" {
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-                                             const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs);
+                                             const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
+                                             uint16_t busyWaitMs);
 }
 
 namespace chip {
@@ -126,7 +127,8 @@ void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onComman
 
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-                                             const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs)
+                                             const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
+                                             uint16_t busyWaitMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -160,6 +162,16 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
 
     sender.release();
     callback.release();
+
+    if (busyWaitMs) {
+        auto durationInMs = chip::System::Clock::Milliseconds32(busyWaitMs);
+        auto & clock = chip::System::SystemClock();
+        auto start   = clock.GetMonotonicTimestamp();
+        while (clock.GetMonotonicTimestamp() - start < durationInMs)
+        {
+            // nothing to do.
+        };
+    }
 
 exit:
     return ToPyChipError(err);

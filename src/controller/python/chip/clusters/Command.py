@@ -142,7 +142,7 @@ def _OnCommandSenderDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None) -> PyChipError:
+def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None, busyWaitMs: int = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -158,8 +158,7 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
     if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
         raise ValueError("responseType must be a ClusterCommand or None")
     if payload.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
-        raise ValueError(
-            f"Command {payload.__class__} must use timed invoke, please specify a valid timedRequestTimeoutMs value")
+        raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
 
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncCommandTransaction(future, eventLoop, responseType)
@@ -167,8 +166,13 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
     payloadTLV = payload.ToTLV()
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     return builtins.chipStack.Call(
-        lambda: handle.pychip_CommandSender_SendCommand(ctypes.py_object(
-            transaction), device, c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV), ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs)))
+        lambda: handle.pychip_CommandSender_SendCommand(
+            ctypes.py_object(transaction), device,
+            c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId,
+            commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV),
+            ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs),
+            ctypes.c_uint16(0 if busyWaitMs is None else busyWaitMs),
+        ))
 
 
 def Init():

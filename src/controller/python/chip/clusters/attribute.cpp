@@ -246,7 +246,7 @@ struct __attribute__((packed)) PyReadAttributeParams
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, uint16_t timedWriteTimeoutMs,
-                                               uint16_t interactionTimeoutMs, size_t n, ...);
+                                               uint16_t interactionTimeoutMs, uint16_t busyWaitMs, size_t n, ...);
 PyChipError pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
                                              DeviceProxy * device, uint8_t * readParamsBuf, size_t n, size_t total, ...);
 }
@@ -323,7 +323,7 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
 }
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, uint16_t timedWriteTimeoutMs,
-                                               uint16_t interactionTimeoutMs, size_t n, ...)
+                                               uint16_t interactionTimeoutMs, uint16_t busyWaitMs, size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -369,6 +369,16 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
     client.release();
     callback.release();
+
+    if (busyWaitMs) {
+        auto durationInMs = chip::System::Clock::Milliseconds32(busyWaitMs);
+        auto & clock = chip::System::SystemClock();
+        auto start   = clock.GetMonotonicTimestamp();
+        while (clock.GetMonotonicTimestamp() - start < durationInMs)
+        {
+            // nothing to do.
+        };
+    }
 
 exit:
     va_end(args);
