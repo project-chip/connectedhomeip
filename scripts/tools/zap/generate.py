@@ -122,7 +122,6 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.add_argument('--version-check', action='store_true')
     parser.add_argument('--no-version-check',
                         action='store_false', dest='version_check')
-    parser.add_argument('--test-sleep', type=int)
     parser.set_defaults(parallel=True)
     parser.set_defaults(prettify_output=True)
     parser.set_defaults(version_check=True)
