@@ -182,7 +182,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/silabs/zll.xml \
                     "
             - name: Build Apps
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                   ./scripts/run_in_build_env.sh \
