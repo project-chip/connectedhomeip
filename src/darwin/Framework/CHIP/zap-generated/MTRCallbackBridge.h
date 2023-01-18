@@ -322,10 +322,10 @@ typedef void (*WiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback)(
     void *, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType);
 typedef void (*NullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> &);
-typedef void (*EthernetNetworkDiagnosticsClusterPHYRateAttributeCallback)(void *,
-                                                                          chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate);
-typedef void (*NullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> &);
+typedef void (*EthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallback)(
+    void *, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum);
+typedef void (*NullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> &);
 typedef void (*TimeSynchronizationClusterGranularityEnumAttributeCallback)(
     void *, chip::app::Clusters::TimeSynchronization::GranularityEnum);
 typedef void (*NullableTimeSynchronizationClusterGranularityEnumAttributeCallback)(
@@ -15222,68 +15222,71 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge
-    : public MTRCallbackBridge<EthernetNetworkDiagnosticsClusterPHYRateAttributeCallback>
+class MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<EthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallback>
 {
 public:
-    MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<EthernetNetworkDiagnosticsClusterPHYRateAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<EthernetNetworkDiagnosticsClusterPHYRateAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<EthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum value);
 };
 
-class MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackSubscriptionBridge
-    : public MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge
+class MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackSubscriptionBridge
+    : public MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge
 {
 public:
-    MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackSubscriptionBridge(
+    MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge(queue, handler, action),
+        MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge::OnDone;
+    using MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallback>
+class MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallback>
 {
 public:
-    MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<NullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               MTRActionBlock action) :
-        MTRCallbackBridge<NullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value);
 };
 
-class MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackSubscriptionBridge
-    : public MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge
+class MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackSubscriptionBridge(
+    MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge(queue, handler, action),
+        MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge::OnDone;
+    using MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

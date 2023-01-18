@@ -25,7 +25,7 @@
 - OnOffDelayedAllOffEffectVariant
 - OnOffDyingLightEffectVariant
 - OnOffEffectIdentifier
-- PHYRate
+- PHYRateEnum
 - RadioFault
 - RoutingRole
 - SaturationMoveMode

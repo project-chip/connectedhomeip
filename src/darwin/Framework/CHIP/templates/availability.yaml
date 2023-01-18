@@ -5209,7 +5209,7 @@
           ThreadNetworkDiagnostics:
               - ConnectionStatusEnum
           EthernetNetworkDiagnostics:
-              - PHYRate
+              - PHYRateEnum
           GeneralDiagnostics:
               - HardwareFault
               - RadioFault
@@ -5290,7 +5290,7 @@
                   - Ac
                   - Ax
           EthernetNetworkDiagnostics:
-              PHYRate:
+              PHYRateEnum:
                   - Rate10M
                   - Rate100M
                   - Rate1G
@@ -5544,7 +5544,7 @@
                   - Rate100G
                   - Rate200G
                   - Rate400G
-              PHYRate:
+              PHYRateEnum:
                   - 10M
                   - 100M
                   - 1000M
@@ -5664,7 +5664,7 @@
           ThreadNetworkDiagnostics:
               ConnectionStatusEnum: ThreadConnectionStatus
           EthernetNetworkDiagnostics:
-              PHYRate: PHYRateType
+              PHYRateEnum: PHYRateType
           GeneralDiagnostics:
               HardwareFault: HardwareFaultType
               RadioFault: RadioFaultType
@@ -5687,7 +5687,7 @@
                   Ac: 80211ac
                   Ax: 80211ax
           EthernetNetworkDiagnostics:
-              PHYRate:
+              PHYRateEnum:
                   Rate10M: 10M
                   Rate100M: 100M
                   Rate1G: 1000M

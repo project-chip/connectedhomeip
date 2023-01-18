@@ -4343,7 +4343,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "PHYRate",
+              "type": "PHYRateEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,

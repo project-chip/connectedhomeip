@@ -15660,15 +15660,15 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSub
     }
 }
 
-void MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate value)
+void MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15683,8 +15683,8 @@ void MTREthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value)
+void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15695,7 +15695,7 @@ void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
