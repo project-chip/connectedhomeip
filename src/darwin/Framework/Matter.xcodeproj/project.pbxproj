@@ -1009,9 +1009,14 @@
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
+					/* Compile time codegen would need this: 
+					   "$(TEMP_DIR)/out/gen/src/controller/data_model/zapgen/", 
+					 */
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/zzz_generated/controller-clusters",
+					/* darwin-specific bypassing compile time codegen for header inclusion */
+					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1160,9 +1165,14 @@
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
+					/* Compile time codegen would need this: 
+					   "$(TEMP_DIR)/out/gen/src/controller/data_model/zapgen/", 
+					 */
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/zzz_generated/controller-clusters",
+					/* darwin-specific bypassing compile time codegen for header inclusion */
+					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

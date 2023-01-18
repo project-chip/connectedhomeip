@@ -1849,7 +1849,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ModeSelect::Structs::SemanticTag::DecodableType & value)
+                                     const chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -6572,7 +6572,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FixedLabel::Attributes::LabelList::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("label list", 1, value);
+            return DataModelLogger::LogValue("LabelList", 1, value);
         }
         case FixedLabel::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -6608,7 +6608,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case UserLabel::Attributes::LabelList::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("label list", 1, value);
+            return DataModelLogger::LogValue("LabelList", 1, value);
         }
         case UserLabel::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -7596,57 +7596,57 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FanControl::Attributes::FanMode::Id: {
             chip::app::Clusters::FanControl::FanModeType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("fan mode", 1, value);
+            return DataModelLogger::LogValue("FanMode", 1, value);
         }
         case FanControl::Attributes::FanModeSequence::Id: {
             chip::app::Clusters::FanControl::FanModeSequenceType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("fan mode sequence", 1, value);
+            return DataModelLogger::LogValue("FanModeSequence", 1, value);
         }
         case FanControl::Attributes::PercentSetting::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("percent setting", 1, value);
+            return DataModelLogger::LogValue("PercentSetting", 1, value);
         }
         case FanControl::Attributes::PercentCurrent::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("percent current", 1, value);
+            return DataModelLogger::LogValue("PercentCurrent", 1, value);
         }
         case FanControl::Attributes::SpeedMax::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("speed max", 1, value);
+            return DataModelLogger::LogValue("SpeedMax", 1, value);
         }
         case FanControl::Attributes::SpeedSetting::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("speed setting", 1, value);
+            return DataModelLogger::LogValue("SpeedSetting", 1, value);
         }
         case FanControl::Attributes::SpeedCurrent::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("speed current", 1, value);
+            return DataModelLogger::LogValue("SpeedCurrent", 1, value);
         }
         case FanControl::Attributes::RockSupport::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rock support", 1, value);
+            return DataModelLogger::LogValue("RockSupport", 1, value);
         }
         case FanControl::Attributes::RockSetting::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rock setting", 1, value);
+            return DataModelLogger::LogValue("RockSetting", 1, value);
         }
         case FanControl::Attributes::WindSupport::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("wind support", 1, value);
+            return DataModelLogger::LogValue("WindSupport", 1, value);
         }
         case FanControl::Attributes::WindSetting::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("wind setting", 1, value);
+            return DataModelLogger::LogValue("WindSetting", 1, value);
         }
         case FanControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -7682,17 +7682,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("temperature display mode", 1, value);
+            return DataModelLogger::LogValue("TemperatureDisplayMode", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("keypad lockout", 1, value);
+            return DataModelLogger::LogValue("KeypadLockout", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("schedule programming visibility", 1, value);
+            return DataModelLogger::LogValue("ScheduleProgrammingVisibility", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -8354,22 +8354,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RelativeHumidityMeasurement::Attributes::MeasuredValue::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured value", 1, value);
+            return DataModelLogger::LogValue("MeasuredValue", 1, value);
         }
         case RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min measured value", 1, value);
+            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
         }
         case RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max measured value", 1, value);
+            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
         }
         case RelativeHumidityMeasurement::Attributes::Tolerance::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("tolerance", 1, value);
+            return DataModelLogger::LogValue("Tolerance", 1, value);
         }
         case RelativeHumidityMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

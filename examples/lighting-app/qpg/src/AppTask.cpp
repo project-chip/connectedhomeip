@@ -16,12 +16,19 @@
  *    limitations under the License.
  */
 
+#if !defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+#error This application requires powercycle counting.
+#endif
+
+#include "gpSched.h"
+#include "powercycle_counting.h"
 #include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
 #include "ota.h"
+#include "powercycle_counting.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 
@@ -61,13 +68,16 @@ using namespace ::chip::DeviceLayer;
 #define APP_EVENT_QUEUE_SIZE 10
 #define QPG_LIGHT_ENDPOINT_ID (1)
 
+static uint8_t countdown = 0;
+
 namespace {
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sHaveBLEConnections  = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
+bool sIsBLEAdvertisingEnabled = false;
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
@@ -137,6 +147,7 @@ Identify gIdentify = {
 /**********************************************************
  * OffWithEffect Callbacks
  *********************************************************/
+
 void OnTriggerOffWithEffect(OnOffEffect * effect)
 {
     chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
@@ -259,6 +270,8 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    gpAppFramework_Reset_Init();
+
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -331,7 +344,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
     {
         // Toggle Dimming of light between 2 fixed levels
         uint8_t val = 0x0;
-        val         = LightingMgr().GetLevel() == 0x7f ? 0x1 : 0x7f;
+        val         = LightingMgr().GetLevel() == 0x40 ? 0xfe : 0x40;
         action      = LightingManager::LEVEL_ACTION;
 
         sAppTask.mSyncClusterToButtonAction = true;
@@ -530,7 +543,7 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
-    if (sAppEventQueue != NULL)
+    if (sAppEventQueue != nullptr)
     {
         if (!xQueueSend(sAppEventQueue, aEvent, 1))
         {
@@ -539,7 +552,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
     else
     {
-        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
+        ChipLogError(NotSpecified, "Event Queue is nullptr should never happen");
     }
 }
 
@@ -564,6 +577,7 @@ void AppTask::UpdateClusterState(void)
 
     // Write the new on/off value
     EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
@@ -591,14 +605,19 @@ void AppTask::UpdateLEDs(void)
     // Otherwise, blink the LED ON for a very short time.
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
+        qvIO_LedSet(SYSTEM_STATE_LED, true);
     }
     else if (sHaveBLEConnections)
     {
         qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
     }
+    else if (sIsBLEAdvertisingEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
+    }
     else
     {
+        // not commisioned yet
         qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
     }
 }
@@ -631,7 +650,42 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
         break;
     }
 
+    case DeviceEventType::kCHIPoBLEAdvertisingChange: {
+        sIsBLEAdvertisingEnabled = (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started);
+        UpdateLEDs();
+        break;
+    }
+
     default:
         break;
     }
+}
+
+static void NextCountdown(void)
+{
+    if (countdown > 0)
+    {
+        LightingMgr().InitiateAction((countdown % 2 == 0) ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 0, 0);
+        countdown--;
+        gpSched_ScheduleEvent(1000000UL, NextCountdown);
+    }
+    else
+    {
+        ConfigurationMgr().InitiateFactoryReset();
+    }
+}
+
+extern "C" {
+void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
+{
+    uint8_t resetCount = gpAppFramework_Reset_GetResetCount();
+
+    ChipLogProgress(NotSpecified, "%d resets so far", resetCount);
+    if (resetCount == 10)
+    {
+        ChipLogProgress(NotSpecified, "Factory Reset Triggered!");
+        countdown = 5;
+        NextCountdown();
+    }
+}
 }

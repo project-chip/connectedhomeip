@@ -171,6 +171,20 @@ menu "CHIP Core"
             help
                 Enable this option to enable OTA Requestor for example
 
+        config OTA_AUTO_REBOOT_ON_APPLY
+            bool "Reboot the device after applying the OTA image"
+            depends on ENABLE_OTA_REQUESTOR
+            default y
+            help
+                Enable this option to reboot the device after applying the new image.
+
+        config OTA_AUTO_REBOOT_DELAY_MS
+            int "OTA reboot delay time (ms)"
+            depends on OTA_AUTO_REBOOT_ON_APPLY
+            default 5000
+            help
+                The delay time for OTA reboot on applying.
+
     endmenu # "System Options"
 
     menu "Security Options"

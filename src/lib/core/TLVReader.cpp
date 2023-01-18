@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -300,6 +300,8 @@ CHIP_ERROR TLVReader::Get(ByteSpan & v)
 
 CHIP_ERROR TLVReader::Get(CharSpan & v)
 {
+    constexpr int kUnicodeInformationSeparator1 = 0x1F;
+
     if (!TLVTypeIsUTF8String(ElementType()))
     {
         return CHIP_ERROR_WRONG_TLV_TYPE;
@@ -307,7 +309,18 @@ CHIP_ERROR TLVReader::Get(CharSpan & v)
 
     const uint8_t * bytes;
     ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
-    v = CharSpan(Uint8::to_const_char(bytes), GetLength());
+
+    uint32_t len = GetLength();
+
+    // If Unicode Information Separator 1 (0x1f) is present in the string then method returns
+    // string ending at first appearance of the Information Separator 1.
+    const uint8_t * infoSeparator = reinterpret_cast<const uint8_t *>(memchr(bytes, kUnicodeInformationSeparator1, len));
+    if (infoSeparator != nullptr)
+    {
+        len = static_cast<uint32_t>(infoSeparator - bytes);
+    }
+
+    v = CharSpan(Uint8::to_const_char(bytes), len);
     return CHIP_NO_ERROR;
 }
 

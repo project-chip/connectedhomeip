@@ -73,11 +73,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     #Check for DNS-SD advertisement CM is not possible in YAML
@@ -187,7 +187,7 @@ tests:
       PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
+          value: [{ Label: "", NodeId: nodeId }, { Label: "", NodeId: nodeId2 }]
           constraints:
               type: list
 
@@ -199,7 +199,7 @@ tests:
       PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
+          value: [{ Label: "", NodeId: nodeId }, { Label: "", NodeId: nodeId2 }]
           constraints:
               type: list
 
@@ -263,11 +263,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "Wait for the commissioning window in step 13 to timeout"
@@ -299,11 +299,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label:

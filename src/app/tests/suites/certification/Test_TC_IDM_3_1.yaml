@@ -545,12 +545,12 @@ tests:
           verify on TH (reference app) receives the right write Request Message for the data sent in the above command
           [1657884282.303557][2898:2903] CHIP:DMG: }
           [1657884282.303695][2898:2903] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 2387607084
-          [1657884282.303778][2898:2903] CHIP:TOO:   temperature display mode: 1
+          [1657884282.303778][2898:2903] CHIP:TOO:   TemperatureDisplayMode: 1
           [1657884282.303862][2898:2903] CHIP:EM: Sending Standalone Ack for MessageCounter:147756485 on exchange 42871i
 
           If the DUT has to provision to verify the logs,, verify that TH all-clusters-app sent success response
           [1655796341.132655][6946:6951] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 3165945391
-          [1655796341.132864][6946:6951] CHIP:TOO:   temperature display mode: 1
+          [1655796341.132864][6946:6951] CHIP:TOO:   TemperatureDisplayMode: 1
           [1655796341.132973][6946:6951] CHIP:EM: Sending Standalone Ack for MessageCounter:245498041 on exchange 51992i
       disabled: true
 
@@ -758,7 +758,7 @@ tests:
 
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655796786.513406][6976:6981] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 3165945392
-          [1655796786.513496][6976:6981] CHIP:TOO:   temperature display mode: 1
+          [1655796786.513496][6976:6981] CHIP:TOO:   TemperatureDisplayMode: 1
           [1655796786.513593][6976:6981] CHIP:EM: Sending Standalone Ack for MessageCounter:190446058 on exchange 28240i
 
 

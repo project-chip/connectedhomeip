@@ -79,11 +79,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -120,11 +120,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR3 Commissions with DUT_CE"
@@ -159,9 +159,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 2, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeId: nodeId },
+                  { Label: "", FabricIndex: 2, NodeId: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
               ]
           constraints:
               type: list
@@ -222,8 +222,8 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeId: nodeId },
+                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
               ]
           constraints:
               type: list
@@ -270,11 +270,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -309,9 +309,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 4, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeId: nodeId },
+                  { Label: "", FabricIndex: 4, NodeId: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
               ]
           constraints:
               type: list

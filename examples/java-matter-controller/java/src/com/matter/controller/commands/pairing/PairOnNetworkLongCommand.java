@@ -27,6 +27,6 @@ public final class PairOnNetworkLongCommand extends PairingCommand {
             getSetupPINCode(),
             null);
     currentCommissioner().setCompletionListener(this);
-    expectSuccess(getTimeoutMillis());
+    waitCompleteMs(getTimeoutMillis());
   }
 }

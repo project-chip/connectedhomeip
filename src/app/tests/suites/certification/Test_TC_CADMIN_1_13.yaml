@@ -83,8 +83,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
       cluster: "AdministratorCommissioning"
@@ -238,8 +236,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -271,8 +267,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR1 opens a 2nd commissioning window on DUT_CE"
       identity: "alpha"
@@ -286,11 +280,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
@@ -306,9 +300,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId2 },
-                  { Label: "", nodeID: nodeId3 },
+                  { Label: "", NodeId: nodeId },
+                  { Label: "", NodeId: nodeId2 },
+                  { Label: "", NodeId: nodeId3 },
               ]
           constraints:
               type: list
@@ -333,11 +327,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
@@ -388,11 +382,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
@@ -408,9 +402,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId2 },
-                  { Label: "", nodeID: nodeId3 },
+                  { Label: "", NodeId: nodeId },
+                  { Label: "", NodeId: nodeId2 },
+                  { Label: "", NodeId: nodeId3 },
               ]
           constraints:
               type: list
@@ -435,11 +429,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 opens a 2nd commissioning window on DUT_CE using ECM"
@@ -454,11 +448,11 @@ tests:
                 value: 180
               - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
