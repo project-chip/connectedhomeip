@@ -72,7 +72,7 @@ def main(setup_code, yaml_path, node_id):
         chip.native.Init()
         chip_stack = ChipStack(chip_stack_storage.name)
         certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(
-            chip_stack, chipStack.GetStorageManager())
+            chip_stack, chip_stack.GetStorageManager())
         certificate_authority_manager.LoadAuthoritiesFromStorage()
 
         if len(certificate_authority_manager.activeCaList) == 0:
@@ -96,7 +96,7 @@ def main(setup_code, yaml_path, node_id):
 
         # Parsing YAML test and setting up chip-repl yamltests runner.
         yaml = TestParser(yaml_path, None, clusters_definitions)
-        runner = ReplTestRunner(clusters_definitions, certificate_authority_manager)
+        runner = ReplTestRunner(clusters_definitions, certificate_authority_manager, dev_ctrl)
 
         # Executing and validating test
         for test_step in yaml.tests:
@@ -107,8 +107,9 @@ def main(setup_code, yaml_path, node_id):
                 decoded_response = runner.decode(response)
                 post_processing_result = test_step.post_process_response(decoded_response)
                 if not post_processing_result.is_success():
-                    # TODO figure out how we error out here
-                    pass
+                    exit(-2)
+            else:
+                exit(-2)
 
         runner.shutdown()
         # Tearing down chip stack. If not done in the correct order test will fail.

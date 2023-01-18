@@ -4881,272 +4881,296 @@ public class ClusterReadMapping {
         readEthernetNetworkDiagnosticsClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put(
         "ethernetNetworkDiagnostics", readEthernetNetworkDiagnosticsInteractionInfo);
-    Map<String, InteractionInfo> readBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicVendorNameCommandParams =
+    Map<String, InteractionInfo> readBridgedDeviceBasicInformationInteractionInfo =
+        new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationVendorNameCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicVendorNameAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationVendorNameAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readVendorNameAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicVendorNameCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readVendorNameAttribute", readBridgedDeviceBasicVendorNameAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicVendorIDCommandParams =
+            readBridgedDeviceBasicInformationVendorNameCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readVendorNameAttribute",
+        readBridgedDeviceBasicInformationVendorNameAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationVendorIDCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicVendorIDAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationVendorIDAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readVendorIDAttribute(
-                      (ChipClusters.BridgedDeviceBasicCluster.VendorIDAttributeCallback) callback);
+                      (ChipClusters.BridgedDeviceBasicInformationCluster.VendorIDAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readBridgedDeviceBasicVendorIDCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readVendorIDAttribute", readBridgedDeviceBasicVendorIDAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicProductNameCommandParams =
+            readBridgedDeviceBasicInformationVendorIDCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readVendorIDAttribute", readBridgedDeviceBasicInformationVendorIDAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationProductNameCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicProductNameAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationProductNameAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readProductNameAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicProductNameCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readProductNameAttribute", readBridgedDeviceBasicProductNameAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicNodeLabelCommandParams =
+            readBridgedDeviceBasicInformationProductNameCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readProductNameAttribute",
+        readBridgedDeviceBasicInformationProductNameAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicNodeLabelAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readNodeLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicNodeLabelCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readNodeLabelAttribute", readBridgedDeviceBasicNodeLabelAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicHardwareVersionCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicHardwareVersionAttributeInteractionInfo =
+            readBridgedDeviceBasicInformationNodeLabelCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readNodeLabelAttribute",
+        readBridgedDeviceBasicInformationNodeLabelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readBridgedDeviceBasicInformationHardwareVersionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicInformationHardwareVersionAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readHardwareVersionAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readBridgedDeviceBasicHardwareVersionCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
+            readBridgedDeviceBasicInformationHardwareVersionCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
         "readHardwareVersionAttribute",
-        readBridgedDeviceBasicHardwareVersionAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicHardwareVersionStringCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicHardwareVersionStringAttributeInteractionInfo =
+        readBridgedDeviceBasicInformationHardwareVersionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readBridgedDeviceBasicInformationHardwareVersionStringCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicInformationHardwareVersionStringAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readHardwareVersionStringAttribute(
                       (ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicHardwareVersionStringCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
+            readBridgedDeviceBasicInformationHardwareVersionStringCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
         "readHardwareVersionStringAttribute",
-        readBridgedDeviceBasicHardwareVersionStringAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicSoftwareVersionCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicSoftwareVersionAttributeInteractionInfo =
+        readBridgedDeviceBasicInformationHardwareVersionStringAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readBridgedDeviceBasicInformationSoftwareVersionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicInformationSoftwareVersionAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readSoftwareVersionAttribute((ChipClusters.LongAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readBridgedDeviceBasicSoftwareVersionCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
+            readBridgedDeviceBasicInformationSoftwareVersionCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
         "readSoftwareVersionAttribute",
-        readBridgedDeviceBasicSoftwareVersionAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicSoftwareVersionStringCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicSoftwareVersionStringAttributeInteractionInfo =
+        readBridgedDeviceBasicInformationSoftwareVersionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readBridgedDeviceBasicInformationSoftwareVersionStringCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicInformationSoftwareVersionStringAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readSoftwareVersionStringAttribute(
                       (ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicSoftwareVersionStringCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
+            readBridgedDeviceBasicInformationSoftwareVersionStringCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
         "readSoftwareVersionStringAttribute",
-        readBridgedDeviceBasicSoftwareVersionStringAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicManufacturingDateCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicManufacturingDateAttributeInteractionInfo =
+        readBridgedDeviceBasicInformationSoftwareVersionStringAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readBridgedDeviceBasicInformationManufacturingDateCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicInformationManufacturingDateAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readManufacturingDateAttribute(
                       (ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicManufacturingDateCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
+            readBridgedDeviceBasicInformationManufacturingDateCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
         "readManufacturingDateAttribute",
-        readBridgedDeviceBasicManufacturingDateAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicPartNumberCommandParams =
+        readBridgedDeviceBasicInformationManufacturingDateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationPartNumberCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicPartNumberAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationPartNumberAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readPartNumberAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicPartNumberCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readPartNumberAttribute", readBridgedDeviceBasicPartNumberAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicProductURLCommandParams =
+            readBridgedDeviceBasicInformationPartNumberCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readPartNumberAttribute",
+        readBridgedDeviceBasicInformationPartNumberAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationProductURLCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicProductURLAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationProductURLAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readProductURLAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicProductURLCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readProductURLAttribute", readBridgedDeviceBasicProductURLAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicProductLabelCommandParams =
+            readBridgedDeviceBasicInformationProductURLCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readProductURLAttribute",
+        readBridgedDeviceBasicInformationProductURLAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationProductLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicProductLabelAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationProductLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readProductLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicProductLabelCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readProductLabelAttribute", readBridgedDeviceBasicProductLabelAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicSerialNumberCommandParams =
+            readBridgedDeviceBasicInformationProductLabelCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readProductLabelAttribute",
+        readBridgedDeviceBasicInformationProductLabelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationSerialNumberCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicSerialNumberAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationSerialNumberAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readSerialNumberAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicSerialNumberCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readSerialNumberAttribute", readBridgedDeviceBasicSerialNumberAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicReachableCommandParams =
+            readBridgedDeviceBasicInformationSerialNumberCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readSerialNumberAttribute",
+        readBridgedDeviceBasicInformationSerialNumberAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationReachableCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicReachableAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationReachableAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readReachableAttribute((ChipClusters.BooleanAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-            readBridgedDeviceBasicReachableCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readReachableAttribute", readBridgedDeviceBasicReachableAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicUniqueIDCommandParams =
+            readBridgedDeviceBasicInformationReachableCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readReachableAttribute",
+        readBridgedDeviceBasicInformationReachableAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationUniqueIDCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicUniqueIDAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationUniqueIDAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readUniqueIDAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicUniqueIDCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readUniqueIDAttribute", readBridgedDeviceBasicUniqueIDAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicGeneratedCommandListCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicGeneratedCommandListAttributeInteractionInfo =
+            readBridgedDeviceBasicInformationUniqueIDCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readUniqueIDAttribute", readBridgedDeviceBasicInformationUniqueIDAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readBridgedDeviceBasicInformationGeneratedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicInformationGeneratedCommandListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readGeneratedCommandListAttribute(
-                      (ChipClusters.BridgedDeviceBasicCluster.GeneratedCommandListAttributeCallback)
+                      (ChipClusters.BridgedDeviceBasicInformationCluster
+                              .GeneratedCommandListAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicClusterGeneratedCommandListAttributeCallback(),
-            readBridgedDeviceBasicGeneratedCommandListCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
+                    .DelegatedBridgedDeviceBasicInformationClusterGeneratedCommandListAttributeCallback(),
+            readBridgedDeviceBasicInformationGeneratedCommandListCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
         "readGeneratedCommandListAttribute",
-        readBridgedDeviceBasicGeneratedCommandListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicAcceptedCommandListCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicAcceptedCommandListAttributeInteractionInfo =
+        readBridgedDeviceBasicInformationGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readBridgedDeviceBasicInformationAcceptedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicInformationAcceptedCommandListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readAcceptedCommandListAttribute(
-                      (ChipClusters.BridgedDeviceBasicCluster.AcceptedCommandListAttributeCallback)
+                      (ChipClusters.BridgedDeviceBasicInformationCluster
+                              .AcceptedCommandListAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicClusterAcceptedCommandListAttributeCallback(),
-            readBridgedDeviceBasicAcceptedCommandListCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
+                    .DelegatedBridgedDeviceBasicInformationClusterAcceptedCommandListAttributeCallback(),
+            readBridgedDeviceBasicInformationAcceptedCommandListCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
         "readAcceptedCommandListAttribute",
-        readBridgedDeviceBasicAcceptedCommandListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicAttributeListCommandParams =
+        readBridgedDeviceBasicInformationAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicAttributeListAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationAttributeListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readAttributeListAttribute(
-                      (ChipClusters.BridgedDeviceBasicCluster.AttributeListAttributeCallback)
+                      (ChipClusters.BridgedDeviceBasicInformationCluster
+                              .AttributeListAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicClusterAttributeListAttributeCallback(),
-            readBridgedDeviceBasicAttributeListCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readAttributeListAttribute", readBridgedDeviceBasicAttributeListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicFeatureMapCommandParams =
+                    .DelegatedBridgedDeviceBasicInformationClusterAttributeListAttributeCallback(),
+            readBridgedDeviceBasicInformationAttributeListCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readAttributeListAttribute",
+        readBridgedDeviceBasicInformationAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationFeatureMapCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicFeatureMapAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicInformationFeatureMapAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readBridgedDeviceBasicFeatureMapCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
-        "readFeatureMapAttribute", readBridgedDeviceBasicFeatureMapAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicClusterRevisionCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicClusterRevisionAttributeInteractionInfo =
+            readBridgedDeviceBasicInformationFeatureMapCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
+        "readFeatureMapAttribute",
+        readBridgedDeviceBasicInformationFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readBridgedDeviceBasicInformationClusterRevisionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicInformationClusterRevisionAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readBridgedDeviceBasicClusterRevisionCommandParams);
-    readBridgedDeviceBasicInteractionInfo.put(
+            readBridgedDeviceBasicInformationClusterRevisionCommandParams);
+    readBridgedDeviceBasicInformationInteractionInfo.put(
         "readClusterRevisionAttribute",
-        readBridgedDeviceBasicClusterRevisionAttributeInteractionInfo);
-    readAttributeMap.put("bridgedDeviceBasic", readBridgedDeviceBasicInteractionInfo);
+        readBridgedDeviceBasicInformationClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put(
+        "bridgedDeviceBasicInformation", readBridgedDeviceBasicInformationInteractionInfo);
     Map<String, InteractionInfo> readSwitchInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readSwitchNumberOfPositionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

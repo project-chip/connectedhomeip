@@ -688,33 +688,36 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Scenes::Structs::Exten
     ComplexArgumentParser::Finalize(request.clusterId);
     ComplexArgumentParser::Finalize(request.attributeValueList);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request,
-                                        Json::Value & value)
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request,
+                             Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("FabricDescriptor.rootPublicKey", "rootPublicKey",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("FabricDescriptorStruct.rootPublicKey", "rootPublicKey",
                                                                   value.isMember("rootPublicKey")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("FabricDescriptor.vendorId", "vendorId", value.isMember("vendorId")));
+        ComplexArgumentParser::EnsureMemberExist("FabricDescriptorStruct.vendorID", "vendorID", value.isMember("vendorID")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("FabricDescriptor.fabricId", "fabricId", value.isMember("fabricId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("FabricDescriptor.nodeId", "nodeId", value.isMember("nodeId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("FabricDescriptor.label", "label", value.isMember("label")));
+        ComplexArgumentParser::EnsureMemberExist("FabricDescriptorStruct.fabricID", "fabricID", value.isMember("fabricID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("FabricDescriptorStruct.nodeID", "nodeID", value.isMember("nodeID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("FabricDescriptorStruct.label", "label", value.isMember("label")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "rootPublicKey");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.rootPublicKey, value["rootPublicKey"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vendorId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.vendorId, value["vendorId"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vendorID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.vendorID, value["vendorID"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricId, value["fabricId"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricID, value["fabricID"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nodeId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nodeId, value["nodeId"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nodeID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nodeID, value["nodeID"]));
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
@@ -728,12 +731,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.rootPublicKey);
-    ComplexArgumentParser::Finalize(request.vendorId);
-    ComplexArgumentParser::Finalize(request.fabricId);
-    ComplexArgumentParser::Finalize(request.nodeId);
+    ComplexArgumentParser::Finalize(request.vendorID);
+    ComplexArgumentParser::Finalize(request.fabricID);
+    ComplexArgumentParser::Finalize(request.nodeID);
     ComplexArgumentParser::Finalize(request.label);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }

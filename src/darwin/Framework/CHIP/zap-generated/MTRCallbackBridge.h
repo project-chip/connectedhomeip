@@ -342,10 +342,14 @@ typedef void (*AdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, chip::app::Clusters::AdministratorCommissioning::StatusCode);
 typedef void (*NullableAdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> &);
-typedef void (*OperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
-    void *, chip::app::Clusters::OperationalCredentials::OperationalCertStatus);
-typedef void (*NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> &);
+typedef void (*OperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback)(
+    void *, chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum);
+typedef void (*NullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum> &);
+typedef void (*OperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback)(
+    void *, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum);
+typedef void (*NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> &);
 typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
@@ -779,11 +783,11 @@ typedef void (*EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbac
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*EthernetNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BridgedDeviceBasicGeneratedCommandListListAttributeCallback)(
+typedef void (*BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedDeviceBasicAcceptedCommandListListAttributeCallback)(
+typedef void (*BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedDeviceBasicAttributeListListAttributeCallback)(
+typedef void (*BridgedDeviceBasicInformationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*SwitchGeneratedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -804,7 +808,7 @@ typedef void (*OperationalCredentialsNOCsListAttributeCallback)(
 typedef void (*OperationalCredentialsFabricsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
+        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & data);
 typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
 typedef void (*OperationalCredentialsGeneratedCommandListListAttributeCallback)(
@@ -5622,100 +5626,104 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>
+class MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback>
 {
 public:
-    MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
+class MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+    MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>
+class MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback>
 {
 public:
-    MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
+class MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+    MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>
+class MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BridgedDeviceBasicInformationAttributeListListAttributeCallback>
 {
 public:
-    MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge
+class MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge(
+    MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(queue, handler, action),
+        MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnDone;
+    using MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5965,9 +5973,10 @@ public:
                                                                 MTRActionBlock action) :
         MTRCallbackBridge<OperationalCredentialsFabricsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & value);
 };
 
 class MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge
@@ -15561,74 +15570,151 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>
+class MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>
 {
 public:
-    MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<OperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, action,
-                                                                                               OnSuccessFn){};
+    MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<OperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::OperationalCertStatus value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum value);
 };
 
-class MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge
-    : public MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
+class MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge
 {
 public:
-    MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
+    MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, handler, action),
+        MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnDone;
+    using MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>
+class MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>
 {
 public:
-    MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler) :
-        MTRCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler,
-                                                                                                       OnSuccessFn){};
+    MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<NullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
 
-    MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler,
-                                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, action,
-                                                                                                       OnSuccessFn){};
+    MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum> & value);
 };
 
-class MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
+class MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
+    MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, handler, action),
+        MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnDone;
+    using MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>
+{
+public:
+    MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<OperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<OperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum value);
+};
+
+class MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge
+{
+public:
+    MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>
+{
+public:
+    MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                 ResponseHandler handler) :
+        MTRCallbackBridge<NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>(queue, handler,
+                                                                                                               OnSuccessFn){};
+
+    MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                 ResponseHandler handler,
+                                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> & value);
+};
+
+class MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

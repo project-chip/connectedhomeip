@@ -62,3 +62,5 @@ chip::Span<Action *> GetActionListInfo(chip::EndpointId parentId);
 chip::Optional<chip::ClusterId> LookupClusterByName(const char * name);
 std::unique_ptr<GeneratedCluster> CreateCluster(const char * name);
 std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id);
+EmberAfStatus HandleReadOnOffAttribute(Attribute<bool> * attribute, uint8_t * buffer, uint16_t maxReadLength);
+EmberAfStatus HandleWriteOnOffAttribute(Attribute<bool> * attribute, uint8_t * buffer);

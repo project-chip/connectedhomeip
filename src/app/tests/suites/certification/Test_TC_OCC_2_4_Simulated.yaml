@@ -30,9 +30,9 @@ tests:
     - label: "TH reads OccupancySensorType attribute from DUT"
       PICS: OCC.S.A0001
       wait: "readAttribute"
-      attribute: "occupancy sensor type"
+      attribute: "OccupancySensorType"
 
     - label: "TH reads OccupancySensorTypeBitmap attribute from DUT"
       PICS: OCC.S.A0002
       wait: "readAttribute"
-      attribute: "occupancy sensor type bitmap"
+      attribute: "OccupancySensorTypeBitmap"
