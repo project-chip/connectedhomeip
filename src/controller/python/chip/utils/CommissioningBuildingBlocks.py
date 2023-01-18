@@ -35,7 +35,7 @@ async def _IsNodeInFabricList(devCtrl, nodeId):
     resp = await devCtrl.ReadAttribute(nodeId, [(opCreds.Attributes.Fabrics)])
     listOfFabricsDescriptor = resp[0][opCreds][Clusters.OperationalCredentials.Attributes.Fabrics]
     for fabricDescriptor in listOfFabricsDescriptor:
-        if fabricDescriptor.nodeId == nodeId:
+        if fabricDescriptor.nodeID == nodeId:
             return True
 
     return False
@@ -155,7 +155,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
     resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, newFabricDevCtrl.nodeId, 0xFFF1))
-    if resp.statusCode is not opCreds.Enums.OperationalCertStatus.kSuccess:
+    if resp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
@@ -199,7 +199,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
         return False
 
     resp = await devCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.UpdateNOC(chainForUpdateNOC.nocBytes, chainForUpdateNOC.icacBytes))
-    if resp.statusCode is not opCreds.Enums.OperationalCertStatus.kSuccess:
+    if resp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False

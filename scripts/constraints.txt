@@ -86,7 +86,7 @@ flask-compress==1.10.0
     # via gdbgui
 flask-socketio==2.9.6
     # via gdbgui
-future==0.18.2
+future==0.18.3
     # via
     #   -r requirements.esp32.txt
     #   idf-component-manager

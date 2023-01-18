@@ -45,13 +45,13 @@ executable("chip-all-clusters-minimal-app") {
 
   deps = [
     ":chip-all-clusters-common",
+    "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common",
     "${chip_root}/examples/platform/tizen:app-main",
     "${chip_root}/src/lib",
   ]
 
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/zzz_generated/all-clusters-minimal-app",
     "include",
   ]
 
