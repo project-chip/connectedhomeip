@@ -1871,14 +1871,14 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs
     ComplexArgumentParser::Finalize(request.deviceType);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request,
+                                        chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TargetInfo.identifier", "identifier", value.isMember("identifier")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TargetInfo.name", "name", value.isMember("name")));
+        ComplexArgumentParser::EnsureMemberExist("TargetInfoStruct.identifier", "identifier", value.isMember("identifier")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TargetInfoStruct.name", "name", value.isMember("name")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "identifier");
@@ -1890,7 +1890,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.identifier);
     ComplexArgumentParser::Finalize(request.name);

@@ -13063,8 +13063,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRTargetNavigatorClusterTargetInfo * newElement_0;
-                    newElement_0 = [MTRTargetNavigatorClusterTargetInfo new];
+                    MTRTargetNavigatorClusterTargetInfoStruct * newElement_0;
+                    newElement_0 = [MTRTargetNavigatorClusterTargetInfoStruct new];
                     newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
                     newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                                  length:entry_0.name.size()

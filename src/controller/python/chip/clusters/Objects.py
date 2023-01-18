@@ -21926,7 +21926,7 @@ class TargetNavigator(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="targetList", Tag=0x00000000, Type=typing.List[TargetNavigator.Structs.TargetInfo]),
+                ClusterObjectFieldDescriptor(Label="targetList", Tag=0x00000000, Type=typing.List[TargetNavigator.Structs.TargetInfoStruct]),
                 ClusterObjectFieldDescriptor(Label="currentTarget", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -21935,7 +21935,7 @@ class TargetNavigator(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    targetList: 'typing.List[TargetNavigator.Structs.TargetInfo]' = None
+    targetList: 'typing.List[TargetNavigator.Structs.TargetInfoStruct]' = None
     currentTarget: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -21952,7 +21952,7 @@ class TargetNavigator(Cluster):
 
     class Structs:
         @dataclass
-        class TargetInfo(ClusterObject):
+        class TargetInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -22017,9 +22017,9 @@ class TargetNavigator(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[TargetNavigator.Structs.TargetInfo])
+                return ClusterObjectFieldDescriptor(Type=typing.List[TargetNavigator.Structs.TargetInfoStruct])
 
-            value: 'typing.List[TargetNavigator.Structs.TargetInfo]' = field(default_factory=lambda: [])
+            value: 'typing.List[TargetNavigator.Structs.TargetInfoStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class CurrentTarget(ClusterAttributeDescriptor):
