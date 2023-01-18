@@ -19,7 +19,7 @@ from enum import Enum
 import yaml
 
 from . import fixes
-from .constraints import get_constraints
+from .constraints import get_constraints, is_typed_constraint
 
 _TESTS_SECTION = [
     'name',
@@ -163,8 +163,7 @@ def _check_valid_keys(section, valid_keys_dict):
     if section:
         for key in section:
             if key not in valid_keys_dict:
-                print(f'Unknown key: {key}')
-                raise KeyError
+                raise KeyError(f'Unknown key: {key}')
 
 
 def _value_or_none(data, key):
@@ -172,7 +171,7 @@ def _value_or_none(data, key):
 
 
 def _value_or_config(data, key, config):
-    return data[key] if key in data else config[key]
+    return data[key] if key in data else config.get(key)
 
 
 class _TestStepWithPlaceholders:
@@ -303,7 +302,18 @@ class _TestStepWithPlaceholders:
 
         for value in list(container['values']):
             for key, item_value in list(value.items()):
-                mapping = mapping_type if self.is_attribute else mapping_type[value['name']]
+                if self.is_attribute:
+                    mapping = mapping_type
+                else:
+                    target_key = value['name']
+                    if mapping_type.get(target_key) is None:
+                        for candidate_key in mapping_type:
+                            if candidate_key.lower() == target_key.lower():
+                                raise KeyError(
+                                    f'"{self.label}": Unknown key: "{target_key}". Did you mean "{candidate_key}" ?')
+                        raise KeyError(
+                            f'"{self.label}": Unknown key: "{target_key}". Candidates are: "{[ key for key in mapping_type]}".')
+                    mapping = mapping_type[target_key]
 
                 if key == 'value':
                     value[key] = self._update_value_with_definition(
@@ -312,8 +322,11 @@ class _TestStepWithPlaceholders:
                     self._parsing_config_variable_storage[item_value] = None
                 elif key == 'constraints':
                     for constraint, constraint_value in item_value.items():
-                        value[key][constraint] = self._update_value_with_definition(
-                            constraint_value, mapping_type)
+                        # Only apply update_value_with_definition to constraints that have a value that depends on
+                        # the the value type for the target field.
+                        if is_typed_constraint(constraint):
+                            value[key][constraint] = self._update_value_with_definition(
+                                constraint_value, mapping_type)
                 else:
                     # This key, value pair does not rely on cluster specifications.
                     pass
