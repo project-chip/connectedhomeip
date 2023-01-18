@@ -57,7 +57,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <app/InteractionModelEngine.h>
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-ICDSubscribtionCallback EFR32MatterConfig::mICDSubscriptionHandler;
+ICDSubscriptionCallback EFR32MatterConfig::mICDSubscriptionHandler;
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
 #if CHIP_ENABLE_OPENTHREAD
