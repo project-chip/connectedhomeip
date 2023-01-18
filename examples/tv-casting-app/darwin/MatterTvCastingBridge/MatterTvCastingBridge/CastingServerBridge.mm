@@ -668,10 +668,10 @@
         [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
         ListFreer listFreer;
-        chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type cppSearch;
+        chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type cppSearch;
         if (contentSearch.parameterList.count > 0) {
-            auto * parameterListHolder
-                = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(contentSearch.parameterList.count);
+            auto * parameterListHolder = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(
+                contentSearch.parameterList.count);
             listFreer.add(parameterListHolder);
 
             int parameterIndex = 0;
@@ -679,7 +679,7 @@
                 int externalIdListIndex = 0;
                 if (parameter.externalIDList != nil) {
                     auto * externalIdListHolder
-                        = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type>(
+                        = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type>(
                             parameter.externalIDList.count);
                     listFreer.add(externalIdListHolder);
 
@@ -691,11 +691,11 @@
                         externalIdListIndex++;
                     }
                     parameterListHolder->mList[parameterIndex].externalIDList = MakeOptional(
-                        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type>(
+                        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type>(
                             externalIdListHolder->mList, parameter.externalIDList.count));
                 } else {
                     parameterListHolder->mList[parameterIndex].externalIDList = chip::Optional<chip::app::DataModel::List<
-                        const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type>>::Missing();
+                        const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type>>::Missing();
                 }
 
                 parameterListHolder->mList[parameterIndex].type
@@ -704,7 +704,7 @@
                     [parameter.value UTF8String], [parameter.value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
                 parameterIndex++;
                 cppSearch.parameterList
-                    = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(
+                    = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(
                         parameterListHolder->mList, contentSearch.parameterList.count);
             }
         }

@@ -27,8 +27,8 @@ using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
 using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
-using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType;
-using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type;
+using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
+using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
 
 class ContentEntry
 {

@@ -31,8 +31,8 @@ namespace app {
 namespace Clusters {
 namespace ContentLauncher {
 
-using BrandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type;
-using Parameter           = chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType;
+using BrandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
+using Parameter           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the Content Launcher Cluster.

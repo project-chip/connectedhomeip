@@ -29,9 +29,10 @@ class LaunchURLCommand : public MediaCommandBase<chip::app::Clusters::ContentLau
 public:
     LaunchURLCommand() : MediaCommandBase(chip::app::Clusters::ContentLauncher::Id) {}
 
-    CHIP_ERROR Invoke(const char * contentUrl, const char * contentDisplayStr,
-                      chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
-                      std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR
+    Invoke(const char * contentUrl, const char * contentDisplayStr,
+           chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type> brandingInformation,
+           std::function<void(CHIP_ERROR)> responseCallback);
 };
 
 class LaunchContentCommand : public MediaCommandBase<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type,
@@ -40,7 +41,7 @@ class LaunchContentCommand : public MediaCommandBase<chip::app::Clusters::Conten
 public:
     LaunchContentCommand() : MediaCommandBase(chip::app::Clusters::ContentLauncher::Id) {}
 
-    CHIP_ERROR Invoke(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search, bool autoPlay,
+    CHIP_ERROR Invoke(chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type search, bool autoPlay,
                       chip::Optional<chip::CharSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
 };
 

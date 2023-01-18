@@ -5067,6 +5067,13 @@
           Channel:
               - ChannelInfoStruct
               - LineupInfoStruct
+          ContentLauncher:
+              - DimensionStruct
+              - AdditionalInfoStruct
+              - ParameterStruct
+              - ContentSearchStruct
+              - StyleInformationStruct
+              - BrandingInformationStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5209,6 +5216,34 @@
                   - lineupName
                   - postalCode
                   - lineupInfoType
+          ContentLauncher:
+              DimensionStruct:
+                  - width
+                  - height
+                  - metric
+              AdditionalInfoStruct:
+                  - name
+                  - value
+              ParameterStruct:
+                  - type
+                  - value
+                  - externalIDList
+              ContentSearchStruct:
+                  - parameterList
+              StyleInformationStruct:
+                  - imageURL
+                  - color
+                  - size
+                  # Member that is actually deprecated, but we effectively
+                  # introduced it in this release.
+                  - imageUrl
+              BrandingInformationStruct:
+                  - providerName
+                  - background
+                  - logo
+                  - progressBar
+                  - splash
+                  - waterMark
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5541,6 +5576,12 @@
           Channel:
               LineupInfoTypeEnum:
                   - MSO
+          ContentLauncher:
+              MetricTypeEnum:
+                  - Pixels
+                  - Percentage
+              ParameterEnum:
+                  - Video
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5719,6 +5760,13 @@
           Channel:
               - ChannelInfo
               - LineupInfo
+          ContentLauncher:
+              - Dimension
+              - AdditionalInfo
+              - Parameter
+              - ContentSearch
+              - StyleInformation
+              - BrandingInformation
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5728,6 +5776,9 @@
                   - vendorId
                   - fabricId
                   - nodeId
+          ContentLauncher:
+              StyleInformationStruct:
+                  - imageUrl
       event fields:
           Switch:
               MultiPressComplete:
@@ -5808,6 +5859,10 @@
           Channel:
               LineupInfoTypeEnum:
                   - Mso
+          ContentLauncher:
+              MetricTypeEnum:
+                  - PIXELS
+                  - PERCENTAGE
       bitmaps:
           DoorLock:
               - DlDaysMaskMap
@@ -5990,6 +6045,13 @@
           Channel:
               ChannelInfoStruct: ChannelInfo
               LineupInfoStruct: LineupInfo
+          ContentLauncher:
+              DimensionStruct: Dimension
+              AdditionalInfoStruct: AdditionalInfo
+              ParameterStruct: Parameter
+              ContentSearchStruct: ContentSearch
+              StyleInformationStruct: StyleInformation
+              BrandingInformationStruct: BrandingInformation
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5999,6 +6061,9 @@
                   vendorID: vendorId
                   fabricID: fabricId
                   nodeID: nodeId
+          ContentLauncher:
+              StyleInformationStruct:
+                  imageURL: imageUrl
       event fields:
           Switch:
               MultiPressComplete:
@@ -6092,6 +6157,10 @@
           Channel:
               LineupInfoTypeEnum:
                   MSO: Mso
+          ContentLauncher:
+              MetricTypeEnum:
+                  Pixels: PIXELS
+                  Percentage: PERCENTAGE
       bitmaps:
           DoorLock:
               DaysMaskMap: DlDaysMaskMap
