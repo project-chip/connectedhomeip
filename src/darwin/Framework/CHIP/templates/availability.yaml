@@ -5037,6 +5037,8 @@
               - FabricDescriptorStruct
           DoorLock:
               - CredentialStruct
+          TargetNavigator:
+              - TargetInfoStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5152,6 +5154,10 @@
               CredentialStruct:
                   - credentialType
                   - credentialIndex
+          TargetNavigator:
+              TargetInfoStruct:
+                  - identifier
+                  - name
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5613,6 +5619,8 @@
               - FabricDescriptor
           DoorLock:
               - DlCredential
+          TargetNavigator:
+              - TargetInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5859,6 +5867,8 @@
               FabricDescriptorStruct: FabricDescriptor
           DoorLock:
               CredentialStruct: DlCredential
+          TargetNavigator:
+              TargetInfoStruct: TargetInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
