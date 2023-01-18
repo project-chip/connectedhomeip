@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.30
+            image: connectedhomeip/chip-build-esp32:0.6.31
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -93,6 +93,14 @@ jobs:
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
+            - name: Check no code generation in output
+              run: |
+                  CNT=$(find -name "CHIPClusters.h" out | wc -l)
+                  if [ "${CNT}" != "0" ]; then
+                     echo "ERROR: found unexpected generated files:"
+                     find -name "CHIPClusters.h" out
+                     exit 1
+                  fi
             - name: Undo code pregeneration changes
               run: |
                   rm -rf ./zzz_pregenerated
@@ -140,7 +148,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.30
+            image: connectedhomeip/chip-build-esp32:0.6.31
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

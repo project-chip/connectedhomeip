@@ -19,7 +19,7 @@
 #include <controller/CurrentFabricRemover.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClusters.h>
 
 using namespace chip::app::Clusters;
 

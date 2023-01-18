@@ -68,7 +68,6 @@ target_sources(${APP_TARGET}
         main/ZclCallbacks.cpp
         main/LockManager.cpp
         main/LockEndpoint.cpp
-        ${GEN_DIR}/lock-app/zap-generated/IMClusterCommandHandler.cpp
 )
 
 target_link_libraries(${APP_TARGET}
