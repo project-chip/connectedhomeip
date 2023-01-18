@@ -59,6 +59,11 @@ bridge:
         bridge/ThirdServer.h: outputs/several_clusters/bridge/ThirdServer.h
         bridge/Third.h: outputs/several_clusters/bridge/Third.h
 
+    inputs/cluster_with_commands.matter:
+        bridge/BridgeClustersImpl.h: outputs/cluster_with_commands/bridge/BridgeClustersImpl.h
+        bridge/BridgeGlobalStructs.h: outputs/cluster_with_commands/bridge/BridgeGlobalStructs.h
+        bridge/OnOff.h: outputs/cluster_with_commands/bridge/OnOff.h
+
 cpp-app:
     inputs/several_clusters.matter:
         app/PluginApplicationCallbacks.h: outputs/several_clusters/cpp-app/PluginApplicationCallbacks.h
