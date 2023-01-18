@@ -886,6 +886,13 @@ void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManag
     _this->mSessionHandle.Grab(sessionHandle);
 
     _this->MoveToState(HandlerState::GeneratingReports);
+
+    ObjectList<AttributePathParams> * attributePath = _this->mpAttributePathList;
+    while (attributePath)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(attributePath->mValue);
+        attributePath = attributePath->mpNext;
+    }
 }
 
 void ReadHandler::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
