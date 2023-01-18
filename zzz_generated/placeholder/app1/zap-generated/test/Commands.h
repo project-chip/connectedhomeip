@@ -2357,19 +2357,19 @@ private:
             LogStep(4, "DUT reads from the TH the (0x0010) PIROccupiedToUnoccupiedDelay optional attribute");
             VerifyOrDo(!ShouldSkip("OCC.C.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PirOccupiedToUnoccupiedDelay::Id);
+                                 OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id);
         }
         case 5: {
             LogStep(5, "DUT reads from the TH the (0x0011) PIRUnoccupiedToOccupiedDelay optional attribute");
             VerifyOrDo(!ShouldSkip("OCC.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PirUnoccupiedToOccupiedDelay::Id);
+                                 OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id);
         }
         case 6: {
             LogStep(6, "DUT reads from the TH the (0x0012) PIRUnoccupiedToOccupiedThreshold optional attribute");
             VerifyOrDo(!ShouldSkip("OCC.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PirUnoccupiedToOccupiedThreshold::Id);
+                                 OccupancySensing::Attributes::PIRUnoccupiedToOccupiedThreshold::Id);
         }
         case 7: {
             LogStep(7, "DUT reads from the TH the (0x0020) UltrasonicOccupiedToUnoccupiedDelay optional attribute");
