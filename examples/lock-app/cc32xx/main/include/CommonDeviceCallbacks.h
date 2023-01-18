@@ -17,8 +17,7 @@
  */
 #pragma once
 
-#include <app/util/af-types.h>
-#include <common/CHIPDeviceManager.h>
+#include <CHIPDeviceManager.h>
 #include <platform/CHIPDeviceLayer.h>
 
 class CommonDeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks

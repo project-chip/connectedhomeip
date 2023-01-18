@@ -37,7 +37,7 @@
 
 #include <platform/cc32xx/CC32XXConfig.h>
 
-//#include "../../app/server/Dnssd.h"
+#include "app/server/Dnssd.h"
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
@@ -191,6 +191,7 @@ void ConnectivityManagerImpl::_OnLwipEvent(struct netif * pNetIf, NetIfStatus_e 
     {
     case E_NETIF_STATUS_IP_ACQUIRED:
         PlatformMgr().ScheduleWork(_OnIpAcquired);
+        cc32xxLog("ConnectivityManagerImpl::OnLwipEvent() : Scheduled OnIpAcquired");
         break;
     default:
         break;

@@ -33,6 +33,9 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <app/server/Dnssd.h>
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -59,6 +62,7 @@ using namespace ::chip::System;
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceManager;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
@@ -67,6 +71,8 @@ extern LED_Handle gLedGreenHandle, gLedRedHandle;
 static Button_Handle gButtonRightHandle;
 
 AppTask AppTask::sAppTask;
+
+static AppDeviceCallbacks EchoCallbacks;
 
 int AppTask::StartAppTask()
 {
@@ -169,6 +175,15 @@ int AppTask::Init()
     // QR code will be used with CHIP Tool
     PLAT_LOG("Print Onboarding Codes");
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork));
+
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    ret                           = deviceMgr.Init(&EchoCallbacks);
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
+        while (1)
+            ;
+    }
 
     return 0;
 }

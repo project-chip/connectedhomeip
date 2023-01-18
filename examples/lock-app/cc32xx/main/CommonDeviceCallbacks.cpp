@@ -23,6 +23,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::System;
 
 DeviceCallbacksDelegate * appDelegate = nullptr;
+extern "C" void cc32xxLog(const char * aFormat, ...);
 
 void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -36,6 +37,7 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
+            cc32xxLog("DeviceEventCallback:Start DNS Server");
             chip::app::DnssdServer::Instance().StartServer();
         }
     }
