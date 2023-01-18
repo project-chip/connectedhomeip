@@ -30,15 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT OnOffCluster : public ClusterBase
-{
-public:
-    OnOffCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::OnOff::Id, endpoint)
-    {}
-    ~OnOffCluster() {}
-};
-
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:

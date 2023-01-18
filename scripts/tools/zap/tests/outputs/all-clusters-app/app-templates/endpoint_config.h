@@ -2238,17 +2238,6 @@
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 102 ) ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: On/Off (client) */ \
-      .clusterId = 0x00000006,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(253), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr ,\
-      .generatedCommandList = nullptr ,\
-    },\
-  { \
       /* Endpoint: 1, Cluster: On/Off (server) */ \
       .clusterId = 0x00000006,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(247), \
