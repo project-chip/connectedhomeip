@@ -202,3 +202,5 @@ get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
 
 chip_app_component_codegen("${CHIP_ROOT}/examples/lock-app/lock-common/lock-app.matter")
+chip_app_component_zapgen("${CHIP_ROOT}/examples/lock-app/lock-common/lock-app.zap")
+
