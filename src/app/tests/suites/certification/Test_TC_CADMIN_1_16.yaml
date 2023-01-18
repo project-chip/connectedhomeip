@@ -75,8 +75,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -110,8 +108,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR3 Commissions with DUT_CE"
       PICS: CADMIN.S
@@ -145,9 +141,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 2, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeId: nodeId },
+                  { Label: "", FabricIndex: 2, NodeId: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
               ]
           constraints:
               type: list
@@ -208,8 +204,8 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeId: nodeId },
+                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
               ]
           constraints:
               type: list
@@ -224,8 +220,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -259,9 +253,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 4, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeId: nodeId },
+                  { Label: "", FabricIndex: 4, NodeId: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
               ]
           constraints:
               type: list

@@ -30,12 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The vendor ID for the device from the Device Attestation Certificate. May be nil only if attestation was unsucessful.
  */
-@property (nonatomic, readonly, nullable) NSNumber * vendorID;
+@property (nonatomic, readonly, nullable) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
 
 /**
  * The product ID for the device from the Device Attestation Certificate. May be nil only if attestation was unsucessful.
  */
-@property (nonatomic, readonly, nullable) NSNumber * productID;
+@property (nonatomic, readonly, nullable) NSNumber * productID MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, readonly) MTRCertificateDERBytes dacCertificate;
 @property (nonatomic, readonly) MTRCertificateDERBytes dacPAICertificate;
