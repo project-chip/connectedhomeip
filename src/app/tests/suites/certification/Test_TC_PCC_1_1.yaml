@@ -41,16 +41,17 @@ tests:
 
     - label: "TH reads the FeatureMap attribute from the DUT"
       PICS:
-          " !PCC.S.F00 && !PCC.S.F01 && !PCC.S.F02 && !PCC.S.F03 && 
-          !PCC.S.F04 && !PCC.S.F06 && !PCC.S.F06 "
+          " !PCC.S.F00 && !PCC.S.F01 && !PCC.S.F02 && !PCC.S.F03 && !PCC.S.F04
+          && !PCC.S.F05 && !PCC.S.F06 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
           constraints:
               type: bitmap32
-    
-    - label: "Given PCC.S.F00(PRSCONST) ensure featuremap has the correct bit set"
+
+    - label: 
+          "Given PCC.S.F00(PRSCONST) ensure featuremap has the correct bit set"
       PICS: PCC.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -59,7 +60,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given PCC.S.F01(PRSCOMP) ensure featuremap has the correct bit set"
+    - label: 
+          "Given PCC.S.F01(PRSCOMP) ensure featuremap has the correct bit set"
       PICS: PCC.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
