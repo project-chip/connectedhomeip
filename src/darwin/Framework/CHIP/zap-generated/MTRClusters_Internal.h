@@ -21,7 +21,7 @@
 #import "MTRDevice.h"
 #import "MTRDevice_Internal.h"
 
-#include <controller-clusters/zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClusters.h>
 
 @interface MTRClusterIdentify ()
 @property (nonatomic, readonly) uint16_t endpoint;

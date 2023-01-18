@@ -52,6 +52,13 @@ config CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 
 endif # NET_L2_OPENTHREAD
 
+if CHIP_WIFI
+
+config NRF_WIFI_LOW_POWER
+	default y
+
+endif # CHIP_WIFI
+
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"
