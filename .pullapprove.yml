@@ -167,7 +167,7 @@ groups:
         reviewers:
             teams: [reviewers-tcl]
         reviews:
-            request: 1
+            request: 10
 
     ############################################################
     #  Base Required Reviewers
