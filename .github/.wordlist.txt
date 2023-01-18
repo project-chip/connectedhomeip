@@ -159,7 +159,7 @@ bouffalolab
 BRD
 breakpoint
 bredr
-BridgedDeviceBasic
+BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
 BromateConcentrationMeasurement

@@ -928,7 +928,7 @@ enum class TimeSourceEnum : uint8_t
 };
 } // namespace TimeSynchronization
 
-namespace BridgedDeviceBasic {} // namespace BridgedDeviceBasic
+namespace BridgedDeviceBasicInformation {} // namespace BridgedDeviceBasicInformation
 
 namespace Switch {
 

@@ -1859,7 +1859,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBridgedDeviceBasicClusterStartUpEvent
+@implementation MTRBridgedDeviceBasicInformationClusterStartUpEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1871,7 +1871,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBridgedDeviceBasicClusterStartUpEvent alloc] init];
+    auto other = [[MTRBridgedDeviceBasicInformationClusterStartUpEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
 
@@ -1887,7 +1887,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBridgedDeviceBasicClusterShutDownEvent
+@implementation MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDeviceBasicInformationClusterStartUpEvent
+@end
+
+@implementation MTRBridgedDeviceBasicInformationClusterShutDownEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1897,7 +1900,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBridgedDeviceBasicClusterShutDownEvent alloc] init];
+    auto other = [[MTRBridgedDeviceBasicInformationClusterShutDownEvent alloc] init];
 
     return other;
 }
@@ -1910,7 +1913,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBridgedDeviceBasicClusterLeaveEvent
+@implementation MTRBridgedDeviceBasicClusterShutDownEvent : MTRBridgedDeviceBasicInformationClusterShutDownEvent
+@end
+
+@implementation MTRBridgedDeviceBasicInformationClusterLeaveEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1920,7 +1926,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBridgedDeviceBasicClusterLeaveEvent alloc] init];
+    auto other = [[MTRBridgedDeviceBasicInformationClusterLeaveEvent alloc] init];
 
     return other;
 }
@@ -1933,7 +1939,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBridgedDeviceBasicClusterReachableChangedEvent
+@implementation MTRBridgedDeviceBasicClusterLeaveEvent : MTRBridgedDeviceBasicInformationClusterLeaveEvent
+@end
+
+@implementation MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1945,7 +1954,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBridgedDeviceBasicClusterReachableChangedEvent alloc] init];
+    auto other = [[MTRBridgedDeviceBasicInformationClusterReachableChangedEvent alloc] init];
 
     other.reachableNewValue = self.reachableNewValue;
 
@@ -1959,6 +1968,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 @end
 
 @implementation MTRSwitchClusterSwitchLatchedEvent

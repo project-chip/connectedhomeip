@@ -3169,8 +3169,10 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBridgedDeviceBasicClusterGeneratedCommandListAttributeCallback
-      implements ChipClusters.BridgedDeviceBasicCluster.GeneratedCommandListAttributeCallback,
+  public static
+  class DelegatedBridgedDeviceBasicInformationClusterGeneratedCommandListAttributeCallback
+      implements ChipClusters.BridgedDeviceBasicInformationCluster
+              .GeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -3193,8 +3195,10 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBridgedDeviceBasicClusterAcceptedCommandListAttributeCallback
-      implements ChipClusters.BridgedDeviceBasicCluster.AcceptedCommandListAttributeCallback,
+  public static
+  class DelegatedBridgedDeviceBasicInformationClusterAcceptedCommandListAttributeCallback
+      implements ChipClusters.BridgedDeviceBasicInformationCluster
+              .AcceptedCommandListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -3217,8 +3221,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBridgedDeviceBasicClusterAttributeListAttributeCallback
-      implements ChipClusters.BridgedDeviceBasicCluster.AttributeListAttributeCallback,
+  public static class DelegatedBridgedDeviceBasicInformationClusterAttributeListAttributeCallback
+      implements ChipClusters.BridgedDeviceBasicInformationCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -7382,11 +7386,12 @@ public class ClusterInfoMapping {
                 new ChipClusters.EthernetNetworkDiagnosticsCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInfo);
-    ClusterInfo bridgedDeviceBasicClusterInfo =
+    ClusterInfo bridgedDeviceBasicInformationClusterInfo =
         new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BridgedDeviceBasicCluster(ptr, endpointId),
+            (ptr, endpointId) ->
+                new ChipClusters.BridgedDeviceBasicInformationCluster(ptr, endpointId),
             new HashMap<>());
-    clusterMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInfo);
+    clusterMap.put("bridgedDeviceBasicInformation", bridgedDeviceBasicInformationClusterInfo);
     ClusterInfo switchClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.SwitchCluster(ptr, endpointId), new HashMap<>());
@@ -7626,7 +7631,9 @@ public class ClusterInfoMapping {
     destination
         .get("ethernetNetworkDiagnostics")
         .combineCommands(source.get("ethernetNetworkDiagnostics"));
-    destination.get("bridgedDeviceBasic").combineCommands(source.get("bridgedDeviceBasic"));
+    destination
+        .get("bridgedDeviceBasicInformation")
+        .combineCommands(source.get("bridgedDeviceBasicInformation"));
     destination.get("switch").combineCommands(source.get("switch"));
     destination
         .get("administratorCommissioning")
@@ -9280,9 +9287,10 @@ public class ClusterInfoMapping {
         "resetCounts", ethernetNetworkDiagnosticsresetCountsInteractionInfo);
     commandMap.put(
         "ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInteractionInfoMap);
-    Map<String, InteractionInfo> bridgedDeviceBasicClusterInteractionInfoMap =
+    Map<String, InteractionInfo> bridgedDeviceBasicInformationClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    commandMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInteractionInfoMap);
+    commandMap.put(
+        "bridgedDeviceBasicInformation", bridgedDeviceBasicInformationClusterInteractionInfoMap);
     Map<String, InteractionInfo> switchClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("switch", switchClusterInteractionInfoMap);
     Map<String, InteractionInfo> administratorCommissioningClusterInteractionInfoMap =

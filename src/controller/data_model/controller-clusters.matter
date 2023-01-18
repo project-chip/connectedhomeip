@@ -1682,7 +1682,7 @@ client cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-client cluster BridgedDeviceBasic = 57 {
+client cluster BridgedDeviceBasicInformation = 57 {
   critical event StartUp = 0 {
     INT32U softwareVersion = 0;
   }
@@ -4480,7 +4480,7 @@ endpoint 1 {
   binding cluster ThreadNetworkDiagnostics;
   binding cluster WiFiNetworkDiagnostics;
   binding cluster EthernetNetworkDiagnostics;
-  binding cluster BridgedDeviceBasic;
+  binding cluster BridgedDeviceBasicInformation;
   binding cluster Switch;
   binding cluster AdministratorCommissioning;
   binding cluster OperationalCredentials;
