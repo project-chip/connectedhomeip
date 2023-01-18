@@ -125,7 +125,7 @@ void ExchangeContext::UpdateSEDIntervalMode(bool activeMode)
     if (activeMode != IsRequestingActiveMode())
     {
         SetRequestingActiveMode(activeMode);
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(activeMode);
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(activeMode, true);
     }
 }
 #endif

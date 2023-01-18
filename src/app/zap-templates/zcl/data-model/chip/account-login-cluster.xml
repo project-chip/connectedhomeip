@@ -27,13 +27,13 @@ limitations under the License.
 
     <command source="client" code="0x00" name="GetSetupPIN" response="GetSetupPINResponse" mustUseTimedInvoke="true" optional="false">
       <description>Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response.</description>
-      <arg name="tempAccountIdentifier" minLength="16" length="100" type="CHAR_STRING"/>
+      <arg name="TempAccountIdentifier" minLength="16" length="100" type="CHAR_STRING"/>
     </command>
 
     <command source="client" code="0x02" name="Login" mustUseTimedInvoke="true" optional="false">
       <description>Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active.</description>
-      <arg name="tempAccountIdentifier" minLength="16" length="100" type="CHAR_STRING"/>
-      <arg name="setupPIN" minLength="11" type="CHAR_STRING"/>
+      <arg name="TempAccountIdentifier" minLength="16" length="100" type="CHAR_STRING"/>
+      <arg name="SetupPIN" minLength="11" type="CHAR_STRING"/>
     </command>
 
     <command source="client" code="0x03" name="Logout" mustUseTimedInvoke="true" optional="false">
@@ -42,7 +42,7 @@ limitations under the License.
 
     <command source="server" code="0x01" name="GetSetupPINResponse" optional="false" disableDefaultResponse="true">
       <description>This message is sent in response to the GetSetupPIN Request, and contains the Setup PIN code, or null when the accounts identified in the request does not match the active account of the running Content App.</description>
-      <arg name="setupPIN" type="CHAR_STRING"/>
+      <arg name="SetupPIN" type="CHAR_STRING"/>
     </command>
 
   </cluster>

@@ -19,10 +19,10 @@
 #include <controller/AutoCommissioner.h>
 
 #include <app/InteractionModelTimeout.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
+#include <zap-generated/CHIPClusters.h>
 
 namespace chip {
 namespace Controller {
@@ -450,7 +450,7 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(DeviceProxy
     return MakeOptional(timeout);
 }
 
-CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk,
+CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, IdentityProtectionKeySpan ipk,
                                                NodeId adminSubject)
 {
     // Reuse ICA Cert buffer for temporary store Root Cert.

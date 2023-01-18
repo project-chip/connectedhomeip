@@ -584,7 +584,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
     // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
-    result = uECC_shared_secret(remote_public_key.ConstBytes() + 1, keypair->private_key, Uint8::to_uchar(out_secret));
+    result = uECC_shared_secret(remote_public_key.ConstBytes() + 1, keypair->private_key, out_secret.Bytes());
     VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     SuccessOrExit(out_secret.SetLength(secret_length));
@@ -657,7 +657,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     const mbedtls_uecc_keypair * keypair = to_const_keypair(&mKeypair);
     size_t len                           = output.Length() == 0 ? output.Capacity() : output.Length();
-    Encoding::BufferWriter bbuf(output, len);
+    Encoding::BufferWriter bbuf(output.Bytes(), len);
     uint8_t privkey[kP256_PrivateKey_Length];
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -691,13 +691,13 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     mbedtls_uecc_keypair * keypair = to_keypair(&mKeypair);
 
     // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
-    memcpy(keypair->public_key, Uint8::to_uchar(input) + 1, 2 * NUM_ECC_BYTES);
-    memcpy(keypair->private_key, Uint8::to_uchar(input) + mPublicKey.Length(), NUM_ECC_BYTES);
+    memcpy(keypair->public_key, input.ConstBytes() + 1, 2 * NUM_ECC_BYTES);
+    memcpy(keypair->private_key, input.ConstBytes() + mPublicKey.Length(), NUM_ECC_BYTES);
 
     keypair = nullptr;
 
     VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    bbuf.Put((const uint8_t *) input, mPublicKey.Length());
+    bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
     mInitialized = true;

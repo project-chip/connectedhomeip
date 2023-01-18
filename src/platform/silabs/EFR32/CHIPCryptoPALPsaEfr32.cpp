@@ -774,8 +774,8 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     // Step 2: do key derivation
     status = psa_raw_key_agreement(PSA_ALG_ECDH, key_id, Uint8::to_const_uchar(remote_public_key), remote_public_key.Length(),
-                                   Uint8::to_uchar(out_secret),
-                                   (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length(), &output_length);
+                                   out_secret.Bytes(), (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length(),
+                                   &output_length);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     SuccessOrExit(out_secret.SetLength(output_length));
@@ -873,7 +873,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     CHIP_ERROR error                          = CHIP_NO_ERROR;
     const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
     size_t len                                = output.Length() == 0 ? output.Capacity() : output.Length();
-    Encoding::BufferWriter bbuf(output, len);
+    Encoding::BufferWriter bbuf(output.Bytes(), len);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
@@ -900,10 +900,10 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 
     Clear();
 
-    memcpy(keypair->privkey, Uint8::to_uchar(input) + mPublicKey.Length(), kP256_PrivateKey_Length);
+    memcpy(keypair->privkey, input.ConstBytes() + mPublicKey.Length(), kP256_PrivateKey_Length);
     keypair->bitlen = 256;
 
-    bbuf.Put((const uint8_t *) input, mPublicKey.Length());
+    bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
     mInitialized = true;
