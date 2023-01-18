@@ -1707,8 +1707,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BridgedDeviceBasic::Id: {
-        using namespace app::Clusters::BridgedDeviceBasic;
+    case app::Clusters::BridgedDeviceBasicInformation::Id: {
+        using namespace app::Clusters::BridgedDeviceBasicInformation;
         switch (aPath.mEventId)
         {
         case Events::StartUp::Id: {
@@ -1727,16 +1727,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass startUpStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicClusterStartUpEvent", startUpStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterStartUpEvent", startUpStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicClusterStartUpEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterStartUpEvent");
                 return nullptr;
             }
             jmethodID startUpStructCtor = env->GetMethodID(startUpStructClass, "<init>", "(Ljava/lang/Long;)V");
             if (startUpStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicClusterStartUpEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterStartUpEvent constructor");
                 return nullptr;
             }
 
@@ -1753,16 +1753,17 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
             jclass shutDownStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicClusterShutDownEvent", shutDownStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterShutDownEvent",
+                shutDownStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicClusterShutDownEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterShutDownEvent");
                 return nullptr;
             }
             jmethodID shutDownStructCtor = env->GetMethodID(shutDownStructClass, "<init>", "()V");
             if (shutDownStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicClusterShutDownEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterShutDownEvent constructor");
                 return nullptr;
             }
 
@@ -1779,16 +1780,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
             jclass leaveStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicClusterLeaveEvent", leaveStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterLeaveEvent", leaveStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicClusterLeaveEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterLeaveEvent");
                 return nullptr;
             }
             jmethodID leaveStructCtor = env->GetMethodID(leaveStructClass, "<init>", "()V");
             if (leaveStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicClusterLeaveEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterLeaveEvent constructor");
                 return nullptr;
             }
 
@@ -1812,18 +1813,20 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass reachableChangedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicClusterReachableChangedEvent",
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterReachableChangedEvent",
                 reachableChangedStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicClusterReachableChangedEvent");
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterReachableChangedEvent");
                 return nullptr;
             }
             jmethodID reachableChangedStructCtor =
                 env->GetMethodID(reachableChangedStructClass, "<init>", "(Ljava/lang/Boolean;)V");
             if (reachableChangedStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicClusterReachableChangedEvent constructor");
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterReachableChangedEvent constructor");
                 return nullptr;
             }
 

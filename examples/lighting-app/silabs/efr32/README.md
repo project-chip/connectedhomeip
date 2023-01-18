@@ -134,7 +134,7 @@ Silicon Labs platform.
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export silabs_board=BRD4161A
@@ -143,7 +143,7 @@ Silicon Labs platform.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ rm -rf out/
 
 *   Build the example as Sleepy End Device (SED)
@@ -156,11 +156,11 @@ Silicon Labs platform.
 
 *   Build the example with pigweed RPC
 
-          $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export silabs_board=BRD4161A
@@ -178,7 +178,7 @@ arguments
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ python3 out/debug/chip-efr32-lighting-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
@@ -360,7 +360,7 @@ To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+modify `examples/platform/silabs/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
 
 ## OTA Software Update

@@ -19,7 +19,7 @@ name:
 
 config:
     nodeId: 0x12344321
-    cluster: "Bridged Device Basic"
+    cluster: "Bridged Device Basic Information"
     endpoint: 3
 
 tests:

@@ -2139,9 +2139,9 @@ server cluster OccupancySensing = 1030 {
   readonly attribute bitmap8 occupancy = 0;
   readonly attribute enum8 occupancySensorType = 1;
   readonly attribute bitmap8 occupancySensorTypeBitmap = 2;
-  attribute access(write: manage) int16u pirOccupiedToUnoccupiedDelay = 16;
-  attribute access(write: manage) int16u pirUnoccupiedToOccupiedDelay = 17;
-  attribute access(write: manage) int8u pirUnoccupiedToOccupiedThreshold = 18;
+  attribute access(write: manage) int16u PIROccupiedToUnoccupiedDelay = 16;
+  attribute access(write: manage) int16u PIRUnoccupiedToOccupiedDelay = 17;
+  attribute access(write: manage) int8u PIRUnoccupiedToOccupiedThreshold = 18;
   attribute access(write: manage) int16u ultrasonicOccupiedToUnoccupiedDelay = 32;
   attribute access(write: manage) int16u ultrasonicUnoccupiedToOccupiedDelay = 33;
   attribute access(write: manage) int8u ultrasonicUnoccupiedToOccupiedThreshold = 34;
@@ -3242,9 +3242,9 @@ endpoint 1 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute pirOccupiedToUnoccupiedDelay;
-    ram      attribute pirUnoccupiedToOccupiedDelay;
-    ram      attribute pirUnoccupiedToOccupiedThreshold default = 1;
+    ram      attribute PIROccupiedToUnoccupiedDelay;
+    ram      attribute PIRUnoccupiedToOccupiedDelay;
+    ram      attribute PIRUnoccupiedToOccupiedThreshold default = 1;
     ram      attribute ultrasonicOccupiedToUnoccupiedDelay;
     ram      attribute ultrasonicUnoccupiedToOccupiedDelay;
     ram      attribute ultrasonicUnoccupiedToOccupiedThreshold default = 1;

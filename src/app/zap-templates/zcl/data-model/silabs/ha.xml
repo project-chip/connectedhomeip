@@ -395,52 +395,52 @@ limitations under the License.
     <define>OCCUPANCY_SENSING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" reportable="true" optional="false">occupancy</attribute>
-    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">occupancy sensor type</attribute>
-    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="BITMAP8" min="0x00" max="0x07" writable="false" optional="false">occupancy sensor type bitmap</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <attribute side="server" code="0x0000" define="OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" reportable="true" optional="false">Occupancy</attribute>
+    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>
+    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="BITMAP8" min="0x00" max="0x07" writable="false" optional="false">OccupancySensorTypeBitmap</attribute>
     <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>PIR occupied to unoccupied delay</description>
+      <description>PIROccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>PIR unoccupied to occupied delay</description>
+      <description>PIRUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>PIR unoccupied to occupied threshold</description>
+      <description>PIRUnoccupiedToOccupiedThreshold</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>ultrasonic occupied to unoccupied delay</description>
+      <description>UltrasonicOccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>ultrasonic unoccupied to occupied delay</description>
+      <description>UltrasonicUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>ultrasonic unoccupied to occupied threshold</description>
+      <description>UltrasonicUnoccupiedToOccupiedThreshold</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>physical contact occupied to unoccupied delay</description>
+      <description>PhysicalContactOccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>physical contact unoccupied to occupied delay</description>
+      <description>PhysicalContactUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>physical contact unoccupied to occupied threshold</description>
+      <description>PhysicalContactUnoccupiedToOccupiedThreshold</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
