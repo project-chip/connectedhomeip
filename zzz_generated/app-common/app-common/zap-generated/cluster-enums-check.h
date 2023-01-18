@@ -1051,12 +1051,24 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AdministratorCommission
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials::OperationalCertStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials::CertificateChainTypeEnum val)
 {
-    using EnumType = OperationalCredentials::OperationalCertStatus;
+    using EnumType = OperationalCredentials::CertificateChainTypeEnum;
     switch (val)
     {
-    case EnumType::kSuccess:
+    case EnumType::kDACCertificate:
+    case EnumType::kPAICertificate:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials::NodeOperationalCertStatusEnum val)
+{
+    using EnumType = OperationalCredentials::NodeOperationalCertStatusEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
     case EnumType::kInvalidPublicKey:
     case EnumType::kInvalidNodeOpId:
     case EnumType::kInvalidNOC:

@@ -973,10 +973,18 @@ static StatusCode __attribute__((unused)) kStatusCodekUnknownEnumValue          
 
 namespace OperationalCredentials {
 
-// Enum for OperationalCertStatus
-enum class OperationalCertStatus : uint8_t
+// Enum for CertificateChainTypeEnum
+enum class CertificateChainTypeEnum : uint8_t
 {
-    kSuccess             = 0x00,
+    kDACCertificate   = 0x01,
+    kPAICertificate   = 0x02,
+    kUnknownEnumValue = 0,
+};
+
+// Enum for NodeOperationalCertStatusEnum
+enum class NodeOperationalCertStatusEnum : uint8_t
+{
+    kOk                  = 0x00,
     kInvalidPublicKey    = 0x01,
     kInvalidNodeOpId     = 0x02,
     kInvalidNOC          = 0x03,

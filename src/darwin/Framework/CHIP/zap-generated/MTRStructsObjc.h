@@ -559,16 +559,23 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     NSNumber * _Nonnull totalNumberOfPressesCounted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTROperationalCredentialsClusterFabricDescriptor : NSObject <NSCopying>
-@property (nonatomic, copy) NSData * _Nonnull rootPublicKey API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull fabricId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull nodeId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nonnull label API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_AVAILABLE
+@interface MTROperationalCredentialsClusterFabricDescriptorStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull rootPublicKey MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricId MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeId MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsClusterFabricDescriptorStruct")
+@interface MTROperationalCredentialsClusterFabricDescriptor : MTROperationalCredentialsClusterFabricDescriptorStruct
+@end
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterNOCStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nonnull noc API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));

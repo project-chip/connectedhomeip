@@ -10059,13 +10059,14 @@ public class ChipClusters {
       removeFabric(chipClusterPtr, callback, fabricIndex, timedInvokeTimeoutMs);
     }
 
-    public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
-      addTrustedRootCertificate(chipClusterPtr, callback, rootCertificate, null);
+    public void addTrustedRootCertificate(
+        DefaultClusterCallback callback, byte[] rootCACertificate) {
+      addTrustedRootCertificate(chipClusterPtr, callback, rootCACertificate, null);
     }
 
     public void addTrustedRootCertificate(
-        DefaultClusterCallback callback, byte[] rootCertificate, int timedInvokeTimeoutMs) {
-      addTrustedRootCertificate(chipClusterPtr, callback, rootCertificate, timedInvokeTimeoutMs);
+        DefaultClusterCallback callback, byte[] rootCACertificate, int timedInvokeTimeoutMs) {
+      addTrustedRootCertificate(chipClusterPtr, callback, rootCACertificate, timedInvokeTimeoutMs);
     }
 
     private native void attestationRequest(
@@ -10119,11 +10120,11 @@ public class ChipClusters {
     private native void addTrustedRootCertificate(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        byte[] rootCertificate,
+        byte[] rootCACertificate,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface AttestationResponseCallback {
-      void onSuccess(byte[] attestationElements, byte[] signature);
+      void onSuccess(byte[] attestationElements, byte[] attestationSignature);
 
       void onError(Exception error);
     }
@@ -10155,7 +10156,8 @@ public class ChipClusters {
     }
 
     public interface FabricsAttributeCallback {
-      void onSuccess(List<ChipStructs.OperationalCredentialsClusterFabricDescriptor> valueList);
+      void onSuccess(
+          List<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct> valueList);
 
       void onError(Exception ex);
 

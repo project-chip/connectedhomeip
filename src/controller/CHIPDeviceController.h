@@ -880,7 +880,8 @@ private:
         return cluster.InvokeCommand(request, this, successCb, failureCb);
     }
 
-    static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
+    static CHIP_ERROR
+    ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum err);
 
     // Sends commissioning complete callbacks to the delegate depending on the status. Sends
     // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.

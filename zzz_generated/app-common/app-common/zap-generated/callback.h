@@ -8109,7 +8109,8 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(
  */
 bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::EndpointId endpoint,
                                                                      chip::app::CommandSender * commandObj,
-                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
+                                                                     chip::ByteSpan AttestationElements,
+                                                                     chip::ByteSpan AttestationSignature);
 /**
  * @brief Operational Credentials Cluster CertificateChainRequest Command callback (from client)
  */
