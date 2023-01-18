@@ -126,7 +126,7 @@ class GeneratorTest:
                             print("* Golden image regeneration seems to have failed.")
                             print("* Documentation regarding code-generation logic available at docs/code_generation.md")
                             print("*\n* Specifically to update golden images, you may want to run:")
-                            print("*\n* ./scripts/tools/zap/test_generate.py --output out/gen --regenerata")
+                            print("*\n* ./scripts/tools/zap/test_generate.py --output out/gen --regenerate")
                             print("*\n" + "*"*80)
                             raise
 
