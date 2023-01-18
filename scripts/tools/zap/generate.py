@@ -151,6 +151,9 @@ def runArgumentsParser() -> CmdLineArgs:
 
     return CmdLineArgs(
         zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
+        parallel = args.parallel,
+        prettify_output = args.prettify_output,
+        version_check = args.version_check,
         lock_file=args.lock_file,
     )
 
