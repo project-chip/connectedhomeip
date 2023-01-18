@@ -19351,7 +19351,7 @@ public class ChipClusters {
     }
 
     public interface ChannelListAttributeCallback {
-      void onSuccess(List<ChipStructs.ChannelClusterChannelInfo> valueList);
+      void onSuccess(List<ChipStructs.ChannelClusterChannelInfoStruct> valueList);
 
       void onError(Exception ex);
 

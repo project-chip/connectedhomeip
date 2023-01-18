@@ -15352,7 +15352,7 @@ namespace Events {} // namespace Events
 } // namespace WakeOnLan
 namespace Channel {
 namespace Structs {
-namespace ChannelInfo {
+namespace ChannelInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15407,8 +15407,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ChannelInfo
-namespace LineupInfo {
+} // namespace ChannelInfoStruct
+namespace LineupInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15459,7 +15459,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace LineupInfo
+} // namespace LineupInfoStruct
 } // namespace Structs
 
 namespace Commands {

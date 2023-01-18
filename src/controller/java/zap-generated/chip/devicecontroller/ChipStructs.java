@@ -1372,14 +1372,14 @@ public class ChipStructs {
     }
   }
 
-  public static class ChannelClusterChannelInfo {
+  public static class ChannelClusterChannelInfoStruct {
     public Integer majorNumber;
     public Integer minorNumber;
     public Optional<String> name;
     public Optional<String> callSign;
     public Optional<String> affiliateCallSign;
 
-    public ChannelClusterChannelInfo(
+    public ChannelClusterChannelInfoStruct(
         Integer majorNumber,
         Integer minorNumber,
         Optional<String> name,
@@ -1395,7 +1395,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ChannelClusterChannelInfo {\n");
+      output.append("ChannelClusterChannelInfoStruct {\n");
       output.append("\tmajorNumber: ");
       output.append(majorNumber);
       output.append("\n");
@@ -1416,13 +1416,13 @@ public class ChipStructs {
     }
   }
 
-  public static class ChannelClusterLineupInfo {
+  public static class ChannelClusterLineupInfoStruct {
     public String operatorName;
     public Optional<String> lineupName;
     public Optional<String> postalCode;
     public Integer lineupInfoType;
 
-    public ChannelClusterLineupInfo(
+    public ChannelClusterLineupInfoStruct(
         String operatorName,
         Optional<String> lineupName,
         Optional<String> postalCode,
@@ -1436,7 +1436,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ChannelClusterLineupInfo {\n");
+      output.append("ChannelClusterLineupInfoStruct {\n");
       output.append("\toperatorName: ");
       output.append(operatorName);
       output.append("\n");

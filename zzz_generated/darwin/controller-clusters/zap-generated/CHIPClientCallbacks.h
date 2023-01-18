@@ -409,7 +409,7 @@ typedef void (*WakeOnLanAttributeListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ChannelChannelListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & data);
 typedef void (*ChannelGeneratedCommandListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ChannelAcceptedCommandListListAttributeCallback)(void * context,

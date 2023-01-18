@@ -22549,9 +22549,9 @@ class Channel(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="channelList", Tag=0x00000000, Type=typing.Optional[typing.List[Channel.Structs.ChannelInfo]]),
-                ClusterObjectFieldDescriptor(Label="lineup", Tag=0x00000001, Type=typing.Union[None, Nullable, Channel.Structs.LineupInfo]),
-                ClusterObjectFieldDescriptor(Label="currentChannel", Tag=0x00000002, Type=typing.Union[None, Nullable, Channel.Structs.ChannelInfo]),
+                ClusterObjectFieldDescriptor(Label="channelList", Tag=0x00000000, Type=typing.Optional[typing.List[Channel.Structs.ChannelInfoStruct]]),
+                ClusterObjectFieldDescriptor(Label="lineup", Tag=0x00000001, Type=typing.Union[None, Nullable, Channel.Structs.LineupInfoStruct]),
+                ClusterObjectFieldDescriptor(Label="currentChannel", Tag=0x00000002, Type=typing.Union[None, Nullable, Channel.Structs.ChannelInfoStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -22559,9 +22559,9 @@ class Channel(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    channelList: 'typing.Optional[typing.List[Channel.Structs.ChannelInfo]]' = None
-    lineup: 'typing.Union[None, Nullable, Channel.Structs.LineupInfo]' = None
-    currentChannel: 'typing.Union[None, Nullable, Channel.Structs.ChannelInfo]' = None
+    channelList: 'typing.Optional[typing.List[Channel.Structs.ChannelInfoStruct]]' = None
+    lineup: 'typing.Union[None, Nullable, Channel.Structs.LineupInfoStruct]' = None
+    currentChannel: 'typing.Union[None, Nullable, Channel.Structs.ChannelInfoStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -22596,7 +22596,7 @@ class Channel(Cluster):
 
     class Structs:
         @dataclass
-        class ChannelInfo(ClusterObject):
+        class ChannelInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -22615,7 +22615,7 @@ class Channel(Cluster):
             affiliateCallSign: 'typing.Optional[str]' = None
 
         @dataclass
-        class LineupInfo(ClusterObject):
+        class LineupInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -22716,9 +22716,9 @@ class Channel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Channel.Structs.ChannelInfo]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Channel.Structs.ChannelInfoStruct]])
 
-            value: 'typing.Optional[typing.List[Channel.Structs.ChannelInfo]]' = None
+            value: 'typing.Optional[typing.List[Channel.Structs.ChannelInfoStruct]]' = None
 
         @dataclass
         class Lineup(ClusterAttributeDescriptor):
@@ -22732,9 +22732,9 @@ class Channel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Channel.Structs.LineupInfo])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Channel.Structs.LineupInfoStruct])
 
-            value: 'typing.Union[None, Nullable, Channel.Structs.LineupInfo]' = None
+            value: 'typing.Union[None, Nullable, Channel.Structs.LineupInfoStruct]' = None
 
         @dataclass
         class CurrentChannel(ClusterAttributeDescriptor):
@@ -22748,9 +22748,9 @@ class Channel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Channel.Structs.ChannelInfo])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Channel.Structs.ChannelInfoStruct])
 
-            value: 'typing.Union[None, Nullable, Channel.Structs.ChannelInfo]' = None
+            value: 'typing.Union[None, Nullable, Channel.Structs.ChannelInfoStruct]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

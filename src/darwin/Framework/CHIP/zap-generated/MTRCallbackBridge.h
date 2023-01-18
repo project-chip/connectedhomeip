@@ -974,11 +974,11 @@ typedef void (*WakeOnLANAttributeListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ChannelChannelListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & data);
 typedef void (*ChannelLineupStructAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &);
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType> &);
 typedef void (*ChannelCurrentChannelStructAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &);
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> &);
 typedef void (*ChannelGeneratedCommandListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ChannelAcceptedCommandListListAttributeCallback)(void * context,
@@ -8671,7 +8671,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & value);
 };
 
 class MTRChannelChannelListListAttributeCallbackSubscriptionBridge : public MTRChannelChannelListListAttributeCallbackBridge
@@ -8701,9 +8701,9 @@ public:
     MTRChannelLineupStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<ChannelLineupStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType> & value);
 };
 
 class MTRChannelLineupStructAttributeCallbackSubscriptionBridge : public MTRChannelLineupStructAttributeCallbackBridge
@@ -8733,9 +8733,9 @@ public:
     MTRChannelCurrentChannelStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<ChannelCurrentChannelStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & value);
 };
 
 class MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge

@@ -77,10 +77,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::BasicInformatio
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::Channel::Structs::ChannelInfo::Type & request);
+static void Finalize(chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & request,
                         Json::Value & value);
 
@@ -137,9 +137,10 @@ static void Finalize(chip::app::Clusters::MediaInput::Structs::InputInfoStruct::
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::LabelStruct::Type & request, Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::LabelStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::LineupInfo::Type & request, Json::Value & value);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type & request,
+                        Json::Value & value);
 
-static void Finalize(chip::app::Clusters::Channel::Structs::LineupInfo::Type & request);
+static void Finalize(chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request,
                         Json::Value & value);
 

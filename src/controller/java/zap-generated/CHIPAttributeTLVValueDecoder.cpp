@@ -14739,26 +14739,26 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                       newElement_0_affiliateCallSign);
                 }
 
-                jclass channelInfoStructClass_1;
+                jclass channelInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfo", channelInfoStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfoStruct", channelInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfo");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfoStruct");
                     return nullptr;
                 }
-                jmethodID channelInfoStructCtor_1 = env->GetMethodID(
-                    channelInfoStructClass_1, "<init>",
+                jmethodID channelInfoStructStructCtor_1 = env->GetMethodID(
+                    channelInfoStructStructClass_1, "<init>",
                     "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-                if (channelInfoStructCtor_1 == nullptr)
+                if (channelInfoStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfo constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfoStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(channelInfoStructClass_1, channelInfoStructCtor_1, newElement_0_majorNumber,
-                                              newElement_0_minorNumber, newElement_0_name, newElement_0_callSign,
-                                              newElement_0_affiliateCallSign);
+                newElement_0 = env->NewObject(channelInfoStructStructClass_1, channelInfoStructStructCtor_1,
+                                              newElement_0_majorNumber, newElement_0_minorNumber, newElement_0_name,
+                                              newElement_0_callSign, newElement_0_affiliateCallSign);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -14814,25 +14814,25 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     value_lineupInfoTypeClassName.c_str(), value_lineupInfoTypeCtorSignature.c_str(),
                     static_cast<uint8_t>(cppValue.Value().lineupInfoType), value_lineupInfoType);
 
-                jclass lineupInfoStructClass_1;
+                jclass lineupInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ChannelClusterLineupInfo", lineupInfoStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$ChannelClusterLineupInfoStruct", lineupInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterLineupInfo");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterLineupInfoStruct");
                     return nullptr;
                 }
-                jmethodID lineupInfoStructCtor_1 =
-                    env->GetMethodID(lineupInfoStructClass_1, "<init>",
+                jmethodID lineupInfoStructStructCtor_1 =
+                    env->GetMethodID(lineupInfoStructStructClass_1, "<init>",
                                      "(Ljava/lang/String;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V");
-                if (lineupInfoStructCtor_1 == nullptr)
+                if (lineupInfoStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterLineupInfo constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterLineupInfoStruct constructor");
                     return nullptr;
                 }
 
-                value = env->NewObject(lineupInfoStructClass_1, lineupInfoStructCtor_1, value_operatorName, value_lineupName,
-                                       value_postalCode, value_lineupInfoType);
+                value = env->NewObject(lineupInfoStructStructClass_1, lineupInfoStructStructCtor_1, value_operatorName,
+                                       value_lineupName, value_postalCode, value_lineupInfoType);
             }
             return value;
         }
@@ -14903,25 +14903,25 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                       value_affiliateCallSign);
                 }
 
-                jclass channelInfoStructClass_1;
+                jclass channelInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfo", channelInfoStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfoStruct", channelInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfo");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfoStruct");
                     return nullptr;
                 }
-                jmethodID channelInfoStructCtor_1 = env->GetMethodID(
-                    channelInfoStructClass_1, "<init>",
+                jmethodID channelInfoStructStructCtor_1 = env->GetMethodID(
+                    channelInfoStructStructClass_1, "<init>",
                     "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-                if (channelInfoStructCtor_1 == nullptr)
+                if (channelInfoStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfo constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfoStruct constructor");
                     return nullptr;
                 }
 
-                value = env->NewObject(channelInfoStructClass_1, channelInfoStructCtor_1, value_majorNumber, value_minorNumber,
-                                       value_name, value_callSign, value_affiliateCallSign);
+                value = env->NewObject(channelInfoStructStructClass_1, channelInfoStructStructCtor_1, value_majorNumber,
+                                       value_minorNumber, value_name, value_callSign, value_affiliateCallSign);
             }
             return value;
         }
