@@ -30,7 +30,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::BridgedDeviceBasic;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
 namespace {
 
@@ -52,9 +52,9 @@ void ReachableChanged(EndpointId endpointId)
 
 } // anonymous namespace
 
-void MatterBridgedDeviceBasicClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
+void MatterBridgedDeviceBasicInformationClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
 {
-    if (attributePath.mClusterId != BridgedDeviceBasic::Id)
+    if (attributePath.mClusterId != BridgedDeviceBasicInformation::Id)
     {
         ChipLogError(Zcl, "MatterBridgedDeviceBasicClusterServerAttributeChangedCallback: Incorrect cluster ID");
         return;

@@ -31,8 +31,8 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
-    31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
@@ -40,13 +40,13 @@
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
-    49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
-    49, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
@@ -56,8 +56,8 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
-    0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
@@ -65,13 +65,13 @@
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
-    0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
-    1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
+    0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
+    0x00000001, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
-    5, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
-    6, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
-    7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
-    0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    0x00000005, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
+    0x00000006, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
+    0x00000007, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
+    0x00000000, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
@@ -106,34 +106,34 @@
 
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
-    6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
-    8, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
-    31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    40, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
-    40, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
-    40, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    65, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
+    0x00000006, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    0x00000008, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
+    0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    0x00000028, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    0x00000028, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    0x00000041, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
+    0x00000300, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
-    16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
-    16384, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
-    0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    5, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
-    6, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
-    16, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
-    4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
-    16400, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
+    0x00004003, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    0x00004000, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
+    0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    0x00000005, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    0x00000010, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
+    0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    0x00000000, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
+    0x00004010, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -156,72 +156,72 @@
 
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
-    3, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-    3, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
-    4, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
-    4, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
-    4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
-    4, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
-    48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
-    48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
-    48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
-    49, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
-    51, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
-    60, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
-    60, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
-    60, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
-    63, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
-    63, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
-    63, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
-    63, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    0x00000003, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    0x00000003, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
+    0x00000030, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    0x00000030, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    0x00000030, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    0x00000031, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
+    0x00000033, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    0x0000003C, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    0x0000003C, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    0x0000003C, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    0x0000003E, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    0x0000003F, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    0x0000003F, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    0x0000003F, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    0x0000003F, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
-    0, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-    64, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
-    0, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
-    3, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
-    4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
-    5, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
-    0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
-    2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
-    4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
-    0, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
-    2, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
-    3, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
-    4, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
-    6, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
-    8, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
-    0, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
-    0, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
-    1, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
-    2, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
-    0, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
-    2, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
-    4, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
-    6, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
-    7, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
-    9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
-    10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
-    11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
-    0, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
-    1, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
-    3, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
-    4, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    0x00000000, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    0x00000040, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
+    0x00000000, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    0x00000003, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    0x00000005, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
+    0x00000000, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    0x00000002, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    0x00000004, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    0x00000000, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    0x00000002, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    0x00000003, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    0x00000004, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    0x00000006, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    0x00000008, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
+    0x00000000, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    0x00000000, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    0x00000001, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    0x00000002, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
+    0x00000000, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
+    0x00000002, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
+    0x00000004, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    0x00000006, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    0x00000007, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
+    0x00000009, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    0x0000000A, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    0x0000000B, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    0x00000000, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    0x00000001, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    0x00000003, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    0x00000004, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -263,14 +263,14 @@
 
 // Parallel array data (*cluster*, event, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
-    31, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
-    31, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
-    0, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
-    1, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
+    0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event

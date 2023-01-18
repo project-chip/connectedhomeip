@@ -113,10 +113,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request,
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request);
+static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type & request,
                         Json::Value & value);
 

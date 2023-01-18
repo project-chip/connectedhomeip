@@ -141,9 +141,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, NodeId: nodeId },
-                  { Label: "", FabricIndex: 2, NodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 2, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -204,8 +204,8 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, NodeId: nodeId },
-                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -253,9 +253,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, NodeId: nodeId },
-                  { Label: "", FabricIndex: 4, NodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 4, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
