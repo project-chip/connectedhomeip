@@ -36,18 +36,17 @@ CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandl
     uint16_t requestedMaxInterval = 0;
     aReadHandler.GetReportingIntervals(requestedMinInterval, requestedMaxInterval);
 
-
     // If requestedMinInterval is greater than IdleTimeInterval, select next wake up time as max interval
-    if(requestedMinInterval > decidedMaxInterval)
+    if (requestedMinInterval > decidedMaxInterval)
     {
         uint8_t ratio = requestedMinInterval / decidedMaxInterval;
-        if(requestedMinInterval % decidedMaxInterval)
+        if (requestedMinInterval % decidedMaxInterval)
         {
             ratio++;
         }
 
         decidedMaxInterval *= ratio;
     }
-    
+
     return aReadHandler.SetReportingIntervals(decidedMaxInterval);
 }
