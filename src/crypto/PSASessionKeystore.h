@@ -29,7 +29,7 @@ public:
     CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
                          Aes128KeyHandle & key) override;
     CHIP_ERROR DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info, Aes128KeyHandle & i2rKey,
-                                 Aes128KeyHandle & r2iKey, Aes128KeyByteArray & attestationChallenge) override;
+                                 Aes128KeyHandle & r2iKey, AttestationChallenge & attestationChallenge) override;
     void DestroyKey(Aes128KeyHandle & key) override;
 };
 

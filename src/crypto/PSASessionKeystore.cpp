@@ -62,8 +62,8 @@ CHIP_ERROR PSASessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, c
     HKDF_sha hkdf;
     Aes128KeyByteArray sr2k;
 
-    ReturnErrorOnFailure(hkdf.HKDF_SHA256(secret, secret.Length(), salt.data(), salt.size(), info.data(), info.size(), sr2k,
-                                          sizeof(Aes128KeyByteArray)));
+    ReturnErrorOnFailure(hkdf.HKDF_SHA256(secret.ConstBytes(), secret.Length(), salt.data(), salt.size(), info.data(), info.size(),
+                                          sr2k, sizeof(Aes128KeyByteArray)));
 
     return CreateKey(sr2k, key);
 }
