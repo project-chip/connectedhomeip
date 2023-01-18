@@ -236,14 +236,14 @@ def check_str_range(s, min_len, max_len, name):
 
 
 def check_int_range(value, min_value, max_value, name):
-    if value and ((value < min_value) or (value > max_value)):
+    if (value is not None) and ((value < min_value) or (value > max_value)):
         logging.error('%s is out of range, should be in range [%d, %d]', name, min_value, max_value)
         sys.exit(1)
 
 
 def validate_args(args):
     # Validate the passcode
-    if args.passcode:
+    if args.passcode is not None:
         if ((args.passcode < 0x0000001 and args.passcode > 0x5F5E0FE) or (args.passcode in INVALID_PASSCODES)):
             logging.error('Invalid passcode:' + str(args.passcode))
             sys.exit(1)
@@ -277,7 +277,7 @@ def gen_spake2p_params(passcode):
 
 
 def populate_factory_data(args, spake2p_params):
-    if args.discriminator:
+    if args.discriminator is not None:
         FACTORY_DATA['discriminator']['value'] = args.discriminator
 
     if spake2p_params:
@@ -301,15 +301,15 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['rd-id-uid']['value'] = args.rd_id_uid
     if args.mfg_date:
         FACTORY_DATA['mfg-date']['value'] = args.mfg_date
-    if args.vendor_id:
+    if args.vendor_id is not None:
         FACTORY_DATA['vendor-id']['value'] = args.vendor_id
     if args.vendor_name:
         FACTORY_DATA['vendor-name']['value'] = args.vendor_name
-    if args.product_id:
+    if args.product_id is not None:
         FACTORY_DATA['product-id']['value'] = args.product_id
     if args.product_name:
         FACTORY_DATA['product-name']['value'] = args.product_name
-    if args.hw_ver:
+    if args.hw_ver is not None:
         FACTORY_DATA['hardware-ver']['value'] = args.hw_ver
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
@@ -449,33 +449,28 @@ def main():
                         help='The discriminator for pairing, range: 0x00-0x0FFF')
 
     # These will be used by DeviceAttestationCredentialsProvider
-    parser.add_argument('--dac-cert', type=str,
-                        help='The path to the DAC certificate in der format')
-    parser.add_argument('--dac-key', type=str,
-                        help='The path to the DAC private key in der format')
-    parser.add_argument('--pai-cert', type=str,
-                        help='The path to the PAI certificate in der format')
-    parser.add_argument('--cd', type=str,
-                        help='The path to the certificate declaration der format')
+    parser.add_argument('--dac-cert', help='The path to the DAC certificate in der format')
+    parser.add_argument('--dac-key', help='The path to the DAC private key in der format')
+    parser.add_argument('--pai-cert', help='The path to the PAI certificate in der format')
+    parser.add_argument('--cd', help='The path to the certificate declaration der format')
 
     # These will be used by DeviceInstanceInfoProvider
     parser.add_argument('--vendor-id', type=any_base_int, help='Vendor id')
-    parser.add_argument('--vendor-name', type=str, help='Vendor name')
+    parser.add_argument('--vendor-name', help='Vendor name')
     parser.add_argument('--product-id', type=any_base_int, help='Product id')
-    parser.add_argument('--product-name', type=str, help='Product name')
+    parser.add_argument('--product-name', help='Product name')
     parser.add_argument('--hw-ver', type=any_base_int, help='Hardware version')
-    parser.add_argument('--hw-ver-str', type=str, help='Hardware version string')
-    parser.add_argument('--mfg-date', type=str, help='Manufacturing date in format YYYY-MM-DD')
-    parser.add_argument('--serial-num', type=str, help='Serial number')
-    parser.add_argument('--rd-id-uid', type=str,
+    parser.add_argument('--hw-ver-str', help='Hardware version string')
+    parser.add_argument('--mfg-date', help='Manufacturing date in format YYYY-MM-DD')
+    parser.add_argument('--serial-num', help='Serial number')
+    parser.add_argument('--rd-id-uid',
                         help='128-bit unique identifier for generating rotating device identifier, provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
 
     # These will be used by DeviceInfoProvider
-    parser.add_argument('--calendar-types', type=str, nargs='+',
+    parser.add_argument('--calendar-types', nargs='+',
                         help='List of supported calendar types.\nSupported Calendar Types: Buddhist, Chinese, Coptic, Ethiopian, Gregorian, Hebrew, Indian, Islamic, Japanese, Korean, Persian, Taiwanese')
-    parser.add_argument('--locales', type=str, nargs='+',
-                        help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
-    parser.add_argument('--fixed-labels', type=str, nargs='+',
+    parser.add_argument('--locales', nargs='+', help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
+    parser.add_argument('--fixed-labels', nargs='+',
                         help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
@@ -489,7 +484,7 @@ def main():
     args = parser.parse_args()
     validate_args(args)
 
-    if args.passcode:
+    if args.passcode is not None:
         spake2p_params = gen_spake2p_params(args.passcode)
 
     populate_factory_data(args, spake2p_params)
