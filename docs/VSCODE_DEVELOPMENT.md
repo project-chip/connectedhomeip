@@ -31,7 +31,7 @@ Tested on:
    <https://github.com/project-chip/connectedhomeip>
 1. Launch Visual Studio Code, and open the cloned folder from
 1. Install the
-   [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+   [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
    extension for Visual Studio Code, this extension allows you to use docker
    containers as a development backend.
 1. Once this is installed, you'll be prompted to reload Visual Studio Code, do
