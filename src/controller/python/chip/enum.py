@@ -15,8 +15,9 @@
 #    limitations under the License.
 #
 
-from aenum import IntEnum, extend_enum
 from threading import Lock
+
+from aenum import IntEnum, extend_enum
 
 # Flag on whether we should map unknown enum values to kUnknownEnumValue.
 _map_missing_enum_to_unknown_enum_value = True
