@@ -47,7 +47,7 @@ tests:
       command: "SelectOutput"
       arguments:
           values:
-              - name: "Index"
+              - name: "index"
                 value: Index
 
     - label: "Reads the CurrentOutput attribute"
