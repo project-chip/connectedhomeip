@@ -36,7 +36,7 @@ tests:
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       response:
-          value: [{ Label: "", NodeId: nodeId }]
+          value: [{ Label: "", NodeID: nodeId }]
           constraints:
               type: list
 
@@ -66,7 +66,7 @@ tests:
       cluster: "Operational Credentials"
       arguments:
           values:
-              - name: RootCertificate
+              - name: RootCACertificate
                 value: "00000000"
 
       response:

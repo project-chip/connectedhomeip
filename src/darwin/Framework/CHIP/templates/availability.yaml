@@ -4978,6 +4978,11 @@
           AdministratorCommissioning:
               OpenCommissioningWindow:
                   - pakePasscodeVerifier
+          OperationalCredentials:
+              AttestationResponse:
+                  - attestationSignature
+              AddTrustedRootCertificate:
+                  - rootCACertificate
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5002,6 +5007,8 @@
               - NetworkInterface
           ModeSelect:
               - SemanticTagStruct
+          OperationalCredentials:
+              - FabricDescriptorStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5100,6 +5107,19 @@
               SemanticTagStruct:
                   - mfgCode
                   - value
+          OperationalCredentials:
+              FabricDescriptorStruct:
+                  - rootPublicKey
+                  - vendorID
+                  - fabricID
+                  - nodeID
+                  - label
+                  - fabricIndex
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - vendorId
+                  - fabricId
+                  - nodeId
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5194,6 +5214,9 @@
               - HardwareFault
               - RadioFault
               - BootReasonEnum
+          OperationalCredentials:
+              - NodeOperationalCertStatusEnum
+              - CertificateChainTypeEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5307,6 +5330,21 @@
                   - HardwareWatchdogReset
                   - SoftwareUpdateCompleted
                   - SoftwareReset
+          OperationalCredentials:
+              NodeOperationalCertStatusEnum:
+                  - OK
+                  - InvalidPublicKey
+                  - InvalidNodeOpId
+                  - InvalidNOC
+                  - MissingCsr
+                  - TableFull
+                  - InvalidAdminSubject
+                  - FabricConflict
+                  - LabelConflict
+                  - InvalidFabricIndex
+              CertificateChainTypeEnum:
+                  - DACCertificate
+                  - PAICertificate
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5405,6 +5443,11 @@
           AdministratorCommissioning:
               OpenCommissioningWindow:
                   - pakeVerifier
+          OperationalCredentials:
+              AttestationResponse:
+                  - signature
+              AddTrustedRootCertificate:
+                  - rootCertificate
       structs:
           Descriptor:
               - DeviceType
@@ -5421,10 +5464,17 @@
               - NetworkInterfaceType
           ModeSelect:
               - SemanticTag
+          OperationalCredentials:
+              - FabricDescriptor
       struct fields:
           Descriptor:
               DeviceTypeStruct:
                   - type
+          OperationalCredentials:
+              FabricDescriptorStruct:
+                  - vendorId
+                  - fabricId
+                  - nodeId
       event fields:
           Switch:
               MultiPressComplete:
@@ -5441,6 +5491,8 @@
               - HardwareFaultType
               - RadioFaultType
               - BootReasonType
+          OperationalCredentials:
+              - OperationalCertStatus
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5503,6 +5555,14 @@
                   - 100G
                   - 200G
                   - 400G
+          OperationalCredentials:
+              # Both the enum and the values got renamed, so don't output the
+              # new value with the old enum name or the old value with the
+              # new enum name.
+              NodeOperationalCertStatusEnum:
+                  - SUCCESS
+              OperationalCertStatus:
+                  - OK
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -5567,6 +5627,11 @@
           AdministratorCommissioning:
               OpenCommissioningWindow:
                   pakePasscodeVerifier: pakeVerifier
+          OperationalCredentials:
+              AttestationResponse:
+                  attestationSignature: signature
+              AddTrustedRootCertificate:
+                  rootCACertificate: rootCertificate
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
@@ -5577,10 +5642,17 @@
               NetworkInterface: NetworkInterfaceType
           ModeSelect:
               SemanticTagStruct: SemanticTag
+          OperationalCredentials:
+              FabricDescriptorStruct: FabricDescriptor
       struct fields:
           Descriptor:
               DeviceTypeStruct:
                   deviceType: type
+          OperationalCredentials:
+              FabricDescriptorStruct:
+                  vendorID: vendorId
+                  fabricID: fabricId
+                  nodeID: nodeId
       event fields:
           Switch:
               MultiPressComplete:
@@ -5597,6 +5669,8 @@
               HardwareFault: HardwareFaultType
               RadioFault: RadioFaultType
               BootReasonEnum: BootReasonType
+          OperationalCredentials:
+              NodeOperationalCertStatusEnum: OperationalCertStatus
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5635,6 +5709,11 @@
                   Rate100G: 100G
                   Rate200G: 200G
                   Rate400G: 400G
+          OperationalCredentials:
+              NodeOperationalCertStatusEnum:
+                  OK: SUCCESS
+              OperationalCertStatus:
+                  OK: SUCCESS
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:

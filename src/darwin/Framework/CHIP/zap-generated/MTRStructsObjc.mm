@@ -2184,18 +2184,18 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROperationalCredentialsClusterFabricDescriptor
+@implementation MTROperationalCredentialsClusterFabricDescriptorStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _rootPublicKey = [NSData data];
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
-        _fabricId = @(0);
+        _fabricID = @(0);
 
-        _nodeId = @(0);
+        _nodeID = @(0);
 
         _label = @"";
 
@@ -2206,12 +2206,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROperationalCredentialsClusterFabricDescriptor alloc] init];
+    auto other = [[MTROperationalCredentialsClusterFabricDescriptorStruct alloc] init];
 
     other.rootPublicKey = self.rootPublicKey;
-    other.vendorId = self.vendorId;
-    other.fabricId = self.fabricId;
-    other.nodeId = self.nodeId;
+    other.vendorID = self.vendorID;
+    other.fabricID = self.fabricID;
+    other.nodeID = self.nodeID;
     other.label = self.label;
     other.fabricIndex = self.fabricIndex;
 
@@ -2221,12 +2221,45 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: rootPublicKey:%@; vendorId:%@; fabricId:%@; nodeId:%@; label:%@; fabricIndex:%@; >",
-                  NSStringFromClass([self class]), [_rootPublicKey base64EncodedStringWithOptions:0], _vendorId, _fabricId, _nodeId,
+        [NSString stringWithFormat:@"<%@: rootPublicKey:%@; vendorID:%@; fabricID:%@; nodeID:%@; label:%@; fabricIndex:%@; >",
+                  NSStringFromClass([self class]), [_rootPublicKey base64EncodedStringWithOptions:0], _vendorID, _fabricID, _nodeID,
                   _label, _fabricIndex];
     return descriptionString;
 }
 
+- (void)setVendorId:(NSNumber * _Nonnull)vendorId
+{
+    self.vendorID = vendorId;
+}
+
+- (NSNumber * _Nonnull)vendorId
+{
+    return self.vendorID;
+}
+
+- (void)setFabricId:(NSNumber * _Nonnull)fabricId
+{
+    self.fabricID = fabricId;
+}
+
+- (NSNumber * _Nonnull)fabricId
+{
+    return self.fabricID;
+}
+
+- (void)setNodeId:(NSNumber * _Nonnull)nodeId
+{
+    self.nodeID = nodeId;
+}
+
+- (NSNumber * _Nonnull)nodeId
+{
+    return self.nodeID;
+}
+
+@end
+
+@implementation MTROperationalCredentialsClusterFabricDescriptor : MTROperationalCredentialsClusterFabricDescriptorStruct
 @end
 
 @implementation MTROperationalCredentialsClusterNOCStruct

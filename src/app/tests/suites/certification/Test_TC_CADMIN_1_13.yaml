@@ -300,9 +300,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", NodeId: nodeId },
-                  { Label: "", NodeId: nodeId2 },
-                  { Label: "", NodeId: nodeId3 },
+                  { Label: "", NodeID: nodeId },
+                  { Label: "", NodeID: nodeId2 },
+                  { Label: "", NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -402,9 +402,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", NodeId: nodeId },
-                  { Label: "", NodeId: nodeId2 },
-                  { Label: "", NodeId: nodeId3 },
+                  { Label: "", NodeID: nodeId },
+                  { Label: "", NodeID: nodeId2 },
+                  { Label: "", NodeID: nodeId3 },
               ]
           constraints:
               type: list

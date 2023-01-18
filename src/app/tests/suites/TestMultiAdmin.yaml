@@ -98,7 +98,7 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value: [{ "NodeId": nodeId }]
+          value: [{ "NodeID": nodeId }]
 
     - label: "Close Commissioning Window after failed commissioning"
       cluster: "AdministratorCommissioning"

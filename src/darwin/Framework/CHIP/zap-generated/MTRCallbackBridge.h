@@ -342,10 +342,14 @@ typedef void (*AdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, chip::app::Clusters::AdministratorCommissioning::StatusCode);
 typedef void (*NullableAdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> &);
-typedef void (*OperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
-    void *, chip::app::Clusters::OperationalCredentials::OperationalCertStatus);
-typedef void (*NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> &);
+typedef void (*OperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback)(
+    void *, chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum);
+typedef void (*NullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum> &);
+typedef void (*OperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback)(
+    void *, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum);
+typedef void (*NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> &);
 typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
@@ -804,7 +808,7 @@ typedef void (*OperationalCredentialsNOCsListAttributeCallback)(
 typedef void (*OperationalCredentialsFabricsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
+        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & data);
 typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
 typedef void (*OperationalCredentialsGeneratedCommandListListAttributeCallback)(
@@ -5969,9 +5973,10 @@ public:
                                                                 MTRActionBlock action) :
         MTRCallbackBridge<OperationalCredentialsFabricsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & value);
 };
 
 class MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge
@@ -15565,74 +15570,151 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>
+class MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>
 {
 public:
-    MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<OperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, action,
-                                                                                               OnSuccessFn){};
+    MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<OperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::OperationalCertStatus value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum value);
 };
 
-class MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge
-    : public MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
+class MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge
 {
 public:
-    MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
+    MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, handler, action),
+        MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnDone;
+    using MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>
+class MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>
 {
 public:
-    MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler) :
-        MTRCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler,
-                                                                                                       OnSuccessFn){};
+    MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<NullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
 
-    MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler,
-                                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, action,
-                                                                                                       OnSuccessFn){};
+    MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum> & value);
 };
 
-class MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
+class MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
+    MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, handler, action),
+        MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnDone;
+    using MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>
+{
+public:
+    MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<OperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<OperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum value);
+};
+
+class MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge
+{
+public:
+    MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>
+{
+public:
+    MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                 ResponseHandler handler) :
+        MTRCallbackBridge<NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>(queue, handler,
+                                                                                                               OnSuccessFn){};
+
+    MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                 ResponseHandler handler,
+                                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> & value);
+};
+
+class MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

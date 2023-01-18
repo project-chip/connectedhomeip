@@ -686,7 +686,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType & value)
+                          const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -698,26 +698,26 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("VendorId", indent + 1, value.vendorId);
+        CHIP_ERROR err = LogValue("VendorID", indent + 1, value.vendorID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VendorId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VendorID'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("FabricId", indent + 1, value.fabricId);
+        CHIP_ERROR err = LogValue("FabricID", indent + 1, value.fabricID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricID'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("NodeId", indent + 1, value.nodeId);
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
             return err;
         }
     }
@@ -3903,7 +3903,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("attestationElements", indent + 1, value.attestationElements));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("signature", indent + 1, value.signature));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("attestationSignature", indent + 1, value.attestationSignature));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -6460,7 +6460,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         case OperationalCredentials::Attributes::Fabrics::Id: {
             chip::app::DataModel::DecodableList<
-                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Fabrics", 1, value);

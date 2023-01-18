@@ -1004,25 +1004,25 @@ public class ChipStructs {
     }
   }
 
-  public static class OperationalCredentialsClusterFabricDescriptor {
+  public static class OperationalCredentialsClusterFabricDescriptorStruct {
     public byte[] rootPublicKey;
-    public Integer vendorId;
-    public Long fabricId;
-    public Long nodeId;
+    public Integer vendorID;
+    public Long fabricID;
+    public Long nodeID;
     public String label;
     public Integer fabricIndex;
 
-    public OperationalCredentialsClusterFabricDescriptor(
+    public OperationalCredentialsClusterFabricDescriptorStruct(
         byte[] rootPublicKey,
-        Integer vendorId,
-        Long fabricId,
-        Long nodeId,
+        Integer vendorID,
+        Long fabricID,
+        Long nodeID,
         String label,
         Integer fabricIndex) {
       this.rootPublicKey = rootPublicKey;
-      this.vendorId = vendorId;
-      this.fabricId = fabricId;
-      this.nodeId = nodeId;
+      this.vendorID = vendorID;
+      this.fabricID = fabricID;
+      this.nodeID = nodeID;
       this.label = label;
       this.fabricIndex = fabricIndex;
     }
@@ -1030,18 +1030,18 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("OperationalCredentialsClusterFabricDescriptor {\n");
+      output.append("OperationalCredentialsClusterFabricDescriptorStruct {\n");
       output.append("\trootPublicKey: ");
       output.append(Arrays.toString(rootPublicKey));
       output.append("\n");
-      output.append("\tvendorId: ");
-      output.append(vendorId);
+      output.append("\tvendorID: ");
+      output.append(vendorID);
       output.append("\n");
-      output.append("\tfabricId: ");
-      output.append(fabricId);
+      output.append("\tfabricID: ");
+      output.append(fabricID);
       output.append("\n");
-      output.append("\tnodeId: ");
-      output.append(nodeId);
+      output.append("\tnodeID: ");
+      output.append(nodeID);
       output.append("\n");
       output.append("\tlabel: ");
       output.append(label);
