@@ -454,7 +454,7 @@ tests:
           Verify on TH(chip-tool) , DUT is responds right attribute value for above command
 
           [1653630542.619226][9034:9039] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3604656322
-          [1653630542.619277][9034:9039] CHIP:TOO:   occupancy sensor type: 0
+          [1653630542.619277][9034:9039] CHIP:TOO:   OccupancySensorType: 0
           [1653630542.619361][9034:9039] CHIP:EM: Sending Standalone Ack for MessageCounter:4568856 on exchange 18045i
       disabled: true
 
@@ -498,7 +498,7 @@ tests:
 
           Verify on TH(chip-tool) , DUT is responds right attribute value for above command
           [1653630949.025002][9198:9203] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3604656322
-          [1653630949.025066][9198:9203] CHIP:TOO:   occupancy sensor type: 0
+          [1653630949.025066][9198:9203] CHIP:TOO:   OccupancySensorType: 0
           [1653630949.025181][9198:9203] CHIP:EM: Sending Standalone Ack for MessageCounter:1638675 on exchange 63250i
       disabled: true
 

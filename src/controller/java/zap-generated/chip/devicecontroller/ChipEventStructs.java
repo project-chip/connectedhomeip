@@ -653,17 +653,17 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BridgedDeviceBasicClusterStartUpEvent {
+  public static class BridgedDeviceBasicInformationClusterStartUpEvent {
     public Long softwareVersion;
 
-    public BridgedDeviceBasicClusterStartUpEvent(Long softwareVersion) {
+    public BridgedDeviceBasicInformationClusterStartUpEvent(Long softwareVersion) {
       this.softwareVersion = softwareVersion;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterStartUpEvent {\n");
+      output.append("BridgedDeviceBasicInformationClusterStartUpEvent {\n");
       output.append("\tsoftwareVersion: ");
       output.append(softwareVersion);
       output.append("\n");
@@ -672,43 +672,43 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BridgedDeviceBasicClusterShutDownEvent {
+  public static class BridgedDeviceBasicInformationClusterShutDownEvent {
 
-    public BridgedDeviceBasicClusterShutDownEvent() {}
+    public BridgedDeviceBasicInformationClusterShutDownEvent() {}
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterShutDownEvent {\n");
+      output.append("BridgedDeviceBasicInformationClusterShutDownEvent {\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class BridgedDeviceBasicClusterLeaveEvent {
+  public static class BridgedDeviceBasicInformationClusterLeaveEvent {
 
-    public BridgedDeviceBasicClusterLeaveEvent() {}
+    public BridgedDeviceBasicInformationClusterLeaveEvent() {}
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterLeaveEvent {\n");
+      output.append("BridgedDeviceBasicInformationClusterLeaveEvent {\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class BridgedDeviceBasicClusterReachableChangedEvent {
+  public static class BridgedDeviceBasicInformationClusterReachableChangedEvent {
     public Boolean reachableNewValue;
 
-    public BridgedDeviceBasicClusterReachableChangedEvent(Boolean reachableNewValue) {
+    public BridgedDeviceBasicInformationClusterReachableChangedEvent(Boolean reachableNewValue) {
       this.reachableNewValue = reachableNewValue;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterReachableChangedEvent {\n");
+      output.append("BridgedDeviceBasicInformationClusterReachableChangedEvent {\n");
       output.append("\treachableNewValue: ");
       output.append(reachableNewValue);
       output.append("\n");

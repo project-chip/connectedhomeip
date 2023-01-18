@@ -86,14 +86,12 @@ endif (CONFIG_ENABLE_CHIP_SHELL)
 target_sources(app PRIVATE
     ${CHEF}/nrfconnect/main.cpp
     ${CHEF}/common/stubs.cpp
-    ${GEN_DIR}/IMClusterCommandHandler.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
-    GEN_DIR ${GEN_DIR}
 )
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

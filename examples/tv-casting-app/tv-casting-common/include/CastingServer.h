@@ -36,7 +36,7 @@
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <functional>
-#include <tv-casting-app/zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
 constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);

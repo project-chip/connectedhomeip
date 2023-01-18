@@ -5512,15 +5512,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster Bridged Device Basic
+ * Cluster Bridged Device Basic Information
  *
  * This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
           the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name.
  */
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBaseClusterBridgedDeviceBasic : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterBridgedDeviceBasicInformation : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -17027,6 +17027,10 @@ MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterOTASoftwareUpdateRequestor")
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRBaseClusterBridgedDeviceBasic : MTRBaseClusterBridgedDeviceBasicInformation
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterWakeOnLAN")
 @interface MTRBaseClusterWakeOnLan : MTRBaseClusterWakeOnLAN
 @end
@@ -17894,25 +17898,57 @@ typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningStatusCode) {
     MTRAdministratorCommissioningStatusCodeWindowNotOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTROperationalCredentialsCertificateChainType) {
+    MTROperationalCredentialsCertificateChainTypeDACCertificate MTR_NEWLY_AVAILABLE = 0x01,
+    MTROperationalCredentialsCertificateChainTypePAICertificate MTR_NEWLY_AVAILABLE = 0x02,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTROperationalCredentialsNodeOperationalCertStatus) {
+    MTROperationalCredentialsNodeOperationalCertStatusOK MTR_NEWLY_AVAILABLE = 0x00,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidPublicKey MTR_NEWLY_AVAILABLE = 0x01,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidNodeOpId MTR_NEWLY_AVAILABLE = 0x02,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidNOC MTR_NEWLY_AVAILABLE = 0x03,
+    MTROperationalCredentialsNodeOperationalCertStatusMissingCsr MTR_NEWLY_AVAILABLE = 0x04,
+    MTROperationalCredentialsNodeOperationalCertStatusTableFull MTR_NEWLY_AVAILABLE = 0x05,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidAdminSubject MTR_NEWLY_AVAILABLE = 0x06,
+    MTROperationalCredentialsNodeOperationalCertStatusFabricConflict MTR_NEWLY_AVAILABLE = 0x09,
+    MTROperationalCredentialsNodeOperationalCertStatusLabelConflict MTR_NEWLY_AVAILABLE = 0x0A,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidFabricIndex MTR_NEWLY_AVAILABLE = 0x0B,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTROperationalCredentialsOperationalCertStatus) {
-    MTROperationalCredentialsOperationalCertStatusSUCCESS API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTROperationalCredentialsOperationalCertStatusSUCCESS API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusOK")
+    = 0x00,
     MTROperationalCredentialsOperationalCertStatusInvalidPublicKey API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidPublicKey")
     = 0x01,
     MTROperationalCredentialsOperationalCertStatusInvalidNodeOpId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidNodeOpId")
     = 0x02,
-    MTROperationalCredentialsOperationalCertStatusInvalidNOC API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTROperationalCredentialsOperationalCertStatusMissingCsr API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTROperationalCredentialsOperationalCertStatusTableFull API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTROperationalCredentialsOperationalCertStatusInvalidAdminSubject API_AVAILABLE(
-        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTROperationalCredentialsOperationalCertStatusInvalidNOC API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidNOC")
+    = 0x03,
+    MTROperationalCredentialsOperationalCertStatusMissingCsr API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusMissingCsr")
+    = 0x04,
+    MTROperationalCredentialsOperationalCertStatusTableFull API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusTableFull")
+    = 0x05,
+    MTROperationalCredentialsOperationalCertStatusInvalidAdminSubject API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+        tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidAdminSubject")
     = 0x06,
     MTROperationalCredentialsOperationalCertStatusFabricConflict API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusFabricConflict")
     = 0x09,
     MTROperationalCredentialsOperationalCertStatusLabelConflict API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusLabelConflict")
     = 0x0A,
     MTROperationalCredentialsOperationalCertStatusInvalidFabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidFabricIndex")
     = 0x0B,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatus");
 
 typedef NS_ENUM(uint8_t, MTRGroupKeyManagementGroupKeySecurityPolicy) {
     MTRGroupKeyManagementGroupKeySecurityPolicyTrustFirst API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,

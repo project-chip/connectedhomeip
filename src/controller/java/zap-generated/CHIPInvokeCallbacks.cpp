@@ -1867,13 +1867,13 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallback::CallbackFn(
     env->SetByteArrayRegion(AttestationElementsByteArray, 0, static_cast<jsize>(dataResponse.attestationElements.size()),
                             reinterpret_cast<const jbyte *>(dataResponse.attestationElements.data()));
     AttestationElements = AttestationElementsByteArray;
-    jobject Signature;
-    jbyteArray SignatureByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.signature.size()));
-    env->SetByteArrayRegion(SignatureByteArray, 0, static_cast<jsize>(dataResponse.signature.size()),
-                            reinterpret_cast<const jbyte *>(dataResponse.signature.data()));
-    Signature = SignatureByteArray;
+    jobject AttestationSignature;
+    jbyteArray AttestationSignatureByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.attestationSignature.size()));
+    env->SetByteArrayRegion(AttestationSignatureByteArray, 0, static_cast<jsize>(dataResponse.attestationSignature.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.attestationSignature.data()));
+    AttestationSignature = AttestationSignatureByteArray;
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, AttestationElements, Signature);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, AttestationElements, AttestationSignature);
 }
 CHIPOperationalCredentialsClusterCertificateChainResponseCallback::
     CHIPOperationalCredentialsClusterCertificateChainResponseCallback(jobject javaCallback) :

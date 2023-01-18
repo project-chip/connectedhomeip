@@ -10745,7 +10745,7 @@ class TimeSynchronization(Cluster):
 
 
 @dataclass
-class BridgedDeviceBasic(Cluster):
+class BridgedDeviceBasicInformation(Cluster):
     id: typing.ClassVar[int] = 0x0039
 
     @ChipUtility.classproperty
@@ -11751,7 +11751,7 @@ class OperationalCredentials(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="NOCs", Tag=0x00000000, Type=typing.List[OperationalCredentials.Structs.NOCStruct]),
-                ClusterObjectFieldDescriptor(Label="fabrics", Tag=0x00000001, Type=typing.List[OperationalCredentials.Structs.FabricDescriptor]),
+                ClusterObjectFieldDescriptor(Label="fabrics", Tag=0x00000001, Type=typing.List[OperationalCredentials.Structs.FabricDescriptorStruct]),
                 ClusterObjectFieldDescriptor(Label="supportedFabrics", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="commissionedFabrics", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="trustedRootCertificates", Tag=0x00000004, Type=typing.List[bytes]),
@@ -11764,7 +11764,7 @@ class OperationalCredentials(Cluster):
             ])
 
     NOCs: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = None
-    fabrics: 'typing.List[OperationalCredentials.Structs.FabricDescriptor]' = None
+    fabrics: 'typing.List[OperationalCredentials.Structs.FabricDescriptorStruct]' = None
     supportedFabrics: 'uint' = None
     commissionedFabrics: 'uint' = None
     trustedRootCertificates: 'typing.List[bytes]' = None
@@ -11776,8 +11776,17 @@ class OperationalCredentials(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class OperationalCertStatus(MatterIntEnum):
-            kSuccess = 0x00
+        class CertificateChainTypeEnum(MatterIntEnum):
+            kDACCertificate = 0x01
+            kPAICertificate = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 0,
+
+        class NodeOperationalCertStatusEnum(MatterIntEnum):
+            kOk = 0x00
             kInvalidPublicKey = 0x01
             kInvalidNodeOpId = 0x02
             kInvalidNOC = 0x03
@@ -11796,23 +11805,23 @@ class OperationalCredentials(Cluster):
 
     class Structs:
         @dataclass
-        class FabricDescriptor(ClusterObject):
+        class FabricDescriptorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="rootPublicKey", Tag=1, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="vendorId", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="fabricId", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="nodeId", Tag=4, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="vendorID", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="fabricID", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="nodeID", Tag=4, Type=uint),
                             ClusterObjectFieldDescriptor(Label="label", Tag=5, Type=str),
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             rootPublicKey: 'bytes' = b""
-            vendorId: 'uint' = 0
-            fabricId: 'uint' = 0
-            nodeId: 'uint' = 0
+            vendorID: 'uint' = 0
+            fabricID: 'uint' = 0
+            nodeID: 'uint' = 0
             label: 'str' = ""
             fabricIndex: 'uint' = 0
 
@@ -11862,11 +11871,11 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="attestationElements", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="signature", Tag=1, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="attestationSignature", Tag=1, Type=bytes),
                     ])
 
             attestationElements: 'bytes' = b""
-            signature: 'bytes' = b""
+            attestationSignature: 'bytes' = b""
 
         @dataclass
         class CertificateChainRequest(ClusterCommand):
@@ -11879,10 +11888,10 @@ class OperationalCredentials(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=OperationalCredentials.Enums.CertificateChainTypeEnum),
                     ])
 
-            certificateType: 'uint' = 0
+            certificateType: 'OperationalCredentials.Enums.CertificateChainTypeEnum' = 0
 
         @dataclass
         class CertificateChainResponse(ClusterCommand):
@@ -11989,12 +11998,12 @@ class OperationalCredentials(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="statusCode", Tag=0, Type=OperationalCredentials.Enums.OperationalCertStatus),
+                            ClusterObjectFieldDescriptor(Label="statusCode", Tag=0, Type=OperationalCredentials.Enums.NodeOperationalCertStatusEnum),
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=1, Type=typing.Optional[uint]),
                             ClusterObjectFieldDescriptor(Label="debugText", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            statusCode: 'OperationalCredentials.Enums.OperationalCertStatus' = 0
+            statusCode: 'OperationalCredentials.Enums.NodeOperationalCertStatusEnum' = 0
             fabricIndex: 'typing.Optional[uint]' = None
             debugText: 'typing.Optional[str]' = None
 
@@ -12041,10 +12050,10 @@ class OperationalCredentials(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="rootCertificate", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="rootCACertificate", Tag=0, Type=bytes),
                     ])
 
-            rootCertificate: 'bytes' = b""
+            rootCACertificate: 'bytes' = b""
 
 
     class Attributes:
@@ -12076,9 +12085,9 @@ class OperationalCredentials(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[OperationalCredentials.Structs.FabricDescriptor])
+                return ClusterObjectFieldDescriptor(Type=typing.List[OperationalCredentials.Structs.FabricDescriptorStruct])
 
-            value: 'typing.List[OperationalCredentials.Structs.FabricDescriptor]' = field(default_factory=lambda: [])
+            value: 'typing.List[OperationalCredentials.Structs.FabricDescriptorStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class SupportedFabrics(ClusterAttributeDescriptor):
@@ -21690,9 +21699,9 @@ class OccupancySensing(Cluster):
                 ClusterObjectFieldDescriptor(Label="occupancy", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="occupancySensorType", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="occupancySensorTypeBitmap", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="pirOccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="pirUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="pirUnoccupiedToOccupiedThreshold", Tag=0x00000012, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="PIROccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedThreshold", Tag=0x00000012, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ultrasonicOccupiedToUnoccupiedDelay", Tag=0x00000020, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ultrasonicUnoccupiedToOccupiedDelay", Tag=0x00000021, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ultrasonicUnoccupiedToOccupiedThreshold", Tag=0x00000022, Type=typing.Optional[uint]),
@@ -21709,9 +21718,9 @@ class OccupancySensing(Cluster):
     occupancy: 'uint' = None
     occupancySensorType: 'uint' = None
     occupancySensorTypeBitmap: 'uint' = None
-    pirOccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
-    pirUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
-    pirUnoccupiedToOccupiedThreshold: 'typing.Optional[uint]' = None
+    PIROccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
+    PIRUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
+    PIRUnoccupiedToOccupiedThreshold: 'typing.Optional[uint]' = None
     ultrasonicOccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
     ultrasonicUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
     ultrasonicUnoccupiedToOccupiedThreshold: 'typing.Optional[uint]' = None
@@ -21777,7 +21786,7 @@ class OccupancySensing(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class PirOccupiedToUnoccupiedDelay(ClusterAttributeDescriptor):
+        class PIROccupiedToUnoccupiedDelay(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0406
@@ -21793,7 +21802,7 @@ class OccupancySensing(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class PirUnoccupiedToOccupiedDelay(ClusterAttributeDescriptor):
+        class PIRUnoccupiedToOccupiedDelay(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0406
@@ -21809,7 +21818,7 @@ class OccupancySensing(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class PirUnoccupiedToOccupiedThreshold(ClusterAttributeDescriptor):
+        class PIRUnoccupiedToOccupiedThreshold(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0406

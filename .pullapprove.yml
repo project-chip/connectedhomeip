@@ -144,6 +144,14 @@ groups:
             teams: [reviewers-samsung]
         reviews:
             request: 10
+    shared-reviewers-signify:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-signify]
+        reviews:
+            request: 10
     shared-reviewers-silabs:
         type: optional
         conditions:
@@ -159,7 +167,7 @@ groups:
         reviewers:
             teams: [reviewers-tcl]
         reviews:
-            request: 1
+            request: 10
 
     ############################################################
     #  Base Required Reviewers

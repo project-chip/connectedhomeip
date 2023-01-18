@@ -141,8 +141,6 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated/IMClusterCommandHandler.cpp
-
     ${chip_dir}/examples/lighting-app/lighting-common/src/ColorFormat.cpp
 
     ${chip_dir}/examples/lighting-app/ameba/main/chipinterface.cpp

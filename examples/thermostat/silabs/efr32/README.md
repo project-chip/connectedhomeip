@@ -131,7 +131,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/efr32/ ./out/thermostat-app BRD4161A
+          ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/silabs/efr32/ ./out/thermostat-app BRD4161A
 
 -   To delete generated executable, libraries and object files use:
 
@@ -140,7 +140,7 @@ Silicon Labs platform.
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/thermostat/efr32
+          $ cd ~/connectedhomeip/examples/thermostat/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
@@ -149,16 +149,16 @@ Silicon Labs platform.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/thermostat/efr32
+          $ cd ~/connectedhomeip/examples/thermostat/silabs/efr32
           $ rm -rf out/
 
 *   Build the example with Matter shell
 
-          ./scripts/examples/gn_efr32_example.sh examples/thermostat/efr32/ out/thermostat-app BRD4161A chip_build_libshell=true
+          ./scripts/examples/gn_efr32_example.sh examples/thermostat/silabs/efr32/ out/thermostat-app BRD4161A chip_build_libshell=true
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/efr32/ ./out/thermostat-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/silabs/efr32/ ./out/thermostat-app_SED BRD4161A --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
@@ -166,11 +166,11 @@ Silicon Labs platform.
 
 *   Build the example with pigweed RCP
 
-          $ ./scripts/examples/gn_efr32_example.sh examples/thermostat/efr32/ out/thermostat-app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_efr32_example.sh examples/thermostat/silabs/efr32/ out/thermostat-app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/thermostat/efr32
+          $ cd ~/connectedhomeip/examples/thermostat/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
@@ -186,7 +186,7 @@ arguments
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/thermostat/efr32
+          $ cd ~/connectedhomeip/examples/thermostat/silabs/efr32
           $ python3 out/debug/chip-efr32-thermostat-switch-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
@@ -252,7 +252,7 @@ combination with JLinkRTTClient as follows:
 
 -   For this example to work, it is necessary to have a second efr32 device
     running the
-    [thermostat app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/thermostat/efr32/README.md)
+    [thermostat app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/thermostat/silabs/efr32/README.md)
     commissioned on the same openthread network
 
 -   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
@@ -373,19 +373,19 @@ features can easily be toggled on or off. Here is a short list of options :
 
 chip_progress_logging, chip_detail_logging, chip_automation_logging
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/efr32 ./out/thermostat-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/silabs/efr32 ./out/thermostat-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
 
 ### Debug build / release build
 
 is_debug
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/efr32 ./out/thermostat-app BRD4164A "is_debug=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/silabs/efr32 ./out/thermostat-app BRD4164A "is_debug=false"
 
 ### Disabling LCD
 
 show_qr_code
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/efr32 ./out/thermostat-app BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/silabs/efr32 ./out/thermostat-app BRD4164A "show_qr_code=false"
 
 ### KVS maximum entry count
 
@@ -394,4 +394,4 @@ kvs_max_entries
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/efr32 ./out/thermostat-app BRD4164A kvs_max_entries=50
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/thermostat/silabs/efr32 ./out/thermostat-app BRD4164A kvs_max_entries=50

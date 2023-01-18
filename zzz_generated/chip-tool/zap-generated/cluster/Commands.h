@@ -62,7 +62,7 @@
 | WiFiNetworkDiagnostics                                              | 0x0036 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | TimeSynchronization                                                 | 0x0038 |
-| BridgedDeviceBasic                                                  | 0x0039 |
+| BridgedDeviceBasicInformation                                       | 0x0039 |
 | Switch                                                              | 0x003B |
 | AdministratorCommissioning                                          | 0x003C |
 | OperationalCredentials                                              | 0x003E |
@@ -2969,7 +2969,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster BridgedDeviceBasic                                          | 0x0039 |
+| Cluster BridgedDeviceBasicInformation                               | 0x0039 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -3402,7 +3402,7 @@ public:
     OperationalCredentialsAddTrustedRootCertificate(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-trusted-root-certificate", credsIssuerConfig)
     {
-        AddArgument("RootCertificate", &mRequest.rootCertificate);
+        AddArgument("RootCACertificate", &mRequest.rootCACertificate);
         ClusterCommand::AddArguments();
     }
 
@@ -5894,9 +5894,9 @@ private:
 | * Occupancy                                                         | 0x0000 |
 | * OccupancySensorType                                               | 0x0001 |
 | * OccupancySensorTypeBitmap                                         | 0x0002 |
-| * PirOccupiedToUnoccupiedDelay                                      | 0x0010 |
-| * PirUnoccupiedToOccupiedDelay                                      | 0x0011 |
-| * PirUnoccupiedToOccupiedThreshold                                  | 0x0012 |
+| * PIROccupiedToUnoccupiedDelay                                      | 0x0010 |
+| * PIRUnoccupiedToOccupiedDelay                                      | 0x0011 |
+| * PIRUnoccupiedToOccupiedThreshold                                  | 0x0012 |
 | * UltrasonicOccupiedToUnoccupiedDelay                               | 0x0020 |
 | * UltrasonicUnoccupiedToOccupiedDelay                               | 0x0021 |
 | * UltrasonicUnoccupiedToOccupiedThreshold                           | 0x0022 |
@@ -10094,11 +10094,11 @@ void registerClusterTimeSynchronization(Commands & commands, CredentialIssuerCom
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBridgedDeviceBasic(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBridgedDeviceBasicInformation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::BridgedDeviceBasic;
+    using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
-    const char * clusterName = "BridgedDeviceBasic";
+    const char * clusterName = "BridgedDeviceBasicInformation";
 
     commands_list clusterCommands = {
         //
@@ -12040,11 +12040,11 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
                                    credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "pir-occupied-to-unoccupied-delay", Attributes::PirOccupiedToUnoccupiedDelay::Id,
+        make_unique<ReadAttribute>(Id, "piroccupied-to-unoccupied-delay", Attributes::PIROccupiedToUnoccupiedDelay::Id,
                                    credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "pir-unoccupied-to-occupied-delay", Attributes::PirUnoccupiedToOccupiedDelay::Id,
+        make_unique<ReadAttribute>(Id, "pirunoccupied-to-occupied-delay", Attributes::PIRUnoccupiedToOccupiedDelay::Id,
                                    credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "pir-unoccupied-to-occupied-threshold", Attributes::PirUnoccupiedToOccupiedThreshold::Id,
+        make_unique<ReadAttribute>(Id, "pirunoccupied-to-occupied-threshold", Attributes::PIRUnoccupiedToOccupiedThreshold::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "ultrasonic-occupied-to-unoccupied-delay",
                                    Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
@@ -12064,12 +12064,12 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<uint16_t>>(Id, "pir-occupied-to-unoccupied-delay", 0, UINT16_MAX,
-                                              Attributes::PirOccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "pir-unoccupied-to-occupied-delay", 0, UINT16_MAX,
-                                              Attributes::PirUnoccupiedToOccupiedDelay::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "pir-unoccupied-to-occupied-threshold", 0, UINT8_MAX,
-                                             Attributes::PirUnoccupiedToOccupiedThreshold::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "piroccupied-to-unoccupied-delay", 0, UINT16_MAX,
+                                              Attributes::PIROccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "pirunoccupied-to-occupied-delay", 0, UINT16_MAX,
+                                              Attributes::PIRUnoccupiedToOccupiedDelay::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "pirunoccupied-to-occupied-threshold", 0, UINT8_MAX,
+                                             Attributes::PIRUnoccupiedToOccupiedThreshold::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "ultrasonic-occupied-to-unoccupied-delay", 0, UINT16_MAX,
                                               Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "ultrasonic-unoccupied-to-occupied-delay", 0, UINT16_MAX,
@@ -12087,12 +12087,12 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
                                         credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "pir-occupied-to-unoccupied-delay", Attributes::PirOccupiedToUnoccupiedDelay::Id,
+        make_unique<SubscribeAttribute>(Id, "piroccupied-to-unoccupied-delay", Attributes::PIROccupiedToUnoccupiedDelay::Id,
                                         credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "pir-unoccupied-to-occupied-delay", Attributes::PirUnoccupiedToOccupiedDelay::Id,
+        make_unique<SubscribeAttribute>(Id, "pirunoccupied-to-occupied-delay", Attributes::PIRUnoccupiedToOccupiedDelay::Id,
                                         credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "pir-unoccupied-to-occupied-threshold",
-                                        Attributes::PirUnoccupiedToOccupiedThreshold::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "pirunoccupied-to-occupied-threshold", Attributes::PIRUnoccupiedToOccupiedThreshold::Id,
+                                        credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "ultrasonic-occupied-to-unoccupied-delay",
                                         Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "ultrasonic-unoccupied-to-occupied-delay",
@@ -13561,7 +13561,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterWiFiNetworkDiagnostics(commands, credsIssuerConfig);
     registerClusterEthernetNetworkDiagnostics(commands, credsIssuerConfig);
     registerClusterTimeSynchronization(commands, credsIssuerConfig);
-    registerClusterBridgedDeviceBasic(commands, credsIssuerConfig);
+    registerClusterBridgedDeviceBasicInformation(commands, credsIssuerConfig);
     registerClusterSwitch(commands, credsIssuerConfig);
     registerClusterAdministratorCommissioning(commands, credsIssuerConfig);
     registerClusterOperationalCredentials(commands, credsIssuerConfig);
