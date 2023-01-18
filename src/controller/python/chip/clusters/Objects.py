@@ -87,7 +87,7 @@ class Identify(Cluster):
         @dataclass
         class Identify(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0003
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -103,7 +103,7 @@ class Identify(Cluster):
         @dataclass
         class TriggerEffect(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0003
-            command_id: typing.ClassVar[int] = 0x0040
+            command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -263,7 +263,7 @@ class Groups(Cluster):
         @dataclass
         class AddGroup(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'AddGroupResponse'
 
@@ -281,7 +281,7 @@ class Groups(Cluster):
         @dataclass
         class AddGroupResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -299,7 +299,7 @@ class Groups(Cluster):
         @dataclass
         class ViewGroup(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ViewGroupResponse'
 
@@ -315,7 +315,7 @@ class Groups(Cluster):
         @dataclass
         class ViewGroupResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -335,7 +335,7 @@ class Groups(Cluster):
         @dataclass
         class GetGroupMembership(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetGroupMembershipResponse'
 
@@ -351,7 +351,7 @@ class Groups(Cluster):
         @dataclass
         class GetGroupMembershipResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -369,7 +369,7 @@ class Groups(Cluster):
         @dataclass
         class RemoveGroup(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'RemoveGroupResponse'
 
@@ -385,7 +385,7 @@ class Groups(Cluster):
         @dataclass
         class RemoveGroupResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -403,7 +403,7 @@ class Groups(Cluster):
         @dataclass
         class RemoveAllGroups(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -417,7 +417,7 @@ class Groups(Cluster):
         @dataclass
         class AddGroupIfIdentifying(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0004
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -599,7 +599,7 @@ class Scenes(Cluster):
         @dataclass
         class AddScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'AddSceneResponse'
 
@@ -623,7 +623,7 @@ class Scenes(Cluster):
         @dataclass
         class AddSceneResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -643,7 +643,7 @@ class Scenes(Cluster):
         @dataclass
         class ViewScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ViewSceneResponse'
 
@@ -661,7 +661,7 @@ class Scenes(Cluster):
         @dataclass
         class ViewSceneResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -687,7 +687,7 @@ class Scenes(Cluster):
         @dataclass
         class RemoveScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'RemoveSceneResponse'
 
@@ -705,7 +705,7 @@ class Scenes(Cluster):
         @dataclass
         class RemoveSceneResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -725,7 +725,7 @@ class Scenes(Cluster):
         @dataclass
         class RemoveAllScenes(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'RemoveAllScenesResponse'
 
@@ -741,7 +741,7 @@ class Scenes(Cluster):
         @dataclass
         class RemoveAllScenesResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -759,7 +759,7 @@ class Scenes(Cluster):
         @dataclass
         class StoreScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'StoreSceneResponse'
 
@@ -777,7 +777,7 @@ class Scenes(Cluster):
         @dataclass
         class StoreSceneResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -797,7 +797,7 @@ class Scenes(Cluster):
         @dataclass
         class RecallScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -817,7 +817,7 @@ class Scenes(Cluster):
         @dataclass
         class GetSceneMembership(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetSceneMembershipResponse'
 
@@ -833,7 +833,7 @@ class Scenes(Cluster):
         @dataclass
         class GetSceneMembershipResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -855,7 +855,7 @@ class Scenes(Cluster):
         @dataclass
         class EnhancedAddScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0040
+            command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'EnhancedAddSceneResponse'
 
@@ -879,7 +879,7 @@ class Scenes(Cluster):
         @dataclass
         class EnhancedAddSceneResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0040
+            command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -899,7 +899,7 @@ class Scenes(Cluster):
         @dataclass
         class EnhancedViewScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0041
+            command_id: typing.ClassVar[int] = 0x00000041
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'EnhancedViewSceneResponse'
 
@@ -917,7 +917,7 @@ class Scenes(Cluster):
         @dataclass
         class EnhancedViewSceneResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0041
+            command_id: typing.ClassVar[int] = 0x00000041
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -943,7 +943,7 @@ class Scenes(Cluster):
         @dataclass
         class CopyScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0042
+            command_id: typing.ClassVar[int] = 0x00000042
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'CopySceneResponse'
 
@@ -967,7 +967,7 @@ class Scenes(Cluster):
         @dataclass
         class CopySceneResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0005
-            command_id: typing.ClassVar[int] = 0x0042
+            command_id: typing.ClassVar[int] = 0x00000042
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -1219,7 +1219,7 @@ class OnOff(Cluster):
         @dataclass
         class Off(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0006
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1233,7 +1233,7 @@ class OnOff(Cluster):
         @dataclass
         class On(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0006
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1247,7 +1247,7 @@ class OnOff(Cluster):
         @dataclass
         class Toggle(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0006
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1261,7 +1261,7 @@ class OnOff(Cluster):
         @dataclass
         class OffWithEffect(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0006
-            command_id: typing.ClassVar[int] = 0x0040
+            command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1279,7 +1279,7 @@ class OnOff(Cluster):
         @dataclass
         class OnWithRecallGlobalScene(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0006
-            command_id: typing.ClassVar[int] = 0x0041
+            command_id: typing.ClassVar[int] = 0x00000041
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1293,7 +1293,7 @@ class OnOff(Cluster):
         @dataclass
         class OnWithTimedOff(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0006
-            command_id: typing.ClassVar[int] = 0x0042
+            command_id: typing.ClassVar[int] = 0x00000042
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1681,7 +1681,7 @@ class LevelControl(Cluster):
         @dataclass
         class MoveToLevel(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1703,7 +1703,7 @@ class LevelControl(Cluster):
         @dataclass
         class Move(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1725,7 +1725,7 @@ class LevelControl(Cluster):
         @dataclass
         class Step(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1749,7 +1749,7 @@ class LevelControl(Cluster):
         @dataclass
         class Stop(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1767,7 +1767,7 @@ class LevelControl(Cluster):
         @dataclass
         class MoveToLevelWithOnOff(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1789,7 +1789,7 @@ class LevelControl(Cluster):
         @dataclass
         class MoveWithOnOff(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1811,7 +1811,7 @@ class LevelControl(Cluster):
         @dataclass
         class StepWithOnOff(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1835,7 +1835,7 @@ class LevelControl(Cluster):
         @dataclass
         class StopWithOnOff(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -1853,7 +1853,7 @@ class LevelControl(Cluster):
         @dataclass
         class MoveToClosestFrequency(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0008
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3307,7 +3307,7 @@ class Actions(Cluster):
         @dataclass
         class InstantAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3325,7 +3325,7 @@ class Actions(Cluster):
         @dataclass
         class InstantActionWithTransition(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3345,7 +3345,7 @@ class Actions(Cluster):
         @dataclass
         class StartAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3363,7 +3363,7 @@ class Actions(Cluster):
         @dataclass
         class StartActionWithDuration(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3383,7 +3383,7 @@ class Actions(Cluster):
         @dataclass
         class StopAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3401,7 +3401,7 @@ class Actions(Cluster):
         @dataclass
         class PauseAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3419,7 +3419,7 @@ class Actions(Cluster):
         @dataclass
         class PauseActionWithDuration(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3439,7 +3439,7 @@ class Actions(Cluster):
         @dataclass
         class ResumeAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3457,7 +3457,7 @@ class Actions(Cluster):
         @dataclass
         class EnableAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3475,7 +3475,7 @@ class Actions(Cluster):
         @dataclass
         class EnableActionWithDuration(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x0009
+            command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3495,7 +3495,7 @@ class Actions(Cluster):
         @dataclass
         class DisableAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x000A
+            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3513,7 +3513,7 @@ class Actions(Cluster):
         @dataclass
         class DisableActionWithDuration(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
-            command_id: typing.ClassVar[int] = 0x000B
+            command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -3793,7 +3793,7 @@ class BasicInformation(Cluster):
         @dataclass
         class MfgSpecificPing(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0028
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x10020000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -4328,7 +4328,7 @@ class OtaSoftwareUpdateProvider(Cluster):
         @dataclass
         class QueryImage(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'QueryImageResponse'
 
@@ -4358,7 +4358,7 @@ class OtaSoftwareUpdateProvider(Cluster):
         @dataclass
         class QueryImageResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -4388,7 +4388,7 @@ class OtaSoftwareUpdateProvider(Cluster):
         @dataclass
         class ApplyUpdateRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ApplyUpdateResponse'
 
@@ -4406,7 +4406,7 @@ class OtaSoftwareUpdateProvider(Cluster):
         @dataclass
         class ApplyUpdateResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -4424,7 +4424,7 @@ class OtaSoftwareUpdateProvider(Cluster):
         @dataclass
         class NotifyUpdateApplied(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -4599,7 +4599,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
         @dataclass
         class AnnounceOTAProvider(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x002A
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -6305,7 +6305,7 @@ class GeneralCommissioning(Cluster):
         @dataclass
         class ArmFailSafe(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0030
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ArmFailSafeResponse'
 
@@ -6323,7 +6323,7 @@ class GeneralCommissioning(Cluster):
         @dataclass
         class ArmFailSafeResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0030
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -6341,7 +6341,7 @@ class GeneralCommissioning(Cluster):
         @dataclass
         class SetRegulatoryConfig(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0030
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'SetRegulatoryConfigResponse'
 
@@ -6361,7 +6361,7 @@ class GeneralCommissioning(Cluster):
         @dataclass
         class SetRegulatoryConfigResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0030
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -6379,7 +6379,7 @@ class GeneralCommissioning(Cluster):
         @dataclass
         class CommissioningComplete(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0030
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'CommissioningCompleteResponse'
 
@@ -6393,7 +6393,7 @@ class GeneralCommissioning(Cluster):
         @dataclass
         class CommissioningCompleteResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0030
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -6699,7 +6699,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class ScanNetworks(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ScanNetworksResponse'
 
@@ -6717,7 +6717,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class ScanNetworksResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -6739,7 +6739,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class AddOrUpdateWiFiNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NetworkConfigResponse'
 
@@ -6759,7 +6759,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class AddOrUpdateThreadNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NetworkConfigResponse'
 
@@ -6777,7 +6777,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class RemoveNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NetworkConfigResponse'
 
@@ -6795,7 +6795,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class NetworkConfigResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -6815,7 +6815,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class ConnectNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ConnectNetworkResponse'
 
@@ -6833,7 +6833,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class ConnectNetworkResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -6853,7 +6853,7 @@ class NetworkCommissioning(Cluster):
         @dataclass
         class ReorderNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NetworkConfigResponse'
 
@@ -7126,7 +7126,7 @@ class DiagnosticLogs(Cluster):
         @dataclass
         class RetrieveLogsRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0032
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'RetrieveLogsResponse'
 
@@ -7146,7 +7146,7 @@ class DiagnosticLogs(Cluster):
         @dataclass
         class RetrieveLogsResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0032
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -7366,7 +7366,7 @@ class GeneralDiagnostics(Cluster):
         @dataclass
         class TestEventTrigger(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0033
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -7748,7 +7748,7 @@ class SoftwareDiagnostics(Cluster):
         @dataclass
         class ResetWatermarks(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0034
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -8218,7 +8218,7 @@ class ThreadNetworkDiagnostics(Cluster):
         @dataclass
         class ResetCounts(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0035
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -9442,7 +9442,7 @@ class WiFiNetworkDiagnostics(Cluster):
         @dataclass
         class ResetCounts(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0036
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -9863,7 +9863,7 @@ class EthernetNetworkDiagnostics(Cluster):
         @dataclass
         class ResetCounts(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0037
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -10208,7 +10208,7 @@ class TimeSynchronization(Cluster):
         @dataclass
         class SetUtcTime(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0038
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -11262,7 +11262,7 @@ class AdministratorCommissioning(Cluster):
         @dataclass
         class OpenCommissioningWindow(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003C
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -11290,7 +11290,7 @@ class AdministratorCommissioning(Cluster):
         @dataclass
         class OpenBasicCommissioningWindow(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003C
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -11310,7 +11310,7 @@ class AdministratorCommissioning(Cluster):
         @dataclass
         class RevokeCommissioning(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003C
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -11551,7 +11551,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class AttestationRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'AttestationResponse'
 
@@ -11567,7 +11567,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class AttestationResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -11585,7 +11585,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class CertificateChainRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'CertificateChainResponse'
 
@@ -11601,7 +11601,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class CertificateChainResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -11617,7 +11617,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class CSRRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'CSRResponse'
 
@@ -11635,7 +11635,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class CSRResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -11653,7 +11653,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class AddNOC(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NOCResponse'
 
@@ -11677,7 +11677,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class UpdateNOC(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NOCResponse'
 
@@ -11695,7 +11695,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class NOCResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -11715,7 +11715,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class UpdateFabricLabel(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x0009
+            command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NOCResponse'
 
@@ -11731,7 +11731,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class RemoveFabric(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x000A
+            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NOCResponse'
 
@@ -11747,7 +11747,7 @@ class OperationalCredentials(Cluster):
         @dataclass
         class AddTrustedRootCertificate(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x000B
+            command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -12039,7 +12039,7 @@ class GroupKeyManagement(Cluster):
         @dataclass
         class KeySetWrite(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003F
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -12055,7 +12055,7 @@ class GroupKeyManagement(Cluster):
         @dataclass
         class KeySetRead(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003F
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'KeySetReadResponse'
 
@@ -12071,7 +12071,7 @@ class GroupKeyManagement(Cluster):
         @dataclass
         class KeySetReadResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003F
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -12087,7 +12087,7 @@ class GroupKeyManagement(Cluster):
         @dataclass
         class KeySetRemove(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003F
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -12103,7 +12103,7 @@ class GroupKeyManagement(Cluster):
         @dataclass
         class KeySetReadAllIndices(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003F
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'KeySetReadAllIndicesResponse'
 
@@ -12119,7 +12119,7 @@ class GroupKeyManagement(Cluster):
         @dataclass
         class KeySetReadAllIndicesResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003F
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -13095,7 +13095,7 @@ class ModeSelect(Cluster):
         @dataclass
         class ChangeToMode(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0050
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13572,7 +13572,7 @@ class DoorLock(Cluster):
         @dataclass
         class LockDoor(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13592,7 +13592,7 @@ class DoorLock(Cluster):
         @dataclass
         class UnlockDoor(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13612,7 +13612,7 @@ class DoorLock(Cluster):
         @dataclass
         class UnlockWithTimeout(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13634,7 +13634,7 @@ class DoorLock(Cluster):
         @dataclass
         class SetWeekDaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x000B
+            command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13662,7 +13662,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetWeekDaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x000C
+            command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetWeekDayScheduleResponse'
 
@@ -13680,7 +13680,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetWeekDayScheduleResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x000C
+            command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -13710,7 +13710,7 @@ class DoorLock(Cluster):
         @dataclass
         class ClearWeekDaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x000D
+            command_id: typing.ClassVar[int] = 0x0000000D
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13728,7 +13728,7 @@ class DoorLock(Cluster):
         @dataclass
         class SetYearDaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x000E
+            command_id: typing.ClassVar[int] = 0x0000000E
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13750,7 +13750,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetYearDaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x000F
+            command_id: typing.ClassVar[int] = 0x0000000F
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetYearDayScheduleResponse'
 
@@ -13768,7 +13768,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetYearDayScheduleResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x000F
+            command_id: typing.ClassVar[int] = 0x0000000F
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -13792,7 +13792,7 @@ class DoorLock(Cluster):
         @dataclass
         class ClearYearDaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0010
+            command_id: typing.ClassVar[int] = 0x00000010
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13810,7 +13810,7 @@ class DoorLock(Cluster):
         @dataclass
         class SetHolidaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0011
+            command_id: typing.ClassVar[int] = 0x00000011
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13832,7 +13832,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetHolidaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0012
+            command_id: typing.ClassVar[int] = 0x00000012
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetHolidayScheduleResponse'
 
@@ -13848,7 +13848,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetHolidayScheduleResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0012
+            command_id: typing.ClassVar[int] = 0x00000012
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -13872,7 +13872,7 @@ class DoorLock(Cluster):
         @dataclass
         class ClearHolidaySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0013
+            command_id: typing.ClassVar[int] = 0x00000013
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13888,7 +13888,7 @@ class DoorLock(Cluster):
         @dataclass
         class SetUser(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x001A
+            command_id: typing.ClassVar[int] = 0x0000001A
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13920,7 +13920,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetUser(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x001B
+            command_id: typing.ClassVar[int] = 0x0000001B
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetUserResponse'
 
@@ -13936,7 +13936,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetUserResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x001C
+            command_id: typing.ClassVar[int] = 0x0000001C
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -13970,7 +13970,7 @@ class DoorLock(Cluster):
         @dataclass
         class ClearUser(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x001D
+            command_id: typing.ClassVar[int] = 0x0000001D
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -13990,7 +13990,7 @@ class DoorLock(Cluster):
         @dataclass
         class SetCredential(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0022
+            command_id: typing.ClassVar[int] = 0x00000022
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'SetCredentialResponse'
 
@@ -14020,7 +14020,7 @@ class DoorLock(Cluster):
         @dataclass
         class SetCredentialResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0023
+            command_id: typing.ClassVar[int] = 0x00000023
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -14040,7 +14040,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetCredentialStatus(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0024
+            command_id: typing.ClassVar[int] = 0x00000024
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetCredentialStatusResponse'
 
@@ -14056,7 +14056,7 @@ class DoorLock(Cluster):
         @dataclass
         class GetCredentialStatusResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0025
+            command_id: typing.ClassVar[int] = 0x00000025
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -14080,7 +14080,7 @@ class DoorLock(Cluster):
         @dataclass
         class ClearCredential(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0101
-            command_id: typing.ClassVar[int] = 0x0026
+            command_id: typing.ClassVar[int] = 0x00000026
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -14999,7 +14999,7 @@ class WindowCovering(Cluster):
         @dataclass
         class UpOrOpen(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0102
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -15013,7 +15013,7 @@ class WindowCovering(Cluster):
         @dataclass
         class DownOrClose(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0102
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -15027,7 +15027,7 @@ class WindowCovering(Cluster):
         @dataclass
         class StopMotion(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0102
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -15041,7 +15041,7 @@ class WindowCovering(Cluster):
         @dataclass
         class GoToLiftValue(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0102
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -15057,7 +15057,7 @@ class WindowCovering(Cluster):
         @dataclass
         class GoToLiftPercentage(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0102
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -15073,7 +15073,7 @@ class WindowCovering(Cluster):
         @dataclass
         class GoToTiltValue(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0102
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -15089,7 +15089,7 @@ class WindowCovering(Cluster):
         @dataclass
         class GoToTiltPercentage(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0102
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -15585,7 +15585,7 @@ class BarrierControl(Cluster):
         @dataclass
         class BarrierControlGoToPercent(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0103
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -15601,7 +15601,7 @@ class BarrierControl(Cluster):
         @dataclass
         class BarrierControlStop(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0103
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -16852,7 +16852,7 @@ class Thermostat(Cluster):
         @dataclass
         class SetpointRaiseLower(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -16870,7 +16870,7 @@ class Thermostat(Cluster):
         @dataclass
         class GetWeeklyScheduleResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -16892,7 +16892,7 @@ class Thermostat(Cluster):
         @dataclass
         class SetWeeklySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -16914,7 +16914,7 @@ class Thermostat(Cluster):
         @dataclass
         class GetWeeklySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetWeeklyScheduleResponse'
 
@@ -16932,7 +16932,7 @@ class Thermostat(Cluster):
         @dataclass
         class ClearWeeklySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18465,7 +18465,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveToHue(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18489,7 +18489,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveHue(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18511,7 +18511,7 @@ class ColorControl(Cluster):
         @dataclass
         class StepHue(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18535,7 +18535,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveToSaturation(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18557,7 +18557,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveSaturation(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18579,7 +18579,7 @@ class ColorControl(Cluster):
         @dataclass
         class StepSaturation(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18603,7 +18603,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveToHueAndSaturation(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18627,7 +18627,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveToColor(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18651,7 +18651,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveColor(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18673,7 +18673,7 @@ class ColorControl(Cluster):
         @dataclass
         class StepColor(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0009
+            command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18697,7 +18697,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveToColorTemperature(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x000A
+            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18719,7 +18719,7 @@ class ColorControl(Cluster):
         @dataclass
         class EnhancedMoveToHue(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0040
+            command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18743,7 +18743,7 @@ class ColorControl(Cluster):
         @dataclass
         class EnhancedMoveHue(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0041
+            command_id: typing.ClassVar[int] = 0x00000041
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18765,7 +18765,7 @@ class ColorControl(Cluster):
         @dataclass
         class EnhancedStepHue(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0042
+            command_id: typing.ClassVar[int] = 0x00000042
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18789,7 +18789,7 @@ class ColorControl(Cluster):
         @dataclass
         class EnhancedMoveToHueAndSaturation(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0043
+            command_id: typing.ClassVar[int] = 0x00000043
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18813,7 +18813,7 @@ class ColorControl(Cluster):
         @dataclass
         class ColorLoopSet(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0044
+            command_id: typing.ClassVar[int] = 0x00000044
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18841,7 +18841,7 @@ class ColorControl(Cluster):
         @dataclass
         class StopMoveStep(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x0047
+            command_id: typing.ClassVar[int] = 0x00000047
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18859,7 +18859,7 @@ class ColorControl(Cluster):
         @dataclass
         class MoveColorTemperature(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x004B
+            command_id: typing.ClassVar[int] = 0x0000004B
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -18885,7 +18885,7 @@ class ColorControl(Cluster):
         @dataclass
         class StepColorTemperature(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0300
-            command_id: typing.ClassVar[int] = 0x004C
+            command_id: typing.ClassVar[int] = 0x0000004C
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -21721,7 +21721,7 @@ class Channel(Cluster):
         @dataclass
         class ChangeChannel(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0504
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ChangeChannelResponse'
 
@@ -21737,7 +21737,7 @@ class Channel(Cluster):
         @dataclass
         class ChangeChannelResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0504
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -21755,7 +21755,7 @@ class Channel(Cluster):
         @dataclass
         class ChangeChannelByNumber(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0504
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -21773,7 +21773,7 @@ class Channel(Cluster):
         @dataclass
         class SkipChannel(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0504
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -21970,7 +21970,7 @@ class TargetNavigator(Cluster):
         @dataclass
         class NavigateTarget(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0505
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'NavigateTargetResponse'
 
@@ -21988,7 +21988,7 @@ class TargetNavigator(Cluster):
         @dataclass
         class NavigateTargetResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0505
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -22190,7 +22190,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class Play(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22204,7 +22204,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class Pause(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22218,7 +22218,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class StopPlayback(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22232,7 +22232,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class StartOver(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22246,7 +22246,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class Previous(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22260,7 +22260,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class Next(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22274,7 +22274,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class Rewind(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22288,7 +22288,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class FastForward(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22302,7 +22302,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class SkipForward(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22318,7 +22318,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class SkipBackward(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0009
+            command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22334,7 +22334,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class PlaybackResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x000A
+            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -22352,7 +22352,7 @@ class MediaPlayback(Cluster):
         @dataclass
         class Seek(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x000B
+            command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
@@ -22626,7 +22626,7 @@ class MediaInput(Cluster):
         @dataclass
         class SelectInput(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0507
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -22642,7 +22642,7 @@ class MediaInput(Cluster):
         @dataclass
         class ShowInputStatus(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0507
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -22656,7 +22656,7 @@ class MediaInput(Cluster):
         @dataclass
         class HideInputStatus(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0507
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -22670,7 +22670,7 @@ class MediaInput(Cluster):
         @dataclass
         class RenameInput(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0507
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -22828,7 +22828,7 @@ class LowPower(Cluster):
         @dataclass
         class Sleep(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0508
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -23044,7 +23044,7 @@ class KeypadInput(Cluster):
         @dataclass
         class SendKey(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0509
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'SendKeyResponse'
 
@@ -23060,7 +23060,7 @@ class KeypadInput(Cluster):
         @dataclass
         class SendKeyResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0509
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -23305,7 +23305,7 @@ class ContentLauncher(Cluster):
         @dataclass
         class LaunchContent(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050A
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'LaunchResponse'
 
@@ -23325,7 +23325,7 @@ class ContentLauncher(Cluster):
         @dataclass
         class LaunchURL(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050A
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'LaunchResponse'
 
@@ -23345,7 +23345,7 @@ class ContentLauncher(Cluster):
         @dataclass
         class LaunchResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050A
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -23533,7 +23533,7 @@ class AudioOutput(Cluster):
         @dataclass
         class SelectOutput(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050B
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -23549,7 +23549,7 @@ class AudioOutput(Cluster):
         @dataclass
         class RenameOutput(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050B
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -23745,7 +23745,7 @@ class ApplicationLauncher(Cluster):
         @dataclass
         class LaunchApp(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050C
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'LauncherResponse'
 
@@ -23763,7 +23763,7 @@ class ApplicationLauncher(Cluster):
         @dataclass
         class StopApp(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050C
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'LauncherResponse'
 
@@ -23779,7 +23779,7 @@ class ApplicationLauncher(Cluster):
         @dataclass
         class HideApp(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050C
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'LauncherResponse'
 
@@ -23795,7 +23795,7 @@ class ApplicationLauncher(Cluster):
         @dataclass
         class LauncherResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050C
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -24226,7 +24226,7 @@ class AccountLogin(Cluster):
         @dataclass
         class GetSetupPIN(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050E
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'GetSetupPINResponse'
 
@@ -24246,7 +24246,7 @@ class AccountLogin(Cluster):
         @dataclass
         class GetSetupPINResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050E
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -24262,7 +24262,7 @@ class AccountLogin(Cluster):
         @dataclass
         class Login(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050E
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -24284,7 +24284,7 @@ class AccountLogin(Cluster):
         @dataclass
         class Logout(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050E
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -24666,7 +24666,7 @@ class ElectricalMeasurement(Cluster):
         @dataclass
         class GetProfileInfoResponseCommand(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0B04
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -24688,7 +24688,7 @@ class ElectricalMeasurement(Cluster):
         @dataclass
         class GetProfileInfoCommand(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0B04
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -24702,7 +24702,7 @@ class ElectricalMeasurement(Cluster):
         @dataclass
         class GetMeasurementProfileResponseCommand(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0B04
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -24728,7 +24728,7 @@ class ElectricalMeasurement(Cluster):
         @dataclass
         class GetMeasurementProfileCommand(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0B04
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -26929,7 +26929,7 @@ class ClientMonitoring(Cluster):
         @dataclass
         class RegisterClientMonitoring(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x1046
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -26947,7 +26947,7 @@ class ClientMonitoring(Cluster):
         @dataclass
         class UnregisterClientMonitoring(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x1046
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -26965,7 +26965,7 @@ class ClientMonitoring(Cluster):
         @dataclass
         class StayAwakeRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x1046
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -27469,7 +27469,7 @@ class UnitTesting(Cluster):
         @dataclass
         class Test(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -27483,7 +27483,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestSpecificResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27499,7 +27499,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestNotHandled(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -27513,7 +27513,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestAddArgumentsResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27529,7 +27529,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestSpecific(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestSpecificResponse'
 
@@ -27543,7 +27543,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestSimpleArgumentResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27559,7 +27559,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestUnknownCommand(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -27573,7 +27573,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestStructArrayArgumentResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27599,7 +27599,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestAddArguments(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestAddArgumentsResponse'
 
@@ -27617,7 +27617,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestListInt8UReverseResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27633,7 +27633,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestSimpleArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestSimpleArgumentResponse'
 
@@ -27649,7 +27649,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestEnumsResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0005
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27667,7 +27667,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestStructArrayArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestStructArrayArgumentResponse'
 
@@ -27693,7 +27693,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestNullableOptionalResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0006
+            command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27715,7 +27715,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestStructArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'BooleanResponse'
 
@@ -27731,7 +27731,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestComplexNullableOptionalResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0007
+            command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27801,7 +27801,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestNestedStructArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'BooleanResponse'
 
@@ -27817,7 +27817,7 @@ class UnitTesting(Cluster):
         @dataclass
         class BooleanResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27833,7 +27833,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestListStructArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0009
+            command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'BooleanResponse'
 
@@ -27849,7 +27849,7 @@ class UnitTesting(Cluster):
         @dataclass
         class SimpleStructResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0009
+            command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27865,7 +27865,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestListInt8UArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x000A
+            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'BooleanResponse'
 
@@ -27881,7 +27881,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestEmitTestEventResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x000A
+            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27897,7 +27897,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestNestedStructListArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x000B
+            command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'BooleanResponse'
 
@@ -27913,7 +27913,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestEmitTestFabricScopedEventResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x000B
+            command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -27929,7 +27929,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestListNestedStructListArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x000C
+            command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'BooleanResponse'
 
@@ -27945,7 +27945,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestListInt8UReverseRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x000D
+            command_id: typing.ClassVar[int] = 0x0000000D
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestListInt8UReverseResponse'
 
@@ -27961,7 +27961,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestEnumsRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x000E
+            command_id: typing.ClassVar[int] = 0x0000000E
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestEnumsResponse'
 
@@ -27979,7 +27979,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestNullableOptionalRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x000F
+            command_id: typing.ClassVar[int] = 0x0000000F
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestNullableOptionalResponse'
 
@@ -27995,7 +27995,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestComplexNullableOptionalRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0010
+            command_id: typing.ClassVar[int] = 0x00000010
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestComplexNullableOptionalResponse'
 
@@ -28033,7 +28033,7 @@ class UnitTesting(Cluster):
         @dataclass
         class SimpleStructEchoRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0011
+            command_id: typing.ClassVar[int] = 0x00000011
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'SimpleStructResponse'
 
@@ -28049,7 +28049,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TimedInvokeRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0012
+            command_id: typing.ClassVar[int] = 0x00000012
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -28067,7 +28067,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestSimpleOptionalArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0013
+            command_id: typing.ClassVar[int] = 0x00000013
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -28083,7 +28083,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestEmitTestEventRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0014
+            command_id: typing.ClassVar[int] = 0x00000014
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestEmitTestEventResponse'
 
@@ -28103,7 +28103,7 @@ class UnitTesting(Cluster):
         @dataclass
         class TestEmitTestFabricScopedEventRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
-            command_id: typing.ClassVar[int] = 0x0015
+            command_id: typing.ClassVar[int] = 0x00000015
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'TestEmitTestFabricScopedEventResponse'
 
@@ -29600,7 +29600,7 @@ class FaultInjection(Cluster):
         @dataclass
         class FailAtFault(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC06
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -29624,7 +29624,7 @@ class FaultInjection(Cluster):
         @dataclass
         class FailRandomlyAtFault(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC06
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
