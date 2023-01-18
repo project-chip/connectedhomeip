@@ -183,7 +183,7 @@ RUN set -x \
 #       for a uniform update, a separate update script exists:
 #
 #       scripts/tools/zap/version_update.py
-ENV ZAP_VERSION=v2023.01.09-nightly
+ENV ZAP_VERSION=v2023.01.18-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
     && cd /opt/zap-${ZAP_VERSION} \
