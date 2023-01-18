@@ -21200,9 +21200,9 @@ class OccupancySensing(Cluster):
                 ClusterObjectFieldDescriptor(Label="occupancy", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="occupancySensorType", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="occupancySensorTypeBitmap", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="pirOccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="pirUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="pirUnoccupiedToOccupiedThreshold", Tag=0x00000012, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="PIROccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedThreshold", Tag=0x00000012, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ultrasonicOccupiedToUnoccupiedDelay", Tag=0x00000020, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ultrasonicUnoccupiedToOccupiedDelay", Tag=0x00000021, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ultrasonicUnoccupiedToOccupiedThreshold", Tag=0x00000022, Type=typing.Optional[uint]),
@@ -21219,9 +21219,9 @@ class OccupancySensing(Cluster):
     occupancy: 'uint' = None
     occupancySensorType: 'uint' = None
     occupancySensorTypeBitmap: 'uint' = None
-    pirOccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
-    pirUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
-    pirUnoccupiedToOccupiedThreshold: 'typing.Optional[uint]' = None
+    PIROccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
+    PIRUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
+    PIRUnoccupiedToOccupiedThreshold: 'typing.Optional[uint]' = None
     ultrasonicOccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
     ultrasonicUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
     ultrasonicUnoccupiedToOccupiedThreshold: 'typing.Optional[uint]' = None
@@ -21287,7 +21287,7 @@ class OccupancySensing(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class PirOccupiedToUnoccupiedDelay(ClusterAttributeDescriptor):
+        class PIROccupiedToUnoccupiedDelay(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0406
@@ -21303,7 +21303,7 @@ class OccupancySensing(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class PirUnoccupiedToOccupiedDelay(ClusterAttributeDescriptor):
+        class PIRUnoccupiedToOccupiedDelay(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0406
@@ -21319,7 +21319,7 @@ class OccupancySensing(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class PirUnoccupiedToOccupiedThreshold(ClusterAttributeDescriptor):
+        class PIRUnoccupiedToOccupiedThreshold(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0406

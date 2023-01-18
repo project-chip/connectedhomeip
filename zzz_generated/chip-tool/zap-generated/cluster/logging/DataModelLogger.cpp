@@ -8405,62 +8405,62 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OccupancySensing::Attributes::Occupancy::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("occupancy", 1, value);
+            return DataModelLogger::LogValue("Occupancy", 1, value);
         }
         case OccupancySensing::Attributes::OccupancySensorType::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("occupancy sensor type", 1, value);
+            return DataModelLogger::LogValue("OccupancySensorType", 1, value);
         }
         case OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("occupancy sensor type bitmap", 1, value);
+            return DataModelLogger::LogValue("OccupancySensorTypeBitmap", 1, value);
         }
-        case OccupancySensing::Attributes::PirOccupiedToUnoccupiedDelay::Id: {
+        case OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PIR occupied to unoccupied delay", 1, value);
+            return DataModelLogger::LogValue("PIROccupiedToUnoccupiedDelay", 1, value);
         }
-        case OccupancySensing::Attributes::PirUnoccupiedToOccupiedDelay::Id: {
+        case OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PIR unoccupied to occupied delay", 1, value);
+            return DataModelLogger::LogValue("PIRUnoccupiedToOccupiedDelay", 1, value);
         }
-        case OccupancySensing::Attributes::PirUnoccupiedToOccupiedThreshold::Id: {
+        case OccupancySensing::Attributes::PIRUnoccupiedToOccupiedThreshold::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PIR unoccupied to occupied threshold", 1, value);
+            return DataModelLogger::LogValue("PIRUnoccupiedToOccupiedThreshold", 1, value);
         }
         case OccupancySensing::Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ultrasonic occupied to unoccupied delay", 1, value);
+            return DataModelLogger::LogValue("UltrasonicOccupiedToUnoccupiedDelay", 1, value);
         }
         case OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ultrasonic unoccupied to occupied delay", 1, value);
+            return DataModelLogger::LogValue("UltrasonicUnoccupiedToOccupiedDelay", 1, value);
         }
         case OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ultrasonic unoccupied to occupied threshold", 1, value);
+            return DataModelLogger::LogValue("UltrasonicUnoccupiedToOccupiedThreshold", 1, value);
         }
         case OccupancySensing::Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("physical contact occupied to unoccupied delay", 1, value);
+            return DataModelLogger::LogValue("PhysicalContactOccupiedToUnoccupiedDelay", 1, value);
         }
         case OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("physical contact unoccupied to occupied delay", 1, value);
+            return DataModelLogger::LogValue("PhysicalContactUnoccupiedToOccupiedDelay", 1, value);
         }
         case OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("physical contact unoccupied to occupied threshold", 1, value);
+            return DataModelLogger::LogValue("PhysicalContactUnoccupiedToOccupiedThreshold", 1, value);
         }
         case OccupancySensing::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
