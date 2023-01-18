@@ -6282,8 +6282,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
         }
         break;
     }
-    case Clusters::BridgedDeviceBasic::Id: {
-        using namespace Clusters::BridgedDeviceBasic;
+    case Clusters::BridgedDeviceBasicInformation::Id: {
+        using namespace Clusters::BridgedDeviceBasicInformation;
         switch (aPath.mAttributeId) {
         case Attributes::VendorName::Id: {
             using TypeInfo = Attributes::VendorName::TypeInfo;
@@ -12493,8 +12493,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
-        case Attributes::PirOccupiedToUnoccupiedDelay::Id: {
-            using TypeInfo = Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo;
+        case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
+            using TypeInfo = Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -12504,8 +12504,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
-        case Attributes::PirUnoccupiedToOccupiedDelay::Id: {
-            using TypeInfo = Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo;
+        case Attributes::PIRUnoccupiedToOccupiedDelay::Id: {
+            using TypeInfo = Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -12515,8 +12515,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
-        case Attributes::PirUnoccupiedToOccupiedThreshold::Id: {
-            using TypeInfo = Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo;
+        case Attributes::PIRUnoccupiedToOccupiedThreshold::Id: {
+            using TypeInfo = Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

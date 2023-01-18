@@ -2052,85 +2052,65 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster Bridged Device Basic
+ * Cluster Bridged Device Basic Information
  *    This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
           the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name.
  */
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRClusterBridgedDeviceBasic : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterBridgedDeviceBasicInformation : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeVendorIDWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeVendorIDWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeProductNameWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeProductNameWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeNodeLabelWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeNodeLabelWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeNodeLabelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeNodeLabelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-- (void)writeAttributeNodeLabelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                  params:(MTRWriteParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+                                  params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeHardwareVersionWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeHardwareVersionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionStringWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionStringWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeManufacturingDateWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeManufacturingDateWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributePartNumberWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributePartNumberWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeProductURLWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeProductURLWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeProductLabelWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeProductLabelWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeSerialNumberWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeSerialNumberWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeReachableWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeReachableWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeUniqueIDWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeUniqueIDWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -6621,6 +6601,10 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterOTASoftwareUpdateProvider")
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRClusterOTASoftwareUpdateRequestor")
 @interface MTRClusterOtaSoftwareUpdateRequestor : MTRClusterOTASoftwareUpdateRequestor
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRClusterBridgedDeviceBasic : MTRClusterBridgedDeviceBasicInformation
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

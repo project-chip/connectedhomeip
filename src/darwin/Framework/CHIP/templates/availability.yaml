@@ -4559,6 +4559,7 @@
           - WakeOnLAN
           - ClientMonitoring
           - BasicInformation
+          - BridgedDeviceBasicInformation
       attributes:
           Descriptor:
               # We really only started treating DeviceTypeList as DeviceTypeList in the API revamp,
@@ -4725,6 +4726,27 @@
               - RSSI
           GeneralDiagnostics:
               - BootReason
+          BridgedDeviceBasicInformation:
+              - VendorName
+              - VendorID
+              - ProductName
+              - NodeLabel
+              - HardwareVersion
+              - HardwareVersionString
+              - SoftwareVersion
+              - SoftwareVersionString
+              - ManufacturingDate
+              - PartNumber
+              - ProductURL
+              - ProductLabel
+              - SerialNumber
+              - Reachable
+              - UniqueID
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -5095,6 +5117,11 @@
               - WiredFaultChange
               - BatFaultChange
               - BatChargeFaultChange
+          BridgedDeviceBasicInformation:
+              - StartUp
+              - ShutDown
+              - Leave
+              - ReachableChanged
       event fields:
           Switch:
               MultiPressComplete:
@@ -5140,6 +5167,11 @@
               BatChargeFaultChange:
                   - current
                   - previous
+          BridgedDeviceBasicInformation:
+              StartUp:
+                  - softwareVersion
+              ReachableChanged:
+                  - reachableNewValue
       enums:
           OTASoftwareUpdateProvider:
               - OTAApplyUpdateAction
@@ -5478,6 +5510,7 @@
           OTASoftwareUpdateProvider: OtaSoftwareUpdateProvider
           OTASoftwareUpdateRequestor: OtaSoftwareUpdateRequestor
           WakeOnLAN: WakeOnLan
+          BridgedDeviceBasicInformation: BridgedDeviceBasic
       attributes:
           Descriptor:
               DeviceTypeList: DeviceList

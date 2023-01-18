@@ -17,14 +17,14 @@ limitations under the License.
 <configurator>
     <domain name="CHIP"/>
     <cluster>
-        <name>Bridged Device Basic</name>
+        <name>Bridged Device Basic Information</name>
         <domain>CHIP</domain>
         <description>This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
           the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name.</description>
         <code>0x0039</code>
-        <define>BRIDGED_DEVICE_BASIC_CLUSTER</define>
+        <define>BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
         <globalAttribute side="either" code="0xFFFD" value="1"/>

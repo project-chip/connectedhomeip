@@ -9571,7 +9571,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace TimeSynchronization
 
-namespace BridgedDeviceBasic {
+namespace BridgedDeviceBasicInformation {
 namespace Attributes {
 
 namespace VendorName {
@@ -9579,7 +9579,8 @@ namespace VendorName {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9599,7 +9600,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorName
@@ -9610,8 +9612,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value)
 {
     using Traits = NumericAttributeTraits<chip::VendorId>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9630,7 +9633,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable,
+                                       ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorID
@@ -9640,7 +9644,8 @@ namespace ProductName {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9660,7 +9665,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductName
@@ -9670,7 +9676,8 @@ namespace NodeLabel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9690,7 +9697,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace NodeLabel
@@ -9701,8 +9709,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9721,7 +9730,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace HardwareVersion
@@ -9731,7 +9741,8 @@ namespace HardwareVersionString {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[64 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9751,7 +9762,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[64 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace HardwareVersionString
@@ -9762,8 +9774,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9782,7 +9795,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoftwareVersion
@@ -9792,7 +9806,8 @@ namespace SoftwareVersionString {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[64 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9812,7 +9827,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[64 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoftwareVersionString
@@ -9822,7 +9838,8 @@ namespace ManufacturingDate {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[16 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9842,7 +9859,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[16 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ManufacturingDate
@@ -9852,7 +9870,8 @@ namespace PartNumber {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9872,7 +9891,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace PartNumber
@@ -9882,7 +9902,8 @@ namespace ProductURL {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[256 + 2];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
@@ -9902,7 +9923,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[256 + 2];
     emberAfCopyInt16u(zclString, 0, static_cast<uint16_t>(value.size()));
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
                                        ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
@@ -9913,7 +9934,8 @@ namespace ProductLabel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[64 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9933,7 +9955,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[64 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductLabel
@@ -9943,7 +9966,8 @@ namespace SerialNumber {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -9963,7 +9987,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace SerialNumber
@@ -9974,8 +9999,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9994,7 +10020,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Reachable
@@ -10004,7 +10031,8 @@ namespace UniqueID {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -10024,7 +10052,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace UniqueID
@@ -10035,8 +10064,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -10055,7 +10085,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable,
+                                       ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -10066,8 +10097,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -10086,13 +10118,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BridgedDeviceBasic
+} // namespace BridgedDeviceBasicInformation
 
 namespace Switch {
 namespace Attributes {
@@ -21921,7 +21954,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 } // namespace OccupancySensorTypeBitmap
 
-namespace PirOccupiedToUnoccupiedDelay {
+namespace PIROccupiedToUnoccupiedDelay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -21950,9 +21983,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace PirOccupiedToUnoccupiedDelay
+} // namespace PIROccupiedToUnoccupiedDelay
 
-namespace PirUnoccupiedToOccupiedDelay {
+namespace PIRUnoccupiedToOccupiedDelay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -21981,9 +22014,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace PirUnoccupiedToOccupiedDelay
+} // namespace PIRUnoccupiedToOccupiedDelay
 
-namespace PirUnoccupiedToOccupiedThreshold {
+namespace PIRUnoccupiedToOccupiedThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -22012,7 +22045,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace PirUnoccupiedToOccupiedThreshold
+} // namespace PIRUnoccupiedToOccupiedThreshold
 
 namespace UltrasonicOccupiedToUnoccupiedDelay {
 

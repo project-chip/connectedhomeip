@@ -779,11 +779,11 @@ typedef void (*EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbac
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*EthernetNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BridgedDeviceBasicGeneratedCommandListListAttributeCallback)(
+typedef void (*BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedDeviceBasicAcceptedCommandListListAttributeCallback)(
+typedef void (*BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedDeviceBasicAttributeListListAttributeCallback)(
+typedef void (*BridgedDeviceBasicInformationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*SwitchGeneratedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -5622,100 +5622,104 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>
+class MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback>
 {
 public:
-    MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
+class MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+    MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>
+class MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback>
 {
 public:
-    MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
+class MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+    MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>
+class MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BridgedDeviceBasicInformationAttributeListListAttributeCallback>
 {
 public:
-    MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<BridgedDeviceBasicInformationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge
+class MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge(
+    MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(queue, handler, action),
+        MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnDone;
+    using MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

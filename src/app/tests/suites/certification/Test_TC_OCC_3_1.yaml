@@ -34,7 +34,7 @@ tests:
     - label: "Reads Occupancy attribute from DUT"
       PICS: OCC.S.A0000
       command: "readAttribute"
-      attribute: "occupancy"
+      attribute: "Occupancy"
       response:
           saveAs: OccupancyValue
 
@@ -52,7 +52,7 @@ tests:
     - label: "Reads back Occupancy attribute from DUT after few seconds"
       PICS: OCC.S.A0000 && OCC.M.OccupancyChange
       command: "readAttribute"
-      attribute: "occupancy"
+      attribute: "Occupancy"
       response:
           constraints:
               notValue: OccupancyValue

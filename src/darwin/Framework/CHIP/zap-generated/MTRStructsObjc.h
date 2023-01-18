@@ -480,22 +480,38 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSString * _Nullable name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBridgedDeviceBasicClusterStartUpEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterStartUpEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBridgedDeviceBasicClusterShutDownEvent : NSObject <NSCopying>
+@interface MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDeviceBasicInformationClusterStartUpEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterShutDownEvent : NSObject <NSCopying>
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBridgedDeviceBasicClusterLeaveEvent : NSObject <NSCopying>
+@interface MTRBridgedDeviceBasicClusterShutDownEvent : MTRBridgedDeviceBasicInformationClusterShutDownEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterLeaveEvent : NSObject <NSCopying>
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBridgedDeviceBasicClusterReachableChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@interface MTRBridgedDeviceBasicClusterLeaveEvent : MTRBridgedDeviceBasicInformationClusterLeaveEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterReachableChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue MTR_NEWLY_AVAILABLE;
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

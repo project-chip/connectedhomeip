@@ -157,7 +157,7 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterBridgedDeviceBasic ()
+@interface MTRBaseClusterBridgedDeviceBasicInformation ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
