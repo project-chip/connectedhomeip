@@ -45,13 +45,55 @@ void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsD
     mOperationalCredentialsDelegate = operationalCredentialsDelegate;
 }
 
+// Returns true if maybeUnsafeSpan is pointing to a buffer that we're not sure
+// will live for long enough.  knownSafeSpan, if it has a value, points to a
+// buffer that we _are_ sure will live for long enough.
+template <typename SpanType>
+static bool IsUnsafeSpan(const Optional<SpanType> & maybeUnsafeSpan, const Optional<SpanType> & knownSafeSpan)
+{
+    if (!maybeUnsafeSpan.HasValue())
+    {
+        return false;
+    }
+
+    if (!knownSafeSpan.HasValue())
+    {
+        return true;
+    }
+
+    return maybeUnsafeSpan.Value().data() != knownSafeSpan.Value().data();
+}
+
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
+    // Make sure any members that point to buffers that we are not pointing to
+    // our own buffers are not going to dangle.  We can skip this step if all
+    // the buffers pointers that we don't plan to re-point to our own buffers
+    // below are already pointing to the same things as our own buffer pointers
+    // (so that we know they have to be safe somehow).
+    //
+    // The checks are a bit painful, because Span does not have a usable
+    // operator==, and in any case, we want to compare for pointer equality, not
+    // data equality.
+    bool haveMaybeDanglingBufferPointers =
+        ((params.GetNOCChainGenerationParameters().HasValue() &&
+          (!mParams.GetNOCChainGenerationParameters().HasValue() ||
+           params.GetNOCChainGenerationParameters().Value().nocsrElements.data() !=
+               mParams.GetNOCChainGenerationParameters().Value().nocsrElements.data() ||
+           params.GetNOCChainGenerationParameters().Value().signature.data() !=
+               mParams.GetNOCChainGenerationParameters().Value().signature.data())) ||
+         IsUnsafeSpan(params.GetRootCert(), mParams.GetRootCert()) || IsUnsafeSpan(params.GetNoc(), mParams.GetNoc()) ||
+         IsUnsafeSpan(params.GetIcac(), mParams.GetIcac()) || IsUnsafeSpan(params.GetIpk(), mParams.GetIpk()) ||
+         IsUnsafeSpan(params.GetAttestationElements(), mParams.GetAttestationElements()) ||
+         IsUnsafeSpan(params.GetAttestationSignature(), mParams.GetAttestationSignature()) ||
+         IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()));
+
     mParams = params;
 
-    // Make sure any members that point to buffers that we are not pointing to
-    // our own buffers are not going to dangle.
-    mParams.ClearExternalBufferDependentValues();
+    if (haveMaybeDanglingBufferPointers)
+    {
+        mParams.ClearExternalBufferDependentValues();
+    }
 
     // For members of params that point to some sort of buffer, we have to copy
     // the data over into our own buffers.
@@ -62,6 +104,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         if (dataset.size() > CommissioningParameters::kMaxThreadDatasetLen)
         {
             ChipLogError(Controller, "Thread operational data set is too large");
+            // Make sure our buffer pointers don't dangle.
+            mParams.ClearExternalBufferDependentValues();
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         memcpy(mThreadOperationalDataset, dataset.data(), dataset.size());
@@ -76,6 +120,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
             creds.credentials.size() > CommissioningParameters::kMaxCredentialsLen)
         {
             ChipLogError(Controller, "Wifi credentials are too large");
+            // Make sure our buffer pointers don't dangle.
+            mParams.ClearExternalBufferDependentValues();
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         memcpy(mSsid, creds.ssid.data(), creds.ssid.size());
@@ -96,6 +142,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         else
         {
             ChipLogError(Controller, "Country code is too large: %u", static_cast<unsigned>(code.size()));
+            // Make sure our buffer pointers don't dangle.
+            mParams.ClearExternalBufferDependentValues();
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
