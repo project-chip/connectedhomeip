@@ -5105,7 +5105,7 @@ void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscription
     }
 }
 
-void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -5128,7 +5128,7 @@ void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -5143,7 +5143,7 @@ void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -5166,7 +5166,7 @@ void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -5181,7 +5181,7 @@ void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -5204,7 +5204,7 @@ void MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

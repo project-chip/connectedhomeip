@@ -417,7 +417,7 @@ src/app/tests/suites/examples/gen_readme_example.sh
 | WiFiNetworkDiagnostics         | NitricOxideConcentrationMeasurement      | AccountLogin                                  |
 | EthernetNetworkDiagnostics     | NitrogenDioxideConcentrationMeasurement  | TestCluster                                   |
 | TimeSynchronization            | OxygenConcentrationMeasurement           | Messaging                                     |
-| BridgedDeviceBasic             | OzoneConcentrationMeasurement            | ApplianceIdentification                       |
+| BridgedDeviceBasicInformation  | OzoneConcentrationMeasurement            | ApplianceIdentification                       |
 | Switch                         | SulfurDioxideConcentrationMeasurement    | MeterIdentification                           |
 
 </details>

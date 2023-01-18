@@ -10470,7 +10470,7 @@ class TimeSynchronization(Cluster):
 
 
 @dataclass
-class BridgedDeviceBasic(Cluster):
+class BridgedDeviceBasicInformation(Cluster):
     id: typing.ClassVar[int] = 0x0039
 
     @ChipUtility.classproperty

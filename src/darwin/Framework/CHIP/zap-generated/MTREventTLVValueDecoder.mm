@@ -1201,8 +1201,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
-    case Clusters::BridgedDeviceBasic::Id: {
-        using namespace Clusters::BridgedDeviceBasic;
+    case Clusters::BridgedDeviceBasicInformation::Id: {
+        using namespace Clusters::BridgedDeviceBasicInformation;
         switch (aPath.mEventId) {
 
         case Events::StartUp::Id: {
@@ -1212,7 +1212,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBridgedDeviceBasicClusterStartUpEvent new];
+            __auto_type * value = [MTRBridgedDeviceBasicInformationClusterStartUpEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1230,7 +1230,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBridgedDeviceBasicClusterShutDownEvent new];
+            __auto_type * value = [MTRBridgedDeviceBasicInformationClusterShutDownEvent new];
 
             return value;
         }
@@ -1242,7 +1242,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBridgedDeviceBasicClusterLeaveEvent new];
+            __auto_type * value = [MTRBridgedDeviceBasicInformationClusterLeaveEvent new];
 
             return value;
         }
@@ -1254,7 +1254,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBridgedDeviceBasicClusterReachableChangedEvent new];
+            __auto_type * value = [MTRBridgedDeviceBasicInformationClusterReachableChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;

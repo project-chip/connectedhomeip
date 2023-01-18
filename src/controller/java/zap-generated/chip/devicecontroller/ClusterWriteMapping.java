@@ -488,25 +488,28 @@ public class ClusterWriteMapping {
         new LinkedHashMap<>();
     writeAttributeMap.put(
         "ethernetNetworkDiagnostics", writeEthernetNetworkDiagnosticsInteractionInfo);
-    Map<String, InteractionInfo> writeBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBridgedDeviceBasicNodeLabelCommandParams =
+    Map<String, InteractionInfo> writeBridgedDeviceBasicInformationInteractionInfo =
+        new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeBridgedDeviceBasicInformationNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedDeviceBasicnodeLabelCommandParameterInfo =
+    CommandParameterInfo bridgedDeviceBasicInformationnodeLabelCommandParameterInfo =
         new CommandParameterInfo("value", String.class, String.class);
-    writeBridgedDeviceBasicNodeLabelCommandParams.put(
-        "value", bridgedDeviceBasicnodeLabelCommandParameterInfo);
-    InteractionInfo writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo =
+    writeBridgedDeviceBasicInformationNodeLabelCommandParams.put(
+        "value", bridgedDeviceBasicInformationnodeLabelCommandParameterInfo);
+    InteractionInfo writeBridgedDeviceBasicInformationNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .writeNodeLabelAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBridgedDeviceBasicNodeLabelCommandParams);
-    writeBridgedDeviceBasicInteractionInfo.put(
-        "writeNodeLabelAttribute", writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo);
-    writeAttributeMap.put("bridgedDeviceBasic", writeBridgedDeviceBasicInteractionInfo);
+            writeBridgedDeviceBasicInformationNodeLabelCommandParams);
+    writeBridgedDeviceBasicInformationInteractionInfo.put(
+        "writeNodeLabelAttribute",
+        writeBridgedDeviceBasicInformationNodeLabelAttributeInteractionInfo);
+    writeAttributeMap.put(
+        "bridgedDeviceBasicInformation", writeBridgedDeviceBasicInformationInteractionInfo);
     Map<String, InteractionInfo> writeSwitchInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("switch", writeSwitchInteractionInfo);
     Map<String, InteractionInfo> writeAdministratorCommissioningInteractionInfo =

@@ -777,46 +777,46 @@ typedef void (*CHIPEthernetNetworkDiagnosticsClusterFeatureMapAttributeCallbackT
 typedef void (*CHIPEthernetNetworkDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPBridgedDeviceBasicClusterVendorNameAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterVendorIDAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorID::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterProductNameAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterNodeLabelAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::NodeLabel::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterHardwareVersionAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersion::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterHardwareVersionStringAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterSoftwareVersionAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersion::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterSoftwareVersionStringAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterManufacturingDateAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterPartNumberAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterProductURLAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterProductLabelAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterSerialNumberAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterReachableAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::Reachable::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterUniqueIDAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::UniqueID::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterGeneratedCommandListAttributeCallbackType)(
-    void *, const chip::app::Clusters::BridgedDeviceBasic::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
-typedef void (*CHIPBridgedDeviceBasicClusterAcceptedCommandListAttributeCallbackType)(
-    void *, const chip::app::Clusters::BridgedDeviceBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
-typedef void (*CHIPBridgedDeviceBasicClusterAttributeListAttributeCallbackType)(
-    void *, const chip::app::Clusters::BridgedDeviceBasic::Attributes::AttributeList::TypeInfo::DecodableType &);
-typedef void (*CHIPBridgedDeviceBasicClusterFeatureMapAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::FeatureMap::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedDeviceBasicClusterClusterRevisionAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterVendorNameAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::VendorName::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterVendorIDAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::VendorID::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterProductNameAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ProductName::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterNodeLabelAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterHardwareVersionAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::HardwareVersion::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterHardwareVersionStringAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::HardwareVersionString::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterSoftwareVersionAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::SoftwareVersion::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterSoftwareVersionStringAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::SoftwareVersionString::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterManufacturingDateAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ManufacturingDate::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterPartNumberAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::PartNumber::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterProductURLAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ProductURL::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterProductLabelAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ProductLabel::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterSerialNumberAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::SerialNumber::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterReachableAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterUniqueIDAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::UniqueID::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterAcceptedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterAttributeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicInformationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPSwitchClusterNumberOfPositionsAttributeCallbackType)(
     void *, chip::app::Clusters::Switch::Attributes::NumberOfPositions::TypeInfo::DecodableArgType);
