@@ -267,7 +267,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase command}}WithCompletionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
-  [self {{asLowerCamelCase name}}WithParams:nil completionHandler:completionHandler];
+  [self {{asLowerCamelCase command}}WithParams:nil completionHandler:completionHandler];
 }
 {{/unless}}
 {{/unless}}
