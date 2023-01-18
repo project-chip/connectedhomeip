@@ -1652,8 +1652,8 @@ typedef void (*CHIPKeypadInputClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::KeypadInput::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPKeypadInputClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-typedef void (*CHIPContentLauncherClusterLaunchResponseCallbackType)(
-    void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType &);
+typedef void (*CHIPContentLauncherClusterLauncherResponseCallbackType)(
+    void *, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &);
 
 typedef void (*CHIPContentLauncherClusterAcceptHeaderAttributeCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableType &);

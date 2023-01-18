@@ -12964,7 +12964,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Upon receipt, this SHALL launch the specified content with optional search criteria.
  */
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
-                     completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                     completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 /**
  * Command LaunchURL
@@ -12972,7 +12972,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Upon receipt, this SHALL launch content from the specified URL.
  */
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
-                 completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                 completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeAcceptHeaderWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -19162,8 +19162,14 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRContentLauncherMetricType) {
-    MTRContentLauncherMetricTypePIXELS API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRContentLauncherMetricTypePERCENTAGE API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRContentLauncherMetricTypePixels MTR_NEWLY_AVAILABLE = 0x00,
+    MTRContentLauncherMetricTypePIXELS API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherMetricTypePixels")
+    = 0x00,
+    MTRContentLauncherMetricTypePercentage MTR_NEWLY_AVAILABLE = 0x01,
+    MTRContentLauncherMetricTypePERCENTAGE API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherMetricTypePercentage")
+    = 0x01,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRContentLauncherParameter) {
@@ -19180,6 +19186,7 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherParameter) {
     MTRContentLauncherParameterSport API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
     MTRContentLauncherParameterSportsTeam API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0B,
     MTRContentLauncherParameterType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0C,
+    MTRContentLauncherParameterVideo MTR_NEWLY_AVAILABLE = 0x0D,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {

@@ -1004,9 +1004,9 @@ namespace LaunchURL {
 static constexpr CommandId Id = 0x00000001;
 } // namespace LaunchURL
 
-namespace LaunchResponse {
+namespace LauncherResponse {
 static constexpr CommandId Id = 0x00000002;
-} // namespace LaunchResponse
+} // namespace LauncherResponse
 
 } // namespace Commands
 } // namespace ContentLauncher

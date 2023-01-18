@@ -3423,7 +3423,7 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRMediaInputClusterInputInfo : MTRMediaInputClusterInputInfoStruct
 @end
 
-@implementation MTRContentLauncherClusterDimension
+@implementation MTRContentLauncherClusterDimensionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3439,7 +3439,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRContentLauncherClusterDimension alloc] init];
+    auto other = [[MTRContentLauncherClusterDimensionStruct alloc] init];
 
     other.width = self.width;
     other.height = self.height;
@@ -3457,7 +3457,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRContentLauncherClusterAdditionalInfo
+@implementation MTRContentLauncherClusterDimension : MTRContentLauncherClusterDimensionStruct
+@end
+
+@implementation MTRContentLauncherClusterAdditionalInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3471,7 +3474,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRContentLauncherClusterAdditionalInfo alloc] init];
+    auto other = [[MTRContentLauncherClusterAdditionalInfoStruct alloc] init];
 
     other.name = self.name;
     other.value = self.value;
@@ -3488,7 +3491,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRContentLauncherClusterParameter
+@implementation MTRContentLauncherClusterAdditionalInfo : MTRContentLauncherClusterAdditionalInfoStruct
+@end
+
+@implementation MTRContentLauncherClusterParameterStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3504,7 +3510,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRContentLauncherClusterParameter alloc] init];
+    auto other = [[MTRContentLauncherClusterParameterStruct alloc] init];
 
     other.type = self.type;
     other.value = self.value;
@@ -3522,7 +3528,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRContentLauncherClusterContentSearch
+@implementation MTRContentLauncherClusterParameter : MTRContentLauncherClusterParameterStruct
+@end
+
+@implementation MTRContentLauncherClusterContentSearchStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3534,7 +3543,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRContentLauncherClusterContentSearch alloc] init];
+    auto other = [[MTRContentLauncherClusterContentSearchStruct alloc] init];
 
     other.parameterList = self.parameterList;
 
@@ -3550,12 +3559,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRContentLauncherClusterStyleInformation
+@implementation MTRContentLauncherClusterContentSearch : MTRContentLauncherClusterContentSearchStruct
+@end
+
+@implementation MTRContentLauncherClusterStyleInformationStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _imageUrl = nil;
+        _imageURL = nil;
 
         _color = nil;
 
@@ -3566,9 +3578,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRContentLauncherClusterStyleInformation alloc] init];
+    auto other = [[MTRContentLauncherClusterStyleInformationStruct alloc] init];
 
-    other.imageUrl = self.imageUrl;
+    other.imageURL = self.imageURL;
     other.color = self.color;
     other.size = self.size;
 
@@ -3578,13 +3590,26 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: imageUrl:%@; color:%@; size:%@; >", NSStringFromClass([self class]), _imageUrl, _color, _size];
+        stringWithFormat:@"<%@: imageURL:%@; color:%@; size:%@; >", NSStringFromClass([self class]), _imageURL, _color, _size];
     return descriptionString;
+}
+
+- (void)setImageUrl:(NSString * _Nullable)imageUrl
+{
+    self.imageURL = imageUrl;
+}
+
+- (NSString * _Nullable)imageUrl
+{
+    return self.imageURL;
 }
 
 @end
 
-@implementation MTRContentLauncherClusterBrandingInformation
+@implementation MTRContentLauncherClusterStyleInformation : MTRContentLauncherClusterStyleInformationStruct
+@end
+
+@implementation MTRContentLauncherClusterBrandingInformationStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3606,7 +3631,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRContentLauncherClusterBrandingInformation alloc] init];
+    auto other = [[MTRContentLauncherClusterBrandingInformationStruct alloc] init];
 
     other.providerName = self.providerName;
     other.background = self.background;
@@ -3626,6 +3651,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRContentLauncherClusterBrandingInformation : MTRContentLauncherClusterBrandingInformationStruct
 @end
 
 @implementation MTRAudioOutputClusterOutputInfoStruct

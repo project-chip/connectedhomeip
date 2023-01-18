@@ -107,8 +107,8 @@ typedef void (*MediaPlaybackClusterPlaybackResponseCallbackType)(
     void *, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &);
 typedef void (*KeypadInputClusterSendKeyResponseCallbackType)(
     void *, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &);
-typedef void (*ContentLauncherClusterLaunchResponseCallbackType)(
-    void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType &);
+typedef void (*ContentLauncherClusterLauncherResponseCallbackType)(
+    void *, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &);
 typedef void (*ApplicationLauncherClusterLauncherResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &);
 typedef void (*AccountLoginClusterGetSetupPINResponseCallbackType)(
@@ -11419,18 +11419,19 @@ public:
                             const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data);
 };
 
-class MTRContentLauncherClusterLaunchResponseCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherClusterLaunchResponseCallbackType>
+class MTRContentLauncherClusterLauncherResponseCallbackBridge
+    : public MTRCallbackBridge<ContentLauncherClusterLauncherResponseCallbackType>
 {
 public:
-    MTRContentLauncherClusterLaunchResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ContentLauncherClusterLaunchResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRContentLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ContentLauncherClusterLauncherResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRContentLauncherClusterLaunchResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ContentLauncherClusterLaunchResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+    MTRContentLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRActionBlock action) :
+        MTRCallbackBridge<ContentLauncherClusterLauncherResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data);
+                            const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & data);
 };
 
 class MTRApplicationLauncherClusterLauncherResponseCallbackBridge

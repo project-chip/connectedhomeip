@@ -3469,6 +3469,7 @@ server cluster ContentLauncher = 1290 {
     kSport = 10;
     kSportsTeam = 11;
     kType = 12;
+    kVideo = 13;
   }
 
   bitmap ContentLauncherFeature : BITMAP32 {
@@ -3481,37 +3482,37 @@ server cluster ContentLauncher = 1290 {
     kHls = 0x2;
   }
 
-  struct ContentSearch {
-    Parameter parameterList[] = 0;
+  struct ContentSearchStruct {
+    ParameterStruct parameterList[] = 0;
   }
 
-  struct Parameter {
+  struct ParameterStruct {
     ParameterEnum type = 0;
     char_string value = 1;
-    optional AdditionalInfo externalIDList[] = 2;
+    optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
-  struct AdditionalInfo {
+  struct AdditionalInfoStruct {
     char_string name = 0;
     char_string value = 1;
   }
 
-  struct BrandingInformation {
+  struct BrandingInformationStruct {
     char_string providerName = 0;
-    optional StyleInformation background = 1;
-    optional StyleInformation logo = 2;
-    optional StyleInformation progressBar = 3;
-    optional StyleInformation splash = 4;
-    optional StyleInformation waterMark = 5;
+    optional StyleInformationStruct background = 1;
+    optional StyleInformationStruct logo = 2;
+    optional StyleInformationStruct progressBar = 3;
+    optional StyleInformationStruct splash = 4;
+    optional StyleInformationStruct waterMark = 5;
   }
 
-  struct StyleInformation {
-    optional char_string imageUrl = 0;
+  struct StyleInformationStruct {
+    optional char_string imageURL = 0;
     optional char_string color = 1;
-    optional Dimension size = 2;
+    optional DimensionStruct size = 2;
   }
 
-  struct Dimension {
+  struct DimensionStruct {
     double width = 0;
     double height = 1;
     MetricTypeEnum metric = 2;

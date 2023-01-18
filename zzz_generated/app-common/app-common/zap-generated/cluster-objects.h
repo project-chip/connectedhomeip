@@ -22136,7 +22136,7 @@ struct TypeInfo
 } // namespace KeypadInput
 namespace ContentLauncher {
 namespace Structs {
-namespace Dimension {
+namespace DimensionStruct {
 enum class Fields
 {
     kWidth  = 0,
@@ -22160,8 +22160,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Dimension
-namespace AdditionalInfo {
+} // namespace DimensionStruct
+namespace AdditionalInfoStruct {
 enum class Fields
 {
     kName  = 0,
@@ -22183,8 +22183,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace AdditionalInfo
-namespace Parameter {
+} // namespace AdditionalInfoStruct
+namespace ParameterStruct {
 enum class Fields
 {
     kType           = 0,
@@ -22197,7 +22197,7 @@ struct Type
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    Optional<DataModel::List<const Structs::AdditionalInfo::Type>> externalIDList;
+    Optional<DataModel::List<const Structs::AdditionalInfoStruct::Type>> externalIDList;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -22209,15 +22209,15 @@ struct DecodableType
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    Optional<DataModel::DecodableList<Structs::AdditionalInfo::DecodableType>> externalIDList;
+    Optional<DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType>> externalIDList;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace Parameter
-namespace ContentSearch {
+} // namespace ParameterStruct
+namespace ContentSearchStruct {
 enum class Fields
 {
     kParameterList = 0,
@@ -22226,7 +22226,7 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const Structs::Parameter::Type> parameterList;
+    DataModel::List<const Structs::ParameterStruct::Type> parameterList;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -22236,18 +22236,18 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<Structs::Parameter::DecodableType> parameterList;
+    DataModel::DecodableList<Structs::ParameterStruct::DecodableType> parameterList;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace ContentSearch
-namespace StyleInformation {
+} // namespace ContentSearchStruct
+namespace StyleInformationStruct {
 enum class Fields
 {
-    kImageUrl = 0,
+    kImageURL = 0,
     kColor    = 1,
     kSize     = 2,
 };
@@ -22255,9 +22255,9 @@ enum class Fields
 struct Type
 {
 public:
-    Optional<chip::CharSpan> imageUrl;
+    Optional<chip::CharSpan> imageURL;
     Optional<chip::CharSpan> color;
-    Optional<Structs::Dimension::Type> size;
+    Optional<Structs::DimensionStruct::Type> size;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -22268,8 +22268,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace StyleInformation
-namespace BrandingInformation {
+} // namespace StyleInformationStruct
+namespace BrandingInformationStruct {
 enum class Fields
 {
     kProviderName = 0,
@@ -22284,11 +22284,11 @@ struct Type
 {
 public:
     chip::CharSpan providerName;
-    Optional<Structs::StyleInformation::Type> background;
-    Optional<Structs::StyleInformation::Type> logo;
-    Optional<Structs::StyleInformation::Type> progressBar;
-    Optional<Structs::StyleInformation::Type> splash;
-    Optional<Structs::StyleInformation::Type> waterMark;
+    Optional<Structs::StyleInformationStruct::Type> background;
+    Optional<Structs::StyleInformationStruct::Type> logo;
+    Optional<Structs::StyleInformationStruct::Type> progressBar;
+    Optional<Structs::StyleInformationStruct::Type> splash;
+    Optional<Structs::StyleInformationStruct::Type> waterMark;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -22299,7 +22299,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace BrandingInformation
+} // namespace BrandingInformationStruct
 } // namespace Structs
 
 namespace Commands {
@@ -22315,10 +22315,10 @@ struct Type;
 struct DecodableType;
 } // namespace LaunchURL
 
-namespace LaunchResponse {
+namespace LauncherResponse {
 struct Type;
 struct DecodableType;
-} // namespace LaunchResponse
+} // namespace LauncherResponse
 
 } // namespace Commands
 
@@ -22338,13 +22338,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    Structs::ContentSearch::Type search;
+    Structs::ContentSearchStruct::Type search;
     bool autoPlay = static_cast<bool>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType;
+    using ResponseType = Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -22355,7 +22355,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    Structs::ContentSearch::DecodableType search;
+    Structs::ContentSearchStruct::DecodableType search;
     bool autoPlay = static_cast<bool>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22378,11 +22378,11 @@ public:
 
     chip::CharSpan contentURL;
     Optional<chip::CharSpan> displayString;
-    Optional<Structs::BrandingInformation::Type> brandingInformation;
+    Optional<Structs::BrandingInformationStruct::Type> brandingInformation;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType;
+    using ResponseType = Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -22395,11 +22395,11 @@ public:
 
     chip::CharSpan contentURL;
     Optional<chip::CharSpan> displayString;
-    Optional<Structs::BrandingInformation::DecodableType> brandingInformation;
+    Optional<Structs::BrandingInformationStruct::DecodableType> brandingInformation;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURL
-namespace LaunchResponse {
+namespace LauncherResponse {
 enum class Fields
 {
     kStatus = 0,
@@ -22410,7 +22410,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
@@ -22426,14 +22426,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace LaunchResponse
+}; // namespace LauncherResponse
 } // namespace Commands
 
 namespace Attributes {

@@ -8718,10 +8718,10 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData);
 /**
- * @brief Content Launcher Cluster LaunchResponse Command callback (from server)
+ * @brief Content Launcher Cluster LauncherResponse Command callback (from server)
  */
-bool emberAfContentLauncherClusterLaunchResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t status, chip::CharSpan data);
+bool emberAfContentLauncherClusterLauncherResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                           uint8_t Status, chip::CharSpan Data);
 /**
  * @brief Audio Output Cluster SelectOutput Command callback (from client)
  */

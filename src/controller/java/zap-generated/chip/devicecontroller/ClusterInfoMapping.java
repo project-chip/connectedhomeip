@@ -6099,8 +6099,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedLaunchResponseCallback
-      implements ChipClusters.ContentLauncherCluster.LaunchResponseCallback,
+  public static class DelegatedLauncherResponseCallback
+      implements ChipClusters.ContentLauncherCluster.LauncherResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6110,12 +6110,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> data) {
+    public void onSuccess(Integer Status, Optional<String> Data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
-      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo DataResponseValue = new CommandResponseInfo("Data", "Optional<String>");
+      responseValues.put(DataResponseValue, Data);
       callback.onSuccess(responseValues);
     }
 
@@ -11618,13 +11618,13 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ContentLauncherCluster) cluster)
                   .launchContent(
-                      (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
-                      (ChipStructs.ContentLauncherClusterContentSearch)
+                      (ChipClusters.ContentLauncherCluster.LauncherResponseCallback) callback,
+                      (ChipStructs.ContentLauncherClusterContentSearchStruct)
                           commandArguments.get("search"),
                       (Boolean) commandArguments.get("autoPlay"),
                       (Optional<String>) commandArguments.get("data"));
             },
-            () -> new DelegatedLaunchResponseCallback(),
+            () -> new DelegatedLauncherResponseCallback(),
             contentLauncherlaunchContentCommandParams);
     contentLauncherClusterInteractionInfoMap.put(
         "launchContent", contentLauncherlaunchContentInteractionInfo);
@@ -11645,13 +11645,13 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ContentLauncherCluster) cluster)
                   .launchURL(
-                      (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
+                      (ChipClusters.ContentLauncherCluster.LauncherResponseCallback) callback,
                       (String) commandArguments.get("contentURL"),
                       (Optional<String>) commandArguments.get("displayString"),
-                      (Optional<ChipStructs.ContentLauncherClusterBrandingInformation>)
+                      (Optional<ChipStructs.ContentLauncherClusterBrandingInformationStruct>)
                           commandArguments.get("brandingInformation"));
             },
-            () -> new DelegatedLaunchResponseCallback(),
+            () -> new DelegatedLauncherResponseCallback(),
             contentLauncherlaunchURLCommandParams);
     contentLauncherClusterInteractionInfoMap.put(
         "launchURL", contentLauncherlaunchURLInteractionInfo);
