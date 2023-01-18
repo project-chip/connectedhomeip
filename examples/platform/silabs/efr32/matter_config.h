@@ -23,7 +23,7 @@
 #include <platform/KeyValueStoreManager.h>
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-#include "ICDSubscribtionCallback.h"
+#include "ICDSubscriptionCallback.h"
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
 class EFR32MatterConfig
@@ -38,6 +38,6 @@ private:
     static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-    static ICDSubscribtionCallback mICDSubscriptionHandler;
+    static ICDSubscriptionCallback mICDSubscriptionHandler;
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 };

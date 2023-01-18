@@ -118,8 +118,8 @@ config("ICD-subscription-callback-config") {
 
 source_set("efr32-ICD-subscription-callback") {
   sources = [
-    "../ICDSubscribtionCallback.cpp",
-    "../ICDSubscribtionCallback.h",
+    "../ICDSubscriptionCallback.cpp",
+    "../ICDSubscriptionCallback.h",
   ]
 
   public_deps = [ "${chip_root}/src/app:app" ]

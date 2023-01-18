@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
-#include "ICDSubscribtionCallback.h"
+#include "ICDSubscriptionCallback.h"
 #include <platform/CHIPDeviceConfig.h>
 
-CHIP_ERROR ICDSubscribtionCallback::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
+CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
                                                             chip::Transport::SecureSession & aSecureSession)
 {
     using namespace chip::System::Clock;
@@ -30,8 +30,24 @@ CHIP_ERROR ICDSubscribtionCallback::OnSubscriptionRequested(chip::app::ReadHandl
     {
         interval_s32 = Seconds16::max();
     }
+    uint16_t decidedMaxInterval = interval_s32.count();
 
-    Seconds16 interval_s16 = interval_s32;
+    uint16_t requestedMinInterval = 0;
+    uint16_t requestedMaxInterval = 0;
+    aReadHandler.GetReportingIntervals(requestedMinInterval, requestedMaxInterval);
 
-    return aReadHandler.SetReportingIntervals(interval_s16.count());
+
+    // If requestedMinInterval is greater than IdleTimeInterval, select next wake up time as max interval
+    if(requestedMinInterval > decidedMaxInterval)
+    {
+        uint8_t ratio = requestedMinInterval / decidedMaxInterval;
+        if(requestedMinInterval % decidedMaxInterval)
+        {
+            ratio++;
+        }
+
+        decidedMaxInterval *= ratio;
+    }
+    
+    return aReadHandler.SetReportingIntervals(decidedMaxInterval);
 }
