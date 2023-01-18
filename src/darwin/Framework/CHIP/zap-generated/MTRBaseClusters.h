@@ -18417,6 +18417,16 @@ typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlPumpOperationMode) {
     MTRPumpConfigurationAndControlPumpOperationModeLocal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlPumpFeature) {
+    MTRPumpConfigurationAndControlPumpFeatureConstantPressure MTR_NEWLY_AVAILABLE = 0x1,
+    MTRPumpConfigurationAndControlPumpFeatureCompensatedPressure MTR_NEWLY_AVAILABLE = 0x2,
+    MTRPumpConfigurationAndControlPumpFeatureConstantFlow MTR_NEWLY_AVAILABLE = 0x4,
+    MTRPumpConfigurationAndControlPumpFeatureConstantSpeed MTR_NEWLY_AVAILABLE = 0x8,
+    MTRPumpConfigurationAndControlPumpFeatureConstantTemperature MTR_NEWLY_AVAILABLE = 0x10,
+    MTRPumpConfigurationAndControlPumpFeatureAutomatic MTR_NEWLY_AVAILABLE = 0x20,
+    MTRPumpConfigurationAndControlPumpFeatureLocal MTR_NEWLY_AVAILABLE = 0x40,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatus) {
     MTRPumpConfigurationAndControlPumpStatusDeviceFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRPumpConfigurationAndControlPumpStatusSupplyfault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,

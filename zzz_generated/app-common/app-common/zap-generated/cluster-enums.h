@@ -1585,6 +1585,18 @@ enum class PumpOperationMode : uint8_t
     kUnknownEnumValue = 4,
 };
 
+// Bitmap for PumpFeature
+enum class PumpFeature : uint32_t
+{
+    kConstantPressure    = 0x1,
+    kCompensatedPressure = 0x2,
+    kConstantFlow        = 0x4,
+    kConstantSpeed       = 0x8,
+    kConstantTemperature = 0x10,
+    kAutomatic           = 0x20,
+    kLocal               = 0x40,
+};
+
 // Bitmap for PumpStatus
 enum class PumpStatus : uint16_t
 {

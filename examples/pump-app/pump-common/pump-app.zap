@@ -7150,7 +7150,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "31",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -7166,7 +7166,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -7914,5 +7914,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 771
     }
-  ]
+  ],
+  "log": []
 }

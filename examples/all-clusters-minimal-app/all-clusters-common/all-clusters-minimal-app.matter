@@ -2169,6 +2169,16 @@ server cluster PumpConfigurationAndControl = 512 {
     kLocal = 3;
   }
 
+  bitmap PumpFeature : BITMAP32 {
+    kConstantPressure = 0x1;
+    kCompensatedPressure = 0x2;
+    kConstantFlow = 0x4;
+    kConstantSpeed = 0x8;
+    kConstantTemperature = 0x10;
+    kAutomatic = 0x20;
+    kLocal = 0x40;
+  }
+
   bitmap PumpStatus : BITMAP16 {
     kDeviceFault = 0x1;
     kSupplyfault = 0x2;
@@ -2235,6 +2245,8 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute nullable int16s maxPressure = 0;
   readonly attribute nullable int16u maxSpeed = 1;
   readonly attribute nullable int16u maxFlow = 2;
+  readonly attribute nullable int16s minConstPressure = 3;
+  readonly attribute nullable int16s maxConstPressure = 4;
   readonly attribute PumpOperationMode effectiveOperationMode = 17;
   readonly attribute PumpControlMode effectiveControlMode = 18;
   readonly attribute nullable int16s capacity = 19;
@@ -3664,12 +3676,14 @@ endpoint 1 {
     ram      attribute maxPressure;
     ram      attribute maxSpeed;
     ram      attribute maxFlow;
+    ram      attribute minConstPressure;
+    ram      attribute maxConstPressure;
     ram      attribute effectiveOperationMode;
     ram      attribute effectiveControlMode;
     ram      attribute capacity;
     ram      attribute operationMode;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster Thermostat {

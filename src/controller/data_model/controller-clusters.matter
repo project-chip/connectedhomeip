@@ -2811,6 +2811,16 @@ client cluster PumpConfigurationAndControl = 512 {
     kLocal = 3;
   }
 
+  bitmap PumpFeature : BITMAP32 {
+    kConstantPressure = 0x1;
+    kCompensatedPressure = 0x2;
+    kConstantFlow = 0x4;
+    kConstantSpeed = 0x8;
+    kConstantTemperature = 0x10;
+    kAutomatic = 0x20;
+    kLocal = 0x40;
+  }
+
   bitmap PumpStatus : BITMAP16 {
     kDeviceFault = 0x1;
     kSupplyfault = 0x2;
