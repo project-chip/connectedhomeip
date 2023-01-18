@@ -50,7 +50,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: 
+    - label:
           "Given PCC.S.F00(PRSCONST) ensure featuremap has the correct bit set"
       PICS: PCC.S.F00
       command: "readAttribute"
@@ -60,7 +60,7 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: 
+    - label:
           "Given PCC.S.F01(PRSCOMP) ensure featuremap has the correct bit set"
       PICS: PCC.S.F01
       command: "readAttribute"
