@@ -152,7 +152,7 @@ def runArgumentsParser() -> CmdLineArgs:
 
     return CmdLineArgs(
         zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
-        lock_file = args.lock_file,
+        lock_file=args.lock_file,
     )
 
 
