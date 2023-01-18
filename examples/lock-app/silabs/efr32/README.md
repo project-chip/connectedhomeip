@@ -4,20 +4,20 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 
 <hr>
 
--   [Matter EFR32 Lock Example](#matter-efr32-lock-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling LCD](#disabling-lcd)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter EFR32 Lock Example](#matter-efr32-lock-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Notes](#notes)
+  - [Memory settings](#memory-settings)
+  - [OTA Software Update](#ota-software-update)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -93,32 +93,6 @@ Mac OS X
 
     -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
-    MG24 boards :
-
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
     -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
