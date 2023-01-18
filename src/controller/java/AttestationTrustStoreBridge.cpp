@@ -40,12 +40,12 @@ CHIP_ERROR AttestationTrustStoreBridge::GetProductAttestationAuthorityCert(const
                                                                            chip::MutableByteSpan & outPaaDerBuffer) const
 {
     VerifyOrReturnError(skid.size() == chip::Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     constexpr size_t paaCertAllocatedLen = chip::Credentials::kMaxDERCertLength;
     Platform::ScopedMemoryBuffer<uint8_t> paaCert;
     VerifyOrReturnError(paaCert.Alloc(paaCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
-    
-    MutableByteSpan paaDerBuffer{paaCert.Get(), paaCertAllocatedLen};
+
+    MutableByteSpan paaDerBuffer{ paaCert.Get(), paaCertAllocatedLen };
     ReturnErrorOnFailure(GetPaaCertFromJava(skid, paaDerBuffer));
 
     uint8_t skidBuf[chip::Crypto::kSubjectKeyIdentifierLength] = { 0 };

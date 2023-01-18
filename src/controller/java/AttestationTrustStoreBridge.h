@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/Span.h>
 
