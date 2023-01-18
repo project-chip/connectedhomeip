@@ -19699,13 +19699,13 @@ public class ChipClusters {
       pause(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
 
-    public void stopPlayback(PlaybackResponseCallback callback) {
-      stopPlayback(chipClusterPtr, callback, null);
+    public void stop(PlaybackResponseCallback callback) {
+      stop(chipClusterPtr, callback, null);
     }
 
-    public void stopPlayback(PlaybackResponseCallback callback, int timedInvokeTimeoutMs) {
+    public void stop(PlaybackResponseCallback callback, int timedInvokeTimeoutMs) {
 
-      stopPlayback(chipClusterPtr, callback, timedInvokeTimeoutMs);
+      stop(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
 
     public void startOver(PlaybackResponseCallback callback) {
@@ -19793,7 +19793,7 @@ public class ChipClusters {
         PlaybackResponseCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    private native void stopPlayback(
+    private native void stop(
         long chipClusterPtr,
         PlaybackResponseCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);

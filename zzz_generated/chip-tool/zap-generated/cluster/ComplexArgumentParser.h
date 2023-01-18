@@ -191,10 +191,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type & request);
+static void Finalize(chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type & request);
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & request,
                         Json::Value & value);

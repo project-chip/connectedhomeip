@@ -1785,7 +1785,7 @@ client cluster MediaPlayback = 1286 {
 
   command Play(): PlaybackResponse = 0;
   command Pause(): PlaybackResponse = 1;
-  command StopPlayback(): PlaybackResponse = 2;
+  command Stop(): PlaybackResponse = 2;
   command StartOver(): PlaybackResponse = 3;
   command Previous(): PlaybackResponse = 4;
   command Next(): PlaybackResponse = 5;

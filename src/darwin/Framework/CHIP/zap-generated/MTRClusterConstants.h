@@ -6402,7 +6402,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandPauseID")
     = 0x00000001,
     MTRClusterMediaPlaybackCommandStopPlaybackID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandStopID")
     = 0x00000002,
     MTRClusterMediaPlaybackCommandStartOverID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID")
@@ -6435,7 +6435,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster MediaPlayback commands
     MTRCommandIDTypeClusterMediaPlaybackCommandPlayID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterMediaPlaybackCommandPauseID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterMediaPlaybackCommandStopID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRCommandIDTypeClusterMediaPlaybackCommandNextID MTR_NEWLY_AVAILABLE = 0x00000005,

@@ -15833,7 +15833,7 @@ namespace Events {} // namespace Events
 } // namespace TargetNavigator
 namespace MediaPlayback {
 namespace Structs {
-namespace PlaybackPosition {
+namespace PlaybackPositionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15876,7 +15876,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace PlaybackPosition
+} // namespace PlaybackPositionStruct
 } // namespace Structs
 
 namespace Commands {
@@ -15946,7 +15946,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace Pause.
-namespace StopPlayback {
+namespace Stop {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15978,7 +15978,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace StopPlayback.
+} // namespace Stop.
 namespace StartOver {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {

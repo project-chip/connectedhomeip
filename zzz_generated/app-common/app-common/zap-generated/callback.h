@@ -8607,11 +8607,11 @@ bool emberAfMediaPlaybackClusterPauseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::MediaPlayback::Commands::Pause::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster StopPlayback Command callback (from client)
+ * @brief Media Playback Cluster Stop Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterStopPlaybackCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::StopPlayback::DecodableType & commandData);
+bool emberAfMediaPlaybackClusterStopCallback(chip::app::CommandHandler * commandObj,
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::MediaPlayback::Commands::Stop::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster StartOver Command callback (from client)
  */
@@ -8658,7 +8658,7 @@ bool emberAfMediaPlaybackClusterSkipBackwardCallback(
  * @brief Media Playback Cluster PlaybackResponse Command callback (from server)
  */
 bool emberAfMediaPlaybackClusterPlaybackResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t status, chip::CharSpan data);
+                                                         uint8_t Status, chip::CharSpan Data);
 /**
  * @brief Media Playback Cluster Seek Command callback (from client)
  */

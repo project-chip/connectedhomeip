@@ -3449,25 +3449,25 @@ void CHIPMediaPlaybackClusterPlaybackResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.status), status);
-    jobject data;
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), Status);
+    jobject Data;
     if (!dataResponse.data.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, data);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, Data);
     }
     else
     {
-        jobject dataInsideOptional;
-        dataInsideOptional =
+        jobject DataInsideOptional;
+        DataInsideOptional =
             env->NewStringUTF(std::string(dataResponse.data.Value().data(), dataResponse.data.Value().size()).c_str());
-        chip::JniReferences::GetInstance().CreateOptional(dataInsideOptional, data);
+        chip::JniReferences::GetInstance().CreateOptional(DataInsideOptional, Data);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, Data);
 }
 CHIPKeypadInputClusterSendKeyResponseCallback::CHIPKeypadInputClusterSendKeyResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPKeypadInputClusterSendKeyResponseCallbackType>(CallbackFn, this)

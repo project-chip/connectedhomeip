@@ -21055,7 +21055,7 @@ struct TypeInfo
 } // namespace TargetNavigator
 namespace MediaPlayback {
 namespace Structs {
-namespace PlaybackPosition {
+namespace PlaybackPositionStruct {
 enum class Fields
 {
     kUpdatedAt = 0,
@@ -21077,7 +21077,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace PlaybackPosition
+} // namespace PlaybackPositionStruct
 } // namespace Structs
 
 namespace Commands {
@@ -21093,10 +21093,10 @@ struct Type;
 struct DecodableType;
 } // namespace Pause
 
-namespace StopPlayback {
+namespace Stop {
 struct Type;
 struct DecodableType;
-} // namespace StopPlayback
+} // namespace Stop
 
 namespace StartOver {
 struct Type;
@@ -21202,7 +21202,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Pause
-namespace StopPlayback {
+namespace Stop {
 enum class Fields
 {
 };
@@ -21211,7 +21211,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::StopPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21224,12 +21224,12 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::StopPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace StopPlayback
+}; // namespace Stop
 namespace StartOver {
 enum class Fields
 {
@@ -21544,11 +21544,11 @@ struct TypeInfo
 namespace SampledPosition {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type>;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType>;
+        chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampledPosition::Id; }
