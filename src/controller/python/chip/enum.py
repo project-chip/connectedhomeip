@@ -16,9 +16,11 @@
 #
 
 from aenum import IntEnum, extend_enum
+from threading import Lock
 
 # Flag on whether we should map unknown enum values to kUnknownEnumValue.
 _map_missing_enum_to_unknown_enum_value = True
+_placeholder_count_lock = Lock()
 # Count that is used to append the end of placeholder enum names in
 # MatterIntEnum.extend_enum_if_value_doesnt_exist.
 _placeholder_count = 0
@@ -47,9 +49,12 @@ class MatterIntEnum(IntEnum):
             return_value = None
 
         if return_value is None or return_value.value != value:
+            global _placeholder_count_lock
             global _placeholder_count
-            return_value = extend_enum(cls, f'kUnknownPlaceholder{_placeholder_count}', value)
-            _placeholder_count = _placeholder_count + 1
+            with _placeholder_count_lock:
+                return_value = extend_enum(cls, f'kUnknownPlaceholder{_placeholder_count}', value)
+                _placeholder_count = _placeholder_count + 1
+
         return return_value
 
 
