@@ -449,14 +449,18 @@ JNI_METHOD(void, setAttestationTrustStoreDelegate)
 
     if (attestationTrustStoreDelegate != nullptr)
     {
-        wrapper->ClearAttestationTrustStoreBridge();
         jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
-        wrapper->SetAttestationTrustStoreBridge(new AttestationTrustStoreBridge(attestationTrustStoreDelegateRef));
-        VerifyOrExit(wrapper->GetAttestationTrustStoreBridge() != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        AttestationTrustStoreBridge * attestationTrustStoreBridge =
+            new AttestationTrustStoreBridge(attestationTrustStoreDelegateRef);
+        VerifyOrExit(attestationTrustStoreBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        wrapper->ClearAttestationTrustStoreBridge();
+        wrapper->SetAttestationTrustStoreBridge(attestationTrustStoreBridge);
 
+        DeviceAttestationVerifier * deviceAttestationVerifier =
+            new Credentials::DefaultDACVerifier(wrapper->GetAttestationTrustStoreBridge());
+        VerifyOrExit(deviceAttestationVerifier != nullptr, err = CHIP_ERROR_NO_MEMORY);
         wrapper->ClearDeviceAttestationVerifier();
-        wrapper->SetDeviceAttestationVerifier(new Credentials::DefaultDACVerifier(wrapper->GetAttestationTrustStoreBridge()));
-        VerifyOrExit(wrapper->GetDeviceAttestationVerifier() != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        wrapper->SetDeviceAttestationVerifier(deviceAttestationVerifier);
 
         wrapper->Controller()->SetDeviceAttestationVerifier(wrapper->GetDeviceAttestationVerifier());
     }
