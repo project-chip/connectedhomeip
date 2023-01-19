@@ -445,7 +445,7 @@ class ClusterObjectTests:
             raise AssertionError("The command invoke should be rejected.")
         except chip.interaction_model.InteractionModelError as ex:
             if ex.status != chip.interaction_model.Status.NeedsTimedInteraction:
-                raise AssertionError("The command invoke error with NeedsTimedInteraction.")
+                raise AssertionError("The command invoke was expected to error with NeedsTimedInteraction.")
 
         logger.info(
             "4: Writing TestCluster-TimedWriteBoolean without timedRequestTimeoutMs should be rejected")
@@ -456,8 +456,9 @@ class ClusterObjectTests:
                                                  True)),
                                          ])
             raise AssertionError("The write request should be rejected.")
-        except ValueError:
-            pass
+        except chip.interaction_model.InteractionModelError as ex:
+            if ex.status != chip.interaction_model.Status.NeedsTimedInteraction:
+                raise AssertionError("The write attribute was expected to error with NeedsTimedInteraction.")
 
     @ classmethod
     @ base.test_case
