@@ -18939,10 +18939,7 @@ typedef NS_OPTIONS(uint16_t, MTRColorControlColorCapabilities) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRColorControlFeature) {
-    MTRColorControlFeatureHueSaturation MTR_NEWLY_AVAILABLE = 0x1,
-    MTRColorControlFeatureHueAndSaturation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRColorControlFeatureHueSaturation")
-    = 0x1,
+    MTRColorControlFeatureHueAndSaturation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRColorControlFeatureEnhancedHue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
     MTRColorControlFeatureColorLoop API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
     MTRColorControlFeatureXY API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
