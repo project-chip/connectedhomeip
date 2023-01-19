@@ -74,7 +74,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -82,13 +82,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     #Check for DNS-SD advertisement CM is not possible in YAML
@@ -136,7 +136,7 @@ tests:
           error: FAILURE
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -144,17 +144,17 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000
@@ -174,7 +174,7 @@ tests:
           error: FAILURE
 
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000
@@ -200,7 +200,7 @@ tests:
     - label:
           "TH_CR1 opens a new commissioning window on DUT_CE using wrong
           PakeVerifier value using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -208,20 +208,20 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: IncorrectPakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
           clusterError: 3
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -229,17 +229,17 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR1 opens another commissioning window on DUT_CE using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -247,13 +247,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
@@ -284,7 +284,7 @@ tests:
     - label:
           "TH_CR1 tries to revoke the commissioning window on DUT_CE using
           RevokeCommissioning command"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000

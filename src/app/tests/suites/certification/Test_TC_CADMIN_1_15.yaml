@@ -70,20 +70,20 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -111,20 +111,20 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR3 Commissions with DUT_CE"
@@ -159,9 +159,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 2, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 2, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -222,8 +222,8 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -261,20 +261,20 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -309,9 +309,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 4, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 4, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list

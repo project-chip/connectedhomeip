@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # CHIP RPC CONSOLE
 
 This python application provides a console for interacting with rpc-enabled chip

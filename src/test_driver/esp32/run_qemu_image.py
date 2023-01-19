@@ -13,13 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import coloredlogs
-import click
 import logging
 import os
 import re
-import sys
 import subprocess
+import sys
+
+import click
+import coloredlogs
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants

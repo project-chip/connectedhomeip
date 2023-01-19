@@ -57,7 +57,7 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate) override;
+    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate) override;
     CHIP_ERROR GetEthFullDuplex(bool & fullDuplex) override;
     CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset) override;
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount) override;

@@ -19,11 +19,13 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
     switch (aPath.mClusterId)
     {
     {{#chip_client_clusters includeAll=true}}
+    {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
     case Clusters::{{asUpperCamelCase name}}::Id: {
         using namespace Clusters::{{asUpperCamelCase name}};
         switch (aPath.mAttributeId)
         {
         {{#chip_server_cluster_attributes}}
+        {{#unless (wasRemoved (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         case Attributes::{{asUpperCamelCase name}}::Id: {
             using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -36,6 +38,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             {{>decode_value target="value" source="cppValue" cluster=parent.name errorCode="*aError = err; return nil;" depth=0}}
             return value;
         }
+        {{/unless}}
         {{/chip_server_cluster_attributes}}
         default:
           *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
@@ -43,6 +46,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
         }
         break;
     }
+    {{/unless}}
     {{/chip_client_clusters}}
     default: {
       *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;

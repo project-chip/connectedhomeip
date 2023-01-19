@@ -35,7 +35,7 @@ tests:
 
     - label: "Open Commissioning Window from alpha"
       endpoint: 0
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:

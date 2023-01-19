@@ -65,7 +65,7 @@
 
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -460,38 +460,76 @@ static void TestAES_CCM_128DecryptInvalidNonceLen(nlTestSuite * inSuite, void * 
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_128Containers(nlTestSuite * inSuite, void * inContext)
+static void TestSensitiveDataBuffer(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    uint8_t testVector[kAES_CCM128_Key_Length];
-    AesCcm128Key deepCopy;
-    AesCcm128KeySpan shallowCopy;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    constexpr size_t kCapacity         = 32;
+    constexpr size_t kLength           = 16;
+    using Buffer                       = SensitiveDataBuffer<kCapacity>;
+    const uint8_t kAllZeros[kCapacity] = { 0 };
+    uint8_t testVector[kCapacity];
 
     // Give us some data.
+    CHIP_ERROR err = DRBG_get_bytes(testVector, sizeof(testVector));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test initial value
+    Buffer buffer;
+    NL_TEST_ASSERT(inSuite, buffer.ConstBytes() == (const uint8_t *) buffer.Bytes());
+    NL_TEST_ASSERT(inSuite, buffer.Length() == 0);
+
+    // Put data in the buffer and test all accessors
+    memcpy(buffer.Bytes(), testVector, kCapacity);
+    buffer.SetLength(kLength);
+
+    NL_TEST_ASSERT(inSuite, buffer.ConstBytes() == (const uint8_t *) buffer.Bytes());
+    NL_TEST_ASSERT(inSuite, buffer.ConstBytes() == buffer.Span().data());
+    NL_TEST_ASSERT(inSuite, buffer.Length() == kLength);
+    NL_TEST_ASSERT(inSuite, buffer.Length() == buffer.Span().size());
+
+    // Test sanitization of entire buffer (even though length < capacity)
+    const void * bufferStorage = buffer.ConstBytes();
+    buffer.~Buffer();
+    NL_TEST_ASSERT(inSuite, memcmp(bufferStorage, kAllZeros, kCapacity) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(bufferStorage, testVector, kCapacity));
+}
+
+static void TestSensitiveDataFixedBuffer(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+
+    constexpr size_t kCapacity         = 32;
+    using Buffer                       = SensitiveDataFixedBuffer<kCapacity>;
+    using BufferSpan                   = FixedByteSpan<kCapacity>;
+    const uint8_t kAllZeros[kCapacity] = { 0 };
+    uint8_t testVector[kCapacity];
+
+    // Give us some data.
+    CHIP_ERROR err = DRBG_get_bytes(testVector, sizeof(testVector));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test construction from array and all accessors
+    Buffer buffer(testVector);
+    NL_TEST_ASSERT(inSuite, buffer.ConstBytes() == (const uint8_t *) buffer.Bytes());
+    NL_TEST_ASSERT(inSuite, buffer.ConstBytes() == buffer.Span().data());
+    NL_TEST_ASSERT(inSuite, memcmp(buffer.ConstBytes(), testVector, kCapacity) == 0);
+
+    // Test sanitization
+    const void * bufferStorage = buffer.ConstBytes();
+    buffer.~Buffer();
+    NL_TEST_ASSERT(inSuite, memcmp(bufferStorage, kAllZeros, kCapacity) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(bufferStorage, testVector, kCapacity));
+
+    // Give us different data
     err = DRBG_get_bytes(testVector, sizeof(testVector));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // Test deep copy from array.
-    deepCopy = AesCcm128Key(testVector);
-    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) == 0);
-
-    // Test sanitization.
-    deepCopy.~AesCcm128Key();
-    new (&deepCopy) AesCcm128Key();
-    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)));
-
-    // Give us different data.
-    err = DRBG_get_bytes(testVector, sizeof(testVector));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    // Test deep copy from KeySpan.
-    shallowCopy = AesCcm128KeySpan(testVector);
-    deepCopy    = AesCcm128Key(shallowCopy);
-    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) == 0);
-
-    // Test Span getter.
-    NL_TEST_ASSERT(inSuite, memcmp(testVector, deepCopy.Span().data(), deepCopy.Span().size()) == 0);
+    // Test construction from span and all accessors
+    new (&buffer) Buffer(BufferSpan(testVector));
+    NL_TEST_ASSERT(inSuite, buffer.ConstBytes() == (const uint8_t *) buffer.Bytes());
+    NL_TEST_ASSERT(inSuite, buffer.ConstBytes() == buffer.Span().data());
+    NL_TEST_ASSERT(inSuite, memcmp(buffer.ConstBytes(), testVector, kCapacity) == 0);
 }
 
 static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
@@ -919,7 +957,7 @@ static void TestECDSA_ValidationFailIncorrectMsgSignature(nlTestSuite * inSuite,
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
-    signature[0] = static_cast<uint8_t>(~signature[0]); // Flipping bits should invalidate the signature.
+    signature.Bytes()[0] = static_cast<uint8_t>(~signature.ConstBytes()[0]); // Flipping bits should invalidate the signature.
 
     CHIP_ERROR validation_error =
         keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -942,7 +980,7 @@ static void TestECDSA_ValidationFailIncorrectHashSignature(nlTestSuite * inSuite
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
-    signature[0] = static_cast<uint8_t>(~signature[0]); // Flipping bits should invalidate the signature.
+    signature.Bytes()[0] = static_cast<uint8_t>(~signature.ConstBytes()[0]); // Flipping bits should invalidate the signature.
 
     CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, sizeof(hash), signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
@@ -1029,14 +1067,14 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
-    out_secret1[0] = 0;
+    out_secret1.Bytes()[0] = 0;
 
     P256ECDHDerivedSecret out_secret2;
-    out_secret2[0] = 1;
+    out_secret2.Bytes()[0] = 1;
 
     CHIP_ERROR error = CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite,
-                   memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Capacity()) !=
+                   memcmp(out_secret1.ConstBytes(), out_secret2.ConstBytes(), out_secret1.Capacity()) !=
                        0); // Validate that buffers are indeed different.
 
     error = keypair2.ECDH_derive_secret(keypair1.Pubkey(), out_secret1);
@@ -1048,7 +1086,7 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
     bool signature_lengths_match = out_secret1.Length() == out_secret2.Length();
     NL_TEST_ASSERT(inSuite, signature_lengths_match);
 
-    bool signatures_match = (memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Length()) == 0);
+    bool signatures_match = (memcmp(out_secret1.ConstBytes(), out_secret2.ConstBytes(), out_secret1.Length()) == 0);
     NL_TEST_ASSERT(inSuite, signatures_match);
 }
 
@@ -2301,6 +2339,87 @@ static void TestVIDPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestX509_ReplaceCertIfResignedCertFound(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+
+    struct TestCase
+    {
+        ByteSpan referenceCert;
+        ByteSpan * candidateCertsList;
+        size_t candidateCertsCount;
+        ByteSpan expectedOutCert;
+    };
+
+    // clang-format off
+    ByteSpan TestCandidateCertsList1[] = { sTestCert_DAC_FFF1_8000_0004_Cert,
+                                           sTestCert_PAI_FFF2_8004_FB_Cert,
+                                           sTestCert_PAA_FFF1_Cert };
+    ByteSpan TestCandidateCertsList2[] = { sTestCert_DAC_FFF1_8000_0004_Cert,
+                                           sTestCert_PAI_FFF2_NoPID_Resigned_Cert };
+    ByteSpan TestCandidateCertsList3[] = { sTestCert_DAC_FFF1_8000_0004_Cert,
+                                           sTestCert_PAI_FFF2_8001_Resigned_Cert };
+    ByteSpan TestCandidateCertsList4[] = { sTestCert_PAI_FFF2_8001_Resigned_Cert,
+                                           sTestCert_PAI_FFF1_8000_Cert };
+    ByteSpan TestCandidateCertsList5[] = { sTestCert_PAI_FFF2_NoPID_Resigned_Cert,
+                                           sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert };
+    ByteSpan TestCandidateCertsList6[] = { sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert,
+                                           sTestCert_DAC_FFF1_8000_0004_Cert };
+    ByteSpan TestCandidateCertsList7[] = { sTestCert_PAA_NoVID_ToResignPAIs_Cert,
+                                           sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert,
+                                           sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert,
+                                           sTestCert_PAI_FFF2_8001_Resigned_Cert,
+                                           sTestCert_PAI_FFF2_NoPID_Resigned_Cert };
+    ByteSpan TestCandidateCertsList8[] = { sTestCert_PAA_NoVID_ToResignPAIs_Cert,
+                                           sTestCert_PAI_FFF2_8001_Resigned_Cert,
+                                           ByteSpan(),
+                                           sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert,
+                                           sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert,
+                                           sTestCert_PAI_FFF2_NoPID_Resigned_Cert };
+
+    const TestCase kTestCases[] = {
+        { sTestCert_PAI_FFF2_8001_Cert, nullptr, 5, sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, 0, sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF1_8000_Cert, TestCandidateCertsList1, ArraySize(TestCandidateCertsList1), sTestCert_PAI_FFF1_8000_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList2, ArraySize(TestCandidateCertsList2), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, ArraySize(TestCandidateCertsList3), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList4, ArraySize(TestCandidateCertsList4), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList5, ArraySize(TestCandidateCertsList5), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList6, ArraySize(TestCandidateCertsList6), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_NoPID_Cert, TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), sTestCert_PAI_FFF2_NoPID_Resigned_Cert },
+    };
+    // clang-format on
+
+    for (const auto & testCase : kTestCases)
+    {
+        ByteSpan outCert;
+        CHIP_ERROR result = ReplaceCertIfResignedCertFound(testCase.referenceCert, testCase.candidateCertsList,
+                                                           testCase.candidateCertsCount, outCert);
+
+        NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, outCert.data_equal(testCase.expectedOutCert));
+    }
+
+    // Error case: invalid input argument for referenceCertificate
+    {
+        ByteSpan outCert;
+        CHIP_ERROR result =
+            ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), outCert);
+        NL_TEST_ASSERT(inSuite, result == CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Error case: invalid input argument for one of the certificates in the candidateCertificates list
+    {
+        ByteSpan outCert;
+        CHIP_ERROR result =
+            ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList8, ArraySize(TestCandidateCertsList8), outCert);
+        NL_TEST_ASSERT(inSuite, result == CHIP_ERROR_INVALID_ARGUMENT);
+    }
+}
+
 static const uint8_t kCompressedFabricId[] = { 0x29, 0x06, 0xC9, 0x08, 0xD1, 0x15, 0xD3, 0x62 };
 
 const uint8_t kEpochKeyBuffer1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
@@ -2417,7 +2536,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid tag", TestAES_CCM_128EncryptInvalidTagLen),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid key", TestAES_CCM_128DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid nonce", TestAES_CCM_128DecryptInvalidNonceLen),
-    NL_TEST_DEF("Test decrypting AES-CCM-128 Containers", TestAES_CCM_128Containers),
     NL_TEST_DEF("Test encrypt/decrypt AES-CTR-128 test vectors", TestAES_CTR_128CryptTestVectors),
     NL_TEST_DEF("Test ASN.1 signature conversion routines", TestAsn1Conversions),
     NL_TEST_DEF("Test Integer to ASN.1 DER conversion", TestRawIntegerToDerValidCases),
@@ -2462,9 +2580,12 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from Attribute String", TestVIDPID_StringExtraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from x509 Attestation Certificate", TestVIDPID_x509Extraction),
+    NL_TEST_DEF("Test Replace Resigned Certificate Version if Found", TestX509_ReplaceCertIfResignedCertFound),
     NL_TEST_DEF("Test Group Operation Key Derivation", TestGroup_OperationalKeyDerivation),
     NL_TEST_DEF("Test Group Session ID Derivation", TestGroup_SessionIdDerivation),
     NL_TEST_DEF("Test Group Privacy Key Derivation", TestGroup_PrivacyKeyDerivation),
+    NL_TEST_DEF("Test sensitive data buffer", TestSensitiveDataBuffer),
+    NL_TEST_DEF("Test sensitive data fixed buffer", TestSensitiveDataFixedBuffer),
     NL_TEST_SENTINEL()
 };
 

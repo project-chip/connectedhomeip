@@ -38,7 +38,7 @@
 #include <app/data-model/Decode.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -509,7 +509,8 @@ private:
     void StopResubscription();
     void ClearActiveSubscriptionState();
 
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                      const SessionHandle & sessionHandle);
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);

@@ -4,7 +4,10 @@
         "Test_TC_ACL_1_1",
         "Test_TC_ACL_2_1",
         "Test_TC_ACL_2_2",
-        "Test_TC_ACL_2_3"
+        "Test_TC_ACL_2_3",
+        "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_7",
+        "Test_TC_ACL_2_9"
     ],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
@@ -61,7 +64,11 @@
         "Test_TC_ILL_2_1",
         "Test_TC_ILL_2_2"
     ],
-    "OccupancySensing": ["Test_TC_OCC_1_1", "Test_TC_OCC_2_1"],
+    "OccupancySensing": [
+        "Test_TC_OCC_1_1",
+        "Test_TC_OCC_2_1",
+        "Test_TC_OCC_2_3"
+    ],
     "LevelControl": [
         "Test_TC_LVL_1_1",
         "Test_TC_LVL_2_1",
@@ -73,7 +80,7 @@
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_1_1"],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
-    "UnitLocalization": ["Test_TC_LUNIT_1_2"],
+    "UnitLocalization": ["Test_TC_LUNIT_1_2", "Test_TC_LUNIT_3_1"],
     "UserLabel": [
         "Test_TC_ULABEL_1_1",
         "Test_TC_ULABEL_2_1",
@@ -230,7 +237,9 @@
         "TestFanControl",
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
-        "TestCommissioningWindow"
+        "TestCommissioningWindow",
+        "TestCommissionerNodeId",
+        "TestClientMonitoringCluster"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],

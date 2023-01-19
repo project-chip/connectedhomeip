@@ -20,7 +20,7 @@
 
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 
 /**

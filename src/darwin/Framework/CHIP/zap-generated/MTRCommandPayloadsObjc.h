@@ -2101,9 +2101,9 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull content API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSData * _Nonnull logContent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull timeStamp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSNumber * _Nonnull utcTimeStamp MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nonnull timeSinceBoot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
@@ -2122,6 +2122,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
     tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
+@end
+
+@interface MTRDiagnosticLogsClusterRetrieveLogsResponseParams (Deprecated)
+
+@property (nonatomic, copy) NSData * _Nonnull content API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use logContent");
+
+@property (nonatomic, copy) NSNumber * _Nonnull timeStamp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use utcTimeStamp");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2254,7 +2263,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull commissioningTimeout API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     ;
 
-@property (nonatomic, copy) NSData * _Nonnull pakeVerifier API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSData * _Nonnull pakePasscodeVerifier MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nonnull discriminator API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -2276,6 +2285,12 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@end
+
+@interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (Deprecated)
+
+@property (nonatomic, copy) NSData * _Nonnull pakeVerifier API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use pakePasscodeVerifier");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2345,7 +2360,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @property (nonatomic, copy) NSData * _Nonnull attestationElements API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull signature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSData * _Nonnull attestationSignature MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2362,6 +2377,12 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
     tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
+@end
+
+@interface MTROperationalCredentialsClusterAttestationResponseParams (Deprecated)
+
+@property (nonatomic, copy) NSData * _Nonnull signature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use attestationSignature");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2577,7 +2598,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull rootCertificate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSData * _Nonnull rootCACertificate MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2593,6 +2614,12 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@end
+
+@interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams (Deprecated)
+
+@property (nonatomic, copy) NSData * _Nonnull rootCertificate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use rootCACertificate");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3138,7 +3165,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @property (nonatomic, copy) NSString * _Nullable userName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userUniqueId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueID MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nullable userStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -3160,6 +3187,12 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@end
+
+@interface MTRDoorLockClusterSetUserParams (Deprecated)
+
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use userUniqueID");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3190,7 +3223,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @property (nonatomic, copy) NSString * _Nullable userName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userUniqueId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueID MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nullable userStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -3224,6 +3257,12 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+@interface MTRDoorLockClusterGetUserResponseParams (Deprecated)
+
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use userUniqueID");
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterClearUserParams : NSObject <NSCopying>
 
@@ -3251,7 +3290,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull operationType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 @property (nonatomic, copy)
-    MTRDoorLockClusterDlCredential * _Nonnull credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockClusterCredentialStruct * _Nonnull credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 @property (nonatomic, copy) NSData * _Nonnull credentialData API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -3308,7 +3347,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetCredentialStatusParams : NSObject <NSCopying>
 
 @property (nonatomic, copy)
-    MTRDoorLockClusterDlCredential * _Nonnull credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockClusterCredentialStruct * _Nonnull credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3362,7 +3401,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterClearCredentialParams : NSObject <NSCopying>
 
 @property (nonatomic, copy)
-    MTRDoorLockClusterDlCredential * _Nullable credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockClusterCredentialStruct * _Nullable credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5146,48 +5185,6 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull startTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 @property (nonatomic, copy) NSNumber * _Nonnull numberOfIntervals API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRClientMonitoringClusterRegisterClientMonitoringParams : NSObject <NSCopying>
-
-@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId MTR_NEWLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nonnull iCid MTR_NEWLY_AVAILABLE;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRClientMonitoringClusterStayAwakeRequestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

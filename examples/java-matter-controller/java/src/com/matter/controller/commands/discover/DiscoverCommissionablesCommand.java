@@ -58,7 +58,8 @@ public final class DiscoverCommissionablesCommand extends MatterCommand {
   }
 
   private final void logDevice(DiscoveredDevice device) {
-    System.out.format("\tDiscriminator: %ld", device.discriminator);
-    System.out.format("\tIP Address : %s", device.ipAddress);
+    System.out.println("Discovered node:");
+    System.out.format("\tDiscriminator: %d", device.discriminator);
+    System.out.format("\tIP Address : %s%n", device.ipAddress);
   }
 }

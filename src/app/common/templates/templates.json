@@ -8,6 +8,10 @@
         "templates/app/helper.js",
         "templates/chip/helper.js"
     ],
+    "resources": {
+        "weak-enum-list": "weak-enum-list.yaml",
+        "legacy-struct-list": "legacy-struct-list.yaml"
+    },
     "override": "../../zap-templates/common/override.js",
     "partials": [
         {
@@ -57,11 +61,6 @@
             "path": "../../zap-templates/templates/app/callback.zapt",
             "name": "ZCL callback header",
             "output": "callback.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/command-id.zapt",
-            "name": "ZCL command-id header",
-            "output": "command-id.h"
         },
         {
             "path": "../../zap-templates/templates/app/enums.zapt",

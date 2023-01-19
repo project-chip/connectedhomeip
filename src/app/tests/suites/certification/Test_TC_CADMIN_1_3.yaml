@@ -63,7 +63,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -71,13 +71,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     #Check for DNS-SD advertisement CM is not possible in YAML
@@ -187,7 +187,7 @@ tests:
       PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
+          value: [{ Label: "", NodeID: nodeId }, { Label: "", NodeID: nodeId2 }]
           constraints:
               type: list
 
@@ -199,7 +199,7 @@ tests:
       PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
+          value: [{ Label: "", NodeID: nodeId }, { Label: "", NodeID: nodeId2 }]
           constraints:
               type: list
 
@@ -252,7 +252,7 @@ tests:
               maxLength: 32
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       identity: "beta"
@@ -261,13 +261,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "Wait for the commissioning window in step 13 to timeout"
@@ -280,7 +280,7 @@ tests:
 
     - label:
           "TH_CR2 reads the window status to verify the DUT_CE window is closed"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       PICS: CADMIN.S.A0000
       command: "readAttribute"
       attribute: "WindowStatus"
@@ -288,7 +288,7 @@ tests:
           value: 0
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       identity: "beta"
@@ -297,13 +297,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label:

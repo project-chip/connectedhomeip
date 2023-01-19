@@ -74,7 +74,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -82,13 +82,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 900
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     #Check for DNS-SD advertisement CM is not possible in YAML

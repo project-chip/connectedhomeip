@@ -50,6 +50,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -75,6 +83,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -198,6 +212,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -219,6 +241,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -271,6 +299,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -292,6 +328,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -336,6 +378,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -357,6 +407,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -417,6 +473,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -438,6 +502,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -532,6 +602,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -553,6 +631,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -599,6 +683,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -620,6 +712,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -681,6 +779,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -702,6 +808,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -747,6 +859,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -768,6 +888,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -879,6 +1005,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -900,6 +1034,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -945,6 +1085,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -966,6 +1114,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1022,6 +1176,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1043,6 +1205,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1088,6 +1256,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1109,6 +1285,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1165,6 +1347,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1186,6 +1376,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1262,6 +1458,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1283,6 +1487,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1447,6 +1657,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1468,6 +1686,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1512,6 +1736,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1533,6 +1765,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1593,6 +1831,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1614,6 +1860,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1666,6 +1918,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1687,6 +1947,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1719,6 +1985,597 @@ private:
             LogStep(5, "DUT reads the ConfigStatus attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LCFG_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_LCFG_3_1_SimulatedSuite() : TestCommand("Test_TC_LCFG_3_1_Simulated", 3)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LCFG_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT reads SupportedLocales attribute from TH");
+            VerifyOrDo(!ShouldSkip("LCFG.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), LocalizationConfiguration::Id,
+                                 LocalizationConfiguration::Attributes::SupportedLocales::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads ActiveLocale attribute from TH");
+            VerifyOrDo(!ShouldSkip("LCFG.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), LocalizationConfiguration::Id,
+                                 LocalizationConfiguration::Attributes::ActiveLocale::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LUNIT_1_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_LUNIT_1_1_SimulatedSuite() : TestCommand("Test_TC_LUNIT_1_1_Simulated", 6)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LUNIT_1_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT read (0xFFFD) ClusterRevision attribute");
+            VerifyOrDo(!ShouldSkip("LUNIT.C.Afffd"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::ClusterRevision::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT read (0xFFFC) FeatureMap attribute");
+            VerifyOrDo(!ShouldSkip("LUNIT.C.Afffc"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::FeatureMap::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT read (0xFFFB) AttributeList attribute");
+            VerifyOrDo(!ShouldSkip("LUNIT.C.Afffb"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT read (0xFFF9) AcceptedCommandList attribute");
+            VerifyOrDo(!ShouldSkip("LUNIT.C.Afff9"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::AcceptedCommandList::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT read (0xFFF8) GeneratedCommandList attribute");
+            VerifyOrDo(!ShouldSkip("LUNIT.C.Afff8"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::GeneratedCommandList::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LUNIT_2_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_LUNIT_2_1_SimulatedSuite() : TestCommand("Test_TC_LUNIT_2_1_Simulated", 4)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LUNIT_2_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT reads TemperatureUnit attribute from TH");
+            VerifyOrDo(!ShouldSkip("LUNIT.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::TemperatureUnit::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT writes 3 to TemperatureUnit attribute on TH");
+            VerifyOrDo(!ShouldSkip("LUNIT.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::TemperatureUnit::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT reads TemperatureUnit attribute from TH");
+            VerifyOrDo(!ShouldSkip("LUNIT.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::TemperatureUnit::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_OCC_2_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_OCC_2_2_SimulatedSuite() : TestCommand("Test_TC_OCC_2_2_Simulated", 13)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_OCC_2_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT reads from the TH the (0x0000) Occupancy attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::Occupancy::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads from the TH the (0x0001) OccupancySensorType attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorType::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT reads from the TH the (0x0002) OccupancySensorType attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads from the TH the (0x0010) PIROccupiedToUnoccupiedDelay optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT reads from the TH the (0x0011) PIRUnoccupiedToOccupiedDelay optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id);
+        }
+        case 6: {
+            LogStep(6, "DUT reads from the TH the (0x0012) PIRUnoccupiedToOccupiedThreshold optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::PIRUnoccupiedToOccupiedThreshold::Id);
+        }
+        case 7: {
+            LogStep(7, "DUT reads from the TH the (0x0020) UltrasonicOccupiedToUnoccupiedDelay optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0020"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id);
+        }
+        case 8: {
+            LogStep(8, "DUT reads from the TH the (0x0021) UltrasonicUnoccupiedToOccupiedDelay optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0021"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id);
+        }
+        case 9: {
+            LogStep(9, "DUT reads from the TH the (0x0022) UltrasonicUnoccupiedToOccupiedThreshold optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0022"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id);
+        }
+        case 10: {
+            LogStep(10, "DUT reads from the TH the (0x0030) PhysicalContactOccupiedToUnoccupiedDelay optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0030"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id);
+        }
+        case 11: {
+            LogStep(11, "DUT reads from the TH the (0x0031) PhysicalContactUnoccupiedToOccupiedDelay optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0031"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id);
+        }
+        case 12: {
+            LogStep(12, "DUT reads from the TH the (0x0032) PhysicalContactUnoccupiedToOccupiedThreshold optional attribute");
+            VerifyOrDo(!ShouldSkip("OCC.C.A0032"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
+                                 OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_OCC_2_4_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_OCC_2_4_SimulatedSuite() : TestCommand("Test_TC_OCC_2_4_Simulated", 3)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_OCC_2_4_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "TH reads OccupancySensorType attribute from DUT");
+            VerifyOrDo(!ShouldSkip("OCC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorType::Id);
+        }
+        case 2: {
+            LogStep(2, "TH reads OccupancySensorTypeBitmap attribute from DUT");
+            VerifyOrDo(!ShouldSkip("OCC.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ULABEL_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_ULABEL_3_1_SimulatedSuite() : TestCommand("Test_TC_ULABEL_3_1_Simulated", 3)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ULABEL_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: LabelList");
+            VerifyOrDo(!ShouldSkip("ULABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), UserLabel::Id, UserLabel::Attributes::LabelList::Id);
+        }
+        case 2: {
+            LogStep(2, "write attribute: LabelList");
+            VerifyOrDo(!ShouldSkip("ULABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), UserLabel::Id, UserLabel::Attributes::LabelList::Id);
         }
         }
         return CHIP_NO_ERROR;
@@ -1803,6 +2660,30 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
     {
         return std::unique_ptr<Test_TC_WNCV_5_1_SimulatedSuite>(new Test_TC_WNCV_5_1_SimulatedSuite());
     }
+    if (testName == "Test_TC_LCFG_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_LCFG_3_1_SimulatedSuite>(new Test_TC_LCFG_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_LUNIT_1_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_LUNIT_1_1_SimulatedSuite>(new Test_TC_LUNIT_1_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_LUNIT_2_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_LUNIT_2_1_SimulatedSuite>(new Test_TC_LUNIT_2_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_OCC_2_2_Simulated")
+    {
+        return std::unique_ptr<Test_TC_OCC_2_2_SimulatedSuite>(new Test_TC_OCC_2_2_SimulatedSuite());
+    }
+    if (testName == "Test_TC_OCC_2_4_Simulated")
+    {
+        return std::unique_ptr<Test_TC_OCC_2_4_SimulatedSuite>(new Test_TC_OCC_2_4_SimulatedSuite());
+    }
+    if (testName == "Test_TC_ULABEL_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_ULABEL_3_1_SimulatedSuite>(new Test_TC_ULABEL_3_1_SimulatedSuite());
+    }
 
     return nullptr;
 }
@@ -1829,4 +2710,10 @@ void PrintTestCommands()
     ChipLogError(chipTool, "\t* Test_TC_RH_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_SWTCH_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_WNCV_5_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_LCFG_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_LUNIT_1_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_LUNIT_2_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_OCC_2_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_OCC_2_4_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_ULABEL_3_1_Simulated");
 }

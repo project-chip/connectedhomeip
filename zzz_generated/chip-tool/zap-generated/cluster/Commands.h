@@ -62,7 +62,7 @@
 | WiFiNetworkDiagnostics                                              | 0x0036 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | TimeSynchronization                                                 | 0x0038 |
-| BridgedDeviceBasic                                                  | 0x0039 |
+| BridgedDeviceBasicInformation                                       | 0x0039 |
 | Switch                                                              | 0x003B |
 | AdministratorCommissioning                                          | 0x003C |
 | OperationalCredentials                                              | 0x003E |
@@ -2581,7 +2581,7 @@ private:
 | * RebootCount                                                       | 0x0001 |
 | * UpTime                                                            | 0x0002 |
 | * TotalOperationalHours                                             | 0x0003 |
-| * BootReasons                                                       | 0x0004 |
+| * BootReason                                                        | 0x0004 |
 | * ActiveHardwareFaults                                              | 0x0005 |
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
@@ -2696,8 +2696,8 @@ private:
 | * ExtendedPanId                                                     | 0x0004 |
 | * MeshLocalPrefix                                                   | 0x0005 |
 | * OverrunCount                                                      | 0x0006 |
-| * NeighborTableList                                                 | 0x0007 |
-| * RouteTableList                                                    | 0x0008 |
+| * NeighborTable                                                     | 0x0007 |
+| * RouteTable                                                        | 0x0008 |
 | * PartitionId                                                       | 0x0009 |
 | * Weighting                                                         | 0x000A |
 | * DataVersion                                                       | 0x000B |
@@ -2969,7 +2969,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster BridgedDeviceBasic                                          | 0x0039 |
+| Cluster BridgedDeviceBasicInformation                               | 0x0039 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -3058,7 +3058,7 @@ public:
         ClusterCommand("open-commissioning-window", credsIssuerConfig)
     {
         AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mRequest.commissioningTimeout);
-        AddArgument("PAKEVerifier", &mRequest.PAKEVerifier);
+        AddArgument("PAKEPasscodeVerifier", &mRequest.PAKEPasscodeVerifier);
         AddArgument("Discriminator", 0, UINT16_MAX, &mRequest.discriminator);
         AddArgument("Iterations", 0, UINT32_MAX, &mRequest.iterations);
         AddArgument("Salt", &mRequest.salt);
@@ -3402,7 +3402,7 @@ public:
     OperationalCredentialsAddTrustedRootCertificate(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-trusted-root-certificate", credsIssuerConfig)
     {
-        AddArgument("RootCertificate", &mRequest.rootCertificate);
+        AddArgument("RootCACertificate", &mRequest.rootCACertificate);
         ClusterCommand::AddArguments();
     }
 
@@ -3800,7 +3800,7 @@ class DoorLockLockDoor : public ClusterCommand
 public:
     DoorLockLockDoor(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("lock-door", credsIssuerConfig)
     {
-        AddArgument("PinCode", &mRequest.pinCode);
+        AddArgument("PINCode", &mRequest.PINCode);
         ClusterCommand::AddArguments();
     }
 
@@ -3830,7 +3830,7 @@ class DoorLockUnlockDoor : public ClusterCommand
 public:
     DoorLockUnlockDoor(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("unlock-door", credsIssuerConfig)
     {
-        AddArgument("PinCode", &mRequest.pinCode);
+        AddArgument("PINCode", &mRequest.PINCode);
         ClusterCommand::AddArguments();
     }
 
@@ -3862,7 +3862,7 @@ public:
         ClusterCommand("unlock-with-timeout", credsIssuerConfig)
     {
         AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
-        AddArgument("PinCode", &mRequest.pinCode);
+        AddArgument("PINCode", &mRequest.PINCode);
         ClusterCommand::AddArguments();
     }
 
@@ -4190,7 +4190,7 @@ public:
         AddArgument("OperationType", 0, UINT8_MAX, &mRequest.operationType);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         AddArgument("UserName", &mRequest.userName);
-        AddArgument("UserUniqueId", 0, UINT32_MAX, &mRequest.userUniqueId);
+        AddArgument("UserUniqueID", 0, UINT32_MAX, &mRequest.userUniqueID);
         AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
         AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
         AddArgument("CredentialRule", 0, UINT8_MAX, &mRequest.credentialRule);
@@ -4309,7 +4309,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::SetCredential::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
+    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type> mComplex_Credential;
 };
 
 /*
@@ -4341,7 +4341,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
+    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type> mComplex_Credential;
 };
 
 /*
@@ -4373,7 +4373,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::ClearCredential::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::Structs::DlCredential::Type>>
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type>>
         mComplex_Credential;
 };
 
@@ -5894,9 +5894,9 @@ private:
 | * Occupancy                                                         | 0x0000 |
 | * OccupancySensorType                                               | 0x0001 |
 | * OccupancySensorTypeBitmap                                         | 0x0002 |
-| * PirOccupiedToUnoccupiedDelay                                      | 0x0010 |
-| * PirUnoccupiedToOccupiedDelay                                      | 0x0011 |
-| * PirUnoccupiedToOccupiedThreshold                                  | 0x0012 |
+| * PIROccupiedToUnoccupiedDelay                                      | 0x0010 |
+| * PIRUnoccupiedToOccupiedDelay                                      | 0x0011 |
+| * PIRUnoccupiedToOccupiedThreshold                                  | 0x0012 |
 | * UltrasonicOccupiedToUnoccupiedDelay                               | 0x0020 |
 | * UltrasonicUnoccupiedToOccupiedDelay                               | 0x0021 |
 | * UltrasonicUnoccupiedToOccupiedThreshold                           | 0x0022 |
@@ -7306,7 +7306,8 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * RegisterClientMonitoring                                          |   0x00 |
-| * StayAwakeRequest                                                  |   0x01 |
+| * UnregisterClientMonitoring                                        |   0x01 |
+| * StayAwakeRequest                                                  |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * IdleModeInterval                                                  | 0x0000 |
@@ -7355,14 +7356,16 @@ private:
 };
 
 /*
- * Command StayAwakeRequest
+ * Command UnregisterClientMonitoring
  */
-class ClientMonitoringStayAwakeRequest : public ClusterCommand
+class ClientMonitoringUnregisterClientMonitoring : public ClusterCommand
 {
 public:
-    ClientMonitoringStayAwakeRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("stay-awake-request", credsIssuerConfig)
+    ClientMonitoringUnregisterClientMonitoring(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("unregister-client-monitoring", credsIssuerConfig)
     {
+        AddArgument("ClientNodeId", 0, UINT64_MAX, &mRequest.clientNodeId);
+        AddArgument("ICid", 0, UINT64_MAX, &mRequest.ICid);
         ClusterCommand::AddArguments();
     }
 
@@ -7378,6 +7381,36 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000001, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::Type mRequest;
+};
+
+/*
+ * Command StayAwakeRequest
+ */
+class ClientMonitoringStayAwakeRequest : public ClusterCommand
+{
+public:
+    ClientMonitoringStayAwakeRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("stay-awake-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000002, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000002, mRequest);
     }
 
 private:
@@ -9588,7 +9621,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "boot-reason", Attributes::BootReason::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
@@ -9605,7 +9638,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "boot-reason", Attributes::BootReason::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
@@ -9705,8 +9738,8 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "extended-pan-id", Attributes::ExtendedPanId::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "mesh-local-prefix", Attributes::MeshLocalPrefix::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "neighbor-table-list", Attributes::NeighborTableList::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "route-table-list", Attributes::RouteTableList::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "neighbor-table", Attributes::NeighborTable::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "route-table", Attributes::RouteTable::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "partition-id", Attributes::PartitionId::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "weighting", Attributes::Weighting::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "data-version", Attributes::DataVersion::Id, credsIssuerConfig),                         //
@@ -9782,8 +9815,8 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "extended-pan-id", Attributes::ExtendedPanId::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "mesh-local-prefix", Attributes::MeshLocalPrefix::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "neighbor-table-list", Attributes::NeighborTableList::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "route-table-list", Attributes::RouteTableList::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "neighbor-table", Attributes::NeighborTable::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "route-table", Attributes::RouteTable::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "partition-id", Attributes::PartitionId::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "weighting", Attributes::Weighting::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "data-version", Attributes::DataVersion::Id, credsIssuerConfig),                      //
@@ -10061,11 +10094,11 @@ void registerClusterTimeSynchronization(Commands & commands, CredentialIssuerCom
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBridgedDeviceBasic(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBridgedDeviceBasicInformation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::BridgedDeviceBasic;
+    using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
-    const char * clusterName = "BridgedDeviceBasic";
+    const char * clusterName = "BridgedDeviceBasicInformation";
 
     commands_list clusterCommands = {
         //
@@ -10722,7 +10755,7 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteAttribute<uint32_t>>(Id, "auto-relock-time", 0, UINT32_MAX, Attributes::AutoRelockTime::Id,
                                               credsIssuerConfig),                                                               //
         make_unique<WriteAttribute<uint8_t>>(Id, "sound-volume", 0, UINT8_MAX, Attributes::SoundVolume::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::DoorLock::DlOperatingMode>>(
+        make_unique<WriteAttribute<chip::app::Clusters::DoorLock::OperatingModeEnum>>(
             Id, "operating-mode", 0, UINT8_MAX, Attributes::OperatingMode::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "enable-local-programming", 0, 1, Attributes::EnableLocalProgramming::Id,
                                           credsIssuerConfig), //
@@ -12007,11 +12040,11 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
                                    credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "pir-occupied-to-unoccupied-delay", Attributes::PirOccupiedToUnoccupiedDelay::Id,
+        make_unique<ReadAttribute>(Id, "piroccupied-to-unoccupied-delay", Attributes::PIROccupiedToUnoccupiedDelay::Id,
                                    credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "pir-unoccupied-to-occupied-delay", Attributes::PirUnoccupiedToOccupiedDelay::Id,
+        make_unique<ReadAttribute>(Id, "pirunoccupied-to-occupied-delay", Attributes::PIRUnoccupiedToOccupiedDelay::Id,
                                    credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "pir-unoccupied-to-occupied-threshold", Attributes::PirUnoccupiedToOccupiedThreshold::Id,
+        make_unique<ReadAttribute>(Id, "pirunoccupied-to-occupied-threshold", Attributes::PIRUnoccupiedToOccupiedThreshold::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "ultrasonic-occupied-to-unoccupied-delay",
                                    Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
@@ -12031,12 +12064,12 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<uint16_t>>(Id, "pir-occupied-to-unoccupied-delay", 0, UINT16_MAX,
-                                              Attributes::PirOccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "pir-unoccupied-to-occupied-delay", 0, UINT16_MAX,
-                                              Attributes::PirUnoccupiedToOccupiedDelay::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "pir-unoccupied-to-occupied-threshold", 0, UINT8_MAX,
-                                             Attributes::PirUnoccupiedToOccupiedThreshold::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "piroccupied-to-unoccupied-delay", 0, UINT16_MAX,
+                                              Attributes::PIROccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "pirunoccupied-to-occupied-delay", 0, UINT16_MAX,
+                                              Attributes::PIRUnoccupiedToOccupiedDelay::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "pirunoccupied-to-occupied-threshold", 0, UINT8_MAX,
+                                             Attributes::PIRUnoccupiedToOccupiedThreshold::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "ultrasonic-occupied-to-unoccupied-delay", 0, UINT16_MAX,
                                               Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "ultrasonic-unoccupied-to-occupied-delay", 0, UINT16_MAX,
@@ -12054,12 +12087,12 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
                                         credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "pir-occupied-to-unoccupied-delay", Attributes::PirOccupiedToUnoccupiedDelay::Id,
+        make_unique<SubscribeAttribute>(Id, "piroccupied-to-unoccupied-delay", Attributes::PIROccupiedToUnoccupiedDelay::Id,
                                         credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "pir-unoccupied-to-occupied-delay", Attributes::PirUnoccupiedToOccupiedDelay::Id,
+        make_unique<SubscribeAttribute>(Id, "pirunoccupied-to-occupied-delay", Attributes::PIRUnoccupiedToOccupiedDelay::Id,
                                         credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "pir-unoccupied-to-occupied-threshold",
-                                        Attributes::PirUnoccupiedToOccupiedThreshold::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "pirunoccupied-to-occupied-threshold", Attributes::PIRUnoccupiedToOccupiedThreshold::Id,
+                                        credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "ultrasonic-occupied-to-unoccupied-delay",
                                         Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "ultrasonic-unoccupied-to-occupied-delay",
@@ -13013,9 +13046,10 @@ void registerClusterClientMonitoring(Commands & commands, CredentialIssuerComman
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                       //
-        make_unique<ClientMonitoringRegisterClientMonitoring>(credsIssuerConfig), //
-        make_unique<ClientMonitoringStayAwakeRequest>(credsIssuerConfig),         //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                         //
+        make_unique<ClientMonitoringRegisterClientMonitoring>(credsIssuerConfig),   //
+        make_unique<ClientMonitoringUnregisterClientMonitoring>(credsIssuerConfig), //
+        make_unique<ClientMonitoringStayAwakeRequest>(credsIssuerConfig),           //
         //
         // Attributes
         //
@@ -13527,7 +13561,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterWiFiNetworkDiagnostics(commands, credsIssuerConfig);
     registerClusterEthernetNetworkDiagnostics(commands, credsIssuerConfig);
     registerClusterTimeSynchronization(commands, credsIssuerConfig);
-    registerClusterBridgedDeviceBasic(commands, credsIssuerConfig);
+    registerClusterBridgedDeviceBasicInformation(commands, credsIssuerConfig);
     registerClusterSwitch(commands, credsIssuerConfig);
     registerClusterAdministratorCommissioning(commands, credsIssuerConfig);
     registerClusterOperationalCredentials(commands, credsIssuerConfig);

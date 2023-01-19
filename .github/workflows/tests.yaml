@@ -47,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build:0.6.31
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -105,7 +105,7 @@ jobs:
               #       things.
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/idl/xml_parser.py \
+                    "./scripts/py_matter_idl/matter_idl/xml_parser.py \
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
@@ -120,7 +120,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/bridged-device-basic.xml \
+                      src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
@@ -182,8 +182,9 @@ jobs:
                       src/app/zap-templates/zcl/data-model/silabs/zll.xml \
                     "
             - name: Build Apps
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
@@ -202,6 +203,23 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+            - name: Run Tests using chip-repl
+              timeout-minutes: 5
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --run-yamltests-with-chip-repl \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -242,6 +260,10 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+            # NOTE: Generally kept in sync within the repo using
+            #       scripts/tools/zap/version_update.py
+            ZAP_VERSION: v2023.01.09-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -275,6 +297,15 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+            - name: Install zap
+              run: |
+                 sudo mkdir -p $ZAP_INSTALL_PATH
+                 sudo chown `whoami` $ZAP_INSTALL_PATH
+                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
+                      --output $ZAP_INSTALL_PATH/zap-mac.zip
+                 cd $ZAP_INSTALL_PATH
+                 unzip zap-mac.zip zap-cli
+                 rm zap-mac.zip
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -287,7 +318,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 75
+              timeout-minutes: 90
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -352,7 +383,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build:0.6.31
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -426,7 +457,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build:0.6.31
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -452,7 +483,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Build Java Mattter Controller and all clusters app
+            - name: Build Java Matter Controller and all clusters app
               timeout-minutes: 50
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
@@ -463,7 +494,7 @@ jobs:
                       build \
                    "
             - name: Run Discover Tests
-              timeout-minutes: 65
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -475,7 +506,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Tests
-              timeout-minutes: 65
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -513,6 +544,10 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
+            # NOTE: Generally kept in sync within the repo using
+            #       scripts/tools/zap/version_update.py
+            ZAP_VERSION: v2023.01.09-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 
         if: github.actor != 'restyled-io[bot]' && false
         runs-on: macos-latest
@@ -540,6 +575,15 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+            - name: Install zap
+              run: |
+                 sudo mkdir -p $ZAP_INSTALL_PATH
+                 sudo chown `whoami` $ZAP_INSTALL_PATH
+                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
+                      --output $ZAP_INSTALL_PATH/zap-mac.zip
+                 cd $ZAP_INSTALL_PATH
+                 unzip zap-mac.zip zap-cli
+                 rm zap-mac.zip
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh

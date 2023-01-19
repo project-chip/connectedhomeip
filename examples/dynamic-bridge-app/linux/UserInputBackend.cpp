@@ -120,7 +120,8 @@ void AddCluster(const std::vector<std::string> & tokens)
     auto c = CreateCluster(cluster_name.c_str());
     if (c)
     {
-        g_pending->AddCluster(std::make_unique<DynamicCluster>(std::move(c)));
+        g_pending->AddCluster(
+            std::make_unique<DynamicCluster>(std::move(c), c->GetIncomingCommandList(), c->GetOutgoingCommandList()));
     }
     else
     {
@@ -285,20 +286,20 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
     {
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
     case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
-        wr.PutString(chip::TLV::Tag(), str.data(), (uint32_t) str.size());
+        wr.PutString(chip::TLV::AnonymousTag(), str.data(), (uint32_t) str.size());
         break;
     case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
     case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-        wr.PutBytes(chip::TLV::Tag(), (const uint8_t *) str.data(), (uint32_t) str.size());
+        wr.PutBytes(chip::TLV::AnonymousTag(), (const uint8_t *) str.data(), (uint32_t) str.size());
         break;
     case ZCL_STRUCT_ATTRIBUTE_TYPE:
         // Writing structs not supported yet
         break;
     case ZCL_SINGLE_ATTRIBUTE_TYPE:
-        wr.Put(chip::TLV::Tag(), (float) atof(str.c_str()));
+        wr.Put(chip::TLV::AnonymousTag(), (float) atof(str.c_str()));
         break;
     case ZCL_DOUBLE_ATTRIBUTE_TYPE:
-        wr.Put(chip::TLV::Tag(), atof(str.c_str()));
+        wr.Put(chip::TLV::AnonymousTag(), atof(str.c_str()));
         break;
     case ZCL_INT8S_ATTRIBUTE_TYPE:
     case ZCL_INT16S_ATTRIBUTE_TYPE:
@@ -308,7 +309,7 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
     case ZCL_INT48S_ATTRIBUTE_TYPE:
     case ZCL_INT56S_ATTRIBUTE_TYPE:
     case ZCL_INT64S_ATTRIBUTE_TYPE:
-        wr.Put(chip::TLV::Tag(), (int64_t) strtoll(str.c_str(), nullptr, 10));
+        wr.Put(chip::TLV::AnonymousTag(), (int64_t) strtoll(str.c_str(), nullptr, 10));
         break;
 
     case ZCL_INT8U_ATTRIBUTE_TYPE:
@@ -319,12 +320,12 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
     case ZCL_INT48U_ATTRIBUTE_TYPE:
     case ZCL_INT56U_ATTRIBUTE_TYPE:
     case ZCL_INT64U_ATTRIBUTE_TYPE:
-        wr.Put(chip::TLV::Tag(), (uint64_t) strtoll(str.c_str(), nullptr, 10));
+        wr.Put(chip::TLV::AnonymousTag(), (uint64_t) strtoll(str.c_str(), nullptr, 10));
         break;
 
     default:
         // Assume integer
-        wr.Put(chip::TLV::Tag(), (int64_t) strtoll(str.c_str(), nullptr, 10));
+        wr.Put(chip::TLV::AnonymousTag(), (int64_t) strtoll(str.c_str(), nullptr, 10));
         break;
     }
     wr.Finalize();

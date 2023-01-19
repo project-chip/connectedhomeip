@@ -16,7 +16,7 @@
         "binding-cluster.xml",
         "boolean-state-cluster.xml",
         "actions-cluster.xml",
-        "bridged-device-basic.xml",
+        "bridged-device-basic-information.xml",
         "chip-ota.xml",
         "chip-types.xml",
         "channel-cluster.xml",
@@ -102,7 +102,7 @@
             "TargetsPerAccessControlEntry",
             "AccessControlEntriesPerFabric"
         ],
-        "AdministratorCommissioning": [
+        "Administrator Commissioning": [
             "WindowStatus",
             "AdminFabricIndex",
             "AdminVendorId"
@@ -152,7 +152,7 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReasons"
+            "BootReason"
         ],
         "Group Key Management": [
             "ClusterRevision",
@@ -179,7 +179,7 @@
             "cluster_error_boolean"
         ],
         "Thread Network Diagnostics": [
-            "channel",
+            "Channel",
             "RoutingRole",
             "NetworkName",
             "PanId",
@@ -187,7 +187,7 @@
             "MeshLocalPrefix",
             "OverrunCount",
             "PartitionId",
-            "weighting",
+            "Weighting",
             "DataVersion",
             "StableDataVersion",
             "LeaderRouterId",
@@ -241,11 +241,11 @@
             "OperationalDatasetComponents"
         ],
         "WiFi Network Diagnostics": [
-            "bssid",
+            "BSSID",
             "SecurityType",
             "WiFiVersion",
             "ChannelNumber",
-            "Rssi",
+            "RSSI",
             "BeaconLostCount",
             "BeaconRxCount",
             "PacketMulticastRxCount",

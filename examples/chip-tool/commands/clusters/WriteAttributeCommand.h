@@ -228,6 +228,8 @@ protected:
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
                     "If provided, do a timed write with the given timed interaction timeout. See \"7.6.10. Timed Interaction\" in "
                     "the Matter specification.");
+        AddArgument("busyWaitForMs", 0, UINT16_MAX, &mBusyWaitForMs,
+                    "If provided, block the main thread processing for the given time right after sending a command.");
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersions,
                     "Comma-separated list of data versions for the clusters being written.");
         AddArgument("suppressResponse", 0, 1, &mSuppressResponse);

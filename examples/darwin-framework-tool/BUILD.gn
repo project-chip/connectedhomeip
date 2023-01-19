@@ -62,14 +62,14 @@ action("build-darwin-framework") {
     "Matter Framework",
     "--log_path",
     rebase_path("${root_build_dir}/darwin_framework_build.log", root_build_dir),
+    "--target_arch",
+    mac_target_arch,
   ]
 
   if (sdk != "macosx") {
     args += [
       "--target_sdk",
       sdk,
-      "--target_arch",
-      mac_target_arch,
     ]
   }
 

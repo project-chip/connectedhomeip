@@ -24,7 +24,6 @@
 #include "door-lock-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
 #include <app/util/af-event.h>
@@ -47,16 +46,16 @@ using namespace chip::app::Clusters::DoorLock;
 // =============================================================================
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
-    err = DlOperationError::kUnspecified;
+    err = OperationErrorEnum::kUnspecified;
     return false;
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
-    err = DlOperationError::kUnspecified;
+    err = OperationErrorEnum::kUnspecified;
     return false;
 }
 
@@ -133,14 +132,14 @@ emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, Em
 
 bool __attribute__((weak))
 emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                             const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
-                             DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
+                             const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
+                             CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
     return false;
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                    EmberAfPluginDoorLockCredentialInfo & credential)
 {
     return false;
@@ -148,8 +147,8 @@ emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credent
 
 bool __attribute__((weak))
 emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
-                                   chip::FabricIndex modifier, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
-                                   const chip::ByteSpan & credentialData)
+                                   chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
+                                   CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
 {
     return false;
 }
@@ -174,7 +173,7 @@ emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayInd
 
 DlStatus __attribute__((weak))
 emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
-                                 DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+                                 DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
     return DlStatus::kFailure;
 }
@@ -188,7 +187,7 @@ emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayInd
 
 DlStatus __attribute__((weak))
 emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
-                                 uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
+                                 uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
     return DlStatus::kFailure;
 }

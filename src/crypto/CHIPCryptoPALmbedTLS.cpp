@@ -664,7 +664,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
         mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &keypair->CHIP_CRYPTO_PAL_PRIVATE(d), CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_write_binary(&mpi_secret, Uint8::to_uchar(out_secret), secret_length);
+    result = mbedtls_mpi_write_binary(&mpi_secret, out_secret.Bytes(), secret_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
     SuccessOrExit(out_secret.SetLength(secret_length));
 
@@ -753,7 +753,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
     size_t len                          = output.Length() == 0 ? output.Capacity() : output.Length();
-    Encoding::BufferWriter bbuf(output, len);
+    Encoding::BufferWriter bbuf(output.Bytes(), len);
     uint8_t privkey[kP256_PrivateKey_Length];
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -795,7 +795,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    bbuf.Put((const uint8_t *) input, mPublicKey.Length());
+    bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
     result = mbedtls_ecp_point_read_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
@@ -803,7 +803,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     {
-        const uint8_t * privkey = Uint8::to_const_uchar(input) + mPublicKey.Length();
+        const uint8_t * privkey = input.ConstBytes() + mPublicKey.Length();
 
         result = mbedtls_mpi_read_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(d), privkey, kP256_PrivateKey_Length);
         VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -1834,6 +1834,83 @@ exit:
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
     return error;
+}
+
+namespace {
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+CHIP_ERROR ExtractRawSubjectFromX509Cert(const ByteSpan & certificate, MutableByteSpan & subject)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    uint8_t * p      = nullptr;
+    size_t len       = 0;
+    mbedtls_x509_crt mbedCertificate;
+
+    ReturnErrorCodeIf(certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mbedtls_x509_crt_init(&mbedCertificate);
+    result = mbedtls_x509_crt_parse(&mbedCertificate, Uint8::to_const_uchar(certificate.data()), certificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    len = mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(subject_raw).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+    p   = mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(subject_raw).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+
+    VerifyOrExit(len <= subject.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(subject.data(), p, len);
+    subject.reduce_size(len);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbedCertificate);
+
+    return error;
+}
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+} // namespace
+
+CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate, const ByteSpan * candidateCertificates,
+                                          size_t candidateCertificatesCount, ByteSpan & outCertificate)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    constexpr size_t kMaxCertificateSubjectLength = 150;
+    uint8_t referenceSubjectBuf[kMaxCertificateSubjectLength];
+    uint8_t referenceSKIDBuf[kSubjectKeyIdentifierLength];
+    MutableByteSpan referenceSubject(referenceSubjectBuf);
+    MutableByteSpan referenceSKID(referenceSKIDBuf);
+
+    outCertificate = referenceCertificate;
+
+    ReturnErrorCodeIf(candidateCertificates == nullptr || candidateCertificatesCount == 0, CHIP_NO_ERROR);
+
+    ReturnErrorOnFailure(ExtractRawSubjectFromX509Cert(referenceCertificate, referenceSubject));
+    ReturnErrorOnFailure(ExtractSKIDFromX509Cert(referenceCertificate, referenceSKID));
+
+    for (size_t i = 0; i < candidateCertificatesCount; i++)
+    {
+        const ByteSpan candidateCertificate = candidateCertificates[i];
+        uint8_t candidateSubjectBuf[kMaxCertificateSubjectLength];
+        uint8_t candidateSKIDBuf[kSubjectKeyIdentifierLength];
+        MutableByteSpan candidateSubject(candidateSubjectBuf);
+        MutableByteSpan candidateSKID(candidateSKIDBuf);
+
+        ReturnErrorOnFailure(ExtractRawSubjectFromX509Cert(candidateCertificate, candidateSubject));
+        ReturnErrorOnFailure(ExtractSKIDFromX509Cert(candidateCertificate, candidateSKID));
+
+        if (referenceSKID.data_equal(candidateSKID) && referenceSubject.data_equal(candidateSubject))
+        {
+            outCertificate = candidateCertificate;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+#else
+    (void) referenceCertificate;
+    (void) candidateCertificates;
+    (void) candidateCertificatesCount;
+    (void) outCertificate;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 }
 
 } // namespace Crypto

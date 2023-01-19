@@ -74,7 +74,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticD
 CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEncoder)
 {
     Attributes::PHYRate::TypeInfo::Type pHYRate;
-    PHYRateType value = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_M;
+    auto value = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE10_M;
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetEthPHYRate(value) == CHIP_NO_ERROR)
     {
@@ -138,7 +138,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
-    case PHYRate::Id: {
+    case Attributes::PHYRate::Id: {
         return ReadPHYRate(aEncoder);
     }
     case FullDuplex::Id: {

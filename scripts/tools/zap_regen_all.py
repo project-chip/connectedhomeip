@@ -16,22 +16,29 @@
 #
 
 import argparse
-import os
-from pathlib import Path
-import sys
-import subprocess
 import logging
 import multiprocessing
-
+import os
+import subprocess
+import sys
+import time
 from dataclasses import dataclass
+from pathlib import Path
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
 
+@dataclass
+class TargetRunStats:
+    config: str
+    template: str
+    generate_time: float
+
+
 @dataclass(eq=True, frozen=True)
 class ZapDistinctOutput:
-    """Defines the properties that determine if some output seems unique or 
+    """Defines the properties that determine if some output seems unique or
        not, for the purposes of detecting codegen overlap.
 
        Not perfect, since separate templates may use the same file names, but
@@ -43,7 +50,7 @@ class ZapDistinctOutput:
 
 
 class ZAPGenerateTarget:
-    def __init__(self, zap_config, template=None, output_dir=None):
+    def __init__(self, zap_config, template, output_dir=None):
         self.script = './scripts/tools/zap/generate.py'
         self.zap_config = str(zap_config)
         self.template = template
@@ -79,12 +86,16 @@ class ZAPGenerateTarget:
 
         return cmd
 
-    def generate(self):
+    def generate(self) -> TargetRunStats:
         """Runs a ZAP generate command on the configured zap/template/outputs.
         """
         cmd = self.build_cmd()
         logging.info("Generating target: %s" % " ".join(cmd))
+
+        generate_start = time.time()
         subprocess.check_call(cmd)
+        generate_end = time.time()
+
         if "chef" in self.zap_config:
             af_gen_event = os.path.join(self.output_dir, "af-gen-event.h")
             with open(af_gen_event, "w+"):  # Empty file needed for linux
@@ -95,6 +106,11 @@ class ZAPGenerateTarget:
                                        "devices",
                                        os.path.basename(idl_path))
             os.rename(idl_path, target_path)
+        return TargetRunStats(
+            generate_time=generate_end - generate_start,
+            config=self.zap_config,
+            template=self.template,
+        )
 
 
 def checkPythonVersion():
@@ -146,7 +162,8 @@ def getGlobalTemplatesTargets():
                 'zzz_generated', 'placeholder', example_name, 'zap-generated')
             template = 'examples/placeholder/templates/templates.json'
 
-            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
+            targets.append(ZAPGenerateTarget(
+                filepath, output_dir=output_dir, template="src/app/zap-templates/matter-idl.json"))
             targets.append(
                 ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
             continue
@@ -170,11 +187,23 @@ def getGlobalTemplatesTargets():
         # a name like <zap-generated/foo.h>
         output_dir = os.path.join(
             'zzz_generated', generate_subdir, 'zap-generated')
-        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
+        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir,
+                       template="src/app/zap-templates/matter-idl.json"))
 
     targets.append(ZAPGenerateTarget(
         'src/controller/data_model/controller-clusters.zap',
+        template="src/app/zap-templates/matter-idl.json",
         output_dir=os.path.join('zzz_generated/controller-clusters/zap-generated')))
+
+    # This generates app headers for darwin only, for easier/clearer include
+    # in .pbxproj files.
+    #
+    # TODO: These files can be code generated at compile time, we should figure
+    #       out a path for this codegen to not be required.
+    targets.append(ZAPGenerateTarget(
+        'src/controller/data_model/controller-clusters.zap',
+        template="src/app/zap-templates/app-templates.json",
+        output_dir=os.path.join('zzz_generated/darwin/controller-clusters/zap-generated')))
 
     return targets
 
@@ -265,7 +294,7 @@ def _ParallelGenerateOne(target):
     Helper method to be passed to multiprocessing parallel generation of
     items.
     """
-    target.generate()
+    return target.generate()
 
 
 def main():
@@ -282,17 +311,37 @@ def main():
     if not args.dry_run:
 
         if args.run_bootstrap:
-            subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+            subprocess.check_call(os.path.join(
+                CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
+        timings = []
         if args.parallel:
             # Ensure each zap run is independent
             os.environ['ZAP_TEMPSTATE'] = '1'
             with multiprocessing.Pool() as pool:
-                for _ in pool.imap_unordered(_ParallelGenerateOne, targets):
-                    pass
+                for timing in pool.imap_unordered(_ParallelGenerateOne, targets):
+                    timings.append(timing)
         else:
             for target in targets:
-                target.generate()
+                timings.append(target.generate())
+
+        timings.sort(key=lambda t: t.generate_time)
+
+        print(" Time (s) | {:^50} | {:^50}".format("Config", "Template"))
+        for timing in timings:
+            tmpl = timing.template
+
+            if len(tmpl) > 50:
+                # easier to distinguish paths ... shorten common in-fixes
+                tmpl = tmpl.replace("/zap-templates/", "/../")
+                tmpl = tmpl.replace("/templates/", "/../")
+
+            print(" %8d | %50s | %50s" % (
+                timing.generate_time,
+                ".." + timing.config[len(timing.config) -
+                                     48:] if len(timing.config) > 50 else timing.config,
+                ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl,
+            ))
 
 
 if __name__ == '__main__':

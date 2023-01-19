@@ -28,8 +28,8 @@ The tool uses the generic CHIP Device Controller library, available in the
 ## Building
 
 Please follow the instructions
-[here](./python_chip_controller_building.md#building) to build the Python
-virtual environment.
+[here](./python_chip_controller_building.md#building-and-installing) to build
+the Python virtual environment.
 
 ## Launching the REPL
 

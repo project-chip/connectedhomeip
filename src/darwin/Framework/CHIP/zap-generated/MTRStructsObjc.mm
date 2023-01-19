@@ -1164,7 +1164,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRGeneralDiagnosticsClusterNetworkInterfaceType
+@implementation MTRGeneralDiagnosticsClusterNetworkInterface
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1190,7 +1190,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRGeneralDiagnosticsClusterNetworkInterfaceType alloc] init];
+    auto other = [[MTRGeneralDiagnosticsClusterNetworkInterface alloc] init];
 
     other.name = self.name;
     other.isOperational = self.isOperational;
@@ -1214,6 +1214,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGeneralDiagnosticsClusterNetworkInterfaceType : MTRGeneralDiagnosticsClusterNetworkInterface
 @end
 
 @implementation MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent
@@ -1337,7 +1340,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSoftwareDiagnosticsClusterThreadMetrics
+@implementation MTRSoftwareDiagnosticsClusterThreadMetricsStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1357,7 +1360,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRSoftwareDiagnosticsClusterThreadMetrics alloc] init];
+    auto other = [[MTRSoftwareDiagnosticsClusterThreadMetricsStruct alloc] init];
 
     other.id = self.id;
     other.name = self.name;
@@ -1376,6 +1379,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRSoftwareDiagnosticsClusterThreadMetrics : MTRSoftwareDiagnosticsClusterThreadMetricsStruct
 @end
 
 @implementation MTRSoftwareDiagnosticsClusterSoftwareFaultEvent
@@ -1853,7 +1859,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBridgedDeviceBasicClusterStartUpEvent
+@implementation MTRBridgedDeviceBasicInformationClusterStartUpEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1865,7 +1871,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBridgedDeviceBasicClusterStartUpEvent alloc] init];
+    auto other = [[MTRBridgedDeviceBasicInformationClusterStartUpEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
 
@@ -1881,7 +1887,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBridgedDeviceBasicClusterShutDownEvent
+@implementation MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDeviceBasicInformationClusterStartUpEvent
+@end
+
+@implementation MTRBridgedDeviceBasicInformationClusterShutDownEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1891,7 +1900,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBridgedDeviceBasicClusterShutDownEvent alloc] init];
+    auto other = [[MTRBridgedDeviceBasicInformationClusterShutDownEvent alloc] init];
 
     return other;
 }
@@ -1904,7 +1913,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBridgedDeviceBasicClusterLeaveEvent
+@implementation MTRBridgedDeviceBasicClusterShutDownEvent : MTRBridgedDeviceBasicInformationClusterShutDownEvent
+@end
+
+@implementation MTRBridgedDeviceBasicInformationClusterLeaveEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1914,7 +1926,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBridgedDeviceBasicClusterLeaveEvent alloc] init];
+    auto other = [[MTRBridgedDeviceBasicInformationClusterLeaveEvent alloc] init];
 
     return other;
 }
@@ -1927,7 +1939,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBridgedDeviceBasicClusterReachableChangedEvent
+@implementation MTRBridgedDeviceBasicClusterLeaveEvent : MTRBridgedDeviceBasicInformationClusterLeaveEvent
+@end
+
+@implementation MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1939,7 +1954,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBridgedDeviceBasicClusterReachableChangedEvent alloc] init];
+    auto other = [[MTRBridgedDeviceBasicInformationClusterReachableChangedEvent alloc] init];
 
     other.reachableNewValue = self.reachableNewValue;
 
@@ -1953,6 +1968,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 @end
 
 @implementation MTRSwitchClusterSwitchLatchedEvent
@@ -2166,18 +2184,18 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROperationalCredentialsClusterFabricDescriptor
+@implementation MTROperationalCredentialsClusterFabricDescriptorStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _rootPublicKey = [NSData data];
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
-        _fabricId = @(0);
+        _fabricID = @(0);
 
-        _nodeId = @(0);
+        _nodeID = @(0);
 
         _label = @"";
 
@@ -2188,12 +2206,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROperationalCredentialsClusterFabricDescriptor alloc] init];
+    auto other = [[MTROperationalCredentialsClusterFabricDescriptorStruct alloc] init];
 
     other.rootPublicKey = self.rootPublicKey;
-    other.vendorId = self.vendorId;
-    other.fabricId = self.fabricId;
-    other.nodeId = self.nodeId;
+    other.vendorID = self.vendorID;
+    other.fabricID = self.fabricID;
+    other.nodeID = self.nodeID;
     other.label = self.label;
     other.fabricIndex = self.fabricIndex;
 
@@ -2203,12 +2221,45 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: rootPublicKey:%@; vendorId:%@; fabricId:%@; nodeId:%@; label:%@; fabricIndex:%@; >",
-                  NSStringFromClass([self class]), [_rootPublicKey base64EncodedStringWithOptions:0], _vendorId, _fabricId, _nodeId,
+        [NSString stringWithFormat:@"<%@: rootPublicKey:%@; vendorID:%@; fabricID:%@; nodeID:%@; label:%@; fabricIndex:%@; >",
+                  NSStringFromClass([self class]), [_rootPublicKey base64EncodedStringWithOptions:0], _vendorID, _fabricID, _nodeID,
                   _label, _fabricIndex];
     return descriptionString;
 }
 
+- (void)setVendorId:(NSNumber * _Nonnull)vendorId
+{
+    self.vendorID = vendorId;
+}
+
+- (NSNumber * _Nonnull)vendorId
+{
+    return self.vendorID;
+}
+
+- (void)setFabricId:(NSNumber * _Nonnull)fabricId
+{
+    self.fabricID = fabricId;
+}
+
+- (NSNumber * _Nonnull)fabricId
+{
+    return self.fabricID;
+}
+
+- (void)setNodeId:(NSNumber * _Nonnull)nodeId
+{
+    self.nodeID = nodeId;
+}
+
+- (NSNumber * _Nonnull)nodeId
+{
+    return self.nodeID;
+}
+
+@end
+
+@implementation MTROperationalCredentialsClusterFabricDescriptor : MTROperationalCredentialsClusterFabricDescriptorStruct
 @end
 
 @implementation MTROperationalCredentialsClusterNOCStruct
@@ -2460,7 +2511,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterSemanticTag
+@implementation MTRModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2474,7 +2525,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRModeSelectClusterSemanticTag alloc] init];
+    auto other = [[MTRModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2489,6 +2540,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct
@@ -2525,7 +2579,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDoorLockClusterDlCredential
+@implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2539,7 +2593,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRDoorLockClusterDlCredential alloc] init];
+    auto other = [[MTRDoorLockClusterCredentialStruct alloc] init];
 
     other.credentialType = self.credentialType;
     other.credentialIndex = self.credentialIndex;
@@ -2554,6 +2608,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDoorLockClusterDlCredential : MTRDoorLockClusterCredentialStruct
 @end
 
 @implementation MTRDoorLockClusterDoorLockAlarmEvent
@@ -3681,40 +3738,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorId:%@; applicationId:%@; >",
                                              NSStringFromClass([self class]), _catalogVendorId, _applicationId];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRClientMonitoringClusterMonitoringRegistration
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clientNodeId = @(0);
-
-        _iCid = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRClientMonitoringClusterMonitoringRegistration alloc] init];
-
-    other.clientNodeId = self.clientNodeId;
-    other.iCid = self.iCid;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; fabricIndex:%@; >",
-                                             NSStringFromClass([self class]), _clientNodeId, _iCid, _fabricIndex];
     return descriptionString;
 }
 

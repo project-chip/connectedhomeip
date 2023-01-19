@@ -16,13 +16,13 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <zap-generated/CHIPClusters.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
@@ -125,7 +125,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
 }
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging::ExchangeManager & exchangeMgr,
-                                                                      SessionHandle & sessionHandle)
+                                                                      const SessionHandle & sessionHandle)
 {
     ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, mNodeId);
 
@@ -141,7 +141,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
 
         AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout.count();
-        request.PAKEVerifier         = serializedVerifierSpan;
+        request.PAKEPasscodeVerifier = serializedVerifierSpan;
         request.discriminator        = mSetupPayload.discriminator.GetLongValue();
         request.iterations           = mPBKDFIterations;
         request.salt                 = mPBKDFSalt;
@@ -259,7 +259,7 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowFailure(void * context,
 }
 
 void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                                          SessionHandle & sessionHandle)
+                                                          const SessionHandle & sessionHandle)
 {
     auto * self = static_cast<CommissioningWindowOpener *>(context);
 

@@ -941,7 +941,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     out_buf_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
-    result         = EVP_PKEY_derive(context, Uint8::to_uchar(out_secret), &out_buf_length);
+    result         = EVP_PKEY_derive(context, out_secret.Bytes(), &out_buf_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     SuccessOrExit(out_secret.SetLength(out_buf_length));
 
@@ -1077,7 +1077,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 
     {
         size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
-        Encoding::BufferWriter bbuf(output, len);
+        Encoding::BufferWriter bbuf(output.Bytes(), len);
         bbuf.Put(mPublicKey, mPublicKey.Length());
         bbuf.Put(privkey, sizeof(privkey));
         VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
@@ -1108,10 +1108,10 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     int result       = 0;
     int nid          = NID_undef;
 
-    const uint8_t * privkey = Uint8::to_const_uchar(input) + mPublicKey.Length();
+    const uint8_t * privkey = input.ConstBytes() + mPublicKey.Length();
 
     VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    bbuf.Put(input, mPublicKey.Length());
+    bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
     nid = _nidForCurve(curve);
@@ -2041,6 +2041,66 @@ exit:
     ASN1_OBJECT_free(matterVidObj);
     ASN1_OBJECT_free(matterPidObj);
     X509_free(x509certificate);
+
+    return err;
+}
+
+CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate, const ByteSpan * candidateCertificates,
+                                          size_t candidateCertificatesCount, ByteSpan & outCertificate)
+{
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    X509 * x509ReferenceCertificate       = nullptr;
+    X509 * x509CandidateCertificate       = nullptr;
+    const uint8_t * pReferenceCertificate = referenceCertificate.data();
+    X509_NAME * referenceSubject          = nullptr;
+    X509_NAME * candidateSubject          = nullptr;
+    uint8_t referenceSKIDBuf[kSubjectKeyIdentifierLength];
+    uint8_t candidateSKIDBuf[kSubjectKeyIdentifierLength];
+    MutableByteSpan referenceSKID(referenceSKIDBuf);
+    MutableByteSpan candidateSKID(candidateSKIDBuf);
+
+    ReturnErrorCodeIf(referenceCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    outCertificate = referenceCertificate;
+
+    ReturnErrorCodeIf(candidateCertificates == nullptr || candidateCertificatesCount == 0, CHIP_NO_ERROR);
+
+    ReturnErrorOnFailure(ExtractSKIDFromX509Cert(referenceCertificate, referenceSKID));
+
+    x509ReferenceCertificate = d2i_X509(nullptr, &pReferenceCertificate, static_cast<long>(referenceCertificate.size()));
+    VerifyOrExit(x509ReferenceCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    referenceSubject = X509_get_subject_name(x509ReferenceCertificate);
+    VerifyOrExit(referenceSubject != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    for (size_t i = 0; i < candidateCertificatesCount; i++)
+    {
+        const ByteSpan candidateCertificate   = candidateCertificates[i];
+        const uint8_t * pCandidateCertificate = candidateCertificate.data();
+
+        VerifyOrExit(!candidateCertificate.empty(), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        SuccessOrExit(err = ExtractSKIDFromX509Cert(candidateCertificate, candidateSKID));
+
+        x509CandidateCertificate = d2i_X509(nullptr, &pCandidateCertificate, static_cast<long>(candidateCertificate.size()));
+        VerifyOrExit(x509CandidateCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        candidateSubject = X509_get_subject_name(x509CandidateCertificate);
+        VerifyOrExit(candidateSubject != nullptr, err = CHIP_ERROR_INTERNAL);
+
+        if (referenceSKID.data_equal(candidateSKID) && X509_NAME_cmp(referenceSubject, candidateSubject) == 0)
+        {
+            outCertificate = candidateCertificate;
+            ExitNow();
+        }
+
+        X509_free(x509CandidateCertificate);
+        x509CandidateCertificate = nullptr;
+    }
+
+exit:
+    X509_free(x509ReferenceCertificate);
+    X509_free(x509CandidateCertificate);
 
     return err;
 }

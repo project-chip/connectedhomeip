@@ -21,22 +21,53 @@
 #include "../common/CHIPCommand.h"
 #include "../common/Commands.h"
 
-#include "InteractiveCommands.h"
+#include "WebSocketServer.h"
 
 class Commands;
 
-class InteractiveStartCommand : public CHIPCommand
+class InteractiveCommand : public CHIPCommand
+{
+public:
+    InteractiveCommand(const char * name, Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
+        CHIPCommand(name, credsIssuerConfig), mHandler(commandsHandler)
+    {}
+
+    /////////// CHIPCommand Interface /////////
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+
+    bool ParseCommand(char * command);
+
+private:
+    Commands * mHandler = nullptr;
+};
+
+class InteractiveStartCommand : public InteractiveCommand
 {
 public:
     InteractiveStartCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
-        CHIPCommand("start", credsIssuerConfig), mHandler(commandsHandler)
+        InteractiveCommand("start", commandsHandler, credsIssuerConfig)
     {}
 
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+};
+
+class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate
+{
+public:
+    InteractiveServerCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
+        InteractiveCommand("server", commandsHandler, credsIssuerConfig)
+    {
+        AddArgument("port", 0, UINT16_MAX, &mPort, "Port the websocket will listen to. Defaults to 9002.");
+    }
+
+    /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+    /////////// WebSocketServerDelegate Interface /////////
+    bool OnWebSocketMessageReceived(char * msg) override;
 
 private:
-    bool ParseCommand(char * command);
-    Commands * mHandler = nullptr;
+    WebSocketServer mWebSocketServer;
+    chip::Optional<uint16_t> mPort;
 };

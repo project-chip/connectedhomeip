@@ -319,18 +319,21 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull rssi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRGeneralDiagnosticsClusterNetworkInterface : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull name MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull isOperational MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable offPremiseServicesReachableIPv4 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable offPremiseServicesReachableIPv6 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull hardwareAddress MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull iPv4Addresses MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull iPv6Addresses MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull type MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRGeneralDiagnosticsClusterNetworkInterfaceType : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull isOperational API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy)
-    NSNumber * _Nullable offPremiseServicesReachableIPv4 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy)
-    NSNumber * _Nullable offPremiseServicesReachableIPv6 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSData * _Nonnull hardwareAddress API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSArray * _Nonnull iPv4Addresses API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSArray * _Nonnull iPv6Addresses API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull type API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsClusterNetworkInterface")
+@interface MTRGeneralDiagnosticsClusterNetworkInterfaceType : MTRGeneralDiagnosticsClusterNetworkInterface
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -356,13 +359,18 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull bootReason API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRSoftwareDiagnosticsClusterThreadMetricsStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull id MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable name MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable stackFreeCurrent MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable stackFreeMinimum MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable stackSize MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRSoftwareDiagnosticsClusterThreadMetrics : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull id API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nullable name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable stackFreeCurrent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable stackFreeMinimum API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable stackSize API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRSoftwareDiagnosticsClusterThreadMetricsStruct")
+@interface MTRSoftwareDiagnosticsClusterThreadMetrics : MTRSoftwareDiagnosticsClusterThreadMetricsStruct
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -472,22 +480,38 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSString * _Nullable name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBridgedDeviceBasicClusterStartUpEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterStartUpEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBridgedDeviceBasicClusterShutDownEvent : NSObject <NSCopying>
+@interface MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDeviceBasicInformationClusterStartUpEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterShutDownEvent : NSObject <NSCopying>
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBridgedDeviceBasicClusterLeaveEvent : NSObject <NSCopying>
+@interface MTRBridgedDeviceBasicClusterShutDownEvent : MTRBridgedDeviceBasicInformationClusterShutDownEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterLeaveEvent : NSObject <NSCopying>
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBridgedDeviceBasicClusterReachableChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@interface MTRBridgedDeviceBasicClusterLeaveEvent : MTRBridgedDeviceBasicInformationClusterLeaveEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterReachableChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue MTR_NEWLY_AVAILABLE;
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -535,16 +559,23 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     NSNumber * _Nonnull totalNumberOfPressesCounted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTROperationalCredentialsClusterFabricDescriptor : NSObject <NSCopying>
-@property (nonatomic, copy) NSData * _Nonnull rootPublicKey API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull fabricId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull nodeId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nonnull label API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_AVAILABLE
+@interface MTROperationalCredentialsClusterFabricDescriptorStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull rootPublicKey MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricId MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeId MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsClusterFabricDescriptorStruct")
+@interface MTROperationalCredentialsClusterFabricDescriptor : MTROperationalCredentialsClusterFabricDescriptorStruct
+@end
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterNOCStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nonnull noc API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
@@ -597,12 +628,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull stateValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRModeSelectClusterSemanticTag : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull mfgCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull value API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_AVAILABLE
+@interface MTRModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRModeSelectClusterSemanticTagStruct")
+@interface MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
+@end
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
@@ -610,10 +645,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRDoorLockClusterCredentialStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull credentialType MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull credentialIndex MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRDoorLockClusterDlCredential : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull credentialType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull credentialIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRDoorLockClusterCredentialStruct")
+@interface MTRDoorLockClusterDlCredential : MTRDoorLockClusterCredentialStruct
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -842,13 +882,6 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRApplicationBasicClusterApplicationBasicApplication : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull catalogVendorId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSString * _Nonnull applicationId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRClientMonitoringClusterMonitoringRegistration : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull iCid MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE

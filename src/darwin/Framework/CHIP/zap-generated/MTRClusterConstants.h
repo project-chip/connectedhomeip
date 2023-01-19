@@ -109,7 +109,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTimeSynchronizationID")
     = 0x00000038,
     MTRClusterBridgedDeviceBasicID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBridgedDeviceBasicID")
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBridgedDeviceBasicInformationID")
     = 0x00000039,
     MTRClusterSwitchID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeSwitchID")
@@ -263,7 +263,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeWiFiNetworkDiagnosticsID MTR_NEWLY_AVAILABLE = 0x00000036,
     MTRClusterIDTypeEthernetNetworkDiagnosticsID MTR_NEWLY_AVAILABLE = 0x00000037,
     MTRClusterIDTypeTimeSynchronizationID MTR_NEWLY_AVAILABLE = 0x00000038,
-    MTRClusterIDTypeBridgedDeviceBasicID MTR_NEWLY_AVAILABLE = 0x00000039,
+    MTRClusterIDTypeBridgedDeviceBasicInformationID MTR_NEWLY_AVAILABLE = 0x00000039,
     MTRClusterIDTypeSwitchID MTR_NEWLY_AVAILABLE = 0x0000003B,
     MTRClusterIDTypeAdministratorCommissioningID MTR_NEWLY_AVAILABLE = 0x0000003C,
     MTRClusterIDTypeOperationalCredentialsID MTR_NEWLY_AVAILABLE = 0x0000003E,
@@ -303,7 +303,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeApplicationBasicID MTR_NEWLY_AVAILABLE = 0x0000050D,
     MTRClusterIDTypeAccountLoginID MTR_NEWLY_AVAILABLE = 0x0000050E,
     MTRClusterIDTypeElectricalMeasurementID MTR_NEWLY_AVAILABLE = 0x00000B04,
-    MTRClusterIDTypeClientMonitoringID MTR_NEWLY_AVAILABLE = 0x00001046,
     MTRClusterIDTypeUnitTestingID MTR_NEWLY_AVAILABLE = 0xFFF1FC05,
     MTRClusterIDTypeFaultInjectionID MTR_NEWLY_AVAILABLE = 0xFFF1FC06,
 };
@@ -1524,7 +1523,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID")
     = 0x00000003,
     MTRClusterGeneralDiagnosticsAttributeBootReasonsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID")
     = 0x00000004,
     MTRClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID")
@@ -1559,7 +1558,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeRebootCountID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveRadioFaultsID MTR_NEWLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID MTR_NEWLY_AVAILABLE = 0x00000007,
@@ -1643,10 +1642,10 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID")
     = 0x00000006,
     MTRClusterThreadNetworkDiagnosticsAttributeNeighborTableListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID")
     = 0x00000007,
     MTRClusterThreadNetworkDiagnosticsAttributeRouteTableListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID")
     = 0x00000008,
     MTRClusterThreadNetworkDiagnosticsAttributePartitionIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID")
@@ -1850,8 +1849,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID MTR_NEWLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID MTR_NEWLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID MTR_NEWLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeWeightingID MTR_NEWLY_AVAILABLE = 0x0000000A,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDataVersionID MTR_NEWLY_AVAILABLE = 0x0000000B,
@@ -1919,7 +1918,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster WiFiNetworkDiagnostics deprecated attribute names
     MTRClusterWiFiNetworkDiagnosticsAttributeBssidID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID")
     = 0x00000000,
     MTRClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID")
@@ -1931,7 +1930,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID")
     = 0x00000003,
     MTRClusterWiFiNetworkDiagnosticsAttributeRssiID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID")
     = 0x00000004,
     MTRClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID")
@@ -1976,11 +1975,11 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster WiFiNetworkDiagnostics attributes
-    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID MTR_NEWLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID MTR_NEWLY_AVAILABLE = 0x00000007,
@@ -2138,91 +2137,91 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster BridgedDeviceBasic deprecated attribute names
     MTRClusterBridgedDeviceBasicAttributeVendorNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorNameID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorNameID")
     = 0x00000001,
     MTRClusterBridgedDeviceBasicAttributeVendorIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorIDID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorIDID")
     = 0x00000002,
     MTRClusterBridgedDeviceBasicAttributeProductNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductNameID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductNameID")
     = 0x00000003,
     MTRClusterBridgedDeviceBasicAttributeNodeLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeNodeLabelID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeNodeLabelID")
     = 0x00000005,
     MTRClusterBridgedDeviceBasicAttributeHardwareVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeHardwareVersionID")
     = 0x00000007,
     MTRClusterBridgedDeviceBasicAttributeHardwareVersionStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionStringID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeHardwareVersionStringID")
     = 0x00000008,
     MTRClusterBridgedDeviceBasicAttributeSoftwareVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSoftwareVersionID")
     = 0x00000009,
     MTRClusterBridgedDeviceBasicAttributeSoftwareVersionStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionStringID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSoftwareVersionStringID")
     = 0x0000000A,
     MTRClusterBridgedDeviceBasicAttributeManufacturingDateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeManufacturingDateID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeManufacturingDateID")
     = 0x0000000B,
     MTRClusterBridgedDeviceBasicAttributePartNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributePartNumberID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributePartNumberID")
     = 0x0000000C,
     MTRClusterBridgedDeviceBasicAttributeProductURLID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductURLID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductURLID")
     = 0x0000000D,
     MTRClusterBridgedDeviceBasicAttributeProductLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductLabelID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductLabelID")
     = 0x0000000E,
     MTRClusterBridgedDeviceBasicAttributeSerialNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSerialNumberID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSerialNumberID")
     = 0x0000000F,
     MTRClusterBridgedDeviceBasicAttributeReachableID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeReachableID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeReachableID")
     = 0x00000011,
     MTRClusterBridgedDeviceBasicAttributeUniqueIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeUniqueIDID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeUniqueIDID")
     = 0x00000012,
     MTRClusterBridgedDeviceBasicAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeGeneratedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterBridgedDeviceBasicAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAcceptedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterBridgedDeviceBasicAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAttributeListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterBridgedDeviceBasicAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeFeatureMapID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterBridgedDeviceBasicAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeClusterRevisionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
-    // Cluster BridgedDeviceBasic attributes
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorNameID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorIDID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductNameID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeNodeLabelID MTR_NEWLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionID MTR_NEWLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionStringID MTR_NEWLY_AVAILABLE = 0x00000008,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionID MTR_NEWLY_AVAILABLE = 0x00000009,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionStringID MTR_NEWLY_AVAILABLE = 0x0000000A,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeManufacturingDateID MTR_NEWLY_AVAILABLE = 0x0000000B,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributePartNumberID MTR_NEWLY_AVAILABLE = 0x0000000C,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductURLID MTR_NEWLY_AVAILABLE = 0x0000000D,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductLabelID MTR_NEWLY_AVAILABLE = 0x0000000E,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSerialNumberID MTR_NEWLY_AVAILABLE = 0x0000000F,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeReachableID MTR_NEWLY_AVAILABLE = 0x00000011,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeUniqueIDID MTR_NEWLY_AVAILABLE = 0x00000012,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    // Cluster BridgedDeviceBasicInformation attributes
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorNameID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorIDID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductNameID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeNodeLabelID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeHardwareVersionID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeHardwareVersionStringID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSoftwareVersionID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSoftwareVersionStringID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeManufacturingDateID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributePartNumberID MTR_NEWLY_AVAILABLE = 0x0000000C,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductURLID MTR_NEWLY_AVAILABLE = 0x0000000D,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductLabelID MTR_NEWLY_AVAILABLE = 0x0000000E,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSerialNumberID MTR_NEWLY_AVAILABLE = 0x0000000F,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeReachableID MTR_NEWLY_AVAILABLE = 0x00000011,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeUniqueIDID MTR_NEWLY_AVAILABLE = 0x00000012,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAttributeListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeFeatureMapID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Switch deprecated attribute names
@@ -5190,22 +5189,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster ClientMonitoring attributes
-    MTRAttributeIDTypeClusterClientMonitoringAttributeIdleModeIntervalID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeIntervalID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeThresholdID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeExpectedClientsID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
     // Cluster TestCluster deprecated attribute names
     MTRClusterTestClusterAttributeBooleanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID")
@@ -6594,10 +6577,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID MTR_NEWLY_AVAILABLE = 0x00000001,
 
-    // Cluster ClientMonitoring commands
-    MTRCommandIDTypeClusterClientMonitoringCommandRegisterClientMonitoringID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterClientMonitoringCommandStayAwakeRequestID MTR_NEWLY_AVAILABLE = 0x00000001,
-
     // Cluster TestCluster deprecated command id names
     MTRClusterTestClusterCommandTestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestID")
@@ -6886,23 +6865,23 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 
     // Cluster BridgedDeviceBasic deprecated event names
     MTRClusterBridgedDeviceBasicEventStartUpID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventStartUpID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicInformationEventStartUpID")
     = 0x00000000,
     MTRClusterBridgedDeviceBasicEventShutDownID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventShutDownID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicInformationEventShutDownID")
     = 0x00000001,
     MTRClusterBridgedDeviceBasicEventLeaveID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventLeaveID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicInformationEventLeaveID")
     = 0x00000002,
     MTRClusterBridgedDeviceBasicEventReachableChangedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventReachableChangedID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicInformationEventReachableChangedID")
     = 0x00000003,
 
-    // Cluster BridgedDeviceBasic events
-    MTREventIDTypeClusterBridgedDeviceBasicEventStartUpID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterBridgedDeviceBasicEventShutDownID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTREventIDTypeClusterBridgedDeviceBasicEventLeaveID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTREventIDTypeClusterBridgedDeviceBasicEventReachableChangedID MTR_NEWLY_AVAILABLE = 0x00000003,
+    // Cluster BridgedDeviceBasicInformation events
+    MTREventIDTypeClusterBridgedDeviceBasicInformationEventStartUpID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterBridgedDeviceBasicInformationEventShutDownID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterBridgedDeviceBasicInformationEventLeaveID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterBridgedDeviceBasicInformationEventReachableChangedID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster Switch deprecated event names
     MTRClusterSwitchEventSwitchLatchedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

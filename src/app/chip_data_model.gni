@@ -58,6 +58,56 @@ template("chip_data_model") {
     }
   }
 
+  chip_zapgen("${_data_model_name}_zapgen") {
+    input = rebase_path(invoker.zap_file)
+    generator = "app-templates"
+
+    outputs = [
+      "zap-generated/access.h",
+      "zap-generated/gen_config.h",
+      "zap-generated/endpoint_config.h",
+      "zap-generated/CHIPClientCallbacks.h",
+    ]
+
+    if (chip_code_pre_generated_directory == "") {
+      prune_outputs = []
+    }
+
+    if (chip_controller) {
+      outputs += [ "zap-generated/CHIPClusters.h" ]
+    } else {
+      if (defined(prune_outputs)) {
+        prune_outputs += [ "zap-generated/CHIPClusters.h" ]
+      }
+    }
+
+    # TODO: It is unclear here why `zap_pregenerated_dir` has any relevance
+    #       in including IMClusterCommandHandler or not.
+    #
+    #       This logic has been carried over from previous code during compile
+    #       time codegen addition, however the rationale of why pregenerated
+    #       dir controls IMClusterCommandHandler needs to be explained and
+    #       potentially controlled by a clearer variable (is this for controllers?
+    #       is this during app compile but not others? I am unclear what
+    #       zap_pregenerated_dir is supposed to convey. Existence of a directory
+    #       does not obviously map to "need command handler cpp compiled in").
+    if (defined(invoker.zap_pregenerated_dir)) {
+      outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
+    } else {
+      if (defined(prune_outputs)) {
+        prune_outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
+      }
+    }
+
+    public_configs = [ ":${_data_model_name}_config" ]
+
+    if (!defined(deps)) {
+      deps = []
+    }
+
+    deps += [ "${chip_root}/src/app" ]
+  }
+
   chip_codegen("${_data_model_name}_codegen") {
     input = _idl
     generator = "cpp-app"
@@ -73,11 +123,11 @@ template("chip_data_model") {
       deps = []
     }
 
-    deps += [ "${chip_root}/src/app/common:cluster-objects" ]
+    deps += [
+      ":${_data_model_name}_zapgen",
+      "${chip_root}/src/app/common:cluster-objects",
+    ]
   }
-
-  _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
-                             invoker.use_default_im_dispatch
 
   source_set(_data_model_name) {
     forward_variables_from(invoker,
@@ -92,10 +142,9 @@ template("chip_data_model") {
       sources = []
     }
 
-    if (!defined(deps)) {
-      deps = []
+    if (!defined(is_server)) {
+      is_server = false
     }
-    deps += [ ":${_data_model_name}_codegen" ]
 
     sources += [
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
@@ -109,6 +158,8 @@ template("chip_data_model") {
       "${_app_root}/clusters/on-off-server/on-off-server.h",
       "${_app_root}/clusters/scenes/scenes-tokens.h",
       "${_app_root}/clusters/scenes/scenes.h",
+      "${_app_root}/util/ClientMonitoringRegistrationTable.cpp",
+      "${_app_root}/util/ClientMonitoringRegistrationTable.h",
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/af-event.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
@@ -183,23 +234,13 @@ template("chip_data_model") {
       }
     }
 
-    if (defined(invoker.zap_pregenerated_dir)) {
-      if (chip_controller) {
-        sources += [ "${invoker.zap_pregenerated_dir}/CHIPClusters.h" ]
-      }
-
-      if (_use_default_im_dispatch) {
-        sources +=
-            [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
-      }
-    }
-
     if (!defined(public_deps)) {
       public_deps = []
     }
 
     public_deps += [
       ":${_data_model_name}_codegen",
+      ":${_data_model_name}_zapgen",
       "${chip_root}/src/app",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/controller",
@@ -208,7 +249,7 @@ template("chip_data_model") {
       "${chip_root}/src/protocols/secure_channel",
     ]
 
-    if (defined(invoker.is_server)) {
+    if (is_server) {
       public_deps += [ "${chip_root}/src/app/server" ]
     }
 

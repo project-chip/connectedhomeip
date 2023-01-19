@@ -18,6 +18,7 @@
 {{> clusters_header}}
 
 {{#chip_client_clusters includeAll=true}}
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 {{> cluster_header}}
 
 {{#chip_cluster_commands}}
@@ -92,6 +93,7 @@ private:
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "cluster"}}Cluster{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 
@@ -243,13 +245,16 @@ public:
 };
 
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
+{{/unless}}
 {{/chip_client_clusters}}
 
 /*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
 {{#chip_client_clusters includeAll=true}}
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 void registerCluster{{asUpperCamelCase name}}(Commands & commands)
 {
     using namespace chip::app::Clusters::{{asUpperCamelCase name}};
@@ -267,24 +272,31 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#first}}
          make_unique<ReadAttribute>(Id), //
         {{/first}}
+        {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{#first}}
         make_unique<WriteAttribute>(Id), //
         {{/first}}
+        {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         {{#if isWritableAttribute}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
+        {{/unless}}
         {{#first}}
         make_unique<SubscribeAttribute>(Id), //
         {{/first}}
+        {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         {{#if isReportableAttribute}}
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
+        {{/unless}}
         {{/chip_server_cluster_attributes}}
     };
 
     commands.Register(clusterName, clusterCommands);
 }
+{{/unless}}
 {{/chip_client_clusters}}
 
 void registerClusterAny(Commands & commands)
@@ -306,6 +318,8 @@ void registerClusters(Commands & commands)
 {
     registerClusterAny(commands);
 {{#chip_client_clusters includeAll=true}}
+    {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
     registerCluster{{asUpperCamelCase name}}(commands);
+    {{/unless}}
 {{/chip_client_clusters}}
 }

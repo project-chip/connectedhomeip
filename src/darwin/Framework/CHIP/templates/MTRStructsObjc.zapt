@@ -8,22 +8,30 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_structs}}
 {{#*inline "interfaceDecl"}}
 {{#zcl_struct_items}}
+{{#unless (wasRemoved (asUpperCamelCase ../../name preserveAcronyms=true) struct=../struct structField=(asStructPropertyName label))}}
 {{> struct_field_decl cluster=parent.parent.name type=type label=label}} {{availability (asUpperCamelCase ../../name preserveAcronyms=true) struct=../struct structField=(asStructPropertyName label) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase ../../name preserveAcronyms=true) "Cluster" (asUpperCamelCase ../name preserveAcronyms=true))}};
+{{/unless}}
 {{#if (hasOldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))}}
-{{> struct_field_decl cluster=../../name type=type label=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))}} {{availability (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName name)) deprecationMessage=(concat "Please use " (asStructPropertyName name))}};
+{{#unless (wasRemoved (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label)))}}
+{{> struct_field_decl cluster=../../name type=type label=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))}} {{availability (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label)) deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{/unless}}
 {{/if}}
 {{/zcl_struct_items}}
 {{/inline}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true))}}
 {{availability (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true) deprecationMessage="This struct is unused and will be removed"}}
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}} : NSObject <NSCopying>
 {{> interfaceDecl struct=(asUpperCamelCase name preserveAcronyms=true)}}
 @end
 
+{{/unless}}
 {{! Takes the name of the struct to use as structName. }}
 {{#*inline "oldNameDecl"}}
+{{#unless (wasRemoved (compatClusterNameRemapping parent.name) struct=structName)}}
 {{availability (compatClusterNameRemapping parent.name) struct=structName deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{structName}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
+{{/unless}}
 {{/inline}}
 {{! Takes the old name of the struct, if any, as oldStructName. }}
 {{#*inline "oldNameCheck"}}
@@ -40,21 +48,29 @@ NS_ASSUME_NONNULL_BEGIN
 {{/zcl_structs}}
 
 {{#zcl_events}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
 {{availability (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true)}}
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event : NSObject <NSCopying>
 {{#zcl_event_fields}}
+{{#unless (wasRemoved (asUpperCamelCase ../../name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
 {{> struct_field_decl cluster=parent.parent.name type=type label=name}} {{availability (asUpperCamelCase ../../name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name)}};
+{{/unless}}
 {{#if (hasOldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
+{{#unless (wasRemoved (asUpperCamelCase ../../name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(oldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name)))}}
 {{> struct_field_decl cluster=parent.parent.name type=type label=(oldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))}} {{availability (asUpperCamelCase ../../name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(oldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name)) deprecationMessage=(concat "Please use " (asStructPropertyName name))}};
+{{/unless}}
 {{/if}}
 {{/zcl_event_fields}}
 @end
+{{/unless}}
 {{! Takes the name of the event to use as eventName. }}
 {{#*inline "oldNameDecl"}}
+{{#unless (wasRemoved (compatClusterNameRemapping parent.name) event=eventName)}}
 
 {{availability (compatClusterNameRemapping parent.name) event=eventName deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Event")}}
 @interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{eventName}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
 @end
+{{/unless}}
 {{/inline}}
 {{! Takes the old name of the event, if any, as oldEventName. }}
 {{#*inline "oldNameCheck"}}

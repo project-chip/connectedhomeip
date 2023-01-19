@@ -3955,16 +3955,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                      completion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeBootReasonsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeBootReasonWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeBootReasonsWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeBootReasonWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeBootReasonsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                             endpoint:(NSNumber *)endpoint
-                                                queue:(dispatch_queue_t)queue
-                                           completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeBootReasonWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                            endpoint:(NSNumber *)endpoint
+                                               queue:(dispatch_queue_t)queue
+                                          completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeActiveHardwareFaultsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -4322,28 +4322,28 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                             completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeNeighborTableListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeNeighborTableWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeNeighborTableListWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeNeighborTableWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeNeighborTableListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                                 completion:(void (^)(NSArray * _Nullable value,
-                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
++ (void)readAttributeNeighborTableWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                             completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeRouteTableListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeRouteTableWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeRouteTableListWithParams:(MTRSubscribeParams *)params
-                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeRouteTableWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeRouteTableListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                endpoint:(NSNumber *)endpoint
-                                                   queue:(dispatch_queue_t)queue
-                                              completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeRouteTableWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                            endpoint:(NSNumber *)endpoint
+                                               queue:(dispatch_queue_t)queue
+                                          completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributePartitionIdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
@@ -5095,13 +5095,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)resetCountsWithCompletion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeBssidWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeBSSIDWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeBssidWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributeBSSIDWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeBssidWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributeBSSIDWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                        endpoint:(NSNumber *)endpoint
                                           queue:(dispatch_queue_t)queue
                                      completion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
@@ -5143,13 +5143,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                              completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeRssiWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeRSSIWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeRssiWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributeRSSIWithParams:(MTRSubscribeParams *)params
                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeRssiWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributeRSSIWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                       endpoint:(NSNumber *)endpoint
                                          queue:(dispatch_queue_t)queue
                                     completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
@@ -5512,15 +5512,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster Bridged Device Basic
+ * Cluster Bridged Device Basic Information
  *
  * This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
           the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name.
  */
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBaseClusterBridgedDeviceBasic : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterBridgedDeviceBasicInformation : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5894,7 +5894,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster AdministratorCommissioning
+ * Cluster Administrator Commissioning
  *
  * Commands to trigger a Node to allow a new Administrator to commission it.
  */
@@ -17027,6 +17027,10 @@ MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterOTASoftwareUpdateRequestor")
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRBaseClusterBridgedDeviceBasic : MTRBaseClusterBridgedDeviceBasicInformation
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterWakeOnLAN")
 @interface MTRBaseClusterWakeOnLan : MTRBaseClusterWakeOnLAN
 @end
@@ -17522,10 +17526,22 @@ typedef NS_OPTIONS(uint32_t, MTRNetworkCommissioningFeature) {
 
 typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
     MTRNetworkCommissioningWiFiSecurityUnencrypted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRNetworkCommissioningWiFiSecurityWepPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
-    MTRNetworkCommissioningWiFiSecurityWpaPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-    MTRNetworkCommissioningWiFiSecurityWpa2Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
-    MTRNetworkCommissioningWiFiSecurityWpa3Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
+    MTRNetworkCommissioningWiFiSecurityWEP MTR_NEWLY_AVAILABLE = 0x2,
+    MTRNetworkCommissioningWiFiSecurityWepPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWEP")
+    = 0x2,
+    MTRNetworkCommissioningWiFiSecurityWPAPersonal MTR_NEWLY_AVAILABLE = 0x4,
+    MTRNetworkCommissioningWiFiSecurityWpaPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWPAPersonal")
+    = 0x4,
+    MTRNetworkCommissioningWiFiSecurityWPA2Personal MTR_NEWLY_AVAILABLE = 0x8,
+    MTRNetworkCommissioningWiFiSecurityWpa2Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWPA2Personal")
+    = 0x8,
+    MTRNetworkCommissioningWiFiSecurityWPA3Personal MTR_NEWLY_AVAILABLE = 0x10,
+    MTRNetworkCommissioningWiFiSecurityWpa3Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWPA3Personal")
+    = 0x10,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsIntent) {
@@ -17547,32 +17563,91 @@ typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsTransferProtocol) {
     MTRDiagnosticLogsLogsTransferProtocolBDX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsBootReason) {
+    MTRGeneralDiagnosticsBootReasonUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRGeneralDiagnosticsBootReasonPowerOnReboot MTR_NEWLY_AVAILABLE = 0x01,
+    MTRGeneralDiagnosticsBootReasonBrownOutReset MTR_NEWLY_AVAILABLE = 0x02,
+    MTRGeneralDiagnosticsBootReasonSoftwareWatchdogReset MTR_NEWLY_AVAILABLE = 0x03,
+    MTRGeneralDiagnosticsBootReasonHardwareWatchdogReset MTR_NEWLY_AVAILABLE = 0x04,
+    MTRGeneralDiagnosticsBootReasonSoftwareUpdateCompleted MTR_NEWLY_AVAILABLE = 0x05,
+    MTRGeneralDiagnosticsBootReasonSoftwareReset MTR_NEWLY_AVAILABLE = 0x06,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsBootReasonType) {
-    MTRGeneralDiagnosticsBootReasonTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRGeneralDiagnosticsBootReasonTypePowerOnReboot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRGeneralDiagnosticsBootReasonTypeBrownOutReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRGeneralDiagnosticsBootReasonTypeSoftwareWatchdogReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRGeneralDiagnosticsBootReasonTypeHardwareWatchdogReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
+    MTRGeneralDiagnosticsBootReasonTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonUnspecified")
+    = 0x00,
+    MTRGeneralDiagnosticsBootReasonTypePowerOnReboot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonPowerOnReboot")
+    = 0x01,
+    MTRGeneralDiagnosticsBootReasonTypeBrownOutReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonBrownOutReset")
+    = 0x02,
+    MTRGeneralDiagnosticsBootReasonTypeSoftwareWatchdogReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonSoftwareWatchdogReset")
+    = 0x03,
+    MTRGeneralDiagnosticsBootReasonTypeHardwareWatchdogReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonHardwareWatchdogReset")
+    = 0x04,
     MTRGeneralDiagnosticsBootReasonTypeSoftwareUpdateCompleted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonSoftwareUpdateCompleted")
     = 0x05,
-    MTRGeneralDiagnosticsBootReasonTypeSoftwareReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRGeneralDiagnosticsBootReasonTypeSoftwareReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonSoftwareReset")
+    = 0x06,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReason");
+
+typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsHardwareFault) {
+    MTRGeneralDiagnosticsHardwareFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRGeneralDiagnosticsHardwareFaultRadio MTR_NEWLY_AVAILABLE = 0x01,
+    MTRGeneralDiagnosticsHardwareFaultSensor MTR_NEWLY_AVAILABLE = 0x02,
+    MTRGeneralDiagnosticsHardwareFaultResettableOverTemp MTR_NEWLY_AVAILABLE = 0x03,
+    MTRGeneralDiagnosticsHardwareFaultNonResettableOverTemp MTR_NEWLY_AVAILABLE = 0x04,
+    MTRGeneralDiagnosticsHardwareFaultPowerSource MTR_NEWLY_AVAILABLE = 0x05,
+    MTRGeneralDiagnosticsHardwareFaultVisualDisplayFault MTR_NEWLY_AVAILABLE = 0x06,
+    MTRGeneralDiagnosticsHardwareFaultAudioOutputFault MTR_NEWLY_AVAILABLE = 0x07,
+    MTRGeneralDiagnosticsHardwareFaultUserInterfaceFault MTR_NEWLY_AVAILABLE = 0x08,
+    MTRGeneralDiagnosticsHardwareFaultNonVolatileMemoryError MTR_NEWLY_AVAILABLE = 0x09,
+    MTRGeneralDiagnosticsHardwareFaultTamperDetected MTR_NEWLY_AVAILABLE = 0x0A,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsHardwareFaultType) {
-    MTRGeneralDiagnosticsHardwareFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRGeneralDiagnosticsHardwareFaultTypeRadio API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRGeneralDiagnosticsHardwareFaultTypeSensor API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRGeneralDiagnosticsHardwareFaultTypeResettableOverTemp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
+    MTRGeneralDiagnosticsHardwareFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultUnspecified")
+    = 0x00,
+    MTRGeneralDiagnosticsHardwareFaultTypeRadio API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultRadio")
+    = 0x01,
+    MTRGeneralDiagnosticsHardwareFaultTypeSensor API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultSensor")
+    = 0x02,
+    MTRGeneralDiagnosticsHardwareFaultTypeResettableOverTemp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultResettableOverTemp")
+    = 0x03,
     MTRGeneralDiagnosticsHardwareFaultTypeNonResettableOverTemp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultNonResettableOverTemp")
     = 0x04,
-    MTRGeneralDiagnosticsHardwareFaultTypePowerSource API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRGeneralDiagnosticsHardwareFaultTypeVisualDisplayFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTRGeneralDiagnosticsHardwareFaultTypeAudioOutputFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTRGeneralDiagnosticsHardwareFaultTypeUserInterfaceFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
+    MTRGeneralDiagnosticsHardwareFaultTypePowerSource API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultPowerSource")
+    = 0x05,
+    MTRGeneralDiagnosticsHardwareFaultTypeVisualDisplayFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultVisualDisplayFault")
+    = 0x06,
+    MTRGeneralDiagnosticsHardwareFaultTypeAudioOutputFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultAudioOutputFault")
+    = 0x07,
+    MTRGeneralDiagnosticsHardwareFaultTypeUserInterfaceFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultUserInterfaceFault")
+    = 0x08,
     MTRGeneralDiagnosticsHardwareFaultTypeNonVolatileMemoryError API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultNonVolatileMemoryError")
     = 0x09,
-    MTRGeneralDiagnosticsHardwareFaultTypeTamperDetected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRGeneralDiagnosticsHardwareFaultTypeTamperDetected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultTamperDetected")
+    = 0x0A,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFault");
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsInterfaceType) {
     MTRGeneralDiagnosticsInterfaceTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -17582,26 +17657,82 @@ typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsInterfaceType) {
     MTRGeneralDiagnosticsInterfaceTypeThread API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsNetworkFault) {
+    MTRGeneralDiagnosticsNetworkFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRGeneralDiagnosticsNetworkFaultHardwareFailure MTR_NEWLY_AVAILABLE = 0x01,
+    MTRGeneralDiagnosticsNetworkFaultNetworkJammed MTR_NEWLY_AVAILABLE = 0x02,
+    MTRGeneralDiagnosticsNetworkFaultConnectionFailed MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsNetworkFaultType) {
-    MTRGeneralDiagnosticsNetworkFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRGeneralDiagnosticsNetworkFaultTypeHardwareFailure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRGeneralDiagnosticsNetworkFaultTypeNetworkJammed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRGeneralDiagnosticsNetworkFaultTypeConnectionFailed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRGeneralDiagnosticsNetworkFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFaultUnspecified")
+    = 0x00,
+    MTRGeneralDiagnosticsNetworkFaultTypeHardwareFailure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFaultHardwareFailure")
+    = 0x01,
+    MTRGeneralDiagnosticsNetworkFaultTypeNetworkJammed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFaultNetworkJammed")
+    = 0x02,
+    MTRGeneralDiagnosticsNetworkFaultTypeConnectionFailed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFaultConnectionFailed")
+    = 0x03,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsNetworkFault");
+
+typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsRadioFault) {
+    MTRGeneralDiagnosticsRadioFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRGeneralDiagnosticsRadioFaultWiFiFault MTR_NEWLY_AVAILABLE = 0x01,
+    MTRGeneralDiagnosticsRadioFaultCellularFault MTR_NEWLY_AVAILABLE = 0x02,
+    MTRGeneralDiagnosticsRadioFaultThreadFault MTR_NEWLY_AVAILABLE = 0x03,
+    MTRGeneralDiagnosticsRadioFaultNFCFault MTR_NEWLY_AVAILABLE = 0x04,
+    MTRGeneralDiagnosticsRadioFaultBLEFault MTR_NEWLY_AVAILABLE = 0x05,
+    MTRGeneralDiagnosticsRadioFaultEthernetFault MTR_NEWLY_AVAILABLE = 0x06,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsRadioFaultType) {
-    MTRGeneralDiagnosticsRadioFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRGeneralDiagnosticsRadioFaultTypeWiFiFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRGeneralDiagnosticsRadioFaultTypeCellularFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRGeneralDiagnosticsRadioFaultTypeThreadFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRGeneralDiagnosticsRadioFaultTypeNFCFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRGeneralDiagnosticsRadioFaultTypeBLEFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRGeneralDiagnosticsRadioFaultTypeEthernetFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRGeneralDiagnosticsRadioFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultUnspecified")
+    = 0x00,
+    MTRGeneralDiagnosticsRadioFaultTypeWiFiFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultWiFiFault")
+    = 0x01,
+    MTRGeneralDiagnosticsRadioFaultTypeCellularFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultCellularFault")
+    = 0x02,
+    MTRGeneralDiagnosticsRadioFaultTypeThreadFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultThreadFault")
+    = 0x03,
+    MTRGeneralDiagnosticsRadioFaultTypeNFCFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultNFCFault")
+    = 0x04,
+    MTRGeneralDiagnosticsRadioFaultTypeBLEFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultBLEFault")
+    = 0x05,
+    MTRGeneralDiagnosticsRadioFaultTypeEthernetFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultEthernetFault")
+    = 0x06,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFault");
 
 typedef NS_OPTIONS(uint32_t, MTRSoftwareDiagnosticsFeature) {
     MTRSoftwareDiagnosticsFeatureWaterMarks API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsConnectionStatus) {
+    MTRThreadNetworkDiagnosticsConnectionStatusConnected MTR_NEWLY_AVAILABLE = 0x00,
+    MTRThreadNetworkDiagnosticsConnectionStatusNotConnected MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsThreadConnectionStatus) {
+    MTRThreadNetworkDiagnosticsThreadConnectionStatusConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThreadNetworkDiagnosticsConnectionStatusConnected")
+    = 0x00,
+    MTRThreadNetworkDiagnosticsThreadConnectionStatusNotConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThreadNetworkDiagnosticsConnectionStatusNotConnected")
+    = 0x01,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRThreadNetworkDiagnosticsConnectionStatus");
 
 typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsNetworkFault) {
     MTRThreadNetworkDiagnosticsNetworkFaultUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -17618,13 +17749,6 @@ typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsRoutingRole) {
     MTRThreadNetworkDiagnosticsRoutingRoleREED API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
     MTRThreadNetworkDiagnosticsRoutingRoleRouter API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
     MTRThreadNetworkDiagnosticsRoutingRoleLeader API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsThreadConnectionStatus) {
-    MTRThreadNetworkDiagnosticsThreadConnectionStatusConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    = 0x00,
-    MTRThreadNetworkDiagnosticsThreadConnectionStatusNotConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    = 0x01,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRThreadNetworkDiagnosticsFeature) {
@@ -17662,26 +17786,78 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiConnectionStatus) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersionType) {
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211a API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211b API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211g API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211n API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211ac API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211ax API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeA MTR_NEWLY_AVAILABLE = 0x00,
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211a API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeA")
+    = 0x00,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeB MTR_NEWLY_AVAILABLE = 0x01,
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211b API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeB")
+    = 0x01,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeG MTR_NEWLY_AVAILABLE = 0x02,
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211g API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeG")
+    = 0x02,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeN MTR_NEWLY_AVAILABLE = 0x03,
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211n API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeN")
+    = 0x03,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAc MTR_NEWLY_AVAILABLE = 0x04,
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211ac API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeAc")
+    = 0x04,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAx MTR_NEWLY_AVAILABLE = 0x05,
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211ax API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeAx")
+    = 0x05,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRate) {
+    MTREthernetNetworkDiagnosticsPHYRateRate10M MTR_NEWLY_AVAILABLE = 0x00,
+    MTREthernetNetworkDiagnosticsPHYRateRate100M MTR_NEWLY_AVAILABLE = 0x01,
+    MTREthernetNetworkDiagnosticsPHYRateRate1G MTR_NEWLY_AVAILABLE = 0x02,
+    MTREthernetNetworkDiagnosticsPHYRateRate25G MTR_NEWLY_AVAILABLE = 0x03,
+    MTREthernetNetworkDiagnosticsPHYRateRate5G MTR_NEWLY_AVAILABLE = 0x04,
+    MTREthernetNetworkDiagnosticsPHYRateRate10G MTR_NEWLY_AVAILABLE = 0x05,
+    MTREthernetNetworkDiagnosticsPHYRateRate40G MTR_NEWLY_AVAILABLE = 0x06,
+    MTREthernetNetworkDiagnosticsPHYRateRate100G MTR_NEWLY_AVAILABLE = 0x07,
+    MTREthernetNetworkDiagnosticsPHYRateRate200G MTR_NEWLY_AVAILABLE = 0x08,
+    MTREthernetNetworkDiagnosticsPHYRateRate400G MTR_NEWLY_AVAILABLE = 0x09,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRateType) {
-    MTREthernetNetworkDiagnosticsPHYRateType10M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTREthernetNetworkDiagnosticsPHYRateType100M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTREthernetNetworkDiagnosticsPHYRateType1000M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTREthernetNetworkDiagnosticsPHYRateType25G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTREthernetNetworkDiagnosticsPHYRateType5G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTREthernetNetworkDiagnosticsPHYRateType10G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTREthernetNetworkDiagnosticsPHYRateType40G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTREthernetNetworkDiagnosticsPHYRateType100G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTREthernetNetworkDiagnosticsPHYRateType200G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-    MTREthernetNetworkDiagnosticsPHYRateType400G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTREthernetNetworkDiagnosticsPHYRateType10M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate10M")
+    = 0x00,
+    MTREthernetNetworkDiagnosticsPHYRateType100M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate100M")
+    = 0x01,
+    MTREthernetNetworkDiagnosticsPHYRateType1000M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate1G")
+    = 0x02,
+    MTREthernetNetworkDiagnosticsPHYRateType25G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate25G")
+    = 0x03,
+    MTREthernetNetworkDiagnosticsPHYRateType5G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate5G")
+    = 0x04,
+    MTREthernetNetworkDiagnosticsPHYRateType10G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate10G")
+    = 0x05,
+    MTREthernetNetworkDiagnosticsPHYRateType40G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate40G")
+    = 0x06,
+    MTREthernetNetworkDiagnosticsPHYRateType100G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate100G")
+    = 0x07,
+    MTREthernetNetworkDiagnosticsPHYRateType200G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate200G")
+    = 0x08,
+    MTREthernetNetworkDiagnosticsPHYRateType400G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate400G")
+    = 0x09,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRate");
 
 typedef NS_ENUM(uint8_t, MTRTimeSynchronizationGranularity) {
     MTRTimeSynchronizationGranularityNoTimeGranularity API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -17738,25 +17914,57 @@ typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningStatusCode) {
     MTRAdministratorCommissioningStatusCodeWindowNotOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTROperationalCredentialsCertificateChainType) {
+    MTROperationalCredentialsCertificateChainTypeDACCertificate MTR_NEWLY_AVAILABLE = 0x01,
+    MTROperationalCredentialsCertificateChainTypePAICertificate MTR_NEWLY_AVAILABLE = 0x02,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTROperationalCredentialsNodeOperationalCertStatus) {
+    MTROperationalCredentialsNodeOperationalCertStatusOK MTR_NEWLY_AVAILABLE = 0x00,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidPublicKey MTR_NEWLY_AVAILABLE = 0x01,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidNodeOpId MTR_NEWLY_AVAILABLE = 0x02,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidNOC MTR_NEWLY_AVAILABLE = 0x03,
+    MTROperationalCredentialsNodeOperationalCertStatusMissingCsr MTR_NEWLY_AVAILABLE = 0x04,
+    MTROperationalCredentialsNodeOperationalCertStatusTableFull MTR_NEWLY_AVAILABLE = 0x05,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidAdminSubject MTR_NEWLY_AVAILABLE = 0x06,
+    MTROperationalCredentialsNodeOperationalCertStatusFabricConflict MTR_NEWLY_AVAILABLE = 0x09,
+    MTROperationalCredentialsNodeOperationalCertStatusLabelConflict MTR_NEWLY_AVAILABLE = 0x0A,
+    MTROperationalCredentialsNodeOperationalCertStatusInvalidFabricIndex MTR_NEWLY_AVAILABLE = 0x0B,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTROperationalCredentialsOperationalCertStatus) {
-    MTROperationalCredentialsOperationalCertStatusSUCCESS API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTROperationalCredentialsOperationalCertStatusSUCCESS API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusOK")
+    = 0x00,
     MTROperationalCredentialsOperationalCertStatusInvalidPublicKey API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidPublicKey")
     = 0x01,
     MTROperationalCredentialsOperationalCertStatusInvalidNodeOpId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidNodeOpId")
     = 0x02,
-    MTROperationalCredentialsOperationalCertStatusInvalidNOC API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTROperationalCredentialsOperationalCertStatusMissingCsr API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTROperationalCredentialsOperationalCertStatusTableFull API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTROperationalCredentialsOperationalCertStatusInvalidAdminSubject API_AVAILABLE(
-        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTROperationalCredentialsOperationalCertStatusInvalidNOC API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidNOC")
+    = 0x03,
+    MTROperationalCredentialsOperationalCertStatusMissingCsr API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusMissingCsr")
+    = 0x04,
+    MTROperationalCredentialsOperationalCertStatusTableFull API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusTableFull")
+    = 0x05,
+    MTROperationalCredentialsOperationalCertStatusInvalidAdminSubject API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+        tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidAdminSubject")
     = 0x06,
     MTROperationalCredentialsOperationalCertStatusFabricConflict API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusFabricConflict")
     = 0x09,
     MTROperationalCredentialsOperationalCertStatusLabelConflict API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusLabelConflict")
     = 0x0A,
     MTROperationalCredentialsOperationalCertStatusInvalidFabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidFabricIndex")
     = 0x0B,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatus");
 
 typedef NS_ENUM(uint8_t, MTRGroupKeyManagementGroupKeySecurityPolicy) {
     MTRGroupKeyManagementGroupKeySecurityPolicyTrustFirst API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -17767,65 +17975,106 @@ typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
     MTRModeSelectFeatureDEPONOFF API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {
+    MTRDoorLockAlarmCodeLockJammed MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockAlarmCodeLockFactoryReset MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockAlarmCodeLockRadioPowerCycled MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDoorLockAlarmCodeWrongCodeEntryLimit MTR_NEWLY_AVAILABLE = 0x04,
+    MTRDoorLockAlarmCodeFrontEsceutcheonRemoved MTR_NEWLY_AVAILABLE = 0x05,
+    MTRDoorLockAlarmCodeDoorForcedOpen MTR_NEWLY_AVAILABLE = 0x06,
+    MTRDoorLockAlarmCodeDoorAjar MTR_NEWLY_AVAILABLE = 0x07,
+    MTRDoorLockAlarmCodeForcedUser MTR_NEWLY_AVAILABLE = 0x08,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDoorLockDlAlarmCode) {
-    MTRDoorLockDlAlarmCodeLockJammed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlAlarmCodeLockFactoryReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlAlarmCodeLockRadioPowerCycled API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockDlAlarmCodeWrongCodeEntryLimit API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockDlAlarmCodeFrontEsceutcheonRemoved API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRDoorLockDlAlarmCodeDoorForcedOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTRDoorLockDlAlarmCodeDoorAjar API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTRDoorLockDlAlarmCodeForcedUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockDlAlarmCodeLockJammed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCodeLockJammed")
+    = 0x00,
+    MTRDoorLockDlAlarmCodeLockFactoryReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCodeLockFactoryReset")
+    = 0x01,
+    MTRDoorLockDlAlarmCodeLockRadioPowerCycled API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCodeLockRadioPowerCycled")
+    = 0x03,
+    MTRDoorLockDlAlarmCodeWrongCodeEntryLimit API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCodeWrongCodeEntryLimit")
+    = 0x04,
+    MTRDoorLockDlAlarmCodeFrontEsceutcheonRemoved API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCodeFrontEsceutcheonRemoved")
+    = 0x05,
+    MTRDoorLockDlAlarmCodeDoorForcedOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCodeDoorForcedOpen")
+    = 0x06,
+    MTRDoorLockDlAlarmCodeDoorAjar API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCodeDoorAjar")
+    = 0x07,
+    MTRDoorLockDlAlarmCodeForcedUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCodeForcedUser")
+    = 0x08,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockAlarmCode");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockCredentialRule) {
+    MTRDoorLockCredentialRuleSingle MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockCredentialRuleDual MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockCredentialRuleTri MTR_NEWLY_AVAILABLE = 0x02,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlCredentialRule) {
-    MTRDoorLockDlCredentialRuleSingle API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlCredentialRuleDouble API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlCredentialRuleTri API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockDlCredentialRuleSingle API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialRuleSingle")
+    = 0x00,
+    MTRDoorLockDlCredentialRuleTri API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialRuleTri")
+    = 0x02,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialRule");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockCredentialType) {
+    MTRDoorLockCredentialTypeProgrammingPIN MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockCredentialTypePIN MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockCredentialTypeRFID MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDoorLockCredentialTypeFingerprint MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDoorLockCredentialTypeFingerVein MTR_NEWLY_AVAILABLE = 0x04,
+    MTRDoorLockCredentialTypeFace MTR_NEWLY_AVAILABLE = 0x05,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlCredentialType) {
-    MTRDoorLockDlCredentialTypeProgrammingPIN API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlCredentialTypePIN API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlCredentialTypeRFID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockDlCredentialTypeFingerprint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockDlCredentialTypeFingerVein API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockDlCredentialTypeFace API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockDlCredentialTypeProgrammingPIN API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialTypeProgrammingPIN")
+    = 0x00,
+    MTRDoorLockDlCredentialTypePIN API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialTypePIN")
+    = 0x01,
+    MTRDoorLockDlCredentialTypeRFID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialTypeRFID")
+    = 0x02,
+    MTRDoorLockDlCredentialTypeFingerprint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialTypeFingerprint")
+    = 0x03,
+    MTRDoorLockDlCredentialTypeFingerVein API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialTypeFingerVein")
+    = 0x04,
+    MTRDoorLockDlCredentialTypeFace API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialTypeFace")
+    = 0x05,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockCredentialType");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDataOperationType) {
+    MTRDoorLockDataOperationTypeAdd MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockDataOperationTypeClear MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockDataOperationTypeModify MTR_NEWLY_AVAILABLE = 0x02,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlDataOperationType) {
-    MTRDoorLockDlDataOperationTypeAdd API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlDataOperationTypeClear API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlDataOperationTypeModify API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRDoorLockDlDoorState) {
-    MTRDoorLockDlDoorStateDoorOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlDoorStateDoorClosed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlDoorStateDoorJammed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockDlDoorStateDoorForcedOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockDlDoorStateDoorUnspecifiedError API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockDlDoorStateDoorAjar API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRDoorLockDlLockDataType) {
-    MTRDoorLockDlLockDataTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlLockDataTypeProgrammingCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlLockDataTypeUserIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockDlLockDataTypeWeekDaySchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockDlLockDataTypeYearDaySchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockDlLockDataTypeHolidaySchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRDoorLockDlLockDataTypePIN API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTRDoorLockDlLockDataTypeRFID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTRDoorLockDlLockDataTypeFingerprint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRDoorLockDlLockOperationType) {
-    MTRDoorLockDlLockOperationTypeLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlLockOperationTypeUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlLockOperationTypeNonAccessUserEvent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockDlLockOperationTypeForcedUserEvent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockDlDataOperationTypeAdd API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDataOperationTypeAdd")
+    = 0x00,
+    MTRDoorLockDlDataOperationTypeClear API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDataOperationTypeClear")
+    = 0x01,
+    MTRDoorLockDlDataOperationTypeModify API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDataOperationTypeModify")
+    = 0x02,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDataOperationType");
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlLockState) {
     MTRDoorLockDlLockStateNotFullyLocked API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -17847,35 +18096,6 @@ typedef NS_ENUM(uint8_t, MTRDoorLockDlLockType) {
     MTRDoorLockDlLockTypeDoorFurniture API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_ENUM(uint8_t, MTRDoorLockDlOperatingMode) {
-    MTRDoorLockDlOperatingModeNormal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlOperatingModeVacation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlOperatingModePrivacy API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockDlOperatingModeNoRemoteLockUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockDlOperatingModePassage API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRDoorLockDlOperationError) {
-    MTRDoorLockDlOperationErrorUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlOperationErrorInvalidCredential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlOperationErrorDisabledUserDenied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockDlOperationErrorRestricted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockDlOperationErrorInsufficientBattery API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRDoorLockDlOperationSource) {
-    MTRDoorLockDlOperationSourceUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlOperationSourceManual API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlOperationSourceProprietaryRemote API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockDlOperationSourceKeypad API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockDlOperationSourceAuto API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockDlOperationSourceButton API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRDoorLockDlOperationSourceSchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTRDoorLockDlOperationSourceRemote API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTRDoorLockDlOperationSourceRFID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-    MTRDoorLockDlOperationSourceBiometric API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
 typedef NS_ENUM(uint8_t, MTRDoorLockDlStatus) {
     MTRDoorLockDlStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRDoorLockDlStatusFailure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
@@ -17886,75 +18106,394 @@ typedef NS_ENUM(uint8_t, MTRDoorLockDlStatus) {
     MTRDoorLockDlStatusNotFound API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8B,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_ENUM(uint8_t, MTRDoorLockDlUserStatus) {
-    MTRDoorLockDlUserStatusAvailable API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlUserStatusOccupiedEnabled API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlUserStatusOccupiedDisabled API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRDoorLockDlUserType) {
-    MTRDoorLockDlUserTypeUnrestrictedUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockDlUserTypeYearDayScheduleUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockDlUserTypeWeekDayScheduleUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockDlUserTypeProgrammingUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockDlUserTypeNonAccessUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockDlUserTypeForcedUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRDoorLockDlUserTypeDisposableUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTRDoorLockDlUserTypeExpiringUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTRDoorLockDlUserTypeScheduleRestrictedUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-    MTRDoorLockDlUserTypeRemoteOnlyUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
 typedef NS_ENUM(uint8_t, MTRDoorLockOperationEventCode) {
-    MTRDoorLockOperationEventCodeUnknownOrMfgSpecific API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockOperationEventCodeLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockOperationEventCodeUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockOperationEventCodeLockInvalidPinOrId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockOperationEventCodeLockInvalidSchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockOperationEventCodeUnlockInvalidPinOrId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRDoorLockOperationEventCodeUnlockInvalidSchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTRDoorLockOperationEventCodeOneTouchLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTRDoorLockOperationEventCodeKeyLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-    MTRDoorLockOperationEventCodeKeyUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
-    MTRDoorLockOperationEventCodeAutoLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
-    MTRDoorLockOperationEventCodeScheduleLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0B,
-    MTRDoorLockOperationEventCodeScheduleUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0C,
-    MTRDoorLockOperationEventCodeManualLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0D,
-    MTRDoorLockOperationEventCodeManualUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0E,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockOperationEventCodeUnknownOrMfgSpecific API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeUnknownOrMfgSpecific")
+    = 0x00,
+    MTRDoorLockOperationEventCodeLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeLock")
+    = 0x01,
+    MTRDoorLockOperationEventCodeUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeUnlock")
+    = 0x02,
+    MTRDoorLockOperationEventCodeLockInvalidPinOrId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeLockInvalidPinOrId")
+    = 0x03,
+    MTRDoorLockOperationEventCodeLockInvalidSchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeLockInvalidSchedule")
+    = 0x04,
+    MTRDoorLockOperationEventCodeUnlockInvalidPinOrId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeUnlockInvalidPinOrId")
+    = 0x05,
+    MTRDoorLockOperationEventCodeUnlockInvalidSchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeUnlockInvalidSchedule")
+    = 0x06,
+    MTRDoorLockOperationEventCodeOneTouchLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeOneTouchLock")
+    = 0x07,
+    MTRDoorLockOperationEventCodeKeyLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeKeyLock")
+    = 0x08,
+    MTRDoorLockOperationEventCodeKeyUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeKeyUnlock")
+    = 0x09,
+    MTRDoorLockOperationEventCodeAutoLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeAutoLock")
+    = 0x0A,
+    MTRDoorLockOperationEventCodeScheduleLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeScheduleLock")
+    = 0x0B,
+    MTRDoorLockOperationEventCodeScheduleUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeScheduleUnlock")
+    = 0x0C,
+    MTRDoorLockOperationEventCodeManualLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeManualLock")
+    = 0x0D,
+    MTRDoorLockOperationEventCodeManualUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationEventCodeManualUnlock")
+    = 0x0E,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("This enum is unused and will be removed");
 
 typedef NS_ENUM(uint8_t, MTRDoorLockProgrammingEventCode) {
-    MTRDoorLockProgrammingEventCodeUnknownOrMfgSpecific API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockProgrammingEventCodeMasterCodeChanged API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockProgrammingEventCodePinAdded API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockProgrammingEventCodePinDeleted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockProgrammingEventCodePinChanged API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockProgrammingEventCodeIdAdded API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRDoorLockProgrammingEventCodeIdDeleted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockProgrammingEventCodeUnknownOrMfgSpecific API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockProgrammingEventCodeUnknownOrMfgSpecific")
+    = 0x00,
+    MTRDoorLockProgrammingEventCodeMasterCodeChanged API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockProgrammingEventCodeMasterCodeChanged")
+    = 0x01,
+    MTRDoorLockProgrammingEventCodePinAdded API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockProgrammingEventCodePinAdded")
+    = 0x02,
+    MTRDoorLockProgrammingEventCodePinDeleted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockProgrammingEventCodePinDeleted")
+    = 0x03,
+    MTRDoorLockProgrammingEventCodePinChanged API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockProgrammingEventCodePinChanged")
+    = 0x04,
+    MTRDoorLockProgrammingEventCodeIdAdded API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockProgrammingEventCodeIdAdded")
+    = 0x05,
+    MTRDoorLockProgrammingEventCodeIdDeleted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockProgrammingEventCodeIdDeleted")
+    = 0x06,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("This enum is unused and will be removed");
 
 typedef NS_ENUM(uint8_t, MTRDoorLockSetPinOrIdStatus) {
-    MTRDoorLockSetPinOrIdStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDoorLockSetPinOrIdStatusGeneralFailure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDoorLockSetPinOrIdStatusMemoryFull API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockSetPinOrIdStatusDuplicateCodeError API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDoorLockSetPinOrIdStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockSetPinOrIdStatusSuccess")
+    = 0x00,
+    MTRDoorLockSetPinOrIdStatusGeneralFailure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockSetPinOrIdStatusGeneralFailure")
+    = 0x01,
+    MTRDoorLockSetPinOrIdStatusMemoryFull API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockSetPinOrIdStatusMemoryFull")
+    = 0x02,
+    MTRDoorLockSetPinOrIdStatusDuplicateCodeError API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockSetPinOrIdStatusDuplicateCodeError")
+    = 0x03,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("This enum is unused and will be removed");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDoorState) {
+    MTRDoorLockDoorStateDoorOpen MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockDoorStateDoorClosed MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockDoorStateDoorJammed MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDoorLockDoorStateDoorForcedOpen MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDoorLockDoorStateDoorUnspecifiedError MTR_NEWLY_AVAILABLE = 0x04,
+    MTRDoorLockDoorStateDoorAjar MTR_NEWLY_AVAILABLE = 0x05,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDlDoorState) {
+    MTRDoorLockDlDoorStateDoorOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDoorStateDoorOpen")
+    = 0x00,
+    MTRDoorLockDlDoorStateDoorClosed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDoorStateDoorClosed")
+    = 0x01,
+    MTRDoorLockDlDoorStateDoorJammed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDoorStateDoorJammed")
+    = 0x02,
+    MTRDoorLockDlDoorStateDoorForcedOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDoorStateDoorForcedOpen")
+    = 0x03,
+    MTRDoorLockDlDoorStateDoorUnspecifiedError API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDoorStateDoorUnspecifiedError")
+    = 0x04,
+    MTRDoorLockDlDoorStateDoorAjar API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDoorStateDoorAjar")
+    = 0x05,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDoorState");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockLockDataType) {
+    MTRDoorLockLockDataTypeUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockLockDataTypeProgrammingCode MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockLockDataTypeUserIndex MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDoorLockLockDataTypeWeekDaySchedule MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDoorLockLockDataTypeYearDaySchedule MTR_NEWLY_AVAILABLE = 0x04,
+    MTRDoorLockLockDataTypeHolidaySchedule MTR_NEWLY_AVAILABLE = 0x05,
+    MTRDoorLockLockDataTypePIN MTR_NEWLY_AVAILABLE = 0x06,
+    MTRDoorLockLockDataTypeRFID MTR_NEWLY_AVAILABLE = 0x07,
+    MTRDoorLockLockDataTypeFingerprint MTR_NEWLY_AVAILABLE = 0x08,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDlLockDataType) {
+    MTRDoorLockDlLockDataTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypeUnspecified")
+    = 0x00,
+    MTRDoorLockDlLockDataTypeProgrammingCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypeProgrammingCode")
+    = 0x01,
+    MTRDoorLockDlLockDataTypeUserIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypeUserIndex")
+    = 0x02,
+    MTRDoorLockDlLockDataTypeWeekDaySchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypeWeekDaySchedule")
+    = 0x03,
+    MTRDoorLockDlLockDataTypeYearDaySchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypeYearDaySchedule")
+    = 0x04,
+    MTRDoorLockDlLockDataTypeHolidaySchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypeHolidaySchedule")
+    = 0x05,
+    MTRDoorLockDlLockDataTypePIN API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypePIN")
+    = 0x06,
+    MTRDoorLockDlLockDataTypeRFID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypeRFID")
+    = 0x07,
+    MTRDoorLockDlLockDataTypeFingerprint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataTypeFingerprint")
+    = 0x08,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockDataType");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockLockOperationType) {
+    MTRDoorLockLockOperationTypeLock MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockLockOperationTypeUnlock MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockLockOperationTypeNonAccessUserEvent MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDoorLockLockOperationTypeForcedUserEvent MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDlLockOperationType) {
+    MTRDoorLockDlLockOperationTypeLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockOperationTypeLock")
+    = 0x00,
+    MTRDoorLockDlLockOperationTypeUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockOperationTypeUnlock")
+    = 0x01,
+    MTRDoorLockDlLockOperationTypeNonAccessUserEvent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockOperationTypeNonAccessUserEvent")
+    = 0x02,
+    MTRDoorLockDlLockOperationTypeForcedUserEvent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockOperationTypeForcedUserEvent")
+    = 0x03,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockLockOperationType");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockOperatingMode) {
+    MTRDoorLockOperatingModeNormal MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockOperatingModeVacation MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockOperatingModePrivacy MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDoorLockOperatingModeNoRemoteLockUnlock MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDoorLockOperatingModePassage MTR_NEWLY_AVAILABLE = 0x04,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDlOperatingMode) {
+    MTRDoorLockDlOperatingModeNormal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperatingModeNormal")
+    = 0x00,
+    MTRDoorLockDlOperatingModeVacation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperatingModeVacation")
+    = 0x01,
+    MTRDoorLockDlOperatingModePrivacy API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperatingModePrivacy")
+    = 0x02,
+    MTRDoorLockDlOperatingModeNoRemoteLockUnlock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperatingModeNoRemoteLockUnlock")
+    = 0x03,
+    MTRDoorLockDlOperatingModePassage API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperatingModePassage")
+    = 0x04,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperatingMode");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockOperationError) {
+    MTRDoorLockOperationErrorUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockOperationErrorInvalidCredential MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockOperationErrorDisabledUserDenied MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDoorLockOperationErrorRestricted MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDoorLockOperationErrorInsufficientBattery MTR_NEWLY_AVAILABLE = 0x04,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDlOperationError) {
+    MTRDoorLockDlOperationErrorUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationErrorUnspecified")
+    = 0x00,
+    MTRDoorLockDlOperationErrorInvalidCredential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationErrorInvalidCredential")
+    = 0x01,
+    MTRDoorLockDlOperationErrorDisabledUserDenied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationErrorDisabledUserDenied")
+    = 0x02,
+    MTRDoorLockDlOperationErrorRestricted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationErrorRestricted")
+    = 0x03,
+    MTRDoorLockDlOperationErrorInsufficientBattery API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationErrorInsufficientBattery")
+    = 0x04,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationError");
+
+typedef NS_ENUM(uint8_t, MTRDoorLockOperationSource) {
+    MTRDoorLockOperationSourceUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockOperationSourceManual MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDoorLockOperationSourceProprietaryRemote MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDoorLockOperationSourceKeypad MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDoorLockOperationSourceAuto MTR_NEWLY_AVAILABLE = 0x04,
+    MTRDoorLockOperationSourceButton MTR_NEWLY_AVAILABLE = 0x05,
+    MTRDoorLockOperationSourceSchedule MTR_NEWLY_AVAILABLE = 0x06,
+    MTRDoorLockOperationSourceRemote MTR_NEWLY_AVAILABLE = 0x07,
+    MTRDoorLockOperationSourceRFID MTR_NEWLY_AVAILABLE = 0x08,
+    MTRDoorLockOperationSourceBiometric MTR_NEWLY_AVAILABLE = 0x09,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDlOperationSource) {
+    MTRDoorLockDlOperationSourceUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceUnspecified")
+    = 0x00,
+    MTRDoorLockDlOperationSourceManual API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceManual")
+    = 0x01,
+    MTRDoorLockDlOperationSourceProprietaryRemote API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceProprietaryRemote")
+    = 0x02,
+    MTRDoorLockDlOperationSourceKeypad API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceKeypad")
+    = 0x03,
+    MTRDoorLockDlOperationSourceAuto API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceAuto")
+    = 0x04,
+    MTRDoorLockDlOperationSourceButton API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceButton")
+    = 0x05,
+    MTRDoorLockDlOperationSourceSchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceSchedule")
+    = 0x06,
+    MTRDoorLockDlOperationSourceRemote API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceRemote")
+    = 0x07,
+    MTRDoorLockDlOperationSourceRFID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceRFID")
+    = 0x08,
+    MTRDoorLockDlOperationSourceBiometric API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSourceBiometric")
+    = 0x09,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockOperationSource");
 
 typedef NS_ENUM(uint8_t, MTRDoorLockUserStatus) {
     MTRDoorLockUserStatusAvailable API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRDoorLockUserStatusOccupiedEnabled API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRDoorLockUserStatusOccupiedDisabled API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDoorLockUserStatusNotSupported API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0xFF,
+    MTRDoorLockUserStatusNotSupported API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("This value is not part of the specification and will be removed")
+    = 0xFF,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRDoorLockDlUserStatus) {
+    MTRDoorLockDlUserStatusAvailable API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserStatusAvailable")
+    = 0x00,
+    MTRDoorLockDlUserStatusOccupiedEnabled API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserStatusOccupiedEnabled")
+    = 0x01,
+    MTRDoorLockDlUserStatusOccupiedDisabled API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserStatusOccupiedDisabled")
+    = 0x03,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserStatus");
+
 typedef NS_ENUM(uint8_t, MTRDoorLockUserType) {
-    MTRDoorLockUserTypeUnrestricted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTRDoorLockUserTypeUnrestrictedUser MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDoorLockUserTypeUnrestricted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeUnrestrictedUser")
+    = 0x00,
     MTRDoorLockUserTypeYearDayScheduleUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRDoorLockUserTypeWeekDayScheduleUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDoorLockUserTypeMasterUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
+    MTRDoorLockUserTypeProgrammingUser MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDoorLockUserTypeMasterUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeProgrammingUser")
+    = 0x03,
     MTRDoorLockUserTypeNonAccessUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRDoorLockUserTypeNotSupported API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0xFF,
+    MTRDoorLockUserTypeForcedUser MTR_NEWLY_AVAILABLE = 0x05,
+    MTRDoorLockUserTypeDisposableUser MTR_NEWLY_AVAILABLE = 0x06,
+    MTRDoorLockUserTypeExpiringUser MTR_NEWLY_AVAILABLE = 0x07,
+    MTRDoorLockUserTypeScheduleRestrictedUser MTR_NEWLY_AVAILABLE = 0x08,
+    MTRDoorLockUserTypeRemoteOnlyUser MTR_NEWLY_AVAILABLE = 0x09,
+    MTRDoorLockUserTypeNotSupported API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("This value is not part of the specification and will be removed")
+    = 0xFF,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_ENUM(uint8_t, MTRDoorLockDlUserType) {
+    MTRDoorLockDlUserTypeUnrestrictedUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeUnrestrictedUser")
+    = 0x00,
+    MTRDoorLockDlUserTypeYearDayScheduleUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeYearDayScheduleUser")
+    = 0x01,
+    MTRDoorLockDlUserTypeWeekDayScheduleUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeWeekDayScheduleUser")
+    = 0x02,
+    MTRDoorLockDlUserTypeProgrammingUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeProgrammingUser")
+    = 0x03,
+    MTRDoorLockDlUserTypeNonAccessUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeNonAccessUser")
+    = 0x04,
+    MTRDoorLockDlUserTypeForcedUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeForcedUser")
+    = 0x05,
+    MTRDoorLockDlUserTypeDisposableUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeDisposableUser")
+    = 0x06,
+    MTRDoorLockDlUserTypeExpiringUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeExpiringUser")
+    = 0x07,
+    MTRDoorLockDlUserTypeScheduleRestrictedUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeScheduleRestrictedUser")
+    = 0x08,
+    MTRDoorLockDlUserTypeRemoteOnlyUser API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserTypeRemoteOnlyUser")
+    = 0x09,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockUserType");
+
+typedef NS_OPTIONS(uint8_t, MTRDoorLockDaysMaskMap) {
+    MTRDoorLockDaysMaskMapSunday MTR_NEWLY_AVAILABLE = 0x1,
+    MTRDoorLockDaysMaskMapMonday MTR_NEWLY_AVAILABLE = 0x2,
+    MTRDoorLockDaysMaskMapTuesday MTR_NEWLY_AVAILABLE = 0x4,
+    MTRDoorLockDaysMaskMapWednesday MTR_NEWLY_AVAILABLE = 0x8,
+    MTRDoorLockDaysMaskMapThursday MTR_NEWLY_AVAILABLE = 0x10,
+    MTRDoorLockDaysMaskMapFriday MTR_NEWLY_AVAILABLE = 0x20,
+    MTRDoorLockDaysMaskMapSaturday MTR_NEWLY_AVAILABLE = 0x40,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRDoorLockDlDaysMaskMap) {
+    MTRDoorLockDlDaysMaskMapSunday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDaysMaskMapSunday")
+    = 0x1,
+    MTRDoorLockDlDaysMaskMapMonday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDaysMaskMapMonday")
+    = 0x2,
+    MTRDoorLockDlDaysMaskMapTuesday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDaysMaskMapTuesday")
+    = 0x4,
+    MTRDoorLockDlDaysMaskMapWednesday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDaysMaskMapWednesday")
+    = 0x8,
+    MTRDoorLockDlDaysMaskMapThursday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDaysMaskMapThursday")
+    = 0x10,
+    MTRDoorLockDlDaysMaskMapFriday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDaysMaskMapFriday")
+    = 0x20,
+    MTRDoorLockDlDaysMaskMapSaturday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDaysMaskMapSaturday")
+    = 0x40,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDoorLockDaysMaskMap");
 
 typedef NS_OPTIONS(uint8_t, MTRDoorLockDlCredentialRuleMask) {
     MTRDoorLockDlCredentialRuleMaskSingle API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
@@ -17966,16 +18505,6 @@ typedef NS_OPTIONS(uint8_t, MTRDoorLockDlCredentialRulesSupport) {
     MTRDoorLockDlCredentialRulesSupportSingle API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRDoorLockDlCredentialRulesSupportDual API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
     MTRDoorLockDlCredentialRulesSupportTri API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_OPTIONS(uint8_t, MTRDoorLockDlDaysMaskMap) {
-    MTRDoorLockDlDaysMaskMapSunday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRDoorLockDlDaysMaskMapMonday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
-    MTRDoorLockDlDaysMaskMapTuesday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-    MTRDoorLockDlDaysMaskMapWednesday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
-    MTRDoorLockDlDaysMaskMapThursday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
-    MTRDoorLockDlDaysMaskMapFriday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x20,
-    MTRDoorLockDlDaysMaskMapSaturday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x40,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint16_t, MTRDoorLockDlDefaultConfigurationRegister) {
@@ -18101,17 +18630,38 @@ typedef NS_OPTIONS(uint8_t, MTRDoorLockDayOfWeek) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRDoorLockFeature) {
-    MTRDoorLockFeaturePINCredentials API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRDoorLockFeatureRFIDCredentials API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
+    MTRDoorLockFeaturePINCredential MTR_NEWLY_AVAILABLE = 0x1,
+    MTRDoorLockFeaturePINCredentials API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockFeaturePINCredential")
+    = 0x1,
+    MTRDoorLockFeatureRFIDCredential MTR_NEWLY_AVAILABLE = 0x2,
+    MTRDoorLockFeatureRFIDCredentials API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockFeatureRFIDCredential")
+    = 0x2,
     MTRDoorLockFeatureFingerCredentials API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
     MTRDoorLockFeatureLogging API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
-    MTRDoorLockFeatureWeekDaySchedules API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
+    MTRDoorLockFeatureWeekDayAccessSchedules MTR_NEWLY_AVAILABLE = 0x10,
+    MTRDoorLockFeatureWeekDaySchedules API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockFeatureWeekDayAccessSchedules")
+    = 0x10,
     MTRDoorLockFeatureDoorPositionSensor API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x20,
     MTRDoorLockFeatureFaceCredentials API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x40,
-    MTRDoorLockFeatureCredentialsOTA API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x80,
-    MTRDoorLockFeatureUsersManagement API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x100,
-    MTRDoorLockFeatureNotifications API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x200,
-    MTRDoorLockFeatureYearDaySchedules API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x400,
+    MTRDoorLockFeatureCredentialsOverTheAirAccess MTR_NEWLY_AVAILABLE = 0x80,
+    MTRDoorLockFeatureCredentialsOTA API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockFeatureCredentialsOverTheAirAccess")
+    = 0x80,
+    MTRDoorLockFeatureUser MTR_NEWLY_AVAILABLE = 0x100,
+    MTRDoorLockFeatureUsersManagement API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockFeatureUser")
+    = 0x100,
+    MTRDoorLockFeatureNotification MTR_NEWLY_AVAILABLE = 0x200,
+    MTRDoorLockFeatureNotifications API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockFeatureNotification")
+    = 0x200,
+    MTRDoorLockFeatureYearDayAccessSchedules MTR_NEWLY_AVAILABLE = 0x400,
+    MTRDoorLockFeatureYearDaySchedules API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDoorLockFeatureYearDayAccessSchedules")
+    = 0x400,
     MTRDoorLockFeatureHolidaySchedules API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x800,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -18224,6 +18774,16 @@ typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlPumpOperationMode) {
     MTRPumpConfigurationAndControlPumpOperationModeMaximum API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRPumpConfigurationAndControlPumpOperationModeLocal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlPumpFeature) {
+    MTRPumpConfigurationAndControlPumpFeatureConstantPressure MTR_NEWLY_AVAILABLE = 0x1,
+    MTRPumpConfigurationAndControlPumpFeatureCompensatedPressure MTR_NEWLY_AVAILABLE = 0x2,
+    MTRPumpConfigurationAndControlPumpFeatureConstantFlow MTR_NEWLY_AVAILABLE = 0x4,
+    MTRPumpConfigurationAndControlPumpFeatureConstantSpeed MTR_NEWLY_AVAILABLE = 0x8,
+    MTRPumpConfigurationAndControlPumpFeatureConstantTemperature MTR_NEWLY_AVAILABLE = 0x10,
+    MTRPumpConfigurationAndControlPumpFeatureAutomatic MTR_NEWLY_AVAILABLE = 0x20,
+    MTRPumpConfigurationAndControlPumpFeatureLocal MTR_NEWLY_AVAILABLE = 0x40,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatus) {
     MTRPumpConfigurationAndControlPumpStatusDeviceFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
@@ -18415,7 +18975,10 @@ typedef NS_ENUM(uint8_t, MTRIlluminanceMeasurementLightSensorType) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRPressureMeasurementPressureFeature) {
-    MTRPressureMeasurementPressureFeatureEXT API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
+    MTRPressureMeasurementPressureFeatureExtended MTR_NEWLY_AVAILABLE = 0x1,
+    MTRPressureMeasurementPressureFeatureEXT API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRPressureMeasurementPressureFeatureExtended")
+    = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRChannelStatus) {
@@ -24289,21 +24852,21 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 - (void)readAttributeBootReasonsWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonsWithCompletion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonWithCompletion:");
 - (void)subscribeAttributeBootReasonsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(MTRSubscribeParams * _Nullable)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeBootReasonsWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeBootReasonWithParams:subscriptionEstablished:");
 + (void)readAttributeBootReasonsWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                           endpoint:(NSNumber *)endpoint
                                              queue:(dispatch_queue_t)queue
                                  completionHandler:
                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonsWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeActiveHardwareFaultsWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
@@ -24832,7 +25395,7 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 - (void)readAttributeNeighborTableListWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableListWithCompletion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableWithCompletion:");
 - (void)
     subscribeAttributeNeighborTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
@@ -24840,19 +25403,19 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeNeighborTableListWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeNeighborTableWithParams:subscriptionEstablished:");
 + (void)readAttributeNeighborTableListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                                 endpoint:(NSNumber *)endpoint
                                                    queue:(dispatch_queue_t)queue
                                        completionHandler:
                                            (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableListWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeRouteTableListWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableListWithCompletion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableWithCompletion:");
 - (void)subscribeAttributeRouteTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(MTRSubscribeParams * _Nullable)params
@@ -24860,14 +25423,14 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                           reportHandler:
                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeRouteTableListWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeRouteTableWithParams:subscriptionEstablished:");
 + (void)readAttributeRouteTableListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
                                     completionHandler:
                                         (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableListWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributePartitionIdWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
@@ -26078,20 +26641,20 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 
 - (void)readAttributeBssidWithCompletionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeBssidWithCompletion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeBSSIDWithCompletion:");
 - (void)subscribeAttributeBssidWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(MTRSubscribeParams * _Nullable)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeBssidWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeBSSIDWithParams:subscriptionEstablished:");
 + (void)readAttributeBssidWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                     endpoint:(NSNumber *)endpoint
                                        queue:(dispatch_queue_t)queue
                            completionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeBssidWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeBSSIDWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeSecurityTypeWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
@@ -26153,20 +26716,20 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 
 - (void)readAttributeRssiWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeRssiWithCompletion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeRSSIWithCompletion:");
 - (void)subscribeAttributeRssiWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        params:(MTRSubscribeParams * _Nullable)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeRssiWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeRSSIWithParams:subscriptionEstablished:");
 + (void)readAttributeRssiWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                    endpoint:(NSNumber *)endpoint
                                       queue:(dispatch_queue_t)queue
                           completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeRssiWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeRSSIWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeBeaconLostCountWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler

@@ -19,9 +19,10 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
-#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Commands.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::Scenes::Commands;
 
 bool emberAfScenesClusterAddSceneResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId,
                                                   uint8_t sceneId)
@@ -85,7 +86,7 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(app::CommandHandler 
 bool emberAfPluginScenesClientParseAddSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, GroupId groupId,
                                                     uint8_t sceneId)
 {
-    bool enhanced = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
+    bool enhanced = (cmd->commandId == EnhancedAddScene::Id);
     emberAfScenesClusterPrintln("RX: %pAddSceneResponse 0x%x, 0x%2x, 0x%x", (enhanced ? "Enhanced" : ""), status, groupId, sceneId);
     emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -95,7 +96,7 @@ bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand
                                                      uint8_t sceneId, uint16_t transitionTime, const uint8_t * sceneName,
                                                      const uint8_t * extensionFieldSets)
 {
-    bool enhanced = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
+    bool enhanced = (cmd->commandId == EnhancedViewScene::Id);
 
     emberAfScenesClusterPrint("RX: %pViewSceneResponse 0x%x, 0x%2x, 0x%x", (enhanced ? "Enhanced" : ""), status, groupId, sceneId);
 

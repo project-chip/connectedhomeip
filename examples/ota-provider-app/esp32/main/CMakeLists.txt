@@ -52,7 +52,6 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-provider"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/ota-provider-app/ota-provider-common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       EXCLUDE_SRCS
@@ -62,6 +61,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
 chip_app_component_codegen("${CHIP_ROOT}/examples/ota-provider-app/ota-provider-common/ota-provider-app.matter")
+chip_app_component_zapgen("${CHIP_ROOT}/examples/ota-provider-app/ota-provider-common/ota-provider-app.zap")
 
 spiffs_create_partition_image(img_storage ${CMAKE_SOURCE_DIR}/spiffs_image FLASH_IN_PROJECT)
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)

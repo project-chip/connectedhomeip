@@ -20,6 +20,7 @@
 
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
+#include <controller/CurrentFabricRemover.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
@@ -55,7 +56,8 @@ public:
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType),
-        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }
+        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
+        mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
 
@@ -184,4 +186,10 @@ private:
     char * mOnboardingPayload;
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
+
+    // For unpair
+    chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
+    chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
+
+    static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
 };

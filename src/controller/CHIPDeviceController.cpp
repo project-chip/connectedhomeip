@@ -38,13 +38,14 @@
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClusters.h>
 
 #include <app/server/Dnssd.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/util/error-mapping.h>
+#include <controller/CurrentFabricRemover.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -894,8 +895,10 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
-    // TODO: Send unpairing message to the remote device.
-    return CHIP_NO_ERROR;
+    MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+    return AutoCurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId);
 }
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
@@ -965,7 +968,7 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * 
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     OperationalCredentials::Commands::CertificateChainRequest::Type request;
-    request.certificateType = certificateType;
+    request.certificateType = static_cast<OperationalCredentials::CertificateChainTypeEnum>(certificateType);
     return SendCommand<OperationalCredentialsCluster>(device, request, OnCertificateChainResponse,
                                                       OnCertificateChainFailureResponse, timeout);
 
@@ -1025,7 +1028,7 @@ void DeviceCommissioner::OnAttestationResponse(void * context,
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
     CommissioningDelegate::CommissioningReport report;
-    report.Set<AttestationResponse>(AttestationResponse(data.attestationElements, data.signature));
+    report.Set<AttestationResponse>(AttestationResponse(data.attestationElements, data.attestationSignature));
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
@@ -1241,7 +1244,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(
 }
 
 void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                    const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk,
+                                                    const ByteSpan & rcac, Optional<IdentityProtectionKeySpan> ipk,
                                                     Optional<NodeId> adminSubject)
 {
     MATTER_TRACE_EVENT_SCOPE("OnDeviceNOCChainGeneration", "DeviceCommissioner");
@@ -1268,7 +1271,7 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
 
     // TODO - Verify that the generated root cert matches with commissioner's root cert
     CommissioningDelegate::CommissioningReport report;
-    report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : AesCcm128KeySpan(placeHolderIpk),
+    report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : IdentityProtectionKeySpan(placeHolderIpk),
                                   adminSubject.HasValue() ? adminSubject.Value() : commissioner->GetNodeId()));
     commissioner->CommissioningStageComplete(status, report);
 }
@@ -1322,8 +1325,9 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
-                                                          const Optional<ByteSpan> & icaCertBuf, const AesCcm128KeySpan ipk,
-                                                          const NodeId adminSubject, Optional<System::Clock::Timeout> timeout)
+                                                          const Optional<ByteSpan> & icaCertBuf,
+                                                          const IdentityProtectionKeySpan ipk, const NodeId adminSubject,
+                                                          Optional<System::Clock::Timeout> timeout)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificate", "DeviceCommissioner");
 
@@ -1344,32 +1348,32 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCredentials::OperationalCertStatus err)
+CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCredentials::NodeOperationalCertStatusEnum err)
 {
-    using OperationalCredentials::OperationalCertStatus;
+    using OperationalCredentials::NodeOperationalCertStatusEnum;
     switch (err)
     {
-    case OperationalCertStatus::kSuccess:
+    case NodeOperationalCertStatusEnum::kOk:
         return CHIP_NO_ERROR;
-    case OperationalCertStatus::kInvalidPublicKey:
+    case NodeOperationalCertStatusEnum::kInvalidPublicKey:
         return CHIP_ERROR_INVALID_PUBLIC_KEY;
-    case OperationalCertStatus::kInvalidNodeOpId:
+    case NodeOperationalCertStatusEnum::kInvalidNodeOpId:
         return CHIP_ERROR_WRONG_NODE_ID;
-    case OperationalCertStatus::kInvalidNOC:
+    case NodeOperationalCertStatusEnum::kInvalidNOC:
         return CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
-    case OperationalCertStatus::kMissingCsr:
+    case NodeOperationalCertStatusEnum::kMissingCsr:
         return CHIP_ERROR_INCORRECT_STATE;
-    case OperationalCertStatus::kTableFull:
+    case NodeOperationalCertStatusEnum::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
-    case OperationalCertStatus::kInvalidAdminSubject:
+    case NodeOperationalCertStatusEnum::kInvalidAdminSubject:
         return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
-    case OperationalCertStatus::kFabricConflict:
+    case NodeOperationalCertStatusEnum::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
-    case OperationalCertStatus::kLabelConflict:
+    case NodeOperationalCertStatusEnum::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
-    case OperationalCertStatus::kInvalidFabricIndex:
+    case NodeOperationalCertStatusEnum::kInvalidFabricIndex:
         return CHIP_ERROR_INVALID_FABRIC_INDEX;
-    case OperationalCertStatus::kUnknownEnumValue:
+    case NodeOperationalCertStatusEnum::kUnknownEnumValue:
         // Is this a reasonable value?
         return CHIP_ERROR_CERT_LOAD_FAILED;
     }
@@ -1420,7 +1424,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, 
     ChipLogProgress(Controller, "Sending root certificate to the device");
 
     OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
-    request.rootCertificate = rcac;
+    request.rootCACertificate = rcac;
     ReturnErrorOnFailure(
         SendCommand<OperationalCredentialsCluster>(device, request, OnRootCertSuccessResponse, OnRootCertFailureResponse, timeout));
 
@@ -1676,7 +1680,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 }
 
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                             SessionHandle & sessionHandle)
+                                             const SessionHandle & sessionHandle)
 {
     // CASE session established.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -1825,9 +1829,9 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 ChipLogProgress(Controller,
                                 "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
                                 " fabric.nodeId=0x" ChipLogFormatX64,
-                                fabricDescriptor.vendorId, ChipLogValueX64(fabricDescriptor.fabricId),
-                                ChipLogValueX64(fabricDescriptor.nodeId));
-                if (GetFabricId() == fabricDescriptor.fabricId)
+                                fabricDescriptor.vendorID, ChipLogValueX64(fabricDescriptor.fabricID),
+                                ChipLogValueX64(fabricDescriptor.nodeID));
+                if (GetFabricId() == fabricDescriptor.fabricID)
                 {
                     ChipLogProgress(Controller, "DeviceCommissioner::OnDone - found a matching fabric id");
                     chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
@@ -1849,7 +1853,7 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                     else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
                     {
                         ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
-                        info.nodeId = fabricDescriptor.nodeId;
+                        info.nodeId = fabricDescriptor.nodeID;
                     }
                 }
             }

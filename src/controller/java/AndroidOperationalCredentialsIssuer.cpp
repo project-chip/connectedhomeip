@@ -21,7 +21,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <lib/core/CASEAuthTag.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
@@ -297,7 +297,8 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                                  const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk,
+                                                                  const ByteSpan & rcac,
+                                                                  Optional<Crypto::IdentityProtectionKeySpan> ipk,
                                                                   Optional<NodeId> adminSubject)
 {
     ReturnErrorCodeIf(mOnNOCCompletionCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -384,7 +385,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
     // would obtain a suitable key per fabric.
     uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    Crypto::AesCcm128KeySpan ipkSpan(ipkValue);
+    Crypto::IdentityProtectionKeySpan ipkSpan(ipkValue);
 
     ReturnErrorCodeIf(defaultIpkSpan.size() != sizeof(ipkValue), CHIP_ERROR_INTERNAL);
 

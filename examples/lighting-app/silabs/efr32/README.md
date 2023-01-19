@@ -30,8 +30,6 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 > release with added tools and documentation.
 > [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
 
-<a name="intro"></a>
-
 ## Introduction
 
 The EFR32 lighting example provides a baseline demonstration of a Light control
@@ -50,8 +48,6 @@ Rendez-vous procedure.
 The lighting example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
-
-<a name="building"></a>
 
 ## Building
 
@@ -101,31 +97,6 @@ Silicon Labs platform.
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
-    MG24 boards :
-
-    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
 *   Build the example application:
 
           cd ~/connectedhomeip
@@ -138,7 +109,7 @@ Silicon Labs platform.
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export silabs_board=BRD4161A
@@ -147,7 +118,7 @@ Silicon Labs platform.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ rm -rf out/
 
 *   Build the example as Sleepy End Device (SED)
@@ -160,36 +131,32 @@ Silicon Labs platform.
 
 *   Build the example with pigweed RPC
 
-          $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export silabs_board=BRD4161A
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
-    [Running Pigweed RPC console](#running-pigweed-rpc-console)
+    [Running Pigweed RPC console](#running-rpc-console)
 
 For more build options, help is provided when running the build script without
 arguments
 
          ./scripts/examples/gn_efr32_example.sh
 
-<a name="flashing"></a>
-
 ## Flashing the Application
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ python3 out/debug/chip-efr32-lighting-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
-
-<a name="view-logging"></a>
 
 ## Viewing Logging Output
 
@@ -238,8 +205,6 @@ combination with JLinkRTTClient as follows:
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
-
-<a name="running-complete-example"></a>
 
 ## Running the Complete Example
 
@@ -326,8 +291,6 @@ combination with JLinkRTTClient as follows:
     -   Add Ipv6 route on PC(Linux)
         `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
 
-<a name="running-pigweed-rpc-console"></a>
-
 ## Running RPC console
 
 -   As part of building the example with RPCs enabled the chip_rpc python
@@ -372,20 +335,20 @@ To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+modify `examples/platform/silabs/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
 
 ## OTA Software Update
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../../docs/guides/silabs_efr32_software_update.md)
 
 ## Group Communication (Multicast)
 
 With this lighting example you can also use group communication to send Lighting
 commands to multiples devices at once. Please refer to the
-[chip-tool documentation](../../chip-tool/README.md) _Configuring the server
+[chip-tool documentation](../../../chip-tool/README.md) _Configuring the server
 side for Group Commands_ and _Using the Client to Send Group (Multicast) Matter
 Commands_
 

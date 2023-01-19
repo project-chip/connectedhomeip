@@ -22,8 +22,8 @@
 #pragma once
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <system/SystemClock.h>
 
 namespace chip {
