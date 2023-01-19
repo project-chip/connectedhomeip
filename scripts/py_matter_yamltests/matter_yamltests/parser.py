@@ -20,6 +20,8 @@ import yaml
 
 from . import fixes
 from .constraints import get_constraints, is_typed_constraint
+from .definitions import SpecDefinitions
+from .pics_checker import PICSChecker
 
 _TESTS_SECTION = [
     'name',
@@ -182,7 +184,7 @@ class _TestStepWithPlaceholders:
     processed.
     '''
 
-    def __init__(self, test: dict, config: dict, definitions):
+    def __init__(self, test: dict, config: dict, definitions: SpecDefinitions, pics_checker: PICSChecker):
         # Disabled tests are not parsed in order to allow the test to be added to the test
         # suite even if the feature is not implemented yet.
         self.is_enabled = not ('disabled' in test and test['disabled'])
@@ -200,6 +202,7 @@ class _TestStepWithPlaceholders:
         self.command = _value_or_config(test, 'command', config)
         self.attribute = _value_or_none(test, 'attribute')
         self.endpoint = _value_or_config(test, 'endpoint', config)
+        self.is_pics_enabled = pics_checker.check(_value_or_none(test, 'PICS'))
 
         self.identity = _value_or_none(test, 'identity')
         self.fabric_filtered = _value_or_none(test, 'fabricFiltered')
@@ -388,6 +391,10 @@ class TestStep:
     @property
     def is_enabled(self):
         return self._test.is_enabled
+
+    @property
+    def is_pics_enabled(self):
+        return self._test.is_pics_enabled
 
     @property
     def is_attribute(self):
@@ -690,8 +697,9 @@ class TestStep:
                     variable_info = self._runtime_config_variable_storage[token]
                     if type(variable_info) is dict and 'defaultValue' in variable_info:
                         variable_info = variable_info['defaultValue']
-                    tokens[idx] = variable_info
-                    substitution_occured = True
+                    if variable_info is not None:
+                        tokens[idx] = variable_info
+                        substitution_occured = True
 
             if len(tokens) == 1:
                 return tokens[0]
@@ -716,12 +724,12 @@ class YamlTests:
     multiple runs.
     '''
 
-    def __init__(self, parsing_config_variable_storage: dict, definitions, tests: dict):
+    def __init__(self, parsing_config_variable_storage: dict, definitions: SpecDefinitions, pics_checker: PICSChecker, tests: dict):
         self._parsing_config_variable_storage = parsing_config_variable_storage
         enabled_tests = []
         for test in tests:
             test_with_placeholders = _TestStepWithPlaceholders(
-                test, self._parsing_config_variable_storage, definitions)
+                test, self._parsing_config_variable_storage, definitions, pics_checker)
             if test_with_placeholders.is_enabled:
                 enabled_tests.append(test_with_placeholders)
         fixes.try_update_yaml_node_id_test_runner_state(
@@ -748,24 +756,28 @@ class YamlTests:
 
 class TestParser:
     def __init__(self, test_file, pics_file, definitions):
-        # TODO Needs supports for PICS file
+        data = self.__load_yaml(test_file)
+
+        _check_valid_keys(data, _TESTS_SECTION)
+
+        self.name = _value_or_none(data, 'name')
+        self.PICS = _value_or_none(data, 'PICS')
+
+        self._parsing_config_variable_storage = _value_or_none(data, 'config')
+
+        pics_checker = PICSChecker(pics_file)
+        tests = _value_or_none(data, 'tests')
+        self.tests = YamlTests(
+            self._parsing_config_variable_storage, definitions, pics_checker, tests)
+
+    def update_config(self, key, value):
+        self._parsing_config_variable_storage[key] = value
+
+    def __load_yaml(self, test_file):
         with open(test_file) as f:
             loader = yaml.FullLoader
             loader = fixes.try_add_yaml_support_for_scientific_notation_without_dot(
                 loader)
 
-            data = yaml.load(f, Loader=loader)
-            _check_valid_keys(data, _TESTS_SECTION)
-
-            self.name = _value_or_none(data, 'name')
-            self.PICS = _value_or_none(data, 'PICS')
-
-            self._parsing_config_variable_storage = _value_or_none(
-                data, 'config')
-
-            tests = _value_or_none(data, 'tests')
-            self.tests = YamlTests(
-                self._parsing_config_variable_storage, definitions, tests)
-
-    def update_config(self, key, value):
-        self._parsing_config_variable_storage[key] = value
+            return yaml.load(f, Loader=loader)
+        return None
