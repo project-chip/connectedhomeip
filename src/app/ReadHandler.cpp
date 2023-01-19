@@ -721,46 +721,48 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
-    if (subscriptionResumptionStorage)
+    if (!subscriptionResumptionStorage)
     {
-        SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
-                                                                             .mFabricIndex    = GetAccessingFabricIndex(),
-                                                                             .mSubscriptionId = mSubscriptionId,
-                                                                             .mMinInterval    = mMinIntervalFloorSeconds,
-                                                                             .mMaxInterval    = mMaxInterval,
-                                                                             .mFabricFiltered = IsFabricFiltered() };
-        ObjectList<AttributePathParams> * attributePath                  = mpAttributePathList;
-        size_t attributePathCount                                        = 0;
-        while (attributePath)
-        {
-            attributePathCount++;
-            attributePath = attributePath->mpNext;
-        }
-        attributePath = mpAttributePathList;
-        subscriptionInfo.mAttributePaths.Calloc(attributePathCount);
-        for (size_t i = 0; i < attributePathCount; i++)
-        {
-            subscriptionInfo.mAttributePaths[i].SetValues(attributePath->mValue);
-            attributePath = attributePath->mpNext;
-        }
-
-        ObjectList<EventPathParams> * eventPath = mpEventPathList;
-        size_t eventPathCount                   = 0;
-        while (eventPath)
-        {
-            eventPathCount++;
-            eventPath = eventPath->mpNext;
-        }
-        eventPath = mpEventPathList;
-        subscriptionInfo.mEventPaths.Calloc(eventPathCount);
-        for (size_t i = 0; i < eventPathCount; i++)
-        {
-            subscriptionInfo.mEventPaths[i].SetValues(eventPath->mValue);
-            eventPath = eventPath->mpNext;
-        }
-
-        err = subscriptionResumptionStorage->Save(subscriptionInfo);
+        return CHIP_NO_ERROR;
     }
+
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
+                                                                         .mFabricIndex    = GetAccessingFabricIndex(),
+                                                                         .mSubscriptionId = mSubscriptionId,
+                                                                         .mMinInterval    = mMinIntervalFloorSeconds,
+                                                                         .mMaxInterval    = mMaxInterval,
+                                                                         .mFabricFiltered = IsFabricFiltered() };
+    ObjectList<AttributePathParams> * attributePath                  = mpAttributePathList;
+    size_t attributePathCount                                        = 0;
+    while (attributePath)
+    {
+        attributePathCount++;
+        attributePath = attributePath->mpNext;
+    }
+    attributePath = mpAttributePathList;
+    subscriptionInfo.mAttributePaths.Calloc(attributePathCount);
+    for (size_t i = 0; i < attributePathCount; i++)
+    {
+        subscriptionInfo.mAttributePaths[i].SetValues(attributePath->mValue);
+        attributePath = attributePath->mpNext;
+    }
+
+    ObjectList<EventPathParams> * eventPath = mpEventPathList;
+    size_t eventPathCount                   = 0;
+    while (eventPath)
+    {
+        eventPathCount++;
+        eventPath = eventPath->mpNext;
+    }
+    eventPath = mpEventPathList;
+    subscriptionInfo.mEventPaths.Calloc(eventPathCount);
+    for (size_t i = 0; i < eventPathCount; i++)
+    {
+        subscriptionInfo.mEventPaths[i].SetValues(eventPath->mValue);
+        eventPath = eventPath->mpNext;
+    }
+
+    err = subscriptionResumptionStorage->Save(subscriptionInfo);
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
     return CHIP_NO_ERROR;

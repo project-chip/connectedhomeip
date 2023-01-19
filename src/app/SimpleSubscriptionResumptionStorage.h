@@ -17,9 +17,8 @@
 
 /**
  *    @file
- *      This file defines the CHIP CASE Session object that provides
- *      APIs for constructing a secure session using a certificate from the device's
- *      operational credentials.
+ *      This file defines a basic implementation of SubscriptionResumptionStorage that
+ *      persists subscriptions in a flat list in TLV.
  */
 
 #pragma once
