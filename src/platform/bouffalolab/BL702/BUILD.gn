@@ -75,7 +75,6 @@ static_library("BL702") {
     import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
     public_deps += [
       "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk",
-      "${bouffalolab_iot_sdk_build_root}/bl702:mbedtls",
     ]
 
     sources += [

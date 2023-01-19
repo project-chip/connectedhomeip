@@ -23,15 +23,6 @@ declare_args() {
 
 assert(bl_iot_sdk_target != "", "bl_iot_sdk_target must be specified")
 
-config("bl702_mbedtls_config") {
-  defines = [ "MBEDTLS_CONFIG_FILE=\"bl702-chip-mbedtls-config.h\"" ]
-}
-
-mbedtls_target("mbedtls") {
-  public_configs = [ ":bl702_mbedtls_config" ]
-  include_dirs = [ "${chip_root}/src/platform/bouffalolab/BL702" ]
-}
-
 group("bl_iot_sdk") {
   public_deps = [ bl_iot_sdk_target ]
 }
