@@ -20,7 +20,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "basic Information"
     endpoint: 0
 
 tests:
@@ -80,7 +80,7 @@ tests:
 
 
           on the first reference device  send 3 Subscribe Request Messages to DUT
-           basic subscribe node-label 100 1000 1  0  --keepSubscriptions 1
+           basicinformation subscribe node-label 100 1000 1  0  --keepSubscriptions 1
           [1660652952.537644][58131:58136] CHIP:EM: Removed CHIP MessageCounter:11153878 from RetransTable on exchange 57366i
           [1660652952.537721][58131:58136] CHIP:DMG: ReportDataMessage =
           [1660652952.537759][58131:58136] CHIP:DMG: {
@@ -113,7 +113,7 @@ tests:
           [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 1  0   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 1  0   --keepSubscriptions 1
           [1660653005.341371][58131:58136] CHIP:DMG: ReportDataMessage =
           [1660653005.341441][58131:58136] CHIP:DMG: {
           [1660653005.341503][58131:58136] CHIP:DMG:         SubscriptionId = 0xea4facb0,
@@ -146,7 +146,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
           [1660653043.575397][58131:58136] CHIP:DMG: ReportDataMessage =
           [1660653043.575423][58131:58136] CHIP:DMG: {
           [1660653043.575445][58131:58136] CHIP:DMG:         SubscriptionId = 0x1ff9dbc5,
@@ -180,7 +180,7 @@ tests:
 
 
           on the 2nd reference device send 3 Subscribe Request Messages to DUT
-          basic subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653125.592268][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653125.592310][58143:58148] CHIP:DMG: {
           [1660653125.592348][58143:58148] CHIP:DMG:         SubscriptionId = 0xc15110c4,
@@ -214,7 +214,7 @@ tests:
 
 
 
-           basic subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653198.460290][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653198.460359][58143:58148] CHIP:DMG: {
           [1660653198.460423][58143:58148] CHIP:DMG:         SubscriptionId = 0xfed77bda,
@@ -247,7 +247,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653260.633215][58143:58148] CHIP:EM: Removed CHIP MessageCounter:178377836 from RetransTable on exchange 25360i
           [1660653260.633327][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653260.633387][58143:58148] CHIP:DMG: {
@@ -283,7 +283,7 @@ tests:
 
 
           on the 3rd reference device send 3 Subscribe Request Messages to DUT
-          basic subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
           [1660653438.741061][58149:58154] CHIP:EM: Removed CHIP MessageCounter:141916359 from RetransTable on exchange 34400i
           [1660653438.741116][58149:58154] CHIP:DMG: ReportDataMessage =
           [1660653438.741143][58149:58154] CHIP:DMG: {
@@ -316,7 +316,7 @@ tests:
           [1660653438.742171][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740129e0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
           [1660653500.501007][58149:58154] CHIP:DMG: {
           [1660653500.501077][58149:58154] CHIP:DMG:         SubscriptionId = 0xb129bd8c,
           [1660653500.501126][58149:58154] CHIP:DMG:         AttributeReportIBs =
@@ -348,7 +348,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
           [1660653545.650817][58149:58154] CHIP:DMG: ReportDataMessage =
           [1660653545.650842][58149:58154] CHIP:DMG: {
           [1660653545.650864][58149:58154] CHIP:DMG:         SubscriptionId = 0x5310d542,
@@ -382,14 +382,14 @@ tests:
 
 
           on the 4th reference device send 3 Subscribe Request Messages to DUT
-          basic subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
 
           [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
           [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
           [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
 
           [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
           [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
@@ -397,7 +397,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
           : }
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
@@ -406,7 +406,7 @@ tests:
 
 
           on the 5th reference device send 3 Subscribe Request Messages to DUT
-          basic subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
 
           [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
           [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
@@ -414,7 +414,7 @@ tests:
 
 
 
-           basic subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
 
           [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
           [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
@@ -422,7 +422,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
           : }
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
@@ -432,7 +432,7 @@ tests:
 
           once all the subscription is active, on the first reference device enter below mentioned commands to change the attribute values in RD1
 
-          basic write node-label ""newnode"" 1 0
+          basicinformation write node-label '"newnode"' 1 0
           ReportDataMessage =
           [1660653595.180285][58131:58136] CHIP:DMG: {
           [1660653595.180335][58131:58136] CHIP:DMG:         SubscriptionId = 0x50d4243c,
@@ -463,7 +463,7 @@ tests:
           [1660653595.182295][58131:58136] CHIP:TOO:   NodeLabel: "newnode"
           [1660653595.182400][58131:58136] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x50d4243c Peer = 01:0000000000000001
 
-          basic write location in 1 0
+          basicinformation write location in 1 0
           ReportDataMessage =
           [1660653646.567396][58131:58136] CHIP:DMG: {
           [1660653646.567414][58131:58136] CHIP:DMG:         SubscriptionId = 0xea4facb0,
@@ -495,7 +495,7 @@ tests:
           [1660653646.568191][58131:58136] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0xea4facb0 Peer = 01:0000000000000001
 
 
-          basic write local-config-disabled 1 1 0
+          basicinformation write local-config-disabled 1 1 0
           ReportDataMessage =
           [1660653666.029792][58131:58136] CHIP:DMG: {
           [1660653666.029813][58131:58136] CHIP:DMG:         SubscriptionId = 0x1ff9dbc5,
@@ -776,7 +776,7 @@ tests:
           and verify all the subscription requests are succes. and in The subscription request from RD1 should contain 4 paths, Verify that the subscriptions from RD2, RD3, RD4 and RD5 are not affected.
 
           on the first reference device(RD1)  send 3 Subscribe Request Messages to DUT.
-           basic subscribe node-label 100 1000 1  0  --keepSubscriptions 1
+           basicinformation subscribe node-label 100 1000 1  0  --keepSubscriptions 1
           [1660652952.537644][58131:58136] CHIP:EM: Removed CHIP MessageCounter:11153878 from RetransTable on exchange 57366i
           [1660652952.537721][58131:58136] CHIP:DMG: ReportDataMessage =
           [1660652952.537759][58131:58136] CHIP:DMG: {
@@ -809,7 +809,7 @@ tests:
           [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 1  0   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 1  0   --keepSubscriptions 1
           [1660653005.341371][58131:58136] CHIP:DMG: ReportDataMessage =
           [1660653005.341441][58131:58136] CHIP:DMG: {
           [1660653005.341503][58131:58136] CHIP:DMG:         SubscriptionId = 0xea4facb0,
@@ -842,7 +842,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
           [1660653043.575397][58131:58136] CHIP:DMG: ReportDataMessage =
           [1660653043.575423][58131:58136] CHIP:DMG: {
           [1660653043.575445][58131:58136] CHIP:DMG:         SubscriptionId = 0x1ff9dbc5,
@@ -876,7 +876,7 @@ tests:
 
 
           on the 2nd reference device(RD2)  send 3 Subscribe Request Messages to DUT.
-          basic subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653125.592268][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653125.592310][58143:58148] CHIP:DMG: {
           [1660653125.592348][58143:58148] CHIP:DMG:         SubscriptionId = 0xc15110c4,
@@ -910,7 +910,7 @@ tests:
 
 
 
-           basic subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653198.460290][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653198.460359][58143:58148] CHIP:DMG: {
           [1660653198.460423][58143:58148] CHIP:DMG:         SubscriptionId = 0xfed77bda,
@@ -943,7 +943,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653260.633215][58143:58148] CHIP:EM: Removed CHIP MessageCounter:178377836 from RetransTable on exchange 25360i
           [1660653260.633327][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653260.633387][58143:58148] CHIP:DMG: {
@@ -979,7 +979,7 @@ tests:
 
 
           on the 3rd reference device(RD3)  send 3 Subscribe Request Messages to DUT.
-          basic subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
           [1660653438.741061][58149:58154] CHIP:EM: Removed CHIP MessageCounter:141916359 from RetransTable on exchange 34400i
           [1660653438.741116][58149:58154] CHIP:DMG: ReportDataMessage =
           [1660653438.741143][58149:58154] CHIP:DMG: {
@@ -1012,14 +1012,14 @@ tests:
           [1660653438.742171][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740129e0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
           [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
           [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
           [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
 
 
 
-           basic subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
 
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
@@ -1028,14 +1028,14 @@ tests:
 
 
           on the 4th reference device(RD4)  send 3 Subscribe Request Messages to DUT.
-          basic subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
 
           [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
           [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
           [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
 
           [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
           [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
@@ -1043,7 +1043,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
           [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
@@ -1051,7 +1051,7 @@ tests:
 
 
           on the 5th reference device(RD5)  send 3 Subscribe Request Messages to DUT.
-          basic subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
 
           [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
           [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
@@ -1059,7 +1059,7 @@ tests:
 
 
 
-           basic subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
 
           [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
           [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
@@ -1067,7 +1067,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
           : }
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
@@ -1076,7 +1076,7 @@ tests:
 
 
           Once all 15 subscriptions are active send one more subscriptiopn command in RD1 and Verify that the subscriptions from RD2, RD3, RD4 and RD5 are not affected.
-          basic subscribe product-id 100 1000 1  0  --keepSubscriptions 1
+          basicinformation subscribe product-id 100 1000 1  0  --keepSubscriptions 1
           [1660654945.477837][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3782190841
           [1660654945.477932][58149:58154] CHIP:TOO:   ProductID: 32769
           [1660654945.478023][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740127c0]: Moving to [AwaitingSu]
@@ -1101,7 +1101,7 @@ tests:
            RD5 are not affected.
 
           on the 2nd reference device(RD2)  send 3 Subscribe Request Messages to DUT.
-          basic subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653125.592268][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653125.592310][58143:58148] CHIP:DMG: {
           [1660653125.592348][58143:58148] CHIP:DMG:         SubscriptionId = 0xc15110c4,
@@ -1133,7 +1133,7 @@ tests:
           [1660653125.593776][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff6800df30]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653198.460290][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653198.460359][58143:58148] CHIP:DMG: {
           [1660653198.460423][58143:58148] CHIP:DMG:         SubscriptionId = 0xfed77bda,
@@ -1166,7 +1166,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
           [1660653260.633215][58143:58148] CHIP:EM: Removed CHIP MessageCounter:178377836 from RetransTable on exchange 25360i
           [1660653260.633327][58143:58148] CHIP:DMG: ReportDataMessage =
           [1660653260.633387][58143:58148] CHIP:DMG: {
@@ -1202,7 +1202,7 @@ tests:
 
 
           on the 3nd reference device(RD3)  send 3 Subscribe Request Messages to DUT.
-          basic subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
           [1660653438.741061][58149:58154] CHIP:EM: Removed CHIP MessageCounter:141916359 from RetransTable on exchange 34400i
           [1660653438.741116][58149:58154] CHIP:DMG: ReportDataMessage =
           [1660653438.741143][58149:58154] CHIP:DMG: {
@@ -1235,7 +1235,7 @@ tests:
           [1660653438.742171][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740129e0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
           [1660653500.501007][58149:58154] CHIP:DMG: {
           [1660653500.501077][58149:58154] CHIP:DMG:         SubscriptionId = 0xb129bd8c,
           [1660653500.501126][58149:58154] CHIP:DMG:         AttributeReportIBs =
@@ -1267,7 +1267,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
           [1660653545.650817][58149:58154] CHIP:DMG: ReportDataMessage =
           [1660653545.650842][58149:58154] CHIP:DMG: {
           [1660653545.650864][58149:58154] CHIP:DMG:         SubscriptionId = 0x5310d542,
@@ -1283,14 +1283,14 @@ tests:
 
 
           on the 4nd reference device(RD4)  send 3 Subscribe Request Messages to DUT.
-          basic subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
 
           [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
           [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
           [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
 
           [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
           [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
@@ -1298,7 +1298,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
           : }
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
@@ -1307,7 +1307,7 @@ tests:
 
 
           on the 5th reference device(RD5)  send 3 Subscribe Request Messages to DUT.
-          basic subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+          basicinformation subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
 
           [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
           [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
@@ -1315,7 +1315,7 @@ tests:
 
 
 
-           basic subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
 
           [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
           [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
@@ -1323,7 +1323,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
           : }
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
@@ -1331,20 +1331,20 @@ tests:
 
 
           on the 1st reference device(RD1)  send 6 Subscribe Request Messages to DUT, and Verify that the Subscriptions from RD2, RD3, RD4, RD5 are not affected.
-           basic subscribe node-label 100 1000 1  0  --keepSubscriptions 1
+           basicinformation subscribe node-label 100 1000 1  0  --keepSubscriptions 1
           [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
           [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
           [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
 
 
-           basic subscribe location 100 1000 1  0   --keepSubscriptions 1
+           basicinformation subscribe location 100 1000 1  0   --keepSubscriptions 1
           [1660653005.343616][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
           [1660653005.343884][58131:58136] CHIP:TOO:   Location: XX
           [1660653005.343983][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa00129b0]: Moving to [AwaitingSu]
 
 
 
-           basic subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
+           basicinformation subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
           [1660653043.576169][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653043.576207][58131:58136] CHIP:TOO:   LocalConfigDisabled: FALSE
           [1660653043.576240][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0012b40]: Moving to [AwaitingSu]
@@ -1352,14 +1352,14 @@ tests:
 
 
 
-          basic subscribe product-id 100 1000 1  0  --keepSubscriptions 1
+          basicinformation subscribe product-id 100 1000 1  0  --keepSubscriptions 1
 
           [1660654945.477837][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3782190841
           [1660654945.477932][58149:58154] CHIP:TOO:   ProductID: 32769
           [1660654945.478023][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740127c0]: Moving to [AwaitingSu]
 
 
-          basic subscribe software-version 100 1000 1  0  --keepSubscriptions 1
+          basicinformation subscribe software-version 100 1000 1  0  --keepSubscriptions 1
 
           [1660654945.477837][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3782190841
           [1660654945.477932][58149:58154] CHIP:TOO:   software-version:
@@ -1368,7 +1368,7 @@ tests:
 
 
 
-          basic subscribe  hardware-version  100 1000 1  0  --keepSubscriptions 1
+          basicinformation subscribe  hardware-version  100 1000 1  0  --keepSubscriptions 1
           [1660654945.477837][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3782190841
           [1660654945.477932][58149:58154] CHIP:TOO: hardware-version:
           [1660654945.478023][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740127c0]: Moving to [AwaitingSu]
