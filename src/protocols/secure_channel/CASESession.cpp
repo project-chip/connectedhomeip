@@ -25,8 +25,8 @@
  */
 #include <protocols/secure_channel/CASESession.h>
 
-#include <cinttypes>
-#include <cstring>
+#include <inttypes.h>
+#include <string.h>
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
