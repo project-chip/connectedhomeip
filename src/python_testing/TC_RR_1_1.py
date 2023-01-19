@@ -463,7 +463,7 @@ class TC_RR_1_1(MatterBaseTest):
                                                    Clusters.GroupKeyManagement.Commands.KeySetRead(
                                                        group_keys[fabric_idx][group_key_list_idx].groupKeySetID),
                                                    responseType=Clusters.GroupKeyManagement.Commands.KeySetReadResponse)
-                print(key_set)
+
                 asserts.assert_equal(group_keys[fabric_idx][group_key_list_idx].groupKeySetID,
                                      key_set.groupKeySet.groupKeySetID, "Received incorrect key set.")
                 asserts.assert_equal(group_keys[fabric_idx][group_key_list_idx].groupKeySecurityPolicy,
@@ -474,9 +474,12 @@ class TC_RR_1_1(MatterBaseTest):
                                      key_set.groupKeySet.epochStartTime1)
                 asserts.assert_equal(group_keys[fabric_idx][group_key_list_idx].epochStartTime2,
                                      key_set.groupKeySet.epochStartTime2)
-                asserts.assert_equal(NullValue, key_set.groupKeySet.epochKey0, "Unexpected key response from read.")
-                asserts.assert_equal(NullValue, key_set.groupKeySet.epochKey1, "Unexpected key response from read.")
-                asserts.assert_equal(NullValue, key_set.groupKeySet.epochKey2, "Unexpected key response from read.")
+                asserts.assert_equal(NullValue, key_set.groupKeySet.epochKey0,
+                                     "Value for epochKey0 included in KeySetReadResponse. It must not be.")
+                asserts.assert_equal(NullValue, key_set.groupKeySet.epochKey1,
+                                     "Value for epochKey1 included in KeySetReadResponse. It must not be.")
+                asserts.assert_equal(NullValue, key_set.groupKeySet.epochKey2,
+                                     "Value for epochKey2 included in KeySetReadResponse. It must not be.")
 
         return group_keys
 
