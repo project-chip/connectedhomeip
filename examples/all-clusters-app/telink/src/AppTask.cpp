@@ -44,10 +44,10 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
 #if CONFIG_CHIP_LIB_SHELL
-#include <zephyr/shell/shell.h>
 #include <sys.h>
+#include <zephyr/shell/shell.h>
 
-static int cmd_telink_reboot(const struct shell *shell, size_t argc, char **argv)
+static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** argv)
 {
     ARG_UNUSED(argc);
     ARG_UNUSED(argv);
@@ -56,10 +56,8 @@ static int cmd_telink_reboot(const struct shell *shell, size_t argc, char **argv
     sys_reboot();
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink,
-        SHELL_CMD(reboot, NULL, "Reboot board command", cmd_telink_reboot),
-        SHELL_SUBCMD_SET_END
-);
+SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board command", cmd_telink_reboot),
+                               SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 #endif // CONFIG_CHIP_LIB_SHELL
 
