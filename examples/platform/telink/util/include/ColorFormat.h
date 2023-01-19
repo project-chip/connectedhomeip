@@ -18,26 +18,33 @@
 
 #pragma once
 
-// ---- Lighting Example App Config ----
+#include <stdint.h>
 
-// Buttons config
-#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
+struct RgbColor_t
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
 
-#define BUTTON_PIN_1 2
-#define BUTTON_PIN_3 3
-#define BUTTON_PIN_4 1
-#define BUTTON_PIN_2 0
+struct HsvColor_t
+{
+    uint8_t h;
+    uint8_t s;
+    uint8_t v;
+};
 
-// LEDs config
-// System led config
-#define SYSTEM_STATE_LED_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
-#define SYSTEM_STATE_LED_PIN 7
+struct XyColor_t
+{
+    uint16_t x;
+    uint16_t y;
+};
 
-// Lighting LED config
-#define USE_RGB_PWM 0
+struct CtColor_t
+{
+    uint16_t ctMireds;
+};
 
-#define LIGHTING_PWM_SPEC_BLUE PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0))
-#if USE_RGB_PWM
-#define LIGHTING_PWM_SPEC_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1))
-#define LIGHTING_PWM_SPEC_RED PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2))
-#endif
+RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY);
+RgbColor_t HsvToRgb(HsvColor_t hsv);
+RgbColor_t CTToRgb(CtColor_t ct);
