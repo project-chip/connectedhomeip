@@ -1586,45 +1586,32 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
 CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    SubscriptionResumptionStorage::SubscriptionIndex subscriberIndex;
-    CHIP_ERROR err = mpSubscriptionResumptionStorage->LoadIndex(subscriberIndex);
-    ReturnLogErrorOnFailure(err);
-    ChipLogProgress(InteractionModel, "%u subscriber nodes to resume..", static_cast<unsigned>(subscriberIndex.mSize));
-
-    for (size_t currentNodeIndex = 0; currentNodeIndex < subscriberIndex.mSize; currentNodeIndex++)
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    while (iterator->Next(subscriptionInfo))
     {
-        SubscriptionResumptionStorage::SubscriptionList subscriptions;
-
-        err = mpSubscriptionResumptionStorage->FindByScopedNodeId(subscriberIndex.mNodes[currentNodeIndex], subscriptions);
-        ReturnLogErrorOnFailure(err);
-
-        ChipLogProgress(InteractionModel, "\tNode " ChipLogFormatScopedNodeId ": Loaded %u subscriptions..",
-                        ChipLogValueScopedNodeId(subscriberIndex.mNodes[currentNodeIndex]),
-                        static_cast<unsigned>(subscriptions.mSize));
-        for (size_t currentSubscriptionIndex = 0; currentSubscriptionIndex < subscriptions.mSize; currentSubscriptionIndex++)
+        auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedCount();
+        auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedCount();
+        if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
         {
-            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo =
-                subscriptions.mSubscriptions[currentSubscriptionIndex];
-            auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedCount();
-            auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedCount();
-            if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
-            {
-                ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
-                mpSubscriptionResumptionStorage->Delete(subscriptionInfo);
-                return CHIP_ERROR_NO_MEMORY;
-            }
-
-            ReadHandler * handler = mReadHandlers.CreateObject(*this);
-            if (handler == nullptr)
-            {
-                ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
-                mpSubscriptionResumptionStorage->Delete(subscriptionInfo);
-                return CHIP_ERROR_NO_MEMORY;
-            }
-
-            handler->ResumeSubscription(*mpCASESessionMgr, subscriptionInfo);
+            ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
+            mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
+                                                    subscriptionInfo.mSubscriptionId);
+            return CHIP_ERROR_NO_MEMORY;
         }
+
+        ReadHandler * handler = mReadHandlers.CreateObject(*this);
+        if (handler == nullptr)
+        {
+            ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
+            mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
+                                                    subscriptionInfo.mSubscriptionId);
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        handler->ResumeSubscription(*mpCASESessionMgr, subscriptionInfo);
     }
+    iterator->Release();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
     return CHIP_NO_ERROR;

@@ -192,12 +192,11 @@ public:
     static StorageKeyName IMEventNumber() { return StorageKeyName::FromConst("g/im/ec"); }
 
     // Subscription resumption
-    static StorageKeyName FabricSubscription(FabricIndex fabric, NodeId nodeId)
+    static StorageKeyName SubscriptionResumption(size_t index)
     {
-        return StorageKeyName::Formatted("f/%x/su/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32),
-                                         static_cast<uint32_t>(nodeId));
+        return StorageKeyName::Formatted("g/su/%x", static_cast<unsigned>(index));
     }
-    static StorageKeyName SubscriptionResumptionIndex() { return StorageKeyName::FromConst("g/sui"); }
+    static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
 };
 
 } // namespace chip

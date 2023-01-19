@@ -25,564 +25,414 @@
 #include <app/SimpleSubscriptionResumptionStorage.h>
 
 #include <lib/support/Base64.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
 
-constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kFabricIndexTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kPeerNodeIdTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kFabricIndexTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kSubscriptionIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kMinIntervalTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kMaxIntervalTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kFabricFilteredTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kPathCountTag;
-constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kPathTypeTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventPathTypeTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEndpointIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kClusterIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kAttributeIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventIdTag;
 
-CHIP_ERROR SimpleSubscriptionResumptionStorage::SaveIndex(const SubscriptionIndex & index)
+SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::SimpleSubscriptionInfoIterator(
+    SimpleSubscriptionResumptionStorage & storage) :
+    mStorage(storage)
 {
-    if (index.mSize == 0)
-    {
-        return mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName());
-    }
-
-    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    backingBuffer.Calloc(MaxIndexSize());
-
-    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), MaxIndexSize());
-
-    TLV::TLVType arrayType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
-
-    for (size_t i = 0; i < index.mSize; ++i)
-    {
-        TLV::TLVType innerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, innerType));
-        ReturnErrorOnFailure(writer.Put(kFabricIndexTag, index[i].GetFabricIndex()));
-        ReturnErrorOnFailure(writer.Put(kPeerNodeIdTag, index[i].GetNodeId()));
-        ReturnErrorOnFailure(writer.EndContainer(innerType));
-    }
-
-    ReturnErrorOnFailure(writer.EndContainer(arrayType));
-
-    const auto len = writer.GetLengthWritten();
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    writer.Finalize(backingBuffer);
-
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName(),
-                                                   backingBuffer.Get(), static_cast<uint16_t>(len)));
-
-    return CHIP_NO_ERROR;
+    mNextIndex = 0;
+    mMaxCount  = mStorage.MaxCount();
 }
 
-#define DeleteIndexAndReturnLogErrorOnFailure(expr)                                                                                \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        auto __err = (expr);                                                                                                       \
-        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
-        {                                                                                                                          \
-            mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName());                     \
-            ChipLogError(DataManagement, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                      \
-            return __err;                                                                                                          \
-        }                                                                                                                          \
-    } while (false)
-
-CHIP_ERROR SimpleSubscriptionResumptionStorage::LoadIndex(SubscriptionIndex & index)
+size_t SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::Count()
 {
-    return LoadIndex(index, 0);
+    return mStorage.Count();
 }
 
-CHIP_ERROR SimpleSubscriptionResumptionStorage::LoadIndex(SubscriptionIndex & index, size_t allocateExtraSpace)
+bool SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::Next(SubscriptionInfo & output)
+{
+    for (; mNextIndex < mMaxCount; mNextIndex++)
+    {
+        CHIP_ERROR err = mStorage.Load(mNextIndex, output);
+        if (err == CHIP_NO_ERROR)
+        {
+            // increment index for the next call
+            mNextIndex++;
+            return true;
+        }
+
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ChipLogError(DataManagement, "Failed to load subscription at index %u error %" CHIP_ERROR_FORMAT,
+                         static_cast<unsigned>(mNextIndex), err.Format());
+            mStorage.Delete(mNextIndex);
+        }
+    }
+
+    return false;
+}
+
+void SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::Release()
+{
+    mStorage.mSubscriptionInfoIterators.ReleaseObject(this);
+}
+
+SubscriptionResumptionStorage::SubscriptionInfoIterator * SimpleSubscriptionResumptionStorage::IterateSubscriptions()
+{
+    return mSubscriptionInfoIterators.CreateObject(*this);
+}
+
+size_t SimpleSubscriptionResumptionStorage::MaxCount()
+{
+    // Storage should try to hold the last known CHIP_IM_MAX_NUM_SUBSCRIPTIONS and
+    // use the larger of that value and the current CHIP_IM_MAX_NUM_SUBSCRIPTIONS
+    // value to make sure a reduced CHIP_IM_MAX_NUM_SUBSCRIPTIONS value would not
+    // cause storage leaks / orphaned persisted subscriptions
+
+    uint32_t countMax = 0;
+    uint16_t len      = sizeof(countMax);
+    CHIP_ERROR err =
+        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
+    if (err != CHIP_NO_ERROR)
+    {
+        return CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
+    }
+
+    return max<size_t>(static_cast<size_t>(countMax), CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
+}
+
+size_t SimpleSubscriptionResumptionStorage::Count()
+{
+    size_t countMax          = MaxCount();
+    size_t subscriptionCount = 0;
+    for (size_t subscriptionIndex = 0; subscriptionIndex < countMax; subscriptionIndex++)
+    {
+        if (mStorage->SyncDoesKeyExist(DefaultStorageKeyAllocator::SubscriptionResumption(subscriptionIndex).KeyName()))
+        {
+            subscriptionCount++;
+        }
+    }
+
+    return subscriptionCount;
+}
+
+CHIP_ERROR SimpleSubscriptionResumptionStorage::Delete(size_t subscriptionIndex)
+{
+    return mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumption(subscriptionIndex).KeyName());
+}
+
+CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(size_t subscriptionIndex, SubscriptionInfo & subscriptionInfo)
 {
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    backingBuffer.Calloc(MaxIndexSize());
+    backingBuffer.Calloc(MaxSubscriptionSize());
     if (backingBuffer.Get() == nullptr)
     {
-        mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName());
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    uint16_t len = static_cast<uint16_t>(MaxIndexSize());
-
-    index.mSize = 0;
-    if (mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName(), backingBuffer.Get(), len) !=
-        CHIP_NO_ERROR)
-    {
-        mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName());
-        return CHIP_NO_ERROR;
-    }
+    uint16_t len = static_cast<uint16_t>(MaxSubscriptionSize());
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumption(subscriptionIndex).KeyName(),
+                                                   backingBuffer.Get(), len));
 
     TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
 
-    DeleteIndexAndReturnLogErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
-    TLV::TLVType arrayType;
-    DeleteIndexAndReturnLogErrorOnFailure(reader.EnterContainer(arrayType));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
-    size_t nodeCount;
-    DeleteIndexAndReturnLogErrorOnFailure(reader.CountRemainingInContainer(&nodeCount));
-    if (nodeCount >= CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
+    TLV::TLVType subscriptionContainerType;
+    ReturnErrorOnFailure(reader.EnterContainer(subscriptionContainerType));
+
+    // Node ID
+    ReturnErrorOnFailure(reader.Next(kPeerNodeIdTag));
+    ReturnErrorOnFailure(reader.Get(subscriptionInfo.mNodeId));
+
+    // Fabric index
+    ReturnErrorOnFailure(reader.Next(kFabricIndexTag));
+    ReturnErrorOnFailure(reader.Get(subscriptionInfo.mFabricIndex));
+
+    // Subscription ID
+    ReturnErrorOnFailure(reader.Next(kSubscriptionIdTag));
+    ReturnErrorOnFailure(reader.Get(subscriptionInfo.mSubscriptionId));
+
+    // Min interval
+    ReturnErrorOnFailure(reader.Next(kMinIntervalTag));
+    ReturnErrorOnFailure(reader.Get(subscriptionInfo.mMinInterval));
+
+    // Max interval
+    ReturnErrorOnFailure(reader.Next(kMaxIntervalTag));
+    ReturnErrorOnFailure(reader.Get(subscriptionInfo.mMaxInterval));
+
+    // Fabric filtered boolean
+    ReturnErrorOnFailure(reader.Next(kFabricFilteredTag));
+    ReturnErrorOnFailure(reader.Get(subscriptionInfo.mFabricFiltered));
+
+    // Attribute Paths
+    uint16_t pathCount = 0;
+    ReturnErrorOnFailure(reader.Next(kPathCountTag));
+    ReturnErrorOnFailure(reader.Get(pathCount));
+
+    subscriptionInfo.mAttributePaths = Platform::ScopedMemoryBufferWithSize<AttributePathParamsValues>();
+    if (pathCount)
     {
-        mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName());
-        return CHIP_ERROR_NO_MEMORY;
+        subscriptionInfo.mAttributePaths.Calloc(pathCount);
+        for (uint16_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
+        {
+            ReturnErrorOnFailure(reader.Next(kEndpointIdTag));
+            ReturnErrorOnFailure(reader.Get(subscriptionInfo.mAttributePaths[pathIndex].mEndpointId));
+
+            ReturnErrorOnFailure(reader.Next(kClusterIdTag));
+            ReturnErrorOnFailure(reader.Get(subscriptionInfo.mAttributePaths[pathIndex].mClusterId));
+
+            ReturnErrorOnFailure(reader.Next(kAttributeIdTag));
+            ReturnErrorOnFailure(reader.Get(subscriptionInfo.mAttributePaths[pathIndex].mAttributeId));
+        }
     }
 
-    index.mNodes = std::unique_ptr<ScopedNodeId[]>(new (std::nothrow) ScopedNodeId[nodeCount + allocateExtraSpace]);
-    if (!index.mNodes)
+    // Event Paths
+    pathCount = 0;
+    ReturnErrorOnFailure(reader.Next(kPathCountTag));
+    ReturnErrorOnFailure(reader.Get(pathCount));
+
+    subscriptionInfo.mEventPaths = Platform::ScopedMemoryBufferWithSize<EventPathParamsValues>();
+    if (pathCount)
     {
-        mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName());
-        return CHIP_ERROR_NO_MEMORY;
+        subscriptionInfo.mEventPaths.Calloc(pathCount);
+        for (uint16_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
+        {
+            EventPathType eventPathType;
+            ReturnErrorOnFailure(reader.Next(kEventPathTypeTag));
+            ReturnErrorOnFailure(reader.Get(eventPathType));
+
+            subscriptionInfo.mEventPaths[pathIndex].mIsUrgentEvent = (eventPathType == EventPathType::kUrgent);
+
+            ReturnErrorOnFailure(reader.Next(kEndpointIdTag));
+            ReturnErrorOnFailure(reader.Get(subscriptionInfo.mEventPaths[pathIndex].mEndpointId));
+
+            ReturnErrorOnFailure(reader.Next(kClusterIdTag));
+            ReturnErrorOnFailure(reader.Get(subscriptionInfo.mEventPaths[pathIndex].mClusterId));
+
+            ReturnErrorOnFailure(reader.Next(kEventIdTag));
+            ReturnErrorOnFailure(reader.Get(subscriptionInfo.mEventPaths[pathIndex].mEventId));
+        }
     }
 
-    index.mSize = nodeCount;
-
-    for (size_t currentNodeIndex = 0; currentNodeIndex < nodeCount; currentNodeIndex++)
-    {
-        DeleteIndexAndReturnLogErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-        TLV::TLVType containerType;
-        DeleteIndexAndReturnLogErrorOnFailure(reader.EnterContainer(containerType));
-
-        FabricIndex fabricIndex;
-        DeleteIndexAndReturnLogErrorOnFailure(reader.Next(kFabricIndexTag));
-        DeleteIndexAndReturnLogErrorOnFailure(reader.Get(fabricIndex));
-
-        NodeId peerNodeId;
-        DeleteIndexAndReturnLogErrorOnFailure(reader.Next(kPeerNodeIdTag));
-        DeleteIndexAndReturnLogErrorOnFailure(reader.Get(peerNodeId));
-
-        index[currentNodeIndex] = ScopedNodeId(peerNodeId, fabricIndex);
-
-        DeleteIndexAndReturnLogErrorOnFailure(reader.ExitContainer(containerType));
-    }
-
-    DeleteIndexAndReturnLogErrorOnFailure(reader.ExitContainer(arrayType));
-    DeleteIndexAndReturnLogErrorOnFailure(reader.VerifyEndOfContainer());
+    ReturnErrorOnFailure(reader.ExitContainer(subscriptionContainerType));
 
     return CHIP_NO_ERROR;
 }
 
-#define DeleteSubscriptionsAndReturnLogErrorOnFailure(expr)                                                                        \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        auto __err = (expr);                                                                                                       \
-        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
-        {                                                                                                                          \
-            mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName());                                                           \
-            ChipLogError(DataManagement, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                      \
-            return __err;                                                                                                          \
-        }                                                                                                                          \
-    } while (false)
-
-CHIP_ERROR SimpleSubscriptionResumptionStorage::FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions)
+CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, SubscriptionInfo & subscriptionInfo)
 {
-    return FindByScopedNodeId(node, subscriptions, 0);
-}
-CHIP_ERROR SimpleSubscriptionResumptionStorage::FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions,
-                                                                   size_t allocateExtraSpace)
-{
-    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    backingBuffer.Calloc(MaxStateSize());
-    if (backingBuffer.Get() == nullptr)
+    TLV::TLVType subscriptionContainerType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, subscriptionContainerType));
+    ReturnErrorOnFailure(writer.Put(kPeerNodeIdTag, subscriptionInfo.mNodeId));
+    ReturnErrorOnFailure(writer.Put(kFabricIndexTag, subscriptionInfo.mFabricIndex));
+    ReturnErrorOnFailure(writer.Put(kSubscriptionIdTag, subscriptionInfo.mSubscriptionId));
+    ReturnErrorOnFailure(writer.Put(kMinIntervalTag, subscriptionInfo.mMinInterval));
+    ReturnErrorOnFailure(writer.Put(kMaxIntervalTag, subscriptionInfo.mMaxInterval));
+    ReturnErrorOnFailure(writer.Put(kFabricFilteredTag, subscriptionInfo.mFabricFiltered));
+
+    ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mAttributePaths.AllocatedCount())));
+    for (size_t currentPathIndex = 0; currentPathIndex < subscriptionInfo.mAttributePaths.AllocatedCount(); currentPathIndex++)
     {
-        mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName());
-        return CHIP_ERROR_NO_MEMORY;
+        ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mEndpointId));
+        ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mClusterId));
+        ReturnErrorOnFailure(writer.Put(kAttributeIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mAttributeId));
     }
 
-    uint16_t len = static_cast<uint16_t>(MaxStateSize());
-
-    if (mStorage->SyncGetKeyValue(GetStorageKey(node).KeyName(), backingBuffer.Get(), len) != CHIP_NO_ERROR)
+    ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mEventPaths.AllocatedCount())));
+    for (size_t currentPathIndex = 0; currentPathIndex < subscriptionInfo.mEventPaths.AllocatedCount(); currentPathIndex++)
     {
-        subscriptions.mSize = 0;
-        mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName());
-        return CHIP_NO_ERROR;
-    }
-
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
-
-    DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
-    TLV::TLVType arrayType;
-    DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.EnterContainer(arrayType));
-
-    size_t subscriptionCount;
-    DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.CountRemainingInContainer(&subscriptionCount));
-    if (subscriptionCount >= CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
-    {
-        mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName());
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    subscriptions.mSubscriptions =
-        std::unique_ptr<SubscriptionInfo[]>(new (std::nothrow) SubscriptionInfo[subscriptionCount + allocateExtraSpace]);
-    if (!subscriptions.mSubscriptions)
-    {
-        mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName());
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    subscriptions.mSize = subscriptionCount;
-
-    for (size_t currentSubscriptionIndex = 0; currentSubscriptionIndex < subscriptionCount; currentSubscriptionIndex++)
-    {
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-        TLV::TLVType subscriptionContainerType;
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.EnterContainer(subscriptionContainerType));
-
-        subscriptions[currentSubscriptionIndex] = { .mNodeId = node.GetNodeId(), .mFabricIndex = node.GetFabricIndex() };
-
-        // Subscription ID
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kSubscriptionIdTag));
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Get(subscriptions[currentSubscriptionIndex].mSubscriptionId));
-
-        // Min interval
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kMinIntervalTag));
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Get(subscriptions[currentSubscriptionIndex].mMinInterval));
-
-        // Max interval
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kMaxIntervalTag));
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Get(subscriptions[currentSubscriptionIndex].mMaxInterval));
-
-        // Fabric filtered boolean
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kFabricFilteredTag));
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Get(subscriptions[currentSubscriptionIndex].mFabricFiltered));
-
-        // Attribute Paths
-        uint16_t pathCount = 0;
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kPathCountTag));
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Get(pathCount));
-
-        subscriptions[currentSubscriptionIndex].mAttributePaths = Platform::ScopedMemoryBufferWithSize<AttributePathParamsValues>();
-        if (pathCount)
+        if (subscriptionInfo.mEventPaths[currentPathIndex].mIsUrgentEvent)
         {
-            subscriptions[currentSubscriptionIndex].mAttributePaths.Calloc(pathCount);
-            for (uint16_t currentPathIndex = 0; currentPathIndex < pathCount; currentPathIndex++)
-            {
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kEndpointIdTag));
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(
-                    reader.Get(subscriptions[currentSubscriptionIndex].mAttributePaths[currentPathIndex].mEndpointId));
-
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kClusterIdTag));
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(
-                    reader.Get(subscriptions[currentSubscriptionIndex].mAttributePaths[currentPathIndex].mClusterId));
-
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kAttributeIdTag));
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(
-                    reader.Get(subscriptions[currentSubscriptionIndex].mAttributePaths[currentPathIndex].mAttributeId));
-            }
+            ReturnErrorOnFailure(writer.Put(kEventPathTypeTag, EventPathType::kUrgent));
         }
-
-        // Event Paths
-        pathCount = 0;
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kPathCountTag));
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Get(pathCount));
-
-        subscriptions[currentSubscriptionIndex].mEventPaths = Platform::ScopedMemoryBufferWithSize<EventPathParamsValues>();
-        if (pathCount)
+        else
         {
-            subscriptions[currentSubscriptionIndex].mEventPaths.Calloc(pathCount);
-            for (uint16_t currentPathIndex = 0; currentPathIndex < pathCount; currentPathIndex++)
-            {
-                EventPathType eventPathType;
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kPathTypeTag));
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Get(eventPathType));
-
-                subscriptions[currentSubscriptionIndex].mEventPaths[currentPathIndex].mIsUrgentEvent =
-                    (eventPathType == EventPathType::kUrgent);
-
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kEndpointIdTag));
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(
-                    reader.Get(subscriptions[currentSubscriptionIndex].mEventPaths[currentPathIndex].mEndpointId));
-
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kClusterIdTag));
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(
-                    reader.Get(subscriptions[currentSubscriptionIndex].mEventPaths[currentPathIndex].mClusterId));
-
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.Next(kEventIdTag));
-                DeleteSubscriptionsAndReturnLogErrorOnFailure(
-                    reader.Get(subscriptions[currentSubscriptionIndex].mEventPaths[currentPathIndex].mEventId));
-            }
+            ReturnErrorOnFailure(writer.Put(kEventPathTypeTag, EventPathType::kNonUrgent));
         }
-
-        DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.ExitContainer(subscriptionContainerType));
+        ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mEventPaths[currentPathIndex].mEndpointId));
+        ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mEventPaths[currentPathIndex].mClusterId));
+        ReturnErrorOnFailure(writer.Put(kEventIdTag, subscriptionInfo.mEventPaths[currentPathIndex].mEventId));
     }
 
-    DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.ExitContainer(arrayType));
-    DeleteSubscriptionsAndReturnLogErrorOnFailure(reader.VerifyEndOfContainer());
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SimpleSubscriptionResumptionStorage::SaveSubscriptions(const ScopedNodeId & node, const SubscriptionList & subscriptions)
-{
-    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    backingBuffer.Calloc(MaxIndexSize());
-    VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), MaxIndexSize());
-
-    TLV::TLVType arrayType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
-
-    for (size_t currentSubscriptionIndex = 0; currentSubscriptionIndex < subscriptions.mSize; currentSubscriptionIndex++)
-    {
-        TLV::TLVType subscriptionContainerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, subscriptionContainerType));
-        ReturnErrorOnFailure(writer.Put(kSubscriptionIdTag, subscriptions[currentSubscriptionIndex].mSubscriptionId));
-        ReturnErrorOnFailure(writer.Put(kMinIntervalTag, subscriptions[currentSubscriptionIndex].mMinInterval));
-        ReturnErrorOnFailure(writer.Put(kMaxIntervalTag, subscriptions[currentSubscriptionIndex].mMaxInterval));
-        ReturnErrorOnFailure(writer.Put(kFabricFilteredTag, subscriptions[currentSubscriptionIndex].mFabricFiltered));
-
-        ReturnErrorOnFailure(writer.Put(
-            kPathCountTag, static_cast<uint16_t>(subscriptions[currentSubscriptionIndex].mAttributePaths.AllocatedCount())));
-        for (size_t currentPathIndex = 0;
-             currentPathIndex < subscriptions[currentSubscriptionIndex].mAttributePaths.AllocatedCount(); currentPathIndex++)
-        {
-            ReturnErrorOnFailure(
-                writer.Put(kEndpointIdTag, subscriptions[currentSubscriptionIndex].mAttributePaths[currentPathIndex].mEndpointId));
-            ReturnErrorOnFailure(
-                writer.Put(kClusterIdTag, subscriptions[currentSubscriptionIndex].mAttributePaths[currentPathIndex].mClusterId));
-            ReturnErrorOnFailure(writer.Put(
-                kAttributeIdTag, subscriptions[currentSubscriptionIndex].mAttributePaths[currentPathIndex].mAttributeId));
-        }
-
-        ReturnErrorOnFailure(
-            writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptions[currentSubscriptionIndex].mEventPaths.AllocatedCount())));
-        for (size_t currentPathIndex = 0; currentPathIndex < subscriptions[currentSubscriptionIndex].mEventPaths.AllocatedCount();
-             currentPathIndex++)
-        {
-            if (subscriptions[currentSubscriptionIndex].mEventPaths[currentPathIndex].mIsUrgentEvent)
-            {
-                ReturnErrorOnFailure(writer.Put(kPathTypeTag, EventPathType::kUrgent));
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer.Put(kPathTypeTag, EventPathType::kNonUrgent));
-            }
-            ReturnErrorOnFailure(
-                writer.Put(kEndpointIdTag, subscriptions[currentSubscriptionIndex].mEventPaths[currentPathIndex].mEndpointId));
-            ReturnErrorOnFailure(
-                writer.Put(kClusterIdTag, subscriptions[currentSubscriptionIndex].mEventPaths[currentPathIndex].mClusterId));
-            ReturnErrorOnFailure(
-                writer.Put(kAttributeIdTag, subscriptions[currentSubscriptionIndex].mEventPaths[currentPathIndex].mEventId));
-        }
-
-        ReturnErrorOnFailure(writer.EndContainer(subscriptionContainerType));
-    }
-
-    ReturnErrorOnFailure(writer.EndContainer(arrayType));
-
-    const auto len = writer.GetLengthWritten();
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    writer.Finalize(backingBuffer);
-
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(node).KeyName(), backingBuffer.Get(), static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(writer.EndContainer(subscriptionContainerType));
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(SubscriptionInfo & subscriptionInfo)
 {
-    ScopedNodeId subscriptionNode = ScopedNodeId(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex);
-    // Load index and update if fabric/node is new
-    SubscriptionIndex subscriptionIndex;
-    LoadIndex(subscriptionIndex, 1);
-    bool nodeIsNew = true;
-    for (size_t i = 0; i < subscriptionIndex.mSize; i++)
+    // Ensure this version of CHIP_IM_MAX_NUM_SUBSCRIPTIONS is recorded on Save
+    size_t countMax         = MaxCount();
+    uint32_t countMaxToSave = static_cast<uint32_t>(std::max<size_t>(countMax, CHIP_IM_MAX_NUM_SUBSCRIPTIONS));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(),
+                                                   &countMaxToSave, static_cast<uint16_t>(sizeof(uint32_t))));
+
+    // Find empty index or duplicate if exists
+    size_t subscriptionIndex;
+    size_t firstEmptySubscriptionIndex = countMax; // initialize to out of bounds as "not set"
+    size_t count                       = 0;
+    for (subscriptionIndex = 0; subscriptionIndex < countMax; subscriptionIndex++)
     {
-        if (subscriptionNode == subscriptionIndex[i])
+        SubscriptionInfo currentSubscriptionInfo;
+        CHIP_ERROR err = Load(subscriptionIndex, currentSubscriptionInfo);
+
+        // if empty and firstEmptySubscriptionIndex isn't set yet, then mark empty spot
+        if ((firstEmptySubscriptionIndex == countMax) && (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
         {
-            nodeIsNew = false;
-            break;
-        }
-    }
-    if (nodeIsNew)
-    {
-        if (!subscriptionIndex.mSize)
-        {
-            subscriptionIndex.mNodes = std::unique_ptr<ScopedNodeId[]>(new (std::nothrow) ScopedNodeId[1]);
-            if (!subscriptionIndex.mNodes)
-            {
-                return CHIP_ERROR_NO_MEMORY;
-            }
+            firstEmptySubscriptionIndex = subscriptionIndex;
         }
 
-        if (subscriptionIndex.mSize == CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        subscriptionIndex[subscriptionIndex.mSize++] = subscriptionNode;
-        SaveIndex(subscriptionIndex);
-    }
-
-    // Load existing subscriptions for node, then combine and save state
-    SubscriptionList subscriptions;
-    CHIP_ERROR err = FindByScopedNodeId(subscriptionNode, subscriptions, 1); // ask to allocate 1 extra space for new subscription
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    // if this is the first subscription, allocate space for 1
-    if (!subscriptions.mSize)
-    {
-        subscriptions.mSubscriptions = std::unique_ptr<SubscriptionInfo[]>(new (std::nothrow) SubscriptionInfo[1]);
-        if (!subscriptions.mSubscriptions)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    // Sanity check for duplicate subscription and remove
-    for (size_t i = 0; i < subscriptions.mSize; i++)
-    {
-        if (subscriptionInfo.mSubscriptionId == subscriptions[i].mSubscriptionId)
-        {
-            subscriptions.mSize--;
-            // if not last element, move last element here, essentially deleting this
-            if (i < subscriptions.mSize)
-            {
-                subscriptions[i] = std::move(subscriptions[subscriptions.mSize]);
-            }
-            break;
-        }
-    }
-
-    // Sanity check this will not go over fabric limit - count
-    size_t totalSubscriptions = subscriptions.mSize;
-    for (size_t i = 0; i < subscriptionIndex.mSize; i++)
-    {
-        // This node has already been loaded and counted
-        if (subscriptionNode == subscriptionIndex[i])
-        {
-            continue;
-        }
-
-        SubscriptionList otherSubscriptions;
-        err = FindByScopedNodeId(subscriptionIndex[i], otherSubscriptions);
+        // delete duplicate
         if (err == CHIP_NO_ERROR)
         {
-            totalSubscriptions += otherSubscriptions.mSize;
+            if ((subscriptionInfo.mNodeId == currentSubscriptionInfo.mNodeId) &&
+                (subscriptionInfo.mFabricIndex == currentSubscriptionInfo.mFabricIndex) &&
+                (subscriptionInfo.mSubscriptionId == currentSubscriptionInfo.mSubscriptionId))
+            {
+                Delete(subscriptionIndex);
+                // if duplicate is the first empty spot, then also set it
+                if (firstEmptySubscriptionIndex == countMax)
+                {
+                    firstEmptySubscriptionIndex = subscriptionIndex;
+                }
+            }
+            else
+            {
+                count++;
+            }
         }
     }
-    // Not using CHIP_IM_MAX_NUM_SUBSCRIPTIONS_PER_FABRIC per explanation
-    // in MaxStateSize() header comment block
-    if (totalSubscriptions == CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
+
+    // Fail if already have more persisted subscriptions than currently allowed
+    if (count >= CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    // Merge new subscription in and save
-    subscriptions[subscriptions.mSize++] = std::move(subscriptionInfo);
-    return SaveSubscriptions(subscriptionNode, subscriptions);
-}
-
-CHIP_ERROR SimpleSubscriptionResumptionStorage::Delete(const SubscriptionInfo & subscriptionInfo)
-{
-    ScopedNodeId subscriptionNode = ScopedNodeId(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex);
-    // load existing subscriptions, then search for subscription
-    SubscriptionList subscriptions;
-    CHIP_ERROR err = FindByScopedNodeId(subscriptionNode, subscriptions);
-
-    if (err != CHIP_NO_ERROR)
+    // Fail if no empty space
+    if (firstEmptySubscriptionIndex == countMax)
     {
-        return err;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
-    bool subscriptionsChanged = false;
-    for (size_t i = 0; i < subscriptions.mSize; i++)
+    // Now construct subscription state and save
+    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
+    backingBuffer.Calloc(MaxSubscriptionSize());
+    if (backingBuffer.Get() == nullptr)
     {
-        if (subscriptionInfo.mSubscriptionId == subscriptions[i].mSubscriptionId)
-        {
-            subscriptions.mSize--;
-            // if not last element, move last element here, essentially deleting this
-            if (i < subscriptions.mSize)
-            {
-                subscriptions[i] = std::move(subscriptions[subscriptions.mSize]);
-            }
-
-            subscriptionsChanged = true;
-            break;
-        }
+        return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (subscriptionsChanged)
-    {
-        if (subscriptions.mSize)
-        {
-            return SaveSubscriptions(subscriptionNode, subscriptions);
-        }
+    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), MaxSubscriptionSize());
 
-        // Remove node from index
-        SubscriptionIndex subscriptionIndex;
-        LoadIndex(subscriptionIndex);
-        for (size_t i = 0; i < subscriptionIndex.mSize; i++)
-        {
-            if (subscriptionNode == subscriptionIndex[i])
-            {
-                subscriptionIndex.mSize--;
-                // if not last element, move last element here, essentially deleting this
-                if (i < subscriptionIndex.mSize)
-                {
-                    subscriptionIndex[i] = std::move(subscriptionIndex[subscriptionIndex.mSize]);
-                }
-                break;
-            }
-        }
-        SaveIndex(subscriptionIndex);
+    ReturnErrorOnFailure(Save(writer, subscriptionInfo));
 
-        return mStorage->SyncDeleteKeyValue(GetStorageKey(subscriptionNode).KeyName());
-    }
+    const auto len = writer.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    writer.Finalize(backingBuffer);
+
+    ReturnErrorOnFailure(
+        mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumption(firstEmptySubscriptionIndex).KeyName(),
+                                  backingBuffer.Get(), static_cast<uint16_t>(len)));
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SimpleSubscriptionResumptionStorage::Delete(NodeId nodeId, FabricIndex fabricIndex, SubscriptionId subscriptionId)
+{
+    CHIP_ERROR deleteErr = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    size_t countMax      = MaxCount();
+
+    size_t count = 0;
+    for (size_t subscriptionIndex = 0; subscriptionIndex < countMax; subscriptionIndex++)
+    {
+        SubscriptionInfo subscriptionInfo;
+        CHIP_ERROR err = Load(subscriptionIndex, subscriptionInfo);
+
+        // delete duplicate
+        if (err == CHIP_NO_ERROR)
+        {
+            if ((nodeId == subscriptionInfo.mNodeId) && (fabricIndex == subscriptionInfo.mFabricIndex) &&
+                (subscriptionId == subscriptionInfo.mSubscriptionId))
+            {
+                deleteErr = Delete(subscriptionIndex);
+            }
+            else
+            {
+                count++;
+            }
+        }
+    }
+
+    // if there are no persisted subscriptions, the MaxCount can also be deleted
+    if (count == 0)
+    {
+        DeleteMaxCount();
+    }
+
+    ChipLogProgress(InteractionModel, "JEFFTEST: Delete final count %zu", count);
+
+    return deleteErr;
+}
+
+CHIP_ERROR SimpleSubscriptionResumptionStorage::DeleteMaxCount()
+{
+    return mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName());
 }
 
 CHIP_ERROR SimpleSubscriptionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
 {
-    SubscriptionIndex subscriptionIndex;
-    LoadIndex(subscriptionIndex);
+    CHIP_ERROR deleteErr = CHIP_NO_ERROR;
+    size_t countMax      = MaxCount();
 
-    size_t i          = 0;
-    bool indexChanged = false;
-    while (i < subscriptionIndex.mSize)
+    size_t count = 0;
+    for (size_t subscriptionIndex = 0; subscriptionIndex < countMax; subscriptionIndex++)
     {
-        if (subscriptionIndex[i].GetFabricIndex() == fabricIndex)
-        {
-            mStorage->SyncDeleteKeyValue(GetStorageKey(subscriptionIndex[i]).KeyName());
+        SubscriptionInfo subscriptionInfo;
+        CHIP_ERROR err = Load(subscriptionIndex, subscriptionInfo);
 
-            // Update count and exit if exhausted all nodes
-            --subscriptionIndex.mSize;
-            if (i == subscriptionIndex.mSize)
+        if (err == CHIP_NO_ERROR)
+        {
+            if (fabricIndex == subscriptionInfo.mFabricIndex)
             {
-                break;
+                err = Delete(subscriptionIndex);
+                if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+                {
+                    deleteErr = err;
+                }
             }
-
-            // Move the last element into this hole and keep looping
-            subscriptionIndex[i] = subscriptionIndex[subscriptionIndex.mSize];
-            indexChanged         = true;
-        }
-        else
-        {
-            i++;
+            else
+            {
+                count++;
+            }
         }
     }
 
-    if (indexChanged)
+    // if there are no persisted subscriptions, the MaxCount can also be deleted
+    if (count == 0)
     {
-        SaveIndex(subscriptionIndex);
+        CHIP_ERROR err = DeleteMaxCount();
+
+        if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+        {
+            deleteErr = err;
+        }
     }
 
-    return CHIP_NO_ERROR;
-}
+    ChipLogProgress(InteractionModel, "JEFFTEST: DeleteAll final count %zu", count);
 
-StorageKeyName SimpleSubscriptionResumptionStorage::GetStorageKey(const ScopedNodeId & node)
-{
-    return DefaultStorageKeyAllocator::FabricSubscription(node.GetFabricIndex(), node.GetNodeId());
+    return deleteErr;
 }
 
 } // namespace app

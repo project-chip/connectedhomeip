@@ -27,6 +27,7 @@
 #include <app/SubscriptionResumptionStorage.h>
 #include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/Pool.h>
 
 namespace chip {
 namespace app {
@@ -37,6 +38,8 @@ namespace app {
 class SimpleSubscriptionResumptionStorage : public SubscriptionResumptionStorage
 {
 public:
+    static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
+
     CHIP_ERROR Init(PersistentStorageDelegate * storage)
     {
         VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -44,37 +47,46 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static StorageKeyName GetStorageKey(const ScopedNodeId & node);
-
-    CHIP_ERROR LoadIndex(SubscriptionIndex & index) override;
-
-    CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions) override;
+    SubscriptionInfoIterator * IterateSubscriptions() override;
 
     CHIP_ERROR Save(SubscriptionInfo & subscriptionInfo) override;
 
-    CHIP_ERROR Delete(const SubscriptionInfo & subscriptionInfo) override;
+    CHIP_ERROR Delete(NodeId nodeId, FabricIndex fabricIndex, SubscriptionId subscriptionId) override;
 
     CHIP_ERROR DeleteAll(FabricIndex fabricIndex) override;
 
-private:
-    CHIP_ERROR SaveIndex(const SubscriptionIndex & index);
-    CHIP_ERROR SaveSubscriptions(const ScopedNodeId & node, const SubscriptionList & subscriptions);
-    CHIP_ERROR LoadIndex(SubscriptionIndex & index, size_t allocateExtraSpace);
-    CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions, size_t allocateExtraSpace);
+protected:
+    CHIP_ERROR Save(TLV::TLVWriter & writer, SubscriptionInfo & subscriptionInfo);
+    CHIP_ERROR Load(size_t subscriptionIndex, SubscriptionInfo & subscriptionInfo);
+    CHIP_ERROR Delete(size_t subscriptionIndex);
+    size_t Count();
+    size_t MaxCount();
+    CHIP_ERROR DeleteMaxCount();
+
+    class SimpleSubscriptionInfoIterator : public SubscriptionInfoIterator
+    {
+    public:
+        SimpleSubscriptionInfoIterator(SimpleSubscriptionResumptionStorage & storage);
+        size_t Count() override;
+        bool Next(SubscriptionInfo & output) override;
+        void Release() override;
+
+    private:
+        SimpleSubscriptionResumptionStorage & mStorage;
+        uint16_t mNextIndex;
+        size_t mMaxCount;
+    };
 
     static constexpr size_t MaxScopedNodeIdSize() { return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex)); }
 
-    static constexpr size_t MaxIndexSize()
-    {
-        // The max size of the list is (1 byte control + bytes for actual value) times max number of list items
-        return TLV::EstimateStructOverhead((1 + MaxScopedNodeIdSize()) * CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
-    }
-
     static constexpr size_t MaxSubscriptionPathsSize()
     {
-        return TLV::EstimateStructOverhead(
-            TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(EndpointId), sizeof(ClusterId), sizeof(AttributeId)) *
-            CHIP_IM_MAX_NUM_PATH_PER_SUBSCRIPTION);
+        // IM engine declares an attribute path pool and an event path pool, and each pool
+        // includes CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS for subscriptions
+        return 2 *
+            TLV::EstimateStructOverhead(
+                   TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(EndpointId), sizeof(ClusterId), sizeof(AttributeId)) *
+                   CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS);
     }
 
     static constexpr size_t MaxSubscriptionSize()
@@ -84,25 +96,6 @@ private:
                                            sizeof(bool), MaxSubscriptionPathsSize());
     }
 
-    static constexpr size_t MaxStateSize()
-    {
-        // Due to IM engine subscription eviction logic, effective allowed maximum
-        // subscriptions per fabric is higher than CHIP_IM_MAX_NUM_SUBSCRIPTIONS_PER_FABRIC
-        // when number of fabrics is fewer than maximum. And so max state size should use
-        // CHIP_IM_MAX_NUM_SUBSCRIPTIONS to better estimate, and allow IM engine eviction
-        // logic to trigger the right clean up when needed.
-
-        // The max size of the list is (1 byte control + bytes for actual value) times max number of list items
-        return TLV::EstimateStructOverhead(1 + MaxSubscriptionSize() * CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
-    }
-
-    enum class SubscriptionPathType : uint8_t
-    {
-        kAttributePath      = 0x1,
-        kUrgentEventPath    = 0x2,
-        kNonUrgentEventPath = 0x3,
-    };
-
     enum class EventPathType : uint8_t
     {
         kUrgent    = 0x1,
@@ -111,39 +104,41 @@ private:
 
     // TODO: consider alternate storage scheme to optimize space requirement
 
-    // Nodes TLV structure:
-    //   Array of:
-    //     Scoped Node ID struct of:
-    //       Node ID
-    //       Fabric index
+    // Flat list of subscriptions indexed from from 0 to CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS-1
+    //
+    // Each entry in list is a Subscription TLV structure:
+    //   Struct of:
+    //     Node ID
+    //     Fabric Index
+    //     Subscription ID
+    //     Min interval
+    //     Max interval
+    //     Fabric filtered boolean
+    //     Attribute Path Count x, with these fields repeating x times
+    //       Endpoint ID
+    //       Cluster ID
+    //       Attribute/event ID
+    //     Event Path Count x, with these fields repeating x times
+    //       Event subscription type (urgent / non-urgent)
+    //       Endpoint ID
+    //       Cluster ID
+    //       Event ID
 
-    // Subscription TLV structure:
-    //   Array of:
-    //     Struct of: (Subscription info)
-    //       Node ID
-    //       Subscription ID
-    //       Min interval
-    //       Max interval
-    //       Fabric filtered boolean
-    //       Path Count x, with these fields repeating x times
-    //         Type (attribute, urgent event, non-urgent event)
-    //         Endpoint ID
-    //         Cluster ID
-    //         Attribute/event ID
-    static constexpr TLV::Tag kFabricIndexTag    = TLV::ContextTag(1);
     static constexpr TLV::Tag kPeerNodeIdTag     = TLV::ContextTag(2);
+    static constexpr TLV::Tag kFabricIndexTag    = TLV::ContextTag(1);
     static constexpr TLV::Tag kSubscriptionIdTag = TLV::ContextTag(3);
     static constexpr TLV::Tag kMinIntervalTag    = TLV::ContextTag(4);
     static constexpr TLV::Tag kMaxIntervalTag    = TLV::ContextTag(5);
     static constexpr TLV::Tag kFabricFilteredTag = TLV::ContextTag(6);
     static constexpr TLV::Tag kPathCountTag      = TLV::ContextTag(7);
-    static constexpr TLV::Tag kPathTypeTag       = TLV::ContextTag(8);
+    static constexpr TLV::Tag kEventPathTypeTag  = TLV::ContextTag(8);
     static constexpr TLV::Tag kEndpointIdTag     = TLV::ContextTag(9);
     static constexpr TLV::Tag kClusterIdTag      = TLV::ContextTag(10);
     static constexpr TLV::Tag kAttributeIdTag    = TLV::ContextTag(11);
     static constexpr TLV::Tag kEventIdTag        = TLV::ContextTag(12);
 
     PersistentStorageDelegate * mStorage;
+    ObjectPool<SimpleSubscriptionInfoIterator, kIteratorsMax> mSubscriptionInfoIterators;
 };
 } // namespace app
 } // namespace chip

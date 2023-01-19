@@ -105,6 +105,7 @@ chip_test_suite("tests") {
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
+    "TestSimpleSubscriptionResumptionStorage.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTimedHandler.cpp",

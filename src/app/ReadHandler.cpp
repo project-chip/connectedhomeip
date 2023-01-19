@@ -144,12 +144,12 @@ void ReadHandler::Close(bool keepPersisted)
         auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
         {
-            SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
-                                                                                 .mFabricIndex    = GetAccessingFabricIndex(),
-                                                                                 .mSubscriptionId = mSubscriptionId };
-            subscriptionResumptionStorage->Delete(subscriptionInfo);
+            subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(), mSubscriptionId);
         }
     }
+#else
+    // We disregard the keepPersisted API that is only used if the subscription persistence feature is enabled.
+    (void) keepPersisted;
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     MoveToState(HandlerState::AwaitingDestruction);
     mManagementCallback.OnDone(*this);

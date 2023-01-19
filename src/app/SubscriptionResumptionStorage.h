@@ -17,14 +17,14 @@
 
 /**
  *    @file
- *      This file defines the classes corresponding to CHIP Interaction Model Event Generatorr Delegate.
- *
+ *      This file defines the interface to store subscription information.
  */
 
 #pragma once
 
 #include <app/ReadClient.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/support/CommonIterator.h>
 
 namespace chip {
 namespace app {
@@ -39,8 +39,6 @@ namespace app {
 class SubscriptionResumptionStorage
 {
 public:
-    // TODO: Create RAII ScopedMemoryBuffer replacement container that does not require is_trivial elements
-
     // Structs to hold
     struct AttributePathParamsValues
     {
@@ -86,27 +84,29 @@ public:
         Platform::ScopedMemoryBufferWithSize<EventPathParamsValues> mEventPaths;
     };
 
+    using SubscriptionInfoIterator = CommonIterator<SubscriptionInfo>;
+
     /**
      * Struct to hold list of subscriptions
      */
-    struct SubscriptionList
-    {
-        size_t mSize;
-        std::unique_ptr<SubscriptionInfo[]> mSubscriptions;
-        SubscriptionInfo & operator[](size_t index) { return mSubscriptions[index]; }
-        const SubscriptionInfo & operator[](size_t index) const { return mSubscriptions[index]; }
-    };
-
-    /**
-     * Struct to hold index of all nodes that have persisted subscriptions
-     */
-    struct SubscriptionIndex
-    {
-        size_t mSize;
-        std::unique_ptr<ScopedNodeId[]> mNodes;
-        ScopedNodeId & operator[](size_t index) { return mNodes[index]; }
-        const ScopedNodeId & operator[](size_t index) const { return mNodes[index]; }
-    };
+    //    struct SubscriptionList
+    //    {
+    //        size_t mSize;
+    //        std::unique_ptr<SubscriptionInfo[]> mSubscriptions;
+    //        SubscriptionInfo & operator[](size_t index) { return mSubscriptions[index]; }
+    //        const SubscriptionInfo & operator[](size_t index) const { return mSubscriptions[index]; }
+    //    };
+    //
+    //    /**
+    //     * Struct to hold index of all nodes that have persisted subscriptions
+    //     */
+    //    struct SubscriptionIndex
+    //    {
+    //        size_t mSize;
+    //        std::unique_ptr<ScopedNodeId[]> mNodes;
+    //        ScopedNodeId & operator[](size_t index) { return mNodes[index]; }
+    //        const ScopedNodeId & operator[](size_t index) const { return mNodes[index]; }
+    //    };
 
     virtual ~SubscriptionResumptionStorage(){};
 
@@ -117,7 +117,7 @@ public:
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no subscription resumption information can be found, else an
      * appropriate CHIP error on failure
      */
-    virtual CHIP_ERROR LoadIndex(SubscriptionIndex & subscriberIndex) = 0;
+    //    virtual CHIP_ERROR LoadIndex(SubscriptionIndex & subscriberIndex) = 0;
 
     /**
      * Recover subscription resumption info for a given fabric-scoped node identity.
@@ -127,7 +127,14 @@ public:
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no subscription resumption information can be found, else an
      * appropriate CHIP error on failure
      */
-    virtual CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions) = 0;
+    //    virtual CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions) = 0;
+
+    /**
+     * Iterate through persisted subscriptions
+     *
+     * @return A valid iterator on success. Use CommonIterator accessor to retrieve SubscriptionInfo
+     */
+    virtual SubscriptionInfoIterator * IterateSubscriptions() = 0;
 
     /**
      * Save subscription resumption information to storage.
@@ -144,7 +151,14 @@ public:
      * subscription
      * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
      */
-    virtual CHIP_ERROR Delete(const SubscriptionInfo & subscriptionInfo) = 0;
+    //    virtual CHIP_ERROR Delete(const SubscriptionInfo & subscriptionInfo) = 0;
+
+    /**
+     * Delete subscription resumption information by node ID, fabric index, and subscription ID.
+     *
+     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR Delete(NodeId nodeId, FabricIndex fabricIndex, SubscriptionId subscriptionId) = 0;
 
     /**
      * Remove all subscription resumption information associated with the specified
