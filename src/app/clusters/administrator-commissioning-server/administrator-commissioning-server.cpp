@@ -193,6 +193,8 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
 {
     ChipLogProgress(Zcl, "Received command to close commissioning window");
 
+    Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+
     if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");

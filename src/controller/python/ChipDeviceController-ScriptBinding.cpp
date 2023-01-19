@@ -174,6 +174,8 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
 PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
     chip::Controller::DeviceCommissioner * devCtrl,
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
+    chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
 
 // BLE
 PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
@@ -524,6 +526,13 @@ PyChipError pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnab
     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
 }
 
+PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
+    chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback)
+{
+    sPairingDelegate.SetCommissioningWindowOpenCallback(callback);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
 PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid,
                                                             uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                                             uint8_t optionInt)
@@ -538,8 +547,12 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
     if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
     {
         SetupPayload payload;
-        return ToPyChipError(Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(
-            devCtrl, nodeid, System::Clock::Seconds16(timeout), iteration, discriminator, NullOptional, NullOptional, payload));
+        auto opener =
+            Platform::New<Controller::CommissioningWindowOpener>(static_cast<chip::Controller::DeviceController *>(devCtrl));
+        PyChipError err = ToPyChipError(opener->OpenCommissioningWindow(nodeid, System::Clock::Seconds16(timeout), iteration,
+                                                                        discriminator, NullOptional, NullOptional,
+                                                                        sPairingDelegate.GetOpenWindowCallback(opener), payload));
+        return err;
     }
 
     return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
