@@ -89,14 +89,6 @@ const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
-const ESP32Config::Key ESP32Config::kConfigKey_LockUser           = { kConfigNamespace_ChipConfig, "lock-user" };
-const ESP32Config::Key ESP32Config::kConfigKey_Credential         = { kConfigNamespace_ChipConfig, "credential" };
-const ESP32Config::Key ESP32Config::kConfigKey_LockUserName       = { kConfigNamespace_ChipConfig, "lock-user-name" };
-const ESP32Config::Key ESP32Config::kConfigKey_CredentialData     = { kConfigNamespace_ChipConfig, "credential-data" };
-const ESP32Config::Key ESP32Config::kConfigKey_UserCredentials    = { kConfigNamespace_ChipConfig, "user-credential" };
-const ESP32Config::Key ESP32Config::kConfigKey_WeekDaySchedules   = { kConfigNamespace_ChipConfig, "week-day-sched" };
-const ESP32Config::Key ESP32Config::kConfigKey_YearDaySchedules   = { kConfigNamespace_ChipConfig, "year-day-sched" };
-const ESP32Config::Key ESP32Config::kConfigKey_HolidaySchedules   = { kConfigNamespace_ChipConfig, "holiday-sched" };
 
 // Keys stored in the Chip-counters namespace
 const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
