@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -128,7 +128,7 @@ bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, 
                                             BitMask<LevelControl::LevelControlOptions> optionMask,
                                             BitMask<LevelControl::LevelControlOptions> optionOverride)
 {
-    stepHandler(ZCL_STEP_COMMAND_ID, stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    stepHandler(LevelControl::Commands::Step : Id, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return true;
 }
 

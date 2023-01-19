@@ -18,7 +18,6 @@
 #include "app/util/common.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af-event.h>

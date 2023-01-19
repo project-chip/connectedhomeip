@@ -63,11 +63,6 @@
             "output": "callback.h"
         },
         {
-            "path": "../../zap-templates/templates/app/command-id.zapt",
-            "name": "ZCL command-id header",
-            "output": "command-id.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/enums.zapt",
             "name": "ZCL enums header",
             "output": "enums.h"
