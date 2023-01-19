@@ -5062,6 +5062,8 @@
               - TargetInfoStruct
           MediaInput:
               - InputInfoStruct
+          AudioOutput:
+              - OutputInfoStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5187,6 +5189,11 @@
                   - inputType
                   - name
                   - descriptionString
+          AudioOutput:
+              OutputInfoStruct:
+                  - index
+                  - outputType
+                  - name
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5512,6 +5519,10 @@
                   - HDMI
                   - SCART
                   - USB
+          AudioOutput:
+              OutputTypeEnum:
+                  - HDMI
+                  - BT
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5685,6 +5696,8 @@
               - TargetInfo
           MediaInput:
               - InputInfo
+          AudioOutput:
+              - OutputInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5767,6 +5780,10 @@
                   - Hdmi
                   - Scart
                   - Usb
+          AudioOutput:
+              OutputTypeEnum:
+                  - Hdmi
+                  - Bt
       bitmaps:
           DoorLock:
               - DlDaysMaskMap
@@ -5944,6 +5961,8 @@
               TargetInfoStruct: TargetInfo
           MediaInput:
               InputInfoStruct: InputInfo
+          AudioOutput:
+              OutputInfoStruct: OutputInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -6039,6 +6058,10 @@
                   HDMI: Hdmi
                   SCART: Scart
                   USB: Usb
+          AudioOutput:
+              OutputTypeEnum:
+                  HDMI: Hdmi
+                  BT: Bt
       bitmaps:
           DoorLock:
               DaysMaskMap: DlDaysMaskMap
