@@ -20,7 +20,7 @@ import typing
 from dataclasses import dataclass
 
 from chip.clusters.Types import Nullable, NullValue
-from chip.enum import MatterIntEnum
+from chip.clusters.enum import MatterIntEnum
 from chip.tlv import float32, uint
 from chip.yaml.errors import ValidationError
 from matter_idl import matter_idl_types
