@@ -146,12 +146,13 @@ class ZAPGenerateTarget:
 
 class GoldenTestImageTarget():
     def __init__(self):
-        self.tempdir = tempfile.mkdtemp(prefix='test_golden')
+        self.tempdir = tempfile.mkdtemp(prefix='test_golden', dir='./out')
         self.command = ["./scripts/tools/zap/test_generate.py", "--output", self.tempdir, "--regenerate"]
 
     def __del__(self):
         # Clean up
-        shutil.rmtree(self.tempdir)
+        if os.path.isdir(self.tempdir):
+            shutil.rmtree(self.tempdir)
 
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
