@@ -43,12 +43,12 @@ struct TestSubscriptionInfo : public chip::app::SubscriptionResumptionStorage::S
         {
             return false;
         }
-        if ((mAttributePaths.AllocatedCount() != that.mAttributePaths.AllocatedCount()) ||
-            (mEventPaths.AllocatedCount() != that.mEventPaths.AllocatedCount()))
+        if ((mAttributePaths.AllocatedSize() != that.mAttributePaths.AllocatedSize()) ||
+            (mEventPaths.AllocatedSize() != that.mEventPaths.AllocatedSize()))
         {
             return false;
         }
-        for (size_t i = 0; i < mAttributePaths.AllocatedCount(); i++)
+        for (size_t i = 0; i < mAttributePaths.AllocatedSize(); i++)
         {
             if ((mAttributePaths[i].mEndpointId != that.mAttributePaths[i].mEndpointId) ||
                 (mAttributePaths[i].mClusterId != that.mAttributePaths[i].mClusterId) ||
@@ -57,7 +57,7 @@ struct TestSubscriptionInfo : public chip::app::SubscriptionResumptionStorage::S
                 return false;
             }
         }
-        for (size_t i = 0; i < mEventPaths.AllocatedCount(); i++)
+        for (size_t i = 0; i < mEventPaths.AllocatedSize(); i++)
         {
             if ((mEventPaths[i].mEndpointId != that.mEventPaths[i].mEndpointId) ||
                 (mEventPaths[i].mClusterId != that.mEventPaths[i].mClusterId) ||

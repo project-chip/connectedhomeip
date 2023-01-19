@@ -1592,8 +1592,8 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
     while (iterator->Next(subscriptionInfo))
     {
-        auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedCount();
-        auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedCount();
+        auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedSize();
+        auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedSize();
         if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
         {
             ChipLogProgress(InteractionModel, "no resource for Subscription resumption");

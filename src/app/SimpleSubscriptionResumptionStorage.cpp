@@ -244,16 +244,16 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, Su
     ReturnErrorOnFailure(writer.Put(kMaxIntervalTag, subscriptionInfo.mMaxInterval));
     ReturnErrorOnFailure(writer.Put(kFabricFilteredTag, subscriptionInfo.mFabricFiltered));
 
-    ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mAttributePaths.AllocatedCount())));
-    for (size_t currentPathIndex = 0; currentPathIndex < subscriptionInfo.mAttributePaths.AllocatedCount(); currentPathIndex++)
+    ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mAttributePaths.AllocatedSize())));
+    for (size_t currentPathIndex = 0; currentPathIndex < subscriptionInfo.mAttributePaths.AllocatedSize(); currentPathIndex++)
     {
         ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mEndpointId));
         ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mClusterId));
         ReturnErrorOnFailure(writer.Put(kAttributeIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mAttributeId));
     }
 
-    ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mEventPaths.AllocatedCount())));
-    for (size_t currentPathIndex = 0; currentPathIndex < subscriptionInfo.mEventPaths.AllocatedCount(); currentPathIndex++)
+    ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mEventPaths.AllocatedSize())));
+    for (size_t currentPathIndex = 0; currentPathIndex < subscriptionInfo.mEventPaths.AllocatedSize(); currentPathIndex++)
     {
         if (subscriptionInfo.mEventPaths[currentPathIndex].mIsUrgentEvent)
         {

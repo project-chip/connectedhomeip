@@ -186,11 +186,8 @@ public:
 
     ~ScopedMemoryBufferWithSize() { mCount = 0; }
 
-    // return the size in bytes
-    inline size_t AllocatedSize() const { return mCount * sizeof(T); }
-
-    // return the count
-    inline size_t AllocatedCount() const { return mCount; }
+    // return the size as count of elements
+    inline size_t AllocatedSize() const { return mCount; }
 
     void Free()
     {

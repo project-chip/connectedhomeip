@@ -81,7 +81,7 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
 
     // Move dynamically allocated attributes and events from the SubscriptionInfo struct into
     // the object pool managed by the IM engine
-    for (size_t i = 0; i < subscriptionInfo.mAttributePaths.AllocatedCount(); i++)
+    for (size_t i = 0; i < subscriptionInfo.mAttributePaths.AllocatedSize(); i++)
     {
         AttributePathParams attributePathParams = subscriptionInfo.mAttributePaths[i].GetParams();
         CHIP_ERROR err =
@@ -92,7 +92,7 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
             return;
         }
     }
-    for (size_t i = 0; i < subscriptionInfo.mEventPaths.AllocatedCount(); i++)
+    for (size_t i = 0; i < subscriptionInfo.mEventPaths.AllocatedSize(); i++)
     {
         EventPathParams eventPathParams = subscriptionInfo.mEventPaths[i].GetParams();
         CHIP_ERROR err = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, eventPathParams);
