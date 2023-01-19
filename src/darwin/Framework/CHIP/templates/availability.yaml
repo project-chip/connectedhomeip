@@ -5495,6 +5495,8 @@
               - LevelControlOptions
           DoorLock:
               - DaysMaskMap
+          PumpConfigurationAndControl:
+              - PumpFeature
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5551,6 +5553,15 @@
                   - User
                   - Notification
                   - YearDayAccessSchedules
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - ConstantPressure
+                  - CompensatedPressure
+                  - ConstantFlow
+                  - ConstantSpeed
+                  - ConstantTemperature
+                  - Automatic
+                  - Local
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
