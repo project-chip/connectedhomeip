@@ -357,11 +357,11 @@ limitations under the License.
   </cluster>
   <bitmap name="ColorControlFeature" type="BITMAP32">
     <cluster code="0x0300" />
-    <field name="Hue/Saturation" mask="0x01" />
-    <field name="Enhanced Hue" mask="0x02" />
-    <field name="Color loop" mask="0x04" />
+    <field name="HueAndSaturation" mask="0x01" />
+    <field name="EnhancedHue" mask="0x02" />
+    <field name="ColorLoop" mask="0x04" />
     <field name="XY" mask="0x08" />
-    <field name="Color temperature" mask="0x10" />
+    <field name="ColorTemperature" mask="0x10" />
   </bitmap>
   <cluster>
     <name>Ballast Configuration</name>

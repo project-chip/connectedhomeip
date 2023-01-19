@@ -5542,9 +5542,6 @@
                   - User
                   - Notification
                   - YearDayAccessSchedules
-          ColorControl:
-              ColorControlFeature:
-                  - HueSaturation
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5726,9 +5723,6 @@
                   - UsersManagement
                   - Notifications
                   - YearDaySchedules
-          ColorControl:
-              ColorControlFeature:
-                  - HueAndSaturation
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5991,6 +5985,3 @@
                   User: UsersManagement
                   Notification: Notifications
                   YearDayAccessSchedules: YearDaySchedules
-          ColorControl:
-              ColorControlFeature:
-                  HueSaturation: HueAndSaturation

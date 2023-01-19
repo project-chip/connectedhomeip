@@ -209,8 +209,8 @@ limitations under the License.
   </enum>
   <enum name="HueDirection" type="ENUM8">
     <cluster code="0x0300"/>
-    <item name="Shortest distance" value="0x0"/>
-    <item name="Longest distance" value="0x1"/>
+    <item name="ShortestDistance" value="0x0"/>
+    <item name="LongestDistance" value="0x1"/>
     <item name="Up" value="0x2"/>
     <item name="Down" value="0x3"/>
   </enum>
