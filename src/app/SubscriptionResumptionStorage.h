@@ -30,11 +30,7 @@ namespace chip {
 namespace app {
 
 /**
- * A SubscriptionPersistenceDelegate is used to persist subscriptions when they are established.
- *
- * Allows application to append any type of TLV data as part of an event log entry. Events
- * have a standard header applicable to all events and this class provides the
- * ability to add additional data past such standard header.
+ * The SubscriptionResumptionStorage interface is used to persist subscriptions when they are established.
  */
 class SubscriptionResumptionStorage
 {
