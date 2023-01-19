@@ -23,7 +23,7 @@
 
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
-class TestSimpleSubscriptionResumptionStorage : public chip::app::SimpleSubscriptionResumptionStorage
+class SimpleSubscriptionResumptionStorageTest : public chip::app::SimpleSubscriptionResumptionStorage
 {
 public:
     size_t TestMaxCount() { return MaxCount(); }
@@ -130,7 +130,7 @@ struct TestSubscriptionInfo : public chip::app::SubscriptionResumptionStorage::S
 void TestCount(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
-    TestSimpleSubscriptionResumptionStorage subscriptionStorage;
+    SimpleSubscriptionResumptionStorageTest subscriptionStorage;
     subscriptionStorage.Init(&storage);
 
     // Check by default it returns correct value
@@ -188,7 +188,7 @@ void TestCount(nlTestSuite * inSuite, void * inContext)
 void TestState(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
-    TestSimpleSubscriptionResumptionStorage subscriptionStorage;
+    SimpleSubscriptionResumptionStorageTest subscriptionStorage;
     subscriptionStorage.Init(&storage);
 
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo1 = {
@@ -304,7 +304,7 @@ static constexpr chip::TLV::Tag kTestValue2Tag = chip::TLV::ContextTag(31);
 void TestStateUnexpectedFields(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
-    TestSimpleSubscriptionResumptionStorage subscriptionStorage;
+    SimpleSubscriptionResumptionStorageTest subscriptionStorage;
     subscriptionStorage.Init(&storage);
 
     // Write additional entries at the end of TLV and see it still loads correctly
@@ -361,7 +361,7 @@ void TestStateUnexpectedFields(nlTestSuite * inSuite, void * inContext)
 void TestStateTooBigToLoad(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
-    TestSimpleSubscriptionResumptionStorage subscriptionStorage;
+    SimpleSubscriptionResumptionStorageTest subscriptionStorage;
     subscriptionStorage.Init(&storage);
 
     // Write additional too-big data at the end of TLV and see it fails to loads and entry deleted
@@ -421,7 +421,7 @@ void TestStateTooBigToLoad(nlTestSuite * inSuite, void * inContext)
 void TestStateJunkData(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
-    TestSimpleSubscriptionResumptionStorage subscriptionStorage;
+    SimpleSubscriptionResumptionStorageTest subscriptionStorage;
     subscriptionStorage.Init(&storage);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> junkBytes;

@@ -381,8 +381,6 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Delete(NodeId nodeId, FabricInde
         DeleteMaxCount();
     }
 
-    ChipLogProgress(InteractionModel, "JEFFTEST: Delete final count %zu", count);
-
     return deleteErr;
 }
 
@@ -429,8 +427,6 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::DeleteAll(FabricIndex fabricInde
             deleteErr = err;
         }
     }
-
-    ChipLogProgress(InteractionModel, "JEFFTEST: DeleteAll final count %zu", count);
 
     return deleteErr;
 }

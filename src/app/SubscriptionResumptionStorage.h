@@ -42,9 +42,9 @@ public:
     // Structs to hold
     struct AttributePathParamsValues
     {
-        EndpointId mEndpointId;   // uint16
-        ClusterId mClusterId;     // uint32
-        AttributeId mAttributeId; // uint32
+        ClusterId mClusterId;
+        AttributeId mAttributeId;
+        EndpointId mEndpointId;
         void SetValues(AttributePathParams & params)
         {
             mEndpointId  = params.mEndpointId;
@@ -55,10 +55,10 @@ public:
     };
     struct EventPathParamsValues
     {
-        EndpointId mEndpointId; // uint16
-        ClusterId mClusterId;   // uint32
-        EventId mEventId;       // uint32
-        bool mIsUrgentEvent;    // uint8
+        ClusterId mClusterId;
+        EventId mEventId;
+        EndpointId mEndpointId;
+        bool mIsUrgentEvent;
         void SetValues(EventPathParams & params)
         {
             mEndpointId    = params.mEndpointId;
