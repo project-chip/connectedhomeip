@@ -49,6 +49,13 @@ CHIP_ERROR
   if (aPath.mClusterId != Clusters::{{asUpperCamelCase label}}::Id) {
     return CHIP_ERROR_INVALID_ARGUMENT;
   }
+  // Do not handle Read for non-unify endpoints
+  auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
+
+  if (!unify_node) {
+    return CHIP_NO_ERROR;
+  }
+
 
   ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId,
                                                         aPath.mClusterId,

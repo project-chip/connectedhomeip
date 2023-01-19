@@ -19,6 +19,10 @@
 #include "app/server/OnboardingCodesUtil.h"
 #include "setup_payload/QRCodeSetupPayloadGenerator.h"
 #include "Options.h"
+#include "sl_log.h"
+
+constexpr const char * LOG_TAG = "unify_matter_bridge_qr_code_publisher";
+
 
 namespace unify::matter_bridge {
 
@@ -28,6 +32,7 @@ QRCodePublisher::QRCodePublisher(UnifyMqtt& unify_mqtt ) : m_unify_mqtt(unify_mq
 
 void QRCodePublisher::device_event(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t ptr) {  
   
+  sl_log_debug(LOG_TAG, "device_event:%u", (unsigned int)event->Type);
   switch(event->Type) {
     case chip::DeviceLayer::DeviceEventType::kDnssdPlatformInitialized:
       if(chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen()) {
@@ -45,6 +50,7 @@ void QRCodePublisher::device_event(const chip::DeviceLayer::ChipDeviceEvent * ev
 }
 
 void QRCodePublisher::publish() {
+  sl_log_debug(LOG_TAG, "Publishing QR Code");
   auto qrCode_str = qrcode();
   if(!qrCode_str.empty()) {
     m_unify_mqtt.Publish(
@@ -56,6 +62,7 @@ void QRCodePublisher::publish() {
 }
 
 void QRCodePublisher::unretain() {
+  sl_log_debug(LOG_TAG, "Unretaining QR Code");
   auto qrCode_str = qrcode();
   if(!qrCode_str.empty()) {
     m_unify_mqtt.Publish("ucl/SmartStart/CommissionableDevice/"+qrCode_str,"",false);

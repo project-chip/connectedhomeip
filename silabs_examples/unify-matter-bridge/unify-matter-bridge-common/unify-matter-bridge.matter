@@ -1219,7 +1219,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster Groups {

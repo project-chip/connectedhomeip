@@ -170,6 +170,7 @@ int main(int argc, char * argv[])
     TemperatureMeasurementAttributeAccess temperature_measurement_attribute_access(node_state_monitor, unify_mqtt_handler);
 
     QRCodePublisher qr_code_publisher(unify_mqtt_handler);
+    set_qr_code_publisher(qr_code_publisher);
 
     matter_running = true;
     auto handle    = run_unify();

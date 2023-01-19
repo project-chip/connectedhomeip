@@ -19,12 +19,14 @@
 #include "app/server/Server.h"
 #include "group_command_translator.hpp"
 #include "matter_node_state_monitor.hpp"
+#include "matter_bridge_qrcode_publisher.hpp"
 #include <iostream>
 
 using namespace chip;
 using namespace unify::matter_bridge;
 static matter_node_state_monitor * node_state_monitor = NULL;
 static group_translator * group_mapping_instance      = NULL;
+static QRCodePublisher * qr_code_publisher = NULL;
 
 #define LOG_TAG "matter_bridge_cli"
 
@@ -43,10 +45,20 @@ static sl_status_t close_commission_cli_func(const handle_args_t & arg)
     return SL_STATUS_OK;
 }
 
+void set_qr_code_publisher(QRCodePublisher & p)
+{
+    qr_code_publisher = &p;
+}
 void set_mapping_display_instance(matter_node_state_monitor & n, group_translator & m)
 {
     node_state_monitor     = &n;
     group_mapping_instance = &m;
+}
+
+static sl_status_t qr_code_publish_cli_func(const handle_args_t & arg)
+{
+    qr_code_publisher->publish();
+    return SL_STATUS_OK;
 }
 
 static sl_status_t epmap_cli_func(const handle_args_t & arg)
@@ -73,6 +85,7 @@ command_map_t unify_cli_commands = {
     { "commission", { "Open commissioning window", commission_cli_func } },
     { "closecommission", { "Close the commissioning window", close_commission_cli_func } },
     { "epmap", { "Show endpoint map", epmap_cli_func } },
+    { "qr_code_publish", { "Publish Unify Matter Bridge QR code", qr_code_publish_cli_func} },
     { "groups_map", { "Show Matter vs Unify groups map", groups_map_cli_func } },
 };
 

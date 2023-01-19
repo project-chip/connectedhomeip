@@ -15,6 +15,7 @@
 #include "matter.h"
 #include "matter_node_state_monitor.hpp"
 #include "sl_status.h"
+#include "matter_bridge_qrcode_publisher.hpp"
 
 using namespace unify::matter_bridge; 
 /**
@@ -30,3 +31,4 @@ sl_status_t matter_bridge_cli_init();
  *        --> The group_translator instance is for group mapping display
  */
 void set_mapping_display_instance(matter_node_state_monitor & n, group_translator & m);
+void set_qr_code_publisher(QRCodePublisher & p);
