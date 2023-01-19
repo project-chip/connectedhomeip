@@ -90,8 +90,10 @@ private:
 
     static AppTask sAppTask;
     PWMDevice mBluePwmLed;
+#if USE_RGB_PWM
     PWMDevice mGreenPwmLed;
     PWMDevice mRedPwmLed;
+#endif
 
 #if CONFIG_CHIP_FACTORY_DATA
     // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
