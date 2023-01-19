@@ -399,7 +399,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: AdministratorCommissioning (client) */ \
+      /* Endpoint: 1, Cluster: Administrator Commissioning (client) */ \
       .clusterId = 0x0000003C,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \

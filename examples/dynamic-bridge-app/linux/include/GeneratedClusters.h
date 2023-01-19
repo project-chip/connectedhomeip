@@ -24,4 +24,16 @@ public:
     virtual chip::ClusterId GetClusterId() = 0;
     // Gets the list of available attributes for this cluster.
     virtual std::vector<AttributeInterface *> GetAttributes() = 0;
+
+    // Returns a list of client to server commands. Can be nullptr or terminated by 0xFFFF_FFFF.
+    // The returned list mirrors the `acceptedCommandList` field in `EmberAfCluster`
+    // This function is used to pass a command list when creating a `DynamicCluster` and its underlying `EmberAfCluster`. See
+    // `AddCluster` in `UserInputBackend`.
+    virtual const chip::CommandId * GetIncomingCommandList() { return nullptr; }
+
+    // Returns a list of server generated commands (responses to client commands). Can be nullptr or terminated by 0xFFFF_FFFF.
+    // The returned list mirrors the `generatedCommandList` field in `EmberAfCluster`
+    // This function is used to pass a command list when creating a `DynamicCluster` and its underlying `EmberAfCluster`. See
+    // `AddCluster` in `UserInputBackend`.
+    virtual const chip::CommandId * GetOutgoingCommandList() { return nullptr; }
 };

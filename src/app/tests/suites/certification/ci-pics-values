@@ -730,6 +730,13 @@ FLW.S.A0003=1
 FLW.M.FlowChange=1
 
 #Pump Configuration and Control
+PCC.S.F00=1
+PCC.S.F01=0
+PCC.S.F02=0
+PCC.S.F03=0
+PCC.S.F04=0
+PCC.S.F05=0
+PCC.S.F06=0
 PCC.S.A0000=1
 PCC.S.A0001=1
 PCC.S.A0002=1
@@ -753,12 +760,6 @@ PCC.S.A0016=1
 PCC.S.A0017=1
 PCC.S.A0020=1
 PCC.S.A0021=1
-PCC.M.ControlModeConstSpeed=1
-PCC.M.ControlModeConstPressure=1
-PCC.M.ControlModeCompPressure=1
-PCC.M.ControlModeConstFlow=1
-PCC.M.ControlModeConstTemp=1
-PCC.M.ControlModeAuto=1
 
 #Power Source Cluster
 PS.S.A0000=1

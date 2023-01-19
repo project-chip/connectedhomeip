@@ -16,6 +16,7 @@
 #
 
 import argparse
+import fcntl
 import json
 import os
 import subprocess
@@ -148,7 +149,13 @@ def runArgumentsParser() -> CmdLineArgs:
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
-    return CmdLineArgs(zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap)
+    return CmdLineArgs(
+        zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
+        parallel=args.parallel,
+        prettify_output=args.prettify_output,
+        version_check=args.version_check,
+        lock_file=args.lock_file,
+    )
 
 
 def extractGeneratedIdl(output_dir, zap_config_path):
@@ -276,7 +283,7 @@ class LockFileSerializer:
             return
 
         fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
-        close(self.lock_file)
+        self.lock_file.close()
         self.lock_file = None
 
 

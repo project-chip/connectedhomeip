@@ -10206,7 +10206,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.certificateType = params.certificateType.unsignedCharValue;
+                request.certificateType = static_cast<std::remove_reference_t<decltype(request.certificateType)>>(
+                    params.certificateType.unsignedCharValue);
 
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -10575,7 +10576,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.rootCertificate = [self asByteSpan:params.rootCertificate];
+                request.rootCACertificate = [self asByteSpan:params.rootCACertificate];
 
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -11786,7 +11787,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 }
                 if (params != nil) {
                     if (params.pinCode != nil) {
-                        auto & definedValue_0 = request.pinCode.Emplace();
+                        auto & definedValue_0 = request.PINCode.Emplace();
                         definedValue_0 = [self asByteSpan:params.pinCode];
                     }
                 }
@@ -11851,7 +11852,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 }
                 if (params != nil) {
                     if (params.pinCode != nil) {
-                        auto & definedValue_0 = request.pinCode.Emplace();
+                        auto & definedValue_0 = request.PINCode.Emplace();
                         definedValue_0 = [self asByteSpan:params.pinCode];
                     }
                 }
@@ -11916,7 +11917,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 }
                 request.timeout = params.timeout.unsignedShortValue;
                 if (params.pinCode != nil) {
-                    auto & definedValue_0 = request.pinCode.Emplace();
+                    auto & definedValue_0 = request.PINCode.Emplace();
                     definedValue_0 = [self asByteSpan:params.pinCode];
                 }
 
@@ -12524,11 +12525,11 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     auto & nonNullValue_0 = request.userName.SetNonNull();
                     nonNullValue_0 = [self asCharSpan:params.userName];
                 }
-                if (params.userUniqueId == nil) {
-                    request.userUniqueId.SetNull();
+                if (params.userUniqueID == nil) {
+                    request.userUniqueID.SetNull();
                 } else {
-                    auto & nonNullValue_0 = request.userUniqueId.SetNonNull();
-                    nonNullValue_0 = params.userUniqueId.unsignedIntValue;
+                    auto & nonNullValue_0 = request.userUniqueID.SetNonNull();
+                    nonNullValue_0 = params.userUniqueID.unsignedIntValue;
                 }
                 if (params.userStatus == nil) {
                     request.userStatus.SetNull();

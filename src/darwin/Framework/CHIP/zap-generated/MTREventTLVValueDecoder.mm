@@ -1602,8 +1602,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                             auto iter_2 = cppValue.credentials.Value().Value().begin();
                             while (iter_2.Next()) {
                                 auto & entry_2 = iter_2.GetValue();
-                                MTRDoorLockClusterDlCredential * newElement_2;
-                                newElement_2 = [MTRDoorLockClusterDlCredential new];
+                                MTRDoorLockClusterCredentialStruct * newElement_2;
+                                newElement_2 = [MTRDoorLockClusterCredentialStruct new];
                                 newElement_2.credentialType =
                                     [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
                                 newElement_2.credentialIndex = [NSNumber numberWithUnsignedShort:entry_2.credentialIndex];
@@ -1688,8 +1688,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                             auto iter_2 = cppValue.credentials.Value().Value().begin();
                             while (iter_2.Next()) {
                                 auto & entry_2 = iter_2.GetValue();
-                                MTRDoorLockClusterDlCredential * newElement_2;
-                                newElement_2 = [MTRDoorLockClusterDlCredential new];
+                                MTRDoorLockClusterCredentialStruct * newElement_2;
+                                newElement_2 = [MTRDoorLockClusterCredentialStruct new];
                                 newElement_2.credentialType =
                                     [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
                                 newElement_2.credentialIndex = [NSNumber numberWithUnsignedShort:entry_2.credentialIndex];

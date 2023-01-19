@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/server/Server.h>

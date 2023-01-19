@@ -1,14 +1,14 @@
 #pragma once
 
 #include "BridgeGlobalStructs.h"
-#include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/GeneratedClusters.h"
+#include "GeneratedClusters.h"
 
 namespace clusters {
 struct MyClusterCluster : public GeneratedCluster
 {
 
   MyClusterCluster() :
-      mClusterAttr(chip::CharSpan("clusterAttr"), 1, ATTRIBUTE_MASK_WRITABLE, ZCL_INT16U_ATTRIBUTE_TYPE, 2)
+      mClusterAttr(chip::CharSpan("clusterAttr"), 1, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZCL_INT16U_ATTRIBUTE_TYPE, 2)
   {
   }
 

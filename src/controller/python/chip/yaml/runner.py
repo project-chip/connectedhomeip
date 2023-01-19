@@ -470,15 +470,13 @@ class ReplTestRunner:
     Uses ChipDeviceCtrl from chip-repl to execute parsed YAML TestSteps.
     '''
 
-    def __init__(self, test_spec_definition, certificate_authority_manager):
+    def __init__(self, test_spec_definition, certificate_authority_manager, alpha_dev_ctrl):
         self._test_spec_definition = test_spec_definition
         self._context = _ExecutionContext(data_model_lookup=PreDefinedDataModelLookup())
         self._certificate_authority_manager = certificate_authority_manager
         self._dev_ctrls = {}
 
-        ca_list = certificate_authority_manager.activeCaList
-        dev_ctrl = ca_list[0].adminList[0].NewController()
-        self._dev_ctrls['alpha'] = dev_ctrl
+        self._dev_ctrls['alpha'] = alpha_dev_ctrl
 
     def _invoke_action_factory(self, test_step, cluster: str):
         '''Creates cluster invoke action command from TestStep.

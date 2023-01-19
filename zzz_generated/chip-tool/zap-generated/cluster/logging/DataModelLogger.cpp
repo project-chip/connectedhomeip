@@ -493,6 +493,30 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::DoorLock::Structs::CredentialStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CredentialType", indent + 1, value.credentialType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CredentialType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CredentialIndex", indent + 1, value.credentialIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CredentialIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -541,30 +565,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Metric'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("CredentialType", indent + 1, value.credentialType);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CredentialType'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CredentialIndex", indent + 1, value.credentialIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CredentialIndex'");
             return err;
         }
     }
@@ -686,7 +686,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType & value)
+                          const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -698,26 +698,26 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("VendorId", indent + 1, value.vendorId);
+        CHIP_ERROR err = LogValue("VendorID", indent + 1, value.vendorID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VendorId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VendorID'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("FabricId", indent + 1, value.fabricId);
+        CHIP_ERROR err = LogValue("FabricID", indent + 1, value.fabricID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricID'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("NodeId", indent + 1, value.nodeId);
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeID'");
             return err;
         }
     }
@@ -3903,7 +3903,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("attestationElements", indent + 1, value.attestationElements));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("signature", indent + 1, value.signature));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("attestationSignature", indent + 1, value.attestationSignature));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -3995,7 +3995,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
     ReturnErrorOnFailure(DataModelLogger::LogValue("userName", indent + 1, value.userName));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("userUniqueId", indent + 1, value.userUniqueId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userUniqueID", indent + 1, value.userUniqueID));
     ReturnErrorOnFailure(DataModelLogger::LogValue("userStatus", indent + 1, value.userStatus));
     ReturnErrorOnFailure(DataModelLogger::LogValue("userType", indent + 1, value.userType));
     ReturnErrorOnFailure(DataModelLogger::LogValue("credentialRule", indent + 1, value.credentialRule));
@@ -5627,17 +5627,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BootReason", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveHardwareFaults", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveRadioFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveRadioFaults", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveNetworkFaults", 1, value);
         }
@@ -6179,7 +6179,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case EthernetNetworkDiagnostics::Attributes::PHYRate::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PHYRate", 1, value);
         }
@@ -6407,7 +6407,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case AdministratorCommissioning::Attributes::WindowStatus::Id: {
-            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value;
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WindowStatus", 1, value);
         }
@@ -6460,7 +6460,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         case OperationalCredentials::Attributes::Fabrics::Id: {
             chip::app::DataModel::DecodableList<
-                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Fabrics", 1, value);
@@ -6754,7 +6754,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ActuatorEnabled", 1, value);
         }
         case DoorLock::Attributes::DoorState::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DoorState", 1, value);
         }
@@ -6854,7 +6854,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("SoundVolume", 1, value);
         }
         case DoorLock::Attributes::OperatingMode::Id: {
-            chip::app::Clusters::DoorLock::DlOperatingMode value;
+            chip::app::Clusters::DoorLock::OperatingModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperatingMode", 1, value);
         }

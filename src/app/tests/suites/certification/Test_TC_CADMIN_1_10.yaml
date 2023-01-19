@@ -72,7 +72,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000

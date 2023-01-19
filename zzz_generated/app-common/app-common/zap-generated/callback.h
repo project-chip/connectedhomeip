@@ -282,7 +282,7 @@ void emberAfBridgedDeviceBasicInformationClusterInitCallback(chip::EndpointId en
  */
 void emberAfSwitchClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief AdministratorCommissioning Cluster Init
+/** @brief Administrator Commissioning Cluster Init
  *
  * Cluster Init
  *
@@ -3600,10 +3600,10 @@ void emberAfSwitchClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfSwitchClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// AdministratorCommissioning Cluster
+// Administrator Commissioning Cluster
 //
 
-/** @brief AdministratorCommissioning Cluster Server Init
+/** @brief Administrator Commissioning Cluster Server Init
  *
  * Server Init
  *
@@ -3611,7 +3611,7 @@ void emberAfSwitchClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfAdministratorCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief AdministratorCommissioning Cluster Client Init
+/** @brief Administrator Commissioning Cluster Client Init
  *
  * Client Init
  *
@@ -3619,7 +3619,7 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(chip::EndpointId
  */
 void emberAfAdministratorCommissioningClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief AdministratorCommissioning Cluster Server Attribute Changed
+/** @brief Administrator Commissioning Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
@@ -3627,7 +3627,7 @@ void emberAfAdministratorCommissioningClusterClientInitCallback(chip::EndpointId
  */
 void MatterAdministratorCommissioningClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief AdministratorCommissioning Cluster Server Message Sent
+/** @brief Administrator Commissioning Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -3641,7 +3641,7 @@ void emberAfAdministratorCommissioningClusterServerMessageSentCallback(const chi
                                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                        EmberStatus status);
 
-/** @brief AdministratorCommissioning Cluster Client Message Sent
+/** @brief Administrator Commissioning Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -3655,7 +3655,7 @@ void emberAfAdministratorCommissioningClusterClientMessageSentCallback(const chi
                                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                        EmberStatus status);
 
-/** @brief AdministratorCommissioning Cluster Server Pre Attribute Changed
+/** @brief Administrator Commissioning Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -3667,7 +3667,7 @@ void emberAfAdministratorCommissioningClusterClientMessageSentCallback(const chi
 chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief AdministratorCommissioning Cluster Client Pre Attribute Changed
+/** @brief Administrator Commissioning Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -3679,7 +3679,7 @@ chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningCluste
 chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningClusterClientPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief AdministratorCommissioning Cluster Server Tick
+/** @brief Administrator Commissioning Cluster Server Tick
  *
  * Server Tick
  *
@@ -3687,7 +3687,7 @@ chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningCluste
  */
 void emberAfAdministratorCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief AdministratorCommissioning Cluster Client Tick
+/** @brief Administrator Commissioning Cluster Client Tick
  *
  * Client Tick
  *
@@ -8081,19 +8081,19 @@ bool emberAfTimeSynchronizationClusterSetUtcTimeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TimeSynchronization::Commands::SetUtcTime::DecodableType & commandData);
 /**
- * @brief AdministratorCommissioning Cluster OpenCommissioningWindow Command callback (from client)
+ * @brief Administrator Commissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData);
 /**
- * @brief AdministratorCommissioning Cluster OpenBasicCommissioningWindow Command callback (from client)
+ * @brief Administrator Commissioning Cluster OpenBasicCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
 /**
- * @brief AdministratorCommissioning Cluster RevokeCommissioning Command callback (from client)
+ * @brief Administrator Commissioning Cluster RevokeCommissioning Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -8109,7 +8109,8 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(
  */
 bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::EndpointId endpoint,
                                                                      chip::app::CommandSender * commandObj,
-                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
+                                                                     chip::ByteSpan AttestationElements,
+                                                                     chip::ByteSpan AttestationSignature);
 /**
  * @brief Operational Credentials Cluster CertificateChainRequest Command callback (from client)
  */
@@ -8245,9 +8246,9 @@ bool emberAfDoorLockClusterGetWeekDayScheduleCallback(
  * @brief Door Lock Cluster GetWeekDayScheduleResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetWeekDayScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t weekDayIndex, uint16_t userIndex, uint8_t status,
-                                                              uint8_t daysMask, uint8_t startHour, uint8_t startMinute,
-                                                              uint8_t endHour, uint8_t endMinute);
+                                                              uint8_t WeekDayIndex, uint16_t UserIndex, uint8_t Status,
+                                                              uint8_t DaysMask, uint8_t StartHour, uint8_t StartMinute,
+                                                              uint8_t EndHour, uint8_t EndMinute);
 /**
  * @brief Door Lock Cluster ClearWeekDaySchedule Command callback (from client)
  */
@@ -8270,8 +8271,8 @@ bool emberAfDoorLockClusterGetYearDayScheduleCallback(
  * @brief Door Lock Cluster GetYearDayScheduleResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetYearDayScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t yearDayIndex, uint16_t userIndex, uint8_t status,
-                                                              uint32_t localStartTime, uint32_t localEndTime);
+                                                              uint8_t YearDayIndex, uint16_t UserIndex, uint8_t Status,
+                                                              uint32_t LocalStartTime, uint32_t LocalEndTime);
 /**
  * @brief Door Lock Cluster ClearYearDaySchedule Command callback (from client)
  */
@@ -8294,8 +8295,8 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(
  * @brief Door Lock Cluster GetHolidayScheduleResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t holidayIndex, uint8_t status, uint32_t localStartTime,
-                                                              uint32_t localEndTime, uint8_t operatingMode);
+                                                              uint8_t HolidayIndex, uint8_t Status, uint32_t LocalStartTime,
+                                                              uint32_t LocalEndTime, uint8_t OperatingMode);
 /**
  * @brief Door Lock Cluster ClearHolidaySchedule Command callback (from client)
  */
@@ -8318,11 +8319,11 @@ bool emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandOb
  * @brief Door Lock Cluster GetUserResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetUserResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                   uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId,
-                                                   uint8_t userStatus, uint8_t userType, uint8_t credentialRule,
-                                                   /* TYPE WARNING: array array defaults to */ uint8_t * credentials,
-                                                   chip::FabricIndex creatorFabricIndex, chip::FabricIndex lastModifiedFabricIndex,
-                                                   uint16_t nextUserIndex);
+                                                   uint16_t UserIndex, chip::CharSpan UserName, uint32_t UserUniqueID,
+                                                   uint8_t UserStatus, uint8_t UserType, uint8_t CredentialRule,
+                                                   /* TYPE WARNING: array array defaults to */ uint8_t * Credentials,
+                                                   chip::FabricIndex CreatorFabricIndex, chip::FabricIndex LastModifiedFabricIndex,
+                                                   uint16_t NextUserIndex);
 /**
  * @brief Door Lock Cluster ClearUser Command callback (from client)
  */
@@ -8339,7 +8340,7 @@ bool emberAfDoorLockClusterSetCredentialCallback(
  * @brief Door Lock Cluster SetCredentialResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterSetCredentialResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t status, uint16_t userIndex, uint16_t nextCredentialIndex);
+                                                         uint8_t Status, uint16_t UserIndex, uint16_t NextCredentialIndex);
 /**
  * @brief Door Lock Cluster GetCredentialStatus Command callback (from client)
  */
@@ -8350,10 +8351,10 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
  * @brief Door Lock Cluster GetCredentialStatusResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetCredentialStatusResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               bool credentialExists, uint16_t userIndex,
-                                                               chip::FabricIndex creatorFabricIndex,
-                                                               chip::FabricIndex lastModifiedFabricIndex,
-                                                               uint16_t nextCredentialIndex);
+                                                               bool CredentialExists, uint16_t UserIndex,
+                                                               chip::FabricIndex CreatorFabricIndex,
+                                                               chip::FabricIndex LastModifiedFabricIndex,
+                                                               uint16_t NextCredentialIndex);
 /**
  * @brief Door Lock Cluster ClearCredential Command callback (from client)
  */

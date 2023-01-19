@@ -226,7 +226,7 @@
 
 #if defined(ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                      \
-    { chip::app::Clusters::AdministratorCommissioning::Id, "AdministratorCommissioning" },
+    { chip::app::Clusters::AdministratorCommissioning::Id, "Administrator Commissioning" },
 #else
 #define CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER
 #endif

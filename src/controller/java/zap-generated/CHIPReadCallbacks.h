@@ -3310,7 +3310,7 @@ public:
 
     static void
     CallbackFn(void * context,
-               const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & list);
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -3340,8 +3340,9 @@ public:
         }
     }
 
-    static void CallbackFn(void * context,
-                           const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> & list);
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -3373,7 +3374,7 @@ public:
 
     static void
     CallbackFn(void * context,
-               const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & list);
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -4736,8 +4737,9 @@ public:
         }
     }
 
-    static void CallbackFn(void * context,
-                           const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value);
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -5312,7 +5314,7 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
-                               chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list);
+                               chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -6161,7 +6163,7 @@ public:
     }
 
     static void CallbackFn(void * context,
-                           const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value);
+                           const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
