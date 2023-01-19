@@ -371,13 +371,7 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
     callback.release();
 
     if (busyWaitMs) {
-        auto durationInMs = chip::System::Clock::Milliseconds32(busyWaitMs);
-        auto & clock = chip::System::SystemClock();
-        auto start   = clock.GetMonotonicTimestamp();
-        while (clock.GetMonotonicTimestamp() - start < durationInMs)
-        {
-            // nothing to do.
-        };
+        usleep(busyWaitMs * 1000);
     }
 
 exit:
