@@ -15632,14 +15632,14 @@ public class ChipClusters {
 
     public void moveToColorTemperature(
         DefaultClusterCallback callback,
-        Integer colorTemperature,
+        Integer colorTemperatureMireds,
         Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride) {
       moveToColorTemperature(
           chipClusterPtr,
           callback,
-          colorTemperature,
+          colorTemperatureMireds,
           transitionTime,
           optionsMask,
           optionsOverride,
@@ -15648,7 +15648,7 @@ public class ChipClusters {
 
     public void moveToColorTemperature(
         DefaultClusterCallback callback,
-        Integer colorTemperature,
+        Integer colorTemperatureMireds,
         Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
@@ -15656,7 +15656,7 @@ public class ChipClusters {
       moveToColorTemperature(
           chipClusterPtr,
           callback,
-          colorTemperature,
+          colorTemperatureMireds,
           transitionTime,
           optionsMask,
           optionsOverride,
@@ -16043,7 +16043,7 @@ public class ChipClusters {
     private native void moveToColorTemperature(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer colorTemperature,
+        Integer colorTemperatureMireds,
         Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,

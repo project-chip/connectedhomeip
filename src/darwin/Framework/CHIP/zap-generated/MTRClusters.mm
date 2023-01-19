@@ -17773,7 +17773,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.colorTemperature = params.colorTemperature.unsignedShortValue;
+                request.colorTemperatureMireds = params.colorTemperatureMireds.unsignedShortValue;
                 request.transitionTime = params.transitionTime.unsignedShortValue;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;

@@ -35,12 +35,16 @@ namespace Identify {
 // Enum for IdentifyEffectIdentifier
 enum class IdentifyEffectIdentifier : uint8_t
 {
-    kBlink            = 0x00,
-    kBreathe          = 0x01,
-    kOkay             = 0x02,
-    kChannelChange    = 0x0B,
-    kFinishEffect     = 0xFE,
-    kStopEffect       = 0xFF,
+    kBlink         = 0x00,
+    kBreathe       = 0x01,
+    kOkay          = 0x02,
+    kChannelChange = 0x0B,
+    kFinishEffect  = 0xFE,
+    kStopEffect    = 0xFF,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -55,7 +59,11 @@ static IdentifyEffectIdentifier __attribute__((unused)) kIdentifyEffectIdentifie
 // Enum for IdentifyEffectVariant
 enum class IdentifyEffectVariant : uint8_t
 {
-    kDefault          = 0x00,
+    kDefault = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 1,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -70,12 +78,16 @@ static IdentifyEffectVariant __attribute__((unused)) kIdentifyEffectVariantkUnkn
 // Enum for IdentifyIdentifyType
 enum class IdentifyIdentifyType : uint8_t
 {
-    kNone             = 0x00,
-    kVisibleLight     = 0x01,
-    kVisibleLED       = 0x02,
-    kAudibleBeep      = 0x03,
-    kDisplay          = 0x04,
-    kActuator         = 0x05,
+    kNone         = 0x00,
+    kVisibleLight = 0x01,
+    kVisibleLED   = 0x02,
+    kAudibleBeep  = 0x03,
+    kDisplay      = 0x04,
+    kActuator     = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -113,7 +125,11 @@ enum class OnOffDelayedAllOffEffectVariant : uint8_t
     kFadeToOffIn0p8Seconds                                = 0x00,
     kNoFade                                               = 0x01,
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
-    kUnknownEnumValue                                     = 3,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffDelayedAllOffEffectVariant                                                      = EmberAfOnOffDelayedAllOffEffectVariant;
@@ -128,7 +144,11 @@ static OnOffDelayedAllOffEffectVariant __attribute__((unused)) kOnOffDelayedAllO
 enum class OnOffDyingLightEffectVariant : uint8_t
 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
-    kUnknownEnumValue                                   = 1,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffDyingLightEffectVariant = EmberAfOnOffDyingLightEffectVariant;
@@ -142,8 +162,12 @@ static OnOffDyingLightEffectVariant __attribute__((unused)) kOnOffDyingLightEffe
 // Enum for OnOffEffectIdentifier
 enum class OnOffEffectIdentifier : uint8_t
 {
-    kDelayedAllOff    = 0x00,
-    kDyingLight       = 0x01,
+    kDelayedAllOff = 0x00,
+    kDyingLight    = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -158,7 +182,11 @@ enum class OnOffStartUpOnOff : uint8_t
     kOff                 = 0x00,
     kOn                  = 0x01,
     kTogglePreviousOnOff = 0x02,
-    kUnknownEnumValue    = 3,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Bitmap for OnOffControl
@@ -190,8 +218,12 @@ namespace LevelControl {
 // Enum for MoveMode
 enum class MoveMode : uint8_t
 {
-    kUp               = 0x00,
-    kDown             = 0x01,
+    kUp   = 0x00,
+    kDown = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -205,8 +237,12 @@ static MoveMode __attribute__((unused)) kMoveModekUnknownEnumValue              
 // Enum for StepMode
 enum class StepMode : uint8_t
 {
-    kUp               = 0x00,
-    kDown             = 0x01,
+    kUp   = 0x00,
+    kDown = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -243,29 +279,41 @@ namespace AccessControl {
 // Enum for AccessControlEntryAuthModeEnum
 enum class AccessControlEntryAuthModeEnum : uint8_t
 {
-    kPase             = 0x01,
-    kCase             = 0x02,
-    kGroup            = 0x03,
+    kPase  = 0x01,
+    kCase  = 0x02,
+    kGroup = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
 
 // Enum for AccessControlEntryPrivilegeEnum
 enum class AccessControlEntryPrivilegeEnum : uint8_t
 {
-    kView             = 0x01,
-    kProxyView        = 0x02,
-    kOperate          = 0x03,
-    kManage           = 0x04,
-    kAdminister       = 0x05,
+    kView       = 0x01,
+    kProxyView  = 0x02,
+    kOperate    = 0x03,
+    kManage     = 0x04,
+    kAdminister = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
 
 // Enum for ChangeTypeEnum
 enum class ChangeTypeEnum : uint8_t
 {
-    kChanged          = 0x00,
-    kAdded            = 0x01,
-    kRemoved          = 0x02,
+    kChanged = 0x00,
+    kAdded   = 0x01,
+    kRemoved = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 } // namespace AccessControl
@@ -275,40 +323,56 @@ namespace Actions {
 // Enum for ActionErrorEnum
 enum class ActionErrorEnum : uint8_t
 {
-    kUnknown          = 0x00,
-    kInterrupted      = 0x01,
+    kUnknown     = 0x00,
+    kInterrupted = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 
 // Enum for ActionStateEnum
 enum class ActionStateEnum : uint8_t
 {
-    kInactive         = 0x00,
-    kActive           = 0x01,
-    kPaused           = 0x02,
-    kDisabled         = 0x03,
+    kInactive = 0x00,
+    kActive   = 0x01,
+    kPaused   = 0x02,
+    kDisabled = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 
 // Enum for ActionTypeEnum
 enum class ActionTypeEnum : uint8_t
 {
-    kOther            = 0x00,
-    kScene            = 0x01,
-    kSequence         = 0x02,
-    kAutomation       = 0x03,
-    kException        = 0x04,
-    kNotification     = 0x05,
-    kAlarm            = 0x06,
+    kOther        = 0x00,
+    kScene        = 0x01,
+    kSequence     = 0x02,
+    kAutomation   = 0x03,
+    kException    = 0x04,
+    kNotification = 0x05,
+    kAlarm        = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
 };
 
 // Enum for EndpointListTypeEnum
 enum class EndpointListTypeEnum : uint8_t
 {
-    kOther            = 0x00,
-    kRoom             = 0x01,
-    kZone             = 0x02,
+    kOther = 0x00,
+    kRoom  = 0x01,
+    kZone  = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
@@ -337,19 +401,27 @@ namespace OtaSoftwareUpdateProvider {
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
-    kProceed          = 0x00,
-    kAwaitNextAction  = 0x01,
-    kDiscontinue      = 0x02,
+    kProceed         = 0x00,
+    kAwaitNextAction = 0x01,
+    kDiscontinue     = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
 // Enum for OTADownloadProtocol
 enum class OTADownloadProtocol : uint8_t
 {
-    kBDXSynchronous   = 0x00,
-    kBDXAsynchronous  = 0x01,
-    kHttps            = 0x02,
-    kVendorSpecific   = 0x03,
+    kBDXSynchronous  = 0x00,
+    kBDXAsynchronous = 0x01,
+    kHttps           = 0x02,
+    kVendorSpecific  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 
@@ -360,7 +432,11 @@ enum class OTAQueryStatus : uint8_t
     kBusy                         = 0x01,
     kNotAvailable                 = 0x02,
     kDownloadProtocolNotSupported = 0x03,
-    kUnknownEnumValue             = 4,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 } // namespace OtaSoftwareUpdateProvider
 
@@ -372,17 +448,25 @@ enum class OTAAnnouncementReason : uint8_t
     kSimpleAnnouncement    = 0x00,
     kUpdateAvailable       = 0x01,
     kUrgentUpdateAvailable = 0x02,
-    kUnknownEnumValue      = 3,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Enum for OTAChangeReasonEnum
 enum class OTAChangeReasonEnum : uint8_t
 {
-    kUnknown          = 0x00,
-    kSuccess          = 0x01,
-    kFailure          = 0x02,
-    kTimeOut          = 0x03,
-    kDelayByProvider  = 0x04,
+    kUnknown         = 0x00,
+    kSuccess         = 0x01,
+    kFailure         = 0x02,
+    kTimeOut         = 0x03,
+    kDelayByProvider = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 5,
 };
 
@@ -398,7 +482,11 @@ enum class OTAUpdateStateEnum : uint8_t
     kDelayedOnApply       = 0x06,
     kRollingBack          = 0x07,
     kDelayedOnUserConsent = 0x08,
-    kUnknownEnumValue     = 9,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 9,
 };
 } // namespace OtaSoftwareUpdateRequestor
 
@@ -409,26 +497,34 @@ namespace TimeFormatLocalization {
 // Enum for CalendarType
 enum class CalendarType : uint8_t
 {
-    kBuddhist         = 0x00,
-    kChinese          = 0x01,
-    kCoptic           = 0x02,
-    kEthiopian        = 0x03,
-    kGregorian        = 0x04,
-    kHebrew           = 0x05,
-    kIndian           = 0x06,
-    kIslamic          = 0x07,
-    kJapanese         = 0x08,
-    kKorean           = 0x09,
-    kPersian          = 0x0A,
-    kTaiwanese        = 0x0B,
+    kBuddhist  = 0x00,
+    kChinese   = 0x01,
+    kCoptic    = 0x02,
+    kEthiopian = 0x03,
+    kGregorian = 0x04,
+    kHebrew    = 0x05,
+    kIndian    = 0x06,
+    kIslamic   = 0x07,
+    kJapanese  = 0x08,
+    kKorean    = 0x09,
+    kPersian   = 0x0A,
+    kTaiwanese = 0x0B,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 12,
 };
 
 // Enum for HourFormat
 enum class HourFormat : uint8_t
 {
-    k12hr             = 0x00,
-    k24hr             = 0x01,
+    k12hr = 0x00,
+    k24hr = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 } // namespace TimeFormatLocalization
@@ -438,9 +534,13 @@ namespace UnitLocalization {
 // Enum for TempUnit
 enum class TempUnit : uint8_t
 {
-    kFahrenheit       = 0x00,
-    kCelsius          = 0x01,
-    kKelvin           = 0x02,
+    kFahrenheit = 0x00,
+    kCelsius    = 0x01,
+    kKelvin     = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
@@ -469,34 +569,50 @@ enum class BatChargeFault : uint8_t
     kChargerOverVoltage  = 0x08,
     kChargerUnderVoltage = 0x09,
     kSafetyTimeout       = 0x0A,
-    kUnknownEnumValue    = 11,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 11,
 };
 
 // Enum for BatChargeLevel
 enum class BatChargeLevel : uint8_t
 {
-    kOk               = 0x00,
-    kWarning          = 0x01,
-    kCritical         = 0x02,
+    kOk       = 0x00,
+    kWarning  = 0x01,
+    kCritical = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
 // Enum for BatChargeState
 enum class BatChargeState : uint8_t
 {
-    kUnknown          = 0x00,
-    kIsCharging       = 0x01,
-    kIsAtFullCharge   = 0x02,
-    kIsNotCharging    = 0x03,
+    kUnknown        = 0x00,
+    kIsCharging     = 0x01,
+    kIsAtFullCharge = 0x02,
+    kIsNotCharging  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 
 // Enum for BatFault
 enum class BatFault : uint8_t
 {
-    kUnspecfied       = 0x00,
-    kOverTemp         = 0x01,
-    kUnderTemp        = 0x02,
+    kUnspecfied = 0x00,
+    kOverTemp   = 0x01,
+    kUnderTemp  = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
@@ -507,33 +623,49 @@ enum class BatReplaceability : uint8_t
     kNotReplaceable     = 0x01,
     kUserReplaceable    = 0x02,
     kFactoryReplaceable = 0x03,
-    kUnknownEnumValue   = 4,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Enum for PowerSourceStatus
 enum class PowerSourceStatus : uint8_t
 {
-    kUnspecfied       = 0x00,
-    kActive           = 0x01,
-    kStandby          = 0x02,
-    kUnavailable      = 0x03,
+    kUnspecfied  = 0x00,
+    kActive      = 0x01,
+    kStandby     = 0x02,
+    kUnavailable = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 
 // Enum for WiredCurrentType
 enum class WiredCurrentType : uint8_t
 {
-    kAc               = 0x00,
-    kDc               = 0x01,
+    kAc = 0x00,
+    kDc = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 
 // Enum for WiredFault
 enum class WiredFault : uint8_t
 {
-    kUnspecfied       = 0x00,
-    kOverVoltage      = 0x01,
-    kUnderVoltage     = 0x02,
+    kUnspecfied   = 0x00,
+    kOverVoltage  = 0x01,
+    kUnderVoltage = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
@@ -557,15 +689,23 @@ enum class CommissioningError : uint8_t
     kInvalidAuthentication = 0x02,
     kNoFailSafe            = 0x03,
     kBusyWithOtherAdmin    = 0x04,
-    kUnknownEnumValue      = 5,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
 };
 
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t
 {
-    kIndoor           = 0x00,
-    kOutdoor          = 0x01,
-    kIndoorOutdoor    = 0x02,
+    kIndoor        = 0x00,
+    kOutdoor       = 0x01,
+    kIndoorOutdoor = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 } // namespace GeneralCommissioning
@@ -588,17 +728,25 @@ enum class NetworkCommissioningStatus : uint8_t
     kIPV6Failed             = 0x0A,
     kIPBindFailed           = 0x0B,
     kUnknownError           = 0x0C,
-    kUnknownEnumValue       = 13,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 13,
 };
 
 // Enum for WiFiBand
 enum class WiFiBand : uint8_t
 {
-    k2g4              = 0x00,
-    k3g65             = 0x01,
-    k5g               = 0x02,
-    k6g               = 0x03,
-    k60g              = 0x04,
+    k2g4  = 0x00,
+    k3g65 = 0x01,
+    k5g   = 0x02,
+    k6g   = 0x03,
+    k60g  = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 5,
 };
 
@@ -626,28 +774,40 @@ namespace DiagnosticLogs {
 // Enum for LogsIntent
 enum class LogsIntent : uint8_t
 {
-    kEndUserSupport   = 0x00,
-    kNetworkDiag      = 0x01,
-    kCrashLogs        = 0x02,
+    kEndUserSupport = 0x00,
+    kNetworkDiag    = 0x01,
+    kCrashLogs      = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
 // Enum for LogsStatus
 enum class LogsStatus : uint8_t
 {
-    kSuccess          = 0x00,
-    kExhausted        = 0x01,
-    kNoLogs           = 0x02,
-    kBusy             = 0x03,
-    kDenied           = 0x04,
+    kSuccess   = 0x00,
+    kExhausted = 0x01,
+    kNoLogs    = 0x02,
+    kBusy      = 0x03,
+    kDenied    = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 5,
 };
 
 // Enum for LogsTransferProtocol
 enum class LogsTransferProtocol : uint8_t
 {
-    kResponsePayload  = 0x00,
-    kBdx              = 0x01,
+    kResponsePayload = 0x00,
+    kBdx             = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 } // namespace DiagnosticLogs
@@ -664,7 +824,11 @@ enum class BootReasonEnum : uint8_t
     kHardwareWatchdogReset   = 0x04,
     kSoftwareUpdateCompleted = 0x05,
     kSoftwareReset           = 0x06,
-    kUnknownEnumValue        = 7,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
 };
 
 // Need to convert consumers to using the new enum classes, so we
@@ -684,7 +848,11 @@ enum class HardwareFaultEnum : uint8_t
     kUserInterfaceFault     = 0x08,
     kNonVolatileMemoryError = 0x09,
     kTamperDetected         = 0x0A,
-    kUnknownEnumValue       = 11,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 11,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HardwareFaultEnum                                                                = EmberAfHardwareFaultEnum;
@@ -697,11 +865,15 @@ static HardwareFaultEnum __attribute__((unused)) kHardwareFaultEnumkUnknownEnumV
 // Enum for InterfaceTypeEnum
 enum class InterfaceTypeEnum : uint8_t
 {
-    kUnspecified      = 0x00,
-    kWiFi             = 0x01,
-    kEthernet         = 0x02,
-    kCellular         = 0x03,
-    kThread           = 0x04,
+    kUnspecified = 0x00,
+    kWiFi        = 0x01,
+    kEthernet    = 0x02,
+    kCellular    = 0x03,
+    kThread      = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 5,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -719,6 +891,10 @@ enum class NetworkFaultEnum : uint8_t
     kHardwareFailure  = 0x01,
     kNetworkJammed    = 0x02,
     kConnectionFailed = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -732,13 +908,17 @@ static NetworkFaultEnum __attribute__((unused)) kNetworkFaultEnumkUnknownEnumVal
 // Enum for RadioFaultEnum
 enum class RadioFaultEnum : uint8_t
 {
-    kUnspecified      = 0x00,
-    kWiFiFault        = 0x01,
-    kCellularFault    = 0x02,
-    kThreadFault      = 0x03,
-    kNFCFault         = 0x04,
-    kBLEFault         = 0x05,
-    kEthernetFault    = 0x06,
+    kUnspecified   = 0x00,
+    kWiFiFault     = 0x01,
+    kCellularFault = 0x02,
+    kThreadFault   = 0x03,
+    kNFCFault      = 0x04,
+    kBLEFault      = 0x05,
+    kEthernetFault = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -761,18 +941,26 @@ namespace ThreadNetworkDiagnostics {
 // Enum for ConnectionStatusEnum
 enum class ConnectionStatusEnum : uint8_t
 {
-    kConnected        = 0x00,
-    kNotConnected     = 0x01,
+    kConnected    = 0x00,
+    kNotConnected = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
-    kUnspecified      = 0x00,
-    kLinkDown         = 0x01,
-    kHardwareFailure  = 0x02,
-    kNetworkJammed    = 0x03,
+    kUnspecified     = 0x00,
+    kLinkDown        = 0x01,
+    kHardwareFailure = 0x02,
+    kNetworkJammed   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 
@@ -782,13 +970,17 @@ enum class NetworkFault : uint8_t
 // Enum for RoutingRole
 enum class RoutingRole : uint8_t
 {
-    kUnspecified      = 0x00,
-    kUnassigned       = 0x01,
-    kSleepyEndDevice  = 0x02,
-    kEndDevice        = 0x03,
-    kReed             = 0x04,
-    kRouter           = 0x05,
-    kLeader           = 0x06,
+    kUnspecified     = 0x00,
+    kUnassigned      = 0x01,
+    kSleepyEndDevice = 0x02,
+    kEndDevice       = 0x03,
+    kReed            = 0x04,
+    kRouter          = 0x05,
+    kLeader          = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -815,7 +1007,11 @@ enum class AssociationFailureCause : uint8_t
     kAssociationFailed    = 0x01,
     kAuthenticationFailed = 0x02,
     kSsidNotFound         = 0x03,
-    kUnknownEnumValue     = 4,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Need to convert consumers to using the new enum classes, so we
@@ -824,12 +1020,16 @@ enum class AssociationFailureCause : uint8_t
 // Enum for SecurityType
 enum class SecurityType : uint8_t
 {
-    kUnspecified      = 0x00,
-    kNone             = 0x01,
-    kWep              = 0x02,
-    kWpa              = 0x03,
-    kWpa2             = 0x04,
-    kWpa3             = 0x05,
+    kUnspecified = 0x00,
+    kNone        = 0x01,
+    kWep         = 0x02,
+    kWpa         = 0x03,
+    kWpa2        = 0x04,
+    kWpa3        = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -840,8 +1040,12 @@ static SecurityType __attribute__((unused)) kSecurityTypekUnknownEnumValue      
 // Enum for WiFiConnectionStatus
 enum class WiFiConnectionStatus : uint8_t
 {
-    kConnected        = 0x00,
-    kNotConnected     = 0x01,
+    kConnected    = 0x00,
+    kNotConnected = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 
@@ -851,12 +1055,16 @@ enum class WiFiConnectionStatus : uint8_t
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
-    kA                = 0x00,
-    kB                = 0x01,
-    kG                = 0x02,
-    kN                = 0x03,
-    kAc               = 0x04,
-    kAx               = 0x05,
+    kA  = 0x00,
+    kB  = 0x01,
+    kG  = 0x02,
+    kN  = 0x03,
+    kAc = 0x04,
+    kAx = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -873,16 +1081,20 @@ namespace EthernetNetworkDiagnostics {
 // Enum for PHYRateEnum
 enum class PHYRateEnum : uint8_t
 {
-    kRate10M          = 0x00,
-    kRate100M         = 0x01,
-    kRate1G           = 0x02,
-    kRate25g          = 0x03,
-    kRate5G           = 0x04,
-    kRate10G          = 0x05,
-    kRate40G          = 0x06,
-    kRate100G         = 0x07,
-    kRate200G         = 0x08,
-    kRate400G         = 0x09,
+    kRate10M  = 0x00,
+    kRate100M = 0x01,
+    kRate1G   = 0x02,
+    kRate25g  = 0x03,
+    kRate5G   = 0x04,
+    kRate10G  = 0x05,
+    kRate40G  = 0x06,
+    kRate100G = 0x07,
+    kRate200G = 0x08,
+    kRate400G = 0x09,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 10,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -901,7 +1113,11 @@ enum class GranularityEnum : uint8_t
     kSecondsGranularity      = 0x02,
     kMillisecondsGranularity = 0x03,
     kMicrosecondsGranularity = 0x04,
-    kUnknownEnumValue        = 5,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
 };
 
 // Enum for TimeSourceEnum
@@ -924,6 +1140,10 @@ enum class TimeSourceEnum : uint8_t
     kCloudSource      = 0x0E,
     kPtp              = 0x0F,
     kGnss             = 0x10,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 17,
 };
 } // namespace TimeSynchronization
@@ -951,7 +1171,11 @@ enum class CommissioningWindowStatusEnum : uint8_t
     kWindowNotOpen      = 0x00,
     kEnhancedWindowOpen = 0x01,
     kBasicWindowOpen    = 0x02,
-    kUnknownEnumValue   = 3,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Need to convert consumers to using the new enum classes, so we
@@ -963,7 +1187,11 @@ enum class StatusCode : uint8_t
     kBusy               = 0x02,
     kPAKEParameterError = 0x03,
     kWindowNotOpen      = 0x04,
-    kUnknownEnumValue   = 0,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StatusCode                                                                       = EmberAfStatusCode;
@@ -976,8 +1204,12 @@ namespace OperationalCredentials {
 // Enum for CertificateChainTypeEnum
 enum class CertificateChainTypeEnum : uint8_t
 {
-    kDACCertificate   = 0x01,
-    kPAICertificate   = 0x02,
+    kDACCertificate = 0x01,
+    kPAICertificate = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
 
@@ -994,7 +1226,11 @@ enum class NodeOperationalCertStatusEnum : uint8_t
     kFabricConflict      = 0x09,
     kLabelConflict       = 0x0A,
     kInvalidFabricIndex  = 0x0B,
-    kUnknownEnumValue    = 7,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
 };
 } // namespace OperationalCredentials
 
@@ -1003,8 +1239,12 @@ namespace GroupKeyManagement {
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
-    kTrustFirst       = 0x00,
-    kCacheAndSync     = 0x01,
+    kTrustFirst   = 0x00,
+    kCacheAndSync = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 } // namespace GroupKeyManagement
@@ -1043,45 +1283,65 @@ enum class AlarmCodeEnum : uint8_t
     kDoorForcedOpen          = 0x06,
     kDoorAjar                = 0x07,
     kForcedUser              = 0x08,
-    kUnknownEnumValue        = 2,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
 };
 
 // Enum for CredentialRuleEnum
 enum class CredentialRuleEnum : uint8_t
 {
-    kSingle           = 0x00,
-    kDual             = 0x01,
-    kTri              = 0x02,
+    kSingle = 0x00,
+    kDual   = 0x01,
+    kTri    = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
 // Enum for CredentialTypeEnum
 enum class CredentialTypeEnum : uint8_t
 {
-    kProgrammingPIN   = 0x00,
-    kPin              = 0x01,
-    kRfid             = 0x02,
-    kFingerprint      = 0x03,
-    kFingerVein       = 0x04,
-    kFace             = 0x05,
+    kProgrammingPIN = 0x00,
+    kPin            = 0x01,
+    kRfid           = 0x02,
+    kFingerprint    = 0x03,
+    kFingerVein     = 0x04,
+    kFace           = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
 
 // Enum for DataOperationTypeEnum
 enum class DataOperationTypeEnum : uint8_t
 {
-    kAdd              = 0x00,
-    kClear            = 0x01,
-    kModify           = 0x02,
+    kAdd    = 0x00,
+    kClear  = 0x01,
+    kModify = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
 // Enum for DlLockState
 enum class DlLockState : uint8_t
 {
-    kNotFullyLocked   = 0x00,
-    kLocked           = 0x01,
-    kUnlocked         = 0x02,
+    kNotFullyLocked = 0x00,
+    kLocked         = 0x01,
+    kUnlocked       = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
@@ -1099,7 +1359,11 @@ enum class DlLockType : uint8_t
     kInterconnectedLock = 0x08,
     kDeadLatch          = 0x09,
     kDoorFurniture      = 0x0A,
-    kUnknownEnumValue   = 11,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 11,
 };
 
 // Enum for DlStatus
@@ -1112,7 +1376,11 @@ enum class DlStatus : uint8_t
     kInvalidField      = 0x85,
     kResourceExhausted = 0x89,
     kNotFound          = 0x8B,
-    kUnknownEnumValue  = 4,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Enum for DoorLockOperationEventCode
@@ -1133,7 +1401,11 @@ enum class DoorLockOperationEventCode : uint8_t
     kScheduleUnlock        = 0x0C,
     kManualLock            = 0x0D,
     kManualUnlock          = 0x0E,
-    kUnknownEnumValue      = 15,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 15,
 };
 
 // Enum for DoorLockProgrammingEventCode
@@ -1146,7 +1418,11 @@ enum class DoorLockProgrammingEventCode : uint8_t
     kPinChanged           = 0x04,
     kIdAdded              = 0x05,
     kIdDeleted            = 0x06,
-    kUnknownEnumValue     = 7,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
 };
 
 // Enum for DoorLockSetPinOrIdStatus
@@ -1156,7 +1432,11 @@ enum class DoorLockSetPinOrIdStatus : uint8_t
     kGeneralFailure     = 0x01,
     kMemoryFull         = 0x02,
     kDuplicateCodeError = 0x03,
-    kUnknownEnumValue   = 4,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Enum for DoorLockUserStatus
@@ -1166,6 +1446,10 @@ enum class DoorLockUserStatus : uint8_t
     kOccupiedEnabled  = 0x01,
     kOccupiedDisabled = 0x03,
     kNotSupported     = 0xFF,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 
@@ -1178,7 +1462,11 @@ enum class DoorLockUserType : uint8_t
     kMasterUser          = 0x03,
     kNonAccessUser       = 0x04,
     kNotSupported        = 0xFF,
-    kUnknownEnumValue    = 5,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
 };
 
 // Enum for DoorStateEnum
@@ -1190,21 +1478,29 @@ enum class DoorStateEnum : uint8_t
     kDoorForcedOpen       = 0x03,
     kDoorUnspecifiedError = 0x04,
     kDoorAjar             = 0x05,
-    kUnknownEnumValue     = 6,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
 };
 
 // Enum for LockDataTypeEnum
 enum class LockDataTypeEnum : uint8_t
 {
-    kUnspecified      = 0x00,
-    kProgrammingCode  = 0x01,
-    kUserIndex        = 0x02,
-    kWeekDaySchedule  = 0x03,
-    kYearDaySchedule  = 0x04,
-    kHolidaySchedule  = 0x05,
-    kPin              = 0x06,
-    kRfid             = 0x07,
-    kFingerprint      = 0x08,
+    kUnspecified     = 0x00,
+    kProgrammingCode = 0x01,
+    kUserIndex       = 0x02,
+    kWeekDaySchedule = 0x03,
+    kYearDaySchedule = 0x04,
+    kHolidaySchedule = 0x05,
+    kPin             = 0x06,
+    kRfid            = 0x07,
+    kFingerprint     = 0x08,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 9,
 };
 
@@ -1215,7 +1511,11 @@ enum class LockOperationTypeEnum : uint8_t
     kUnlock             = 0x01,
     kNonAccessUserEvent = 0x02,
     kForcedUserEvent    = 0x03,
-    kUnknownEnumValue   = 4,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Enum for OperatingModeEnum
@@ -1226,7 +1526,11 @@ enum class OperatingModeEnum : uint8_t
     kPrivacy            = 0x02,
     kNoRemoteLockUnlock = 0x03,
     kPassage            = 0x04,
-    kUnknownEnumValue   = 5,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
 };
 
 // Enum for OperationErrorEnum
@@ -1237,7 +1541,11 @@ enum class OperationErrorEnum : uint8_t
     kDisabledUserDenied  = 0x02,
     kRestricted          = 0x03,
     kInsufficientBattery = 0x04,
-    kUnknownEnumValue    = 5,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
 };
 
 // Enum for OperationSourceEnum
@@ -1253,7 +1561,11 @@ enum class OperationSourceEnum : uint8_t
     kRemote            = 0x07,
     kRfid              = 0x08,
     kBiometric         = 0x09,
-    kUnknownEnumValue  = 10,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 10,
 };
 
 // Enum for UserStatusEnum
@@ -1262,6 +1574,10 @@ enum class UserStatusEnum : uint8_t
     kAvailable        = 0x00,
     kOccupiedEnabled  = 0x01,
     kOccupiedDisabled = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 
@@ -1278,7 +1594,11 @@ enum class UserTypeEnum : uint8_t
     kExpiringUser           = 0x07,
     kScheduleRestrictedUser = 0x08,
     kRemoteOnlyUser         = 0x09,
-    kUnknownEnumValue       = 10,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 10,
 };
 
 // Bitmap for DaysMaskMap
@@ -1482,7 +1802,11 @@ enum class EndProductType : uint8_t
     kSwingingShutter           = 0x16,
     kSlidingShutter            = 0x17,
     kUnknown                   = 0xFF,
-    kUnknownEnumValue          = 24,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 24,
 };
 
 // Enum for Type
@@ -1499,7 +1823,11 @@ enum class Type : uint8_t
     kTiltBlindLiftAndTilt      = 0x08,
     kProjectorScreen           = 0x09,
     kUnknown                   = 0xFF,
-    kUnknownEnumValue          = 10,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 10,
 };
 
 // Bitmap for ConfigStatus
@@ -1572,16 +1900,24 @@ enum class PumpControlMode : uint8_t
     kConstantFlow         = 0x03,
     kConstantTemperature  = 0x05,
     kAutomatic            = 0x07,
-    kUnknownEnumValue     = 4,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Enum for PumpOperationMode
 enum class PumpOperationMode : uint8_t
 {
-    kNormal           = 0x00,
-    kMinimum          = 0x01,
-    kMaximum          = 0x02,
-    kLocal            = 0x03,
+    kNormal  = 0x00,
+    kMinimum = 0x01,
+    kMaximum = 0x02,
+    kLocal   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 
@@ -1623,7 +1959,11 @@ enum class SetpointAdjustMode : uint8_t
     kHeatSetpoint         = 0x00,
     kCoolSetpoint         = 0x01,
     kHeatAndCoolSetpoints = 0x02,
-    kUnknownEnumValue     = 3,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SetpointAdjustMode                                                               = EmberAfSetpointAdjustMode;
@@ -1639,15 +1979,23 @@ enum class ThermostatControlSequence : uint8_t
     kHeatingWithReheat           = 0x03,
     kCoolingAndHeating           = 0x04,
     kCoolingAndHeatingWithReheat = 0x05,
-    kUnknownEnumValue            = 6,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
 };
 
 // Enum for ThermostatRunningMode
 enum class ThermostatRunningMode : uint8_t
 {
-    kOff              = 0x00,
-    kCool             = 0x03,
-    kHeat             = 0x04,
+    kOff  = 0x00,
+    kCool = 0x03,
+    kHeat = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 1,
 };
 
@@ -1661,6 +2009,10 @@ enum class ThermostatSystemMode : uint8_t
     kEmergencyHeating = 0x05,
     kPrecooling       = 0x06,
     kFanOnly          = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 
@@ -1707,19 +2059,27 @@ enum class FanModeSequenceType : uint8_t
     kOffLowHighAuto    = 0x03,
     kOffOnAuto         = 0x04,
     kOffOn             = 0x05,
-    kUnknownEnumValue  = 6,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
 };
 
 // Enum for FanModeType
 enum class FanModeType : uint8_t
 {
-    kOff              = 0x00,
-    kLow              = 0x01,
-    kMedium           = 0x02,
-    kHigh             = 0x03,
-    kOn               = 0x04,
-    kAuto             = 0x05,
-    kSmart            = 0x06,
+    kOff    = 0x00,
+    kLow    = 0x01,
+    kMedium = 0x02,
+    kHigh   = 0x03,
+    kOn     = 0x04,
+    kAuto   = 0x05,
+    kSmart  = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
 };
 
@@ -1768,7 +2128,11 @@ enum class ColorLoopAction : uint8_t
     kDeactivate                            = 0x00,
     kActivateFromColorLoopStartEnhancedHue = 0x01,
     kActivateFromEnhancedCurrentHue        = 0x02,
-    kUnknownEnumValue                      = 3,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ColorLoopAction                                                                  = EmberAfColorLoopAction;
@@ -1781,8 +2145,12 @@ static ColorLoopAction __attribute__((unused)) kColorLoopActionkUnknownEnumValue
 // Enum for ColorLoopDirection
 enum class ColorLoopDirection : uint8_t
 {
-    kDecrementHue     = 0x00,
-    kIncrementHue     = 0x01,
+    kDecrementHue = 0x00,
+    kIncrementHue = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -1799,7 +2167,11 @@ enum class ColorMode : uint8_t
     kCurrentHueAndCurrentSaturation = 0x00,
     kCurrentXAndCurrentY            = 0x01,
     kColorTemperature               = 0x02,
-    kUnknownEnumValue               = 3,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ColorMode                                                                        = EmberAfColorMode;
@@ -1816,6 +2188,10 @@ enum class HueDirection : uint8_t
     kLongestDistance  = 0x01,
     kUp               = 0x02,
     kDown             = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -1829,9 +2205,13 @@ static HueDirection __attribute__((unused)) kHueDirectionkUnknownEnumValue      
 // Enum for HueMoveMode
 enum class HueMoveMode : uint8_t
 {
-    kStop             = 0x00,
-    kUp               = 0x01,
-    kDown             = 0x03,
+    kStop = 0x00,
+    kUp   = 0x01,
+    kDown = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -1845,8 +2225,12 @@ static HueMoveMode __attribute__((unused)) kHueMoveModekUnknownEnumValue        
 // Enum for HueStepMode
 enum class HueStepMode : uint8_t
 {
-    kUp               = 0x01,
-    kDown             = 0x03,
+    kUp   = 0x01,
+    kDown = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -1860,9 +2244,13 @@ static HueStepMode __attribute__((unused)) kHueStepModekUnknownEnumValue        
 // Enum for SaturationMoveMode
 enum class SaturationMoveMode : uint8_t
 {
-    kStop             = 0x00,
-    kUp               = 0x01,
-    kDown             = 0x03,
+    kStop = 0x00,
+    kUp   = 0x01,
+    kDown = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -1876,8 +2264,12 @@ static SaturationMoveMode __attribute__((unused)) kSaturationMoveModekUnknownEnu
 // Enum for SaturationStepMode
 enum class SaturationStepMode : uint8_t
 {
-    kUp               = 0x01,
-    kDown             = 0x03,
+    kUp   = 0x01,
+    kDown = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -1922,8 +2314,12 @@ namespace IlluminanceMeasurement {
 // Enum for LightSensorType
 enum class LightSensorType : uint8_t
 {
-    kPhotodiode       = 0x00,
-    kCmos             = 0x01,
+    kPhotodiode = 0x00,
+    kCmos       = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 } // namespace IlluminanceMeasurement
@@ -1952,16 +2348,24 @@ namespace Channel {
 // Enum for ChannelStatusEnum
 enum class ChannelStatusEnum : uint8_t
 {
-    kSuccess          = 0x00,
-    kMultipleMatches  = 0x01,
-    kNoMatches        = 0x02,
+    kSuccess         = 0x00,
+    kMultipleMatches = 0x01,
+    kNoMatches       = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
 // Enum for LineupInfoTypeEnum
 enum class LineupInfoTypeEnum : uint8_t
 {
-    kMso              = 0x00,
+    kMso = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 1,
 };
 
@@ -1978,9 +2382,13 @@ namespace TargetNavigator {
 // Enum for TargetNavigatorStatusEnum
 enum class TargetNavigatorStatusEnum : uint8_t
 {
-    kSuccess          = 0x00,
-    kTargetNotFound   = 0x01,
-    kNotAllowed       = 0x02,
+    kSuccess        = 0x00,
+    kTargetNotFound = 0x01,
+    kNotAllowed     = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 } // namespace TargetNavigator
@@ -1996,16 +2404,24 @@ enum class MediaPlaybackStatusEnum : uint8_t
     kNotActive              = 0x03,
     kSpeedOutOfRange        = 0x04,
     kSeekOutOfRange         = 0x05,
-    kUnknownEnumValue       = 6,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
 };
 
 // Enum for PlaybackStateEnum
 enum class PlaybackStateEnum : uint8_t
 {
-    kPlaying          = 0x00,
-    kPaused           = 0x01,
-    kNotPlaying       = 0x02,
-    kBuffering        = 0x03,
+    kPlaying    = 0x00,
+    kPaused     = 0x01,
+    kNotPlaying = 0x02,
+    kBuffering  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 
@@ -2022,18 +2438,22 @@ namespace MediaInput {
 // Enum for InputTypeEnum
 enum class InputTypeEnum : uint8_t
 {
-    kInternal         = 0x00,
-    kAux              = 0x01,
-    kCoax             = 0x02,
-    kComposite        = 0x03,
-    kHdmi             = 0x04,
-    kInput            = 0x05,
-    kLine             = 0x06,
-    kOptical          = 0x07,
-    kVideo            = 0x08,
-    kScart            = 0x09,
-    kUsb              = 0x0A,
-    kOther            = 0x0B,
+    kInternal  = 0x00,
+    kAux       = 0x01,
+    kCoax      = 0x02,
+    kComposite = 0x03,
+    kHdmi      = 0x04,
+    kInput     = 0x05,
+    kLine      = 0x06,
+    kOptical   = 0x07,
+    kVideo     = 0x08,
+    kScart     = 0x09,
+    kUsb       = 0x0A,
+    kOther     = 0x0B,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 12,
 };
 
@@ -2137,7 +2557,11 @@ enum class CecKeyCode : uint8_t
     kF4Yellow                  = 0x74,
     kF5                        = 0x75,
     kData                      = 0x76,
-    kUnknownEnumValue          = 14,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 14,
 };
 
 // Enum for KeypadInputStatusEnum
@@ -2146,7 +2570,11 @@ enum class KeypadInputStatusEnum : uint8_t
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
     kInvalidKeyInCurrentState = 0x02,
-    kUnknownEnumValue         = 3,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Bitmap for KeypadInputFeature
@@ -2163,36 +2591,48 @@ namespace ContentLauncher {
 // Enum for ContentLaunchStatusEnum
 enum class ContentLaunchStatusEnum : uint8_t
 {
-    kSuccess          = 0x00,
-    kUrlNotAvailable  = 0x01,
-    kAuthFailed       = 0x02,
+    kSuccess         = 0x00,
+    kUrlNotAvailable = 0x01,
+    kAuthFailed      = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
 // Enum for MetricTypeEnum
 enum class MetricTypeEnum : uint8_t
 {
-    kPixels           = 0x00,
-    kPercentage       = 0x01,
+    kPixels     = 0x00,
+    kPercentage = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
 
 // Enum for ParameterEnum
 enum class ParameterEnum : uint8_t
 {
-    kActor            = 0x00,
-    kChannel          = 0x01,
-    kCharacter        = 0x02,
-    kDirector         = 0x03,
-    kEvent            = 0x04,
-    kFranchise        = 0x05,
-    kGenre            = 0x06,
-    kLeague           = 0x07,
-    kPopularity       = 0x08,
-    kProvider         = 0x09,
-    kSport            = 0x0A,
-    kSportsTeam       = 0x0B,
-    kType             = 0x0C,
+    kActor      = 0x00,
+    kChannel    = 0x01,
+    kCharacter  = 0x02,
+    kDirector   = 0x03,
+    kEvent      = 0x04,
+    kFranchise  = 0x05,
+    kGenre      = 0x06,
+    kLeague     = 0x07,
+    kPopularity = 0x08,
+    kProvider   = 0x09,
+    kSport      = 0x0A,
+    kSportsTeam = 0x0B,
+    kType       = 0x0C,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 13,
 };
 
@@ -2216,12 +2656,16 @@ namespace AudioOutput {
 // Enum for OutputTypeEnum
 enum class OutputTypeEnum : uint8_t
 {
-    kHdmi             = 0x00,
-    kBt               = 0x01,
-    kOptical          = 0x02,
-    kHeadphone        = 0x03,
-    kInternal         = 0x04,
-    kOther            = 0x05,
+    kHdmi      = 0x00,
+    kBt        = 0x01,
+    kOptical   = 0x02,
+    kHeadphone = 0x03,
+    kInternal  = 0x04,
+    kOther     = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
 
@@ -2237,9 +2681,13 @@ namespace ApplicationLauncher {
 // Enum for ApplicationLauncherStatusEnum
 enum class ApplicationLauncherStatusEnum : uint8_t
 {
-    kSuccess          = 0x00,
-    kAppNotAvailable  = 0x01,
-    kSystemBusy       = 0x02,
+    kSuccess         = 0x00,
+    kAppNotAvailable = 0x01,
+    kSystemBusy      = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
 
@@ -2259,7 +2707,11 @@ enum class ApplicationStatusEnum : uint8_t
     kActiveVisibleFocus    = 0x01,
     kActiveHidden          = 0x02,
     kActiveVisibleNotFocus = 0x03,
-    kUnknownEnumValue      = 4,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 } // namespace ApplicationBasic
 
@@ -2274,10 +2726,14 @@ namespace UnitTesting {
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
 {
-    kUnspecified      = 0x00,
-    kValueA           = 0x01,
-    kValueB           = 0x02,
-    kValueC           = 0x03,
+    kUnspecified = 0x00,
+    kValueA      = 0x01,
+    kValueB      = 0x02,
+    kValueC      = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
 
@@ -2331,11 +2787,15 @@ namespace FaultInjection {
 // Enum for FaultType
 enum class FaultType : uint8_t
 {
-    kUnspecified      = 0x00,
-    kSystemFault      = 0x01,
-    kInetFault        = 0x02,
-    kChipFault        = 0x03,
-    kCertFault        = 0x04,
+    kUnspecified = 0x00,
+    kSystemFault = 0x01,
+    kInetFault   = 0x02,
+    kChipFault   = 0x03,
+    kCertFault   = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 5,
 };
 } // namespace FaultInjection

@@ -83,13 +83,19 @@ CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
     }
     else
     {
-        for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
+        // In case the application does not want the BindingManager to establish a CASE session
+        // to the available bindings, it can be disabled by setting mEstablishConnectionOnInit
+        // to false.
+        if (params.mEstablishConnectionOnInit)
         {
-            if (entry.type == EMBER_UNICAST_BINDING)
+            for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
             {
-                // The CASE connection can also fail if the unicast peer is offline.
-                // There is recovery mechanism to retry connection on-demand so ignore error.
-                (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+                if (entry.type == EMBER_UNICAST_BINDING)
+                {
+                    // The CASE connection can also fail if the unicast peer is offline.
+                    // There is recovery mechanism to retry connection on-demand so ignore error.
+                    (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+                }
             }
         }
     }

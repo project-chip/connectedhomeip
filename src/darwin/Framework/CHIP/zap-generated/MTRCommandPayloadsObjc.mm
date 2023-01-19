@@ -5616,7 +5616,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _colorTemperature = @(0);
+        _colorTemperatureMireds = @(0);
 
         _transitionTime = @(0);
 
@@ -5632,7 +5632,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRColorControlClusterMoveToColorTemperatureParams alloc] init];
 
-    other.colorTemperature = self.colorTemperature;
+    other.colorTemperatureMireds = self.colorTemperatureMireds;
     other.transitionTime = self.transitionTime;
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
@@ -5644,11 +5644,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: colorTemperature:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _colorTemperature, _transitionTime, _optionsMask, _optionsOverride];
+        [NSString stringWithFormat:@"<%@: colorTemperatureMireds:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _colorTemperatureMireds, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRColorControlClusterMoveToColorTemperatureParams (Deprecated)
+
+- (void)setColorTemperature:(NSNumber * _Nonnull)colorTemperature
+{
+    self.colorTemperatureMireds = colorTemperature;
+}
+
+- (NSNumber * _Nonnull)colorTemperature
+{
+    return self.colorTemperatureMireds;
+}
 @end
 @implementation MTRColorControlClusterEnhancedMoveToHueParams
 - (instancetype)init

@@ -4011,7 +4011,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveToColorTemperatureParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorTemperature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMireds MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -4033,6 +4033,12 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@end
+
+@interface MTRColorControlClusterMoveToColorTemperatureParams (Deprecated)
+
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use colorTemperatureMireds");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

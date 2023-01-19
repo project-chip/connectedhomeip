@@ -4814,7 +4814,7 @@ class ChipClusters:
                     "commandId": 0x0000000A,
                     "commandName": "MoveToColorTemperature",
                     "args": {
-                        "colorTemperature": "int",
+                        "colorTemperatureMireds": "int",
                         "transitionTime": "int",
                         "optionsMask": "int",
                         "optionsOverride": "int",

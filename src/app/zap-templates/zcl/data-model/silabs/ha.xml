@@ -349,7 +349,7 @@ limitations under the License.
       <description>
         Move to a specific color temperature.
       </description>
-      <arg name="ColorTemperature" type="INT16U"/>
+      <arg name="ColorTemperatureMireds" type="INT16U"/>
       <arg name="TransitionTime" type="INT16U"/>
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>

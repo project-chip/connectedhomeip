@@ -5021,6 +5021,9 @@
                   - userUniqueID
               GetUserResponse:
                   - userUniqueID
+          ColorControl:
+              MoveToColorTemperature:
+                  - colorTemperatureMireds
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5622,6 +5625,9 @@
                   - userUniqueId
               GetUserResponse:
                   - userUniqueId
+          ColorControl:
+              MoveToColorTemperature:
+                  - colorTemperature
       structs:
           Descriptor:
               - DeviceType
@@ -5875,6 +5881,9 @@
                   userUniqueID: userUniqueId
               GetUserResponse:
                   userUniqueID: userUniqueId
+          ColorControl:
+              MoveToColorTemperature:
+                  colorTemperatureMireds: colorTemperature
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry

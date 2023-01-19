@@ -1610,7 +1610,7 @@ server cluster ColorControl = 768 {
   }
 
   request struct MoveToColorTemperatureRequest {
-    INT16U colorTemperature = 0;
+    INT16U colorTemperatureMireds = 0;
     INT16U transitionTime = 1;
     BITMAP8 optionsMask = 2;
     BITMAP8 optionsOverride = 3;

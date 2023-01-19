@@ -5451,7 +5451,7 @@ public:
     ColorControlMoveToColorTemperature(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("move-to-color-temperature", credsIssuerConfig)
     {
-        AddArgument("ColorTemperature", 0, UINT16_MAX, &mRequest.colorTemperature);
+        AddArgument("ColorTemperatureMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMireds);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
