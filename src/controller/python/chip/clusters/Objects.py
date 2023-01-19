@@ -27,6 +27,7 @@
 import typing
 from dataclasses import dataclass, field
 from enum import IntEnum
+from enum import IntFlag
 
 from chip import ChipUtility
 from chip.tlv import float32, uint
@@ -80,6 +81,7 @@ class Identify(Cluster):
             kAudibleBeep = 0x03
             kDisplay = 0x04
             kActuator = 0x05
+
 
 
 
@@ -256,6 +258,11 @@ class Groups(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
+
+    class Bitmaps:
+        class GroupClusterFeature(IntFlag):
+            kGroupNames = 0x1
 
 
 
@@ -564,6 +571,11 @@ class Scenes(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
+
+    class Bitmaps:
+        class ScenesCopyMode(IntFlag):
+            kCopyAllScenes = 0x1
 
 
     class Structs:
@@ -1214,6 +1226,17 @@ class OnOff(Cluster):
             kTogglePreviousOnOff = 0x02
 
 
+    class Bitmaps:
+        class OnOffControl(IntFlag):
+            kAcceptOnlyWhenOn = 0x1
+
+        class OnOffFeature(IntFlag):
+            kLighting = 0x1
+
+        class SceneFeatures(IntFlag):
+            kSceneNames = 0x1
+
+
 
     class Commands:
         @dataclass
@@ -1502,6 +1525,7 @@ class OnOffSwitchConfiguration(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class SwitchType(ClusterAttributeDescriptor):
@@ -1674,6 +1698,17 @@ class LevelControl(Cluster):
         class StepMode(IntEnum):
             kUp = 0x00
             kDown = 0x01
+
+
+    class Bitmaps:
+        class LevelControlFeature(IntFlag):
+            kOnOff = 0x1
+            kLighting = 0x2
+            kFrequency = 0x4
+
+        class LevelControlOptions(IntFlag):
+            kExecuteIfOff = 0x1
+            kCoupleColorTempToLevel = 0x2
 
 
 
@@ -2216,6 +2251,7 @@ class BinaryInputBasic(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class ActiveText(ClusterAttributeDescriptor):
@@ -2467,6 +2503,7 @@ class PulseWidthModulation(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -2578,6 +2615,7 @@ class Descriptor(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
     class Structs:
@@ -2768,6 +2806,7 @@ class Binding(Cluster):
     clusterRevision: 'uint' = None
 
 
+
     class Structs:
         @dataclass
         class TargetStruct(ClusterObject):
@@ -2938,6 +2977,7 @@ class AccessControl(Cluster):
             kChanged = 0x00
             kAdded = 0x01
             kRemoved = 0x02
+
 
 
     class Structs:
@@ -3260,6 +3300,22 @@ class Actions(Cluster):
             kOther = 0x00
             kRoom = 0x01
             kZone = 0x02
+
+
+    class Bitmaps:
+        class CommandBits(IntFlag):
+            kInstantAction = 0x1
+            kInstantActionWithTransition = 0x2
+            kStartAction = 0x4
+            kStartActionWithDuration = 0x8
+            kStopAction = 0x10
+            kPauseAction = 0x20
+            kPauseActionWithDuration = 0x40
+            kResumeAction = 0x80
+            kEnableAction = 0x100
+            kEnableActionWithDuration = 0x200
+            kDisableAction = 0x400
+            kDisableActionWithDuration = 0x800
 
 
     class Structs:
@@ -3771,6 +3827,7 @@ class BasicInformation(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
     class Structs:
@@ -4324,6 +4381,7 @@ class OtaSoftwareUpdateProvider(Cluster):
 
 
 
+
     class Commands:
         @dataclass
         class QueryImage(ClusterCommand):
@@ -4575,6 +4633,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             kDelayedOnApply = 0x06
             kRollingBack = 0x07
             kDelayedOnUserConsent = 0x08
+
 
 
     class Structs:
@@ -4868,6 +4927,7 @@ class LocalizationConfiguration(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class ActiveLocale(ClusterAttributeDescriptor):
@@ -5028,6 +5088,7 @@ class TimeFormatLocalization(Cluster):
         class HourFormat(IntEnum):
             k12hr = 0x00
             k24hr = 0x01
+
 
 
 
@@ -5193,6 +5254,11 @@ class UnitLocalization(Cluster):
             kKelvin = 0x02
 
 
+    class Bitmaps:
+        class UnitLocalizationFeature(IntFlag):
+            kTemperatureUnit = 0x1
+
+
 
 
     class Attributes:
@@ -5316,6 +5382,7 @@ class PowerSourceConfiguration(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -5552,6 +5619,14 @@ class PowerSource(Cluster):
             kUnspecfied = 0x00
             kOverVoltage = 0x01
             kUnderVoltage = 0x02
+
+
+    class Bitmaps:
+        class PowerSourceFeature(IntFlag):
+            kWired = 0x1
+            kBattery = 0x2
+            kRechargeable = 0x4
+            kReplaceable = 0x8
 
 
     class Structs:
@@ -6285,6 +6360,7 @@ class GeneralCommissioning(Cluster):
             kIndoorOutdoor = 0x02
 
 
+
     class Structs:
         @dataclass
         class BasicCommissioningInfo(ClusterObject):
@@ -6631,6 +6707,20 @@ class NetworkCommissioning(Cluster):
             k5g = 0x02
             k6g = 0x03
             k60g = 0x04
+
+
+    class Bitmaps:
+        class NetworkCommissioningFeature(IntFlag):
+            kWiFiNetworkInterface = 0x1
+            kThreadNetworkInterface = 0x2
+            kEthernetNetworkInterface = 0x4
+
+        class WiFiSecurity(IntFlag):
+            kUnencrypted = 0x1
+            kWep = 0x2
+            kWpaPersonal = 0x4
+            kWpa2Personal = 0x8
+            kWpa3Personal = 0x10
 
 
     class Structs:
@@ -7122,6 +7212,7 @@ class DiagnosticLogs(Cluster):
 
 
 
+
     class Commands:
         @dataclass
         class RetrieveLogsRequest(ClusterCommand):
@@ -7332,6 +7423,7 @@ class GeneralDiagnostics(Cluster):
             kNFCFault = 0x04
             kBLEFault = 0x05
             kEthernetFault = 0x06
+
 
 
     class Structs:
@@ -7722,6 +7814,11 @@ class SoftwareDiagnostics(Cluster):
     clusterRevision: 'uint' = None
 
 
+    class Bitmaps:
+        class SoftwareDiagnosticsFeature(IntFlag):
+            kWaterMarks = 0x1
+
+
     class Structs:
         @dataclass
         class ThreadMetricsStruct(ClusterObject):
@@ -8097,6 +8194,14 @@ class ThreadNetworkDiagnostics(Cluster):
             kReed = 0x04
             kRouter = 0x05
             kLeader = 0x06
+
+
+    class Bitmaps:
+        class ThreadNetworkDiagnosticsFeature(IntFlag):
+            kPacketCounts = 0x1
+            kErrorCounts = 0x2
+            kMLECounts = 0x4
+            kMACCounts = 0x8
 
 
     class Structs:
@@ -9438,6 +9543,7 @@ class WiFiNetworkDiagnostics(Cluster):
 
 
 
+
     class Commands:
         @dataclass
         class ResetCounts(ClusterCommand):
@@ -9859,6 +9965,7 @@ class EthernetNetworkDiagnostics(Cluster):
 
 
 
+
     class Commands:
         @dataclass
         class ResetCounts(ClusterCommand):
@@ -10169,6 +10276,7 @@ class TimeSynchronization(Cluster):
             kCloudSource = 0x0E
             kPtp = 0x0F
             kGnss = 0x10
+
 
 
     class Structs:
@@ -10519,6 +10627,7 @@ class BridgedDeviceBasicInformation(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -10947,6 +11056,15 @@ class Switch(Cluster):
     clusterRevision: 'uint' = None
 
 
+    class Bitmaps:
+        class SwitchFeature(IntFlag):
+            kLatchingSwitch = 0x1
+            kMomentarySwitch = 0x2
+            kMomentarySwitchRelease = 0x4
+            kMomentarySwitchLongPress = 0x8
+            kMomentarySwitchMultiPress = 0x10
+
+
 
 
     class Attributes:
@@ -11258,6 +11376,7 @@ class AdministratorCommissioning(Cluster):
 
 
 
+
     class Commands:
         @dataclass
         class OpenCommissioningWindow(ClusterCommand):
@@ -11506,6 +11625,7 @@ class OperationalCredentials(Cluster):
             kFabricConflict = 0x09
             kLabelConflict = 0x0A
             kInvalidFabricIndex = 0x0B
+
 
 
     class Structs:
@@ -11975,6 +12095,7 @@ class GroupKeyManagement(Cluster):
             kCacheAndSync = 0x01
 
 
+
     class Structs:
         @dataclass
         class GroupInfoMapStruct(ClusterObject):
@@ -12304,6 +12425,7 @@ class FixedLabel(Cluster):
     clusterRevision: 'uint' = None
 
 
+
     class Structs:
         @dataclass
         class LabelStruct(ClusterObject):
@@ -12442,6 +12564,7 @@ class UserLabel(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
     class Structs:
@@ -12584,6 +12707,7 @@ class ProxyConfiguration(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -12687,6 +12811,7 @@ class ProxyDiscovery(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -12798,6 +12923,7 @@ class ProxyValid(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -12903,6 +13029,7 @@ class BooleanState(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -13058,6 +13185,11 @@ class ModeSelect(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
+
+    class Bitmaps:
+        class ModeSelectFeature(IntFlag):
+            kDeponoff = 0x1
 
 
     class Structs:
@@ -13550,6 +13682,133 @@ class DoorLock(Cluster):
             kExpiringUser = 0x07
             kScheduleRestrictedUser = 0x08
             kRemoteOnlyUser = 0x09
+
+
+    class Bitmaps:
+        class DaysMaskMap(IntFlag):
+            kSunday = 0x1
+            kMonday = 0x2
+            kTuesday = 0x4
+            kWednesday = 0x8
+            kThursday = 0x10
+            kFriday = 0x20
+            kSaturday = 0x40
+
+        class DlCredentialRuleMask(IntFlag):
+            kSingle = 0x1
+            kDual = 0x2
+            kTri = 0x4
+
+        class DlCredentialRulesSupport(IntFlag):
+            kSingle = 0x1
+            kDual = 0x2
+            kTri = 0x4
+
+        class DlDefaultConfigurationRegister(IntFlag):
+            kEnableLocalProgrammingEnabled = 0x1
+            kKeypadInterfaceDefaultAccessEnabled = 0x2
+            kRemoteInterfaceDefaultAccessIsEnabled = 0x4
+            kSoundEnabled = 0x20
+            kAutoRelockTimeSet = 0x40
+            kLEDSettingsSet = 0x80
+
+        class DlKeypadOperationEventMask(IntFlag):
+            kUnknown = 0x1
+            kLock = 0x2
+            kUnlock = 0x4
+            kLockInvalidPIN = 0x8
+            kLockInvalidSchedule = 0x10
+            kUnlockInvalidCode = 0x20
+            kUnlockInvalidSchedule = 0x40
+            kNonAccessUserOpEvent = 0x80
+
+        class DlKeypadProgrammingEventMask(IntFlag):
+            kUnknown = 0x1
+            kProgrammingPINChanged = 0x2
+            kPINAdded = 0x4
+            kPINCleared = 0x8
+            kPINChanged = 0x10
+
+        class DlLocalProgrammingFeatures(IntFlag):
+            kAddUsersCredentialsSchedulesLocally = 0x1
+            kModifyUsersCredentialsSchedulesLocally = 0x2
+            kClearUsersCredentialsSchedulesLocally = 0x4
+            kAdjustLockSettingsLocally = 0x8
+
+        class DlManualOperationEventMask(IntFlag):
+            kUnknown = 0x1
+            kThumbturnLock = 0x2
+            kThumbturnUnlock = 0x4
+            kOneTouchLock = 0x8
+            kKeyLock = 0x10
+            kKeyUnlock = 0x20
+            kAutoLock = 0x40
+            kScheduleLock = 0x80
+            kScheduleUnlock = 0x100
+            kManualLock = 0x200
+            kManualUnlock = 0x400
+
+        class DlRFIDOperationEventMask(IntFlag):
+            kUnknown = 0x1
+            kLock = 0x2
+            kUnlock = 0x4
+            kLockInvalidRFID = 0x8
+            kLockInvalidSchedule = 0x10
+            kUnlockInvalidRFID = 0x20
+            kUnlockInvalidSchedule = 0x40
+
+        class DlRFIDProgrammingEventMask(IntFlag):
+            kUnknown = 0x1
+            kRFIDCodeAdded = 0x20
+            kRFIDCodeCleared = 0x40
+
+        class DlRemoteOperationEventMask(IntFlag):
+            kUnknown = 0x1
+            kLock = 0x2
+            kUnlock = 0x4
+            kLockInvalidCode = 0x8
+            kLockInvalidSchedule = 0x10
+            kUnlockInvalidCode = 0x20
+            kUnlockInvalidSchedule = 0x40
+
+        class DlRemoteProgrammingEventMask(IntFlag):
+            kUnknown = 0x1
+            kProgrammingPINChanged = 0x2
+            kPINAdded = 0x4
+            kPINCleared = 0x8
+            kPINChanged = 0x10
+            kRFIDCodeAdded = 0x20
+            kRFIDCodeCleared = 0x40
+
+        class DlSupportedOperatingModes(IntFlag):
+            kNormal = 0x1
+            kVacation = 0x2
+            kPrivacy = 0x4
+            kNoRemoteLockUnlock = 0x8
+            kPassage = 0x10
+
+        class DoorLockDayOfWeek(IntFlag):
+            kSunday = 0x1
+            kMonday = 0x2
+            kTuesday = 0x4
+            kWednesday = 0x8
+            kThursday = 0x10
+            kFriday = 0x20
+            kSaturday = 0x40
+
+        class DoorLockFeature(IntFlag):
+            kPinCredential = 0x1
+            kRfidCredential = 0x2
+            kFingerCredentials = 0x4
+            kLogging = 0x8
+            kWeekDayAccessSchedules = 0x10
+            kDoorPositionSensor = 0x20
+            kFaceCredentials = 0x40
+            kCredentialsOverTheAirAccess = 0x80
+            kUser = 0x100
+            kNotification = 0x200
+            kYearDayAccessSchedules = 0x400
+            kHolidaySchedules = 0x800
 
 
     class Structs:
@@ -14994,6 +15253,49 @@ class WindowCovering(Cluster):
             kUnknown = 0xFF
 
 
+    class Bitmaps:
+        class ConfigStatus(IntFlag):
+            kOperational = 0x1
+            kOnlineReserved = 0x2
+            kLiftMovementReversed = 0x4
+            kLiftPositionAware = 0x8
+            kTiltPositionAware = 0x10
+            kLiftEncoderControlled = 0x20
+            kTiltEncoderControlled = 0x40
+
+        class Feature(IntFlag):
+            kLift = 0x1
+            kTilt = 0x2
+            kPositionAwareLift = 0x4
+            kAbsolutePosition = 0x8
+            kPositionAwareTilt = 0x10
+
+        class Mode(IntFlag):
+            kMotorDirectionReversed = 0x1
+            kCalibrationMode = 0x2
+            kMaintenanceMode = 0x4
+            kLedFeedback = 0x8
+
+        class OperationalStatus(IntFlag):
+            kGlobal = 0x3
+            kLift = 0xC
+            kTilt = 0x30
+
+        class SafetyStatus(IntFlag):
+            kRemoteLockout = 0x1
+            kTamperDetection = 0x2
+            kFailedCommunication = 0x4
+            kPositionFailure = 0x8
+            kThermalProtection = 0x10
+            kObstacleDetected = 0x20
+            kPower = 0x40
+            kStopInput = 0x80
+            kMotorJammed = 0x100
+            kHardwareFailure = 0x200
+            kManualOperation = 0x400
+            kProtection = 0x800
+
+
 
     class Commands:
         @dataclass
@@ -15581,6 +15883,7 @@ class BarrierControl(Cluster):
 
 
 
+
     class Commands:
         @dataclass
         class BarrierControlGoToPercent(ClusterCommand):
@@ -15937,6 +16240,28 @@ class PumpConfigurationAndControl(Cluster):
             kMinimum = 0x01
             kMaximum = 0x02
             kLocal = 0x03
+
+
+    class Bitmaps:
+        class PumpFeature(IntFlag):
+            kConstantPressure = 0x1
+            kCompensatedPressure = 0x2
+            kConstantFlow = 0x4
+            kConstantSpeed = 0x8
+            kConstantTemperature = 0x10
+            kAutomatic = 0x20
+            kLocal = 0x40
+
+        class PumpStatus(IntFlag):
+            kDeviceFault = 0x1
+            kSupplyfault = 0x2
+            kSpeedLow = 0x4
+            kSpeedHigh = 0x8
+            kLocalOverride = 0x10
+            kRunning = 0x20
+            kRemotePressure = 0x40
+            kRemoteFlow = 0x80
+            kRemoteTemperature = 0x100
 
 
 
@@ -16828,6 +17153,30 @@ class Thermostat(Cluster):
             kEmergencyHeating = 0x05
             kPrecooling = 0x06
             kFanOnly = 0x07
+
+
+    class Bitmaps:
+        class DayOfWeek(IntFlag):
+            kSunday = 0x1
+            kMonday = 0x2
+            kTuesday = 0x4
+            kWednesday = 0x8
+            kThursday = 0x10
+            kFriday = 0x20
+            kSaturday = 0x40
+            kAwayOrVacation = 0x80
+
+        class ModeForSequence(IntFlag):
+            kHeatSetpointFieldPresent = 0x1
+            kCoolSetpointFieldPresent = 0x2
+
+        class ThermostatFeature(IntFlag):
+            kHeating = 0x1
+            kCooling = 0x2
+            kOccupancy = 0x4
+            kSchedule = 0x8
+            kSetback = 0x10
+            kAutomode = 0x20
 
 
     class Structs:
@@ -17873,6 +18222,27 @@ class FanControl(Cluster):
             kSmart = 0x06
 
 
+    class Bitmaps:
+        class FanControlFeature(IntFlag):
+            kMultiSpeed = 0x1
+            kAuto = 0x2
+            kRocking = 0x4
+            kWind = 0x8
+
+        class RockSupportMask(IntFlag):
+            kRockLeftRight = 0x1
+            kRockUpDown = 0x2
+            kRockRound = 0x4
+
+        class WindSettingMask(IntFlag):
+            kSleepWind = 0x1
+            kNaturalWind = 0x2
+
+        class WindSupportMask(IntFlag):
+            kSleepWind = 0x1
+            kNaturalWind = 0x2
+
+
 
 
     class Attributes:
@@ -18160,6 +18530,7 @@ class ThermostatUserInterfaceConfiguration(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -18458,6 +18829,28 @@ class ColorControl(Cluster):
         class SaturationStepMode(IntEnum):
             kUp = 0x01
             kDown = 0x03
+
+
+    class Bitmaps:
+        class ColorCapabilities(IntFlag):
+            kHueSaturationSupported = 0x1
+            kEnhancedHueSupported = 0x2
+            kColorLoopSupported = 0x4
+            kXYAttributesSupported = 0x8
+            kColorTemperatureSupported = 0x10
+
+        class ColorControlFeature(IntFlag):
+            kHueAndSaturation = 0x1
+            kEnhancedHue = 0x2
+            kColorLoop = 0x4
+            kXy = 0x8
+            kColorTemperature = 0x10
+
+        class ColorLoopUpdateFlags(IntFlag):
+            kUpdateAction = 0x1
+            kUpdateDirection = 0x2
+            kUpdateTime = 0x4
+            kUpdateStartHue = 0x8
 
 
 
@@ -19878,6 +20271,7 @@ class BallastConfiguration(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class PhysicalMinLevel(ClusterAttributeDescriptor):
@@ -20224,6 +20618,7 @@ class IlluminanceMeasurement(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class MeasuredValue(ClusterAttributeDescriptor):
@@ -20419,6 +20814,7 @@ class TemperatureMeasurement(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class MeasuredValue(ClusterAttributeDescriptor):
@@ -20604,6 +21000,11 @@ class PressureMeasurement(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
+
+    class Bitmaps:
+        class PressureFeature(IntFlag):
+            kExtended = 0x1
 
 
 
@@ -20867,6 +21268,7 @@ class FlowMeasurement(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class MeasuredValue(ClusterAttributeDescriptor):
@@ -21042,6 +21444,7 @@ class RelativeHumidityMeasurement(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -21237,6 +21640,7 @@ class OccupancySensing(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -21542,6 +21946,7 @@ class WakeOnLan(Cluster):
 
 
 
+
     class Attributes:
         @dataclass
         class MACAddress(ClusterAttributeDescriptor):
@@ -21676,6 +22081,12 @@ class Channel(Cluster):
 
         class LineupInfoTypeEnum(IntEnum):
             kMso = 0x00
+
+
+    class Bitmaps:
+        class ChannelFeature(IntFlag):
+            kChannelList = 0x1
+            kLineupInfo = 0x2
 
 
     class Structs:
@@ -21950,6 +22361,7 @@ class TargetNavigator(Cluster):
             kNotAllowed = 0x02
 
 
+
     class Structs:
         @dataclass
         class TargetInfo(ClusterObject):
@@ -22168,6 +22580,12 @@ class MediaPlayback(Cluster):
             kPaused = 0x01
             kNotPlaying = 0x02
             kBuffering = 0x03
+
+
+    class Bitmaps:
+        class MediaPlaybackFeature(IntFlag):
+            kAdvancedSeek = 0x1
+            kVariableSpeed = 0x2
 
 
     class Structs:
@@ -22602,6 +23020,11 @@ class MediaInput(Cluster):
             kOther = 0x0B
 
 
+    class Bitmaps:
+        class MediaInputFeature(IntFlag):
+            kNameUpdates = 0x1
+
+
     class Structs:
         @dataclass
         class InputInfo(ClusterObject):
@@ -22824,6 +23247,7 @@ class LowPower(Cluster):
 
 
 
+
     class Commands:
         @dataclass
         class Sleep(ClusterCommand):
@@ -23039,6 +23463,13 @@ class KeypadInput(Cluster):
             kInvalidKeyInCurrentState = 0x02
 
 
+    class Bitmaps:
+        class KeypadInputFeature(IntFlag):
+            kNavigationKeyCodes = 0x1
+            kLocationKeys = 0x2
+            kNumberKeys = 0x4
+
+
 
     class Commands:
         @dataclass
@@ -23206,6 +23637,16 @@ class ContentLauncher(Cluster):
             kSport = 0x0A
             kSportsTeam = 0x0B
             kType = 0x0C
+
+
+    class Bitmaps:
+        class ContentLauncherFeature(IntFlag):
+            kContentSearch = 0x1
+            kURLPlayback = 0x2
+
+        class SupportedStreamingProtocol(IntFlag):
+            kDash = 0x1
+            kHls = 0x2
 
 
     class Structs:
@@ -23511,6 +23952,11 @@ class AudioOutput(Cluster):
             kOther = 0x05
 
 
+    class Bitmaps:
+        class AudioOutputFeature(IntFlag):
+            kNameUpdates = 0x1
+
+
     class Structs:
         @dataclass
         class OutputInfo(ClusterObject):
@@ -23710,6 +24156,11 @@ class ApplicationLauncher(Cluster):
             kSuccess = 0x00
             kAppNotAvailable = 0x01
             kSystemBusy = 0x02
+
+
+    class Bitmaps:
+        class ApplicationLauncherFeature(IntFlag):
+            kApplicationPlatform = 0x1
 
 
     class Structs:
@@ -23971,6 +24422,7 @@ class ApplicationBasic(Cluster):
             kActiveVisibleNotFocus = 0x03
 
 
+
     class Structs:
         @dataclass
         class ApplicationBasicApplication(ClusterObject):
@@ -24219,6 +24671,7 @@ class AccountLogin(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -24659,6 +25112,7 @@ class ElectricalMeasurement(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
 
 
 
@@ -26907,6 +27361,7 @@ class ClientMonitoring(Cluster):
     clusterRevision: 'uint' = None
 
 
+
     class Structs:
         @dataclass
         class MonitoringRegistration(ClusterObject):
@@ -27315,6 +27770,37 @@ class UnitTesting(Cluster):
             kValueA = 0x01
             kValueB = 0x02
             kValueC = 0x03
+
+
+    class Bitmaps:
+        class Bitmap16MaskMap(IntFlag):
+            kMaskVal1 = 0x1
+            kMaskVal2 = 0x2
+            kMaskVal3 = 0x4
+            kMaskVal4 = 0x4000
+
+        class Bitmap32MaskMap(IntFlag):
+            kMaskVal1 = 0x1
+            kMaskVal2 = 0x2
+            kMaskVal3 = 0x4
+            kMaskVal4 = 0x40000000
+
+        class Bitmap64MaskMap(IntFlag):
+            kMaskVal1 = 0x1
+            kMaskVal2 = 0x2
+            kMaskVal3 = 0x4
+            kMaskVal4 = 0x4000000000000000
+
+        class Bitmap8MaskMap(IntFlag):
+            kMaskVal1 = 0x1
+            kMaskVal2 = 0x2
+            kMaskVal3 = 0x4
+            kMaskVal4 = 0x40
+
+        class SimpleBitmap(IntFlag):
+            kValueA = 0x1
+            kValueB = 0x2
+            kValueC = 0x4
 
 
     class Structs:
@@ -29593,6 +30079,7 @@ class FaultInjection(Cluster):
             kInetFault = 0x02
             kChipFault = 0x03
             kCertFault = 0x04
+
 
 
 
