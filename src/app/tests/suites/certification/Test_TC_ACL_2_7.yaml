@@ -62,7 +62,7 @@ tests:
     - label:
           "Step 3:TH1 puts DUT into commissioning mode, TH2 commissions DUT
           using admin node ID N2"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:

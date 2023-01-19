@@ -11158,9 +11158,9 @@ namespace Attributes {
 namespace WindowStatus {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus;
-    using DecodableType    = chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus;
-    using DecodableArgType = chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus;
+    using Type             = chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum;
+    using DecodableType    = chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum;
+    using DecodableArgType = chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WindowStatus::Id; }
@@ -11231,7 +11231,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::WindowStatus::TypeInfo::DecodableType windowStatus =
-            static_cast<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus>(0);
+            static_cast<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum>(0);
         Attributes::AdminFabricIndex::TypeInfo::DecodableType adminFabricIndex;
         Attributes::AdminVendorId::TypeInfo::DecodableType adminVendorId;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;

@@ -1773,9 +1773,10 @@ namespace AdministratorCommissioning {
 namespace Attributes {
 
 namespace WindowStatus {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus * value); // CommissioningWindowStatus
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value);
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum * value); // CommissioningWindowStatusEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum value);
 } // namespace WindowStatus
 
 namespace AdminFabricIndex {

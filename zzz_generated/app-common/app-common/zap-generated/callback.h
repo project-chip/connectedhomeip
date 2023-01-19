@@ -282,7 +282,7 @@ void emberAfBridgedDeviceBasicInformationClusterInitCallback(chip::EndpointId en
  */
 void emberAfSwitchClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief AdministratorCommissioning Cluster Init
+/** @brief Administrator Commissioning Cluster Init
  *
  * Cluster Init
  *
@@ -3600,10 +3600,10 @@ void emberAfSwitchClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfSwitchClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// AdministratorCommissioning Cluster
+// Administrator Commissioning Cluster
 //
 
-/** @brief AdministratorCommissioning Cluster Server Init
+/** @brief Administrator Commissioning Cluster Server Init
  *
  * Server Init
  *
@@ -3611,7 +3611,7 @@ void emberAfSwitchClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfAdministratorCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief AdministratorCommissioning Cluster Client Init
+/** @brief Administrator Commissioning Cluster Client Init
  *
  * Client Init
  *
@@ -3619,7 +3619,7 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(chip::EndpointId
  */
 void emberAfAdministratorCommissioningClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief AdministratorCommissioning Cluster Server Attribute Changed
+/** @brief Administrator Commissioning Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
@@ -3627,7 +3627,7 @@ void emberAfAdministratorCommissioningClusterClientInitCallback(chip::EndpointId
  */
 void MatterAdministratorCommissioningClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief AdministratorCommissioning Cluster Server Message Sent
+/** @brief Administrator Commissioning Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -3641,7 +3641,7 @@ void emberAfAdministratorCommissioningClusterServerMessageSentCallback(const chi
                                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                        EmberStatus status);
 
-/** @brief AdministratorCommissioning Cluster Client Message Sent
+/** @brief Administrator Commissioning Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -3655,7 +3655,7 @@ void emberAfAdministratorCommissioningClusterClientMessageSentCallback(const chi
                                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                        EmberStatus status);
 
-/** @brief AdministratorCommissioning Cluster Server Pre Attribute Changed
+/** @brief Administrator Commissioning Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -3667,7 +3667,7 @@ void emberAfAdministratorCommissioningClusterClientMessageSentCallback(const chi
 chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief AdministratorCommissioning Cluster Client Pre Attribute Changed
+/** @brief Administrator Commissioning Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -3679,7 +3679,7 @@ chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningCluste
 chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningClusterClientPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief AdministratorCommissioning Cluster Server Tick
+/** @brief Administrator Commissioning Cluster Server Tick
  *
  * Server Tick
  *
@@ -3687,7 +3687,7 @@ chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningCluste
  */
 void emberAfAdministratorCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief AdministratorCommissioning Cluster Client Tick
+/** @brief Administrator Commissioning Cluster Client Tick
  *
  * Client Tick
  *
@@ -8081,19 +8081,19 @@ bool emberAfTimeSynchronizationClusterSetUtcTimeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TimeSynchronization::Commands::SetUtcTime::DecodableType & commandData);
 /**
- * @brief AdministratorCommissioning Cluster OpenCommissioningWindow Command callback (from client)
+ * @brief Administrator Commissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData);
 /**
- * @brief AdministratorCommissioning Cluster OpenBasicCommissioningWindow Command callback (from client)
+ * @brief Administrator Commissioning Cluster OpenBasicCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
 /**
- * @brief AdministratorCommissioning Cluster RevokeCommissioning Command callback (from client)
+ * @brief Administrator Commissioning Cluster RevokeCommissioning Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

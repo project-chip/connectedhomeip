@@ -3108,7 +3108,10 @@
               - GranularityEnum
               - TimeSourceEnum
           AdministratorCommissioning:
-              - CommissioningWindowStatus
+              # CommissioningWindowStatusEnum was originally just named
+              # CommissioningWindowStatus, but we generate the same API for both
+              # of those names, so the name can just change here.
+              - CommissioningWindowStatusEnum
               - StatusCode
           OperationalCredentials:
               - OperationalCertStatus
@@ -3532,7 +3535,10 @@
                   - Ptp
                   - Gnss
           AdministratorCommissioning:
-              CommissioningWindowStatus:
+              # CommissioningWindowStatusEnum was originally just named
+              # CommissioningWindowStatus, but we generate the same API for both
+              # of those names, so the name can just change here.
+              CommissioningWindowStatusEnum:
                   - WindowNotOpen
                   - EnhancedWindowOpen
                   - BasicWindowOpen

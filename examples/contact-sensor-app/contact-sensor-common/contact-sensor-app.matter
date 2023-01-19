@@ -1013,7 +1013,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster AdministratorCommissioning = 60 {
-  enum CommissioningWindowStatus : ENUM8 {
+  enum CommissioningWindowStatusEnum : ENUM8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
     kBasicWindowOpen = 2;
@@ -1025,7 +1025,7 @@ server cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 4;
   }
 
-  readonly attribute CommissioningWindowStatus windowStatus = 0;
+  readonly attribute CommissioningWindowStatusEnum windowStatus = 0;
   readonly attribute nullable fabric_idx adminFabricIndex = 1;
   readonly attribute nullable int16u adminVendorId = 2;
   readonly attribute bitmap32 featureMap = 65532;

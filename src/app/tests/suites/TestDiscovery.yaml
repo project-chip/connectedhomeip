@@ -54,7 +54,7 @@ tests:
                 value: nodeId
 
     - label: "Open Commissioning Window with too-short timeout"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -65,7 +65,7 @@ tests:
           error: INVALID_COMMAND
 
     - label: "Open Commissioning Window with too-long timeout"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -76,7 +76,7 @@ tests:
           error: INVALID_COMMAND
 
     - label: "Open Commissioning Window"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -320,7 +320,7 @@ tests:
                 value: nodeId
 
     - label: "Open Commissioning Window"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:

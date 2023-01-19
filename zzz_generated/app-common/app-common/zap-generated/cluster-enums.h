@@ -945,8 +945,8 @@ enum class SwitchFeature : uint32_t
 
 namespace AdministratorCommissioning {
 
-// Enum for CommissioningWindowStatus
-enum class CommissioningWindowStatus : uint8_t
+// Enum for CommissioningWindowStatusEnum
+enum class CommissioningWindowStatusEnum : uint8_t
 {
     kWindowNotOpen      = 0x00,
     kEnhancedWindowOpen = 0x01,

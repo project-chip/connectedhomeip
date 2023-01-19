@@ -334,10 +334,10 @@ typedef void (*TimeSynchronizationClusterTimeSourceEnumAttributeCallback)(void *
                                                                           chip::app::Clusters::TimeSynchronization::TimeSourceEnum);
 typedef void (*NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeSourceEnum> &);
-typedef void (*AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
-    void *, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus);
-typedef void (*NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> &);
+typedef void (*AdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallback)(
+    void *, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum);
+typedef void (*NullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum> &);
 typedef void (*AdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, chip::app::Clusters::AdministratorCommissioning::StatusCode);
 typedef void (*NullableAdministratorCommissioningClusterStatusCodeAttributeCallback)(
@@ -15422,77 +15422,78 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>
+class MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallback>
 {
 public:
-    MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler) :
-        MTRCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>(queue, handler,
-                                                                                                       OnSuccessFn){};
+    MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler) :
+        MTRCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallback>(queue, handler,
+                                                                                                           OnSuccessFn){};
 
-    MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler,
-                                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>(queue, handler, action,
-                                                                                                       OnSuccessFn){};
+    MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler,
+                                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                                           OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum value);
 };
 
-class MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge
-    : public MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
+class MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge
 {
 public:
-    MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge(
+    MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(queue, handler, action),
+        MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnDone;
+    using MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>
+class MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallback>
 {
 public:
-    MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                 ResponseHandler handler) :
-        MTRCallbackBridge<NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>(queue, handler,
-                                                                                                               OnSuccessFn){};
+    MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallback>(queue, handler,
+                                                                                                                   OnSuccessFn){};
 
-    MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                 ResponseHandler handler,
-                                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>(
+    MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                     ResponseHandler handler,
+                                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallback>(
             queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> & value);
+        const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum> &
+            value);
 };
 
-class MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
+class MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge(
+    MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(queue, handler, action),
+        MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnDone;
+    using MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

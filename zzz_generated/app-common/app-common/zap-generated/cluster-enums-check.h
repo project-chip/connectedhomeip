@@ -1016,9 +1016,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::Ti
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(AdministratorCommissioning::CommissioningWindowStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(AdministratorCommissioning::CommissioningWindowStatusEnum val)
 {
-    using EnumType = AdministratorCommissioning::CommissioningWindowStatus;
+    using EnumType = AdministratorCommissioning::CommissioningWindowStatusEnum;
     switch (val)
     {
     case EnumType::kWindowNotOpen:

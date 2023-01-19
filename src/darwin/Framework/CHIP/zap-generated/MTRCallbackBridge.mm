@@ -15810,15 +15810,16 @@ void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscri
     }
 }
 
-void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value)
+void MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15833,8 +15834,8 @@ void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallb
     }
 }
 
-void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> & value)
+void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15845,7 +15846,7 @@ void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttrib
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::
+void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {

@@ -70,7 +70,7 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -111,7 +111,7 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -261,7 +261,7 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:

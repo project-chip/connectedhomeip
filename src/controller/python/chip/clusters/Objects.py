@@ -11226,7 +11226,7 @@ class AdministratorCommissioning(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="windowStatus", Tag=0x00000000, Type=AdministratorCommissioning.Enums.CommissioningWindowStatus),
+                ClusterObjectFieldDescriptor(Label="windowStatus", Tag=0x00000000, Type=AdministratorCommissioning.Enums.CommissioningWindowStatusEnum),
                 ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="adminVendorId", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -11236,7 +11236,7 @@ class AdministratorCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    windowStatus: 'AdministratorCommissioning.Enums.CommissioningWindowStatus' = None
+    windowStatus: 'AdministratorCommissioning.Enums.CommissioningWindowStatusEnum' = None
     adminFabricIndex: 'typing.Union[Nullable, uint]' = None
     adminVendorId: 'typing.Union[Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -11246,7 +11246,7 @@ class AdministratorCommissioning(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class CommissioningWindowStatus(IntEnum):
+        class CommissioningWindowStatusEnum(IntEnum):
             kWindowNotOpen = 0x00
             kEnhancedWindowOpen = 0x01
             kBasicWindowOpen = 0x02
@@ -11339,9 +11339,9 @@ class AdministratorCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=AdministratorCommissioning.Enums.CommissioningWindowStatus)
+                return ClusterObjectFieldDescriptor(Type=AdministratorCommissioning.Enums.CommissioningWindowStatusEnum)
 
-            value: 'AdministratorCommissioning.Enums.CommissioningWindowStatus' = 0
+            value: 'AdministratorCommissioning.Enums.CommissioningWindowStatusEnum' = 0
 
         @dataclass
         class AdminFabricIndex(ClusterAttributeDescriptor):
