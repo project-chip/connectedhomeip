@@ -37,7 +37,6 @@
 
 #include <platform/cc32xx/CC32XXConfig.h>
 
-#include "app/server/Dnssd.h"
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
