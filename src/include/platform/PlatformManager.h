@@ -109,14 +109,6 @@ public:
      * other.
      */
     CHIP_ERROR InitChipStack();
-    void Shutdown();
-
-    void LockChipStack();
-    bool TryLockChipStack();
-    void UnlockChipStack();
-#if CHIP_STACK_LOCK_TRACKING_ENABLED
-    bool IsChipStackLockedByCurrentThread() const;
-#endif
 
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
@@ -147,15 +139,6 @@ public:
      * processing thread) before ScheduleWork returns.
      */
     CHIP_ERROR ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
-
-    /*
-     * PostEvent can be called safely on any thread without locking the stack.
-     * When called from a thread that is not doing the stack work item
-     * processing, the event might get dispatched (on the work item processing
-     * thread) before PostEvent returns.
-     */
-    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
-    void PostEventOrDie(const ChipDeviceEvent * event);
 
     /**
      * Process work items until StopEventLoopTask is called.  RunEventLoop will
@@ -201,6 +184,24 @@ public:
      * returns.
      */
     CHIP_ERROR StopEventLoopTask();
+
+    void LockChipStack();
+    bool TryLockChipStack();
+    void UnlockChipStack();
+    void Shutdown();
+
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+    bool IsChipStackLockedByCurrentThread() const;
+#endif
+
+    /*
+     * PostEvent can be called safely on any thread without locking the stack.
+     * When called from a thread that is not doing the stack work item
+     * processing, the event might get dispatched (on the work item processing
+     * thread) before PostEvent returns.
+     */
+    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
+    void PostEventOrDie(const ChipDeviceEvent * event);
 
     CHIP_ERROR ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
 
@@ -326,6 +327,13 @@ public:
 namespace chip {
 namespace DeviceLayer {
 
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+inline bool PlatformManager::IsChipStackLockedByCurrentThread() const
+{
+    return static_cast<const ImplClass *>(this)->_IsChipStackLockedByCurrentThread();
+}
+#endif
+
 inline CHIP_ERROR PlatformManager::InitChipStack()
 {
     // NOTE: this is NOT thread safe and cannot be as the chip stack lock is prepared by
@@ -344,40 +352,6 @@ inline CHIP_ERROR PlatformManager::InitChipStack()
     mInitialized   = (err == CHIP_NO_ERROR);
     return err;
 }
-
-/**
- * @brief
- *   Shuts down and cleans up the main objects in the CHIP stack.
- *   This DOES NOT stop the chip thread or event queue from running.
- *
- */
-inline void PlatformManager::Shutdown()
-{
-    static_cast<ImplClass *>(this)->_Shutdown();
-    mInitialized = false;
-}
-
-inline void PlatformManager::LockChipStack()
-{
-    static_cast<ImplClass *>(this)->_LockChipStack();
-}
-
-inline bool PlatformManager::TryLockChipStack()
-{
-    return static_cast<ImplClass *>(this)->_TryLockChipStack();
-}
-
-inline void PlatformManager::UnlockChipStack()
-{
-    static_cast<ImplClass *>(this)->_UnlockChipStack();
-}
-
-#if CHIP_STACK_LOCK_TRACKING_ENABLED
-inline bool PlatformManager::IsChipStackLockedByCurrentThread() const
-{
-    return static_cast<const ImplClass *>(this)->_IsChipStackLockedByCurrentThread();
-}
-#endif
 
 inline CHIP_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, intptr_t arg)
 {
@@ -402,18 +376,6 @@ inline void PlatformManager::HandleServerShuttingDown()
 inline CHIP_ERROR PlatformManager::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
     return static_cast<ImplClass *>(this)->_ScheduleWork(workFunct, arg);
-}
-
-inline CHIP_ERROR PlatformManager::PostEvent(const ChipDeviceEvent * event)
-{
-    return static_cast<ImplClass *>(this)->_PostEvent(event);
-}
-
-inline void PlatformManager::PostEventOrDie(const ChipDeviceEvent * event)
-{
-    CHIP_ERROR status = static_cast<ImplClass *>(this)->_PostEvent(event);
-    VerifyOrDieWithMsg(status == CHIP_NO_ERROR, DeviceLayer, "Failed to post event %d: %" CHIP_ERROR_FORMAT,
-                       static_cast<int>(event->Type), status.Format());
 }
 
 inline void PlatformManager::RunEventLoop()
@@ -450,6 +412,45 @@ inline CHIP_ERROR PlatformManager::StartEventLoopTask()
 inline CHIP_ERROR PlatformManager::StopEventLoopTask()
 {
     return static_cast<ImplClass *>(this)->_StopEventLoopTask();
+}
+
+/**
+ * @brief
+ *   Shuts down and cleans up the main objects in the CHIP stack.
+ *   This DOES NOT stop the chip thread or event queue from running.
+ *
+ */
+inline void PlatformManager::Shutdown()
+{
+    static_cast<ImplClass *>(this)->_Shutdown();
+    mInitialized = false;
+}
+
+inline void PlatformManager::LockChipStack()
+{
+    static_cast<ImplClass *>(this)->_LockChipStack();
+}
+
+inline bool PlatformManager::TryLockChipStack()
+{
+    return static_cast<ImplClass *>(this)->_TryLockChipStack();
+}
+
+inline void PlatformManager::UnlockChipStack()
+{
+    static_cast<ImplClass *>(this)->_UnlockChipStack();
+}
+
+inline CHIP_ERROR PlatformManager::PostEvent(const ChipDeviceEvent * event)
+{
+    return static_cast<ImplClass *>(this)->_PostEvent(event);
+}
+
+inline void PlatformManager::PostEventOrDie(const ChipDeviceEvent * event)
+{
+    CHIP_ERROR status = static_cast<ImplClass *>(this)->_PostEvent(event);
+    VerifyOrDieWithMsg(status == CHIP_NO_ERROR, DeviceLayer, "Failed to post event %d: %" CHIP_ERROR_FORMAT,
+                       static_cast<int>(event->Type), status.Format());
 }
 
 inline CHIP_ERROR PlatformManager::ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg)
