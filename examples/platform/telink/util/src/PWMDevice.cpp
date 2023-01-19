@@ -70,8 +70,8 @@ bool PWMDevice::InitiateAction(Action_t aAction, int32_t aActor, uint8_t * value
         action_initiated = true;
         new_state        = kState_Off;
     }
-    else if ((aAction == LEVEL_ACTION || aAction == COLOR_ACTION_XY
-            || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT) && *value != mLevel)
+    else if ((aAction == LEVEL_ACTION || aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT) &&
+             *value != mLevel)
     {
         action_initiated = true;
         if (*value == 0)
@@ -95,8 +95,7 @@ bool PWMDevice::InitiateAction(Action_t aAction, int32_t aActor, uint8_t * value
         {
             Set(new_state == kState_On);
         }
-        else if (aAction == LEVEL_ACTION || aAction == COLOR_ACTION_XY
-                || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT)
+        else if (aAction == LEVEL_ACTION || aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT)
         {
             SetLevel(*value);
         }

@@ -64,7 +64,7 @@ constexpr uint8_t kDefaultMaxLevel        = 254;
 const struct pwm_dt_spec sBluePwmLed = LIGHTING_PWM_SPEC_BLUE;
 #if USE_RGB_PWM
 const struct pwm_dt_spec sGreenPwmLed = LIGHTING_PWM_SPEC_GREEN;
-const struct pwm_dt_spec sRedPwmLed = LIGHTING_PWM_SPEC_RED;
+const struct pwm_dt_spec sRedPwmLed   = LIGHTING_PWM_SPEC_RED;
 #endif
 
 #if CONFIG_CHIP_FACTORY_DATA
@@ -298,16 +298,18 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         {
             action = PWMDevice::OFF_ACTION;
         }
-        else {
+        else
+        {
             action = PWMDevice::ON_ACTION;
         }
 #else
         action = sAppTask.mBluePwmLed.IsTurnedOn() ? PWMDevice::OFF_ACTION : PWMDevice::ON_ACTION;
 #endif
-        actor  = AppEvent::kEventType_Button;
+        actor = AppEvent::kEventType_Button;
     }
 
-    if (action != PWMDevice::INVALID_ACTION && (
+    if (action != PWMDevice::INVALID_ACTION &&
+        (
 #if USE_RGB_PWM
             !sAppTask.mRedPwmLed.InitiateAction(action, actor, NULL) ||
             !sAppTask.mGreenPwmLed.InitiateAction(action, actor, NULL) ||
@@ -526,7 +528,7 @@ void AppTask::UpdateClusterState()
 #if USE_RGB_PWM
     bool isTurnedOn = sAppTask.mRedPwmLed.IsTurnedOn() || sAppTask.mGreenPwmLed.IsTurnedOn() || sAppTask.mBluePwmLed.IsTurnedOn();
 #else
-    bool isTurnedOn = sAppTask.mBluePwmLed.IsTurnedOn();
+    bool isTurnedOn  = sAppTask.mBluePwmLed.IsTurnedOn();
 #endif
     // write the new on/off value
     EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(1, isTurnedOn);
@@ -538,9 +540,8 @@ void AppTask::UpdateClusterState()
 
 #if USE_RGB_PWM
     uint8_t setLevel;
-    if (sColorAction == PWMDevice::COLOR_ACTION_XY
-            || sColorAction == PWMDevice::COLOR_ACTION_HSV
-            || sColorAction == PWMDevice::COLOR_ACTION_CT)
+    if (sColorAction == PWMDevice::COLOR_ACTION_XY || sColorAction == PWMDevice::COLOR_ACTION_HSV ||
+        sColorAction == PWMDevice::COLOR_ACTION_CT)
     {
         setLevel = sBrightness;
     }
@@ -622,7 +623,7 @@ void AppTask::InitButtons(void)
 
 void AppTask::SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uint8_t * value)
 {
- #if USE_RGB_PWM
+#if USE_RGB_PWM
     bool setRgbAction = false;
     RgbColor_t rgb;
 #endif
@@ -648,7 +649,7 @@ void AppTask::SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uin
         else if (sColorAction == PWMDevice::COLOR_ACTION_HSV)
         {
             sHSV.v = sBrightness;
-            rgb = HsvToRgb(sHSV);
+            rgb    = HsvToRgb(sHSV);
         }
         else
         {
@@ -669,18 +670,17 @@ void AppTask::SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uin
     {
         sXY = *reinterpret_cast<XyColor_t *>(value);
         rgb = XYToRgb(sBrightness, sXY.x, sXY.y);
-        ChipLogProgress(Zcl, "XY to RGB: X: %u, Y: %u, Level: %u | R: %u, G: %u, B: %u",
-                sXY.x, sXY.y, sBrightness, rgb.r, rgb.g, rgb.b);
+        ChipLogProgress(Zcl, "XY to RGB: X: %u, Y: %u, Level: %u | R: %u, G: %u, B: %u", sXY.x, sXY.y, sBrightness, rgb.r, rgb.g,
+                        rgb.b);
         setRgbAction = true;
         sColorAction = PWMDevice::COLOR_ACTION_XY;
     }
     else if (aAction == PWMDevice::COLOR_ACTION_HSV)
     {
-        sHSV = *reinterpret_cast<HsvColor_t *>(value);
+        sHSV   = *reinterpret_cast<HsvColor_t *>(value);
         sHSV.v = sBrightness;
-        rgb = HsvToRgb(sHSV);
-        ChipLogProgress(Zcl, "HSV to RGB: H: %u, S: %u, V: %u | R: %u, G: %u, B: %u",
-                sHSV.h, sHSV.s, sHSV.v, rgb.r, rgb.g, rgb.b);
+        rgb    = HsvToRgb(sHSV);
+        ChipLogProgress(Zcl, "HSV to RGB: H: %u, S: %u, V: %u | R: %u, G: %u, B: %u", sHSV.h, sHSV.s, sHSV.v, rgb.r, rgb.g, rgb.b);
         setRgbAction = true;
         sColorAction = PWMDevice::COLOR_ACTION_HSV;
     }

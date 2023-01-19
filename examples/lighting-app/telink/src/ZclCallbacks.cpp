@@ -17,8 +17,8 @@
  */
 
 #include "AppTask.h"
-#include "PWMDevice.h"
 #include "ColorFormat.h"
+#include "PWMDevice.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -42,7 +42,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
         GetAppTask().SetInitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
-                                    static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+                                       static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
@@ -79,8 +79,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             }
 
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_XY,
-                                           static_cast<int32_t>(AppEvent::kEventType_Lighting), (uint8_t *) &xy);
+            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+                                           (uint8_t *) &xy);
         }
         /* HSV color space */
         else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
@@ -101,13 +101,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 hsv.s = *value;
             }
             ChipLogProgress(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_HSV,
-                                           static_cast<int32_t>(AppEvent::kEventType_Lighting), (uint8_t *) &hsv);
+            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+                                           (uint8_t *) &hsv);
         }
         /* Temperature Mireds color space */
         else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
         {
-            ChipLogProgress(Zcl, "New Temperature Mireds color = %u", *(uint16_t*)value);
+            ChipLogProgress(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
             GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
         }
         else
