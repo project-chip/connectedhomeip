@@ -4828,6 +4828,8 @@
               - RegisterClientMonitoring
               - UnregisterClientMonitoring
               - StayAwakeRequest
+          ContentLauncher:
+              - LauncherResponse
       command fields:
           UnitTesting:
               TestSpecificResponse:
@@ -5030,6 +5032,10 @@
           ColorControl:
               MoveToColorTemperature:
                   - colorTemperatureMireds
+          ContentLauncher:
+              LauncherResponse:
+                  - status
+                  - data
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5684,6 +5690,9 @@
               - Rssi
           GeneralDiagnostics:
               - BootReasons
+      commands:
+          ContentLauncher:
+              - LaunchResponse
       command fields:
           Groups:
               AddGroup:
@@ -5975,6 +5984,8 @@
       commands:
           OTASoftwareUpdateRequestor:
               AnnounceOTAProvider: AnnounceOtaProvider
+          ContentLauncher:
+              LauncherResponse: LaunchResponse
       command fields:
           OTASoftwareUpdateProvider:
               QueryImage:

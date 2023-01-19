@@ -24,7 +24,7 @@
 
 // COMMAND CLASSES
 class LaunchURLCommand : public MediaCommandBase<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type,
-                                                 chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType>
+                                                 chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType>
 {
 public:
     LaunchURLCommand() : MediaCommandBase(chip::app::Clusters::ContentLauncher::Id) {}
@@ -35,8 +35,9 @@ public:
            std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class LaunchContentCommand : public MediaCommandBase<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type,
-                                                     chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType>
+class LaunchContentCommand
+    : public MediaCommandBase<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type,
+                              chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType>
 {
 public:
     LaunchContentCommand() : MediaCommandBase(chip::app::Clusters::ContentLauncher::Id) {}

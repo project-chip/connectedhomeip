@@ -32,7 +32,7 @@
 namespace chip {
 namespace AppPlatform {
 
-using LaunchResponseType = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+using LaunchResponseType = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
 
 std::string ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath)
 {

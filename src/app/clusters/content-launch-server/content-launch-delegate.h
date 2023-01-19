@@ -40,11 +40,11 @@ using Parameter           = chip::app::Clusters::ContentLauncher::Structs::Param
 class Delegate
 {
 public:
-    virtual void HandleLaunchContent(CommandResponseHelper<Commands::LaunchResponse::Type> & helper,
+    virtual void HandleLaunchContent(CommandResponseHelper<Commands::LauncherResponse::Type> & helper,
                                      const DataModel::DecodableList<Parameter> & parameterList, bool autoplay,
                                      const CharSpan & data) = 0;
 
-    virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LaunchResponse::Type> & helper, const CharSpan & contentUrl,
+    virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LauncherResponse::Type> & helper, const CharSpan & contentUrl,
                                  const CharSpan & displayString, const BrandingInformation & brandingInformation) = 0;
 
     virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;
