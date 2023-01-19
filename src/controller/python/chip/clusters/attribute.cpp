@@ -370,7 +370,8 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
     client.release();
     callback.release();
 
-    if (busyWaitMs) {
+    if (busyWaitMs)
+    {
         usleep(busyWaitMs * 1000);
     }
 

@@ -163,7 +163,8 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
     sender.release();
     callback.release();
 
-    if (busyWaitMs) {
+    if (busyWaitMs)
+    {
         usleep(busyWaitMs * 1000);
     }
 
