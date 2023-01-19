@@ -146,6 +146,9 @@ class ZAPGenerateTarget:
 
 class GoldenTestImageTarget():
     def __init__(self):
+        # NOTE: output-path is inside the tree. This is because clang-format
+        #       will search for a .clang-format file in the directory tree
+        #       so attempts to format outside the tree will generate diffs.
         self.tempdir = tempfile.mkdtemp(prefix='test_golden', dir='./out')
         self.command = ["./scripts/tools/zap/test_generate.py", "--output", self.tempdir, "--regenerate"]
 
