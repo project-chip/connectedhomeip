@@ -102,10 +102,16 @@ typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumNam
    {{/inline}}
    {{> oldNameItemDecl oldItemName=(oldName ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true))}}
    {{/zcl_enum_items}}
+   {{!We had extra "Not Supported" values for DoorLockUserStatus/DoorLockUserType that we have to wedge in here manually for now.}}
+   {{#if (and (isStrEqual clusterName "DoorLock")
+              (or (isStrEqual enumName "UserTypeEnum") (isStrEqual enumName "UserStatusEnum"))
+              (not (wasRemoved clusterName enum=enumName enumValue="NotSupported")))}}
+   {{objCEnumName clusterName enumName}}{{objCEnumItemLabel "NotSupported"}} {{availability clusterName enum=enumName enumValue="NotSupported" deprecationMessage="This value is not part of the specification and will be removed"}} = 0xFF,
+   {{/if}}
 }
 {{/inline}}
 {{#unless (wasRemoved (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true))}}
-{{> enumDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) enumName=(asUpperCamelCase label preserveAcronyms=true)}} {{availability (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true)}};
+{{> enumDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) enumName=(asUpperCamelCase label preserveAcronyms=true)}} {{availability (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage="This enum is unused and will be removed"}};
 {{/unless}}
 {{! Takes the name of the enum to use as enumName. }}
 {{#*inline "oldNameDecl"}}

@@ -498,6 +498,32 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Struc
     ComplexArgumentParser::Finalize(request.parameterList);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CredentialStruct.credentialType", "credentialType",
+                                                                  value.isMember("credentialType")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CredentialStruct.credentialIndex", "credentialIndex",
+                                                                  value.isMember("credentialIndex")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "credentialType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.credentialType, value["credentialType"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "credentialIndex");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.credentialIndex, value["credentialIndex"]));
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.credentialType);
+    ComplexArgumentParser::Finalize(request.credentialIndex);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                                         Json::Value & value)
 {
@@ -551,31 +577,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Struc
     ComplexArgumentParser::Finalize(request.width);
     ComplexArgumentParser::Finalize(request.height);
     ComplexArgumentParser::Finalize(request.metric);
-}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DlCredential.credentialType", "credentialType",
-                                                                  value.isMember("credentialType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DlCredential.credentialIndex", "credentialIndex",
-                                                                  value.isMember("credentialIndex")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "credentialType");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.credentialType, value["credentialType"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "credentialIndex");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.credentialIndex, value["credentialIndex"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::DlCredential::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.credentialType);
-    ComplexArgumentParser::Finalize(request.credentialIndex);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::UnitTesting::Structs::DoubleNestedStructList::Type & request,

@@ -9,9 +9,10 @@
 
 import typing
 from dataclasses import dataclass, field
+from enum import IntFlag
 
 from chip import ChipUtility
-from chip.enum import MatterIntEnum
+from chip.clusters.enum import MatterIntEnum
 from chip.tlv import float32, uint
 
 from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
@@ -61,6 +62,17 @@ class {{asUpperCamelCase name}}(Cluster):
 
 {{/zcl_enums}}
 
+{{#zcl_bitmaps}}
+{{#first}}
+    class Bitmaps:
+{{/first}}
+        class {{asType label}}(IntFlag):
+{{#zcl_bitmap_items}}
+            k{{asUpperCamelCase label}} = {{asHex mask}}
+{{/zcl_bitmap_items}}
+
+{{/zcl_bitmaps}}
+
 {{#zcl_structs}}
 {{#first}}
     class Structs:
@@ -92,7 +104,7 @@ class {{asUpperCamelCase name}}(Cluster):
         @dataclass
         class {{asUpperCamelCase name}}(ClusterCommand):
             cluster_id: typing.ClassVar[int] = {{ asHex parent.code 4 }}
-            command_id: typing.ClassVar[int] = {{ asHex code 4 }}
+            command_id: typing.ClassVar[int] = {{ asMEI manufacturerCode code }}
 {{#if (isServer source)}}
             is_client: typing.ClassVar[bool] = False
 {{else}}

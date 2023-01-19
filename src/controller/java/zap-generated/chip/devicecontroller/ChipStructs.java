@@ -1318,11 +1318,11 @@ public class ChipStructs {
     }
   }
 
-  public static class DoorLockClusterDlCredential {
+  public static class DoorLockClusterCredentialStruct {
     public Integer credentialType;
     public Integer credentialIndex;
 
-    public DoorLockClusterDlCredential(Integer credentialType, Integer credentialIndex) {
+    public DoorLockClusterCredentialStruct(Integer credentialType, Integer credentialIndex) {
       this.credentialType = credentialType;
       this.credentialIndex = credentialIndex;
     }
@@ -1330,7 +1330,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterDlCredential {\n");
+      output.append("DoorLockClusterCredentialStruct {\n");
       output.append("\tcredentialType: ");
       output.append(credentialType);
       output.append("\n");

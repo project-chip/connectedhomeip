@@ -2163,7 +2163,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster AdministratorCommissioning
+ * Cluster Administrator Commissioning
  *    Commands to trigger a Node to allow a new Administrator to commission it.
  */
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
