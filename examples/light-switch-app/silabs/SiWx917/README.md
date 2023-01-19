@@ -4,22 +4,22 @@ An example showing the use of CHIP on the Silicon Labs SiWx917 SoC device.
 
 <hr>
 
-- [Matter SiWx917 Light Switch Example](#matter-siwx917-light-switch-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-      - [Linux](#linux)
-      - [Mac OS X](#mac-os-x)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Notes](#notes)
-      - [On PC(Linux):](#on-pclinux)
-  - [Memory settings](#memory-settings)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [Disabling LCD](#disabling-lcd)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter SiWx917 Light Switch Example](#matter-siwx917-light-switch-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+        -   [Linux](#linux)
+        -   [Mac OS X](#mac-os-x)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+            -   [On PC(Linux):](#on-pclinux)
+    -   [Memory settings](#memory-settings)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
