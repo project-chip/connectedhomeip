@@ -76,7 +76,7 @@ tests:
       response:
           saveAs: th2FabricIndex
 
-    - label: "TH1 writes ACL giving view privilge for descriptor cluster"
+    - label: "TH1 writes ACL giving view privilege for descriptor cluster"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
