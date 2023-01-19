@@ -1317,7 +1317,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
 
-    auto * workPtr = new Sigma3Work();
+    auto * workPtr = Platform::New<Sigma3Work>();
     VerifyOrExit(workPtr != nullptr, err = CHIP_ERROR_NO_MEMORY);
     {
         auto & work = *workPtr;
@@ -1448,7 +1448,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     }
 
 exit:
-    delete workPtr;
+    Platform::Delete(workPtr);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1501,7 +1501,7 @@ exit:
 
     if (err2 != CHIP_NO_ERROR)
     {
-        delete &work; // scheduling failed, so delete
+        Platform::Delete(&work); // scheduling failed, so delete
     }
 }
 
@@ -1547,7 +1547,7 @@ CHIP_ERROR CASESession::HandleSigma3c(Sigma3Work & work)
     Finish();
 
 exit:
-    delete &work;
+    Platform::Delete(&work);
 
     if (err != CHIP_NO_ERROR && !ignoreFailure)
     {
