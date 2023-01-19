@@ -19098,13 +19098,13 @@ class ColorControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="colorTemperature", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="colorTemperatureMireds", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
-            colorTemperature: 'uint' = 0
+            colorTemperatureMireds: 'uint' = 0
             transitionTime: 'uint' = 0
             optionsMask: 'uint' = 0
             optionsOverride: 'uint' = 0

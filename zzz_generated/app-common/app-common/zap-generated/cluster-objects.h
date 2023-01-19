@@ -18307,10 +18307,10 @@ public:
 namespace MoveToColorTemperature {
 enum class Fields
 {
-    kColorTemperature = 0,
-    kTransitionTime   = 1,
-    kOptionsMask      = 2,
-    kOptionsOverride  = 3,
+    kColorTemperatureMireds = 0,
+    kTransitionTime         = 1,
+    kOptionsMask            = 2,
+    kOptionsOverride        = 3,
 };
 
 struct Type
@@ -18320,10 +18320,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t colorTemperature = static_cast<uint16_t>(0);
-    uint16_t transitionTime   = static_cast<uint16_t>(0);
-    uint8_t optionsMask       = static_cast<uint8_t>(0);
-    uint8_t optionsOverride   = static_cast<uint8_t>(0);
+    uint16_t colorTemperatureMireds = static_cast<uint16_t>(0);
+    uint16_t transitionTime         = static_cast<uint16_t>(0);
+    uint8_t optionsMask             = static_cast<uint8_t>(0);
+    uint8_t optionsOverride         = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18338,10 +18338,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t colorTemperature = static_cast<uint16_t>(0);
-    uint16_t transitionTime   = static_cast<uint16_t>(0);
-    uint8_t optionsMask       = static_cast<uint8_t>(0);
-    uint8_t optionsOverride   = static_cast<uint8_t>(0);
+    uint16_t colorTemperatureMireds = static_cast<uint16_t>(0);
+    uint16_t transitionTime         = static_cast<uint16_t>(0);
+    uint8_t optionsMask             = static_cast<uint8_t>(0);
+    uint8_t optionsOverride         = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToColorTemperature
