@@ -39,12 +39,7 @@ class SimpleSubscriptionResumptionStorage : public SubscriptionResumptionStorage
 public:
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage)
-    {
-        VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mStorage = storage;
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init(PersistentStorageDelegate * storage);
 
     SubscriptionInfoIterator * IterateSubscriptions() override;
 
@@ -59,7 +54,6 @@ protected:
     CHIP_ERROR Load(uint16_t subscriptionIndex, SubscriptionInfo & subscriptionInfo);
     CHIP_ERROR Delete(uint16_t subscriptionIndex);
     uint16_t Count();
-    uint16_t MaxCount();
     CHIP_ERROR DeleteMaxCount();
 
     class SimpleSubscriptionInfoIterator : public SubscriptionInfoIterator
@@ -73,7 +67,6 @@ protected:
     private:
         SimpleSubscriptionResumptionStorage & mStorage;
         uint16_t mNextIndex;
-        uint16_t mMaxCount;
     };
 
     static constexpr size_t MaxScopedNodeIdSize() { return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex)); }

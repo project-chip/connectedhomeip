@@ -49,7 +49,6 @@ SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::SimpleSubsc
     mStorage(storage)
 {
     mNextIndex = 0;
-    mMaxCount  = mStorage.MaxCount();
 }
 
 size_t SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::Count()
@@ -59,7 +58,7 @@ size_t SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::Coun
 
 bool SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::Next(SubscriptionInfo & output)
 {
-    for (; mNextIndex < mMaxCount; mNextIndex++)
+    for (; mNextIndex < CHIP_IM_MAX_NUM_SUBSCRIPTIONS; mNextIndex++)
     {
         CHIP_ERROR err = mStorage.Load(mNextIndex, output);
         if (err == CHIP_NO_ERROR)
@@ -85,35 +84,42 @@ void SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::Releas
     mStorage.mSubscriptionInfoIterators.ReleaseObject(this);
 }
 
+CHIP_ERROR SimpleSubscriptionResumptionStorage::Init(PersistentStorageDelegate * storage)
+{
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mStorage = storage;
+
+    uint16_t countMax;
+    uint16_t len = sizeof(countMax);
+    CHIP_ERROR err =
+        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
+    // If there's a previous MacCount and it's larger than CHIP_IM_MAX_NUM_SUBSCRIPTIONS,
+    // clean up subscriptions beyond the limit
+    if ((err == CHIP_NO_ERROR) && (countMax != CHIP_IM_MAX_NUM_SUBSCRIPTIONS))
+    {
+        for (uint16_t subscriptionIndex = CHIP_IM_MAX_NUM_SUBSCRIPTIONS; subscriptionIndex < countMax; subscriptionIndex++)
+        {
+            Delete(subscriptionIndex);
+        }
+    }
+
+    // Always save the current CHIP_IM_MAX_NUM_SUBSCRIPTIONS
+    uint16_t countMaxToSave = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(),
+                                                   &countMaxToSave, sizeof(uint16_t)));
+
+    return CHIP_NO_ERROR;
+}
+
 SubscriptionResumptionStorage::SubscriptionInfoIterator * SimpleSubscriptionResumptionStorage::IterateSubscriptions()
 {
     return mSubscriptionInfoIterators.CreateObject(*this);
 }
 
-uint16_t SimpleSubscriptionResumptionStorage::MaxCount()
-{
-    // Storage should try to hold the last known CHIP_IM_MAX_NUM_SUBSCRIPTIONS and
-    // use the larger of that value and the current CHIP_IM_MAX_NUM_SUBSCRIPTIONS
-    // value to make sure a reduced CHIP_IM_MAX_NUM_SUBSCRIPTIONS value would not
-    // cause storage leaks / orphaned persisted subscriptions
-
-    uint16_t countMax = 0;
-    uint16_t len      = sizeof(countMax);
-    CHIP_ERROR err =
-        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
-    if (err != CHIP_NO_ERROR)
-    {
-        return CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
-    }
-
-    return max<uint16_t>(countMax, CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
-}
-
 uint16_t SimpleSubscriptionResumptionStorage::Count()
 {
-    uint16_t countMax          = MaxCount();
     uint16_t subscriptionCount = 0;
-    for (uint16_t subscriptionIndex = 0; subscriptionIndex < countMax; subscriptionIndex++)
+    for (uint16_t subscriptionIndex = 0; subscriptionIndex < CHIP_IM_MAX_NUM_SUBSCRIPTIONS; subscriptionIndex++)
     {
         if (mStorage->SyncDoesKeyExist(DefaultStorageKeyAllocator::SubscriptionResumption(subscriptionIndex).KeyName()))
         {
@@ -269,23 +275,16 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, Su
 
 CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(SubscriptionInfo & subscriptionInfo)
 {
-    // Ensure this version of CHIP_IM_MAX_NUM_SUBSCRIPTIONS is recorded on Save
-    uint16_t countMax       = MaxCount();
-    uint16_t countMaxToSave = std::max<uint16_t>(countMax, CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(),
-                                                   &countMaxToSave, sizeof(uint16_t)));
-
     // Find empty index or duplicate if exists
     uint16_t subscriptionIndex;
-    uint16_t firstEmptySubscriptionIndex = countMax; // initialize to out of bounds as "not set"
-    uint16_t count                       = 0;
-    for (subscriptionIndex = 0; subscriptionIndex < countMax; subscriptionIndex++)
+    uint16_t firstEmptySubscriptionIndex = CHIP_IM_MAX_NUM_SUBSCRIPTIONS; // initialize to out of bounds as "not set"
+    for (subscriptionIndex = 0; subscriptionIndex < CHIP_IM_MAX_NUM_SUBSCRIPTIONS; subscriptionIndex++)
     {
         SubscriptionInfo currentSubscriptionInfo;
         CHIP_ERROR err = Load(subscriptionIndex, currentSubscriptionInfo);
 
         // if empty and firstEmptySubscriptionIndex isn't set yet, then mark empty spot
-        if ((firstEmptySubscriptionIndex == countMax) && (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+        if ((firstEmptySubscriptionIndex == CHIP_IM_MAX_NUM_SUBSCRIPTIONS) && (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
         {
             firstEmptySubscriptionIndex = subscriptionIndex;
         }
@@ -299,26 +298,16 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(SubscriptionInfo & subscrip
             {
                 Delete(subscriptionIndex);
                 // if duplicate is the first empty spot, then also set it
-                if (firstEmptySubscriptionIndex == countMax)
+                if (firstEmptySubscriptionIndex == CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
                 {
                     firstEmptySubscriptionIndex = subscriptionIndex;
                 }
             }
-            else
-            {
-                count++;
-            }
         }
     }
 
-    // Fail if already have more persisted subscriptions than currently allowed
-    if (count >= CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
     // Fail if no empty space
-    if (firstEmptySubscriptionIndex == countMax)
+    if (firstEmptySubscriptionIndex == CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -347,10 +336,9 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(SubscriptionInfo & subscrip
 CHIP_ERROR SimpleSubscriptionResumptionStorage::Delete(NodeId nodeId, FabricIndex fabricIndex, SubscriptionId subscriptionId)
 {
     CHIP_ERROR deleteErr = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    uint16_t countMax    = MaxCount();
 
     uint16_t count = 0;
-    for (uint16_t subscriptionIndex = 0; subscriptionIndex < countMax; subscriptionIndex++)
+    for (uint16_t subscriptionIndex = 0; subscriptionIndex < CHIP_IM_MAX_NUM_SUBSCRIPTIONS; subscriptionIndex++)
     {
         SubscriptionInfo subscriptionInfo;
         CHIP_ERROR err = Load(subscriptionIndex, subscriptionInfo);
@@ -387,10 +375,9 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::DeleteMaxCount()
 CHIP_ERROR SimpleSubscriptionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
 {
     CHIP_ERROR deleteErr = CHIP_NO_ERROR;
-    uint16_t countMax    = MaxCount();
 
     uint16_t count = 0;
-    for (uint16_t subscriptionIndex = 0; subscriptionIndex < countMax; subscriptionIndex++)
+    for (uint16_t subscriptionIndex = 0; subscriptionIndex < CHIP_IM_MAX_NUM_SUBSCRIPTIONS; subscriptionIndex++)
     {
         SubscriptionInfo subscriptionInfo;
         CHIP_ERROR err = Load(subscriptionIndex, subscriptionInfo);

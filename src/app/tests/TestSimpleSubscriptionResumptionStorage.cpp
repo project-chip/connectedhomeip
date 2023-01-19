@@ -26,7 +26,6 @@
 class SimpleSubscriptionResumptionStorageTest : public chip::app::SimpleSubscriptionResumptionStorage
 {
 public:
-    size_t TestMaxCount() { return MaxCount(); }
     CHIP_ERROR TestSave(chip::TLV::TLVWriter & writer,
                         chip::app::SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
     {
@@ -78,18 +77,6 @@ void TestCount(nlTestSuite * inSuite, void * inContext)
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
     subscriptionStorage.Init(&storage);
 
-    // Check by default it returns correct value
-    NL_TEST_ASSERT(inSuite, subscriptionStorage.TestMaxCount() == CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
-
-    // Force larger value and check that it returns the larger value
-    uint16_t countMaxToSave = 2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
-    storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMaxToSave,
-                            sizeof(uint16_t));
-    NL_TEST_ASSERT(inSuite, subscriptionStorage.TestMaxCount() == (2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS));
-
-    // Reset
-    storage.SyncDeleteKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName());
-
     // Write some subscriptions and see the counts are correct
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId = 6666, .mFabricIndex = 46 };
 
@@ -126,6 +113,43 @@ void TestCount(nlTestSuite * inSuite, void * inContext)
     }
     iterator->Release();
     NL_TEST_ASSERT(inSuite, count == 0);
+}
+
+void TestMaxCount(nlTestSuite * inSuite, void * inContext)
+{
+    // Force large MacCount value and check that Init resets it properly, and deletes extra subs:
+
+    chip::TestPersistentStorageDelegate storage;
+    SimpleSubscriptionResumptionStorageTest subscriptionStorage;
+
+    // First set a large MaxCount before Init
+    uint16_t countMaxToSave = 2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
+    CHIP_ERROR err          = storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(),
+                                             &countMaxToSave, sizeof(uint16_t));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Then write something beyond CHIP_IM_MAX_NUM_SUBSCRIPTIONS
+    chip::Platform::ScopedMemoryBuffer<uint8_t> junkBytes;
+    junkBytes.Calloc(subscriptionStorage.TestMaxSubscriptionSize() / 2);
+    NL_TEST_ASSERT(inSuite, junkBytes.Get() != nullptr);
+    NL_TEST_ASSERT(inSuite,
+                   storage.SyncSetKeyValue(
+                       chip::DefaultStorageKeyAllocator::SubscriptionResumption(CHIP_IM_MAX_NUM_SUBSCRIPTIONS + 1).KeyName(),
+                       junkBytes.Get(), static_cast<uint16_t>(subscriptionStorage.TestMaxSubscriptionSize() / 2)) == CHIP_NO_ERROR);
+
+    subscriptionStorage.Init(&storage);
+
+    // First check the MaxCount is reset to CHIP_IM_MAX_NUM_SUBSCRIPTIONS
+    uint16_t countMax = 0;
+    uint16_t len      = sizeof(countMax);
+    err = storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, countMax == CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
+
+    // Then check the fake sub is no more
+    NL_TEST_ASSERT(inSuite,
+                   !storage.SyncDoesKeyExist(
+                       chip::DefaultStorageKeyAllocator::SubscriptionResumption(CHIP_IM_MAX_NUM_SUBSCRIPTIONS + 1).KeyName()));
 }
 
 void TestState(nlTestSuite * inSuite, void * inContext)
@@ -411,6 +435,7 @@ int Test_Teardown(void * inContext)
 static const nlTest sTests[] =
 {
     NL_TEST_DEF("TestCount", TestCount),
+    NL_TEST_DEF("TestMaxCount", TestMaxCount),
     NL_TEST_DEF("TestState", TestState),
     NL_TEST_DEF("TestStateUnexpectedFields", TestStateUnexpectedFields),
     NL_TEST_DEF("TestStateTooBigToLoad", TestStateTooBigToLoad),
