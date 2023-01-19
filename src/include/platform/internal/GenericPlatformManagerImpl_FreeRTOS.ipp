@@ -127,12 +127,6 @@ exit:
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
-{
-    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
-}
-
-template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_LockChipStack(void)
 {
     xSemaphoreTake(mChipStackLock, portMAX_DELAY);
@@ -278,13 +272,6 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartEventLoopTask(v
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopEventLoopTask(void)
-{
-    mShouldRunEventLoop.store(false);
-    return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP event task running");
@@ -421,6 +408,19 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
             ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         }
     }
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
+{
+    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopEventLoopTask(void)
+{
+    mShouldRunEventLoop.store(false);
+    return CHIP_NO_ERROR;
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
