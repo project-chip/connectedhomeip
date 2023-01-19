@@ -627,7 +627,7 @@ void AppTask::SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uin
     RgbColor_t rgb;
 #endif
 
-    if (aAction == PWMDevice::ON_ACTION || aAction == PWMDevice::OFF_ACTION) 
+    if (aAction == PWMDevice::ON_ACTION || aAction == PWMDevice::OFF_ACTION)
     {
         sAppTask.mBluePwmLed.InitiateAction(aAction, aActor, value);
 #if USE_RGB_PWM
@@ -635,7 +635,7 @@ void AppTask::SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uin
         sAppTask.mGreenPwmLed.InitiateAction(aAction, aActor, value);
 #endif
     }
-    else if (aAction == PWMDevice::LEVEL_ACTION) 
+    else if (aAction == PWMDevice::LEVEL_ACTION)
     {
 #if USE_RGB_PWM
         // Save a new brightness for ColorControl
@@ -663,7 +663,7 @@ void AppTask::SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uin
         sAppTask.mBluePwmLed.InitiateAction(aAction, aActor, value);
 #endif
     }
- 
+
 #if USE_RGB_PWM
     else if (aAction == PWMDevice::COLOR_ACTION_XY)
     {

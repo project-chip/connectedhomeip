@@ -79,7 +79,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             }
 
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_XY, 
+            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_XY,
                                            static_cast<int32_t>(AppEvent::kEventType_Lighting), (uint8_t *) &xy);
         }
         /* HSV color space */
@@ -101,7 +101,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 hsv.s = *value;
             }
             ChipLogProgress(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_HSV, 
+            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_HSV,
                                            static_cast<int32_t>(AppEvent::kEventType_Lighting), (uint8_t *) &hsv);
         }
         /* Temperature Mireds color space */
