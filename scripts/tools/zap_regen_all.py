@@ -19,14 +19,13 @@ import argparse
 import logging
 import multiprocessing
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
-import shutil
 import time
-
-from enum import Flag, auto
 from dataclasses import dataclass
+from enum import Flag, auto
 from pathlib import Path
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -50,6 +49,7 @@ class TargetType(Flag):
 
     # All possible targets. Convenience constant
     ALL = TESTS | GLOBAL | SPECIFIC | GOLDEN_TEST_IMAGES
+
 
 __TARGET_TYPES__ = {
     'tests': TargetType.TESTS,
@@ -200,7 +200,7 @@ def setupArgumentsParser():
     # Convert a list of target_types (as strings)
     # into a single flag value
     if not args.type:
-        args.type = TargetType.ALL # default instead of a list
+        args.type = TargetType.ALL  # default instead of a list
     else:
         # convert the list into a single flag value
         types = [t for t in map(lambda x: __TARGET_TYPES__[x.lower()], args.type)]
@@ -307,6 +307,7 @@ def getTestsTemplatesTargets(test_target):
 
 def getGoldenTestImageTargets():
     return [GoldenTestImageTarget()]
+
 
 def getSpecificTemplatesTargets():
     zap_filepath = 'src/controller/data_model/controller-clusters.zap'
