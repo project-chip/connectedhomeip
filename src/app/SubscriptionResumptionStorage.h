@@ -35,7 +35,7 @@ namespace app {
 class SubscriptionResumptionStorage
 {
 public:
-    // Structs to hold
+    // Structs to hold path param values as is_trivial struct
     struct AttributePathParamsValues
     {
         ClusterId mClusterId;
@@ -85,25 +85,6 @@ public:
     virtual ~SubscriptionResumptionStorage(){};
 
     /**
-     * Recover fabric-scoped node identities of persisted subscribers.
-     *
-     * @param subscriberIndex the nodes for previously persisted subscribers
-     * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no subscription resumption information can be found, else an
-     * appropriate CHIP error on failure
-     */
-    //    virtual CHIP_ERROR LoadIndex(SubscriptionIndex & subscriberIndex) = 0;
-
-    /**
-     * Recover subscription resumption info for a given fabric-scoped node identity.
-     *
-     * @param node the node for which to recover subscription resumption information
-     * @param subscriptions (out) recovered subscriptions info
-     * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no subscription resumption information can be found, else an
-     * appropriate CHIP error on failure
-     */
-    //    virtual CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions) = 0;
-
-    /**
      * Iterate through persisted subscriptions
      *
      * @return A valid iterator on success. Use CommonIterator accessor to retrieve SubscriptionInfo
@@ -117,15 +98,6 @@ public:
      * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
      */
     virtual CHIP_ERROR Save(SubscriptionInfo & subscriptionInfo) = 0;
-
-    /**
-     * Save subscription resumption information to storage.
-     *
-     * @param subscriptionInfo the subscription information to delete - only node and subscriptionId will be used to find the
-     * subscription
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
-     */
-    //    virtual CHIP_ERROR Delete(const SubscriptionInfo & subscriptionInfo) = 0;
 
     /**
      * Delete subscription resumption information by node ID, fabric index, and subscription ID.
