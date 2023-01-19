@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "driver/gpio.h"
-
 // ---- Lock Example App Config ----
 
 #define APP_TASK_NAME "LOCK-APP"
