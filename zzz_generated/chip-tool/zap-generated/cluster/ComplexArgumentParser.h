@@ -22,10 +22,15 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & request);
+static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request);
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Actions::Structs::ActionStruct::Type & request,
                         Json::Value & value);
 
@@ -68,10 +73,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::Type & request);
+static void Finalize(chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & request,
                         Json::Value & value);
 
@@ -80,6 +85,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                         Json::Value & value);
 
@@ -88,10 +97,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::DoorLock::Structs::DlCredential::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::DoubleNestedStructList::Type & request,
                         Json::Value & value);
 
@@ -104,18 +109,15 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Actions::Struct
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Actions::Structs::EndpointListStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request,
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request);
+static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type & request,
                         Json::Value & value);
 
@@ -166,10 +168,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::NetworkCommissi
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & request);
+static void Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::Type & request,
                         Json::Value & value);
 
@@ -204,10 +206,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ThreadNetworkDi
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & request);
+static void Finalize(chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                         Json::Value & value);
 
@@ -245,10 +247,10 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & request);
+static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request,
                         Json::Value & value);
 

@@ -28,7 +28,7 @@
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
-using AdministratorCommissioning::CommissioningWindowStatus;
+using AdministratorCommissioning::CommissioningWindowStatusEnum;
 using chip::app::DataModel::MakeNullable;
 using chip::app::DataModel::Nullable;
 using chip::app::DataModel::NullNullable;
@@ -106,7 +106,7 @@ void CommissioningWindowManager::ResetState()
     }
 #endif
 
-    UpdateWindowStatus(CommissioningWindowStatus::kWindowNotOpen);
+    UpdateWindowStatus(CommissioningWindowStatusEnum::kWindowNotOpen);
 
     UpdateOpenerFabricIndex(NullNullable);
     UpdateOpenerVendorId(NullNullable);
@@ -368,7 +368,7 @@ void CommissioningWindowManager::CloseCommissioningWindow()
     }
 }
 
-CommissioningWindowStatus CommissioningWindowManager::CommissioningWindowStatusForCluster() const
+CommissioningWindowStatusEnum CommissioningWindowManager::CommissioningWindowStatusForCluster() const
 {
     // If the condition we use to determine whether we were opened via the
     // cluster ever changes, make sure whatever code affects that condition
@@ -377,7 +377,7 @@ CommissioningWindowStatus CommissioningWindowManager::CommissioningWindowStatusF
     if (mOpenerVendorId.IsNull())
     {
         // Not opened via the cluster.
-        return CommissioningWindowStatus::kWindowNotOpen;
+        return CommissioningWindowStatusEnum::kWindowNotOpen;
     }
 
     return mWindowStatus;
@@ -385,7 +385,7 @@ CommissioningWindowStatus CommissioningWindowManager::CommissioningWindowStatusF
 
 bool CommissioningWindowManager::IsCommissioningWindowOpen() const
 {
-    return mWindowStatus != CommissioningWindowStatus::kWindowNotOpen;
+    return mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen;
 }
 
 void CommissioningWindowManager::OnFabricRemoved(FabricIndex removedIndex)
@@ -409,9 +409,9 @@ Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() cons
 
     switch (mWindowStatus)
     {
-    case CommissioningWindowStatus::kEnhancedWindowOpen:
+    case CommissioningWindowStatusEnum::kEnhancedWindowOpen:
         return Dnssd::CommissioningMode::kEnabledEnhanced;
-    case CommissioningWindowStatus::kBasicWindowOpen:
+    case CommissioningWindowStatusEnum::kBasicWindowOpen:
         return Dnssd::CommissioningMode::kEnabledBasic;
     default:
         return Dnssd::CommissioningMode::kDisabled;
@@ -442,11 +442,11 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 
     if (mUseECM)
     {
-        UpdateWindowStatus(CommissioningWindowStatus::kEnhancedWindowOpen);
+        UpdateWindowStatus(CommissioningWindowStatusEnum::kEnhancedWindowOpen);
     }
     else
     {
-        UpdateWindowStatus(CommissioningWindowStatus::kBasicWindowOpen);
+        UpdateWindowStatus(CommissioningWindowStatusEnum::kBasicWindowOpen);
     }
 
     if (mAppDelegate != nullptr)
@@ -537,10 +537,10 @@ void CommissioningWindowManager::ExpireFailSafeIfArmed()
     }
 }
 
-void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatus aNewStatus)
+void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnum aNewStatus)
 {
-    CommissioningWindowStatus oldClusterStatus = CommissioningWindowStatusForCluster();
-    mWindowStatus                              = aNewStatus;
+    CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
+    mWindowStatus                                  = aNewStatus;
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
     {
         // The Administrator Commissioning cluster is always on the root endpoint.
@@ -553,7 +553,7 @@ void CommissioningWindowManager::UpdateOpenerVendorId(Nullable<VendorId> aNewOpe
 {
     // Changing the opener vendor id affects what
     // CommissioningWindowStatusForCluster() returns.
-    CommissioningWindowStatus oldClusterStatus = CommissioningWindowStatusForCluster();
+    CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
 
     if (mOpenerVendorId != aNewOpenerVendorId)
     {

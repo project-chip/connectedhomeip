@@ -33,7 +33,9 @@ public:
      * This is called anytime a basic or enhanced commissioning window is opened.
      *
      * The type of the window can be retrieved by calling
-     * CommissioningWindowManager::CommissioningWindowStatus()
+     * CommissioningWindowManager::CommissioningWindowStatusForCluster(), but
+     * being careful about how to handle the None status when a window is in
+     * fact open.
      */
     virtual void OnCommissioningWindowOpened() {}
     virtual void OnCommissioningWindowClosed() {}

@@ -120,7 +120,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   }
 
   pw_python_pip_install("pip_install_matter_packages") {
-    packages = [ "//examples/common/pigweed/rpc_console:chip_rpc_distribution" ]
+    packages = [
+      "//examples/common/pigweed/rpc_console:chip_rpc_distribution",
+      "//scripts:matter_yamltests_distribution",
+    ]
   }
 
   # Python packages installed during bootstrap.
@@ -260,9 +263,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//:fake_platform_tests",
         "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
-        "//scripts/idl:idl.tests",
+        "//scripts/py_matter_idl:matter_idl.tests",
+        "//scripts/py_matter_yamltests:matter_yamltests.tests",
         "//src:tests_run",
       ]
+
+      if (current_os == "linux" || current_os == "mac") {
+        deps += [ "${chip_root}/scripts/tools/zap:tests" ]
+      }
     }
   }
 } else {

@@ -25,9 +25,9 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVTags.h>
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {

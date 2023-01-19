@@ -22,7 +22,6 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
@@ -143,8 +142,8 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::AddGroupResponse::Type response;
 
-    response.groupId = commandData.groupId;
-    response.status  = GroupAdd(fabricIndex, commandPath.mEndpointId, commandData.groupId, commandData.groupName);
+    response.groupID = commandData.groupID;
+    response.status  = GroupAdd(fabricIndex, commandPath.mEndpointId, commandData.groupID, commandData.groupName);
     commandObj->AddResponse(commandPath, response);
     return true;
 }
@@ -153,7 +152,7 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
                                            const Commands::ViewGroup::DecodableType & commandData)
 {
     auto fabricIndex             = commandObj->GetAccessingFabricIndex();
-    auto groupId                 = commandData.groupId;
+    auto groupId                 = commandData.groupID;
     GroupDataProvider * provider = GetGroupDataProvider();
     GroupDataProvider::GroupInfo info;
     Groups::Commands::ViewGroupResponse::Type response;
@@ -170,7 +169,7 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
     response.groupName = CharSpan(info.name, strnlen(info.name, GroupDataProvider::GroupInfo::kGroupNameMax));
     status             = EMBER_ZCL_STATUS_SUCCESS;
 exit:
-    response.groupId = groupId;
+    response.groupID = groupId;
     response.status  = status;
     commandObj->AddResponse(commandPath, response);
     return true;
@@ -289,10 +288,10 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
 
 #ifdef EMBER_AF_PLUGIN_SCENES
     // If a group is, removed the scenes associated with that group SHOULD be removed.
-    emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, commandData.groupId);
+    emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, commandData.groupID);
 #endif
-    response.groupId = commandData.groupId;
-    response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupId);
+    response.groupID = commandData.groupID;
+    response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 
     commandObj->AddResponse(commandPath, response);
     return true;
@@ -342,7 +341,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
                                                        const Commands::AddGroupIfIdentifying::DecodableType & commandData)
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto groupId     = commandData.groupId;
+    auto groupId     = commandData.groupID;
     auto groupName   = commandData.groupName;
     auto endpointId  = commandPath.mEndpointId;
 

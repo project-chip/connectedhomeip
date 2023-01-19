@@ -13,26 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 import logging
-import enum
 import sys
+
+import click
 
 try:
     import coloredlogs
     _has_coloredlogs = True
-except:
+except ImportError:
     _has_coloredlogs = False
 
 try:
-    from idl.matter_idl_parser import CreateParser
-except:
+    from matter_idl.matter_idl_parser import CreateParser
+except ImportError:
     import os
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-    from idl.matter_idl_parser import CreateParser
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
+    from matter_idl.matter_idl_parser import CreateParser
 
-from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
-from idl.generators.registry import CodeGenerator, GENERATORS
+# isort: off
+from matter_idl.generators import FileSystemGeneratorStorage, GeneratorStorage
+from matter_idl.generators.registry import CodeGenerator, GENERATORS
 
 
 class ListGeneratedFilesStorage(GeneratorStorage):

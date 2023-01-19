@@ -169,7 +169,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             }
 
             jfieldID getTypeField = env->GetFieldID(nifClass, "type", "I");
-            ifp->type             = static_cast<InterfaceType>(env->GetIntField(nifObject, getTypeField));
+            ifp->type             = static_cast<InterfaceTypeEnum>(env->GetIntField(nifObject, getTypeField));
 
             jfieldID ipv4AddressField  = env->GetFieldID(nifClass, "ipv4Address", "[B");
             jbyteArray jIpv4AddressObj = static_cast<jbyteArray>(env->GetObjectField(nifObject, ipv4AddressField));

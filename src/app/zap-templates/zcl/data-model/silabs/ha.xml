@@ -34,17 +34,17 @@ limitations under the License.
     <define>FAN_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">fan mode</attribute>
-    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">fan mode sequence</attribute>
-    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">percent setting</attribute>
-    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">percent current</attribute>
-    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">speed max</attribute>
-    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">speed setting</attribute>
-    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">speed current</attribute>
-    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">rock support</attribute> 
-    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">rock setting</attribute>
-    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">wind support</attribute>
-    <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">wind setting</attribute>                            
+    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">FanModeSequence</attribute>
+    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
+    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
+    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">SpeedMax</attribute>
+    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">SpeedSetting</attribute>
+    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">SpeedCurrent</attribute>
+    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">RockSupport</attribute>
+    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">RockSetting</attribute>
+    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">WindSupport</attribute>
+    <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">WindSetting</attribute>
   </cluster>
   <!-- Fan Control Cluster data types -->  
   <enum name="FanModeType" type="ENUM8">
@@ -68,7 +68,7 @@ limitations under the License.
   </enum>  
   <bitmap name="FanControlFeature" type="BITMAP32">
     <cluster code="0x0202" />
-    <field name="MultiSpeed" mask="0x01" />
+    <field name="Multi-Speed" mask="0x01" />
     <field name="Auto" mask="0x02" />
     <field name="Rocking" mask="0x04" />
     <field name="Wind" mask="0x08" />
@@ -81,13 +81,13 @@ limitations under the License.
   </bitmap>
   <bitmap name="WindSupportMask" type="BITMAP8">
       <cluster code="0x0202" />
-      <field name="SleepWind" mask="0x01" />
-      <field name="NaturalWind" mask="0x02" />
+      <field name="Sleep Wind" mask="0x01" />
+      <field name="Natural Wind" mask="0x02" />
   </bitmap>
   <bitmap name="WindSettingMask" type="BITMAP8">
       <cluster code="0x0202" />
-      <field name="SleepWind" mask="0x01" />
-      <field name="NaturalWind" mask="0x02" />
+      <field name="Sleep Wind" mask="0x01" />
+      <field name="Natural Wind" mask="0x02" />
   </bitmap>    
   <cluster>
     <name>Thermostat User Interface Configuration</name>
@@ -97,14 +97,15 @@ limitations under the License.
     <define>THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
-    <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">temperature display mode</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">TemperatureDisplayMode</attribute>
     <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="false">
-      <description>keypad lockout</description>
+      <description>KeypadLockout</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ENUM8" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>schedule programming visibility</description>
+      <description>ScheduleProgrammingVisibility</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
@@ -348,7 +349,7 @@ limitations under the License.
       <description>
         Move to a specific color temperature.
       </description>
-      <arg name="ColorTemperature" type="INT16U"/>
+      <arg name="ColorTemperatureMireds" type="INT16U"/>
       <arg name="TransitionTime" type="INT16U"/>
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
@@ -394,52 +395,52 @@ limitations under the License.
     <define>OCCUPANCY_SENSING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" reportable="true" optional="false">occupancy</attribute>
-    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">occupancy sensor type</attribute>
-    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="BITMAP8" min="0x00" max="0x07" writable="false" optional="false">occupancy sensor type bitmap</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <attribute side="server" code="0x0000" define="OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" reportable="true" optional="false">Occupancy</attribute>
+    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>
+    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="BITMAP8" min="0x00" max="0x07" writable="false" optional="false">OccupancySensorTypeBitmap</attribute>
     <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>PIR occupied to unoccupied delay</description>
+      <description>PIROccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>PIR unoccupied to occupied delay</description>
+      <description>PIRUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>PIR unoccupied to occupied threshold</description>
+      <description>PIRUnoccupiedToOccupiedThreshold</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>ultrasonic occupied to unoccupied delay</description>
+      <description>UltrasonicOccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>ultrasonic unoccupied to occupied delay</description>
+      <description>UltrasonicUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>ultrasonic unoccupied to occupied threshold</description>
+      <description>UltrasonicUnoccupiedToOccupiedThreshold</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>physical contact occupied to unoccupied delay</description>
+      <description>PhysicalContactOccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>physical contact unoccupied to occupied delay</description>
+      <description>PhysicalContactUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>physical contact unoccupied to occupied threshold</description>
+      <description>PhysicalContactUnoccupiedToOccupiedThreshold</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>

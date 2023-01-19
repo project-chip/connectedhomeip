@@ -1,0 +1,4 @@
+# List of structs for which we output a legacy definition in af-structs.h
+# Ideally this list should become empty.
+- CredentialStruct
+- ApplicationBasicApplication

@@ -144,9 +144,6 @@ void PlatformManagerImpl::PlatformInit(void)
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("MatterLight");
 
 #if CHIP_ENABLE_OPENTHREAD
-#if CONFIG_ENABLE_CHIP_SHELL
-    cmd_otcli_init();
-#endif
 
     ChipLogProgress(NotSpecified, "Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();
@@ -166,6 +163,11 @@ void PlatformManagerImpl::PlatformInit(void)
         ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed");
         appError(ret);
     }
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    cmd_otcli_init();
+#endif
+
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     ret = sWiFiNetworkCommissioningInstance.Init();
@@ -417,7 +419,8 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
 
-        ChipLogProgress(NotSpecified, "Wi-Fi state changed\r\n", ConnectivityMgr().IsWiFiStationConnected());
+        ChipLogProgress(NotSpecified, "Wi-Fi state changed to %s.\r\n",
+                        ConnectivityMgr().IsWiFiStationConnected() ? "connected" : "disconnected");
 
         chip::app::DnssdServer::Instance().StartServer();
         NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();

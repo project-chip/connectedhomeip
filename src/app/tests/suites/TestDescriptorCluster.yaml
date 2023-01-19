@@ -32,7 +32,7 @@ tests:
       command: "readAttribute"
       attribute: "DeviceTypeList"
       response:
-          value: [{ type: 22, revision: 1 }]
+          value: [{ DeviceType: 22, Revision: 1 }]
 
     - label: "Read attribute Server list"
       command: "readAttribute"
@@ -65,6 +65,7 @@ tests:
                   0x0040, # Fixed Label
                   0x0041, # User Label
                   0x0405, # Relative Humidity Measurement (why on EP0?)
+                  0x1046, # Client Monitoring
                   0xFFF1FC06, # Fault Injection
               ]
 

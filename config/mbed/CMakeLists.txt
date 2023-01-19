@@ -492,11 +492,7 @@ if (NOT ${APP_TARGET} MATCHES "shell")
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
     )
 else()
-    target_include_directories(${APP_TARGET} 
-        PRIVATE ${GEN_DIR}/ota-requestor-app)
-    
-    target_sources(${APP_TARGET} 
-        PRIVATE ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp)
+    target_include_directories(${APP_TARGET} PRIVATE ${GEN_DIR}/ota-requestor-app)
 endif()
 
     list(APPEND CHIP_DEFINES

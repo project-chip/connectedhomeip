@@ -92,7 +92,7 @@ tests:
       command: "CommissioningComplete"
       response:
           values:
-              - name: errorCode
+              - name: ErrorCode
                 value: 3 # NoFailSafe
 
     - label: "Check Breadcrumb was not touched by invalid CommissioningComplete"
@@ -102,7 +102,7 @@ tests:
           value: 1
 
     - label: "Open Commissioning Window from alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -115,13 +115,13 @@ tests:
       command: "ArmFailSafe"
       arguments:
           values:
-              - name: expiryLengthSeconds
+              - name: ExpiryLengthSeconds
                 value: 10
-              - name: breadcrumb
+              - name: Breadcrumb
                 value: 5000
       response:
           values:
-              - name: errorCode
+              - name: ErrorCode
                 value: 4 # BusyWithOtherAdmin
 
     - label:
@@ -162,13 +162,13 @@ tests:
       command: "ArmFailSafe"
       arguments:
           values:
-              - name: expiryLengthSeconds
+              - name: ExpiryLengthSeconds
                 value: 500
-              - name: breadcrumb
+              - name: Breadcrumb
                 value: 2
       response:
           values:
-              - name: errorCode
+              - name: ErrorCode
                 value: 0 # OK
 
     - label: "Check Breadcrumb was properly set by ArmFailSafe"
@@ -182,13 +182,13 @@ tests:
       identity: "beta"
       arguments:
           values:
-              - name: expiryLengthSeconds
+              - name: ExpiryLengthSeconds
                 value: 10
-              - name: breadcrumb
+              - name: Breadcrumb
                 value: 5000
       response:
           values:
-              - name: errorCode
+              - name: ErrorCode
                 value: 4 # BusyWithOtherAdmin
 
     - label:
@@ -204,7 +204,7 @@ tests:
       identity: "beta"
       response:
           values:
-              - name: errorCode
+              - name: ErrorCode
                 value: 2 # InvalidAuthentication
 
     - label:
@@ -219,7 +219,7 @@ tests:
       command: "CommissioningComplete"
       response:
           values:
-              - name: errorCode
+              - name: ErrorCode
                 value: 0 # Ok
 
     - label: "Check Breadcrumb was reset to 0 by CommissioningComplete"
@@ -232,13 +232,13 @@ tests:
       command: "ArmFailSafe"
       arguments:
           values:
-              - name: expiryLengthSeconds
+              - name: ExpiryLengthSeconds
                 value: 500
-              - name: breadcrumb
+              - name: Breadcrumb
                 value: 3
       response:
           values:
-              - name: errorCode
+              - name: ErrorCode
                 value: 0 # OK
 
     - label: "Check Breadcrumb was set by arming fail-safe again"
@@ -251,13 +251,13 @@ tests:
       command: "ArmFailSafe"
       arguments:
           values:
-              - name: expiryLengthSeconds
+              - name: ExpiryLengthSeconds
                 value: 0
-              - name: breadcrumb
+              - name: Breadcrumb
                 value: 4
       response:
           values:
-              - name: errorCode
+              - name: ErrorCode
                 value: 0 # OK
 
     - label: "Check Breadcrumb was reset by expiring the fail-safe"

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/TypeTraits.h>

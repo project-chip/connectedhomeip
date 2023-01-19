@@ -101,7 +101,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "AddGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                         "groupName": "str",
                     },
                 },
@@ -109,7 +109,7 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "ViewGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             0x00000002: {
@@ -123,7 +123,7 @@ class ChipClusters:
                     "commandId": 0x00000003,
                     "commandName": "RemoveGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             0x00000004: {
@@ -136,7 +136,7 @@ class ChipClusters:
                     "commandId": 0x00000005,
                     "commandName": "AddGroupIfIdentifying",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                         "groupName": "str",
                     },
                 },
@@ -333,7 +333,7 @@ class ChipClusters:
                     "commandId": 0x00000040,
                     "commandName": "OffWithEffect",
                     "args": {
-                        "effectId": "int",
+                        "effectIdentifier": "int",
                         "effectVariant": "int",
                     },
                 },
@@ -1069,8 +1069,8 @@ class ChipClusters:
                 },
             },
     }
-    _BASIC_CLUSTER_INFO = {
-            "clusterName": "Basic",
+    _BASIC_INFORMATION_CLUSTER_INFO = {
+            "clusterName": "BasicInformation",
             "clusterId": 0x00000028,
             "commands": {
             },
@@ -1238,8 +1238,8 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "QueryImage",
                     "args": {
-                        "vendorId": "int",
-                        "productId": "int",
+                        "vendorID": "int",
+                        "productID": "int",
                         "softwareVersion": "int",
                         "protocolsSupported": "int",
                         "hardwareVersion": "int",
@@ -1292,10 +1292,10 @@ class ChipClusters:
             "commands": {
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "AnnounceOtaProvider",
+                    "commandName": "AnnounceOTAProvider",
                     "args": {
-                        "providerNodeId": "int",
-                        "vendorId": "int",
+                        "providerNodeID": "int",
+                        "vendorID": "int",
                         "announcementReason": "int",
                         "metadataForNode": "bytes",
                         "endpoint": "int",
@@ -1304,7 +1304,7 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "DefaultOtaProviders",
+                    "attributeName": "DefaultOTAProviders",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
@@ -2055,7 +2055,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000004: {
-                    "attributeName": "BootReasons",
+                    "attributeName": "BootReason",
                     "attributeId": 0x00000004,
                     "type": "int",
                     "reportable": True,
@@ -2239,13 +2239,13 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000007: {
-                    "attributeName": "NeighborTableList",
+                    "attributeName": "NeighborTable",
                     "attributeId": 0x00000007,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000008: {
-                    "attributeName": "RouteTableList",
+                    "attributeName": "RouteTable",
                     "attributeId": 0x00000008,
                     "type": "",
                     "reportable": True,
@@ -2826,8 +2826,8 @@ class ChipClusters:
                 },
             },
     }
-    _BRIDGED_DEVICE_BASIC_CLUSTER_INFO = {
-            "clusterName": "BridgedDeviceBasic",
+    _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO = {
+            "clusterName": "BridgedDeviceBasicInformation",
             "clusterId": 0x00000039,
             "commands": {
             },
@@ -3020,7 +3020,7 @@ class ChipClusters:
                     "commandName": "OpenCommissioningWindow",
                     "args": {
                         "commissioningTimeout": "int",
-                        "PAKEVerifier": "bytes",
+                        "PAKEPasscodeVerifier": "bytes",
                         "discriminator": "int",
                         "iterations": "int",
                         "salt": "bytes",
@@ -3154,7 +3154,7 @@ class ChipClusters:
                     "commandId": 0x0000000B,
                     "commandName": "AddTrustedRootCertificate",
                     "args": {
-                        "rootCertificate": "bytes",
+                        "rootCACertificate": "bytes",
                     },
                 },
             },
@@ -3543,14 +3543,14 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LockDoor",
                     "args": {
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x00000001: {
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x00000003: {
@@ -3558,7 +3558,7 @@ class ChipClusters:
                     "commandName": "UnlockWithTimeout",
                     "args": {
                         "timeout": "int",
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x0000000B: {
@@ -3647,7 +3647,7 @@ class ChipClusters:
                         "operationType": "int",
                         "userIndex": "int",
                         "userName": "str",
-                        "userUniqueId": "int",
+                        "userUniqueID": "int",
                         "userStatus": "int",
                         "userType": "int",
                         "credentialRule": "int",
@@ -4814,7 +4814,7 @@ class ChipClusters:
                     "commandId": 0x0000000A,
                     "commandName": "MoveToColorTemperature",
                     "args": {
-                        "colorTemperature": "int",
+                        "colorTemperatureMireds": "int",
                         "transitionTime": "int",
                         "optionsMask": "int",
                         "optionsOverride": "int",
@@ -6737,6 +6737,84 @@ class ChipClusters:
                 },
             },
     }
+    _CLIENT_MONITORING_CLUSTER_INFO = {
+            "clusterName": "ClientMonitoring",
+            "clusterId": 0x00001046,
+            "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "RegisterClientMonitoring",
+                    "args": {
+                        "clientNodeId": "int",
+                        "ICid": "int",
+                    },
+                },
+            0x00000001: {
+                    "commandId": 0x00000001,
+                    "commandName": "UnregisterClientMonitoring",
+                    "args": {
+                        "clientNodeId": "int",
+                        "ICid": "int",
+                    },
+                },
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "IdleModeInterval",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000001: {
+                    "attributeName": "ActiveModeInterval",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000002: {
+                    "attributeName": "ActiveModeThreshold",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "ExpectedClients",
+                    "attributeId": 0x00000003,
+                    "type": "",
+                    "reportable": True,
+                },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "AcceptedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                    "reportable": True,
+                },
+            },
+    }
     _UNIT_TESTING_CLUSTER_INFO = {
             "clusterName": "UnitTesting",
             "clusterId": 0xFFF1FC05,
@@ -7515,7 +7593,7 @@ class ChipClusters:
     0x0000001E: _BINDING_CLUSTER_INFO,
     0x0000001F: _ACCESS_CONTROL_CLUSTER_INFO,
     0x00000025: _ACTIONS_CLUSTER_INFO,
-    0x00000028: _BASIC_CLUSTER_INFO,
+    0x00000028: _BASIC_INFORMATION_CLUSTER_INFO,
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
     0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
     0x0000002B: _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
@@ -7531,7 +7609,7 @@ class ChipClusters:
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000037: _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
-    0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+    0x00000039: _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
     0x0000003B: _SWITCH_CLUSTER_INFO,
     0x0000003C: _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
     0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
@@ -7568,6 +7646,7 @@ class ChipClusters:
     0x0000050D: _APPLICATION_BASIC_CLUSTER_INFO,
     0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
     0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
+    0x00001046: _CLIENT_MONITORING_CLUSTER_INFO,
     0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
     }
 
@@ -7583,7 +7662,7 @@ class ChipClusters:
         "Binding": _BINDING_CLUSTER_INFO,
         "AccessControl": _ACCESS_CONTROL_CLUSTER_INFO,
         "Actions": _ACTIONS_CLUSTER_INFO,
-        "Basic": _BASIC_CLUSTER_INFO,
+        "BasicInformation": _BASIC_INFORMATION_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
         "LocalizationConfiguration": _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
@@ -7599,7 +7678,7 @@ class ChipClusters:
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "EthernetNetworkDiagnostics": _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
-        "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+        "BridgedDeviceBasicInformation": _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         "Switch": _SWITCH_CLUSTER_INFO,
         "AdministratorCommissioning": _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
@@ -7636,6 +7715,7 @@ class ChipClusters:
         "ApplicationBasic": _APPLICATION_BASIC_CLUSTER_INFO,
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
+        "ClientMonitoring": _CLIENT_MONITORING_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
     }
 

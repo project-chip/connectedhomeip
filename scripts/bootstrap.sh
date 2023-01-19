@@ -30,11 +30,14 @@ _bootstrap_or_activate() {
         _CONFIG_FILE="$PW_CONFIG_FILE"
     fi
 
-    if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
-        [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
+    if [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
         # Make sure our submodule remotes are correct for this revision.
         git submodule sync --recursive
         git submodule update --init
+    elif [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ]; then
+        # In this case, only update already checked out submodules.
+        git submodule sync --recursive
+        git submodule update
     fi
 
     PW_BRANDING_BANNER="$_CHIP_ROOT/scripts/matter_banner.txt"

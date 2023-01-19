@@ -54,7 +54,7 @@ AmebaZ
 amebaz2
 announcementReason
 AnnounceOTAProvider
-AnnounceOtaProviderRequest
+AnnounceOTAProviderRequest
 APIs
 apk
 AppConfig
@@ -125,6 +125,7 @@ backtrace
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
+BasicInformation
 baudrate
 BD
 BDX
@@ -158,7 +159,7 @@ bouffalolab
 BRD
 breakpoint
 bredr
-BridgedDeviceBasic
+BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
 BromateConcentrationMeasurement

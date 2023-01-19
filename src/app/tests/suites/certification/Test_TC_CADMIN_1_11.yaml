@@ -70,20 +70,20 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     #Check for DNS-SD advertisement CM is not possible in YAML
@@ -139,20 +139,20 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -179,20 +179,20 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label:
@@ -200,20 +200,20 @@ tests:
           set in step 5, TH_CR1 opens a 2nd commissioning window on DUT_CE using
           a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
@@ -228,9 +228,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId3 },
-                  { Label: "", nodeID: nodeId2 },
+                  { Label: "", NodeID: nodeId },
+                  { Label: "", NodeID: nodeId3 },
+                  { Label: "", NodeID: nodeId2 },
               ]
           constraints:
               type: list
@@ -249,15 +249,13 @@ tests:
           "TH_CR1 re-opens a commissioning window on DUT_CE using a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=1"
@@ -287,15 +285,13 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       identity: "gamma"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
       response:
           error: FAILURE
           clusterError: 2
@@ -319,24 +315,22 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId3 },
-                  { Label: "", nodeID: nodeId2 },
+                  { Label: "", NodeID: nodeId },
+                  { Label: "", NodeID: nodeId3 },
+                  { Label: "", NodeID: nodeId2 },
               ]
           constraints:
               type: list
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
       PICS: CADMIN.S.C01.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label:
           "Before the expiration of PIXIT.CADMIN.CwDuration seconds that was set
@@ -344,15 +338,13 @@ tests:
           a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       identity: "beta"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
       response:
           error: FAILURE
           clusterError: 2

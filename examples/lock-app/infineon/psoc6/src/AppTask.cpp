@@ -80,8 +80,8 @@ using namespace ::chip::System;
 #define APP_EVENT_QUEUE_SIZE 10
 
 using chip::app::Clusters::DoorLock::DlLockState;
-using chip::app::Clusters::DoorLock::DlOperationError;
-using chip::app::Clusters::DoorLock::DlOperationSource;
+using chip::app::Clusters::DoorLock::OperationErrorEnum;
+using chip::app::Clusters::DoorLock::OperationSourceEnum;
 namespace {
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -407,7 +407,7 @@ void AppTask::LockActionEventHandler(AppEvent * event)
             P6_LOG("Sending a lock jammed event");
 
             /* Generating Door Lock Jammed event */
-            DoorLockServer::Instance().SendLockAlarmEvent(1 /* Endpoint Id */, DlAlarmCode::kLockJammed);
+            DoorLockServer::Instance().SendLockAlarmEvent(1 /* Endpoint Id */, AlarmCodeEnum::kLockJammed);
 
             return;
         }
@@ -663,7 +663,7 @@ void AppTask::UpdateCluster(intptr_t context)
     bool unlocked        = LockMgr().NextState();
     DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
 
-    DlOperationSource source = DlOperationSource::kUnspecified;
+    OperationSourceEnum source = OperationSourceEnum::kUnspecified;
 
     // write the new lock value
     EmberAfStatus status =

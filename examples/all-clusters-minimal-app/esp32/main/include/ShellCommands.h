@@ -134,7 +134,7 @@ public:
 
 private:
     CASECommands() {}
-    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
     {
         streamer_printf(streamer_get(), "Establish CASESession Success!\r\n");
         GetInstance().SetOnConnecting(false);

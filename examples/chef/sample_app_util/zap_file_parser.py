@@ -29,13 +29,12 @@ Future work:
     available.
   - Add support for .matter files.
 """
-import copy
 import base64
+import copy
 import hashlib
 import json
 import os
 import re
-
 from typing import Dict, List, Literal, Optional, Sequence, TypedDict, Union
 
 try:

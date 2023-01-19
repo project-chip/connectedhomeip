@@ -16,7 +16,7 @@
  */
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/CommonPersistentData.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -33,7 +33,15 @@ using GroupEndpoint = GroupDataProvider::GroupEndpoint;
 using EpochKey      = GroupDataProvider::EpochKey;
 using KeySet        = GroupDataProvider::KeySet;
 using GroupSession  = GroupDataProvider::GroupSession;
-using FabricList    = CommonPersistentData::FabricList;
+
+struct FabricList : public CommonPersistentData::FabricList
+{
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    {
+        key = DefaultStorageKeyAllocator::GroupFabricList();
+        return CHIP_NO_ERROR;
+    }
+};
 
 constexpr size_t kPersistentBufferMax = 128;
 
@@ -494,6 +502,37 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
 
         id = static_cast<uint16_t>(max_id + 1);
         return false;
+    }
+
+    // returns index if the find_id is found, otherwise std::numeric_limits<size_t>::max
+    size_t Find(PersistentStorageDelegate * storage, const FabricData & fabric, const KeysetId find_id)
+    {
+        fabric_index = fabric.fabric_index;
+        id           = fabric.first_map;
+        max_id       = 0;
+        index        = 0;
+        first        = true;
+
+        while (index < fabric.map_count)
+        {
+            if (CHIP_NO_ERROR != Load(storage))
+            {
+                break;
+            }
+            if (keyset_id == find_id)
+            {
+                // Match found
+                return index;
+            }
+            max_id = std::max(id, max_id);
+            first  = false;
+            prev   = id;
+            id     = next;
+            index++;
+        }
+
+        id = static_cast<uint16_t>(max_id + 1);
+        return std::numeric_limits<size_t>::max();
     }
 };
 
@@ -1566,7 +1605,25 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
         fabric.keyset_count--;
     }
     // Update fabric info
-    return fabric.Save(mStorage);
+    ReturnErrorOnFailure(fabric.Save(mStorage));
+
+    // Removing a key set also removes the associated group mappings
+    KeyMapData map;
+    uint16_t original_count = fabric.map_count;
+    for (uint16_t i = 0; i < original_count; ++i)
+    {
+        fabric.Load(mStorage);
+        size_t idx = map.Find(mStorage, fabric, target_id);
+        if (idx == std::numeric_limits<size_t>::max())
+        {
+            break;
+        }
+        // NOTE: It's unclear what should happen here if we have removed the key set
+        // and possibly some mappings before failing. For now, ignoring errors, but
+        // open to suggestsions for the correct behavior.
+        RemoveGroupKeyAt(fabric_index, idx);
+    }
+    return CHIP_NO_ERROR;
 }
 
 GroupDataProvider::KeySetIterator * GroupDataProviderImpl::IterateKeySets(chip::FabricIndex fabric_index)

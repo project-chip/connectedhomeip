@@ -485,8 +485,8 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         {
             const char * fileNameOrStr = arg;
-            std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
-            VerifyOrReturnError(ReadCert(fileNameOrStr, cert.get()), false);
+            std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
+            VerifyOrReturnError(ReadCert(fileNameOrStr, cert), false);
 
             ByteSpan skid;
             VerifyOrReturnError(ExtractSKIDFromX509Cert(cert.get(), skid), false);
@@ -995,7 +995,7 @@ CHIP_ERROR EncodeSignerInfo_Ignor_Error(const ByteSpan & signerKeyId, const P256
 
             uint8_t asn1SignatureBuf[kMax_ECDSA_Signature_Length_Der];
             MutableByteSpan asn1Signature(asn1SignatureBuf);
-            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, ByteSpan(signature, signature.Length()), asn1Signature));
+            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, signature.Span(), asn1Signature));
 
             if (!cdConfig.IsCMSSignatureCorrect())
             {
@@ -1144,10 +1144,10 @@ bool Cmd_GenCD(int argc, char * argv[])
     }
 
     {
-        std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+        std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
         std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> key(EVP_PKEY_new(), &EVP_PKEY_free);
 
-        VerifyOrReturnError(ReadCert(gCertFileNameOrStr, cert.get()), false);
+        VerifyOrReturnError(ReadCert(gCertFileNameOrStr, cert), false);
         VerifyOrReturnError(ReadKey(gKeyFileNameOrStr, key), false);
 
         // Extract the subject key id from the X509 certificate.

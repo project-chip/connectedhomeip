@@ -33,20 +33,20 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "tempAccountIdentifier"
+              - name: "TempAccountIdentifier"
                 value: "asdf"
       response:
           values:
-              - name: "setupPIN"
+              - name: "SetupPIN"
                 value: "tempPin123"
     - label: "Login Command"
       command: "login"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "tempAccountIdentifier"
+              - name: "TempAccountIdentifier"
                 value: "asdf"
-              - name: "setupPIN"
+              - name: "SetupPIN"
                 value: "tempPin123"
 
     - label: "Logout Command"

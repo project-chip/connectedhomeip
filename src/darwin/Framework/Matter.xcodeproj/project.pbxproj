@@ -48,6 +48,7 @@
 		3DECCB702934AECD00585AEC /* MTRLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DECCB6F2934AC1C00585AEC /* MTRLogging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3DECCB722934AFE200585AEC /* MTRLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3DECCB712934AFE200585AEC /* MTRLogging.mm */; };
 		3DECCB742934C21B00585AEC /* MTRDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DECCB732934C21B00585AEC /* MTRDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3DFCB32C29678C9500332B35 /* MTRConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DFCB32B29678C9500332B35 /* MTRConversion.h */; };
 		51029DF6293AA6100087AFB0 /* MTROperationalCertificateIssuer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51029DF5293AA6100087AFB0 /* MTROperationalCertificateIssuer.mm */; };
 		511913FB28C100EF009235E9 /* MTRBaseSubscriptionCallback.mm in Sources */ = {isa = PBXBuildFile; fileRef = 511913F928C100EF009235E9 /* MTRBaseSubscriptionCallback.mm */; };
 		511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 511913FA28C100EF009235E9 /* MTRBaseSubscriptionCallback.h */; };
@@ -236,6 +237,7 @@
 		3DECCB6F2934AC1C00585AEC /* MTRLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRLogging.h; sourceTree = "<group>"; };
 		3DECCB712934AFE200585AEC /* MTRLogging.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRLogging.mm; sourceTree = "<group>"; };
 		3DECCB732934C21B00585AEC /* MTRDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDefines.h; sourceTree = "<group>"; };
+		3DFCB32B29678C9500332B35 /* MTRConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRConversion.h; sourceTree = "<group>"; };
 		51029DF5293AA6100087AFB0 /* MTROperationalCertificateIssuer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROperationalCertificateIssuer.mm; sourceTree = "<group>"; };
 		511913F928C100EF009235E9 /* MTRBaseSubscriptionCallback.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRBaseSubscriptionCallback.mm; sourceTree = "<group>"; };
 		511913FA28C100EF009235E9 /* MTRBaseSubscriptionCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRBaseSubscriptionCallback.h; sourceTree = "<group>"; };
@@ -507,6 +509,7 @@
 				99AECC7F2798A57E00B6355B /* MTRCommissioningParameters.mm */,
 				51E030FE27EA20D20083DC9C /* MTRControllerAccessControl.h */,
 				51E030FF27EA20D20083DC9C /* MTRControllerAccessControl.mm */,
+				3DFCB32B29678C9500332B35 /* MTRConversion.h */,
 				3CF134A6289D8AD90017A19E /* MTRCSRInfo.h */,
 				3CF134A8289D8D800017A19E /* MTRCSRInfo.mm */,
 				3DECCB732934C21B00585AEC /* MTRDefines.h */,
@@ -667,6 +670,7 @@
 				27A53C1727FBC6920053F131 /* MTRAttestationTrustStoreBridge.h in Headers */,
 				5A830D6C27CFCF590053B85D /* MTRDeviceControllerOverXPC_Internal.h in Headers */,
 				88EBF8D027FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.h in Headers */,
+				3DFCB32C29678C9500332B35 /* MTRConversion.h in Headers */,
 				5A60370827EA1FF60020DB79 /* MTRClusterStateCacheContainer+XPC.h in Headers */,
 				5ACDDD7E27CD3F3A00EFD68A /* MTRClusterStateCacheContainer_Internal.h in Headers */,
 				5136661328067D550025EDAE /* MTRDeviceController_Internal.h in Headers */,
@@ -1005,9 +1009,14 @@
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
+					/* Compile time codegen would need this: 
+					   "$(TEMP_DIR)/out/gen/src/controller/data_model/zapgen/", 
+					 */
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/zzz_generated/controller-clusters",
+					/* darwin-specific bypassing compile time codegen for header inclusion */
+					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1156,9 +1165,14 @@
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
+					/* Compile time codegen would need this: 
+					   "$(TEMP_DIR)/out/gen/src/controller/data_model/zapgen/", 
+					 */
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/zzz_generated/controller-clusters",
+					/* darwin-specific bypassing compile time codegen for header inclusion */
+					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

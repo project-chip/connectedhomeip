@@ -69,7 +69,8 @@ exclude:
     - "third_party/android_deps/gradlew" # gradle wrapper generated file
     - "src/controller/python/chip/clusters/Objects.py" # generated file, no point to restyle
     - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file, no point to restyle
-    - "scripts/idl/tests/outputs/**/*" # Matches generated output 1:1
+    - "scripts/py_matter_idl/matter_idl/tests/outputs/**/*" # Matches generated output 1:1
+    - "scripts/tools/zap/tests/outputs/**/*" # Matches generated output 1:1
     - "examples/chef/sample_app_util/test_files/*.yaml"
     - "examples/chef/zzz_generated/**/*"
     - "examples/platform/nxp/k32w/k32w0/scripts/demo_generated_certs/**/*"
@@ -77,6 +78,7 @@ exclude:
     - "scripts/run_codegen_targets.sh" # shellharden breaks for loops over command outputs
     - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.h" # Too big?
     - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm" # Too big?
+    - "zzz_generated/**/*" # already clang-formatted by our zap tooling
 
 
 changed_paths:
@@ -213,10 +215,19 @@ restylers:
           - "**/*.sh"
           - "**/*.bash"
     - name: autopep8
-      image: 'restyled/restyler-autopep8:v1.5.7'
+      image: 'restyled/restyler-autopep8:v2.0.0'
       command:
         - autopep8
         - '--in-place'
+      arguments: []
+      include:
+        - '**/*.py'
+      interpreters:
+        - python
+    - name: isort
+      image: 'restyled/restyler-isort:v5.11.2'
+      command:
+        - isort
       arguments: []
       include:
         - '**/*.py'

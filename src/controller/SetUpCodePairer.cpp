@@ -491,7 +491,8 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
     if (CHIP_ERROR_TIMEOUT == error && mCurrentPASEParameters.HasValue())
     {
         const auto & params = mCurrentPASEParameters.Value();
-        auto & ip           = params.GetPeerAddress().GetIPAddress();
+        const auto & peer   = params.GetPeerAddress();
+        const auto & ip     = peer.GetIPAddress();
         auto err            = Dnssd::Resolver::Instance().ReconfirmRecord(params.mHostName, ip, params.mInterfaceId);
         if (CHIP_NO_ERROR != err && CHIP_ERROR_NOT_IMPLEMENTED != err)
         {

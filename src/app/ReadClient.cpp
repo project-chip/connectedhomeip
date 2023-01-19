@@ -28,7 +28,7 @@
 #include <app/ReadClient.h>
 #include <app/StatusResponse.h>
 #include <assert.h>
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
 #include <messaging/ReliableMessageMgr.h>
 
@@ -64,6 +64,7 @@ void ReadClient::ClearActiveSubscriptionState()
     mMinIntervalFloorSeconds      = 0;
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
+    mIsResubscriptionScheduled    = false;
     MoveToState(ClientState::Idle);
 }
 
@@ -155,6 +156,7 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     ReturnErrorOnFailure(
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Milliseconds32(aTimeTillNextResubscriptionMs), OnResubscribeTimerCallback, this));
+    mIsResubscriptionScheduled = true;
 
     return CHIP_NO_ERROR;
 }
@@ -820,7 +822,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
         timeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
     }
 
-    // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
+    // EFR32/MBED/INFINION/K32W's chrono count return long unsigned, but other platform returns unsigned
     ChipLogProgress(
         DataManagement,
         "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32 " Peer = %02x:" ChipLogFormatX64,
@@ -841,6 +843,7 @@ void ReadClient::CancelResubscribeTimer()
 {
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnResubscribeTimerCallback, this);
+    mIsResubscriptionScheduled = false;
 }
 
 void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState)
@@ -1065,7 +1068,8 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                       const SessionHandle & sessionHandle)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
@@ -1094,6 +1098,8 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
 {
     ReadClient * const _this = static_cast<ReadClient *>(apAppState);
     VerifyOrDie(_this != nullptr);
+
+    _this->mIsResubscriptionScheduled = false;
 
     CHIP_ERROR err;
 

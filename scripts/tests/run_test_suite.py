@@ -22,13 +22,11 @@ import typing
 from dataclasses import dataclass
 from pathlib import Path
 
+import chiptest
 import click
 import coloredlogs
-
-import chiptest
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -108,11 +106,16 @@ class RunContext:
     help='Internal flag for running inside a unshared environment'
 )
 @click.option(
+    '--run-yamltests-with-chip-repl',
+    default=False,
+    is_flag=True,
+    help='Run YAML tests using chip-repl based python parser only')
+@click.option(
     '--chip-tool',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, chip_tool):
+         no_log_timestamps, root, internal_inside_unshare, run_yamltests_with_chip_repl, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -123,7 +126,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         chip_tool = FindBinaryPath('chip-tool')
 
     # Figures out selected test that match the given name(s)
-    all_tests = [test for test in chiptest.AllTests(chip_tool)]
+    all_tests = [test for test in chiptest.AllTests(chip_tool, run_yamltests_with_chip_repl)]
 
     # Default to only non-manual tests unless explicit targets are specified.
     tests = list(filter(lambda test: not test.is_manual, all_tests))
@@ -192,6 +195,9 @@ def cmd_list(context):
     '--bridge-app',
     help='what bridge app to use')
 @click.option(
+    '--chip-repl-yaml-tester',
+    help='what python script to use for running yaml tests using chip-repl as controller')
+@click.option(
     '--pics-file',
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
@@ -202,7 +208,7 @@ def cmd_list(context):
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, pics_file, test_timeout_seconds):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, chip_repl_yaml_tester, pics_file, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -223,6 +229,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if bridge_app is None:
         bridge_app = FindBinaryPath('chip-bridge-app')
 
+    if chip_repl_yaml_tester is None:
+        chip_repl_yaml_tester = FindBinaryPath('yamltest_with_chip_repl_tester.py')
+
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
@@ -231,7 +240,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         ota_provider_app=[ota_provider_app],
         ota_requestor_app=[ota_requestor_app],
         tv_app=[tv_app],
-        bridge_app=[bridge_app]
+        bridge_app=[bridge_app],
+        chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester]
     )
 
     if sys.platform == 'linux':
@@ -264,6 +274,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 sys.exit(2)
 
     apps_register.uninit()
+    if sys.platform == 'linux':
+        chiptest.linux.ShutdownNamespaceForTestExecution()
 
 
 # On linux, allow an execution shell to be prepared

@@ -3,17 +3,22 @@
 '''
 
 # This file contains generated struct, enum, command definition.
-# Users are not expected to import this file, instead, users can use import chip.clusters, which will import all symbols from this file and can get a readable, pretty naming like clusters.OnOff.commands.OnCommand
+# Users are not expected to import this file, instead, users can use import chip.clusters,
+# which will import all symbols from this file and can get a readable, pretty naming like
+# clusters.OnOff.commands.OnCommand
 
-from dataclasses import dataclass, field
 import typing
-from enum import IntEnum
+from dataclasses import dataclass, field
+from enum import IntFlag
+
 from chip import ChipUtility
+from chip.clusters.enum import MatterIntEnum
+from chip.tlv import float32, uint
 
-from chip.tlv import uint, float32
-
-from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor, Cluster, ClusterEvent
+from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
+                             ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
+
 
 {{#zcl_clusters}}
 @dataclass
@@ -45,12 +50,28 @@ class {{asUpperCamelCase name}}(Cluster):
 {{#first}}
     class Enums:
 {{/first}}
-        class {{asType label}}(IntEnum):
+        class {{asType label}}(MatterIntEnum):
 {{#zcl_enum_items}}
             k{{asUpperCamelCase label}} = {{asHex value 2}}
 {{/zcl_enum_items}}
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
 
 {{/zcl_enums}}
+
+{{#zcl_bitmaps}}
+{{#first}}
+    class Bitmaps:
+{{/first}}
+        class {{asType label}}(IntFlag):
+{{#zcl_bitmap_items}}
+            k{{asUpperCamelCase label}} = {{asHex mask}}
+{{/zcl_bitmap_items}}
+
+{{/zcl_bitmaps}}
 
 {{#zcl_structs}}
 {{#first}}
@@ -83,12 +104,12 @@ class {{asUpperCamelCase name}}(Cluster):
         @dataclass
         class {{asUpperCamelCase name}}(ClusterCommand):
             cluster_id: typing.ClassVar[int] = {{ asHex parent.code 4 }}
-            command_id: typing.ClassVar[int] = {{ asHex code 4 }}
+            command_id: typing.ClassVar[int] = {{ asMEI manufacturerCode code }}
 {{#if (isServer source)}}
             is_client: typing.ClassVar[bool] = False
 {{else}}
             is_client: typing.ClassVar[bool] = True
-{{/if}}       
+{{/if}}
 
             {{~#if responseName}}
             response_type: typing.ClassVar[str] = '{{asUpperCamelCase responseName}}'

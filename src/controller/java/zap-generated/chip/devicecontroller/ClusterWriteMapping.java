@@ -288,57 +288,60 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("accessControl", writeAccessControlInteractionInfo);
     Map<String, InteractionInfo> writeActionsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("actions", writeActionsInteractionInfo);
-    Map<String, InteractionInfo> writeBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBasicNodeLabelCommandParams =
+    Map<String, InteractionInfo> writeBasicInformationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeBasicInformationNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo basicnodeLabelCommandParameterInfo =
+    CommandParameterInfo basicInformationnodeLabelCommandParameterInfo =
         new CommandParameterInfo("value", String.class, String.class);
-    writeBasicNodeLabelCommandParams.put("value", basicnodeLabelCommandParameterInfo);
-    InteractionInfo writeBasicNodeLabelAttributeInteractionInfo =
+    writeBasicInformationNodeLabelCommandParams.put(
+        "value", basicInformationnodeLabelCommandParameterInfo);
+    InteractionInfo writeBasicInformationNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BasicCluster) cluster)
+              ((ChipClusters.BasicInformationCluster) cluster)
                   .writeNodeLabelAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBasicNodeLabelCommandParams);
-    writeBasicInteractionInfo.put(
-        "writeNodeLabelAttribute", writeBasicNodeLabelAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeBasicLocationCommandParams =
+            writeBasicInformationNodeLabelCommandParams);
+    writeBasicInformationInteractionInfo.put(
+        "writeNodeLabelAttribute", writeBasicInformationNodeLabelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBasicInformationLocationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo basiclocationCommandParameterInfo =
+    CommandParameterInfo basicInformationlocationCommandParameterInfo =
         new CommandParameterInfo("value", String.class, String.class);
-    writeBasicLocationCommandParams.put("value", basiclocationCommandParameterInfo);
-    InteractionInfo writeBasicLocationAttributeInteractionInfo =
+    writeBasicInformationLocationCommandParams.put(
+        "value", basicInformationlocationCommandParameterInfo);
+    InteractionInfo writeBasicInformationLocationAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BasicCluster) cluster)
+              ((ChipClusters.BasicInformationCluster) cluster)
                   .writeLocationAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBasicLocationCommandParams);
-    writeBasicInteractionInfo.put(
-        "writeLocationAttribute", writeBasicLocationAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeBasicLocalConfigDisabledCommandParams =
+            writeBasicInformationLocationCommandParams);
+    writeBasicInformationInteractionInfo.put(
+        "writeLocationAttribute", writeBasicInformationLocationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBasicInformationLocalConfigDisabledCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo basiclocalConfigDisabledCommandParameterInfo =
+    CommandParameterInfo basicInformationlocalConfigDisabledCommandParameterInfo =
         new CommandParameterInfo("value", Boolean.class, Boolean.class);
-    writeBasicLocalConfigDisabledCommandParams.put(
-        "value", basiclocalConfigDisabledCommandParameterInfo);
-    InteractionInfo writeBasicLocalConfigDisabledAttributeInteractionInfo =
+    writeBasicInformationLocalConfigDisabledCommandParams.put(
+        "value", basicInformationlocalConfigDisabledCommandParameterInfo);
+    InteractionInfo writeBasicInformationLocalConfigDisabledAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BasicCluster) cluster)
+              ((ChipClusters.BasicInformationCluster) cluster)
                   .writeLocalConfigDisabledAttribute(
                       (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBasicLocalConfigDisabledCommandParams);
-    writeBasicInteractionInfo.put(
-        "writeLocalConfigDisabledAttribute", writeBasicLocalConfigDisabledAttributeInteractionInfo);
-    writeAttributeMap.put("basic", writeBasicInteractionInfo);
+            writeBasicInformationLocalConfigDisabledCommandParams);
+    writeBasicInformationInteractionInfo.put(
+        "writeLocalConfigDisabledAttribute",
+        writeBasicInformationLocalConfigDisabledAttributeInteractionInfo);
+    writeAttributeMap.put("basicInformation", writeBasicInformationInteractionInfo);
     Map<String, InteractionInfo> writeOtaSoftwareUpdateProviderInteractionInfo =
         new LinkedHashMap<>();
     writeAttributeMap.put(
@@ -485,25 +488,28 @@ public class ClusterWriteMapping {
         new LinkedHashMap<>();
     writeAttributeMap.put(
         "ethernetNetworkDiagnostics", writeEthernetNetworkDiagnosticsInteractionInfo);
-    Map<String, InteractionInfo> writeBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBridgedDeviceBasicNodeLabelCommandParams =
+    Map<String, InteractionInfo> writeBridgedDeviceBasicInformationInteractionInfo =
+        new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeBridgedDeviceBasicInformationNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedDeviceBasicnodeLabelCommandParameterInfo =
+    CommandParameterInfo bridgedDeviceBasicInformationnodeLabelCommandParameterInfo =
         new CommandParameterInfo("value", String.class, String.class);
-    writeBridgedDeviceBasicNodeLabelCommandParams.put(
-        "value", bridgedDeviceBasicnodeLabelCommandParameterInfo);
-    InteractionInfo writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo =
+    writeBridgedDeviceBasicInformationNodeLabelCommandParams.put(
+        "value", bridgedDeviceBasicInformationnodeLabelCommandParameterInfo);
+    InteractionInfo writeBridgedDeviceBasicInformationNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+              ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .writeNodeLabelAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBridgedDeviceBasicNodeLabelCommandParams);
-    writeBridgedDeviceBasicInteractionInfo.put(
-        "writeNodeLabelAttribute", writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo);
-    writeAttributeMap.put("bridgedDeviceBasic", writeBridgedDeviceBasicInteractionInfo);
+            writeBridgedDeviceBasicInformationNodeLabelCommandParams);
+    writeBridgedDeviceBasicInformationInteractionInfo.put(
+        "writeNodeLabelAttribute",
+        writeBridgedDeviceBasicInformationNodeLabelAttributeInteractionInfo);
+    writeAttributeMap.put(
+        "bridgedDeviceBasicInformation", writeBridgedDeviceBasicInformationInteractionInfo);
     Map<String, InteractionInfo> writeSwitchInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("switch", writeSwitchInteractionInfo);
     Map<String, InteractionInfo> writeAdministratorCommissioningInteractionInfo =
@@ -1605,6 +1611,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("accountLogin", writeAccountLoginInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("electricalMeasurement", writeElectricalMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeClientMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("clientMonitoring", writeClientMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

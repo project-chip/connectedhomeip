@@ -29,9 +29,9 @@ operations:
   --application FILE    Flash an image through drag and drop
 """
 
-import sys
 import os
 import shutil
+import sys
 
 import firmware_utils
 

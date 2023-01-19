@@ -35,7 +35,7 @@ tests:
     - label: "TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           constraints:
               type: list

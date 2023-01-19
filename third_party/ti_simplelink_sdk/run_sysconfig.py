@@ -11,8 +11,8 @@ This script will attempt to run sh or cmd to run the wrapper scripts for the
 SysConfig cmd line.
 """
 
-import sys
 import subprocess
+import sys
 
 # Select OS specific helper script
 if sys.platform.startswith('linux'):

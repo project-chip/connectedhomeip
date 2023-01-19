@@ -66,13 +66,13 @@
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
     {                                                                                                                              \
-        0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT()                                     \
+        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)                                     \
     } /* cluster revision */                                                                                                       \
     }
 
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
-        attId, ZAP_TYPE(attType), attSizeBytes, attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT()               \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
     }
 
 #define CLUSTER_TICK_FREQ_ALL (0x00)

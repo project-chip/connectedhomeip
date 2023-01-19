@@ -1138,7 +1138,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
             constexpr uint16_t kFrameErrorRate100Percent   = 0xffff;
             constexpr uint16_t kMessageErrorRate100Percent = 0xffff;
@@ -1196,7 +1196,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
             otRouterInfo routerInfo;
 
@@ -1836,9 +1836,10 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mIntervalsMode = intervalType;
 
     Impl()->LockThreadStack();
+
+    mIntervalsMode = intervalType;
 
 // For Thread devices, the intervals are defined as:
 // * poll period for SED devices that poll the parent for data
@@ -1879,10 +1880,9 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ConnectivityManager::SEDIntervalMode mode;
 
     if (onOff)
     {
@@ -1894,12 +1894,42 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiv
             mActiveModeConsumers--;
     }
 
+    if (!onOff && delayIdle && CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD.count() != 0)
+    {
+        err = DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD, RequestSEDModeChange, this);
+        if (CHIP_NO_ERROR == err)
+        {
+            return err;
+        }
+
+        ChipLogError(DeviceLayer, "Failed to postponed Idle Mode with error %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return SEDChangeMode();
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDChangeMode()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ConnectivityManager::SEDIntervalMode mode;
+
     mode = mActiveModeConsumers > 0 ? ConnectivityManager::SEDIntervalMode::Active : ConnectivityManager::SEDIntervalMode::Idle;
 
     if (mIntervalsMode != mode)
         err = SetSEDIntervalMode(mode);
 
     return err;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeChange(chip::System::Layer * apSystemLayer,
+                                                                               void * apAppState)
+{
+    if (apAppState != nullptr)
+    {
+        static_cast<GenericThreadStackManagerImpl_OpenThread *>(apAppState)->SEDChangeMode();
+    }
 }
 #endif
 

@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import argparse
-import tarfile
+import os
 import shutil
+import tarfile
+
 import docker
 
 client = docker.from_env()
@@ -65,4 +66,6 @@ for device_file_name in os.listdir(args.tar_path):
     image[0].tag(docker_image_name, tag=f'revision-id_{args.revision_id}')
 
     print(f'Pushing image: {docker_image_name}')
-    client.images.push(docker_image_name)
+    response = client.images.push(docker_image_name, stream=True, decode=True)
+    for line in response:
+        print(line)

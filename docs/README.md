@@ -24,7 +24,7 @@
 ## Style Guide
 
 -   Documentation about style is documented in
-    [the style guide](./STYLE_GUIDE.md)
+    [the style guide](./style/style_guide.md)
 -   Additional documentation about more specific files are in the
     [style folder](./style/)
 

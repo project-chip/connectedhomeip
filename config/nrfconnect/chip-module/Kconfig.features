@@ -25,10 +25,6 @@ config CHIP_WIFI
 	select WIFI_NRF700X
 	select WIFI
 	select WPA_SUPP
-	imply FLASH
-	imply SETTINGS
-	imply NVS
-	imply FLASH_MAP
 	imply NORDIC_SECURITY_BACKEND
 	imply MBEDTLS_ENTROPY_C
 	imply MBEDTLS_PSA_CRYPTO_C
@@ -47,17 +43,15 @@ config CHIP_WIFI
 config CHIP_QSPI_NOR
 	bool "Enable QSPI NOR feature set"
 	help
-		Enables QSPI NOR with the set of options
-		configuring pages and buffer sizes.
+	  Enables QSPI NOR flash with a set of options for configuring pages and
+	  buffer sizes.
 
 if CHIP_QSPI_NOR
 
 config NORDIC_QSPI_NOR
-	bool
 	default y
 
 config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
-	int
 	default 16
 
 endif # CHIP_QSPI_NOR
@@ -69,13 +63,12 @@ config CHIP_SPI_NOR
 	imply MULTITHREADING
 	imply PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
 	help
-		Enables SPI NOR with the set of options
-		configuring pages and buffer sizes.
+	  Enables SPI NOR flash with a set of options for configuring pages and
+	  buffer sizes.
 
 if CHIP_SPI_NOR
 
 config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
-	int
 	default 4096
 
 endif # CHIP_SPI_NOR
@@ -85,71 +78,48 @@ config CHIP_DFU_OVER_BT_SMP
 	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
 	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP
 	imply BOOTLOADER_MCUBOOT
+	select MCUMGR
+	select MCUMGR_SMP_BT
+	select MCUMGR_CMD_IMG_MGMT
+	select MCUMGR_CMD_OS_MGMT
+	# Enable custom SMP request to erase settings partition.
+	select MCUMGR_GRP_ZEPHYR_BASIC if SOC_SERIES_NRF53X
+	select MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE if SOC_SERIES_NRF53X
 	help
-		Enables Device Firmware Upgrade over Bluetoot LE with SMP
-		and configures set of options related to that feature.
+	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
+	  the set of options related to that feature.
 
 if CHIP_DFU_OVER_BT_SMP
 
 # MCU Manager and SMP configuration
-config MCUMGR
-	bool
-	default y
-
-config MCUMGR_CMD_IMG_MGMT
-	bool
-	default y
-
-config MCUMGR_CMD_OS_MGMT
-	bool
-	default y
-
-config MCUMGR_SMP_BT
-	bool
-	default y
-
 config MCUMGR_SMP_BT_AUTHEN
-	bool
 	default n
 
 config MCUMGR_BUF_COUNT
-	int
 	default 6
 
 # Increase BT MTU and RX buffer for big size DFU messages
 config BT_L2CAP_TX_MTU
-	int
 	default 498
 
 config BT_BUF_ACL_RX_SIZE
-	int
 	default 502
 
 # Increase MCUMGR_BUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
 config MCUMGR_BUF_SIZE
-	int
 	default 1024
 
 # Increase system workqueue size, as SMP is processed within it
 config SYSTEM_WORKQUEUE_STACK_SIZE
-	int
 	default 2800
 
 if SOC_SERIES_NRF53X
 
-# FLASH nop device is enabled to prevent bus faults when mcumgr tries to access
-# simulated partition with network core image data.
-config FLASH_NOP_DEVICE
-	bool
-	default y
-
 # Enable custom SMP request to erase settings partition.
 config MCUMGR_GRP_ZEPHYR_BASIC
-	bool
 	default y
 
 config MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE
-	bool
 	default y
 
 endif # SOC_SERIES_NRF53X

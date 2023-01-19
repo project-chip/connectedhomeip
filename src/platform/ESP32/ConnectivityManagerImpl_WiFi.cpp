@@ -28,6 +28,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
+#include <platform/ESP32/route_hook/ESP32RouteHook.h>
 #include <platform/internal/BLEManager.h>
 
 #include "esp_event.h"
@@ -104,11 +105,6 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        wifi_config_t stationConfig;
-
-        memset(&stationConfig, 0, sizeof(stationConfig));
-        esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
-
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
@@ -1099,6 +1095,8 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
+
+    esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
 }
 
 } // namespace DeviceLayer

@@ -65,6 +65,7 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath &, AttributeValueEncoder & aEn
 /*
  * @brief
  * Lists that are string-like should be encoded as char/byte spans.
+ * Encode using a given AttributeValueEncoder.
  */
 template <
     typename X,
@@ -76,8 +77,23 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder
 
 /*
  * @brief
+ * Lists that are string-like should be encoded as char/byte spans.
+ * Encode using a given TLVWriter.
+ */
+template <
+    typename X,
+    std::enable_if_t<IsList<std::decay_t<X>>::value && sizeof(std::decay_t<typename X::pointer>) == sizeof(char), bool> = true>
+CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
+{
+    return writer.Put(tag, Span<std::decay_t<typename X::pointer>>(x.data(), x.size()));
+}
+
+/*
+ * @brief
  *
  * If an item is requested from a list, encode just that single item, or the entire list otherwise.
+ *
+ * Encodes items using a given AttributeValueEncoder.
  *
  * The object must satisfy the following constraints
  * size() must return an integer
@@ -111,6 +127,46 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder
         }
         return err;
     });
+}
+
+/*
+ * @brief
+ *
+ * If an item is requested from a list, encode just that single item, or the entire list otherwise.
+ *
+ * Encodes items using a given TLVWriter.
+ *
+ * The object must satisfy the following constraints
+ * size() must return an integer
+ * begin() must return a type conforming to LegacyRandomAccessIterator
+ *
+ * This is const X& instead of X&& because it is "more specialized" and so this overload will
+ * be chosen if possible.
+ */
+template <
+    typename X,
+    std::enable_if_t<IsList<std::decay_t<X>>::value && (sizeof(std::decay_t<typename X::pointer>) > sizeof(char)), bool> = true>
+CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
+{
+    if (aPath.mListIndex.HasValue())
+    {
+        uint16_t index = aPath.mListIndex.Value();
+        if (index >= x.size())
+            return CHIP_ERROR_INVALID_ARGUMENT;
+
+        auto it = x.begin();
+        std::advance(it, index);
+        return Encode(writer, tag, *it);
+    }
+    TLV::TLVType type;
+
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+    for (auto & item : x)
+    {
+        ReturnErrorOnFailure(Encode(writer, tag, item));
+    }
+    ReturnErrorOnFailure(writer.EndContainer(type));
+    return CHIP_NO_ERROR;
 }
 
 /*

@@ -15,18 +15,19 @@
 #    limitations under the License.
 #
 
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
+import asyncio
+import logging
+import queue
+import time
+from threading import Event
+
+import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.FabricAdmin
-import chip.CertificateAuthority
-import logging
-from mobly import asserts
+from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.utils import CommissioningBuildingBlocks
-from chip.clusters.Attribute import TypedAttributePath, SubscriptionTransaction
-import queue
-import asyncio
-from threading import Event
-import time
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from mobly import asserts
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic
 #       to some internal behavior assumptions of the SDK we are making relative to the write to
@@ -115,7 +116,7 @@ class TC_SC_3_6(MatterBaseTest):
 
         logging.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
 
-        capability_minima = await self.read_single_attribute(dev_ctrl, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.CapabilityMinima)
+        capability_minima = await self.read_single_attribute(dev_ctrl, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.BasicInformation.Attributes.CapabilityMinima)
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
         logging.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics" %
@@ -129,7 +130,7 @@ class TC_SC_3_6(MatterBaseTest):
         client_list.append(dev_ctrl)
 
         if num_controllers_per_fabric > 1:
-            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id)
+            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=self.dut_node_id)
             for controller in new_controllers:
                 controller.name = all_names.pop(0)
             client_list.extend(new_controllers)
@@ -147,7 +148,7 @@ class TC_SC_3_6(MatterBaseTest):
 
             if num_controllers_per_fabric > 1:
                 new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=new_fabric_admin, adminDevCtrl=new_admin_ctrl,
-                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id)
+                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=self.dut_node_id)
                 for controller in new_controllers:
                     controller.name = all_names.pop(0)
 
@@ -158,7 +159,7 @@ class TC_SC_3_6(MatterBaseTest):
 
         # Before subscribing, set the NodeLabel to "Before Subscriptions"
         logging.info("Pre-conditions: writing initial value of NodeLabel, so that we can control for change of attribute detection")
-        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=BEFORE_LABEL))])
+        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=BEFORE_LABEL))])
 
         # Subscribe with all clients to NodeLabel attribute
         sub_handlers = []
@@ -169,12 +170,12 @@ class TC_SC_3_6(MatterBaseTest):
         for sub_idx, client in enumerate(client_list):
             logging.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
-            sub = await client.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.Basic.Attributes.NodeLabel)],
+            sub = await client.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.BasicInformation.Attributes.NodeLabel)],
                                              reportInterval=(min_report_interval_sec, max_report_interval_sec), keepSubscriptions=False)
             self._subscriptions.append(sub)
 
             attribute_handler = AttributeChangeAccumulator(
-                name=client.name, expected_attribute=Clusters.Basic.Attributes.NodeLabel, output=output_queue)
+                name=client.name, expected_attribute=Clusters.BasicInformation.Attributes.NodeLabel, output=output_queue)
             sub.SetAttributeUpdateCallback(attribute_handler)
             sub_handlers.append(attribute_handler)
 
@@ -189,7 +190,7 @@ class TC_SC_3_6(MatterBaseTest):
         logging.info(
             "Step 1 (second part): Change attribute with one client, await all attributes changed within time")
         await asyncio.sleep(1)
-        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=AFTER_LABEL))])
+        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=AFTER_LABEL))])
 
         all_changes = {client.name: False for client in client_list}
 
@@ -204,7 +205,7 @@ class TC_SC_3_6(MatterBaseTest):
                 client_name, endpoint, attribute, value = item['name'], item['endpoint'], item['attribute'], item['value']
 
                 # Record arrival of an expected subscription change when seen
-                if endpoint == 0 and attribute == Clusters.Basic.Attributes.NodeLabel and value == AFTER_LABEL:
+                if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
                         logging.info("Got expected attribute change for client %s" % client_name)
                         all_changes[client_name] = True

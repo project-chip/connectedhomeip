@@ -43,7 +43,7 @@ class ConnectivityUtils
 public:
     static uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel);
     static uint8_t MapFrequencyToChannel(const uint16_t frequency);
-    static app::Clusters::GeneralDiagnostics::InterfaceType GetInterfaceConnectionType(const char * ifname);
+    static app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
     static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
     static CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
     static CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
@@ -53,7 +53,7 @@ public:
     static CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount);
     static CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate);
     static CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
-    static CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate);
+    static CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
     static CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
 
 private:

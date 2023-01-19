@@ -75,7 +75,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -83,11 +83,9 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -230,7 +228,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -238,8 +236,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -263,7 +259,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -271,12 +267,10 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR1 opens a 2nd commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -284,13 +278,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
@@ -306,9 +300,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId2 },
-                  { Label: "", nodeID: nodeId3 },
+                  { Label: "", NodeID: nodeId },
+                  { Label: "", NodeID: nodeId2 },
+                  { Label: "", NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -323,7 +317,7 @@ tests:
 
     - label: "TH_CR1 re-opens new commissioning window on DUT_CE using ECM"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -331,17 +325,17 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -378,7 +372,7 @@ tests:
 
     - label: "TH_CR3 opens a 2nd commissioning window on DUT_CE"
       identity: "gamma"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -386,13 +380,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
@@ -408,9 +402,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId2 },
-                  { Label: "", nodeID: nodeId3 },
+                  { Label: "", NodeID: nodeId },
+                  { Label: "", NodeID: nodeId2 },
+                  { Label: "", NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -425,7 +419,7 @@ tests:
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -433,18 +427,18 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 opens a 2nd commissioning window on DUT_CE using ECM"
       identity: "beta"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -452,13 +446,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
@@ -473,7 +467,7 @@ tests:
                 value: 180000
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -481,7 +475,7 @@ tests:
           value: 0
 
     - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "AdminFabricIndex"
       PICS: CADMIN.S.A0001
@@ -489,7 +483,7 @@ tests:
           value: null
 
     - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "AdminVendorId"
       PICS: CADMIN.S.A0002

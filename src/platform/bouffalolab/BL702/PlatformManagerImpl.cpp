@@ -26,7 +26,9 @@
 
 #include <lwip/tcpip.h>
 
+extern "C" {
 #include <bl_sec.h>
+}
 
 namespace chip {
 namespace DeviceLayer {

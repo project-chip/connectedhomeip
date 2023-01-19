@@ -26,6 +26,7 @@
 #include "KeypadInput.h"
 #include "LevelControl.h"
 #include "MediaPlayback.h"
+#include "OnOff.h"
 #include "PersistenceManager.h"
 #include "TargetEndpointInfo.h"
 #include "TargetNavigator.h"
@@ -35,7 +36,7 @@
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <functional>
-#include <tv-casting-app/zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
 constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
@@ -167,6 +168,13 @@ public:
                                      chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval,
                                      uint16_t maxInterval,
                                      chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+
+    /**
+     * @brief OnOff cluster
+     */
+    CHIP_ERROR OnOff_On(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR OnOff_Off(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR OnOff_Toggle(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
 
     /**
      * @brief Media Playback cluster
@@ -415,7 +423,8 @@ private:
     void ReadServerClusters(chip::EndpointId endpointId);
 
     PersistenceManager mPersistenceManager;
-    bool mInited = false;
+    bool mInited        = false;
+    bool mUdcInProgress = false;
     TargetVideoPlayerInfo mActiveTargetVideoPlayerInfo;
     TargetVideoPlayerInfo mCachedTargetVideoPlayerInfo[kMaxCachedVideoPlayers];
     uint16_t mTargetVideoPlayerVendorId                                   = 0;
@@ -450,6 +459,13 @@ private:
     CurrentLevelSubscriber mCurrentLevelSubscriber;
     MinLevelSubscriber mMinLevelSubscriber;
     MaxLevelSubscriber mMaxLevelSubscriber;
+
+    /**
+     * @brief OnOff cluster
+     */
+    OnCommand mOnCommand;
+    OffCommand mOffCommand;
+    ToggleCommand mToggleCommand;
 
     /**
      * @brief Media Playback cluster
