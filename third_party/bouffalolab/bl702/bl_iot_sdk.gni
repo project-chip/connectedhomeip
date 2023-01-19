@@ -24,8 +24,6 @@ declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
   enable_cdc_module = false
-
-  thread_port_1_3 = false
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
@@ -64,12 +62,14 @@ template("bl_iot_sdk") {
       defines += invoker.defines
     }
 
-    if (defined(invoker.freertos_config)) {
-      cflags_c = [
-        "-include",
-        rebase_path("${invoker.freertos_config}", root_build_dir),
-      ]
-    }
+    cflags_c = [
+      "-include",
+      rebase_path("${invoker.freertos_config}", root_build_dir),
+    ]
+    cflags_cc = [
+      "-include",
+      rebase_path("${invoker.freertos_config}", root_build_dir),
+    ]
   }
 
   config("${sdk_target_name}_config_soc") {
@@ -239,7 +239,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_boot2.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_chip.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_cks.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_dma.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_efuse.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_emac.c",
@@ -284,9 +283,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_common.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
-
-      # need update bl_sec_sha.c to fix compile error
-      # "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
     ]
 
     cflags_c = [
@@ -296,6 +293,7 @@ template("bl_iot_sdk") {
       "-Wno-old-style-declaration",
       "-Wno-stringop-overflow",
       "-Wno-format-truncation",
+      "-Wno-shadow",
     ]
     configs += [
       ":${sdk_target_name}_config_soc",
@@ -522,13 +520,14 @@ template("bl_iot_sdk") {
       "CONFIG_BT_SETTINGS_USE_PRINTK",
     ]
 
-    libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_702_std/lib/libblecontroller_702_std.a" ]
+    libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_702_m1s1/lib/libblecontroller_702_m1s1.a" ]
 
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include/tinycrypt",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
     ]
 
     sources = [
@@ -577,9 +576,6 @@ template("bl_iot_sdk") {
 
   config("${sdk_target_name}_config_openthread_port") {
     defines = [ "OT_FREERTOS_ENABLE=1" ]
-    if (thread_port_1_3) {
-      defines += [ "OT_THREAD_PORT_1_3" ]
-    }
 
     include_dirs = [
       "${chip_root}/platform/bl702",
@@ -588,14 +584,12 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/include",
     ]
 
-    if (thread_port_1_3) {
-      include_dirs += [
-        "${bl_iot_sdk_root}/components/network/thread/openthread_utils/include",
-      ]
-    }
+    include_dirs += [
+      "${bl_iot_sdk_root}/components/network/thread/openthread_utils/include",
+    ]
   }
 
-  source_set("${sdk_target_name}_openthread") {
+  source_set("${sdk_target_name}_openthread_port") {
     import("//build_overrides/openthread.gni")
 
     include_dirs = [
@@ -609,18 +603,17 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_alarm.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_diag.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_entropy.c",
+      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_linkmetric.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_logging.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_misc.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_radio.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings.c",
     ]
 
-    libs = [ "${bl_iot_sdk_root}/components/network/lmac154/lib/liblmac154.a" ]
-
-    if (thread_port_1_3) {
-      sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_linkmetric.c" ]
-      libs += [ "${bl_iot_sdk_root}/components/network/thread/openthread_utils/lib/libopenthread_utils.a" ]
-    }
+    libs = [
+      "${bl_iot_sdk_root}/components/network/lmac154/lib/liblmac154.a",
+      "${bl_iot_sdk_root}/components/network/thread/openthread_utils_bl702/lib/libopenthread_utils_bl702.a",
+    ]
 
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
@@ -811,7 +804,7 @@ template("bl_iot_sdk") {
     ]
 
     if (chip_enable_openthread) {
-      public_deps += [ ":${sdk_target_name}_openthread" ]
+      public_deps += [ ":${sdk_target_name}_openthread_port" ]
     }
 
     if (chip_enable_wifi) {

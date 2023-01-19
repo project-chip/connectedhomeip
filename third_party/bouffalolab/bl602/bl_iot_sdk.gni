@@ -56,12 +56,14 @@ template("bl_iot_sdk") {
       defines += invoker.defines
     }
 
-    if (defined(invoker.freertos_config)) {
-      cflags_c = [
-        "-include",
-        rebase_path("${invoker.freertos_config}", root_build_dir),
-      ]
-    }
+    cflags_c = [
+      "-include",
+      rebase_path("${invoker.freertos_config}", root_build_dir),
+    ]
+    cflags_cc = [
+      "-include",
+      rebase_path("${invoker.freertos_config}", root_build_dir),
+    ]
   }
 
   source_set("${sdk_target_name}_soc") {
@@ -259,6 +261,7 @@ template("bl_iot_sdk") {
       "-Wno-old-style-declaration",
       "-Wno-stringop-overflow",
       "-Wno-format-truncation",
+      "-Wno-unused-variable",
     ]
     configs += [
       ":${sdk_target_name}_config_wifi",
@@ -567,9 +570,10 @@ template("bl_iot_sdk") {
 
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include/tinycrypt",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
     ]
 
     sources = [
@@ -613,6 +617,7 @@ template("bl_iot_sdk") {
       "-Wno-unused-function",
       "-Wno-incompatible-pointer-types",
       "-Wno-discarded-qualifiers",
+      "-Wno-unused-variable",
     ]
   }
 
@@ -660,6 +665,7 @@ template("bl_iot_sdk") {
       "BL_CHIP_NAME=\"BL602\"",
       "TD_DIAGNOSIS_STA",
       "OS_USING_FREERTOS",
+      "CFG_VIRT_DEV_MAX=1",
     ]
     include_dirs = [
       "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/include",
@@ -904,6 +910,10 @@ template("bl_iot_sdk") {
     sources +=
         [ "${bl_iot_sdk_root}/components/network/lwip_dhcpd/dhcp_server_raw.c" ]
 
+    cflags_c = [
+      "-Wno-incompatible-pointer-types",
+      "-Wno-sign-compare",
+    ]
     configs += [ ":${sdk_target_name}_config_freertos" ]
     public_configs = [
       ":${sdk_target_name}_config",
