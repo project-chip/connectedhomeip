@@ -30,6 +30,7 @@ import chip.platform.NsdManagerServiceBrowser
 import chip.platform.NsdManagerServiceResolver
 import chip.platform.PreferencesConfigurationManager
 import chip.platform.PreferencesKeyValueStoreManager
+import com.google.chip.chiptool.attestation.ExampleAttestationTrustStoreDelegate
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -47,6 +48,9 @@ object ChipClient {
 
     if (!this::chipDeviceController.isInitialized) {
       chipDeviceController = ChipDeviceController(ControllerParams.newBuilder().setControllerVendorId(VENDOR_ID).build())
+      // Set delegate for attestation trust store for device attestation verifier.
+      // It will replace the default attestation trust store.
+      chipDeviceController.setAttestationTrustStoreDelegate(ExampleAttestationTrustStoreDelegate(chipDeviceController))
     }
     return chipDeviceController
   }

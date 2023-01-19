@@ -84,6 +84,8 @@ CHIP_ERROR AttestationTrustStoreBridge::GetPaaCertFromJava(const chip::ByteSpan 
 
     jbyteArray javaPaaCert =
         (jbyteArray) env->CallObjectMethod(mAttestationTrustStoreDelegate, getProductAttestationAuthorityCertMethod, javaSkid);
+    VerifyOrReturnError(javaPaaCert != nullptr, CHIP_ERROR_CA_CERT_NOT_FOUND);
+
     JniByteArray paaCertBytes(env, javaPaaCert);
     CopySpanToMutableSpan(paaCertBytes.byteSpan(), outPaaDerBuffer);
 
