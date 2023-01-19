@@ -8901,22 +8901,22 @@ public class ClusterReadMapping {
             readBallastConfigurationMaxLevelCommandParams);
     readBallastConfigurationInteractionInfo.put(
         "readMaxLevelAttribute", readBallastConfigurationMaxLevelAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBallastConfigurationIntrinsicBalanceFactorCommandParams =
+    Map<String, CommandParameterInfo> readBallastConfigurationIntrinsicBallastFactorCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBallastConfigurationIntrinsicBalanceFactorAttributeInteractionInfo =
+    InteractionInfo readBallastConfigurationIntrinsicBallastFactorAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BallastConfigurationCluster) cluster)
-                  .readIntrinsicBalanceFactorAttribute(
+                  .readIntrinsicBallastFactorAttribute(
                       (ChipClusters.BallastConfigurationCluster
-                              .IntrinsicBalanceFactorAttributeCallback)
+                              .IntrinsicBallastFactorAttributeCallback)
                           callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readBallastConfigurationIntrinsicBalanceFactorCommandParams);
+            readBallastConfigurationIntrinsicBallastFactorCommandParams);
     readBallastConfigurationInteractionInfo.put(
-        "readIntrinsicBalanceFactorAttribute",
-        readBallastConfigurationIntrinsicBalanceFactorAttributeInteractionInfo);
+        "readIntrinsicBallastFactorAttribute",
+        readBallastConfigurationIntrinsicBallastFactorAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBallastConfigurationBallastFactorAdjustmentCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBallastConfigurationBallastFactorAdjustmentAttributeInteractionInfo =

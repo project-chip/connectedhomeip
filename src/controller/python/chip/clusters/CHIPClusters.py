@@ -5307,7 +5307,7 @@ class ChipClusters:
                     "writable": True,
                 },
                 0x00000014: {
-                    "attributeName": "IntrinsicBalanceFactor",
+                    "attributeName": "IntrinsicBallastFactor",
                     "attributeId": 0x00000014,
                     "type": "int",
                     "reportable": True,

@@ -35,8 +35,8 @@
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
-using chip::SessionHandle;
 using chip::Messaging::ExchangeManager;
+using chip::SessionHandle;
 
 static void MTRClustersLogEnqueue(NSString * logPrefix, MTRAsyncCallbackWorkQueue * workQueue)
 {
@@ -19293,23 +19293,23 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                             timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeIntrinsicBalanceFactorWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeIntrinsicBallastFactorWithParams:(MTRReadParams * _Nullable)params
 {
     return
         [self.device readAttributeWithEndpointID:@(_endpoint)
                                        clusterID:@(MTRClusterIDTypeBallastConfigurationID)
-                                     attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID)
                                           params:params];
 }
 
-- (void)writeAttributeIntrinsicBalanceFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributeIntrinsicBallastFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeIntrinsicBalanceFactorWithValue:dataValueDictionary
+    [self writeAttributeIntrinsicBallastFactorWithValue:dataValueDictionary
                                   expectedValueInterval:expectedValueIntervalMs
                                                  params:nil];
 }
-- (void)writeAttributeIntrinsicBalanceFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributeIntrinsicBallastFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                params:(MTRWriteParams * _Nullable)params
 {
@@ -19317,7 +19317,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
                                     clusterID:@(MTRClusterIDTypeBallastConfigurationID)
-                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];

@@ -19254,9 +19254,9 @@ void CHIPColorControlAttributeListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback(
+CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback::CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback(
     jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPBallastConfigurationClusterIntrinsicBalanceFactorAttributeCallbackType>(CallbackFn, this),
+    chip::Callback::Callback<CHIPBallastConfigurationClusterIntrinsicBallastFactorAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -19273,7 +19273,7 @@ CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::CHIPBallastConf
     }
 }
 
-CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::~CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback()
+CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback::~CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19284,7 +19284,7 @@ CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::~CHIPBallastCon
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::CallbackFn(
+void CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -19293,8 +19293,8 @@ void CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::CallbackFn
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
