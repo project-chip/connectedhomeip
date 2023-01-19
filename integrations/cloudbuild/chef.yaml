@@ -12,7 +12,7 @@ steps:
             path: /pwenv
       timeout: 2700s
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.31"
+    - name: "connectedhomeip/chip-build-vscode:0.6.32"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
