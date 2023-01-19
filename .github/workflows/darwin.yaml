@@ -34,8 +34,8 @@ jobs:
         env:
             # NOTE: Generally kept in sync within the repo using
             #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.09-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
+            ZAP_VERSION: v2023.01.18-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
