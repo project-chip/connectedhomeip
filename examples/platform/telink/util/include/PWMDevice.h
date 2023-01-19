@@ -31,6 +31,9 @@ public:
         ON_ACTION = 0,
         OFF_ACTION,
         LEVEL_ACTION,
+        COLOR_ACTION_XY,
+        COLOR_ACTION_HSV,
+        COLOR_ACTION_CT,
 
         INVALID_ACTION
     };

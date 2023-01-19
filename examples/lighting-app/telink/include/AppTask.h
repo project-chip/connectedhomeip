@@ -40,9 +40,10 @@ class AppTask
 public:
     CHIP_ERROR StartApp();
 
-    void PostEvent(AppEvent * event);
+    void SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uint8_t * value);
+    void PostEvent(AppEvent * aEvent);
     void UpdateClusterState();
-    PWMDevice & GetPWMDevice() { return mPWMDevice; }
+    PWMDevice & GetPWMDevice() { return mBluePwmLed; }
 
     enum ButtonId_t
     {
@@ -88,7 +89,9 @@ private:
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
-    PWMDevice mPWMDevice;
+    PWMDevice mBluePwmLed;
+    PWMDevice mGreenPwmLed;
+    PWMDevice mRedPwmLed;
 
 #if CONFIG_CHIP_FACTORY_DATA
     // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
