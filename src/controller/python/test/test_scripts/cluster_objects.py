@@ -444,7 +444,7 @@ class ClusterObjectTests:
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
             raise AssertionError("The command invoke should be rejected.")
         except chip.interaction_model.InteractionModelError as ex:
-            if ex != chip.interaction_model.Status.NeedsTimedInteraction:
+            if ex.status != chip.interaction_model.Status.NeedsTimedInteraction:
                 raise AssertionError("The command invoke error with NeedsTimedInteraction.")
 
         logger.info(
