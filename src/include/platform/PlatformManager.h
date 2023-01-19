@@ -203,10 +203,15 @@ public:
     [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
     void PostEventOrDie(const ChipDeviceEvent * event);
 
+    /**
+     * Generally this function has the same semantics as ScheduleWork
+     * except it applies to background processing.
+     */
     CHIP_ERROR ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
 
     /**
-     * Posts an event for background processing.
+     * Generally this function has the same semantics as PostEvent
+     * except it applies to background processing.
      * 
      * If CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING is not true, will delegate
      * to PostEvent.
@@ -218,8 +223,22 @@ public:
      */
     CHIP_ERROR PostBackgroundEvent(const ChipDeviceEvent * event);
 
+    /**
+     * Generally this function has the same semantics as RunEventLoop
+     * except it applies to background processing.
+     */
     void RunBackgroundEventLoop();
+
+    /**
+     * Generally this function has the same semantics as StartEventLoopTask
+     * except it applies to background processing.
+     */
     CHIP_ERROR StartBackgroundEventLoopTask();
+
+    /**
+     * Generally this function has the same semantics as StopEventLoopTask
+     * except it applies to background processing.
+     */
     CHIP_ERROR StopBackgroundEventLoopTask();
 
 private:
