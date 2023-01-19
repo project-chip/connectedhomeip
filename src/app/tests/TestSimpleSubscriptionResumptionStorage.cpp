@@ -35,61 +35,6 @@ public:
     static constexpr size_t TestMaxSubscriptionSize() { return MaxSubscriptionSize(); }
 };
 
-// Fictitious subsccription 1
-constexpr chip::FabricIndex fabric1            = 10;
-constexpr chip::NodeId node1                   = 12344321;
-constexpr chip::SubscriptionId subscriptionId1 = 1;
-constexpr uint16_t minInterval1                = 1;
-constexpr uint16_t maxInterval1                = 10;
-constexpr bool fabricFiltered1                 = false;
-// has only attribute subs
-constexpr chip::EndpointId attributeEndpointId1_1 = 1;
-constexpr chip::ClusterId attributeClusterId1_1   = 1;
-constexpr chip::AttributeId attributeId1_1        = 1;
-constexpr chip::EndpointId attributeEndpointId1_2 = 2;
-constexpr chip::ClusterId attributeClusterId1_2   = 2;
-constexpr chip::AttributeId attributeId1_2        = 2;
-
-// Fictitious subsccription 2
-constexpr chip::FabricIndex fabric2            = 14;
-constexpr chip::NodeId node2                   = 11223344;
-constexpr chip::SubscriptionId subscriptionId2 = 2;
-constexpr uint16_t minInterval2                = 2;
-constexpr uint16_t maxInterval2                = 20;
-constexpr bool fabricFiltered2                 = true;
-// has only event subs
-constexpr chip::EndpointId eventEndpointId2_1 = 1;
-constexpr chip::ClusterId eventClusterId2_1   = 1;
-constexpr chip::AttributeId eventId2_1        = 1;
-constexpr bool isUrgentEvent2_1               = false;
-constexpr chip::EndpointId eventEndpointId2_2 = 2;
-constexpr chip::ClusterId eventClusterId2_2   = 2;
-constexpr chip::AttributeId eventId2_2        = 2;
-constexpr bool isUrgentEvent2_2               = true;
-
-// Fictitious subsccription 3
-constexpr chip::FabricIndex fabric3            = 18;
-constexpr chip::NodeId node3                   = 44332211;
-constexpr chip::SubscriptionId subscriptionId3 = 3;
-constexpr uint16_t minInterval3                = 3;
-constexpr uint16_t maxInterval3                = 30;
-constexpr bool fabricFiltered3                 = true;
-// has both attributes and events
-constexpr chip::EndpointId attributeEndpointId3_1 = 1;
-constexpr chip::ClusterId attributeClusterId3_1   = 1;
-constexpr chip::AttributeId attributeId3_1        = 1;
-constexpr chip::EndpointId attributeEndpointId3_2 = 2;
-constexpr chip::ClusterId attributeClusterId3_2   = 2;
-constexpr chip::AttributeId attributeId3_2        = 2;
-constexpr chip::EndpointId eventEndpointId3_1     = 1;
-constexpr chip::ClusterId eventClusterId3_1       = 1;
-constexpr chip::AttributeId eventId3_1            = 1;
-constexpr bool isUrgentEvent3_1                   = false;
-constexpr chip::EndpointId eventEndpointId3_2     = 2;
-constexpr chip::ClusterId eventClusterId3_2       = 2;
-constexpr chip::AttributeId eventId3_2            = 2;
-constexpr bool isUrgentEvent3_2                   = true;
-
 struct TestSubscriptionInfo : public chip::app::SubscriptionResumptionStorage::SubscriptionInfo
 {
     bool operator==(const SubscriptionInfo & that) const
@@ -181,8 +126,6 @@ void TestCount(nlTestSuite * inSuite, void * inContext)
     }
     iterator->Release();
     NL_TEST_ASSERT(inSuite, count == 0);
-
-    NL_TEST_ASSERT(inSuite, false);
 }
 
 void TestState(nlTestSuite * inSuite, void * inContext)
@@ -192,63 +135,63 @@ void TestState(nlTestSuite * inSuite, void * inContext)
     subscriptionStorage.Init(&storage);
 
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo1 = {
-        .mNodeId         = node1,
-        .mFabricIndex    = fabric1,
-        .mSubscriptionId = subscriptionId1,
-        .mMinInterval    = minInterval1,
-        .mMaxInterval    = maxInterval1,
-        .mFabricFiltered = fabricFiltered1,
+        .mNodeId         = 1111,
+        .mFabricIndex    = 41,
+        .mSubscriptionId = 1,
+        .mMinInterval    = 1,
+        .mMaxInterval    = 11,
+        .mFabricFiltered = true,
     };
     subscriptionInfo1.mAttributePaths.Calloc(2);
-    subscriptionInfo1.mAttributePaths[0].mEndpointId  = attributeEndpointId1_1;
-    subscriptionInfo1.mAttributePaths[0].mClusterId   = attributeClusterId1_1;
-    subscriptionInfo1.mAttributePaths[0].mAttributeId = attributeId1_1;
-    subscriptionInfo1.mAttributePaths[1].mEndpointId  = attributeEndpointId1_2;
-    subscriptionInfo1.mAttributePaths[1].mClusterId   = attributeClusterId1_2;
-    subscriptionInfo1.mAttributePaths[1].mAttributeId = attributeId1_2;
+    subscriptionInfo1.mAttributePaths[0].mEndpointId  = 1;
+    subscriptionInfo1.mAttributePaths[0].mClusterId   = 1;
+    subscriptionInfo1.mAttributePaths[0].mAttributeId = 1;
+    subscriptionInfo1.mAttributePaths[1].mEndpointId  = 2;
+    subscriptionInfo1.mAttributePaths[1].mClusterId   = 2;
+    subscriptionInfo1.mAttributePaths[1].mAttributeId = 2;
 
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo2 = {
-        .mNodeId         = node2,
-        .mFabricIndex    = fabric2,
-        .mSubscriptionId = subscriptionId2,
-        .mMinInterval    = minInterval2,
-        .mMaxInterval    = maxInterval2,
-        .mFabricFiltered = fabricFiltered2,
+        .mNodeId         = 2222,
+        .mFabricIndex    = 42,
+        .mSubscriptionId = 2,
+        .mMinInterval    = 2,
+        .mMaxInterval    = 12,
+        .mFabricFiltered = false,
     };
     subscriptionInfo2.mEventPaths.Calloc(2);
-    subscriptionInfo2.mEventPaths[0].mEndpointId    = eventEndpointId2_1;
-    subscriptionInfo2.mEventPaths[0].mClusterId     = eventClusterId2_1;
-    subscriptionInfo2.mEventPaths[0].mEventId       = eventId2_1;
-    subscriptionInfo2.mEventPaths[0].mIsUrgentEvent = isUrgentEvent2_1;
-    subscriptionInfo2.mEventPaths[1].mEndpointId    = eventEndpointId2_2;
-    subscriptionInfo2.mEventPaths[1].mClusterId     = eventClusterId2_2;
-    subscriptionInfo2.mEventPaths[1].mEventId       = eventId2_2;
-    subscriptionInfo2.mEventPaths[1].mIsUrgentEvent = isUrgentEvent2_2;
+    subscriptionInfo2.mEventPaths[0].mEndpointId    = 3;
+    subscriptionInfo2.mEventPaths[0].mClusterId     = 3;
+    subscriptionInfo2.mEventPaths[0].mEventId       = 3;
+    subscriptionInfo2.mEventPaths[0].mIsUrgentEvent = false;
+    subscriptionInfo2.mEventPaths[1].mEndpointId    = 4;
+    subscriptionInfo2.mEventPaths[1].mClusterId     = 4;
+    subscriptionInfo2.mEventPaths[1].mEventId       = 4;
+    subscriptionInfo2.mEventPaths[1].mIsUrgentEvent = true;
 
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo3 = {
-        .mNodeId         = node3,
-        .mFabricIndex    = fabric3,
-        .mSubscriptionId = subscriptionId3,
-        .mMinInterval    = minInterval3,
-        .mMaxInterval    = maxInterval3,
-        .mFabricFiltered = fabricFiltered3,
+        .mNodeId         = 3333,
+        .mFabricIndex    = 43,
+        .mSubscriptionId = 3,
+        .mMinInterval    = 3,
+        .mMaxInterval    = 13,
+        .mFabricFiltered = true,
     };
     subscriptionInfo3.mAttributePaths.Calloc(2);
-    subscriptionInfo3.mAttributePaths[0].mEndpointId  = attributeEndpointId3_1;
-    subscriptionInfo3.mAttributePaths[0].mClusterId   = attributeClusterId3_1;
-    subscriptionInfo3.mAttributePaths[0].mAttributeId = attributeId3_1;
-    subscriptionInfo3.mAttributePaths[1].mEndpointId  = attributeEndpointId3_2;
-    subscriptionInfo3.mAttributePaths[1].mClusterId   = attributeClusterId3_2;
-    subscriptionInfo3.mAttributePaths[1].mAttributeId = attributeId3_2;
+    subscriptionInfo3.mAttributePaths[0].mEndpointId  = 5;
+    subscriptionInfo3.mAttributePaths[0].mClusterId   = 5;
+    subscriptionInfo3.mAttributePaths[0].mAttributeId = 5;
+    subscriptionInfo3.mAttributePaths[1].mEndpointId  = 6;
+    subscriptionInfo3.mAttributePaths[1].mClusterId   = 6;
+    subscriptionInfo3.mAttributePaths[1].mAttributeId = 6;
     subscriptionInfo3.mEventPaths.Calloc(2);
-    subscriptionInfo3.mEventPaths[0].mEndpointId    = eventEndpointId3_1;
-    subscriptionInfo3.mEventPaths[0].mClusterId     = eventClusterId3_1;
-    subscriptionInfo3.mEventPaths[0].mEventId       = eventId3_1;
-    subscriptionInfo2.mEventPaths[0].mIsUrgentEvent = isUrgentEvent3_1;
-    subscriptionInfo3.mEventPaths[1].mEndpointId    = eventEndpointId3_2;
-    subscriptionInfo3.mEventPaths[1].mClusterId     = eventClusterId3_2;
-    subscriptionInfo3.mEventPaths[1].mEventId       = eventId3_2;
-    subscriptionInfo2.mEventPaths[1].mIsUrgentEvent = isUrgentEvent3_2;
+    subscriptionInfo3.mEventPaths[0].mEndpointId    = 7;
+    subscriptionInfo3.mEventPaths[0].mClusterId     = 7;
+    subscriptionInfo3.mEventPaths[0].mEventId       = 7;
+    subscriptionInfo2.mEventPaths[0].mIsUrgentEvent = true;
+    subscriptionInfo3.mEventPaths[1].mEndpointId    = 8;
+    subscriptionInfo3.mEventPaths[1].mClusterId     = 8;
+    subscriptionInfo3.mEventPaths[1].mEventId       = 8;
+    subscriptionInfo2.mEventPaths[1].mIsUrgentEvent = false;
 
     CHIP_ERROR err;
     err = subscriptionStorage.Save(subscriptionInfo1);
@@ -309,20 +252,20 @@ void TestStateUnexpectedFields(nlTestSuite * inSuite, void * inContext)
 
     // Write additional entries at the end of TLV and see it still loads correctly
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo1 = {
-        .mNodeId         = node1,
-        .mFabricIndex    = fabric1,
-        .mSubscriptionId = subscriptionId1,
-        .mMinInterval    = minInterval1,
-        .mMaxInterval    = maxInterval1,
-        .mFabricFiltered = fabricFiltered1,
+        .mNodeId         = 4444,
+        .mFabricIndex    = 44,
+        .mSubscriptionId = 4,
+        .mMinInterval    = 4,
+        .mMaxInterval    = 14,
+        .mFabricFiltered = true,
     };
     subscriptionInfo1.mAttributePaths.Calloc(2);
-    subscriptionInfo1.mAttributePaths[0].mEndpointId  = attributeEndpointId1_1;
-    subscriptionInfo1.mAttributePaths[0].mClusterId   = attributeClusterId1_1;
-    subscriptionInfo1.mAttributePaths[0].mAttributeId = attributeId1_1;
-    subscriptionInfo1.mAttributePaths[1].mEndpointId  = attributeEndpointId1_2;
-    subscriptionInfo1.mAttributePaths[1].mClusterId   = attributeClusterId1_2;
-    subscriptionInfo1.mAttributePaths[1].mAttributeId = attributeId1_2;
+    subscriptionInfo1.mAttributePaths[0].mEndpointId  = 9;
+    subscriptionInfo1.mAttributePaths[0].mClusterId   = 9;
+    subscriptionInfo1.mAttributePaths[0].mAttributeId = 9;
+    subscriptionInfo1.mAttributePaths[1].mEndpointId  = 10;
+    subscriptionInfo1.mAttributePaths[1].mClusterId   = 10;
+    subscriptionInfo1.mAttributePaths[1].mAttributeId = 10;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     backingBuffer.Calloc(subscriptionStorage.TestMaxSubscriptionSize());
@@ -366,20 +309,20 @@ void TestStateTooBigToLoad(nlTestSuite * inSuite, void * inContext)
 
     // Write additional too-big data at the end of TLV and see it fails to loads and entry deleted
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo1 = {
-        .mNodeId         = node1,
-        .mFabricIndex    = fabric1,
-        .mSubscriptionId = subscriptionId1,
-        .mMinInterval    = minInterval1,
-        .mMaxInterval    = maxInterval1,
-        .mFabricFiltered = fabricFiltered1,
+        .mNodeId         = 5555,
+        .mFabricIndex    = 45,
+        .mSubscriptionId = 5,
+        .mMinInterval    = 5,
+        .mMaxInterval    = 15,
+        .mFabricFiltered = false,
     };
     subscriptionInfo1.mAttributePaths.Calloc(2);
-    subscriptionInfo1.mAttributePaths[0].mEndpointId  = attributeEndpointId1_1;
-    subscriptionInfo1.mAttributePaths[0].mClusterId   = attributeClusterId1_1;
-    subscriptionInfo1.mAttributePaths[0].mAttributeId = attributeId1_1;
-    subscriptionInfo1.mAttributePaths[1].mEndpointId  = attributeEndpointId1_2;
-    subscriptionInfo1.mAttributePaths[1].mClusterId   = attributeClusterId1_2;
-    subscriptionInfo1.mAttributePaths[1].mAttributeId = attributeId1_2;
+    subscriptionInfo1.mAttributePaths[0].mEndpointId  = 11;
+    subscriptionInfo1.mAttributePaths[0].mClusterId   = 11;
+    subscriptionInfo1.mAttributePaths[0].mAttributeId = 11;
+    subscriptionInfo1.mAttributePaths[1].mEndpointId  = 12;
+    subscriptionInfo1.mAttributePaths[1].mClusterId   = 12;
+    subscriptionInfo1.mAttributePaths[1].mAttributeId = 12;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     backingBuffer.Calloc(subscriptionStorage.TestMaxSubscriptionSize() * 2);

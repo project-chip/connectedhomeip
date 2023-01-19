@@ -79,13 +79,13 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
     mMaxInterval             = subscriptionInfo.mMaxInterval;
     SetStateFlag(ReadHandlerFlags::FabricFiltered, subscriptionInfo.mFabricFiltered);
 
-    // Move dynamically allocated attributes and events from the SubscriptionInfo struct into the object pool managed by the IM
-    // engine
-    CHIP_ERROR err;
+    // Move dynamically allocated attributes and events from the SubscriptionInfo struct into
+    // the object pool managed by the IM engine
     for (size_t i = 0; i < subscriptionInfo.mAttributePaths.AllocatedCount(); i++)
     {
         AttributePathParams attributePathParams = subscriptionInfo.mAttributePaths[i].GetParams();
-        err = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attributePathParams);
+        CHIP_ERROR err =
+            InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attributePathParams);
         if (err != CHIP_NO_ERROR)
         {
             Close();
@@ -95,7 +95,7 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
     for (size_t i = 0; i < subscriptionInfo.mEventPaths.AllocatedCount(); i++)
     {
         EventPathParams eventPathParams = subscriptionInfo.mEventPaths[i].GetParams();
-        err = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, eventPathParams);
+        CHIP_ERROR err = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, eventPathParams);
         if (err != CHIP_NO_ERROR)
         {
             Close();

@@ -1586,6 +1586,11 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
 CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    if (!mpSubscriptionResumptionStorage)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
     while (iterator->Next(subscriptionInfo))
@@ -1595,8 +1600,7 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
         if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
         {
             ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
-            mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
-                                                    subscriptionInfo.mSubscriptionId);
+            iterator->Release();
             return CHIP_ERROR_NO_MEMORY;
         }
 
@@ -1604,8 +1608,7 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
         if (handler == nullptr)
         {
             ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
-            mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
-                                                    subscriptionInfo.mSubscriptionId);
+            iterator->Release();
             return CHIP_ERROR_NO_MEMORY;
         }
 
