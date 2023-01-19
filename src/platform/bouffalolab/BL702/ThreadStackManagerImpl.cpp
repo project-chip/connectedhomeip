@@ -48,8 +48,8 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     otRadio_opt_t opt;
-    
-    opt.byte = 0;
+
+    opt.byte            = 0;
     opt.bf.isCoexEnable = true;
 
     ot_alarmInit();
@@ -119,7 +119,7 @@ extern "C" void otPlatFree(void * aPtr)
     free(aPtr);
 }
 
-extern "C" uint32_t otrEnterCrit(void) 
+extern "C" uint32_t otrEnterCrit(void)
 {
     if (xPortIsInsideInterrupt())
     {
