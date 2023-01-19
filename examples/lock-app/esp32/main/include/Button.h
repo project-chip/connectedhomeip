@@ -17,10 +17,11 @@
 
 #pragma once
 
-#include "AppTask.h"
-#include "driver/gpio.h"
-#include "freertos/FreeRTOS.h"
 #include <stdint.h>
+
+#include "AppConfig.h"
+#include "AppTask.h"
+#include "freertos/FreeRTOS.h"
 
 class Button
 {

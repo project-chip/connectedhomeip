@@ -24,8 +24,8 @@
  **/
 
 #include "DeviceCallbacks.h"
-#include <lock/AppConfig.h>
-#include <lock/BoltLockManager.h>
+#include "AppConfig.h"
+#include "BoltLockManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -59,8 +59,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 
 void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id,
-                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (*value)
     {
