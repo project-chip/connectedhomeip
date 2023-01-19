@@ -2579,7 +2579,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDoorLockClusterDlCredential
+@implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2593,7 +2593,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRDoorLockClusterDlCredential alloc] init];
+    auto other = [[MTRDoorLockClusterCredentialStruct alloc] init];
 
     other.credentialType = self.credentialType;
     other.credentialIndex = self.credentialIndex;
@@ -2608,6 +2608,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDoorLockClusterDlCredential : MTRDoorLockClusterCredentialStruct
 @end
 
 @implementation MTRDoorLockClusterDoorLockAlarmEvent

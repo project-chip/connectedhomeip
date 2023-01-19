@@ -2368,23 +2368,24 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             newElement_2_credentialIndexClassName.c_str(), newElement_2_credentialIndexCtorSignature.c_str(),
                             entry_2.credentialIndex, newElement_2_credentialIndex);
 
-                        jclass dlCredentialStructClass_3;
+                        jclass credentialStructStructClass_3;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DoorLockClusterDlCredential", dlCredentialStructClass_3);
+                            env, "chip/devicecontroller/ChipStructs$DoorLockClusterCredentialStruct",
+                            credentialStructStructClass_3);
                         if (err != CHIP_NO_ERROR)
                         {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterDlCredential");
+                            ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterCredentialStruct");
                             return nullptr;
                         }
-                        jmethodID dlCredentialStructCtor_3 =
-                            env->GetMethodID(dlCredentialStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
-                        if (dlCredentialStructCtor_3 == nullptr)
+                        jmethodID credentialStructStructCtor_3 =
+                            env->GetMethodID(credentialStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                        if (credentialStructStructCtor_3 == nullptr)
                         {
-                            ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterDlCredential constructor");
+                            ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterCredentialStruct constructor");
                             return nullptr;
                         }
 
-                        newElement_2 = env->NewObject(dlCredentialStructClass_3, dlCredentialStructCtor_3,
+                        newElement_2 = env->NewObject(credentialStructStructClass_3, credentialStructStructCtor_3,
                                                       newElement_2_credentialType, newElement_2_credentialIndex);
                         chip::JniReferences::GetInstance().AddToList(value_credentialsInsideOptional, newElement_2);
                     }
@@ -2519,23 +2520,24 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             newElement_2_credentialIndexClassName.c_str(), newElement_2_credentialIndexCtorSignature.c_str(),
                             entry_2.credentialIndex, newElement_2_credentialIndex);
 
-                        jclass dlCredentialStructClass_3;
+                        jclass credentialStructStructClass_3;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DoorLockClusterDlCredential", dlCredentialStructClass_3);
+                            env, "chip/devicecontroller/ChipStructs$DoorLockClusterCredentialStruct",
+                            credentialStructStructClass_3);
                         if (err != CHIP_NO_ERROR)
                         {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterDlCredential");
+                            ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterCredentialStruct");
                             return nullptr;
                         }
-                        jmethodID dlCredentialStructCtor_3 =
-                            env->GetMethodID(dlCredentialStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
-                        if (dlCredentialStructCtor_3 == nullptr)
+                        jmethodID credentialStructStructCtor_3 =
+                            env->GetMethodID(credentialStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                        if (credentialStructStructCtor_3 == nullptr)
                         {
-                            ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterDlCredential constructor");
+                            ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterCredentialStruct constructor");
                             return nullptr;
                         }
 
-                        newElement_2 = env->NewObject(dlCredentialStructClass_3, dlCredentialStructCtor_3,
+                        newElement_2 = env->NewObject(credentialStructStructClass_3, credentialStructStructCtor_3,
                                                       newElement_2_credentialType, newElement_2_credentialIndex);
                         chip::JniReferences::GetInstance().AddToList(value_credentialsInsideOptional, newElement_2);
                     }

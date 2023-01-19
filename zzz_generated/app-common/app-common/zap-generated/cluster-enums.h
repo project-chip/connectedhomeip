@@ -1032,8 +1032,8 @@ enum class ModeSelectFeature : uint32_t
 
 namespace DoorLock {
 
-// Enum for DlAlarmCode
-enum class DlAlarmCode : uint8_t
+// Enum for AlarmCodeEnum
+enum class AlarmCodeEnum : uint8_t
 {
     kLockJammed              = 0x00,
     kLockFactoryReset        = 0x01,
@@ -1046,17 +1046,17 @@ enum class DlAlarmCode : uint8_t
     kUnknownEnumValue        = 2,
 };
 
-// Enum for DlCredentialRule
-enum class DlCredentialRule : uint8_t
+// Enum for CredentialRuleEnum
+enum class CredentialRuleEnum : uint8_t
 {
     kSingle           = 0x00,
-    kDouble           = 0x01,
+    kDual             = 0x01,
     kTri              = 0x02,
     kUnknownEnumValue = 3,
 };
 
-// Enum for DlCredentialType
-enum class DlCredentialType : uint8_t
+// Enum for CredentialTypeEnum
+enum class CredentialTypeEnum : uint8_t
 {
     kProgrammingPIN   = 0x00,
     kPin              = 0x01,
@@ -1067,50 +1067,13 @@ enum class DlCredentialType : uint8_t
     kUnknownEnumValue = 6,
 };
 
-// Enum for DlDataOperationType
-enum class DlDataOperationType : uint8_t
+// Enum for DataOperationTypeEnum
+enum class DataOperationTypeEnum : uint8_t
 {
     kAdd              = 0x00,
     kClear            = 0x01,
     kModify           = 0x02,
     kUnknownEnumValue = 3,
-};
-
-// Enum for DlDoorState
-enum class DlDoorState : uint8_t
-{
-    kDoorOpen             = 0x00,
-    kDoorClosed           = 0x01,
-    kDoorJammed           = 0x02,
-    kDoorForcedOpen       = 0x03,
-    kDoorUnspecifiedError = 0x04,
-    kDoorAjar             = 0x05,
-    kUnknownEnumValue     = 6,
-};
-
-// Enum for DlLockDataType
-enum class DlLockDataType : uint8_t
-{
-    kUnspecified      = 0x00,
-    kProgrammingCode  = 0x01,
-    kUserIndex        = 0x02,
-    kWeekDaySchedule  = 0x03,
-    kYearDaySchedule  = 0x04,
-    kHolidaySchedule  = 0x05,
-    kPin              = 0x06,
-    kRfid             = 0x07,
-    kFingerprint      = 0x08,
-    kUnknownEnumValue = 9,
-};
-
-// Enum for DlLockOperationType
-enum class DlLockOperationType : uint8_t
-{
-    kLock               = 0x00,
-    kUnlock             = 0x01,
-    kNonAccessUserEvent = 0x02,
-    kForcedUserEvent    = 0x03,
-    kUnknownEnumValue   = 4,
 };
 
 // Enum for DlLockState
@@ -1139,44 +1102,6 @@ enum class DlLockType : uint8_t
     kUnknownEnumValue   = 11,
 };
 
-// Enum for DlOperatingMode
-enum class DlOperatingMode : uint8_t
-{
-    kNormal             = 0x00,
-    kVacation           = 0x01,
-    kPrivacy            = 0x02,
-    kNoRemoteLockUnlock = 0x03,
-    kPassage            = 0x04,
-    kUnknownEnumValue   = 5,
-};
-
-// Enum for DlOperationError
-enum class DlOperationError : uint8_t
-{
-    kUnspecified         = 0x00,
-    kInvalidCredential   = 0x01,
-    kDisabledUserDenied  = 0x02,
-    kRestricted          = 0x03,
-    kInsufficientBattery = 0x04,
-    kUnknownEnumValue    = 5,
-};
-
-// Enum for DlOperationSource
-enum class DlOperationSource : uint8_t
-{
-    kUnspecified       = 0x00,
-    kManual            = 0x01,
-    kProprietaryRemote = 0x02,
-    kKeypad            = 0x03,
-    kAuto              = 0x04,
-    kButton            = 0x05,
-    kSchedule          = 0x06,
-    kRemote            = 0x07,
-    kRfid              = 0x08,
-    kBiometric         = 0x09,
-    kUnknownEnumValue  = 10,
-};
-
 // Enum for DlStatus
 enum class DlStatus : uint8_t
 {
@@ -1188,31 +1113,6 @@ enum class DlStatus : uint8_t
     kResourceExhausted = 0x89,
     kNotFound          = 0x8B,
     kUnknownEnumValue  = 4,
-};
-
-// Enum for DlUserStatus
-enum class DlUserStatus : uint8_t
-{
-    kAvailable        = 0x00,
-    kOccupiedEnabled  = 0x01,
-    kOccupiedDisabled = 0x03,
-    kUnknownEnumValue = 2,
-};
-
-// Enum for DlUserType
-enum class DlUserType : uint8_t
-{
-    kUnrestrictedUser       = 0x00,
-    kYearDayScheduleUser    = 0x01,
-    kWeekDayScheduleUser    = 0x02,
-    kProgrammingUser        = 0x03,
-    kNonAccessUser          = 0x04,
-    kForcedUser             = 0x05,
-    kDisposableUser         = 0x06,
-    kExpiringUser           = 0x07,
-    kScheduleRestrictedUser = 0x08,
-    kRemoteOnlyUser         = 0x09,
-    kUnknownEnumValue       = 10,
 };
 
 // Enum for DoorLockOperationEventCode
@@ -1281,6 +1181,118 @@ enum class DoorLockUserType : uint8_t
     kUnknownEnumValue    = 5,
 };
 
+// Enum for DoorStateEnum
+enum class DoorStateEnum : uint8_t
+{
+    kDoorOpen             = 0x00,
+    kDoorClosed           = 0x01,
+    kDoorJammed           = 0x02,
+    kDoorForcedOpen       = 0x03,
+    kDoorUnspecifiedError = 0x04,
+    kDoorAjar             = 0x05,
+    kUnknownEnumValue     = 6,
+};
+
+// Enum for LockDataTypeEnum
+enum class LockDataTypeEnum : uint8_t
+{
+    kUnspecified      = 0x00,
+    kProgrammingCode  = 0x01,
+    kUserIndex        = 0x02,
+    kWeekDaySchedule  = 0x03,
+    kYearDaySchedule  = 0x04,
+    kHolidaySchedule  = 0x05,
+    kPin              = 0x06,
+    kRfid             = 0x07,
+    kFingerprint      = 0x08,
+    kUnknownEnumValue = 9,
+};
+
+// Enum for LockOperationTypeEnum
+enum class LockOperationTypeEnum : uint8_t
+{
+    kLock               = 0x00,
+    kUnlock             = 0x01,
+    kNonAccessUserEvent = 0x02,
+    kForcedUserEvent    = 0x03,
+    kUnknownEnumValue   = 4,
+};
+
+// Enum for OperatingModeEnum
+enum class OperatingModeEnum : uint8_t
+{
+    kNormal             = 0x00,
+    kVacation           = 0x01,
+    kPrivacy            = 0x02,
+    kNoRemoteLockUnlock = 0x03,
+    kPassage            = 0x04,
+    kUnknownEnumValue   = 5,
+};
+
+// Enum for OperationErrorEnum
+enum class OperationErrorEnum : uint8_t
+{
+    kUnspecified         = 0x00,
+    kInvalidCredential   = 0x01,
+    kDisabledUserDenied  = 0x02,
+    kRestricted          = 0x03,
+    kInsufficientBattery = 0x04,
+    kUnknownEnumValue    = 5,
+};
+
+// Enum for OperationSourceEnum
+enum class OperationSourceEnum : uint8_t
+{
+    kUnspecified       = 0x00,
+    kManual            = 0x01,
+    kProprietaryRemote = 0x02,
+    kKeypad            = 0x03,
+    kAuto              = 0x04,
+    kButton            = 0x05,
+    kSchedule          = 0x06,
+    kRemote            = 0x07,
+    kRfid              = 0x08,
+    kBiometric         = 0x09,
+    kUnknownEnumValue  = 10,
+};
+
+// Enum for UserStatusEnum
+enum class UserStatusEnum : uint8_t
+{
+    kAvailable        = 0x00,
+    kOccupiedEnabled  = 0x01,
+    kOccupiedDisabled = 0x03,
+    kUnknownEnumValue = 2,
+};
+
+// Enum for UserTypeEnum
+enum class UserTypeEnum : uint8_t
+{
+    kUnrestrictedUser       = 0x00,
+    kYearDayScheduleUser    = 0x01,
+    kWeekDayScheduleUser    = 0x02,
+    kProgrammingUser        = 0x03,
+    kNonAccessUser          = 0x04,
+    kForcedUser             = 0x05,
+    kDisposableUser         = 0x06,
+    kExpiringUser           = 0x07,
+    kScheduleRestrictedUser = 0x08,
+    kRemoteOnlyUser         = 0x09,
+    kUnknownEnumValue       = 10,
+};
+
+// Bitmap for DaysMaskMap
+enum class DaysMaskMap : uint8_t
+{
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+};
+
 // Bitmap for DlCredentialRuleMask
 enum class DlCredentialRuleMask : uint8_t
 {
@@ -1295,18 +1307,6 @@ enum class DlCredentialRulesSupport : uint8_t
     kSingle = 0x1,
     kDual   = 0x2,
     kTri    = 0x4,
-};
-
-// Bitmap for DlDaysMaskMap
-enum class DlDaysMaskMap : uint8_t
-{
-    kSunday    = 0x1,
-    kMonday    = 0x2,
-    kTuesday   = 0x4,
-    kWednesday = 0x8,
-    kThursday  = 0x10,
-    kFriday    = 0x20,
-    kSaturday  = 0x40,
 };
 
 // Bitmap for DlDefaultConfigurationRegister
@@ -1437,18 +1437,18 @@ enum class DoorLockDayOfWeek : uint8_t
 // Bitmap for DoorLockFeature
 enum class DoorLockFeature : uint32_t
 {
-    kPINCredentials     = 0x1,
-    kRFIDCredentials    = 0x2,
-    kFingerCredentials  = 0x4,
-    kLogging            = 0x8,
-    kWeekDaySchedules   = 0x10,
-    kDoorPositionSensor = 0x20,
-    kFaceCredentials    = 0x40,
-    kCredentialsOTA     = 0x80,
-    kUsersManagement    = 0x100,
-    kNotifications      = 0x200,
-    kYearDaySchedules   = 0x400,
-    kHolidaySchedules   = 0x800,
+    kPinCredential               = 0x1,
+    kRfidCredential              = 0x2,
+    kFingerCredentials           = 0x4,
+    kLogging                     = 0x8,
+    kWeekDayAccessSchedules      = 0x10,
+    kDoorPositionSensor          = 0x20,
+    kFaceCredentials             = 0x40,
+    kCredentialsOverTheAirAccess = 0x80,
+    kUser                        = 0x100,
+    kNotification                = 0x200,
+    kYearDayAccessSchedules      = 0x400,
+    kHolidaySchedules            = 0x800,
 };
 } // namespace DoorLock
 

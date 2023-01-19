@@ -1313,7 +1313,7 @@ server cluster UserLabel = 65 {
 }
 
 server cluster DoorLock = 257 {
-  enum DlAlarmCode : ENUM8 {
+  enum AlarmCodeEnum : ENUM8 {
     kLockJammed = 0;
     kLockFactoryReset = 1;
     kLockRadioPowerCycled = 3;
@@ -1324,13 +1324,13 @@ server cluster DoorLock = 257 {
     kForcedUser = 8;
   }
 
-  enum DlCredentialRule : ENUM8 {
+  enum CredentialRuleEnum : ENUM8 {
     kSingle = 0;
-    kDouble = 1;
+    kDual = 1;
     kTri = 2;
   }
 
-  enum DlCredentialType : ENUM8 {
+  enum CredentialTypeEnum : ENUM8 {
     kProgrammingPIN = 0;
     kPin = 1;
     kRfid = 2;
@@ -1339,38 +1339,10 @@ server cluster DoorLock = 257 {
     kFace = 5;
   }
 
-  enum DlDataOperationType : ENUM8 {
+  enum DataOperationTypeEnum : ENUM8 {
     kAdd = 0;
     kClear = 1;
     kModify = 2;
-  }
-
-  enum DlDoorState : ENUM8 {
-    kDoorOpen = 0;
-    kDoorClosed = 1;
-    kDoorJammed = 2;
-    kDoorForcedOpen = 3;
-    kDoorUnspecifiedError = 4;
-    kDoorAjar = 5;
-  }
-
-  enum DlLockDataType : ENUM8 {
-    kUnspecified = 0;
-    kProgrammingCode = 1;
-    kUserIndex = 2;
-    kWeekDaySchedule = 3;
-    kYearDaySchedule = 4;
-    kHolidaySchedule = 5;
-    kPin = 6;
-    kRfid = 7;
-    kFingerprint = 8;
-  }
-
-  enum DlLockOperationType : ENUM8 {
-    kLock = 0;
-    kUnlock = 1;
-    kNonAccessUserEvent = 2;
-    kForcedUserEvent = 3;
   }
 
   enum DlLockState : ENUM8 {
@@ -1393,35 +1365,6 @@ server cluster DoorLock = 257 {
     kDoorFurniture = 10;
   }
 
-  enum DlOperatingMode : ENUM8 {
-    kNormal = 0;
-    kVacation = 1;
-    kPrivacy = 2;
-    kNoRemoteLockUnlock = 3;
-    kPassage = 4;
-  }
-
-  enum DlOperationError : ENUM8 {
-    kUnspecified = 0;
-    kInvalidCredential = 1;
-    kDisabledUserDenied = 2;
-    kRestricted = 3;
-    kInsufficientBattery = 4;
-  }
-
-  enum DlOperationSource : ENUM8 {
-    kUnspecified = 0;
-    kManual = 1;
-    kProprietaryRemote = 2;
-    kKeypad = 3;
-    kAuto = 4;
-    kButton = 5;
-    kSchedule = 6;
-    kRemote = 7;
-    kRfid = 8;
-    kBiometric = 9;
-  }
-
   enum DlStatus : ENUM8 {
     kSuccess = 0;
     kFailure = 1;
@@ -1430,25 +1373,6 @@ server cluster DoorLock = 257 {
     kInvalidField = 133;
     kResourceExhausted = 137;
     kNotFound = 139;
-  }
-
-  enum DlUserStatus : ENUM8 {
-    kAvailable = 0;
-    kOccupiedEnabled = 1;
-    kOccupiedDisabled = 3;
-  }
-
-  enum DlUserType : ENUM8 {
-    kUnrestrictedUser = 0;
-    kYearDayScheduleUser = 1;
-    kWeekDayScheduleUser = 2;
-    kProgrammingUser = 3;
-    kNonAccessUser = 4;
-    kForcedUser = 5;
-    kDisposableUser = 6;
-    kExpiringUser = 7;
-    kScheduleRestrictedUser = 8;
-    kRemoteOnlyUser = 9;
   }
 
   enum DoorLockOperationEventCode : ENUM8 {
@@ -1502,6 +1426,92 @@ server cluster DoorLock = 257 {
     kNotSupported = 255;
   }
 
+  enum DoorStateEnum : ENUM8 {
+    kDoorOpen = 0;
+    kDoorClosed = 1;
+    kDoorJammed = 2;
+    kDoorForcedOpen = 3;
+    kDoorUnspecifiedError = 4;
+    kDoorAjar = 5;
+  }
+
+  enum LockDataTypeEnum : ENUM8 {
+    kUnspecified = 0;
+    kProgrammingCode = 1;
+    kUserIndex = 2;
+    kWeekDaySchedule = 3;
+    kYearDaySchedule = 4;
+    kHolidaySchedule = 5;
+    kPin = 6;
+    kRfid = 7;
+    kFingerprint = 8;
+  }
+
+  enum LockOperationTypeEnum : ENUM8 {
+    kLock = 0;
+    kUnlock = 1;
+    kNonAccessUserEvent = 2;
+    kForcedUserEvent = 3;
+  }
+
+  enum OperatingModeEnum : ENUM8 {
+    kNormal = 0;
+    kVacation = 1;
+    kPrivacy = 2;
+    kNoRemoteLockUnlock = 3;
+    kPassage = 4;
+  }
+
+  enum OperationErrorEnum : ENUM8 {
+    kUnspecified = 0;
+    kInvalidCredential = 1;
+    kDisabledUserDenied = 2;
+    kRestricted = 3;
+    kInsufficientBattery = 4;
+  }
+
+  enum OperationSourceEnum : ENUM8 {
+    kUnspecified = 0;
+    kManual = 1;
+    kProprietaryRemote = 2;
+    kKeypad = 3;
+    kAuto = 4;
+    kButton = 5;
+    kSchedule = 6;
+    kRemote = 7;
+    kRfid = 8;
+    kBiometric = 9;
+  }
+
+  enum UserStatusEnum : ENUM8 {
+    kAvailable = 0;
+    kOccupiedEnabled = 1;
+    kOccupiedDisabled = 3;
+  }
+
+  enum UserTypeEnum : ENUM8 {
+    kUnrestrictedUser = 0;
+    kYearDayScheduleUser = 1;
+    kWeekDayScheduleUser = 2;
+    kProgrammingUser = 3;
+    kNonAccessUser = 4;
+    kForcedUser = 5;
+    kDisposableUser = 6;
+    kExpiringUser = 7;
+    kScheduleRestrictedUser = 8;
+    kRemoteOnlyUser = 9;
+  }
+
+  bitmap DaysMaskMap : BITMAP8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
   bitmap DlCredentialRuleMask : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -1512,16 +1522,6 @@ server cluster DoorLock = 257 {
     kSingle = 0x1;
     kDual = 0x2;
     kTri = 0x4;
-  }
-
-  bitmap DlDaysMaskMap : BITMAP8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
   }
 
   bitmap DlDefaultConfigurationRegister : BITMAP16 {
@@ -1628,56 +1628,56 @@ server cluster DoorLock = 257 {
   }
 
   bitmap DoorLockFeature : BITMAP32 {
-    kPINCredentials = 0x1;
-    kRFIDCredentials = 0x2;
+    kPinCredential = 0x1;
+    kRfidCredential = 0x2;
     kFingerCredentials = 0x4;
     kLogging = 0x8;
-    kWeekDaySchedules = 0x10;
+    kWeekDayAccessSchedules = 0x10;
     kDoorPositionSensor = 0x20;
     kFaceCredentials = 0x40;
-    kCredentialsOTA = 0x80;
-    kUsersManagement = 0x100;
-    kNotifications = 0x200;
-    kYearDaySchedules = 0x400;
+    kCredentialsOverTheAirAccess = 0x80;
+    kUser = 0x100;
+    kNotification = 0x200;
+    kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
   }
 
-  struct DlCredential {
-    DlCredentialType credentialType = 0;
+  struct CredentialStruct {
+    CredentialTypeEnum credentialType = 0;
     int16u credentialIndex = 1;
   }
 
   critical event DoorLockAlarm = 0 {
-    DlAlarmCode alarmCode = 0;
+    AlarmCodeEnum alarmCode = 0;
   }
 
   critical event DoorStateChange = 1 {
-    DlDoorState doorState = 0;
+    DoorStateEnum doorState = 0;
   }
 
   critical event LockOperation = 2 {
-    DlLockOperationType lockOperationType = 0;
-    DlOperationSource operationSource = 1;
+    LockOperationTypeEnum lockOperationType = 0;
+    OperationSourceEnum operationSource = 1;
     nullable INT16U userIndex = 2;
     nullable fabric_idx fabricIndex = 3;
     nullable NODE_ID sourceNode = 4;
-    optional nullable DlCredential credentials[] = 5;
+    optional nullable CredentialStruct credentials[] = 5;
   }
 
   critical event LockOperationError = 3 {
-    DlLockOperationType lockOperationType = 0;
-    DlOperationSource operationSource = 1;
-    DlOperationError operationError = 2;
+    LockOperationTypeEnum lockOperationType = 0;
+    OperationSourceEnum operationSource = 1;
+    OperationErrorEnum operationError = 2;
     nullable INT16U userIndex = 3;
     nullable fabric_idx fabricIndex = 4;
     nullable NODE_ID sourceNode = 5;
-    optional nullable DlCredential credentials[] = 6;
+    optional nullable CredentialStruct credentials[] = 6;
   }
 
   info event LockUserChange = 4 {
-    DlLockDataType lockDataType = 0;
-    DlDataOperationType dataOperationType = 1;
-    DlOperationSource operationSource = 2;
+    LockDataTypeEnum lockDataType = 0;
+    DataOperationTypeEnum dataOperationType = 1;
+    OperationSourceEnum operationSource = 2;
     nullable INT16U userIndex = 3;
     nullable fabric_idx fabricIndex = 4;
     nullable NODE_ID sourceNode = 5;
@@ -1687,7 +1687,7 @@ server cluster DoorLock = 257 {
   readonly attribute nullable DlLockState lockState = 0;
   readonly attribute DlLockType lockType = 1;
   readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute nullable DlDoorState doorState = 3;
+  readonly attribute nullable DoorStateEnum doorState = 3;
   readonly attribute int16u numberOfTotalUsersSupported = 17;
   readonly attribute int16u numberOfPINUsersSupported = 18;
   readonly attribute int16u numberOfRFIDUsersSupported = 19;
@@ -1703,7 +1703,7 @@ server cluster DoorLock = 257 {
   attribute access(write: manage) char_string<3> language = 33;
   attribute access(write: manage) int32u autoRelockTime = 35;
   attribute access(write: manage) int8u soundVolume = 36;
-  attribute access(write: manage) DlOperatingMode operatingMode = 37;
+  attribute access(write: manage) OperatingModeEnum operatingMode = 37;
   readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
   attribute access(write: manage) boolean enableOneTouchLocking = 41;
   attribute access(write: manage) boolean enablePrivacyModeButton = 43;
@@ -1714,22 +1714,22 @@ server cluster DoorLock = 257 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LockDoorRequest {
-    optional OCTET_STRING pinCode = 0;
+    optional OCTET_STRING PINCode = 0;
   }
 
   request struct UnlockDoorRequest {
-    optional OCTET_STRING pinCode = 0;
+    optional OCTET_STRING PINCode = 0;
   }
 
   request struct UnlockWithTimeoutRequest {
     INT16U timeout = 0;
-    optional OCTET_STRING pinCode = 1;
+    optional OCTET_STRING PINCode = 1;
   }
 
   request struct SetWeekDayScheduleRequest {
     INT8U weekDayIndex = 0;
     INT16U userIndex = 1;
-    DlDaysMaskMap daysMask = 2;
+    DaysMaskMap daysMask = 2;
     INT8U startHour = 3;
     INT8U startMinute = 4;
     INT8U endHour = 5;
@@ -1767,7 +1767,7 @@ server cluster DoorLock = 257 {
     INT8U holidayIndex = 0;
     epoch_s localStartTime = 1;
     epoch_s localEndTime = 2;
-    DlOperatingMode operatingMode = 3;
+    OperatingModeEnum operatingMode = 3;
   }
 
   request struct GetHolidayScheduleRequest {
@@ -1779,13 +1779,13 @@ server cluster DoorLock = 257 {
   }
 
   request struct SetUserRequest {
-    DlDataOperationType operationType = 0;
+    DataOperationTypeEnum operationType = 0;
     INT16U userIndex = 1;
     nullable CHAR_STRING userName = 2;
-    nullable INT32U userUniqueId = 3;
-    nullable DlUserStatus userStatus = 4;
-    nullable DlUserType userType = 5;
-    nullable DlCredentialRule credentialRule = 6;
+    nullable INT32U userUniqueID = 3;
+    nullable UserStatusEnum userStatus = 4;
+    nullable UserTypeEnum userType = 5;
+    nullable CredentialRuleEnum credentialRule = 6;
   }
 
   request struct GetUserRequest {
@@ -1797,27 +1797,27 @@ server cluster DoorLock = 257 {
   }
 
   request struct SetCredentialRequest {
-    DlDataOperationType operationType = 0;
-    DlCredential credential = 1;
+    DataOperationTypeEnum operationType = 0;
+    CredentialStruct credential = 1;
     LONG_OCTET_STRING credentialData = 2;
     nullable INT16U userIndex = 3;
-    nullable DlUserStatus userStatus = 4;
-    nullable DlUserType userType = 5;
+    nullable UserStatusEnum userStatus = 4;
+    nullable UserTypeEnum userType = 5;
   }
 
   request struct GetCredentialStatusRequest {
-    DlCredential credential = 0;
+    CredentialStruct credential = 0;
   }
 
   request struct ClearCredentialRequest {
-    nullable DlCredential credential = 0;
+    nullable CredentialStruct credential = 0;
   }
 
   response struct GetWeekDayScheduleResponse = 12 {
     INT8U weekDayIndex = 0;
     INT16U userIndex = 1;
     DlStatus status = 2;
-    optional DlDaysMaskMap daysMask = 3;
+    optional DaysMaskMap daysMask = 3;
     optional INT8U startHour = 4;
     optional INT8U startMinute = 5;
     optional INT8U endHour = 6;
@@ -1837,17 +1837,17 @@ server cluster DoorLock = 257 {
     DlStatus status = 1;
     optional epoch_s localStartTime = 2;
     optional epoch_s localEndTime = 3;
-    optional DlOperatingMode operatingMode = 4;
+    optional OperatingModeEnum operatingMode = 4;
   }
 
   response struct GetUserResponse = 28 {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
-    nullable INT32U userUniqueId = 2;
-    nullable DlUserStatus userStatus = 3;
-    nullable DlUserType userType = 4;
-    nullable DlCredentialRule credentialRule = 5;
-    nullable DlCredential credentials[] = 6;
+    nullable INT32U userUniqueID = 2;
+    nullable UserStatusEnum userStatus = 3;
+    nullable UserTypeEnum userType = 4;
+    nullable CredentialRuleEnum credentialRule = 5;
+    nullable CredentialStruct credentials[] = 6;
     nullable fabric_idx creatorFabricIndex = 7;
     nullable fabric_idx lastModifiedFabricIndex = 8;
     nullable INT16U nextUserIndex = 9;

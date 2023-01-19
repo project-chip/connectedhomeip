@@ -9,17 +9,17 @@
 #include <app/clusters/door-lock-server/door-lock-server.h>
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
-                                            chip::app::Clusters::DoorLock::DlOperationError & err)
+                                            chip::app::Clusters::DoorLock::OperationErrorEnum & err)
 {
-    err = DlOperationError::kUnspecified;
+    err = OperationErrorEnum::kUnspecified;
     // TBD: LockManager, check pinCode, ...
     return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
-                                              chip::app::Clusters::DoorLock::DlOperationError & err)
+                                              chip::app::Clusters::DoorLock::OperationErrorEnum & err)
 {
-    err = DlOperationError::kUnspecified;
+    err = OperationErrorEnum::kUnspecified;
     // TBD: LockManager, check pinCode, ...
     return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked);
 }

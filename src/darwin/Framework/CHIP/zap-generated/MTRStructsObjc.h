@@ -645,10 +645,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRDoorLockClusterCredentialStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull credentialType MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull credentialIndex MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRDoorLockClusterDlCredential : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull credentialType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull credentialIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRDoorLockClusterCredentialStruct")
+@interface MTRDoorLockClusterDlCredential : MTRDoorLockClusterCredentialStruct
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

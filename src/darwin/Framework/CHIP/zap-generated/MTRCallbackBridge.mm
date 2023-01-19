@@ -12191,10 +12191,10 @@ void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
         }
     }
     {
-        if (data.userUniqueId.IsNull()) {
-            response.userUniqueId = nil;
+        if (data.userUniqueID.IsNull()) {
+            response.userUniqueID = nil;
         } else {
-            response.userUniqueId = [NSNumber numberWithUnsignedInt:data.userUniqueId.Value()];
+            response.userUniqueID = [NSNumber numberWithUnsignedInt:data.userUniqueID.Value()];
         }
     }
     {
@@ -12227,8 +12227,8 @@ void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
                 auto iter_1 = data.credentials.Value().begin();
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
-                    MTRDoorLockClusterDlCredential * newElement_1;
-                    newElement_1 = [MTRDoorLockClusterDlCredential new];
+                    MTRDoorLockClusterCredentialStruct * newElement_1;
+                    newElement_1 = [MTRDoorLockClusterCredentialStruct new];
                     newElement_1.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.credentialType)];
                     newElement_1.credentialIndex = [NSNumber numberWithUnsignedShort:entry_1.credentialIndex];
                     [array_1 addObject:newElement_1];
@@ -16063,15 +16063,15 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback
     }
 }
 
-void MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlAlarmCode value)
+void MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::AlarmCodeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDoorLockClusterAlarmCodeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16086,8 +16086,8 @@ void MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlAlarmCode> & value)
+void MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::AlarmCodeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16098,7 +16098,7 @@ void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16113,15 +16113,15 @@ void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlCredentialRule value)
+void MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::CredentialRuleEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDoorLockClusterCredentialRuleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16136,8 +16136,8 @@ void MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & value)
+void MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialRuleEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16148,7 +16148,7 @@ void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16163,15 +16163,15 @@ void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlCredentialType value)
+void MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::CredentialTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDoorLockClusterCredentialTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16186,8 +16186,8 @@ void MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialType> & value)
+void MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16198,7 +16198,7 @@ void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16213,15 +16213,15 @@ void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlDataOperationType value)
+void MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DataOperationTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16236,8 +16236,8 @@ void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> & value)
+void MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DataOperationTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16248,157 +16248,7 @@ void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlDoorState value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlLockDataType value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockDataType> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlLockOperationType value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockOperationType> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16513,156 +16363,6 @@ void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperatingMode> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlOperationError value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationError> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlOperationSource value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationSource> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
 void MTRDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlStatus value)
 {
     NSNumber * _Nonnull objCValue;
@@ -16698,106 +16398,6 @@ void MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(
 };
 
 void MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlUserStatus value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlUserType value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16962,15 +16562,15 @@ void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscrip
     }
 }
 
-void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockUserStatus value)
+void MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DoorStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDoorLockClusterDoorStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16985,8 +16585,8 @@ void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserStatus> & value)
+void MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16997,7 +16597,7 @@ void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17012,15 +16612,15 @@ void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockUserType value)
+void MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::LockDataTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDoorLockClusterLockDataTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17035,8 +16635,8 @@ void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserType> & value)
+void MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockDataTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17047,7 +16647,307 @@ void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::LockOperationTypeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockOperationTypeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::OperatingModeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDoorLockClusterOperatingModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperatingModeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::OperationErrorEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDoorLockClusterOperationErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationErrorEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::OperationSourceEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDoorLockClusterOperationSourceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationSourceEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::UserStatusEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDoorLockClusterUserStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserStatusEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::UserTypeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDoorLockClusterUserTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserTypeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

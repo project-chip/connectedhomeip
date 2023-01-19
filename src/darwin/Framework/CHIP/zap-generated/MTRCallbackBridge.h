@@ -354,51 +354,27 @@ typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy> &);
-typedef void (*DoorLockClusterDlAlarmCodeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlAlarmCode);
-typedef void (*NullableDoorLockClusterDlAlarmCodeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlAlarmCode> &);
-typedef void (*DoorLockClusterDlCredentialRuleAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlCredentialRule);
-typedef void (*NullableDoorLockClusterDlCredentialRuleAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> &);
-typedef void (*DoorLockClusterDlCredentialTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlCredentialType);
-typedef void (*NullableDoorLockClusterDlCredentialTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialType> &);
-typedef void (*DoorLockClusterDlDataOperationTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDataOperationType);
-typedef void (*NullableDoorLockClusterDlDataOperationTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> &);
-typedef void (*DoorLockClusterDlDoorStateAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDoorState);
-typedef void (*NullableDoorLockClusterDlDoorStateAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> &);
-typedef void (*DoorLockClusterDlLockDataTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockDataType);
-typedef void (*NullableDoorLockClusterDlLockDataTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockDataType> &);
-typedef void (*DoorLockClusterDlLockOperationTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockOperationType);
-typedef void (*NullableDoorLockClusterDlLockOperationTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockOperationType> &);
+typedef void (*DoorLockClusterAlarmCodeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::AlarmCodeEnum);
+typedef void (*NullableDoorLockClusterAlarmCodeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::AlarmCodeEnum> &);
+typedef void (*DoorLockClusterCredentialRuleEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::CredentialRuleEnum);
+typedef void (*NullableDoorLockClusterCredentialRuleEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialRuleEnum> &);
+typedef void (*DoorLockClusterCredentialTypeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::CredentialTypeEnum);
+typedef void (*NullableDoorLockClusterCredentialTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialTypeEnum> &);
+typedef void (*DoorLockClusterDataOperationTypeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::DataOperationTypeEnum);
+typedef void (*NullableDoorLockClusterDataOperationTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DataOperationTypeEnum> &);
 typedef void (*DoorLockClusterDlLockStateAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockState);
 typedef void (*NullableDoorLockClusterDlLockStateAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> &);
 typedef void (*DoorLockClusterDlLockTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockType);
 typedef void (*NullableDoorLockClusterDlLockTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockType> &);
-typedef void (*DoorLockClusterDlOperatingModeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperatingMode);
-typedef void (*NullableDoorLockClusterDlOperatingModeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperatingMode> &);
-typedef void (*DoorLockClusterDlOperationErrorAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperationError);
-typedef void (*NullableDoorLockClusterDlOperationErrorAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationError> &);
-typedef void (*DoorLockClusterDlOperationSourceAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperationSource);
-typedef void (*NullableDoorLockClusterDlOperationSourceAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationSource> &);
 typedef void (*DoorLockClusterDlStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlStatus);
 typedef void (*NullableDoorLockClusterDlStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlStatus> &);
-typedef void (*DoorLockClusterDlUserStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlUserStatus);
-typedef void (*NullableDoorLockClusterDlUserStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> &);
-typedef void (*DoorLockClusterDlUserTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlUserType);
-typedef void (*NullableDoorLockClusterDlUserTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> &);
 typedef void (*DoorLockClusterDoorLockOperationEventCodeAttributeCallback)(
     void *, chip::app::Clusters::DoorLock::DoorLockOperationEventCode);
 typedef void (*NullableDoorLockClusterDoorLockOperationEventCodeAttributeCallback)(
@@ -411,12 +387,30 @@ typedef void (*DoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback)(void *,
                                                                          chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus);
 typedef void (*NullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus> &);
-typedef void (*DoorLockClusterDoorLockUserStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DoorLockUserStatus);
-typedef void (*NullableDoorLockClusterDoorLockUserStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserStatus> &);
-typedef void (*DoorLockClusterDoorLockUserTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DoorLockUserType);
-typedef void (*NullableDoorLockClusterDoorLockUserTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserType> &);
+typedef void (*DoorLockClusterDoorStateEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::DoorStateEnum);
+typedef void (*NullableDoorLockClusterDoorStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> &);
+typedef void (*DoorLockClusterLockDataTypeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::LockDataTypeEnum);
+typedef void (*NullableDoorLockClusterLockDataTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockDataTypeEnum> &);
+typedef void (*DoorLockClusterLockOperationTypeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::LockOperationTypeEnum);
+typedef void (*NullableDoorLockClusterLockOperationTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockOperationTypeEnum> &);
+typedef void (*DoorLockClusterOperatingModeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::OperatingModeEnum);
+typedef void (*NullableDoorLockClusterOperatingModeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperatingModeEnum> &);
+typedef void (*DoorLockClusterOperationErrorEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::OperationErrorEnum);
+typedef void (*NullableDoorLockClusterOperationErrorEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationErrorEnum> &);
+typedef void (*DoorLockClusterOperationSourceEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::OperationSourceEnum);
+typedef void (*NullableDoorLockClusterOperationSourceEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationSourceEnum> &);
+typedef void (*DoorLockClusterUserStatusEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::UserStatusEnum);
+typedef void (*NullableDoorLockClusterUserStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserStatusEnum> &);
+typedef void (*DoorLockClusterUserTypeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::UserTypeEnum);
+typedef void (*NullableDoorLockClusterUserTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserTypeEnum> &);
 typedef void (*WindowCoveringClusterEndProductTypeAttributeCallback)(void *, chip::app::Clusters::WindowCovering::EndProductType);
 typedef void (*NullableWindowCoveringClusterEndProductTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> &);
@@ -15794,464 +15788,268 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlAlarmCodeAttributeCallback>
+class MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterAlarmCodeEnumAttributeCallback>
 {
 public:
-    MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlAlarmCodeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterAlarmCodeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlAlarmCodeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterAlarmCodeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlAlarmCode value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::AlarmCodeEnum value);
 };
 
-class MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge : public MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge
+class MTRDoorLockClusterAlarmCodeEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge
 {
 public:
-    MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action,
-                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge(queue, handler, action),
+    MTRDoorLockClusterAlarmCodeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnDone;
+    using MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlAlarmCodeAttributeCallback>
+class MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterAlarmCodeEnumAttributeCallback>
 {
 public:
-    MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlAlarmCodeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterAlarmCodeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlAlarmCodeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterAlarmCodeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlAlarmCode> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::AlarmCodeEnum> & value);
 };
 
-class MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge
+class MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action,
-                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlCredentialRuleAttributeCallback>
-{
-public:
-    MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlCredentialRuleAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlCredentialRuleAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlCredentialRule value);
-};
-
-class MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge
-{
-public:
-    MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlCredentialRuleAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlCredentialRuleAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlCredentialRuleAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & value);
-};
-
-class MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge
-{
-public:
-    MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge(
+    MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge(queue, handler, action),
+        MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnDone;
+    using MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlCredentialTypeAttributeCallback>
+class MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterCredentialRuleEnumAttributeCallback>
 {
 public:
-    MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlCredentialTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterCredentialRuleEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlCredentialTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterCredentialRuleEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlCredentialType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::CredentialRuleEnum value);
 };
 
-class MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge
+class MTRDoorLockClusterCredentialRuleEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge
 {
 public:
-    MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge(queue, handler, action),
+    MTRDoorLockClusterCredentialRuleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnDone;
+    using MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlCredentialTypeAttributeCallback>
+class MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterCredentialRuleEnumAttributeCallback>
 {
 public:
-    MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlCredentialTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterCredentialRuleEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlCredentialTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterCredentialRuleEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialRuleEnum> & value);
 };
 
-class MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge
+class MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlDataOperationTypeAttributeCallback>
+class MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterCredentialTypeEnumAttributeCallback>
 {
 public:
-    MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlDataOperationTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterCredentialTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlDataOperationTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterCredentialTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlDataOperationType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::CredentialTypeEnum value);
 };
 
-class MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge
+class MTRDoorLockClusterCredentialTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action,
-                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(queue, handler, action),
+    MTRDoorLockClusterCredentialTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnDone;
+    using MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlDataOperationTypeAttributeCallback>
+class MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterCredentialTypeEnumAttributeCallback>
 {
 public:
-    MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlDataOperationTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterCredentialTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlDataOperationTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterCredentialTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialTypeEnum> & value);
 };
 
-class MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge
+class MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlDoorStateAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlDoorStateAttributeCallback>
+class MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterDataOperationTypeEnumAttributeCallback>
 {
 public:
-    MTRDoorLockClusterDlDoorStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlDoorStateAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterDataOperationTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDoorLockClusterDlDoorStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlDoorStateAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterDataOperationTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlDoorState value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DataOperationTypeEnum value);
 };
 
-class MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge : public MTRDoorLockClusterDlDoorStateAttributeCallbackBridge
+class MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action,
-                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlDoorStateAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlDoorStateAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlDoorStateAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlDoorStateAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value);
-};
-
-class MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge
-{
-public:
-    MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action,
-                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlLockDataTypeAttributeCallback>
-{
-public:
-    MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlLockDataTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlLockDataTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlLockDataType value);
-};
-
-class MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge
-{
-public:
-    MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlLockDataTypeAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlLockDataTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlLockDataTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockDataType> & value);
-};
-
-class MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge
-{
-public:
-    MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge(
+    MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge(queue, handler, action),
+        MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnDone;
+    using MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlLockOperationTypeAttributeCallback>
+class MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterDataOperationTypeEnumAttributeCallback>
 {
 public:
-    MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlLockOperationTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterDataOperationTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlLockOperationTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlLockOperationType value);
-};
-
-class MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge
-{
-public:
-    MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action,
-                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlLockOperationTypeAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlLockOperationTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlLockOperationTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterDataOperationTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockOperationType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DataOperationTypeEnum> & value);
 };
 
-class MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge
+class MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16385,207 +16183,6 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlOperatingModeAttributeCallback>
-{
-public:
-    MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlOperatingModeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlOperatingModeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlOperatingMode value);
-};
-
-class MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge
-{
-public:
-    MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action,
-                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlOperatingModeAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlOperatingModeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlOperatingModeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperatingMode> & value);
-};
-
-class MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge
-{
-public:
-    MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlOperationErrorAttributeCallback>
-{
-public:
-    MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlOperationErrorAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlOperationErrorAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlOperationError value);
-};
-
-class MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge
-{
-public:
-    MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlOperationErrorAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlOperationErrorAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlOperationErrorAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationError> & value);
-};
-
-class MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge
-{
-public:
-    MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlOperationSourceAttributeCallback>
-{
-public:
-    MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlOperationSourceAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlOperationSourceAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlOperationSource value);
-};
-
-class MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge
-{
-public:
-    MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action,
-                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlOperationSourceAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlOperationSourceAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlOperationSourceAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationSource> & value);
-};
-
-class MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge
-{
-public:
-    MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class MTRDoorLockClusterDlStatusAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlStatusAttributeCallback>
 {
 public:
@@ -16644,135 +16241,6 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRDoorLockClusterDlUserStatusAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlUserStatusAttributeCallback>
-{
-public:
-    MTRDoorLockClusterDlUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlUserStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterDlUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlUserStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlUserStatus value);
-};
-
-class MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDlUserStatusAttributeCallbackBridge
-{
-public:
-    MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action,
-                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlUserStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlUserStatusAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlUserStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlUserStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & value);
-};
-
-class MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge
-{
-public:
-    MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRDoorLockClusterDlUserTypeAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlUserTypeAttributeCallback>
-{
-public:
-    MTRDoorLockClusterDlUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDlUserTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterDlUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDlUserTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlUserType value);
-};
-
-class MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge : public MTRDoorLockClusterDlUserTypeAttributeCallbackBridge
-{
-public:
-    MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action,
-                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDlUserTypeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlUserTypeAttributeCallback>
-{
-public:
-    MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDlUserTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDlUserTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & value);
-};
-
-class MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge
-{
-public:
-    MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action,
-                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16983,135 +16451,534 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDoorLockUserStatusAttributeCallback>
+class MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterDoorStateEnumAttributeCallback>
 {
 public:
-    MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDoorLockUserStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterDoorStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDoorLockUserStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterDoorStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockUserStatus value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorStateEnum value);
 };
 
-class MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge
+class MTRDoorLockClusterDoorStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge
 {
 public:
-    MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action,
-                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(queue, handler, action),
+    MTRDoorLockClusterDoorStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnDone;
+    using MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDoorLockUserStatusAttributeCallback>
+class MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterDoorStateEnumAttributeCallback>
 {
 public:
-    MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDoorLockUserStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterDoorStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDoorLockUserStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterDoorStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserStatus> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value);
 };
 
-class MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge
+class MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge(
+    MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(queue, handler, action),
+        MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnDone;
+    using MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDoorLockUserTypeAttributeCallback>
+class MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterLockDataTypeEnumAttributeCallback>
 {
 public:
-    MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterDoorLockUserTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterLockDataTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterDoorLockUserTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<DoorLockClusterLockDataTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockUserType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::LockDataTypeEnum value);
 };
 
-class MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge
-    : public MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge
+class MTRDoorLockClusterLockDataTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRDoorLockClusterLockDataTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           MTRActionBlock action,
                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(queue, handler, action),
+        MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnDone;
+    using MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDoorLockUserTypeAttributeCallback>
+class MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterLockDataTypeEnumAttributeCallback>
 {
 public:
-    MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDoorLockClusterDoorLockUserTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterLockDataTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<NullableDoorLockClusterDoorLockUserTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<NullableDoorLockClusterLockDataTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockDataTypeEnum> & value);
 };
 
-class MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge
+class MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterLockOperationTypeEnumAttributeCallback>
+{
+public:
+    MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterLockOperationTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterLockOperationTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::LockOperationTypeEnum value);
+};
+
+class MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterLockOperationTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterLockOperationTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterLockOperationTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockOperationTypeEnum> & value);
+};
+
+class MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterOperatingModeEnumAttributeCallback>
+{
+public:
+    MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterOperatingModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterOperatingModeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::OperatingModeEnum value);
+};
+
+class MTRDoorLockClusterOperatingModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge
+{
+public:
+    MTRDoorLockClusterOperatingModeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterOperatingModeEnumAttributeCallback>
+{
+public:
+    MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterOperatingModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterOperatingModeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperatingModeEnum> & value);
+};
+
+class MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterOperationErrorEnumAttributeCallback>
+{
+public:
+    MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterOperationErrorEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterOperationErrorEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::OperationErrorEnum value);
+};
+
+class MTRDoorLockClusterOperationErrorEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge
+{
+public:
+    MTRDoorLockClusterOperationErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterOperationErrorEnumAttributeCallback>
+{
+public:
+    MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterOperationErrorEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterOperationErrorEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationErrorEnum> & value);
+};
+
+class MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterOperationSourceEnumAttributeCallback>
+{
+public:
+    MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterOperationSourceEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterOperationSourceEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::OperationSourceEnum value);
+};
+
+class MTRDoorLockClusterOperationSourceEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge
+{
+public:
+    MTRDoorLockClusterOperationSourceEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterOperationSourceEnumAttributeCallback>
+{
+public:
+    MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterOperationSourceEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterOperationSourceEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationSourceEnum> & value);
+};
+
+class MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DoorLockClusterUserStatusEnumAttributeCallback>
+{
+public:
+    MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterUserStatusEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterUserStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::UserStatusEnum value);
+};
+
+class MTRDoorLockClusterUserStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge
+{
+public:
+    MTRDoorLockClusterUserStatusEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action,
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterUserStatusEnumAttributeCallback>
+{
+public:
+    MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterUserStatusEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterUserStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserStatusEnum> & value);
+};
+
+class MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterUserTypeEnumAttributeCallback>
+{
+public:
+    MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DoorLockClusterUserTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DoorLockClusterUserTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::UserTypeEnum value);
+};
+
+class MTRDoorLockClusterUserTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRDoorLockClusterUserTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDoorLockClusterUserTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableDoorLockClusterUserTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableDoorLockClusterUserTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserTypeEnum> & value);
+};
+
+class MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
