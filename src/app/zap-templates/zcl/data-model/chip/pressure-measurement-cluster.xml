@@ -38,6 +38,6 @@ limitations under the License.
 
   <bitmap name="PressureFeature" type="BITMAP32">
     <cluster code="0x0403"/>
-    <field name="EXT" mask="0x1"/>
+    <field name="Extended" mask="0x1"/>
   </bitmap>
 </configurator>

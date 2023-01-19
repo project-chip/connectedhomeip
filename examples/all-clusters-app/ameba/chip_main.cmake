@@ -149,8 +149,6 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
-
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
@@ -160,7 +158,6 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/LEDWidget.cpp
-    ${chip_dir}/examples/all-clusters-app/ameba/main/DsoHack.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c

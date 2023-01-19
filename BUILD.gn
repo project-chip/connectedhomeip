@@ -267,6 +267,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/py_matter_yamltests:matter_yamltests.tests",
         "//src:tests_run",
       ]
+
+      if (current_os == "linux" || current_os == "mac") {
+        deps += [ "${chip_root}/scripts/tools/zap:tests" ]
+      }
     }
   }
 } else {

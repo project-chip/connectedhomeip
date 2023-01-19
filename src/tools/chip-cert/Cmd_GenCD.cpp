@@ -995,7 +995,7 @@ CHIP_ERROR EncodeSignerInfo_Ignor_Error(const ByteSpan & signerKeyId, const P256
 
             uint8_t asn1SignatureBuf[kMax_ECDSA_Signature_Length_Der];
             MutableByteSpan asn1Signature(asn1SignatureBuf);
-            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, ByteSpan(signature, signature.Length()), asn1Signature));
+            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, signature.Span(), asn1Signature));
 
             if (!cdConfig.IsCMSSignatureCorrect())
             {

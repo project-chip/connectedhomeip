@@ -50,6 +50,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -75,6 +83,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -198,6 +212,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -219,6 +241,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -271,6 +299,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -292,6 +328,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -336,6 +378,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -357,6 +407,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -417,6 +473,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -438,6 +502,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -532,6 +602,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -553,6 +631,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -599,6 +683,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -620,6 +712,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -681,6 +779,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -702,6 +808,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -747,6 +859,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -768,6 +888,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -879,6 +1005,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -900,6 +1034,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -945,6 +1085,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -966,6 +1114,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1022,6 +1176,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1043,6 +1205,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1088,6 +1256,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1109,6 +1285,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1165,6 +1347,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1186,6 +1376,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1262,6 +1458,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1283,6 +1487,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1447,6 +1657,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1468,6 +1686,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1512,6 +1736,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1533,6 +1765,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1593,6 +1831,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1614,6 +1860,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1666,6 +1918,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1687,6 +1947,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1752,6 +2018,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1773,6 +2047,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1825,6 +2105,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1846,6 +2134,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1911,6 +2205,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -1932,6 +2234,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1987,6 +2295,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -2008,6 +2324,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -2117,6 +2439,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -2138,6 +2468,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -2188,6 +2524,14 @@ private:
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
+
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
+
         bool shouldContinue = false;
 
         switch (mTestIndex - 1)
@@ -2209,6 +2553,12 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        // Reset on every step in case it changed.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
