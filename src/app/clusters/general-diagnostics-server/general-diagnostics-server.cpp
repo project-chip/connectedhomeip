@@ -276,9 +276,10 @@ void GeneralDiagnosticsServer::OnHardwareFaultsDetect(const GeneralFaults<kMaxHa
 
         // Record HardwareFault event
         EventNumber eventNumber;
-        DataModel::List<const HardwareFault> currentList(reinterpret_cast<const HardwareFault *>(current.data()), current.size());
-        DataModel::List<const HardwareFault> previousList(reinterpret_cast<const HardwareFault *>(previous.data()),
-                                                          previous.size());
+        DataModel::List<const HardwareFaultEnum> currentList(reinterpret_cast<const HardwareFaultEnum *>(current.data()),
+                                                             current.size());
+        DataModel::List<const HardwareFaultEnum> previousList(reinterpret_cast<const HardwareFaultEnum *>(previous.data()),
+                                                              previous.size());
         Events::HardwareFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -302,8 +303,9 @@ void GeneralDiagnosticsServer::OnRadioFaultsDetect(const GeneralFaults<kMaxRadio
 
         // Record RadioFault event
         EventNumber eventNumber;
-        DataModel::List<const RadioFault> currentList(reinterpret_cast<const RadioFault *>(current.data()), current.size());
-        DataModel::List<const RadioFault> previousList(reinterpret_cast<const RadioFault *>(previous.data()), previous.size());
+        DataModel::List<const RadioFaultEnum> currentList(reinterpret_cast<const RadioFaultEnum *>(current.data()), current.size());
+        DataModel::List<const RadioFaultEnum> previousList(reinterpret_cast<const RadioFaultEnum *>(previous.data()),
+                                                           previous.size());
         Events::RadioFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -327,9 +329,9 @@ void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNet
 
         // Record NetworkFault event
         EventNumber eventNumber;
-        DataModel::List<const NetworkFaultType> currentList(reinterpret_cast<const NetworkFaultType *>(current.data()),
+        DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
                                                             current.size());
-        DataModel::List<const NetworkFaultType> previousList(reinterpret_cast<const NetworkFaultType *>(previous.data()),
+        DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
                                                              previous.size());
         Events::NetworkFaultChange::Type event{ currentList, previousList };
 

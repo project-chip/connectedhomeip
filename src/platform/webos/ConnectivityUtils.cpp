@@ -243,15 +243,15 @@ double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
     return result;
 }
 
-InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
-    InterfaceType ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
-    int sock          = -1;
+    InterfaceTypeEnum ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
+    int sock              = -1;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to open socket");
-        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
     }
 
     // Test wireless extensions for CONNECTION_WIFI
@@ -260,7 +260,7 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 
     if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
     {
-        ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     }
     else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
     {
@@ -271,7 +271,7 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
         Platform::CopyString(ifr.ifr_name, ifname);
 
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
-            ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+            ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
     }
 
     close(sock);
@@ -328,7 +328,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
             {
                 Platform::CopyString(ifname, bufSize, ifa->ifa_name);
                 err = CHIP_NO_ERROR;
@@ -522,7 +522,7 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET)
             {
                 Platform::CopyString(ifname, bufSize, ifa->ifa_name);
                 err = CHIP_NO_ERROR;

@@ -5627,17 +5627,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BootReason", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveHardwareFaults", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveRadioFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveRadioFaults", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveNetworkFaults", 1, value);
         }

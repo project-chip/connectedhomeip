@@ -279,21 +279,22 @@ typedef void (*GeneralDiagnosticsClusterBootReasonEnumAttributeCallback)(void *,
                                                                          chip::app::Clusters::GeneralDiagnostics::BootReasonEnum);
 typedef void (*NullableGeneralDiagnosticsClusterBootReasonEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::BootReasonEnum> &);
-typedef void (*GeneralDiagnosticsClusterHardwareFaultAttributeCallback)(void *,
-                                                                        chip::app::Clusters::GeneralDiagnostics::HardwareFault);
-typedef void (*NullableGeneralDiagnosticsClusterHardwareFaultAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFault> &);
-typedef void (*GeneralDiagnosticsClusterInterfaceTypeAttributeCallback)(void *,
-                                                                        chip::app::Clusters::GeneralDiagnostics::InterfaceType);
-typedef void (*NullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceType> &);
-typedef void (*GeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback)(
-    void *, chip::app::Clusters::GeneralDiagnostics::NetworkFaultType);
-typedef void (*NullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> &);
-typedef void (*GeneralDiagnosticsClusterRadioFaultAttributeCallback)(void *, chip::app::Clusters::GeneralDiagnostics::RadioFault);
-typedef void (*NullableGeneralDiagnosticsClusterRadioFaultAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFault> &);
+typedef void (*GeneralDiagnosticsClusterHardwareFaultEnumAttributeCallback)(
+    void *, chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum);
+typedef void (*NullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> &);
+typedef void (*GeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallback)(
+    void *, chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum);
+typedef void (*NullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum> &);
+typedef void (*GeneralDiagnosticsClusterNetworkFaultEnumAttributeCallback)(
+    void *, chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum);
+typedef void (*NullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> &);
+typedef void (*GeneralDiagnosticsClusterRadioFaultEnumAttributeCallback)(void *,
+                                                                         chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum);
+typedef void (*NullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> &);
 typedef void (*ThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum);
 typedef void (*NullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback)(
@@ -721,11 +722,11 @@ typedef void (*GeneralDiagnosticsNetworkInterfacesListAttributeCallback)(
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType> &
         data);
 typedef void (*GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & data);
 typedef void (*GeneralDiagnosticsActiveRadioFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & data);
 typedef void (*GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & data);
 typedef void (*GeneralDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GeneralDiagnosticsAcceptedCommandListListAttributeCallback)(
@@ -4816,7 +4817,7 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & value);
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & value);
 };
 
 class MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge
@@ -4849,8 +4850,9 @@ public:
                                                                       MTRActionBlock action) :
         MTRCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & value);
 };
 
 class MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge
@@ -4885,7 +4887,7 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & value);
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & value);
 };
 
 class MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge
@@ -14449,271 +14451,275 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterHardwareFaultAttributeCallback>
+class MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<GeneralDiagnosticsClusterHardwareFaultEnumAttributeCallback>
 {
 public:
-    MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralDiagnosticsClusterHardwareFaultAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<GeneralDiagnosticsClusterHardwareFaultEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<GeneralDiagnosticsClusterHardwareFaultAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<GeneralDiagnosticsClusterHardwareFaultEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFault value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum value);
 };
 
-class MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackSubscriptionBridge
-    : public MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge
+class MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackSubscriptionBridge
+    : public MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge
 {
 public:
-    MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackSubscriptionBridge(
+    MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge(queue, handler, action),
+        MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge::OnDone;
+    using MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterHardwareFaultAttributeCallback>
+class MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallback>
 {
 public:
-    MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableGeneralDiagnosticsClusterHardwareFaultAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action) :
-        MTRCallbackBridge<NullableGeneralDiagnosticsClusterHardwareFaultAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & value);
 };
 
-class MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackSubscriptionBridge
-    : public MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge
+class MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackSubscriptionBridge(
+    MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge(queue, handler, action),
+        MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableGeneralDiagnosticsClusterHardwareFaultAttributeCallbackBridge::OnDone;
+    using MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterInterfaceTypeAttributeCallback>
+class MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<GeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallback>
 {
 public:
-    MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralDiagnosticsClusterInterfaceTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<GeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<GeneralDiagnosticsClusterInterfaceTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<GeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum value);
 };
 
-class MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge
-    : public MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge
+class MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge(
+    MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(queue, handler, action),
+        MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnDone;
+    using MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback>
+class MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallback>
 {
 public:
-    MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action) :
-        MTRCallbackBridge<NullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceType> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum> & value);
 };
 
-class MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge
+class MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>
+class MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<GeneralDiagnosticsClusterNetworkFaultEnumAttributeCallback>
 {
 public:
-    MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<GeneralDiagnosticsClusterNetworkFaultEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<GeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<GeneralDiagnosticsClusterNetworkFaultEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum value);
 };
 
-class MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge
-    : public MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
+class MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge
+    : public MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge
 {
 public:
-    MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge(
+    MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(queue, handler, action),
+        MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnDone;
+    using MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>
+class MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallback>
 {
 public:
-    MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<NullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<NullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallback>(queue, handler, action,
                                                                                               OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & value);
 };
 
-class MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
+class MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterRadioFaultAttributeCallback>
+class MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<GeneralDiagnosticsClusterRadioFaultEnumAttributeCallback>
 {
 public:
-    MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralDiagnosticsClusterRadioFaultAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<GeneralDiagnosticsClusterRadioFaultEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<GeneralDiagnosticsClusterRadioFaultAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<GeneralDiagnosticsClusterRadioFaultEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::RadioFault value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum value);
 };
 
-class MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackSubscriptionBridge
-    : public MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge
+class MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackSubscriptionBridge
+    : public MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge
 {
 public:
-    MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackSubscriptionBridge(
+    MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge(queue, handler, action),
+        MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge::OnDone;
+    using MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterRadioFaultAttributeCallback>
+class MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallback>
 {
 public:
-    MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableGeneralDiagnosticsClusterRadioFaultAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<NullableGeneralDiagnosticsClusterRadioFaultAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<NullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFault> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & value);
 };
 
-class MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackSubscriptionBridge
-    : public MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge
+class MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackSubscriptionBridge(
+    MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge(queue, handler, action),
+        MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableGeneralDiagnosticsClusterRadioFaultAttributeCallbackBridge::OnDone;
+    using MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

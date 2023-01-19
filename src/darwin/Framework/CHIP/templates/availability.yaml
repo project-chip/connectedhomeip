@@ -3090,7 +3090,10 @@
           GeneralDiagnostics:
               - BootReasonType
               - HardwareFaultType
-              - InterfaceType
+              # InterfaceTypeEnum was originally just named InterfaceType, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - InterfaceTypeEnum
               - NetworkFaultType
               - RadioFaultType
           ThreadNetworkDiagnostics:
@@ -3438,7 +3441,10 @@
                   - UserInterfaceFault
                   - NonVolatileMemoryError
                   - TamperDetected
-              InterfaceType:
+              # InterfaceTypeEnum was originally just named InterfaceType, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              InterfaceTypeEnum:
                   - Unspecified
                   - WiFi
                   - Ethernet
@@ -5249,9 +5255,10 @@
           EthernetNetworkDiagnostics:
               - PHYRateEnum
           GeneralDiagnostics:
-              - HardwareFault
-              - RadioFault
+              - HardwareFaultEnum
+              - RadioFaultEnum
               - BootReasonEnum
+              - NetworkFaultEnum
           OperationalCredentials:
               - NodeOperationalCertStatusEnum
               - CertificateChainTypeEnum
@@ -5351,7 +5358,7 @@
                   - Rate200G
                   - Rate400G
           GeneralDiagnostics:
-              HardwareFault:
+              HardwareFaultEnum:
                   - Unspecified
                   - Radio
                   - Sensor
@@ -5363,7 +5370,7 @@
                   - UserInterfaceFault
                   - NonVolatileMemoryError
                   - TamperDetected
-              RadioFault:
+              RadioFaultEnum:
                   - Unspecified
                   - WiFiFault
                   - CellularFault
@@ -5379,6 +5386,11 @@
                   - HardwareWatchdogReset
                   - SoftwareUpdateCompleted
                   - SoftwareReset
+              NetworkFaultEnum:
+                  - Unspecified
+                  - HardwareFailure
+                  - NetworkJammed
+                  - ConnectionFailed
           OperationalCredentials:
               NodeOperationalCertStatusEnum:
                   - OK
@@ -5644,6 +5656,7 @@
               - HardwareFaultType
               - RadioFaultType
               - BootReasonType
+              - NetworkFaultType
           OperationalCredentials:
               - OperationalCertStatus
           DoorLock:
@@ -5887,9 +5900,10 @@
           EthernetNetworkDiagnostics:
               PHYRateEnum: PHYRateType
           GeneralDiagnostics:
-              HardwareFault: HardwareFaultType
-              RadioFault: RadioFaultType
+              HardwareFaultEnum: HardwareFaultType
+              RadioFaultEnum: RadioFaultType
               BootReasonEnum: BootReasonType
+              NetworkFaultEnum: NetworkFaultType
           OperationalCredentials:
               NodeOperationalCertStatusEnum: OperationalCertStatus
           DoorLock:

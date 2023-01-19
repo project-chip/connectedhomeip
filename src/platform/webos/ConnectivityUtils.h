@@ -42,7 +42,7 @@ class ConnectivityUtils
 public:
     static uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel);
     static uint8_t MapFrequencyToChannel(const uint16_t frequency);
-    static app::Clusters::GeneralDiagnostics::InterfaceType GetInterfaceConnectionType(const char * ifname);
+    static app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
     static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
     static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
     static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
