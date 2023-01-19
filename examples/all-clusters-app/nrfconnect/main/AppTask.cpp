@@ -336,9 +336,9 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
 void AppTask::RequestSMPAdvertisingStart(void)
 {
     AppEvent event;
-    event.Type    = AppEvent::kEventType_StartSMPAdvertising;
-    event.Handler = [](AppEvent *) { GetDFUOverSMP().StartBLEAdvertising(); };
-    sAppTask.PostEvent(&event);
+    event.Type    = AppEventType::StartSMPAdvertising;
+    event.Handler = [](const AppEvent &) { GetDFUOverSMP().StartBLEAdvertising(); };
+    PostEvent(event);
 }
 #endif
 

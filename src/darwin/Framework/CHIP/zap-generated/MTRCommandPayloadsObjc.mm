@@ -3307,7 +3307,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _attestationElements = [NSData data];
 
-        _signature = [NSData data];
+        _attestationSignature = [NSData data];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3318,7 +3318,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] init];
 
     other.attestationElements = self.attestationElements;
-    other.signature = self.signature;
+    other.attestationSignature = self.attestationSignature;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -3326,12 +3326,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: attestationElements:%@; signature:%@; >", NSStringFromClass([self class]),
-                  [_attestationElements base64EncodedStringWithOptions:0], [_signature base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: attestationElements:%@; attestationSignature:%@; >", NSStringFromClass([self class]),
+        [_attestationElements base64EncodedStringWithOptions:0], [_attestationSignature base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTROperationalCredentialsClusterAttestationResponseParams (Deprecated)
+
+- (void)setSignature:(NSData * _Nonnull)signature
+{
+    self.attestationSignature = signature;
+}
+
+- (NSData * _Nonnull)signature
+{
+    return self.attestationSignature;
+}
 @end
 @implementation MTROperationalCredentialsClusterCertificateChainRequestParams
 - (instancetype)init
@@ -3631,7 +3644,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _rootCertificate = [NSData data];
+        _rootCACertificate = [NSData data];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3641,7 +3654,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTROperationalCredentialsClusterAddTrustedRootCertificateParams alloc] init];
 
-    other.rootCertificate = self.rootCertificate;
+    other.rootCACertificate = self.rootCACertificate;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -3649,11 +3662,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCertificate:%@; >", NSStringFromClass([self class]),
-                                             [_rootCertificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCACertificate:%@; >", NSStringFromClass([self class]),
+                                             [_rootCACertificate base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTROperationalCredentialsClusterAddTrustedRootCertificateParams (Deprecated)
+
+- (void)setRootCertificate:(NSData * _Nonnull)rootCertificate
+{
+    self.rootCACertificate = rootCertificate;
+}
+
+- (NSData * _Nonnull)rootCertificate
+{
+    return self.rootCACertificate;
+}
 @end
 @implementation MTRGroupKeyManagementClusterKeySetWriteParams
 - (instancetype)init
@@ -4407,7 +4433,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userName = nil;
 
-        _userUniqueId = nil;
+        _userUniqueID = nil;
 
         _userStatus = nil;
 
@@ -4426,7 +4452,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.operationType = self.operationType;
     other.userIndex = self.userIndex;
     other.userName = self.userName;
-    other.userUniqueId = self.userUniqueId;
+    other.userUniqueID = self.userUniqueID;
     other.userStatus = self.userStatus;
     other.userType = self.userType;
     other.credentialRule = self.credentialRule;
@@ -4439,12 +4465,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString
         stringWithFormat:
-            @"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueId:%@; userStatus:%@; userType:%@; credentialRule:%@; >",
-        NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueId, _userStatus, _userType,
+            @"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; >",
+        NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueID, _userStatus, _userType,
         _credentialRule];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDoorLockClusterSetUserParams (Deprecated)
+
+- (void)setUserUniqueId:(NSNumber * _Nullable)userUniqueId
+{
+    self.userUniqueID = userUniqueId;
+}
+
+- (NSNumber * _Nullable)userUniqueId
+{
+    return self.userUniqueID;
+}
 @end
 @implementation MTRDoorLockClusterGetUserParams
 - (instancetype)init
@@ -4483,7 +4522,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userName = nil;
 
-        _userUniqueId = nil;
+        _userUniqueID = nil;
 
         _userStatus = nil;
 
@@ -4509,7 +4548,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.userIndex = self.userIndex;
     other.userName = self.userName;
-    other.userUniqueId = self.userUniqueId;
+    other.userUniqueID = self.userUniqueID;
     other.userStatus = self.userStatus;
     other.userType = self.userType;
     other.credentialRule = self.credentialRule;
@@ -4525,13 +4564,26 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueId:%@; userStatus:%@; userType:%@; credentialRule:%@; "
+        stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; "
                          @"credentials:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextUserIndex:%@; >",
-        NSStringFromClass([self class]), _userIndex, _userName, _userUniqueId, _userStatus, _userType, _credentialRule,
+        NSStringFromClass([self class]), _userIndex, _userName, _userUniqueID, _userStatus, _userType, _credentialRule,
         _credentials, _creatorFabricIndex, _lastModifiedFabricIndex, _nextUserIndex];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDoorLockClusterGetUserResponseParams (Deprecated)
+
+- (void)setUserUniqueId:(NSNumber * _Nullable)userUniqueId
+{
+    self.userUniqueID = userUniqueId;
+}
+
+- (NSNumber * _Nullable)userUniqueId
+{
+    return self.userUniqueID;
+}
 @end
 @implementation MTRDoorLockClusterClearUserParams
 - (instancetype)init
@@ -4568,7 +4620,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationType = @(0);
 
-        _credential = [MTRDoorLockClusterDlCredential new];
+        _credential = [MTRDoorLockClusterCredentialStruct new];
 
         _credentialData = [NSData data];
 
@@ -4647,7 +4699,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _credential = [MTRDoorLockClusterDlCredential new];
+        _credential = [MTRDoorLockClusterCredentialStruct new];
         _timedInvokeTimeoutMs = nil;
     }
     return self;

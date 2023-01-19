@@ -7217,7 +7217,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "PHYRate",
+              "type": "PHYRateEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -7439,10 +7439,10 @@
           ]
         },
         {
-          "name": "Bridged Device Basic",
+          "name": "Bridged Device Basic Information",
           "code": 57,
           "mfgCode": null,
-          "define": "BRIDGED_DEVICE_BASIC_CLUSTER",
+          "define": "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -7465,10 +7465,10 @@
           ]
         },
         {
-          "name": "Bridged Device Basic",
+          "name": "Bridged Device Basic Information",
           "code": 57,
           "mfgCode": null,
-          "define": "BRIDGED_DEVICE_BASIC_CLUSTER",
+          "define": "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -7959,7 +7959,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -8011,7 +8011,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -8023,7 +8023,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "CommissioningWindowStatus",
+              "type": "CommissioningWindowStatusEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -9607,7 +9607,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "DlDoorState",
+              "type": "DoorStateEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -9927,7 +9927,7 @@
               "code": 37,
               "mfgCode": null,
               "side": "server",
-              "type": "DlOperatingMode",
+              "type": "OperatingModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11981,7 +11981,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "fan mode",
+              "name": "FanMode",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -11997,7 +11997,7 @@
               "reportableChange": 0
             },
             {
-              "name": "fan mode sequence",
+              "name": "FanModeSequence",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -12013,7 +12013,7 @@
               "reportableChange": 0
             },
             {
-              "name": "percent setting",
+              "name": "PercentSetting",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -12029,7 +12029,7 @@
               "reportableChange": 0
             },
             {
-              "name": "percent current",
+              "name": "PercentCurrent",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -12045,7 +12045,7 @@
               "reportableChange": 0
             },
             {
-              "name": "speed max",
+              "name": "SpeedMax",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -12061,7 +12061,7 @@
               "reportableChange": 0
             },
             {
-              "name": "speed setting",
+              "name": "SpeedSetting",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -12077,7 +12077,7 @@
               "reportableChange": 0
             },
             {
-              "name": "speed current",
+              "name": "SpeedCurrent",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -12093,7 +12093,7 @@
               "reportableChange": 0
             },
             {
-              "name": "rock support",
+              "name": "RockSupport",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -12109,7 +12109,7 @@
               "reportableChange": 0
             },
             {
-              "name": "rock setting",
+              "name": "RockSetting",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -12125,7 +12125,7 @@
               "reportableChange": 0
             },
             {
-              "name": "wind support",
+              "name": "WindSupport",
               "code": 9,
               "mfgCode": null,
               "side": "server",
@@ -12141,7 +12141,7 @@
               "reportableChange": 0
             },
             {
-              "name": "wind setting",
+              "name": "WindSetting",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -12273,7 +12273,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "temperature display mode",
+              "name": "TemperatureDisplayMode",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -12289,7 +12289,7 @@
               "reportableChange": 0
             },
             {
-              "name": "keypad lockout",
+              "name": "KeypadLockout",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -12305,7 +12305,7 @@
               "reportableChange": 0
             },
             {
-              "name": "schedule programming visibility",
+              "name": "ScheduleProgrammingVisibility",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -14647,7 +14647,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "measured value",
+              "name": "MeasuredValue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -14663,7 +14663,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min measured value",
+              "name": "MinMeasuredValue",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -14679,7 +14679,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max measured value",
+              "name": "MaxMeasuredValue",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -14695,7 +14695,7 @@
               "reportableChange": 0
             },
             {
-              "name": "tolerance",
+              "name": "Tolerance",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -14827,7 +14827,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "occupancy",
+              "name": "Occupancy",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -14843,7 +14843,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type",
+              "name": "OccupancySensorType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -14859,7 +14859,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type bitmap",
+              "name": "OccupancySensorTypeBitmap",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -14875,7 +14875,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR occupied to unoccupied delay",
+              "name": "PIROccupiedToUnoccupiedDelay",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -14891,7 +14891,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR unoccupied to occupied delay",
+              "name": "PIRUnoccupiedToOccupiedDelay",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -14907,7 +14907,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR unoccupied to occupied threshold",
+              "name": "PIRUnoccupiedToOccupiedThreshold",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -14923,7 +14923,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic occupied to unoccupied delay",
+              "name": "UltrasonicOccupiedToUnoccupiedDelay",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -14939,7 +14939,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic unoccupied to occupied delay",
+              "name": "UltrasonicUnoccupiedToOccupiedDelay",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -14955,7 +14955,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic unoccupied to occupied threshold",
+              "name": "UltrasonicUnoccupiedToOccupiedThreshold",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -14971,7 +14971,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact occupied to unoccupied delay",
+              "name": "PhysicalContactOccupiedToUnoccupiedDelay",
               "code": 48,
               "mfgCode": null,
               "side": "server",
@@ -14987,7 +14987,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact unoccupied to occupied delay",
+              "name": "PhysicalContactUnoccupiedToOccupiedDelay",
               "code": 49,
               "mfgCode": null,
               "side": "server",
@@ -15003,7 +15003,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact unoccupied to occupied threshold",
+              "name": "PhysicalContactUnoccupiedToOccupiedThreshold",
               "code": 50,
               "mfgCode": null,
               "side": "server",

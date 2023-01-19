@@ -154,6 +154,9 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
+        if (controller.controllerNodeId != nil) {
+            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
+        }
 
         // Invalidate our existing CASE session; otherwise trying to work with
         // our device will just reuse it without establishing a new CASE
@@ -181,6 +184,9 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
+        if (controller.controllerNodeId != nil) {
+            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
+        }
 
         [controller setDeviceControllerDelegate:mDeviceControllerDelegate queue:mCallbackQueue];
         [mDeviceControllerDelegate setDeviceId:value.nodeId];
@@ -215,7 +221,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
+    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity)
+    {
+        MTRDeviceController * controller = GetCommissioner(identity);
+
+        SetIdentity(identity);
+        if (controller != nil && controller.controllerNodeId != nil) {
+            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
+        }
+        return mConnectedDevices[identity];
+    }
 
     // PairingDeleted and PairingComplete need to be public so our pairing
     // delegate can call them.
@@ -255,6 +270,7 @@ protected:
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<chip::EndpointId> mEndpointId;
     chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::NodeId> mCommissionerNodeId;
 
     bool CheckConstraintStartsWith(
         const char * _Nonnull itemName, const NSString * _Nonnull current, const char * _Nonnull expected)
@@ -573,19 +589,19 @@ NS_ASSUME_NONNULL_BEGIN
     using namespace chip::app::Clusters::OperationalCredentials;
 
     if (CHIP_ERROR_INVALID_PUBLIC_KEY == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidPublicKey));
     }
     if (CHIP_ERROR_WRONG_NODE_ID == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNodeOpId));
     }
     if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNOC));
     }
     if (CHIP_ERROR_FABRIC_EXISTS == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kFabricConflict));
     }
     if (CHIP_ERROR_INVALID_FABRIC_INDEX == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidFabricIndex));
     }
 
     return StatusIB(err);

@@ -49,7 +49,6 @@ target_sources(app PRIVATE
                src/AppTask.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
@@ -59,7 +58,6 @@ target_sources(app PRIVATE
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
-    GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
 )
 
 if(CONFIG_CHIP_OTA_REQUESTOR)

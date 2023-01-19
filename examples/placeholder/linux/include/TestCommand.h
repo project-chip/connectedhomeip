@@ -174,6 +174,7 @@ public:
 protected:
     chip::app::ConcreteCommandPath mCommandPath;
     chip::app::ConcreteAttributePath mAttributePath;
+    chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<chip::EndpointId> mEndpointId;
     void SetIdentity(const char * name){};
 

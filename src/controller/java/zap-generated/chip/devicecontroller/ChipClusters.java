@@ -9146,10 +9146,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class BridgedDeviceBasicCluster extends BaseChipCluster {
+  public static class BridgedDeviceBasicInformationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 57L;
 
-    public BridgedDeviceBasicCluster(long devicePtr, int endpointId) {
+    public BridgedDeviceBasicInformationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -10059,13 +10059,14 @@ public class ChipClusters {
       removeFabric(chipClusterPtr, callback, fabricIndex, timedInvokeTimeoutMs);
     }
 
-    public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
-      addTrustedRootCertificate(chipClusterPtr, callback, rootCertificate, null);
+    public void addTrustedRootCertificate(
+        DefaultClusterCallback callback, byte[] rootCACertificate) {
+      addTrustedRootCertificate(chipClusterPtr, callback, rootCACertificate, null);
     }
 
     public void addTrustedRootCertificate(
-        DefaultClusterCallback callback, byte[] rootCertificate, int timedInvokeTimeoutMs) {
-      addTrustedRootCertificate(chipClusterPtr, callback, rootCertificate, timedInvokeTimeoutMs);
+        DefaultClusterCallback callback, byte[] rootCACertificate, int timedInvokeTimeoutMs) {
+      addTrustedRootCertificate(chipClusterPtr, callback, rootCACertificate, timedInvokeTimeoutMs);
     }
 
     private native void attestationRequest(
@@ -10119,11 +10120,11 @@ public class ChipClusters {
     private native void addTrustedRootCertificate(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        byte[] rootCertificate,
+        byte[] rootCACertificate,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface AttestationResponseCallback {
-      void onSuccess(byte[] attestationElements, byte[] signature);
+      void onSuccess(byte[] attestationElements, byte[] attestationSignature);
 
       void onError(Exception error);
     }
@@ -10155,7 +10156,8 @@ public class ChipClusters {
     }
 
     public interface FabricsAttributeCallback {
-      void onSuccess(List<ChipStructs.OperationalCredentialsClusterFabricDescriptor> valueList);
+      void onSuccess(
+          List<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct> valueList);
 
       void onError(Exception ex);
 
@@ -11389,21 +11391,21 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void lockDoor(
-        DefaultClusterCallback callback, Optional<byte[]> pinCode, int timedInvokeTimeoutMs) {
-      lockDoor(chipClusterPtr, callback, pinCode, timedInvokeTimeoutMs);
+        DefaultClusterCallback callback, Optional<byte[]> PINCode, int timedInvokeTimeoutMs) {
+      lockDoor(chipClusterPtr, callback, PINCode, timedInvokeTimeoutMs);
     }
 
     public void unlockDoor(
-        DefaultClusterCallback callback, Optional<byte[]> pinCode, int timedInvokeTimeoutMs) {
-      unlockDoor(chipClusterPtr, callback, pinCode, timedInvokeTimeoutMs);
+        DefaultClusterCallback callback, Optional<byte[]> PINCode, int timedInvokeTimeoutMs) {
+      unlockDoor(chipClusterPtr, callback, PINCode, timedInvokeTimeoutMs);
     }
 
     public void unlockWithTimeout(
         DefaultClusterCallback callback,
         Integer timeout,
-        Optional<byte[]> pinCode,
+        Optional<byte[]> PINCode,
         int timedInvokeTimeoutMs) {
-      unlockWithTimeout(chipClusterPtr, callback, timeout, pinCode, timedInvokeTimeoutMs);
+      unlockWithTimeout(chipClusterPtr, callback, timeout, PINCode, timedInvokeTimeoutMs);
     }
 
     public void setWeekDaySchedule(
@@ -11589,7 +11591,7 @@ public class ChipClusters {
         Integer operationType,
         Integer userIndex,
         @Nullable String userName,
-        @Nullable Long userUniqueId,
+        @Nullable Long userUniqueID,
         @Nullable Integer userStatus,
         @Nullable Integer userType,
         @Nullable Integer credentialRule,
@@ -11600,7 +11602,7 @@ public class ChipClusters {
           operationType,
           userIndex,
           userName,
-          userUniqueId,
+          userUniqueID,
           userStatus,
           userType,
           credentialRule,
@@ -11624,7 +11626,7 @@ public class ChipClusters {
     public void setCredential(
         SetCredentialResponseCallback callback,
         Integer operationType,
-        ChipStructs.DoorLockClusterDlCredential credential,
+        ChipStructs.DoorLockClusterCredentialStruct credential,
         byte[] credentialData,
         @Nullable Integer userIndex,
         @Nullable Integer userStatus,
@@ -11644,20 +11646,20 @@ public class ChipClusters {
 
     public void getCredentialStatus(
         GetCredentialStatusResponseCallback callback,
-        ChipStructs.DoorLockClusterDlCredential credential) {
+        ChipStructs.DoorLockClusterCredentialStruct credential) {
       getCredentialStatus(chipClusterPtr, callback, credential, null);
     }
 
     public void getCredentialStatus(
         GetCredentialStatusResponseCallback callback,
-        ChipStructs.DoorLockClusterDlCredential credential,
+        ChipStructs.DoorLockClusterCredentialStruct credential,
         int timedInvokeTimeoutMs) {
       getCredentialStatus(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
     }
 
     public void clearCredential(
         DefaultClusterCallback callback,
-        @Nullable ChipStructs.DoorLockClusterDlCredential credential,
+        @Nullable ChipStructs.DoorLockClusterCredentialStruct credential,
         int timedInvokeTimeoutMs) {
       clearCredential(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
     }
@@ -11665,20 +11667,20 @@ public class ChipClusters {
     private native void lockDoor(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Optional<byte[]> pinCode,
+        Optional<byte[]> PINCode,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void unlockDoor(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Optional<byte[]> pinCode,
+        Optional<byte[]> PINCode,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void unlockWithTimeout(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
         Integer timeout,
-        Optional<byte[]> pinCode,
+        Optional<byte[]> PINCode,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void setWeekDaySchedule(
@@ -11757,7 +11759,7 @@ public class ChipClusters {
         Integer operationType,
         Integer userIndex,
         @Nullable String userName,
-        @Nullable Long userUniqueId,
+        @Nullable Long userUniqueID,
         @Nullable Integer userStatus,
         @Nullable Integer userType,
         @Nullable Integer credentialRule,
@@ -11779,7 +11781,7 @@ public class ChipClusters {
         long chipClusterPtr,
         SetCredentialResponseCallback Callback,
         Integer operationType,
-        ChipStructs.DoorLockClusterDlCredential credential,
+        ChipStructs.DoorLockClusterCredentialStruct credential,
         byte[] credentialData,
         @Nullable Integer userIndex,
         @Nullable Integer userStatus,
@@ -11789,13 +11791,13 @@ public class ChipClusters {
     private native void getCredentialStatus(
         long chipClusterPtr,
         GetCredentialStatusResponseCallback Callback,
-        ChipStructs.DoorLockClusterDlCredential credential,
+        ChipStructs.DoorLockClusterCredentialStruct credential,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void clearCredential(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        @Nullable ChipStructs.DoorLockClusterDlCredential credential,
+        @Nullable ChipStructs.DoorLockClusterCredentialStruct credential,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface GetWeekDayScheduleResponseCallback {
@@ -11838,11 +11840,11 @@ public class ChipClusters {
       void onSuccess(
           Integer userIndex,
           @Nullable String userName,
-          @Nullable Long userUniqueId,
+          @Nullable Long userUniqueID,
           @Nullable Integer userStatus,
           @Nullable Integer userType,
           @Nullable Integer credentialRule,
-          @Nullable ArrayList<ChipStructs.DoorLockClusterDlCredential> credentials,
+          @Nullable ArrayList<ChipStructs.DoorLockClusterCredentialStruct> credentials,
           @Nullable Integer creatorFabricIndex,
           @Nullable Integer lastModifiedFabricIndex,
           @Nullable Integer nextUserIndex);

@@ -71,13 +71,19 @@ protected:
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override{};
 
     static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
-                                    chip::SessionHandle & sessionHandle);
+                                    const chip::SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override;
 
     chip::Controller::DeviceCommissioner & GetCommissioner(const char * identity) override
     {
+        // Best effort to get NodeId - if this fails, GetCommissioner will also fail
+        chip::NodeId id;
+        if (GetCommissionerNodeId(identity, &id) == CHIP_NO_ERROR)
+        {
+            mCommissionerNodeId.SetValue(id);
+        }
         return CHIPCommand::GetCommissioner(identity);
     };
 
@@ -95,6 +101,7 @@ protected:
 
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::NodeId> mCommissionerNodeId;
     std::map<std::string, std::unique_ptr<chip::OperationalDeviceProxy>> mDevices;
 
     // When set to false, prevents interaction model events from affecting the current test status.

@@ -51,7 +51,6 @@ target_sources(app PRIVATE
                src/TemperatureManager.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               ${GEN_DIR}/thermostat/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp)

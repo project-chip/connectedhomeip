@@ -238,6 +238,7 @@
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
         "TestCommissioningWindow",
+        "TestCommissionerNodeId",
         "TestClientMonitoringCluster"
     ],
     "MultiAdmin": ["TestMultiAdmin"],

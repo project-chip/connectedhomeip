@@ -87,7 +87,7 @@ class {{asUpperCamelCase name}}(Cluster):
         @dataclass
         class {{asUpperCamelCase name}}(ClusterCommand):
             cluster_id: typing.ClassVar[int] = {{ asHex parent.code 4 }}
-            command_id: typing.ClassVar[int] = {{ asHex code 4 }}
+            command_id: typing.ClassVar[int] = {{ asMEI manufacturerCode code }}
 {{#if (isServer source)}}
             is_client: typing.ClassVar[bool] = False
 {{else}}

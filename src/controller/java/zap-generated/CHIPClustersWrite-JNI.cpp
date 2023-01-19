@@ -1791,12 +1791,12 @@ JNI_METHOD(void, NetworkCommissioningCluster, writeInterfaceEnabledAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, BridgedDeviceBasicCluster, writeNodeLabelAttribute)
+JNI_METHOD(void, BridgedDeviceBasicInformationCluster, writeNodeLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::BridgedDeviceBasic::Attributes::NodeLabel::TypeInfo;
+    using TypeInfo = chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -1817,8 +1817,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, writeNodeLabelAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
-    BridgedDeviceBasicCluster * cppCluster = reinterpret_cast<BridgedDeviceBasicCluster *>(clusterPtr);
+    CHIP_ERROR err                                    = CHIP_NO_ERROR;
+    BridgedDeviceBasicInformationCluster * cppCluster = reinterpret_cast<BridgedDeviceBasicInformationCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));

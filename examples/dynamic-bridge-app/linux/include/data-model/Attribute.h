@@ -27,6 +27,8 @@ public:
 
     // Read the contents of the attribute.
     virtual CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) = 0;
+
+    virtual CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::TLV::TLVWriter & writer) = 0;
 };
 
 // This is the base type for implementing an attribute
@@ -50,6 +52,23 @@ struct Attribute : public AttributeInterface
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
     {
         return chip::app::DataModel::Encode(aPath, aEncoder, mData);
+    }
+
+    template <typename T = Type, std::enable_if_t<chip::app::DataModel::IsList<std::decay_t<T>>::value, bool> = true>
+    CHIP_ERROR ReadValue(const chip::app::ConcreteReadAttributePath & aPath, chip::TLV::TLVWriter & writer, Type & value)
+    {
+        return chip::app::DataModel::Encode(aPath, writer, chip::TLV::AnonymousTag(), value);
+    }
+
+    template <typename T = Type, std::enable_if_t<!chip::app::DataModel::IsList<std::decay_t<T>>::value, bool> = true>
+    CHIP_ERROR ReadValue(const chip::app::ConcreteReadAttributePath & aPath, chip::TLV::TLVWriter & writer, Type & value)
+    {
+        return chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
+    }
+
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::TLV::TLVWriter & writer) override
+    {
+        return ReadValue(aPath, writer, mData);
     }
 
     void operator=(const Type & value) { mData = value; }

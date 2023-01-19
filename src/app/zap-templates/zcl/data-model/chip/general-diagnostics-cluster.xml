@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <enum name="HardwareFault" type="ENUM8">
+  <enum name="HardwareFaultEnum" type="ENUM8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="Radio" value="0x01"/>
@@ -30,7 +30,7 @@ limitations under the License.
     <item name="NonVolatileMemoryError" value="0x09"/>
     <item name="TamperDetected" value="0x0A"/>
   </enum>
-  <enum name="RadioFault" type="ENUM8">
+  <enum name="RadioFaultEnum" type="ENUM8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="WiFiFault" value="0x01"/>
@@ -40,7 +40,7 @@ limitations under the License.
     <item name="BLEFault" value="0x05"/>
     <item name="EthernetFault" value="0x06"/>    
   </enum>
-  <enum name="NetworkFaultType" type="ENUM8">
+  <enum name="NetworkFaultEnum" type="ENUM8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="HardwareFailure" value="0x01"/>
@@ -57,7 +57,7 @@ limitations under the License.
     <item name="SoftwareUpdateCompleted" value="0x05"/>
     <item name="SoftwareReset" value="0x06"/>
   </enum>  
-  <enum name="InterfaceType" type="ENUM8">
+  <enum name="InterfaceTypeEnum" type="ENUM8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="WiFi" value="0x01"/>
@@ -75,7 +75,7 @@ limitations under the License.
     <item name="HardwareAddress" type="OCTET_STRING" length="8"/>
     <item name="IPv4Addresses" type="OCTET_STRING" array="true"/>
     <item name="IPv6Addresses" type="OCTET_STRING" array="true"/>
-    <item name="Type" type="InterfaceType"/>
+    <item name="Type" type="InterfaceTypeEnum"/>
   </struct>
   <cluster>
     <domain>General</domain>
@@ -88,9 +88,9 @@ limitations under the License.
     <attribute side="server" code="0x02" define="UP_TIME" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">UpTime</attribute>
     <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">TotalOperationalHours</attribute>
     <attribute side="server" code="0x04" define="BOOT_REASONS" type="BootReasonEnum" writable="false" optional="true">BootReason</attribute>
-    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="HardwareFault" writable="false" optional="true">ActiveHardwareFaults</attribute>
-    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="RadioFault" writable="false" optional="true">ActiveRadioFaults</attribute>
-    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultType" writable="false" optional="true">ActiveNetworkFaults</attribute>
+    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="HardwareFaultEnum" writable="false" optional="true">ActiveHardwareFaults</attribute>
+    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
+    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
     <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="BOOLEAN" writable="false" optional="false">TestEventTriggersEnabled</attribute>
 
     <command source="client" code="0x00" name="TestEventTrigger" optional="false">
@@ -102,22 +102,22 @@ limitations under the License.
 
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">
       <description>Indicate a change in the set of hardware faults currently detected by the Node.</description>
-      <field id="0" name="Current" type="HardwareFault" array="true"/>
-      <field id="1" name="Previous" type="HardwareFault" array="true"/>
+      <field id="0" name="Current" type="HardwareFaultEnum" array="true"/>
+      <field id="1" name="Previous" type="HardwareFaultEnum" array="true"/>
     </event>
     <event side="server" code="0x01" name="RadioFaultChange" priority="critical" optional="true">
       <description>Indicate a change in the set of radio faults currently detected by the Node.</description>
-      <field id="0" name="Current" type="RadioFault" array="true"/>
-      <field id="1" name="Previous" type="RadioFault" array="true"/>
+      <field id="0" name="Current" type="RadioFaultEnum" array="true"/>
+      <field id="1" name="Previous" type="RadioFaultEnum" array="true"/>
     </event>
     <event side="server" code="0x02" name="NetworkFaultChange" priority="critical" optional="true">
       <description>Indicate a change in the set of network faults currently detected by the Node.</description>
-      <field id="0" name="Current" type="NetworkFaultType" array="true"/>
-      <field id="1" name="Previous" type="NetworkFaultType" array="true"/>
+      <field id="0" name="Current" type="NetworkFaultEnum" array="true"/>
+      <field id="1" name="Previous" type="NetworkFaultEnum" array="true"/>
     </event>
     <event side="server" code="0x03" name="BootReason" priority="critical" optional="false">
       <description>Indicate the reason that caused the device to start-up.</description>
       <field id="0" name="BootReason" type="BootReasonEnum"/>
-    </event>               
+    </event>
   </cluster>
 </configurator>

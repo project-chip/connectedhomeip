@@ -205,9 +205,9 @@ JNI_METHOD(jint, onNOCChainGeneration)
     // use ipk and adminSubject from CommissioningParameters if not set in ControllerParams
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
 
-    Optional<Crypto::AesCcm128KeySpan> ipkOptional;
+    Optional<Crypto::IdentityProtectionKeySpan> ipkOptional;
     uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    Crypto::AesCcm128KeySpan ipkTempSpan(ipkValue);
+    Crypto::IdentityProtectionKeySpan ipkTempSpan(ipkValue);
 
     jbyteArray ipk = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
     if (ipk != nullptr)
