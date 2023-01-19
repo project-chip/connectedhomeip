@@ -18,9 +18,7 @@ import subprocess
 import sys
 from typing import Tuple
 
-# The version MUST be of the form `YYYY.MM.YY'
-# Since this is ordered as such, alphabetical sorting will be used to check
-# validity
+# The version MUST be of the form `YYYY.M.D'
 #
 # Use scripts/tools/zap/version_update.py to manage ZAP versioning as many
 # files may need updating for versions
@@ -97,7 +95,10 @@ class ZapTool:
             print('*'*80)
             sys.exit(1)
 
-        if version < MIN_ZAP_VERSION:
+        def parse_version_string(str):
+            return list(map(lambda component: int(component), str.split('.')))
+
+        if parse_version_string(version) < parse_version_string(MIN_ZAP_VERSION):
             print(f"Checking ZAP from {self.zap_start}:")
             print(
                 f"  !!! Version validation failed: required at least {MIN_ZAP_VERSION}, got {version} instead")

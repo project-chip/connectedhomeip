@@ -2807,6 +2807,27 @@ PICS:
       id: FLW.M.FlowChange
 
     # Pump Configuration and Control cluster
+    - label: "Supports operating in constant pressure mode"
+      id: PCC.S.F00
+
+    - label: "Supports operating in compensated pressure mode"
+      id: PCC.S.F01
+
+    - label: "Supports operating in constant flow mode"
+      id: PCC.S.F02
+
+    - label: "Supports operating in constant speed mode"
+      id: PCC.S.F03
+
+    - label: "Supports operating in constant temperature mode"
+      id: PCC.S.F04
+
+    - label: "Supports operating in automatic mode"
+      id: PCC.S.F05
+
+    - label: "Supports operating using local settings"
+      id: PCC.S.F06
+
     - label: "Does the device implement the MaxPressure attribute?"
       id: PCC.S.A0000
 
@@ -2875,24 +2896,6 @@ PICS:
 
     - label: "Does the device implement the LifetimeEnergyConsumed attribute?"
       id: PCC.S.A0021
-
-    - label: "Does the device implement the ConstantSpeed control mode?"
-      id: PCC.M.ControlModeConstSpeed
-
-    - label: "Does the device implement the ConstantPressure control mode?"
-      id: PCC.M.ControlModeConstPressure
-
-    - label: "Does the device implement the ProportionalPressure control mode?"
-      id: PCC.M.ControlModeCompPressure
-
-    - label: "Does the device implement the ConstantFlow control mode?"
-      id: PCC.M.ControlModeConstFlow
-
-    - label: "Does the device implement the ConstantTemperature control mode?"
-      id: PCC.M.ControlModeConstTemp
-
-    - label: "Does the device implement the Automatic control mode?"
-      id: PCC.M.ControlModeAuto
 
     #Power Source Cluster
     - label: "Does the device implement the Status attribute?"

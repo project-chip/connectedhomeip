@@ -670,8 +670,8 @@ enum class BootReasonEnum : uint8_t
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for HardwareFault
-enum class HardwareFault : uint8_t
+// Enum for HardwareFaultEnum
+enum class HardwareFaultEnum : uint8_t
 {
     kUnspecified            = 0x00,
     kRadio                  = 0x01,
@@ -687,15 +687,15 @@ enum class HardwareFault : uint8_t
     kUnknownEnumValue       = 11,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HardwareFault                                                                    = EmberAfHardwareFault;
-static HardwareFault __attribute__((unused)) kHardwareFaultkUnknownEnumValue           = static_cast<HardwareFault>(11);
+using HardwareFaultEnum                                                                = EmberAfHardwareFaultEnum;
+static HardwareFaultEnum __attribute__((unused)) kHardwareFaultEnumkUnknownEnumValue   = static_cast<HardwareFaultEnum>(11);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for InterfaceType
-enum class InterfaceType : uint8_t
+// Enum for InterfaceTypeEnum
+enum class InterfaceTypeEnum : uint8_t
 {
     kUnspecified      = 0x00,
     kWiFi             = 0x01,
@@ -705,15 +705,15 @@ enum class InterfaceType : uint8_t
     kUnknownEnumValue = 5,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using InterfaceType                                                                    = EmberAfInterfaceType;
-static InterfaceType __attribute__((unused)) kInterfaceTypekUnknownEnumValue           = static_cast<InterfaceType>(5);
+using InterfaceTypeEnum                                                                = EmberAfInterfaceTypeEnum;
+static InterfaceTypeEnum __attribute__((unused)) kInterfaceTypeEnumkUnknownEnumValue   = static_cast<InterfaceTypeEnum>(5);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for NetworkFaultType
-enum class NetworkFaultType : uint8_t
+// Enum for NetworkFaultEnum
+enum class NetworkFaultEnum : uint8_t
 {
     kUnspecified      = 0x00,
     kHardwareFailure  = 0x01,
@@ -722,15 +722,15 @@ enum class NetworkFaultType : uint8_t
     kUnknownEnumValue = 4,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkFaultType                                                                 = EmberAfNetworkFaultType;
-static NetworkFaultType __attribute__((unused)) kNetworkFaultTypekUnknownEnumValue     = static_cast<NetworkFaultType>(4);
+using NetworkFaultEnum                                                                 = EmberAfNetworkFaultEnum;
+static NetworkFaultEnum __attribute__((unused)) kNetworkFaultEnumkUnknownEnumValue     = static_cast<NetworkFaultEnum>(4);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for RadioFault
-enum class RadioFault : uint8_t
+// Enum for RadioFaultEnum
+enum class RadioFaultEnum : uint8_t
 {
     kUnspecified      = 0x00,
     kWiFiFault        = 0x01,
@@ -742,8 +742,8 @@ enum class RadioFault : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFault                                                                       = EmberAfRadioFault;
-static RadioFault __attribute__((unused)) kRadioFaultkUnknownEnumValue                 = static_cast<RadioFault>(7);
+using RadioFaultEnum                                                                   = EmberAfRadioFaultEnum;
+static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue         = static_cast<RadioFaultEnum>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 
@@ -870,8 +870,8 @@ namespace EthernetNetworkDiagnostics {
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for PHYRate
-enum class PHYRate : uint8_t
+// Enum for PHYRateEnum
+enum class PHYRateEnum : uint8_t
 {
     kRate10M          = 0x00,
     kRate100M         = 0x01,
@@ -886,8 +886,8 @@ enum class PHYRate : uint8_t
     kUnknownEnumValue = 10,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRate                                                                          = EmberAfPHYRate;
-static PHYRate __attribute__((unused)) kPHYRatekUnknownEnumValue                       = static_cast<PHYRate>(10);
+using PHYRateEnum                                                                      = EmberAfPHYRateEnum;
+static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue               = static_cast<PHYRateEnum>(10);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace EthernetNetworkDiagnostics
 
@@ -928,7 +928,7 @@ enum class TimeSourceEnum : uint8_t
 };
 } // namespace TimeSynchronization
 
-namespace BridgedDeviceBasic {} // namespace BridgedDeviceBasic
+namespace BridgedDeviceBasicInformation {} // namespace BridgedDeviceBasicInformation
 
 namespace Switch {
 
@@ -945,8 +945,8 @@ enum class SwitchFeature : uint32_t
 
 namespace AdministratorCommissioning {
 
-// Enum for CommissioningWindowStatus
-enum class CommissioningWindowStatus : uint8_t
+// Enum for CommissioningWindowStatusEnum
+enum class CommissioningWindowStatusEnum : uint8_t
 {
     kWindowNotOpen      = 0x00,
     kEnhancedWindowOpen = 0x01,
@@ -973,10 +973,18 @@ static StatusCode __attribute__((unused)) kStatusCodekUnknownEnumValue          
 
 namespace OperationalCredentials {
 
-// Enum for OperationalCertStatus
-enum class OperationalCertStatus : uint8_t
+// Enum for CertificateChainTypeEnum
+enum class CertificateChainTypeEnum : uint8_t
 {
-    kSuccess             = 0x00,
+    kDACCertificate   = 0x01,
+    kPAICertificate   = 0x02,
+    kUnknownEnumValue = 0,
+};
+
+// Enum for NodeOperationalCertStatusEnum
+enum class NodeOperationalCertStatusEnum : uint8_t
+{
+    kOk                  = 0x00,
     kInvalidPublicKey    = 0x01,
     kInvalidNodeOpId     = 0x02,
     kInvalidNOC          = 0x03,
@@ -1024,8 +1032,8 @@ enum class ModeSelectFeature : uint32_t
 
 namespace DoorLock {
 
-// Enum for DlAlarmCode
-enum class DlAlarmCode : uint8_t
+// Enum for AlarmCodeEnum
+enum class AlarmCodeEnum : uint8_t
 {
     kLockJammed              = 0x00,
     kLockFactoryReset        = 0x01,
@@ -1038,17 +1046,17 @@ enum class DlAlarmCode : uint8_t
     kUnknownEnumValue        = 2,
 };
 
-// Enum for DlCredentialRule
-enum class DlCredentialRule : uint8_t
+// Enum for CredentialRuleEnum
+enum class CredentialRuleEnum : uint8_t
 {
     kSingle           = 0x00,
-    kDouble           = 0x01,
+    kDual             = 0x01,
     kTri              = 0x02,
     kUnknownEnumValue = 3,
 };
 
-// Enum for DlCredentialType
-enum class DlCredentialType : uint8_t
+// Enum for CredentialTypeEnum
+enum class CredentialTypeEnum : uint8_t
 {
     kProgrammingPIN   = 0x00,
     kPin              = 0x01,
@@ -1059,50 +1067,13 @@ enum class DlCredentialType : uint8_t
     kUnknownEnumValue = 6,
 };
 
-// Enum for DlDataOperationType
-enum class DlDataOperationType : uint8_t
+// Enum for DataOperationTypeEnum
+enum class DataOperationTypeEnum : uint8_t
 {
     kAdd              = 0x00,
     kClear            = 0x01,
     kModify           = 0x02,
     kUnknownEnumValue = 3,
-};
-
-// Enum for DlDoorState
-enum class DlDoorState : uint8_t
-{
-    kDoorOpen             = 0x00,
-    kDoorClosed           = 0x01,
-    kDoorJammed           = 0x02,
-    kDoorForcedOpen       = 0x03,
-    kDoorUnspecifiedError = 0x04,
-    kDoorAjar             = 0x05,
-    kUnknownEnumValue     = 6,
-};
-
-// Enum for DlLockDataType
-enum class DlLockDataType : uint8_t
-{
-    kUnspecified      = 0x00,
-    kProgrammingCode  = 0x01,
-    kUserIndex        = 0x02,
-    kWeekDaySchedule  = 0x03,
-    kYearDaySchedule  = 0x04,
-    kHolidaySchedule  = 0x05,
-    kPin              = 0x06,
-    kRfid             = 0x07,
-    kFingerprint      = 0x08,
-    kUnknownEnumValue = 9,
-};
-
-// Enum for DlLockOperationType
-enum class DlLockOperationType : uint8_t
-{
-    kLock               = 0x00,
-    kUnlock             = 0x01,
-    kNonAccessUserEvent = 0x02,
-    kForcedUserEvent    = 0x03,
-    kUnknownEnumValue   = 4,
 };
 
 // Enum for DlLockState
@@ -1131,44 +1102,6 @@ enum class DlLockType : uint8_t
     kUnknownEnumValue   = 11,
 };
 
-// Enum for DlOperatingMode
-enum class DlOperatingMode : uint8_t
-{
-    kNormal             = 0x00,
-    kVacation           = 0x01,
-    kPrivacy            = 0x02,
-    kNoRemoteLockUnlock = 0x03,
-    kPassage            = 0x04,
-    kUnknownEnumValue   = 5,
-};
-
-// Enum for DlOperationError
-enum class DlOperationError : uint8_t
-{
-    kUnspecified         = 0x00,
-    kInvalidCredential   = 0x01,
-    kDisabledUserDenied  = 0x02,
-    kRestricted          = 0x03,
-    kInsufficientBattery = 0x04,
-    kUnknownEnumValue    = 5,
-};
-
-// Enum for DlOperationSource
-enum class DlOperationSource : uint8_t
-{
-    kUnspecified       = 0x00,
-    kManual            = 0x01,
-    kProprietaryRemote = 0x02,
-    kKeypad            = 0x03,
-    kAuto              = 0x04,
-    kButton            = 0x05,
-    kSchedule          = 0x06,
-    kRemote            = 0x07,
-    kRfid              = 0x08,
-    kBiometric         = 0x09,
-    kUnknownEnumValue  = 10,
-};
-
 // Enum for DlStatus
 enum class DlStatus : uint8_t
 {
@@ -1180,31 +1113,6 @@ enum class DlStatus : uint8_t
     kResourceExhausted = 0x89,
     kNotFound          = 0x8B,
     kUnknownEnumValue  = 4,
-};
-
-// Enum for DlUserStatus
-enum class DlUserStatus : uint8_t
-{
-    kAvailable        = 0x00,
-    kOccupiedEnabled  = 0x01,
-    kOccupiedDisabled = 0x03,
-    kUnknownEnumValue = 2,
-};
-
-// Enum for DlUserType
-enum class DlUserType : uint8_t
-{
-    kUnrestrictedUser       = 0x00,
-    kYearDayScheduleUser    = 0x01,
-    kWeekDayScheduleUser    = 0x02,
-    kProgrammingUser        = 0x03,
-    kNonAccessUser          = 0x04,
-    kForcedUser             = 0x05,
-    kDisposableUser         = 0x06,
-    kExpiringUser           = 0x07,
-    kScheduleRestrictedUser = 0x08,
-    kRemoteOnlyUser         = 0x09,
-    kUnknownEnumValue       = 10,
 };
 
 // Enum for DoorLockOperationEventCode
@@ -1273,6 +1181,118 @@ enum class DoorLockUserType : uint8_t
     kUnknownEnumValue    = 5,
 };
 
+// Enum for DoorStateEnum
+enum class DoorStateEnum : uint8_t
+{
+    kDoorOpen             = 0x00,
+    kDoorClosed           = 0x01,
+    kDoorJammed           = 0x02,
+    kDoorForcedOpen       = 0x03,
+    kDoorUnspecifiedError = 0x04,
+    kDoorAjar             = 0x05,
+    kUnknownEnumValue     = 6,
+};
+
+// Enum for LockDataTypeEnum
+enum class LockDataTypeEnum : uint8_t
+{
+    kUnspecified      = 0x00,
+    kProgrammingCode  = 0x01,
+    kUserIndex        = 0x02,
+    kWeekDaySchedule  = 0x03,
+    kYearDaySchedule  = 0x04,
+    kHolidaySchedule  = 0x05,
+    kPin              = 0x06,
+    kRfid             = 0x07,
+    kFingerprint      = 0x08,
+    kUnknownEnumValue = 9,
+};
+
+// Enum for LockOperationTypeEnum
+enum class LockOperationTypeEnum : uint8_t
+{
+    kLock               = 0x00,
+    kUnlock             = 0x01,
+    kNonAccessUserEvent = 0x02,
+    kForcedUserEvent    = 0x03,
+    kUnknownEnumValue   = 4,
+};
+
+// Enum for OperatingModeEnum
+enum class OperatingModeEnum : uint8_t
+{
+    kNormal             = 0x00,
+    kVacation           = 0x01,
+    kPrivacy            = 0x02,
+    kNoRemoteLockUnlock = 0x03,
+    kPassage            = 0x04,
+    kUnknownEnumValue   = 5,
+};
+
+// Enum for OperationErrorEnum
+enum class OperationErrorEnum : uint8_t
+{
+    kUnspecified         = 0x00,
+    kInvalidCredential   = 0x01,
+    kDisabledUserDenied  = 0x02,
+    kRestricted          = 0x03,
+    kInsufficientBattery = 0x04,
+    kUnknownEnumValue    = 5,
+};
+
+// Enum for OperationSourceEnum
+enum class OperationSourceEnum : uint8_t
+{
+    kUnspecified       = 0x00,
+    kManual            = 0x01,
+    kProprietaryRemote = 0x02,
+    kKeypad            = 0x03,
+    kAuto              = 0x04,
+    kButton            = 0x05,
+    kSchedule          = 0x06,
+    kRemote            = 0x07,
+    kRfid              = 0x08,
+    kBiometric         = 0x09,
+    kUnknownEnumValue  = 10,
+};
+
+// Enum for UserStatusEnum
+enum class UserStatusEnum : uint8_t
+{
+    kAvailable        = 0x00,
+    kOccupiedEnabled  = 0x01,
+    kOccupiedDisabled = 0x03,
+    kUnknownEnumValue = 2,
+};
+
+// Enum for UserTypeEnum
+enum class UserTypeEnum : uint8_t
+{
+    kUnrestrictedUser       = 0x00,
+    kYearDayScheduleUser    = 0x01,
+    kWeekDayScheduleUser    = 0x02,
+    kProgrammingUser        = 0x03,
+    kNonAccessUser          = 0x04,
+    kForcedUser             = 0x05,
+    kDisposableUser         = 0x06,
+    kExpiringUser           = 0x07,
+    kScheduleRestrictedUser = 0x08,
+    kRemoteOnlyUser         = 0x09,
+    kUnknownEnumValue       = 10,
+};
+
+// Bitmap for DaysMaskMap
+enum class DaysMaskMap : uint8_t
+{
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+};
+
 // Bitmap for DlCredentialRuleMask
 enum class DlCredentialRuleMask : uint8_t
 {
@@ -1287,18 +1307,6 @@ enum class DlCredentialRulesSupport : uint8_t
     kSingle = 0x1,
     kDual   = 0x2,
     kTri    = 0x4,
-};
-
-// Bitmap for DlDaysMaskMap
-enum class DlDaysMaskMap : uint8_t
-{
-    kSunday    = 0x1,
-    kMonday    = 0x2,
-    kTuesday   = 0x4,
-    kWednesday = 0x8,
-    kThursday  = 0x10,
-    kFriday    = 0x20,
-    kSaturday  = 0x40,
 };
 
 // Bitmap for DlDefaultConfigurationRegister
@@ -1429,18 +1437,18 @@ enum class DoorLockDayOfWeek : uint8_t
 // Bitmap for DoorLockFeature
 enum class DoorLockFeature : uint32_t
 {
-    kPINCredentials     = 0x1,
-    kRFIDCredentials    = 0x2,
-    kFingerCredentials  = 0x4,
-    kLogging            = 0x8,
-    kWeekDaySchedules   = 0x10,
-    kDoorPositionSensor = 0x20,
-    kFaceCredentials    = 0x40,
-    kCredentialsOTA     = 0x80,
-    kUsersManagement    = 0x100,
-    kNotifications      = 0x200,
-    kYearDaySchedules   = 0x400,
-    kHolidaySchedules   = 0x800,
+    kPinCredential               = 0x1,
+    kRfidCredential              = 0x2,
+    kFingerCredentials           = 0x4,
+    kLogging                     = 0x8,
+    kWeekDayAccessSchedules      = 0x10,
+    kDoorPositionSensor          = 0x20,
+    kFaceCredentials             = 0x40,
+    kCredentialsOverTheAirAccess = 0x80,
+    kUser                        = 0x100,
+    kNotification                = 0x200,
+    kYearDayAccessSchedules      = 0x400,
+    kHolidaySchedules            = 0x800,
 };
 } // namespace DoorLock
 
@@ -1575,6 +1583,18 @@ enum class PumpOperationMode : uint8_t
     kMaximum          = 0x02,
     kLocal            = 0x03,
     kUnknownEnumValue = 4,
+};
+
+// Bitmap for PumpFeature
+enum class PumpFeature : uint32_t
+{
+    kConstantPressure    = 0x1,
+    kCompensatedPressure = 0x2,
+    kConstantFlow        = 0x4,
+    kConstantSpeed       = 0x8,
+    kConstantTemperature = 0x10,
+    kAutomatic           = 0x20,
+    kLocal               = 0x40,
 };
 
 // Bitmap for PumpStatus

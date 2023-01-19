@@ -377,7 +377,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: Bridged Device Basic (client) */ \
+      /* Endpoint: 1, Cluster: Bridged Device Basic Information (client) */ \
       .clusterId = 0x00000039,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -399,7 +399,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: AdministratorCommissioning (client) */ \
+      /* Endpoint: 1, Cluster: Administrator Commissioning (client) */ \
       .clusterId = 0x0000003C,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \

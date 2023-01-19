@@ -30,15 +30,16 @@ LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
 // Provided some empty callbacks and replaced feature map
 // to simulate DoorLock endpoint for All-Clusters-App example
-// without using kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials
+// without using kUser|kAccessSchedules|kRfidCredential|kPinCredential
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                            OperationErrorEnum & err)
 {
     return true;
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
-                                              DlOperationError & err)
+                                              OperationErrorEnum & err)
 {
     return true;
 }
@@ -48,7 +49,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     DoorLockServer::Instance().InitServer(endpoint);
 
     // Set FeatureMap to 0, default is:
-    // (kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials) 0x113
+    // (kUser|kAccessSchedules|kRfidCredential|kPinCredential) 0x113
     EmberAfStatus status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {

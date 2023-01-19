@@ -438,7 +438,7 @@
 #define ZCL_TIME_ZONE_DATABASE_ATTRIBUTE_ID (0x0008)
 #define ZCL_NTP_SERVER_PORT_ATTRIBUTE_ID (0x0009)
 
-// Attribute ids for cluster: Bridged Device Basic
+// Attribute ids for cluster: Bridged Device Basic Information
 
 // Client attributes
 
@@ -468,7 +468,7 @@
 #define ZCL_CURRENT_POSITION_ATTRIBUTE_ID (0x0001)
 #define ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID (0x0002)
 
-// Attribute ids for cluster: AdministratorCommissioning
+// Attribute ids for cluster: Administrator Commissioning
 
 // Client attributes
 

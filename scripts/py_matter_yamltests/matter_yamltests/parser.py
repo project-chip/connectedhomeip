@@ -553,14 +553,32 @@ class TestStep:
                 received_value = received_value.get(
                     expected_name) if received_value else None
 
-            # TODO Supports Array/List. See an exemple of failure in TestArmFailSafe.yaml
             expected_value = value.get('value')
-            if expected_value == received_value:
-                result.success(
-                    check_type, error_success.format(name=expected_name, value=received_value))
+            if self._response_value_validation(expected_value, received_value):
+                result.success(check_type, error_success.format(
+                    name=expected_name, value=expected_value))
             else:
-                result.error(
-                    check_type, error_failure.format(name=expected_name, value=expected_value))
+                result.error(check_type, error_failure.format(
+                    name=expected_name, value=expected_value))
+
+    def _response_value_validation(self, expected_value, received_value):
+        if isinstance(expected_value, list):
+            if len(expected_value) != len(received_value):
+                return False
+
+            for index, expected_item in enumerate(expected_value):
+                received_item = received_value[index]
+                if not self._response_value_validation(expected_item, received_item):
+                    return False
+            return True
+        elif isinstance(expected_value, dict):
+            for key, expected_item in expected_value.items():
+                received_item = received_value.get(key)
+                if not self._response_value_validation(expected_item, received_item):
+                    return False
+            return True
+        else:
+            return expected_value == received_value
 
     def _response_constraints_validation(self, response, result):
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
