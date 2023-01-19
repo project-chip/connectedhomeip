@@ -149,8 +149,13 @@ class GoldenTestImageTarget():
         # NOTE: output-path is inside the tree. This is because clang-format
         #       will search for a .clang-format file in the directory tree
         #       so attempts to format outside the tree will generate diffs.
+        # NOTE: relative path because this script generally does a
+        #       os.chdir to CHIP_ROOT anyway.
         os.makedirs('./out', exist_ok=True)
         self.tempdir = tempfile.mkdtemp(prefix='test_golden', dir='./out')
+
+        # This runs a test, but the important bit is we pass `--regenerate`
+        # to it and this will cause it to OVERWRITE golden images.
         self.command = ["./scripts/tools/zap/test_generate.py", "--output", self.tempdir, "--regenerate"]
 
     def __del__(self):
