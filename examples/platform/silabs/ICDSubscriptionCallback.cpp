@@ -30,7 +30,7 @@ CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandl
     {
         interval_s32 = Seconds16::max();
     }
-    uint16_t decidedMaxInterval = interval_s32.count();
+    uint32_t decidedMaxInterval = interval_s32.count();
 
     uint16_t requestedMinInterval = 0;
     uint16_t requestedMaxInterval = 0;
@@ -39,13 +39,26 @@ CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandl
     // If requestedMinInterval is greater than IdleTimeInterval, select next wake up time as max interval
     if (requestedMinInterval > decidedMaxInterval)
     {
-        uint8_t ratio = requestedMinInterval / decidedMaxInterval;
+        uint16_t ratio = requestedMinInterval / decidedMaxInterval;
         if (requestedMinInterval % decidedMaxInterval)
         {
             ratio++;
         }
 
         decidedMaxInterval *= ratio;
+    }
+
+    // Verify that decidedMaxInterval is an acceptable value
+    if (decidedMaxInterval > Seconds16::max().count())
+    {
+        decidedMaxInterval = Seconds16::max().count();
+    }
+
+    // Verify that the decidedMaxInterval respects MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
+    uint16_t maximumMaxInterval = std::max(kSubscriptionMaxIntervalPublisherLimit, requestedMaxInterval);
+    if (decidedMaxInterval > maximumMaxInterval)
+    {
+        decidedMaxInterval = maximumMaxInterval;
     }
 
     return aReadHandler.SetReportingIntervals(decidedMaxInterval);
