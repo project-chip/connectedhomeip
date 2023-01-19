@@ -56,10 +56,10 @@ public:
 
 protected:
     CHIP_ERROR Save(TLV::TLVWriter & writer, SubscriptionInfo & subscriptionInfo);
-    CHIP_ERROR Load(size_t subscriptionIndex, SubscriptionInfo & subscriptionInfo);
-    CHIP_ERROR Delete(size_t subscriptionIndex);
-    size_t Count();
-    size_t MaxCount();
+    CHIP_ERROR Load(uint16_t subscriptionIndex, SubscriptionInfo & subscriptionInfo);
+    CHIP_ERROR Delete(uint16_t subscriptionIndex);
+    uint16_t Count();
+    uint16_t MaxCount();
     CHIP_ERROR DeleteMaxCount();
 
     class SimpleSubscriptionInfoIterator : public SubscriptionInfoIterator
@@ -73,7 +73,7 @@ protected:
     private:
         SimpleSubscriptionResumptionStorage & mStorage;
         uint16_t mNextIndex;
-        size_t mMaxCount;
+        uint16_t mMaxCount;
     };
 
     static constexpr size_t MaxScopedNodeIdSize() { return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex)); }

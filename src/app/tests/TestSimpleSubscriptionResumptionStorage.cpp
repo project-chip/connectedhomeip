@@ -82,16 +82,16 @@ void TestCount(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, subscriptionStorage.TestMaxCount() == CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
 
     // Force larger value and check that it returns the larger value
-    uint32_t countMaxToSave = 2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
+    uint16_t countMaxToSave = 2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
     storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMaxToSave,
-                            static_cast<uint16_t>(sizeof(uint32_t)));
+                            sizeof(uint16_t));
     NL_TEST_ASSERT(inSuite, subscriptionStorage.TestMaxCount() == (2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS));
 
     // Reset
     storage.SyncDeleteKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName());
 
     // Write some subscriptions and see the counts are correct
-    chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId = node1, .mFabricIndex = fabric1 };
+    chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId = 6666, .mFabricIndex = 46 };
 
     for (size_t i = 0; i < (CHIP_IM_MAX_NUM_SUBSCRIPTIONS / 2); i++)
     {
@@ -113,7 +113,7 @@ void TestCount(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, count == (CHIP_IM_MAX_NUM_SUBSCRIPTIONS / 2));
 
     // Delete all and verify iterator counts 0
-    CHIP_ERROR err = subscriptionStorage.DeleteAll(fabric1);
+    CHIP_ERROR err = subscriptionStorage.DeleteAll(46);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     iterator = subscriptionStorage.IterateSubscriptions();
     NL_TEST_ASSERT(inSuite, iterator->Count() == 0);
@@ -235,7 +235,7 @@ void TestState(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !iterator->Next(subscriptionInfo));
     iterator->Release();
 
-    uint32_t countMax = 0;
+    uint16_t countMax = 0;
     uint16_t len      = sizeof(countMax);
     err = storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);

@@ -136,10 +136,10 @@ ReadHandler::~ReadHandler()
     InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
 }
 
-void ReadHandler::Close(bool keepPersisted)
+void ReadHandler::Close(CloseOptions options)
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    if (!keepPersisted)
+    if (options == CloseOptions::kDropPersistedSubscriptions)
     {
         auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
@@ -370,7 +370,7 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
                  ChipLogValueExchange(apExchangeContext));
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     // TODO: Have a retry mechanism tied to wake interval for IC devices
-    CloseButKeepPersisted();
+    Close(CloseOptions::kKeepPersistedSubscriptions);
 #else
     Close();
 #endif
@@ -720,11 +720,16 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     mExchangeCtx->WillSendMessage();
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    PersistSubscription();
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return CHIP_NO_ERROR;
+}
+
+void ReadHandler::PersistSubscription()
+{
     auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
-    if (!subscriptionResumptionStorage)
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturn(subscriptionResumptionStorage != nullptr);
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
                                                                          .mFabricIndex    = GetAccessingFabricIndex(),
@@ -741,6 +746,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     attributePath = mpAttributePathList;
     subscriptionInfo.mAttributePaths.Calloc(attributePathCount);
+    VerifyOrReturn(subscriptionInfo.mAttributePaths.Get() != nullptr);
     for (size_t i = 0; i < attributePathCount; i++)
     {
         subscriptionInfo.mAttributePaths[i].SetValues(attributePath->mValue);
@@ -756,16 +762,14 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     eventPath = mpEventPathList;
     subscriptionInfo.mEventPaths.Calloc(eventPathCount);
+    VerifyOrReturn(subscriptionInfo.mEventPaths.Get() != nullptr);
     for (size_t i = 0; i < eventPathCount; i++)
     {
         subscriptionInfo.mEventPaths[i].SetValues(eventPath->mValue);
         eventPath = eventPath->mpNext;
     }
 
-    err = subscriptionResumptionStorage->Save(subscriptionInfo);
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-
-    return CHIP_NO_ERROR;
+    subscriptionResumptionStorage->Save(subscriptionInfo);
 }
 
 void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState)

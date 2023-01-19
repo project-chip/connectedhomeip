@@ -1586,10 +1586,7 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
 CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    if (!mpSubscriptionResumptionStorage)
-    {
-        return CHIP_NO_ERROR;
-    }
+    ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();

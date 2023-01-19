@@ -82,28 +82,6 @@ public:
 
     using SubscriptionInfoIterator = CommonIterator<SubscriptionInfo>;
 
-    /**
-     * Struct to hold list of subscriptions
-     */
-    //    struct SubscriptionList
-    //    {
-    //        size_t mSize;
-    //        std::unique_ptr<SubscriptionInfo[]> mSubscriptions;
-    //        SubscriptionInfo & operator[](size_t index) { return mSubscriptions[index]; }
-    //        const SubscriptionInfo & operator[](size_t index) const { return mSubscriptions[index]; }
-    //    };
-    //
-    //    /**
-    //     * Struct to hold index of all nodes that have persisted subscriptions
-    //     */
-    //    struct SubscriptionIndex
-    //    {
-    //        size_t mSize;
-    //        std::unique_ptr<ScopedNodeId[]> mNodes;
-    //        ScopedNodeId & operator[](size_t index) { return mNodes[index]; }
-    //        const ScopedNodeId & operator[](size_t index) const { return mNodes[index]; }
-    //    };
-
     virtual ~SubscriptionResumptionStorage(){};
 
     /**

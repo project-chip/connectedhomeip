@@ -263,7 +263,8 @@ private:
      *
      *  @brief Resume a persisted subscription
      *
-     *  Used after ReadHandler(ManagementCallback & apCallback). This
+     *  Used after ReadHandler(ManagementCallback & apCallback). This will start a CASE session
+     *  with the subscriber if one doesn't already exist, and send full priming report when connected.
      */
     void ResumeSubscription(CASESessionManager & caseSessionManager,
                             SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
@@ -381,6 +382,11 @@ private:
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };
 
+    enum class CloseOptions : uint8_t
+    {
+        kDropPersistedSubscriptions,
+        kKeepPersistedSubscriptions
+    };
     /**
      * Called internally to signal the completion of all work on this objecta and signal to a registered callback that it's
      * safe to release this object.
@@ -389,8 +395,7 @@ private:
      * CHIP_CONFIG_PERSIST_SUBSCRIPTIONS not enabled
      *
      */
-    void Close(bool keepPersisted = false);
-    void CloseButKeepPersisted() { Close(true); }
+    void Close(CloseOptions options = CloseOptions::kDropPersistedSubscriptions);
 
     static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -409,6 +414,8 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
+
+    void PersistSubscription();
 
     // Helpers for managing our state flags properly.
     void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
