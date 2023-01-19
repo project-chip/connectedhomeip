@@ -1061,13 +1061,10 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Validate responder identity located in msg_r2_encrypted
     // Constructing responder identity
     {
-        uint8_t rootCertBuf[kMaxCHIPCertLength];
-        MutableByteSpan fabricRCAC{ rootCertBuf };
         CompressedFabricId unused;
         FabricId responderFabricId;
-        SuccessOrExit(err = mFabricsTable->FetchRootCert(mFabricIndex, fabricRCAC));
         SuccessOrExit(err = SetEffectiveTime());
-        SuccessOrExit(err = FabricTable::VerifyCredentials(responderNOC, responderICAC, fabricRCAC, mValidContext, unused, responderFabricId, responderNodeId, responderPublicKey));
+        SuccessOrExit(err = mFabricsTable->VerifyCredentials(mFabricIndex, responderNOC, responderICAC, mValidContext, unused, responderFabricId, responderNodeId, responderPublicKey));
         VerifyOrExit(fabricId == responderFabricId, err = CHIP_ERROR_INVALID_CASE_PARAMETER);
         // Verify that responderNodeId (from responderNOC) matches one that was included
         // in the computation of the Destination Identifier when generating Sigma1.
