@@ -24461,7 +24461,7 @@ CHIPAudioOutputOutputListAttributeCallback::~CHIPAudioOutputOutputListAttributeC
 
 void CHIPAudioOutputOutputListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24504,24 +24504,24 @@ void CHIPAudioOutputOutputListAttributeCallback::CallbackFn(
         jobject newElement_0_name;
         newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
 
-        jclass outputInfoStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$AudioOutputClusterOutputInfo",
-                                                             outputInfoStructClass_1);
+        jclass outputInfoStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$AudioOutputClusterOutputInfoStruct", outputInfoStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$AudioOutputClusterOutputInfo");
+            ChipLogError(Zcl, "Could not find class ChipStructs$AudioOutputClusterOutputInfoStruct");
             return;
         }
-        jmethodID outputInfoStructCtor_1 =
-            env->GetMethodID(outputInfoStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (outputInfoStructCtor_1 == nullptr)
+        jmethodID outputInfoStructStructCtor_1 = env->GetMethodID(outputInfoStructStructClass_1, "<init>",
+                                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
+        if (outputInfoStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$AudioOutputClusterOutputInfo constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$AudioOutputClusterOutputInfoStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(outputInfoStructClass_1, outputInfoStructCtor_1, newElement_0_index, newElement_0_outputType,
-                                      newElement_0_name);
+        newElement_0 = env->NewObject(outputInfoStructStructClass_1, outputInfoStructStructCtor_1, newElement_0_index,
+                                      newElement_0_outputType, newElement_0_name);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

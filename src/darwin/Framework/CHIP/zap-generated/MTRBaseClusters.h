@@ -19190,8 +19190,14 @@ typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedStreamingProtocol) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRAudioOutputOutputType) {
-    MTRAudioOutputOutputTypeHdmi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRAudioOutputOutputTypeBt API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRAudioOutputOutputTypeHDMI MTR_NEWLY_AVAILABLE = 0x00,
+    MTRAudioOutputOutputTypeHdmi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAudioOutputOutputTypeHDMI")
+    = 0x00,
+    MTRAudioOutputOutputTypeBT MTR_NEWLY_AVAILABLE = 0x01,
+    MTRAudioOutputOutputTypeBt API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAudioOutputOutputTypeBT")
+    = 0x01,
     MTRAudioOutputOutputTypeOptical API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRAudioOutputOutputTypeHeadphone API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
     MTRAudioOutputOutputTypeInternal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,

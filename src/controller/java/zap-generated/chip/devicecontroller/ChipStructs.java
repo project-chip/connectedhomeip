@@ -1724,12 +1724,12 @@ public class ChipStructs {
     }
   }
 
-  public static class AudioOutputClusterOutputInfo {
+  public static class AudioOutputClusterOutputInfoStruct {
     public Integer index;
     public Integer outputType;
     public String name;
 
-    public AudioOutputClusterOutputInfo(Integer index, Integer outputType, String name) {
+    public AudioOutputClusterOutputInfoStruct(Integer index, Integer outputType, String name) {
       this.index = index;
       this.outputType = outputType;
       this.name = name;
@@ -1738,7 +1738,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AudioOutputClusterOutputInfo {\n");
+      output.append("AudioOutputClusterOutputInfoStruct {\n");
       output.append("\tindex: ");
       output.append(index);
       output.append("\n");

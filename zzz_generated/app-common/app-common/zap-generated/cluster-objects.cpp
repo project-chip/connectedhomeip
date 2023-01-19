@@ -17237,7 +17237,7 @@ namespace Events {} // namespace Events
 } // namespace ContentLauncher
 namespace AudioOutput {
 namespace Structs {
-namespace OutputInfo {
+namespace OutputInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17284,7 +17284,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace OutputInfo
+} // namespace OutputInfoStruct
 } // namespace Structs
 
 namespace Commands {

@@ -20855,7 +20855,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface OutputListAttributeCallback {
-      void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfo> valueList);
+      void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfoStruct> valueList);
 
       void onError(Exception ex);
 

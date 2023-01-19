@@ -6233,10 +6233,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfo> valueList) {
+    public void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfoStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.AudioOutputClusterOutputInfo>");
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.AudioOutputClusterOutputInfoStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

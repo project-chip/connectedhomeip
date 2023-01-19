@@ -24475,7 +24475,7 @@ class AudioOutput(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="outputList", Tag=0x00000000, Type=typing.List[AudioOutput.Structs.OutputInfo]),
+                ClusterObjectFieldDescriptor(Label="outputList", Tag=0x00000000, Type=typing.List[AudioOutput.Structs.OutputInfoStruct]),
                 ClusterObjectFieldDescriptor(Label="currentOutput", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -24484,7 +24484,7 @@ class AudioOutput(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    outputList: 'typing.List[AudioOutput.Structs.OutputInfo]' = None
+    outputList: 'typing.List[AudioOutput.Structs.OutputInfoStruct]' = None
     currentOutput: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -24514,7 +24514,7 @@ class AudioOutput(Cluster):
 
     class Structs:
         @dataclass
-        class OutputInfo(ClusterObject):
+        class OutputInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -24579,9 +24579,9 @@ class AudioOutput(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[AudioOutput.Structs.OutputInfo])
+                return ClusterObjectFieldDescriptor(Type=typing.List[AudioOutput.Structs.OutputInfoStruct])
 
-            value: 'typing.List[AudioOutput.Structs.OutputInfo]' = field(default_factory=lambda: [])
+            value: 'typing.List[AudioOutput.Structs.OutputInfoStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class CurrentOutput(ClusterAttributeDescriptor):
