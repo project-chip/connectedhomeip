@@ -56,9 +56,9 @@ limitations under the License.
     <cluster code="0x0504"/>
     <item name="MajorNumber"       type="INT16U"/>
     <item name="MinorNumber"       type="INT16U"/>
-    <item name="Name"              type="CHAR_STRING" optional="true" length="32"/>
-    <item name="CallSign"          type="CHAR_STRING" optional="true" length="32"/>
-    <item name="AffiliateCallSign" type="CHAR_STRING" optional="true" length="32"/>
+    <item name="Name"              type="CHAR_STRING" optional="true"/>
+    <item name="CallSign"          type="CHAR_STRING" optional="true"/>
+    <item name="AffiliateCallSign" type="CHAR_STRING" optional="true"/>
   </struct>
 
   <struct name="LineupInfoStruct">

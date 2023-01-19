@@ -1689,9 +1689,9 @@ client cluster Channel = 1284 {
   struct ChannelInfoStruct {
     int16u majorNumber = 0;
     int16u minorNumber = 1;
-    optional char_string<32> name = 2;
-    optional char_string<32> callSign = 3;
-    optional char_string<32> affiliateCallSign = 4;
+    optional char_string name = 2;
+    optional char_string callSign = 3;
+    optional char_string affiliateCallSign = 4;
   }
 
   struct LineupInfoStruct {
