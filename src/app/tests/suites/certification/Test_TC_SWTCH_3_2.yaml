@@ -136,15 +136,15 @@ tests:
           [1671450600.458088][8426:8426] CHIP:DMG:                                         Cluster = 0x3b,
           [1671450600.458108][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_FFFC,
           [1671450600.458122][8426:8426] CHIP:DMG:                                 }
-          [1671450600.458137][8426:8426] CHIP:DMG:                                         
-          [1671450600.458151][8426:8426] CHIP:DMG:                                 Data = 1, 
+          [1671450600.458137][8426:8426] CHIP:DMG:
+          [1671450600.458151][8426:8426] CHIP:DMG:                                 Data = 1,
           [1671450600.458161][8426:8426] CHIP:DMG:                         },
-          [1671450600.458179][8426:8426] CHIP:DMG:                         
+          [1671450600.458179][8426:8426] CHIP:DMG:
           [1671450600.458188][8426:8426] CHIP:DMG:                 },
-          [1671450600.458207][8426:8426] CHIP:DMG:                 
+          [1671450600.458207][8426:8426] CHIP:DMG:
           [1671450600.458216][8426:8426] CHIP:DMG:         ],
-          [1671450600.458242][8426:8426] CHIP:DMG:         
-          [1671450600.458255][8426:8426] CHIP:DMG:         SuppressResponse = true, 
+          [1671450600.458242][8426:8426] CHIP:DMG:
+          [1671450600.458255][8426:8426] CHIP:DMG:         SuppressResponse = true,
           [1671450600.458273][8426:8426] CHIP:DMG:         InteractionModelRevision = 1
           [1671450600.458286][8426:8426] CHIP:DMG: }
       disabled: true
@@ -171,15 +171,15 @@ tests:
           [1671450651.817876][8426:8426] CHIP:DMG: 					Cluster = 0x3b,
           [1671450651.817879][8426:8426] CHIP:DMG: 					Attribute = 0x0000_0000,
           [1671450651.817882][8426:8426] CHIP:DMG: 				}
-          [1671450651.817888][8426:8426] CHIP:DMG: 					
-          [1671450651.817892][8426:8426] CHIP:DMG: 				Data = 2, 
+          [1671450651.817888][8426:8426] CHIP:DMG:
+          [1671450651.817892][8426:8426] CHIP:DMG: 				Data = 2,
           [1671450651.817895][8426:8426] CHIP:DMG: 			},
-          [1671450651.817901][8426:8426] CHIP:DMG: 			
+          [1671450651.817901][8426:8426] CHIP:DMG:
           [1671450651.817905][8426:8426] CHIP:DMG: 		},
-          [1671450651.817910][8426:8426] CHIP:DMG: 		
+          [1671450651.817910][8426:8426] CHIP:DMG:
           [1671450651.817913][8426:8426] CHIP:DMG: 	],
-          [1671450651.817918][8426:8426] CHIP:DMG: 	
-          [1671450651.817921][8426:8426] CHIP:DMG: 	SuppressResponse = true, 
+          [1671450651.817918][8426:8426] CHIP:DMG:
+          [1671450651.817921][8426:8426] CHIP:DMG: 	SuppressResponse = true,
           [1671450651.817925][8426:8426] CHIP:DMG: 	InteractionModelRevision = 1
           [1671450651.817928][8426:8426] CHIP:DMG: }
       disabled: true
@@ -198,13 +198,13 @@ tests:
           [1659679728.732429][2530:2530] CHIP:-: The latching switch is moved to a new position:0
           [1659679728.732454][2530:2530] CHIP:ZCL: SwitchServer: OnSwitchLatch
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
           2. switch subscribe-event switch-latched 1 100 1 1
 
           Verify switch latched event has newposition set to 0 on TH chip-tool logs:
-           
+
           [1659679766.774013][2535:2540] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659679766.774035][2535:2540] CHIP:TOO:          Event number: 3
           [1659679766.774055][2535:2540] CHIP:TOO:          Priority: Info
@@ -238,7 +238,7 @@ tests:
 
           In parallel to this, watch whether DUT reads attribute CurrentPosition (expected to read multiple times to be aware of the changes in the switch position resp. the corresponding attribute)
 
-          1. ./chip-tool interactive start  
+          1. ./chip-tool interactive start
           2. switch read current-position 1 1  (in practice, DUT will issue this command, TH answers)
 
           Verify switch latched event has newposition set to 1 on TH chip-tool logs:
@@ -362,15 +362,15 @@ tests:
           [1671450600.458088][8426:8426] CHIP:DMG:                                         Cluster = 0x3b,
           [1671450600.458108][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_FFFC,
           [1671450600.458122][8426:8426] CHIP:DMG:                                 }
-          [1671450600.458137][8426:8426] CHIP:DMG:                                         
-          [1671450600.458151][8426:8426] CHIP:DMG:                                 Data = 1, 
+          [1671450600.458137][8426:8426] CHIP:DMG:
+          [1671450600.458151][8426:8426] CHIP:DMG:                                 Data = 1,
           [1671450600.458161][8426:8426] CHIP:DMG:                         },
-          [1671450600.458179][8426:8426] CHIP:DMG:                         
+          [1671450600.458179][8426:8426] CHIP:DMG:
           [1671450600.458188][8426:8426] CHIP:DMG:                 },
-          [1671450600.458207][8426:8426] CHIP:DMG:                 
+          [1671450600.458207][8426:8426] CHIP:DMG:
           [1671450600.458216][8426:8426] CHIP:DMG:         ],
-          [1671450600.458242][8426:8426] CHIP:DMG:         
-          [1671450600.458255][8426:8426] CHIP:DMG:         SuppressResponse = true, 
+          [1671450600.458242][8426:8426] CHIP:DMG:
+          [1671450600.458255][8426:8426] CHIP:DMG:         SuppressResponse = true,
           [1671450600.458273][8426:8426] CHIP:DMG:         InteractionModelRevision = 1
           [1671450600.458286][8426:8426] CHIP:DMG: }
       disabled: true
@@ -398,15 +398,15 @@ tests:
           [1671450651.817876][8426:8426] CHIP:DMG: 					Cluster = 0x3b,
           [1671450651.817879][8426:8426] CHIP:DMG: 					Attribute = 0x0000_0000,
           [1671450651.817882][8426:8426] CHIP:DMG: 				}
-          [1671450651.817888][8426:8426] CHIP:DMG: 					
-          [1671450651.817892][8426:8426] CHIP:DMG: 				Data = 2, 
+          [1671450651.817888][8426:8426] CHIP:DMG:
+          [1671450651.817892][8426:8426] CHIP:DMG: 				Data = 2,
           [1671450651.817895][8426:8426] CHIP:DMG: 			},
-          [1671450651.817901][8426:8426] CHIP:DMG: 			
+          [1671450651.817901][8426:8426] CHIP:DMG:
           [1671450651.817905][8426:8426] CHIP:DMG: 		},
-          [1671450651.817910][8426:8426] CHIP:DMG: 		
+          [1671450651.817910][8426:8426] CHIP:DMG:
           [1671450651.817913][8426:8426] CHIP:DMG: 	],
-          [1671450651.817918][8426:8426] CHIP:DMG: 	
-          [1671450651.817921][8426:8426] CHIP:DMG: 	SuppressResponse = true, 
+          [1671450651.817918][8426:8426] CHIP:DMG:
+          [1671450651.817921][8426:8426] CHIP:DMG: 	SuppressResponse = true,
           [1671450651.817925][8426:8426] CHIP:DMG: 	InteractionModelRevision = 1
           [1671450651.817928][8426:8426] CHIP:DMG: }
       disabled: true
@@ -428,7 +428,7 @@ tests:
 
           Verify in TH Log, e.g. (one such message per event subscription being set up)
 
-          Please use Interactive mode to Verify the subscription of an event 
+          Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
           1. ./chip-tool interactive start
            2. switch subscribe-event initial-press 1 100 1 1
@@ -535,7 +535,7 @@ tests:
           [1659621181.542207][5668:5673] CHIP:TOO:   current position: 1
 
 
-          1. ./chip-tool interactive start 
+          1. ./chip-tool interactive start
           2. switch read current-position 1 1
 
           [1659683735.960098][2900:2905] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 3999168277
@@ -629,7 +629,7 @@ tests:
           Repeat this for 1 minute total.
 
 
-          all-clusters app will emit events to the subscriber (DUT-client), e.g. 
+          all-clusters app will emit events to the subscriber (DUT-client), e.g.
           Verify in TH Log:
 
           Please use Interactive mode to Verify the subscription of an event

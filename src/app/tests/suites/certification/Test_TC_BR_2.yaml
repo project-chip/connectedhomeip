@@ -1381,7 +1381,7 @@ tests:
           [1657005275.757177][4900:4905] CHIP:TOO:     [13]: 14
 
 
-          ./chip-tool descriptor read device-type-list 1 1 
+          ./chip-tool descriptor read device-type-list 1 1
 
 
           Verify in TH(chip-tool) Log

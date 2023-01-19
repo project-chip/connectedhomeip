@@ -219,7 +219,7 @@ tests:
       verification: |
           Run the below open-commissioning-window in TH Terminal
 
-          ./chip-tool pairing open-commissioning-window 1 1 200 2000 3840 
+          ./chip-tool pairing open-commissioning-window 1 1 200 2000 3840
 
           verify success on TH (Chip-tool) logs:
 

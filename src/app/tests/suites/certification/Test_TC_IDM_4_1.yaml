@@ -37,7 +37,7 @@ tests:
           device for a single attribute of any data type supported."
       PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -127,7 +127,7 @@ tests:
           data DUT sends the status response back to TH"
       PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -200,7 +200,7 @@ tests:
           multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Bool
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
            Please use Interactive mode to Verify subscription test cases
@@ -368,7 +368,7 @@ tests:
           attribute multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -539,7 +539,7 @@ tests:
           device for multiple attributes(3 attributes)."
       PICS: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start

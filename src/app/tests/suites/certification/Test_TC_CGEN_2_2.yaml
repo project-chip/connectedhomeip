@@ -298,17 +298,17 @@ tests:
           To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
           1. gn gen --check out/debug
           2. ninja -v -C out/debug chip-cert
-          Once build completes 
+          Once build completes
           3. cd out/debug
-          4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex 
-          5. cat Chip-Root-Cert.txt 
+          4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex
+          5. cat Chip-Root-Cert.txt
 
           While adding new add-trusted-root-certificate  please use the above generated new root key
 
           Use the interactive mode to verify this test step
           ./chip-tool interactive start
 
-           operationalcredentials add-trusted-root-certificate  hex:1530010872A919278B9C6D342402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA1824070124080130094104C5E4D28C17F94A9A9E65D524F6708233D232AEBBBDDB82A9182D471D109FF1E05D633B14B0FE64F40A8A7F9E0D0996B6D786B025B4489D1B000384083D840CDE370A3501290118240260300414DB754184659F929C86EAA58A442DACFCD6DD6222300514DB754184659F929C86EAA58A442DACFCD6DD622218300B40B5143626E30CADB003A8DAC2C9B2A28991EC64D3557889CA626A3FD3D12F93D5AAF370F6BBC9D976127B34179EE5937909C7D49C868804B6FE5ECD8F090A169D18 2 0  --commissioner-name beta      
+           operationalcredentials add-trusted-root-certificate  hex:1530010872A919278B9C6D342402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA1824070124080130094104C5E4D28C17F94A9A9E65D524F6708233D232AEBBBDDB82A9182D471D109FF1E05D633B14B0FE64F40A8A7F9E0D0996B6D786B025B4489D1B000384083D840CDE370A3501290118240260300414DB754184659F929C86EAA58A442DACFCD6DD6222300514DB754184659F929C86EAA58A442DACFCD6DD622218300B40B5143626E30CADB003A8DAC2C9B2A28991EC64D3557889CA626A3FD3D12F93D5AAF370F6BBC9D976127B34179EE5937909C7D49C868804B6FE5ECD8F090A169D18 2 0  --commissioner-name beta
 
           on TH2, verify the SUCCESS response from DUT
           [1661453199.897865][30191:30196] CHIP:DMG: },
@@ -332,7 +332,7 @@ tests:
           [1661516003.514181][37550:37555] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1661516003.514212][37550:37555] CHIP:TOO:   ArmFailSafeResponse: {
           [1661516003.514234][37550:37555] CHIP:TOO:     errorCode: 0
-          [1661516003.514244][37550:37555] CHIP:TOO:     debugText: 
+          [1661516003.514244][37550:37555] CHIP:TOO:     debugText:
           [1661516003.514252][37550:37555] CHIP:TOO:    }
           [1661516003.514279][37550:37555] CHIP:DMG: ICR moving to [AwaitingDe]
           [1661516003.514300][37550:37555] CHIP:EM: Sending Standalone Ack for MessageCounter:4065123 on exchange 3722i
@@ -370,7 +370,7 @@ tests:
           [1661453244.946578][30146:30151] CHIP:TOO:       VendorId: 65521
           [1661453244.946590][30146:30151] CHIP:TOO:       FabricId: 1
           [1661453244.946602][30146:30151] CHIP:TOO:       NodeId: 1
-          [1661453244.946612][30146:30151] CHIP:TOO:       Label: 
+          [1661453244.946612][30146:30151] CHIP:TOO:       Label:
           [1661453244.946623][30146:30151] CHIP:TOO:       FabricIndex: 1
           [1661453244.946635][30146:30151] CHIP:TOO:      }
           [1661453244.946705][30146:30151] CHIP:EM: Sending Standalone Ack for MessageCounter:43641672 on exchange 5366i
@@ -398,13 +398,13 @@ tests:
           restart interactive mode
           ./chip-tool interactive start
 
-          ./chip-tool generalcommissioning  arm-fail-safe  900 1 2 0 --commissioner-name beta 
+          ./chip-tool generalcommissioning  arm-fail-safe  900 1 2 0 --commissioner-name beta
           [1661526846.890010][39790:39795] CHIP:DMG: },
           [1661526846.890045][39790:39795] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1661526846.890068][39790:39795] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1661526846.890094][39790:39795] CHIP:TOO:   ArmFailSafeResponse: {
           [1661526846.890112][39790:39795] CHIP:TOO:     errorCode: 0
-          [1661526846.890121][39790:39795] CHIP:TOO:     debugText: 
+          [1661526846.890121][39790:39795] CHIP:TOO:     debugText:
           [1661526846.890129][39790:39795] CHIP:TOO:    }
           [1661526846.890152][39790:39795] CHIP:DMG: ICR moving to [AwaitingDe]
           [1661526846.890175][39790:39795] CHIP:EM: Sending Standalone Ack for MessageCounter:154983735 on exchange 28847i
@@ -417,7 +417,7 @@ tests:
           [1661526855.258299][39790:39795] CHIP:TOO:     MaxCumulativeFailsafeSeconds: 900
           [1661526855.258310][39790:39795] CHIP:TOO:    }
           [1661526855.258357][39790:39795] CHIP:EM: Sending Standalone Ack for MessageCounter:154983736 on exchange 28848i
-           
+
 
            ./chip-tool operationalcredentials certificate-chain-request 1  2 0 --commissioner-name beta
           1661526863.203027][39790:39795] CHIP:DMG:         InteractionModelRevision = 1
@@ -446,7 +446,7 @@ tests:
           [1661526876.824127][39790:39795] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
           [1661526876.824163][39790:39795] CHIP:TOO:   SetRegulatoryConfigResponse: {
           [1661526876.824174][39790:39795] CHIP:TOO:     errorCode: 0
-          [1661526876.824183][39790:39795] CHIP:TOO:     debugText: 
+          [1661526876.824183][39790:39795] CHIP:TOO:     debugText:
           [1661526876.824192][39790:39795] CHIP:TOO:    }
           [1661526876.824212][39790:39795] CHIP:DMG: ICR moving to [AwaitingDe]
           [1661526876.824232][39790:39795] CHIP:EM: Sending Standalone Ack for MessageCounter:154983739 on exchange 28851i
@@ -468,8 +468,8 @@ tests:
           [1661526885.648476][39790:39795] CHIP:DMG: ICR moving to [AwaitingDe]
 
 
-          For CSR-To get csr nonce give below command 2 times 
-           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom) 
+          For CSR-To get csr nonce give below command 2 times
+           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
           Use the above generated Nonce to send below mentioned request
 
           operationalcredentials csrrequest hex:C11D6EAA00A54066220DA7F3FC5DC0F684C13D8B8FD3758B51163C2AEDD6F10F  2 0 --commissioner-name beta  --IsForUpdateNOC 0
@@ -482,7 +482,7 @@ tests:
           [1661526895.276061][39790:39795] CHIP:DMG: ICR moving to [AwaitingDe]
           [1661526895.276069][39790:39795] CHIP:EM: Sending Standalone Ack for MessageCounter:154983743 on exchange 28853i
 
-          operationalcredentials add-trusted-root-certificate  hex:1530010872A919278B9C6D342402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA1824070124080130094104C5E4D28C17F94A9A9E65D524F6708233D232AEBBBDDB82A9182D471D109FF1E05D633B14B0FE64F40A8A7F9E0D0996B6D786B025B4489D1B000384083D840CDE370A3501290118240260300414DB754184659F929C86EAA58A442DACFCD6DD6222300514DB754184659F929C86EAA58A442DACFCD6DD622218300B40B5143626E30CADB003A8DAC2C9B2A28991EC64D3557889CA626A3FD3D12F93D5AAF370F6BBC9D976127B34179EE5937909C7D49C868804B6FE5ECD8F090A169D18 2 0  --commissioner-name beta   
+          operationalcredentials add-trusted-root-certificate  hex:1530010872A919278B9C6D342402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA1824070124080130094104C5E4D28C17F94A9A9E65D524F6708233D232AEBBBDDB82A9182D471D109FF1E05D633B14B0FE64F40A8A7F9E0D0996B6D786B025B4489D1B000384083D840CDE370A3501290118240260300414DB754184659F929C86EAA58A442DACFCD6DD6222300514DB754184659F929C86EAA58A442DACFCD6DD622218300B40B5143626E30CADB003A8DAC2C9B2A28991EC64D3557889CA626A3FD3D12F93D5AAF370F6BBC9D976127B34179EE5937909C7D49C868804B6FE5ECD8F090A169D18 2 0  --commissioner-name beta
           [1661526904.272468][39790:39795] CHIP:DMG:         InteractionModelRevision = 1
           [1661526904.272474][39790:39795] CHIP:DMG: },
           [1661526904.272503][39790:39795] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
@@ -514,7 +514,7 @@ tests:
           cluster using a non-fabric-filtered read"
       verification: |
           Use the interactive mode to verify this test step
-          ./chip-tool interactive start  
+          ./chip-tool interactive start
 
           ./chip-tool operationalcredentials read  nocs  1 0
           On TH1 verify the nocs entries from DUT and Verify that the returned list matches nocs
@@ -564,9 +564,9 @@ tests:
           Operational Credentials cluster"
       verification: |
           Use the interactive mode to verify this test step
-          ./chip-tool interactive start 
+          ./chip-tool interactive start
 
-          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0 
+          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
           On TH1 verify the TrustedRootCertificates entries from DUT and Verify that the returned list matches trustedroots
           [1658484601.144043][28501:28506] CHIP:DMG:         InteractionModelRevision = 1
           [1658484601.144050][28501:28506] CHIP:DMG: }

@@ -44,9 +44,9 @@ tests:
       verification: |
           chip-tv-app is used as dut
 
-           ./chip-tv-app 
+           ./chip-tv-app
 
-          Verify in tv-app side 
+          Verify in tv-app side
           [1667820688.750031][13245:13245] CHIP:DL: Using wifi MAC for hostname
           [1667820688.750083][13245:13245] CHIP:DIS: Advertise operational node 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF
           [1667820688.782144][13245:13245] CHIP:DIS: Responding with _matter._tcp.local

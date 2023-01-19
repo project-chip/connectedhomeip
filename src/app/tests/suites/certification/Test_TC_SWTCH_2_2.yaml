@@ -29,10 +29,10 @@ tests:
           NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
 
           Events to be executed as following
-          1. Compile app using below command in connectedhomeip folder 
+          1. Compile app using below command in connectedhomeip folder
           a. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
           2. Build respective app (all-clusters-app)
-          3. Commission DUT to TH 
+          3. Commission DUT to TH
           4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT ps  -aef|grep all-clusters-app
           5. Follow the Verification step below to generate the event in 2nd terminal of DUT
       disabled: true
@@ -114,7 +114,7 @@ tests:
     - label: "Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          1. ./chip-tool interactive start      
+          1. ./chip-tool interactive start
           2.  switch read current-position 1 1
 
           Verify current position value as 1 inTH(chip-tool) Log:
@@ -159,7 +159,7 @@ tests:
           Raspi device doesn"t support more than 2 position ,so this step is not verifiable by using raspi device
 
 
-          In Raspi platform to change the switch to third position use the below sample command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal. 
+          In Raspi platform to change the switch to third position use the below sample command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
 
           echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
@@ -198,7 +198,7 @@ tests:
     - label: "Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          1. ./chip-tool interactive start      
+          1. ./chip-tool interactive start
           2.  switch read current-position 1 1
 
 
@@ -274,7 +274,7 @@ tests:
     - label: "Read CurrentPosition attribute"
       PICS: SWTCH.S.F01
       verification: |
-          1. ./chip-tool interactive start      
+          1. ./chip-tool interactive start
           2.  switch read current-position 1 1
 
           Verify current position value inTH(chip-tool) Log:
@@ -302,7 +302,7 @@ tests:
     - label: "Read CurrentPosition attribute"
       PICS: SWTCH.S.F01
       verification: |
-          1. ./chip-tool interactive start      
+          1. ./chip-tool interactive start
           2.  switch read current-position 1 1
 
           Verify current position value as 0 inTH(chip-tool) Log:
@@ -346,9 +346,9 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
            2. switch subscribe-event  initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1on TH chip-tool log:
@@ -365,9 +365,9 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
            2. switch subscribe-event short-release 1 100 1 1 --keepSubscriptions true
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
@@ -394,9 +394,9 @@ tests:
           [1659686596.526820][2530:2530] CHIP:-: The new position when the momentary switch starts to be pressed:1
           [1659686596.526881][2530:2530] CHIP:ZCL: SwitchServer: OnInitialPress
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
            2. switch subscribe-event  initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
@@ -422,10 +422,10 @@ tests:
           [1659686852.011466][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
           [1659686852.011490][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
 
@@ -489,10 +489,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event  initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
 
@@ -508,10 +508,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
 
@@ -528,10 +528,10 @@ tests:
           "Operator operates switch (keep pressed for long time, e.g. 5 seconds)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event  initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
 
@@ -543,10 +543,10 @@ tests:
           [1659692507.869421][3696:3701] CHIP:TOO:     NewPosition: 1
           [1659692507.869440][3696:3701] CHIP:TOO:    }
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event long-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-press 1 100 1 1
 
           verify longPress event with NewPosition set to 1 on TH chip-tool log:
 
@@ -562,10 +562,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event long-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-release 1 100 1 1
 
           verify longrelease event with previousPosition set to 1 on TH chip-tool log:
 
@@ -631,10 +631,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
 
@@ -649,10 +649,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
 
@@ -665,10 +665,10 @@ tests:
           [1659694426.794952][3797:3802] CHIP:TOO:    }
 
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-complete 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
 
           verify MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 1 on TH chip-tool log:
 
@@ -685,10 +685,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
 
@@ -704,10 +704,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
 
@@ -723,10 +723,10 @@ tests:
     - label: "Briefly after 6f, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1on TH chip-tool log:
 
@@ -737,10 +737,10 @@ tests:
           [1659694345.040135][3787:3792] CHIP:TOO:   InitialPress: {
           [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-ongoing 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
           verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 on TH chip-tool log:
 
@@ -757,10 +757,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
 
@@ -777,10 +777,10 @@ tests:
 
           echo '{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-complete 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
 
           verify MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 on TH chip-tool log:
 
@@ -804,10 +804,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1on TH chip-tool log:
 
@@ -823,10 +823,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
 
@@ -842,10 +842,10 @@ tests:
     - label: "Briefly after 6k, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1on TH chip-tool log:
 
@@ -856,10 +856,10 @@ tests:
           [1659694345.040135][3787:3792] CHIP:TOO:   InitialPress: {
           [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-ongoing 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
           verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 on TH chip-tool log:
 
@@ -876,10 +876,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
 
@@ -895,10 +895,10 @@ tests:
     - label: "Briefly after 6m, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           verify InitialPress event with NewPosition set to 1on TH chip-tool log:
 
@@ -913,9 +913,9 @@ tests:
 
           echo '{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
            2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
           verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 3 on TH chip-tool log:
@@ -933,10 +933,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
 
@@ -957,10 +957,10 @@ tests:
           [1659694592.348389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e772b
           [1659694592.348481][2530:2530] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-complete 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
 
           verify MultiPresscomplete event with previousPosition set to 1 and TotalNumberOfPressesCounted set to 3 on TH chip-tool log:
 

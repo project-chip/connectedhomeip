@@ -1017,7 +1017,7 @@ tests:
 
 
           onoff write on-time 1 1 1
-           on TH Verify that  subscription is terminated after the MaxInterval of the first subscription is reached. 
+           on TH Verify that  subscription is terminated after the MaxInterval of the first subscription is reached.
           [1657455187.367198][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657455187.367281][11635:11640] CHIP:DMG: {
           [1657455187.367324][11635:11640] CHIP:DMG:      SubscriptionId = 0x50a6822b,
@@ -1110,7 +1110,7 @@ tests:
           value say N(seconds). Change the attribute on the DUT"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
-          Here the command to enter interactive mode:--   ./chip-tool interactive start 
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           onoff subscribe-by-id 0x4001 200 700  1 0xFFFF
            on TH(chip-tool), verify that DUT is responds right attribute value for  command and then send write command to change the attribute value,

@@ -344,7 +344,7 @@ tests:
           ./chip-tool groups get-group-membership [0002] 1 1
 
 
-          Verify the "grouplist" in the inclusive range of 0x0002 and Capacity is in the inclusive range of 0 to 254 or null 
+          Verify the "grouplist" in the inclusive range of 0x0002 and Capacity is in the inclusive range of 0 to 254 or null
           on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1653294426.515523][3638:3643] CHIP:TOO:   GetGroupMembershipResponse: {

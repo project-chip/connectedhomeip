@@ -72,7 +72,7 @@ tests:
           Endpoint supported by DUT (except Endpoint 0)."
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
-          For all the Endpoint id’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json 
+          For all the Endpoint id’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json
           Chip tool outputs all values in integer,  convert to hex before comparing.
 
 

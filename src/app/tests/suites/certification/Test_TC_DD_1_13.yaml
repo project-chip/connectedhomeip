@@ -45,9 +45,9 @@ tests:
           TH Commissioner should not discover the DUT here
 
           For devices not on the network (i.e. BLE discovery):
-          1. Discover commissionables over BLE using a BLE discovery tool of choice. 
-          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop) 
-          OR 
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           TH Commissioner should not discover the DUT here
       disabled: true

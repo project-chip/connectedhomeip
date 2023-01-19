@@ -48,7 +48,7 @@ tests:
           Verify on the TH(reference app), a report data message is received and verify it contains the following data :
            Report data - data of the attribute/event requested earlier.
            Verify on the TH the Subscribe Response has the following fields,
-           SubscriptionId - Verify it is of type uint32. 
+           SubscriptionId - Verify it is of type uint32.
            MaxInterval - Verify it is of type uint32.
            Verify that the MaxInterval is less than or equal MaxIntervalCeiling.
 
@@ -110,7 +110,7 @@ tests:
           Verify on the TH, a report data message is received and verify it contains the following data :
            Report data - data of the attribute/event requested earlier.
            Verify on the TH the Subscribe Response has the following fields,
-           SubscriptionId - Verify it is of type uint32. 
+           SubscriptionId - Verify it is of type uint32.
            MaxInterval - Verify it is of type uint32.
            Verify that the MaxInterval is less than or equal to 60 mins.
 

@@ -36,7 +36,7 @@ tests:
           ./chip-all-clusters-app
 
           *Provision the device using chip tool on first controller(RC1)
-          ./chip-tool pairing onnetwork 1 20202021 
+          ./chip-tool pairing onnetwork 1 20202021
           on first controller open a commissioning window using below command (In RC1)
           ./chip-tool pairing open-commissioning-window 1 1 400 2000 3840 (Save the manualcode for 2nd  Provision)
 
@@ -353,7 +353,7 @@ tests:
           [1657780904.262049][2741:2746] CHIP:TOO: VendorId: 65521
           [1657780904.262073][2741:2746] CHIP:TOO: FabricId: 3
           [1657780904.262096][2741:2746] CHIP:TOO: NodeId: 2
-          [1657780904.262119][2741:2746] CHIP:TOO: Label: 
+          [1657780904.262119][2741:2746] CHIP:TOO: Label:
           [1657780904.262141][2741:2746] CHIP:TOO: FabricIndex: 2
           [1657780904.262164][2741:2746] CHIP:TOO: }
           [1657780904.262252][2741:2746] CHIP:EM: Sending Standalone Ack for MessageCounter:203207506 on exchange 27504i

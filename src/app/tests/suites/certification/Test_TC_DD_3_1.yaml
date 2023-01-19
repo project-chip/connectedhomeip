@@ -170,7 +170,7 @@ tests:
           [1653471970.344771][30157:30162] CHIP:DMG: ICR moving to [ResponseRe]
           [1653471970.344870][30157:30162] CHIP:DMG: InvokeResponseMessage =
           [1653471970.345060][30157:30162] CHIP:DMG: {
-          [1653471970.345124][30157:30162] CHIP:DMG:         suppressResponse = false, 
+          [1653471970.345124][30157:30162] CHIP:DMG:         suppressResponse = false,
           [1653471970.345198][30157:30162] CHIP:DMG:         InvokeResponseIBs =
           [1653471970.345276][30157:30162] CHIP:DMG:         [
           [1653471970.345338][30157:30162] CHIP:DMG:                 InvokeResponseIB =

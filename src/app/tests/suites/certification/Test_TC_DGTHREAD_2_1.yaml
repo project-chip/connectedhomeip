@@ -189,7 +189,7 @@ tests:
           "read OverrunCount attribute from DUT and verify response value, If
           the Overruncount is greater than zero or not"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read overrun-count 54 0 
+          ./chip-tool threadnetworkdiagnostics read overrun-count 54 0
 
           Verify "OverrunCount value is uint64 " on the TH(Chip-tool) Log:
 
@@ -218,7 +218,7 @@ tests:
           Verify "NeighborTableList value is  Zero or greater  " on the TH(Chip-tool) Log:
           if the attribute has an entries verify the each node mentioned in the test plan.
 
-          [1669097995.031917][33680:33682] CHIP:DMG:         SuppressResponse = true, 
+          [1669097995.031917][33680:33682] CHIP:DMG:         SuppressResponse = true,
           [1669097995.031972][33680:33682] CHIP:DMG:         InteractionModelRevision = 1
           [1669097995.032023][33680:33682] CHIP:DMG: }
           [1669097995.032656][33680:33682] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0007 DataVersion: 169843492

@@ -43,7 +43,7 @@ tests:
           be discovered by the DUT Commissioner"
       verification: |
           ./chip-all-clusters-app --discriminator 3840
-          Verify on TH (All-cluster-app): 
+          Verify on TH (All-cluster-app):
 
           [1651109580.413197][31207:31207] CHIP:DL: Device Configuration:
           [1651109580.413259][31207:31207] CHIP:DL:   Serial Number: TEST_SN
@@ -70,7 +70,7 @@ tests:
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
-          Verify on TH (All-cluster-app): 
+          Verify on TH (All-cluster-app):
           [1651109784.452770][31207:31207] CHIP:SVR: Commissioning completed successfully
           [1651109784.452813][31207:31207] CHIP:DIS: Updating services using commissioning mode 0
 

@@ -40,7 +40,7 @@ tests:
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          "1. Provision the device using DUT_CR1 (Chip-tool as DUT controller) 
+          "1. Provision the device using DUT_CR1 (Chip-tool as DUT controller)
           "
       disabled: true
 
@@ -217,7 +217,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool operationalcredentials remove-fabric 2 1 0  
+          ./chip-tool operationalcredentials remove-fabric 2 1 0
 
           Verify TH_CE responses with "RemoveFabric successful" and "Expiring all sessions for fabric 0x2" on TH_CE (all-clusters-app) log
 
