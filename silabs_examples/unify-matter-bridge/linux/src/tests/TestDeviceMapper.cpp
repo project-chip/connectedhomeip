@@ -338,7 +338,7 @@ void TestDeviceMapperSpecOnOffDeviceComplying(nlTestSuite * inSuite, void * aCon
 {
     // Compliant OnOffplugin unit device
     auto identify_cluster               = unify_monitor::cluster("Identify");
-    identify_cluster.attributes         = { "IdentifyTime", "IdentifyType" };
+    identify_cluster.attributes         = { "IdentifyTime" };
     identify_cluster.supported_commands = { "Identify", "TriggerEffect" };
     auto onoff_cluster                  = unify_monitor::cluster("OnOff");
     onoff_cluster.attributes            = { "OnOff", "GlobalSceneControl", "OnTime", "OffWaitTime", "StartUpOnOff" };
@@ -382,7 +382,7 @@ void TestDeviceMapperSpecOnOffDeviceComplying(nlTestSuite * inSuite, void * aCon
 
     // This wont comply to spec before following attributes and commands are
     // properly mapped or emulated: 
-    // Attribute: IdentifyType
+    // Attribute: IdentifyType - is emulated now
     // Whole cluster Scenes
     bool compliance = matter_clusters_conform_to_device_type(cluster_interactor.endpoint_builder.clusters,
                                                              onoff_plugin_unit_requirements.clusters, true, true, true);

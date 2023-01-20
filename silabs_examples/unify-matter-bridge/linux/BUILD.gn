@@ -27,6 +27,7 @@ config("unify-config") {
   include_dirs = [
     "src",
     "src/cluster_translator",
+    "src/cluster_translator/emulations",
     "src/matter_node_state_monitor",
     "src/matter_wrappers",
     "src/device_type_mapper",
@@ -53,6 +54,7 @@ static_library("unify-matter-bridge-lib") {
     "src/cluster_translator/group_command_translator.cpp",
     "src/cluster_translator/group_translator.cpp",
     "src/cluster_translator/cluster_emulator.cpp",
+    "src/cluster_translator/emulations/emulate_identify.cpp",
     "src/demo_uic_cli.cpp",
     "src/device_type_mapper/matter_device_translator.cpp",
     "src/device_type_mapper/matter_device_type_selection.cpp",

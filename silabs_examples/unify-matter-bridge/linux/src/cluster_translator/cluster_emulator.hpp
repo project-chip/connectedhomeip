@@ -17,6 +17,12 @@
 
 #include "matter_endpoint_builder.hpp"
 #include "unify_node_state_monitor.hpp"
+
+// Emulation of commands and attributes
+#include "emulator.hpp"
+#include "emulate_identify.hpp"
+
+
 namespace unify::matter_bridge {
 
 /**
@@ -28,6 +34,10 @@ namespace unify::matter_bridge {
 class ClusterEmulator
 {
 public:
+    ClusterEmulator() {
+        cluster_emulators_string_map["Identify"] = new EmulateIdentify();
+    };
+
     /**
      * @brief Add command and attributes to the clusters on the endpoint
      *
@@ -35,8 +45,7 @@ public:
      * which the endpoint_builder holds. Which commands an attributes are
      * emulated can be checked with  is_command_emulated and is_attribute_emulated
      */
-    void add_emulated_commands_and_attributes(const std::unordered_map<std::string, node_state_monitor::cluster> & unify_clusters,
-                                              matter_cluster_builder &) const;
+    void add_emulated_commands_and_attributes(const node_state_monitor::cluster & unify_clusters, matter_cluster_builder &);
 
     /**
      * @brief Check if a command is emulated
@@ -58,10 +67,10 @@ public:
      * @brief Execute an emulated command
      *
      * @param handlerContext
-     * @return 
+     * @return
      *  - CHIP_ERROR_OK if the command was successfully emulated.
      *  - CHIP_ERROR_NOT_IMPLEMENTED If the command is not emulated
-     * 
+     *
      */
     CHIP_ERROR invoke_command(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) const;
 
@@ -75,20 +84,29 @@ public:
      *  - CHIP_ERROR_NOT_IMPLEMENTED If the attribute is not emulated
      */
     CHIP_ERROR read_attribute(const chip::app::ConcreteReadAttributePath & aPath,
-                              chip::app::AttributeValueEncoder & aEncoder) const;
+                              chip::app::AttributeValueEncoder & aEncoder);
 
     /**
      * @brief Write an emulated attribute
      *
      * @param aPath
      * @param aDecoder
-     * @return 
+     * @return
      *  - CHIP_ERROR_OK write was successfully emulated.
      *  - CHIP_ERROR_WRITE_FAILED the attribute is not writable.
      *  - CHIP_ERROR_NOT_IMPLEMENTED If the attribute is not emulated
      */
     CHIP_ERROR write_attribute(const chip::app::ConcreteDataAttributePath & aPath,
                                chip::app::AttributeValueDecoder & aDecoder) const;
+
+private:
+    // Emulation functions
+    uint32_t read_feature_map_revision(const ConcreteReadAttributePath & aPath) const;
+    uint32_t read_cluster_revision(const ConcreteReadAttributePath & aPath) const;
+
+    std::map<chip::ClusterId, std::map<chip::AttributeId, EmulatorInterface *>> cluster_emulators_attribute_id_map;
+    std::map<chip::ClusterId, std::map<chip::CommandId, EmulatorInterface *>> cluster_emulators_command_id_map;
+    std::map<std::string, EmulatorInterface *> cluster_emulators_string_map;
 };
 
 } // namespace unify::matter_bridge

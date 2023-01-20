@@ -120,7 +120,7 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
                 EmberAfAttributeMetadata{ ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, 0, ZAP_EMPTY_DEFAULT() });
         }
         
-        emulator.add_emulated_commands_and_attributes(clusters, cluster_builder);
+        emulator.add_emulated_commands_and_attributes(cluster, cluster_builder);
 
     }
     if (!basic_cluster_is_supported)

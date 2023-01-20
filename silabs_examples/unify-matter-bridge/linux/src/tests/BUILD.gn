@@ -47,6 +47,7 @@ chip_test_suite("tests") {
     "TestClusterInteractor.cpp",
     "TestClusterTranslator.cpp",
     "TestDeviceMapper.cpp",
+    "TestClusterEmulator.cpp",
     "TestExample.cpp",
     "TestLevelControl.cpp",
     "TestGroupTranslator.cpp",

@@ -114,6 +114,8 @@ bool compare_attributes(const EmberAfAttributeMetadata * attributes, const uint1
 
         if (!required_attribute_found)
         {
+            sl_log_debug(LOG_TAG, "Attribute %s not found in cluster %s", required_attribute.c_str(),
+                   required_cluster_name.c_str());
             return false;
         }
     }
@@ -150,6 +152,8 @@ bool compare_commands(const chip::CommandId * commands, const std::string requir
         }
         if (!required_command_found)
         {
+            sl_log_debug(LOG_TAG, "Command %s not found in cluster %s", required_command.c_str(),
+                   required_cluster_name.c_str());
             return false;
         }
     }
