@@ -560,8 +560,8 @@ DlStatus BoltLockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_
 }
 
 DlStatus BoltLockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                             DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour,
-                                             uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+                                             DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                             uint8_t endHour, uint8_t endMinute)
 {
 
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed

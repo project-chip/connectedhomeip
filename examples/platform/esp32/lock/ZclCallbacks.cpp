@@ -43,7 +43,8 @@ using namespace ::chip::DeviceLayer::Internal;
  */
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint) {}
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                            OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
     bool status = BoltLockMgr().Lock(endpointId, pinCode, err);
