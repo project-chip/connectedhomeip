@@ -734,37 +734,8 @@ void ReadHandler::PersistSubscription()
                                                                          .mMinInterval    = mMinIntervalFloorSeconds,
                                                                          .mMaxInterval    = mMaxInterval,
                                                                          .mFabricFiltered = IsFabricFiltered() };
-    ObjectList<AttributePathParams> * attributePath                  = mpAttributePathList;
-    size_t attributePathCount                                        = 0;
-    while (attributePath)
-    {
-        attributePathCount++;
-        attributePath = attributePath->mpNext;
-    }
-    attributePath = mpAttributePathList;
-    subscriptionInfo.mAttributePaths.Calloc(attributePathCount);
-    VerifyOrReturn(subscriptionInfo.mAttributePaths.Get() != nullptr);
-    for (size_t i = 0; i < attributePathCount; i++)
-    {
-        subscriptionInfo.mAttributePaths[i].SetValues(attributePath->mValue);
-        attributePath = attributePath->mpNext;
-    }
-
-    ObjectList<EventPathParams> * eventPath = mpEventPathList;
-    size_t eventPathCount                   = 0;
-    while (eventPath)
-    {
-        eventPathCount++;
-        eventPath = eventPath->mpNext;
-    }
-    eventPath = mpEventPathList;
-    subscriptionInfo.mEventPaths.Calloc(eventPathCount);
-    VerifyOrReturn(subscriptionInfo.mEventPaths.Get() != nullptr);
-    for (size_t i = 0; i < eventPathCount; i++)
-    {
-        subscriptionInfo.mEventPaths[i].SetValues(eventPath->mValue);
-        eventPath = eventPath->mpNext;
-    }
+    VerifyOrReturn(subscriptionInfo.SetAttributePaths(mpAttributePathList) == CHIP_NO_ERROR);
+    VerifyOrReturn(subscriptionInfo.SetEventPaths(mpEventPathList) == CHIP_NO_ERROR);
 
     subscriptionResumptionStorage->Save(subscriptionInfo);
 }

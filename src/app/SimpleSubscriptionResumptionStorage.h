@@ -37,7 +37,7 @@ namespace app {
 class SimpleSubscriptionResumptionStorage : public SubscriptionResumptionStorage
 {
 public:
-    static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
+    static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS;
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
 

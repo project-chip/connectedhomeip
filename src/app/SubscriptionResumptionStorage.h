@@ -41,7 +41,7 @@ public:
         ClusterId mClusterId;
         AttributeId mAttributeId;
         EndpointId mEndpointId;
-        void SetValues(AttributePathParams & params)
+        void SetValues(const AttributePathParams & params)
         {
             mEndpointId  = params.mEndpointId;
             mClusterId   = params.mClusterId;
@@ -55,7 +55,7 @@ public:
         EventId mEventId;
         EndpointId mEndpointId;
         bool mIsUrgentEvent;
-        void SetValues(EventPathParams & params)
+        void SetValues(const EventPathParams & params)
         {
             mEndpointId    = params.mEndpointId;
             mClusterId     = params.mClusterId;
@@ -78,6 +78,48 @@ public:
         bool mFabricFiltered;
         Platform::ScopedMemoryBufferWithSize<AttributePathParamsValues> mAttributePaths;
         Platform::ScopedMemoryBufferWithSize<EventPathParamsValues> mEventPaths;
+        CHIP_ERROR SetAttributePaths(const ObjectList<AttributePathParams> * pAttributePathList)
+        {
+            mAttributePaths.Free();
+            const ObjectList<AttributePathParams> * attributePath = pAttributePathList;
+            size_t attributePathCount                             = 0;
+            while (attributePath)
+            {
+                attributePathCount++;
+                attributePath = attributePath->mpNext;
+            }
+            ReturnErrorCodeIf((attributePathCount * sizeof(AttributePathParamsValues)) > UINT16_MAX, CHIP_ERROR_NO_MEMORY);
+            mAttributePaths.Calloc(attributePathCount);
+            ReturnErrorCodeIf(mAttributePaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+            attributePath = pAttributePathList;
+            for (size_t i = 0; i < attributePathCount; i++)
+            {
+                mAttributePaths[i].SetValues(attributePath->mValue);
+                attributePath = attributePath->mpNext;
+            }
+            return CHIP_NO_ERROR;
+        }
+        CHIP_ERROR SetEventPaths(const ObjectList<EventPathParams> * pEventPathList)
+        {
+            mEventPaths.Free();
+            const ObjectList<EventPathParams> * eventPath = pEventPathList;
+            size_t eventPathCount                         = 0;
+            while (eventPath)
+            {
+                eventPathCount++;
+                eventPath = eventPath->mpNext;
+            }
+            ReturnErrorCodeIf((eventPathCount * sizeof(EventPathParamsValues)) > UINT16_MAX, CHIP_ERROR_NO_MEMORY);
+            mEventPaths.Calloc(eventPathCount);
+            ReturnErrorCodeIf(mEventPaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+            eventPath = pEventPathList;
+            for (size_t i = 0; i < eventPathCount; i++)
+            {
+                mEventPaths[i].SetValues(eventPath->mValue);
+                eventPath = eventPath->mpNext;
+            }
+            return CHIP_NO_ERROR;
+        }
     };
 
     using SubscriptionInfoIterator = CommonIterator<SubscriptionInfo>;
