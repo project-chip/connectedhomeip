@@ -21,7 +21,7 @@
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <platform/nxp/k32w/k32w0/OTATlvProcessor.h>
+#include <platform/nxp/k32w/common/OTATlvProcessor.h>
 #include <platform/nxp/k32w/k32w0/K32W0FactoryDataProvider.h>
 
 namespace chip {

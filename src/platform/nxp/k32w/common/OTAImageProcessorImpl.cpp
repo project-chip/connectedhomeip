@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,48 +17,23 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/BufferReader.h>
-#if CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
-#include <platform/nxp/k32w/k32w0/OTAApplicationProcessor.h>
-#include <platform/nxp/k32w/k32w0/OTABootloaderProcessor.h>
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-#include <platform/nxp/k32w/k32w0/OTAFactoryDataProcessor.h>
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-#endif // CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
 
-#include "OTAImageProcessorImpl.h"
-#include "OtaSupport.h"
-
-
-extern "C" void ResetMCU(void);
+#include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 
-#if CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
-static OTAApplicationProcessor sApplicationProcessor;
-static OTABootloaderProcessor  sBootloaderProcessor;
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-static OTAFactoryDataProcessor sFactoryDataProcessor;
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-#endif // CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
-
 CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
 {
+    ReturnErrorCodeIf(downloader == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDownloader = downloader;
 
-#if CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
-    ReturnErrorOnFailure(RegisterProcessor(1, &sApplicationProcessor));
-    ReturnErrorOnFailure(RegisterProcessor(2, &sBootloaderProcessor));
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-    ReturnErrorOnFailure(RegisterProcessor(3, &sFactoryDataProcessor));
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-#endif // CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
+    OtaHookInit();
 
     return CHIP_NO_ERROR;
 }
@@ -385,7 +360,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     // queued actions, e.g. sending events to a subscription
     SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
-        [](chip::System::Layer *, void *) { OTA_SetNewImageFlag(); }, nullptr);
+        [](chip::System::Layer *, void *) { OtaHookReset(); }, nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()

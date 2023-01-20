@@ -18,13 +18,11 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
+#include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #include <platform/nxp/k32w/k32w0/OTAApplicationProcessor.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/support/BufferReader.h>
 
 #include "OtaSupport.h"
 #include "OtaUtils.h"
-#include "OTAImageProcessorImpl.h"
 
 namespace chip {
 

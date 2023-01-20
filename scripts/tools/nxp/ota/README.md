@@ -14,7 +14,7 @@ TODO: add more options
 
 Example:
 ```
-./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
+python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256 -fd --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der -app ~/binaries/ota_update/chip-k32w0x-light-example-50000.bin --app-version 50000 --app-version-str "50000_test" --app-build-date "$DATE" ~/binaries/ota_update/chip-k32w0x-light-example-50000.bin $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.ota
 ```
 
 Example (only factory data update):
@@ -78,4 +78,15 @@ private:
     uint32_t mBufferOffset;
     Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
+```
+
+## Factory data update
+`DAC`, `PAI` and `CD` can be updated at a later time by creating a factory data update OTA image.
+If the `PAA` changes, make sure to generate the new certificates using the new `PAA` (which is only
+used by the controller, e.g. `chip-tool`).
+Please see the [manufacturing flow guide](../../../../examples/platform/nxp/doc/manufacturing_flow.md) for generating new certificates.
+
+Example of OTA image generation with factory data and application update (using env variables set in the prerequisities of manufacturing flow):
+```
+python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256 -fd --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der -app $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.bin --app-version 50000 --app-version-str "50000_test" --app-build-date "$DATE" $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.bin $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.ota
 ```

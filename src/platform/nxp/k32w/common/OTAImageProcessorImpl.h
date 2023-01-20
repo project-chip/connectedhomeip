@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +22,17 @@
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
 #include <src/include/platform/OTAImageProcessor.h>
-#include <platform/nxp/k32w/k32w0/OTATlvProcessor.h>
+#include <platform/nxp/k32w/common/OTATlvProcessor.h>
 #include <map>
+
+/*
+ * OTA hooks that can be overwritten by application.
+ * Default behavior is implemented as WEAK symbols in
+ * platform OtaHooks.cpp.
+ */
+extern "C" CHIP_ERROR OtaHookInit();
+extern "C" void OtaHookReset();
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -40,6 +49,7 @@ public:
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
+
     CHIP_ERROR ProcessHeader(ByteSpan & block);
     CHIP_ERROR ProcessPayload(ByteSpan & block);
     CHIP_ERROR SelectProcessor(ByteSpan & block);
