@@ -23,12 +23,13 @@
 
 #include <app/SimpleSubscriptionResumptionStorage.h>
 
+// TODO: move the conditional compilation into BUILD.gn config options
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
 #include <lib/support/Base64.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 namespace chip {
 namespace app {
@@ -195,7 +196,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     {
         subscriptionInfo.mAttributePaths.Calloc(pathCount);
         ReturnErrorCodeIf(subscriptionInfo.mAttributePaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
-        for (uint16_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
+        for (size_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
         {
             ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, kAttributePathTag));
             TLV::TLVType attributeContainerType;
@@ -228,7 +229,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     {
         subscriptionInfo.mEventPaths.Calloc(pathCount);
         ReturnErrorCodeIf(subscriptionInfo.mEventPaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
-        for (uint16_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
+        for (size_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
         {
             ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, kEventPathTag));
             TLV::TLVType eventContainerType;
@@ -377,36 +378,47 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(SubscriptionInfo & subscrip
 
 CHIP_ERROR SimpleSubscriptionResumptionStorage::Delete(NodeId nodeId, FabricIndex fabricIndex, SubscriptionId subscriptionId)
 {
-    CHIP_ERROR deleteErr = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    bool subscriptionFound   = false;
+    CHIP_ERROR lastDeleteErr = CHIP_NO_ERROR;
 
-    uint16_t count = 0;
+    uint16_t remainingSubscriptionsCount = 0;
     for (uint16_t subscriptionIndex = 0; subscriptionIndex < CHIP_IM_MAX_NUM_SUBSCRIPTIONS; subscriptionIndex++)
     {
         SubscriptionInfo subscriptionInfo;
         CHIP_ERROR err = Load(subscriptionIndex, subscriptionInfo);
 
-        // delete duplicate
+        // delete match
         if (err == CHIP_NO_ERROR)
         {
             if ((nodeId == subscriptionInfo.mNodeId) && (fabricIndex == subscriptionInfo.mFabricIndex) &&
                 (subscriptionId == subscriptionInfo.mSubscriptionId))
             {
-                deleteErr = Delete(subscriptionIndex);
+                subscriptionFound    = true;
+                CHIP_ERROR deleteErr = Delete(subscriptionIndex);
+                if (deleteErr != CHIP_NO_ERROR)
+                {
+                    lastDeleteErr = deleteErr;
+                }
             }
             else
             {
-                count++;
+                remainingSubscriptionsCount++;
             }
         }
     }
 
     // if there are no persisted subscriptions, the MaxCount can also be deleted
-    if (count == 0)
+    if (remainingSubscriptionsCount == 0)
     {
         DeleteMaxCount();
     }
 
-    return deleteErr;
+    if (lastDeleteErr != CHIP_NO_ERROR)
+    {
+        return lastDeleteErr;
+    }
+
+    return subscriptionFound ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 }
 
 CHIP_ERROR SimpleSubscriptionResumptionStorage::DeleteMaxCount()

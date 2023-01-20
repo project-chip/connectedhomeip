@@ -119,8 +119,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
         // Make sure different commissioners run on different ports.
         port = static_cast<uint16_t>(port + CurrentCommissionerId());
     }
-    factoryInitParams.listenPort               = port;
-    factoryInitParams.enableServerInteractions = true;
+    factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));

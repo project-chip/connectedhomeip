@@ -382,7 +382,7 @@ private:
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };
 
-    enum class CloseOptions : uint8_t
+    enum class CloseOptions
     {
         kDropPersistedSubscription,
         kKeepPersistedSubscription

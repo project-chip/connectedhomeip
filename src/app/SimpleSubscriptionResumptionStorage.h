@@ -24,11 +24,13 @@
 #pragma once
 
 #include <app/SubscriptionResumptionStorage.h>
+
+// TODO: move the conditional compilation into BUILD.gn config options
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
 #include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Pool.h>
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 namespace chip {
 namespace app {

@@ -137,14 +137,11 @@ public:
      * Save subscription resumption information to storage.
      *
      * @param subscriptionInfo the subscription information to save - caller should expect the passed in value is consumed
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
      */
     virtual CHIP_ERROR Save(SubscriptionInfo & subscriptionInfo) = 0;
 
     /**
      * Delete subscription resumption information by node ID, fabric index, and subscription ID.
-     *
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
      */
     virtual CHIP_ERROR Delete(NodeId nodeId, FabricIndex fabricIndex, SubscriptionId subscriptionId) = 0;
 
@@ -154,7 +151,6 @@ public:
      * and is considered successful.
      *
      * @param fabricIndex the index of the fabric for which to remove subscription resumption information
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
      */
     virtual CHIP_ERROR DeleteAll(FabricIndex fabricIndex) = 0;
 };
