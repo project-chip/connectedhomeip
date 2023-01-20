@@ -666,7 +666,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
         return Status::Success;
     }
 
-    ChipLogDetail(InteractionModel, "Received report with invalid subscriptionId %lu", (unsigned long) subscriptionId);
+    ChipLogDetail(InteractionModel, "Received report with invalid subscriptionId %" PRIu32, subscriptionId);
 
     return Status::InvalidSubscription;
 }
