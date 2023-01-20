@@ -19522,7 +19522,7 @@ public class ChipClusters {
     }
 
     public interface TargetListAttributeCallback {
-      void onSuccess(List<ChipStructs.TargetNavigatorClusterTargetInfo> valueList);
+      void onSuccess(List<ChipStructs.TargetNavigatorClusterTargetInfoStruct> valueList);
 
       void onError(Exception ex);
 

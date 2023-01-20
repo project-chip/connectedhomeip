@@ -20861,7 +20861,7 @@ struct TypeInfo
 } // namespace Channel
 namespace TargetNavigator {
 namespace Structs {
-namespace TargetInfo {
+namespace TargetInfoStruct {
 enum class Fields
 {
     kIdentifier = 0,
@@ -20883,7 +20883,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace TargetInfo
+} // namespace TargetInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -20979,11 +20979,11 @@ namespace Attributes {
 namespace TargetList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType>;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetList::Id; }

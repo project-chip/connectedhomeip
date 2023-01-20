@@ -790,10 +790,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull lineupInfoType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRTargetNavigatorClusterTargetInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull identifier MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull name MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRTargetNavigatorClusterTargetInfo : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull identifier API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nonnull name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRTargetNavigatorClusterTargetInfoStruct")
+@interface MTRTargetNavigatorClusterTargetInfo : MTRTargetNavigatorClusterTargetInfoStruct
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

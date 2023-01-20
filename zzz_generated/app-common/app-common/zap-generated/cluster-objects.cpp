@@ -15663,7 +15663,7 @@ namespace Events {} // namespace Events
 } // namespace Channel
 namespace TargetNavigator {
 namespace Structs {
-namespace TargetInfo {
+namespace TargetInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15706,7 +15706,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace TargetInfo
+} // namespace TargetInfoStruct
 } // namespace Structs
 
 namespace Commands {

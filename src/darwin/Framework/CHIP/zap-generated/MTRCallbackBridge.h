@@ -987,7 +987,8 @@ typedef void (*ChannelAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*TargetNavigatorTargetListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &
+        data);
 typedef void (*TargetNavigatorGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TargetNavigatorAcceptedCommandListListAttributeCallback)(
@@ -8865,7 +8866,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &
             value);
 };
 

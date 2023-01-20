@@ -1454,11 +1454,11 @@ public class ChipStructs {
     }
   }
 
-  public static class TargetNavigatorClusterTargetInfo {
+  public static class TargetNavigatorClusterTargetInfoStruct {
     public Integer identifier;
     public String name;
 
-    public TargetNavigatorClusterTargetInfo(Integer identifier, String name) {
+    public TargetNavigatorClusterTargetInfoStruct(Integer identifier, String name) {
       this.identifier = identifier;
       this.name = name;
     }
@@ -1466,7 +1466,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TargetNavigatorClusterTargetInfo {\n");
+      output.append("TargetNavigatorClusterTargetInfoStruct {\n");
       output.append("\tidentifier: ");
       output.append(identifier);
       output.append("\n");

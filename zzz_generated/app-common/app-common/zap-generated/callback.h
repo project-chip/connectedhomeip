@@ -8593,7 +8593,7 @@ bool emberAfTargetNavigatorClusterNavigateTargetCallback(
  * @brief Target Navigator Cluster NavigateTargetResponse Command callback (from server)
  */
 bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                 uint8_t status, chip::CharSpan data);
+                                                                 uint8_t Status, chip::CharSpan Data);
 /**
  * @brief Media Playback Cluster Play Command callback (from client)
  */
