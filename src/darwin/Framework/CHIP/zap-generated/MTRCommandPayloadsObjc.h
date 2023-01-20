@@ -39,6 +39,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -62,6 +71,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -85,6 +103,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTRGroupsClusterAddGroupParams (Deprecated)
@@ -142,6 +169,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTRGroupsClusterViewGroupParams (Deprecated)
@@ -201,6 +237,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -246,6 +291,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTRGroupsClusterRemoveGroupParams (Deprecated)
@@ -301,6 +355,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -324,6 +387,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTRGroupsClusterAddGroupIfIdentifyingParams (Deprecated)
@@ -359,6 +431,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -408,6 +489,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -463,6 +553,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -510,6 +609,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -557,6 +665,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -608,6 +725,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -629,6 +755,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -686,6 +821,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -735,6 +879,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -796,6 +949,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -841,6 +1003,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -860,6 +1031,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -879,6 +1059,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -902,6 +1091,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTROnOffClusterOffWithEffectParams (Deprecated)
@@ -927,6 +1125,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -952,6 +1159,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -979,6 +1195,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1006,6 +1231,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1035,6 +1269,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1058,6 +1301,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1085,6 +1337,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1112,6 +1373,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1141,6 +1411,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1164,6 +1443,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1185,6 +1473,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1208,6 +1505,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1233,6 +1539,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1256,6 +1571,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1281,6 +1605,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1304,6 +1637,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1327,6 +1669,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1352,6 +1703,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1375,6 +1735,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1398,6 +1767,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1423,6 +1801,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1446,6 +1833,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1471,6 +1867,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1491,6 +1896,15 @@ MTR_NEWLY_DEPRECATED("This command has been removed")
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -1526,6 +1940,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1602,6 +2025,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1660,6 +2092,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1695,6 +2136,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1731,6 +2181,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1781,6 +2240,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1824,6 +2292,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1871,6 +2348,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1924,6 +2410,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1947,6 +2442,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1970,6 +2474,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2019,6 +2532,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2070,6 +2592,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2096,6 +2627,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2156,6 +2696,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2175,6 +2724,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2194,6 +2752,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2213,6 +2780,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2232,6 +2808,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2257,6 +2842,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2287,6 +2881,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (Deprecated)
@@ -2315,6 +2918,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2334,6 +2946,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2355,6 +2976,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2406,6 +3036,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2451,6 +3090,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2504,6 +3152,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2527,6 +3184,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2574,6 +3240,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2595,6 +3270,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2616,6 +3300,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams (Deprecated)
@@ -2644,6 +3337,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2665,6 +3367,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2709,6 +3420,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2730,6 +3450,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2774,6 +3503,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2795,6 +3533,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2816,6 +3563,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2839,6 +3595,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2872,6 +3637,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2895,6 +3669,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2954,6 +3737,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2981,6 +3773,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3004,6 +3805,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3057,6 +3867,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3084,6 +3903,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3105,6 +3933,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3156,6 +3993,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3189,6 +4035,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTRDoorLockClusterSetUserParams (Deprecated)
@@ -3216,6 +4071,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3284,6 +4148,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3316,6 +4189,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3365,6 +4247,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3419,6 +4310,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3438,6 +4338,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3457,6 +4366,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3476,6 +4394,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3497,6 +4424,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3519,6 +4455,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3540,6 +4485,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3562,6 +4516,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3583,6 +4546,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3602,6 +4574,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3625,6 +4606,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3684,6 +4674,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3707,6 +4706,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3726,6 +4734,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3755,6 +4772,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3782,6 +4808,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3811,6 +4846,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3838,6 +4882,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3865,6 +4918,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3894,6 +4956,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3923,6 +4994,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3952,6 +5032,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3979,6 +5068,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4008,6 +5106,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4035,6 +5142,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 @interface MTRColorControlClusterMoveToColorTemperatureParams (Deprecated)
@@ -4070,6 +5186,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4097,6 +5222,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4126,6 +5260,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4155,6 +5298,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4188,6 +5340,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4211,6 +5372,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4244,6 +5414,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4279,6 +5458,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4300,6 +5488,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4347,6 +5544,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4369,6 +5575,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4392,6 +5607,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4435,6 +5659,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4454,6 +5687,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4473,6 +5715,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4492,6 +5743,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4511,6 +5771,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4530,6 +5799,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4549,6 +5827,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4568,6 +5855,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4590,6 +5886,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4612,6 +5917,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4657,6 +5971,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4678,6 +6001,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4697,6 +6029,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4716,6 +6057,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4739,6 +6089,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4758,6 +6117,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4779,6 +6147,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4827,6 +6204,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4853,6 +6239,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4898,6 +6293,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4921,6 +6325,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4945,6 +6358,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4967,6 +6389,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4989,6 +6420,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5035,6 +6475,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5081,6 +6530,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5100,6 +6558,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5149,6 +6616,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5208,6 +6684,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -5227,6 +6712,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5278,6 +6772,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5329,6 +6832,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5380,6 +6892,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5445,6 +6966,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5498,6 +7028,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5563,6 +7102,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5622,6 +7170,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5730,6 +7287,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5783,6 +7349,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5836,6 +7411,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5889,6 +7473,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5944,6 +7537,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5971,6 +7573,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -5999,6 +7610,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6025,6 +7645,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6073,6 +7702,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6100,6 +7738,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6124,6 +7771,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6150,6 +7806,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6181,6 +7846,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6207,6 +7881,15 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6242,6 +7925,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6267,6 +7959,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
 NS_ASSUME_NONNULL_END
