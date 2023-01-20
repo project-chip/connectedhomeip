@@ -60,7 +60,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::BL702Config::Init();
     SuccessOrExit(err);
 
-    opt.byte = 0;
+    opt.byte            = 0;
     opt.bf.isCoexEnable = true;
 
     ot_alarmInit();
