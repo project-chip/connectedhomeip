@@ -108,13 +108,13 @@ tests:
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
                 value: 1
-              - name: "LocalStartTime"
+              - name: "localStartTime"
                 value: 960
-              - name: "LocalEndTime"
+              - name: "localEndTime"
                 value: 1980
 
     #issue #18591
@@ -123,21 +123,21 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
                 value: 1
       response:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
                 value: 1
               - name: "status"
                 value: 0x0
-              - name: "LocalStartTime"
+              - name: "localStartTime"
                 value: 960
-              - name: "LocalEndTime"
+              - name: "localEndTime"
                 value: 1980
                 constraints:
                     minValue: 961
@@ -147,13 +147,13 @@ tests:
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 0
               - name: "userIndex"
                 value: 15
-              - name: "LocalStartTime"
+              - name: "localStartTime"
                 value: 1020
-              - name: "LocalEndTime"
+              - name: "localEndTime"
                 value: 2040
       response:
           error: INVALID_COMMAND
@@ -163,22 +163,22 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 0
               - name: "userIndex"
                 value: 15
       response:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 0
               - name: "userIndex"
                 value: 15
               - name: "status"
                 value: 0x85
-              - name: "LocalStartTime"
+              - name: "localStartTime"
                 constraints:
                     hasValue: false
-              - name: "LocalEndTime"
+              - name: "localEndTime"
                 constraints:
                     hasValue: false
 
@@ -207,22 +207,22 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: NumberOfYearDaySchedulesSupportedPerUser
               - name: "userIndex"
                 value: 5
       response:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: NumberOfYearDaySchedulesSupportedPerUser
               - name: "userIndex"
                 value: 5
               - name: "status"
                 value: 0x8B
-              - name: "LocalStartTime"
+              - name: "localStartTime"
                 constraints:
                     hasValue: false
-              - name: "LocalEndTime"
+              - name: "localEndTime"
                 constraints:
                     hasValue: false
 
@@ -241,22 +241,22 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
                 value: 1
       response:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
                 value: 1
               - name: "status"
                 value: 0x8B
-              - name: "LocalStartTime"
+              - name: "localStartTime"
                 constraints:
                     hasValue: false
-              - name: "LocalEndTime"
+              - name: "localEndTime"
                 constraints:
                     hasValue: false
 
@@ -265,13 +265,13 @@ tests:
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
                 value: 1
-              - name: "LocalStartTime"
+              - name: "localStartTime"
                 value: 1080
-              - name: "LocalEndTime"
+              - name: "localEndTime"
                 value: 2100
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
@@ -279,21 +279,21 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
                 value: 1
       response:
           values:
-              - name: "YearDayIndex"
+              - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
                 value: 1
               - name: "status"
                 value: 0x00
-              - name: "LocalStartTime"
+              - name: "localStartTime"
                 value: 1080
-              - name: "LocalEndTime"
+              - name: "localEndTime"
                 value: 2100
                 constraints:
                     minValue: 1081

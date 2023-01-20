@@ -22664,7 +22664,8 @@ CHIPTargetNavigatorTargetListAttributeCallback::~CHIPTargetNavigatorTargetListAt
 
 void CHIPTargetNavigatorTargetListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -22702,23 +22703,24 @@ void CHIPTargetNavigatorTargetListAttributeCallback::CallbackFn(
         jobject newElement_0_name;
         newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
 
-        jclass targetInfoStructClass_1;
+        jclass targetInfoStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfo", targetInfoStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfoStruct", targetInfoStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfo");
+            ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfoStruct");
             return;
         }
-        jmethodID targetInfoStructCtor_1 =
-            env->GetMethodID(targetInfoStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (targetInfoStructCtor_1 == nullptr)
+        jmethodID targetInfoStructStructCtor_1 =
+            env->GetMethodID(targetInfoStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+        if (targetInfoStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$TargetNavigatorClusterTargetInfo constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$TargetNavigatorClusterTargetInfoStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(targetInfoStructClass_1, targetInfoStructCtor_1, newElement_0_identifier, newElement_0_name);
+        newElement_0 =
+            env->NewObject(targetInfoStructStructClass_1, targetInfoStructStructCtor_1, newElement_0_identifier, newElement_0_name);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -23444,7 +23446,7 @@ CHIPMediaInputInputListAttributeCallback::~CHIPMediaInputInputListAttributeCallb
 
 void CHIPMediaInputInputListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -23489,24 +23491,25 @@ void CHIPMediaInputInputListAttributeCallback::CallbackFn(
         jobject newElement_0_description;
         newElement_0_description = env->NewStringUTF(std::string(entry_0.description.data(), entry_0.description.size()).c_str());
 
-        jclass inputInfoStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$MediaInputClusterInputInfo",
-                                                             inputInfoStructClass_1);
+        jclass inputInfoStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$MediaInputClusterInputInfoStruct", inputInfoStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$MediaInputClusterInputInfo");
+            ChipLogError(Zcl, "Could not find class ChipStructs$MediaInputClusterInputInfoStruct");
             return;
         }
-        jmethodID inputInfoStructCtor_1 = env->GetMethodID(
-            inputInfoStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
-        if (inputInfoStructCtor_1 == nullptr)
+        jmethodID inputInfoStructStructCtor_1 =
+            env->GetMethodID(inputInfoStructStructClass_1, "<init>",
+                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
+        if (inputInfoStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$MediaInputClusterInputInfo constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$MediaInputClusterInputInfoStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(inputInfoStructClass_1, inputInfoStructCtor_1, newElement_0_index, newElement_0_inputType,
-                                      newElement_0_name, newElement_0_description);
+        newElement_0 = env->NewObject(inputInfoStructStructClass_1, inputInfoStructStructCtor_1, newElement_0_index,
+                                      newElement_0_inputType, newElement_0_name, newElement_0_description);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

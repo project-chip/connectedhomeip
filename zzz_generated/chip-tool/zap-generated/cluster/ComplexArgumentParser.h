@@ -130,10 +130,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagem
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::MediaInput::Structs::InputInfo::Type & request);
+static void Finalize(chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::LabelStruct::Type & request, Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::LabelStruct::Type & request);
@@ -222,10 +222,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::AccessControl::Structs::Target::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request);
+static void Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
                         Json::Value & value);
 

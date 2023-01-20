@@ -66,7 +66,7 @@ tests:
       command: "SkipChannel"
       arguments:
           values:
-              - name: "Count"
+              - name: "count"
                 value: 1
 
     - label: "Verify that the channel has changed on the device"

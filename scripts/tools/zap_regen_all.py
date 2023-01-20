@@ -156,7 +156,8 @@ class GoldenTestImageTarget():
 
         # This runs a test, but the important bit is we pass `--regenerate`
         # to it and this will cause it to OVERWRITE golden images.
-        self.command = ["./scripts/tools/zap/test_generate.py", "--output", self.tempdir, "--regenerate"]
+        self.command = ["./scripts/tools/zap/test_generate.py",
+                        "--output", self.tempdir, "--regenerate"]
 
     def __del__(self):
         # Clean up
@@ -180,6 +181,41 @@ class GoldenTestImageTarget():
 
     def log_command(self):
         logging.info("  %s" % " ".join(self.command))
+
+
+class ZAPPregenerateTarget:
+    def __init__(self, input_glob, output_dir, generator=None):
+        self.input_glob = input_glob
+        self.output_dir = output_dir
+        self.script = "./scripts/codepregen.py"
+        self.command = [self.script, "--input-glob", input_glob]
+        self.generator = generator
+
+        if generator is not None:
+            self.command.extend(["--generator", generator])
+        self.command.append(output_dir)
+
+    def distinct_output(self):
+        input_template = self.input_glob
+        if self.generator is not None:
+            input_template += " " + self.generator
+        return ZapDistinctOutput(input_template=input_template, output_directory=self.output_dir)
+
+    def log_command(self):
+        logging.info("  %s" % " ".join(self.command))
+
+    def generate(self) -> TargetRunStats:
+        logging.info("Generating target: %s" % " ".join(self.command))
+
+        generate_start = time.time()
+        subprocess.check_call(self.command)
+        generate_end = time.time()
+
+        return TargetRunStats(
+            generate_time=generate_end - generate_start,
+            config=self.script,
+            template=self.script,
+        )
 
 
 def checkPythonVersion():
@@ -213,7 +249,8 @@ def setupArgumentsParser():
         args.type = TargetType.ALL  # default instead of a list
     else:
         # convert the list into a single flag value
-        types = [t for t in map(lambda x: __TARGET_TYPES__[x.lower()], args.type)]
+        types = [t for t in map(lambda x: __TARGET_TYPES__[
+                                x.lower()], args.type)]
         args.type = types[0]
         for t in types:
             args.type = args.type | t
@@ -282,10 +319,10 @@ def getGlobalTemplatesTargets():
     #
     # TODO: These files can be code generated at compile time, we should figure
     #       out a path for this codegen to not be required.
-    targets.append(ZAPGenerateTarget(
-        'src/controller/data_model/controller-clusters.zap',
-        template="src/app/zap-templates/app-templates.json",
-        output_dir=os.path.join('zzz_generated/darwin/controller-clusters/zap-generated')))
+    targets.append(ZAPPregenerateTarget(
+        "*controller-clusters*", "zzz_generated/darwin", generator="zap"))
+    targets.append(ZAPPregenerateTarget(
+        "*controller-clusters*", "zzz_generated/darwin", generator="codegen-cpp-only"))
 
     return targets
 

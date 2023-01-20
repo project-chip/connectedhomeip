@@ -47,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.31
+            image: connectedhomeip/chip-build:0.6.32
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -262,8 +262,8 @@ jobs:
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
             # NOTE: Generally kept in sync within the repo using
             #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.09-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
+            ZAP_VERSION: v2023.01.18-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -383,7 +383,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.31
+            image: connectedhomeip/chip-build:0.6.32
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -457,7 +457,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.31
+            image: connectedhomeip/chip-build:0.6.32
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -546,8 +546,8 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1"
             # NOTE: Generally kept in sync within the repo using
             #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.09-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
+            ZAP_VERSION: v2023.01.18-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
 
         if: github.actor != 'restyled-io[bot]' && false
         runs-on: macos-latest

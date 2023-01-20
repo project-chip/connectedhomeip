@@ -166,7 +166,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "123456"
 
     - label:
@@ -202,7 +202,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "123456"
 
     - label: "TH sends the unlock Door command to the DUT with invalid PINCode"
@@ -211,7 +211,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "1234568"
       response:
           error: FAILURE
@@ -269,7 +269,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "1234568"
       response:
           error: FAILURE
@@ -280,7 +280,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "1234568"
       response:
           error: FAILURE
@@ -291,7 +291,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "1234568"
       response:
           error: FAILURE
@@ -302,7 +302,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "1234568"
       response:
           error: FAILURE
@@ -322,7 +322,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "123456"
       response:
           error: FAILURE

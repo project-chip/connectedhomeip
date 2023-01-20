@@ -16,14 +16,13 @@
  */
 
 #include "AppTask.h"
+#include "AppConfig.h"
+#include "AppEvent.h"
 #include "Button.h"
 #include "LEDWidget.h"
 #include "esp_log.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <lock/AppConfig.h>
-#include <lock/AppEvent.h>
-//#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -61,7 +60,6 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
-// using namespace ESP32DoorLock::LockInitParams;
 
 AppTask AppTask::sAppTask;
 
@@ -81,14 +79,19 @@ CHIP_ERROR AppTask::StartAppTask()
 
 CHIP_ERROR AppTask::Init()
 {
-    // Create FreeRTOS sw timer for Function Selection
+    // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
                                   false,            // no timer reload (==one-shot)
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
-    CHIP_ERROR err = BoltLockMgr().InitLockState();
+    CHIP_ERROR err = BoltLockMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGI(TAG, "BoltLockMgr().Init() failed");
+        return err;
+    }
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
@@ -198,12 +201,12 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     int32_t actor;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aEvent->mType == AppEvent::kEventType_Lock)
+    if (aEvent->Type == AppEvent::kEventType_Lock)
     {
-        action = static_cast<BoltLockManager::Action_t>(aEvent->mLockEvent.mAction);
-        actor  = aEvent->mLockEvent.mActor;
+        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
+        actor  = aEvent->LockEvent.Actor;
     }
-    else if (aEvent->mType == AppEvent::kEventType_Button)
+    else if (aEvent->Type == AppEvent::kEventType_Button)
     {
         if (BoltLockMgr().IsUnlocked())
         {
@@ -238,19 +241,19 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
         return;
     }
 
-    AppEvent button_event             = {};
-    button_event.mType                = AppEvent::kEventType_Button;
-    button_event.mButtonEvent.mPinNo  = btnIdx;
-    button_event.mButtonEvent.mAction = btnAction;
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.PinNo  = btnIdx;
+    button_event.ButtonEvent.Action = btnAction;
 
     if (btnIdx == APP_LOCK_BUTTON && btnAction == APP_BUTTON_PRESSED)
     {
-        button_event.mHandler = LockActionEventHandler;
+        button_event.Handler = LockActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
     else if (btnIdx == APP_FUNCTION_BUTTON)
     {
-        button_event.mHandler = FunctionHandler;
+        button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
@@ -258,15 +261,15 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
     AppEvent event;
-    event.mType                = AppEvent::kEventType_Timer;
-    event.mTimerEvent.mContext = (void *) xTimer;
-    event.mHandler             = FunctionTimerEventHandler;
+    event.Type               = AppEvent::kEventType_Timer;
+    event.TimerEvent.Context = (void *) xTimer;
+    event.Handler            = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 
 void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->mType != AppEvent::kEventType_Timer)
+    if (aEvent->Type != AppEvent::kEventType_Timer)
     {
         return;
     }
@@ -301,7 +304,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
-    if (aEvent->mButtonEvent.mPinNo != APP_FUNCTION_BUTTON)
+    if (aEvent->ButtonEvent.PinNo != APP_FUNCTION_BUTTON)
     {
         return;
     }
@@ -313,7 +316,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->mButtonEvent.mAction == APP_BUTTON_PRESSED)
+    if (aEvent->ButtonEvent.Action == APP_BUTTON_PRESSED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
@@ -428,10 +431,10 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
 {
     AppEvent event;
-    event.mType              = AppEvent::kEventType_Lock;
-    event.mLockEvent.mActor  = aActor;
-    event.mLockEvent.mAction = aAction;
-    event.mHandler           = LockActionEventHandler;
+    event.Type             = AppEvent::kEventType_Lock;
+    event.LockEvent.Actor  = aActor;
+    event.LockEvent.Action = aAction;
+    event.Handler          = LockActionEventHandler;
     PostEvent(&event);
 }
 
@@ -448,9 +451,9 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-    if (aEvent->mHandler)
+    if (aEvent->Handler)
     {
-        aEvent->mHandler(aEvent);
+        aEvent->Handler(aEvent);
     }
     else
     {

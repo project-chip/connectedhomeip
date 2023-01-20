@@ -29,7 +29,6 @@ struct AppEvent
         kEventType_Button = 0,
         kEventType_Timer,
         kEventType_Light,
-        kEventType_Lock,
         kEventType_Install,
     };
 
@@ -46,11 +45,6 @@ struct AppEvent
         {
             void * mContext;
         } mTimerEvent;
-        struct
-        {
-            uint8_t mAction;
-            int32_t mActor;
-        } mLockEvent;
     };
 
     EventHandler mHandler;
