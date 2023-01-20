@@ -96,7 +96,6 @@ declare -a args=(
     "target_defines=$target_defines"
     "target_cflags=[$target_cflags]"
     "mac_target_arch=\"$target_arch\""
-    "chip_code_pre_generated_directory=\"$CHIP_ROOT/zzz_generated/darwin\""
     "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
 )
 

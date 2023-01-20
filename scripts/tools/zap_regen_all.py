@@ -113,41 +113,6 @@ class ZAPGenerateTarget:
         )
 
 
-class ZAPPregenerateTarget:
-    def __init__(self, input_glob, output_dir, generator=None):
-        self.input_glob = input_glob
-        self.output_dir = output_dir
-        self.script = "./scripts/codepregen.py"
-        self.command = [self.script, "--input-glob", input_glob]
-        self.generator = generator
-
-        if generator is not None:
-            self.command.extend(["--generator", generator])
-        self.command.append(output_dir)
-
-    def distinct_output(self):
-        input_template = self.input_glob
-        if self.generator is not None:
-            input_template += " " + self.generator
-        return ZapDistinctOutput(input_template=input_template, output_directory=self.output_dir)
-
-    def log_command(self):
-        logging.info("  %s" % " ".join(self.command))
-
-    def generate(self) -> TargetRunStats:
-        logging.info("Generating target: %s" % " ".join(self.command))
-
-        generate_start = time.time()
-        subprocess.check_call(self.command)
-        generate_end = time.time()
-
-        return TargetRunStats(
-            generate_time=generate_end - generate_start,
-            config=self.script,
-            template=self.script,
-        )
-
-
 def checkPythonVersion():
     if sys.version_info[0] < 3:
         print('Must use Python 3. Current version is ' +
@@ -235,10 +200,10 @@ def getGlobalTemplatesTargets():
     #
     # TODO: These files can be code generated at compile time, we should figure
     #       out a path for this codegen to not be required.
-    targets.append(ZAPPregenerateTarget(
-        "*controller-clusters*", "zzz_generated/darwin", generator="zap"))
-    targets.append(ZAPPregenerateTarget(
-        "*controller-clusters*", "zzz_generated/darwin", generator="codegen-cpp-only"))
+    targets.append(ZAPGenerateTarget(
+        'src/controller/data_model/controller-clusters.zap',
+        template="src/app/zap-templates/app-templates.json",
+        output_dir=os.path.join('zzz_generated/darwin/controller-clusters/zap-generated')))
 
     return targets
 

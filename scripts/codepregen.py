@@ -74,7 +74,7 @@ def _ParallelGenerateOne(arg):
 @click.option(
     '--generator',
     default='all',
-    type=click.Choice(['all', 'zap', 'codegen', 'codegen-cpp-only']),
+    type=click.Choice(['all', 'zap', 'codegen']),
     help='To what code generator to restrict the generation.')
 @click.option(
     '--input-glob',
@@ -119,11 +119,8 @@ def main(log_level, parallel, dry_run, generator, input_glob, sdk_root, output_d
 
     if generator == 'zap':
         filter.file_type = IdlFileType.ZAP
-    elif generator == 'codegen' or generator == 'codegen-cpp-only':
+    elif generator == 'codegen':
         filter.file_type = IdlFileType.MATTER
-
-    if generator == 'codegen-cpp-only':
-        filter.cpp_only = True
 
     targets = FindPregenerationTargets(sdk_root, filter, runner)
 
