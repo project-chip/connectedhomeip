@@ -872,7 +872,6 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_BSP_Driver",
       ":${sdk_target_name}_bl702_freertos",
       ":${sdk_target_name}_ble",
-      ":${sdk_target_name}_ble",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",
