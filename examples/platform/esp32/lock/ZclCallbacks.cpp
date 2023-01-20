@@ -43,7 +43,7 @@ using namespace ::chip::DeviceLayer::Internal;
  */
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint) {}
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
     bool status = BoltLockMgr().Lock(endpointId, pinCode, err);
@@ -55,7 +55,7 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
-                                              DlOperationError & err)
+                                              OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
     bool status = BoltLockMgr().Unlock(endpointId, pinCode, err);
@@ -67,7 +67,7 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
     return status;
 }
 
-bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential)
 {
     return BoltLockMgr().GetCredential(endpointId, credentialIndex, credentialType, credential);
@@ -75,7 +75,7 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
 
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
                                         chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
-                                        DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+                                        CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
 {
     return BoltLockMgr().SetCredential(endpointId, credentialIndex, creator, modifier, credentialStatus, credentialType,
                                        credentialData);
@@ -88,8 +88,8 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
 
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
                                   chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
-                                  DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
-                                  const DlCredential * credentials, size_t totalCredentials)
+                                  UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
+                                  const CredentialStruct * credentials, size_t totalCredentials)
 {
 
     return BoltLockMgr().SetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus, usertype, credentialRule,
@@ -115,7 +115,7 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t h
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                          DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute)
 {
     return BoltLockMgr().SetWeekdaySchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute, endHour,
@@ -129,7 +129,7 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t y
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
-                                          uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
+                                          uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
     return BoltLockMgr().SetHolidaySchedule(endpointId, holidayIndex, status, localStartTime, localEndTime, operatingMode);
 }
