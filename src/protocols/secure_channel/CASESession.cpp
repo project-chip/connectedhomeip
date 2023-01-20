@@ -1549,7 +1549,7 @@ exit:
     if (err != CHIP_NO_ERROR && !ignoreFailure)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        // Abort the pending establish, which is normally done by the caller,
+        // Abort the pending establish, which is normally done by CASESession::OnMessageReceived,
         // but in the background processing case must be done here.
         DiscardExchange();
         AbortPendingEstablish(err);
