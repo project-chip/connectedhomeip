@@ -94,40 +94,43 @@ protected:
         kNonUrgent = 0x2,
     };
 
-    // TODO: consider alternate storage scheme to optimize space requirement
-
     // Flat list of subscriptions indexed from from 0 to CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS-1
     //
     // Each entry in list is a Subscription TLV structure:
-    //   Struct of:
+    //   Structure of: (Subscription info)
     //     Node ID
     //     Fabric Index
     //     Subscription ID
     //     Min interval
     //     Max interval
     //     Fabric filtered boolean
-    //     Attribute Path Count x, with these fields repeating x times
-    //       Endpoint ID
-    //       Cluster ID
-    //       Attribute/event ID
-    //     Event Path Count x, with these fields repeating x times
-    //       Event subscription type (urgent / non-urgent)
-    //       Endpoint ID
-    //       Cluster ID
-    //       Event ID
+    //     List of:
+    //       Structure of: (Attribute path)
+    //         Endpoint ID
+    //         Cluster ID
+    //         Attribute ID
+    //     List of:
+    //       Structure of: (Event path)
+    //         Event subscription type (urgent / non-urgent)
+    //         Endpoint ID
+    //         Cluster ID
+    //         Event ID
 
-    static constexpr TLV::Tag kPeerNodeIdTag     = TLV::ContextTag(2);
-    static constexpr TLV::Tag kFabricIndexTag    = TLV::ContextTag(1);
-    static constexpr TLV::Tag kSubscriptionIdTag = TLV::ContextTag(3);
-    static constexpr TLV::Tag kMinIntervalTag    = TLV::ContextTag(4);
-    static constexpr TLV::Tag kMaxIntervalTag    = TLV::ContextTag(5);
-    static constexpr TLV::Tag kFabricFilteredTag = TLV::ContextTag(6);
-    static constexpr TLV::Tag kPathCountTag      = TLV::ContextTag(7);
-    static constexpr TLV::Tag kEventPathTypeTag  = TLV::ContextTag(8);
-    static constexpr TLV::Tag kEndpointIdTag     = TLV::ContextTag(9);
-    static constexpr TLV::Tag kClusterIdTag      = TLV::ContextTag(10);
-    static constexpr TLV::Tag kAttributeIdTag    = TLV::ContextTag(11);
-    static constexpr TLV::Tag kEventIdTag        = TLV::ContextTag(12);
+    static constexpr TLV::Tag kPeerNodeIdTag         = TLV::ContextTag(1);
+    static constexpr TLV::Tag kFabricIndexTag        = TLV::ContextTag(2);
+    static constexpr TLV::Tag kSubscriptionIdTag     = TLV::ContextTag(3);
+    static constexpr TLV::Tag kMinIntervalTag        = TLV::ContextTag(4);
+    static constexpr TLV::Tag kMaxIntervalTag        = TLV::ContextTag(5);
+    static constexpr TLV::Tag kFabricFilteredTag     = TLV::ContextTag(6);
+    static constexpr TLV::Tag kAttributePathsListTag = TLV::ContextTag(7);
+    static constexpr TLV::Tag kEventPathsListTag     = TLV::ContextTag(8);
+    static constexpr TLV::Tag kAttributePathTag      = TLV::ContextTag(9);
+    static constexpr TLV::Tag kEventPathTag          = TLV::ContextTag(10);
+    static constexpr TLV::Tag kEndpointIdTag         = TLV::ContextTag(11);
+    static constexpr TLV::Tag kClusterIdTag          = TLV::ContextTag(12);
+    static constexpr TLV::Tag kAttributeIdTag        = TLV::ContextTag(13);
+    static constexpr TLV::Tag kEventIdTag            = TLV::ContextTag(14);
+    static constexpr TLV::Tag kEventPathTypeTag      = TLV::ContextTag(16);
 
     PersistentStorageDelegate * mStorage;
     ObjectPool<SimpleSubscriptionInfoIterator, kIteratorsMax> mSubscriptionInfoIterators;

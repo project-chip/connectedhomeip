@@ -37,12 +37,15 @@ constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kSubscriptionIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kMinIntervalTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kMaxIntervalTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kFabricFilteredTag;
-constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kPathCountTag;
-constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventPathTypeTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kAttributePathsListTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventPathsListTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kAttributePathTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventPathTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEndpointIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kClusterIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kAttributeIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventIdTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventPathTypeTag;
 
 SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::SimpleSubscriptionInfoIterator(
     SimpleSubscriptionResumptionStorage & storage) :
@@ -177,15 +180,21 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     ReturnErrorOnFailure(reader.Get(subscriptionInfo.mFabricFiltered));
 
     // Attribute Paths
-    uint16_t pathCount = 0;
-    ReturnErrorOnFailure(reader.Next(kPathCountTag));
-    ReturnErrorOnFailure(reader.Get(pathCount));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_List, kAttributePathsListTag));
+    TLV::TLVType attributesListType;
+    ReturnErrorOnFailure(reader.EnterContainer(attributesListType));
+
+    size_t pathCount = 0;
+    ReturnErrorOnFailure(reader.CountRemainingInContainer(&pathCount));
 
     // If a stack struct is being reused to iterate, free the previous paths ScopedMemoryBuffer
     subscriptionInfo.mAttributePaths.Free();
-    subscriptionInfo.mAttributePaths = Platform::ScopedMemoryBufferWithSize<AttributePathParamsValues>();
     if (pathCount)
     {
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, kAttributePathTag));
+        TLV::TLVType attributeContainerType;
+        ReturnErrorOnFailure(reader.EnterContainer(attributeContainerType));
+
         subscriptionInfo.mAttributePaths.Calloc(pathCount);
         ReturnErrorCodeIf(subscriptionInfo.mAttributePaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
         for (uint16_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
@@ -199,22 +208,29 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
             ReturnErrorOnFailure(reader.Next(kAttributeIdTag));
             ReturnErrorOnFailure(reader.Get(subscriptionInfo.mAttributePaths[pathIndex].mAttributeId));
         }
+        ReturnErrorOnFailure(reader.ExitContainer(attributeContainerType));
     }
+    ReturnErrorOnFailure(reader.ExitContainer(attributesListType));
 
     // Event Paths
-    pathCount = 0;
-    ReturnErrorOnFailure(reader.Next(kPathCountTag));
-    ReturnErrorOnFailure(reader.Get(pathCount));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_List, kEventPathsListTag));
+    TLV::TLVType eventsListType;
+    ReturnErrorOnFailure(reader.EnterContainer(eventsListType));
+
+    ReturnErrorOnFailure(reader.CountRemainingInContainer(&pathCount));
 
     // If a stack struct is being reused to iterate, free the previous paths ScopedMemoryBuffer
     subscriptionInfo.mEventPaths.Free();
-    subscriptionInfo.mEventPaths = Platform::ScopedMemoryBufferWithSize<EventPathParamsValues>();
     if (pathCount)
     {
         subscriptionInfo.mEventPaths.Calloc(pathCount);
         ReturnErrorCodeIf(subscriptionInfo.mEventPaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
         for (uint16_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
         {
+            ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, kEventPathTag));
+            TLV::TLVType eventContainerType;
+            ReturnErrorOnFailure(reader.EnterContainer(eventContainerType));
+
             EventPathType eventPathType;
             ReturnErrorOnFailure(reader.Next(kEventPathTypeTag));
             ReturnErrorOnFailure(reader.Get(eventPathType));
@@ -229,8 +245,11 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
 
             ReturnErrorOnFailure(reader.Next(kEventIdTag));
             ReturnErrorOnFailure(reader.Get(subscriptionInfo.mEventPaths[pathIndex].mEventId));
+
+            ReturnErrorOnFailure(reader.ExitContainer(eventContainerType));
         }
     }
+    ReturnErrorOnFailure(reader.ExitContainer(eventsListType));
 
     ReturnErrorOnFailure(reader.ExitContainer(subscriptionContainerType));
 
@@ -248,17 +267,30 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, Su
     ReturnErrorOnFailure(writer.Put(kMaxIntervalTag, subscriptionInfo.mMaxInterval));
     ReturnErrorOnFailure(writer.Put(kFabricFilteredTag, subscriptionInfo.mFabricFiltered));
 
-    ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mAttributePaths.AllocatedSize())));
+    // Attribute paths
+    TLV::TLVType attributesListType;
+    ReturnErrorOnFailure(writer.StartContainer(kAttributePathsListTag, TLV::kTLVType_List, attributesListType));
     for (size_t pathIndex = 0; pathIndex < subscriptionInfo.mAttributePaths.AllocatedSize(); pathIndex++)
     {
+        TLV::TLVType attributeContainerType = TLV::kTLVType_Structure;
+        ReturnErrorOnFailure(writer.StartContainer(kAttributePathTag, TLV::kTLVType_Structure, attributeContainerType));
+
         ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mAttributePaths[pathIndex].mEndpointId));
         ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mAttributePaths[pathIndex].mClusterId));
         ReturnErrorOnFailure(writer.Put(kAttributeIdTag, subscriptionInfo.mAttributePaths[pathIndex].mAttributeId));
-    }
 
-    ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mEventPaths.AllocatedSize())));
+        ReturnErrorOnFailure(writer.EndContainer(attributeContainerType));
+    }
+    ReturnErrorOnFailure(writer.EndContainer(attributesListType));
+
+    // Event paths
+    TLV::TLVType eventsListType;
+    ReturnErrorOnFailure(writer.StartContainer(kEventPathsListTag, TLV::kTLVType_List, eventsListType));
     for (size_t pathIndex = 0; pathIndex < subscriptionInfo.mEventPaths.AllocatedSize(); pathIndex++)
     {
+        TLV::TLVType eventContainerType = TLV::kTLVType_Structure;
+        ReturnErrorOnFailure(writer.StartContainer(kEventPathTag, TLV::kTLVType_Structure, eventContainerType));
+
         if (subscriptionInfo.mEventPaths[pathIndex].mIsUrgentEvent)
         {
             ReturnErrorOnFailure(writer.Put(kEventPathTypeTag, EventPathType::kUrgent));
@@ -270,7 +302,10 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, Su
         ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mEventPaths[pathIndex].mEndpointId));
         ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mEventPaths[pathIndex].mClusterId));
         ReturnErrorOnFailure(writer.Put(kEventIdTag, subscriptionInfo.mEventPaths[pathIndex].mEventId));
+
+        ReturnErrorOnFailure(writer.EndContainer(eventContainerType));
     }
+    ReturnErrorOnFailure(writer.EndContainer(eventsListType));
 
     ReturnErrorOnFailure(writer.EndContainer(subscriptionContainerType));
 

@@ -737,7 +737,11 @@ void ReadHandler::PersistSubscription()
     VerifyOrReturn(subscriptionInfo.SetAttributePaths(mpAttributePathList) == CHIP_NO_ERROR);
     VerifyOrReturn(subscriptionInfo.SetEventPaths(mpEventPathList) == CHIP_NO_ERROR);
 
-    subscriptionResumptionStorage->Save(subscriptionInfo);
+    CHIP_ERROR err = subscriptionResumptionStorage->Save(subscriptionInfo);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to save subscription info error: '%" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState)
