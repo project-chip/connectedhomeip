@@ -258,6 +258,8 @@ class ChipDeviceController():
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
             self._ChipStack.commissioningEventRes = err
+            if self._dmLib.pychip_TestCommissionerUsed():
+                self._ChipStack.commissioningEventRes = self._dmLib.pychip_GetCompletionError()
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
 
@@ -484,6 +486,10 @@ class ChipDeviceController():
 
     def SetTestCommissionerSimulateFailureOnReport(self, stage: int):
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport(
+            stage)
+
+    def SetTestCommissionerPrematureCompleteAfter(self, stage: int):
+        return self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter(
             stage)
 
     def CheckTestCommissionerCallbacks(self):
@@ -1436,6 +1442,13 @@ class ChipDeviceController():
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.argtypes = [
                 c_uint8]
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.restype = c_bool
+
+            self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter.argtypes = [
+                c_uint8]
+            self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter.restype = c_bool
+
+            self._dmLib.pychip_GetCompletionError.argtypes = []
+            self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64

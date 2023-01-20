@@ -48,6 +48,12 @@ protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
     CHIP_ERROR PerformStep(CommissioningStage nextStage);
+    CommissioneeDeviceProxy * GetCommissioneeDeviceProxy() { return mCommissioneeDeviceProxy; }
+    /**
+     * The device argument to GetCommandTimeout is the device whose session will
+     * be used for sending the relevant command.
+     */
+    Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
 
 private:
     DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
@@ -64,11 +70,6 @@ private:
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, IdentityProtectionKeySpan ipk, NodeId adminSubject);
-    /**
-     * The device argument to GetCommandTimeout is the device whose session will
-     * be used for sending the relevant command.
-     */
-    Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 
