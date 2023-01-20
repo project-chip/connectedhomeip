@@ -62,8 +62,7 @@
         "Test_TC_DA_1_3",
         "Test_TC_DA_1_4",
         "Test_TC_DA_1_5",
-        "Test_TC_DA_1_6",
-        "Test_TC_DA_1_7"
+        "Test_TC_DA_1_6"
     ],
     "DeviceManagement": [
         "Test_TC_BINFO_2_2",
@@ -218,7 +217,6 @@
         "Test_TC_SC_3_2",
         "Test_TC_SC_3_3",
         "Test_TC_SC_3_4",
-        "Test_TC_SC_3_6",
         "Test_TC_SC_4_1",
         "Test_TC_SC_4_2",
         "Test_TC_SC_4_3",

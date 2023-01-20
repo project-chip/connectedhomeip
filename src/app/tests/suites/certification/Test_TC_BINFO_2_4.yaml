@@ -24,6 +24,17 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Note: : Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition:"
+      verification: |
+          1. Commission TH to DUT
+          2. DUT subscribes to the events it supports
+      disabled: true
+
     - label: "Simulate a Reachable attribute change on the TH"
       PICS: BINFO.C.E03
       verification: |
@@ -31,7 +42,7 @@ tests:
 
           As its an optional event we cannot generate the event as of now , hence no example logs provided.
 
-          ./chip-tool basic read-event  reachable-changed 1 0
+          ./chip-tool  basicinformation read-event  reachable-changed 1 0
       disabled: true
 
     - label: "Simulate a shutdown on the TH"
@@ -49,37 +60,146 @@ tests:
           2.  run below subscribe-event  command in interactive mode shell and then Turn down the TH (all-clusters-app)
           basic subscribe-event shut-down 20 100 1 0
 
-          On DUT as a client side, ,verify that Shutdown event has priority set as CRITICAL
+          On TH(all-cluster-app), ,verify that Shutdown event has priority set as CRITICAL (0x2)
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0001
-          [1653050528.900202][119367:119372] CHIP:TOO:          Event number: 5
-          [1653050528.900295][119367:119372] CHIP:TOO:          Priority: Critical
-          [1653050528.900386][119367:119372] CHIP:TOO:          Timestamp: 289436805
-          [1653050528.900630][119367:119372] CHIP:TOO:   ShutDown: {
-          [1653050528.900732][119367:119372] CHIP:TOO:    }
-          [1653050528.900892][119367:119372] CHIP:DMG: Refresh LivenessCheckTime for 28000 milliseconds with SubscriptionId = 0x27408c83 Peer = 01:0000000000000
+          [1666095658.719821][16788:16788] CHIP:DMG: Unblock report hold after min 20 seconds
+          ^C[1666095661.196050][16788:16788] CHIP:DL: Caught signal 2
+          [1666095661.196434][16788:16788] CHIP:DL: Select failed: ../../third_party/connectedhomeip/src/system/SystemLayerImplSelect.cpp:493: OS Error 0x02000004: Interrupted system call
+          [1666095661.196516][16788:16788] CHIP:ZCL: Emitting ShutDown event
+          [1666095661.196659][16788:16788] CHIP:EVL: LogEvent event number: 0x0000000000000004 priority: 2, endpoint id:  0x0 cluster id: 0x0000_0028 event id: 0x1 Sys timestamp: 0x0000000006C599DA
+          [1666095661.196784][16788:16788] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 34 DirtyGeneration = 0
+          [1666095661.196870][16788:16788] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1666095661.196942][16788:16788] CHIP:DMG: AccessControl: allowed
+          [1666095661.197336][16788:16788] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1666095661.197412][16788:16788] CHIP:DMG: AccessControl: allowed
+          [1666095661.197544][16788:16788] CHIP:DMG: Fetched 1 events
+          [1666095661.197604][16788:16788] CHIP:DMG: <RE> Sending report (payload has 46 bytes)...
+          [1666095661.197694][16788:16788] CHIP:DMG: IM RH moving to [AwaitingReportResponse]
+          [1666095661.198422][16788:16788] CHIP:EM: <<< [E:41036i M:8509282] (S) Msg TX to 1:000000000001B669 [CE46] --- Type 0001:05 (IM:ReportData)
+          [1666095661.198540][16788:16788] CHIP:IN: (S) Sending msg 8509282 on secure session with LSID: 51611
+          [1666095661.199285][16788:16788] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0e:be37%wlan0]:49389 | 8509282 | [Interaction Model  (1) / Report Data (0x05) / Session = 13015 / Exchange = 41036]
+          [1666095661.199393][16788:16788] CHIP:DMG: Header Flags =
+          [1666095661.199457][16788:16788] CHIP:DMG: {
+          [1666095661.199546][16788:16788] CHIP:DMG:     Exchange (0x05) =
+          [1666095661.199606][16788:16788] CHIP:DMG:     {
+          [1666095661.199649][16788:16788] CHIP:DMG:         Initiator = true
+          [1666095661.199694][16788:16788] CHIP:DMG:         NeedsAck = true
+          [1666095661.199739][16788:16788] CHIP:DMG:     }
+          [1666095661.199802][16788:16788] CHIP:DMG: }
+          [1666095661.199858][16788:16788] CHIP:DMG:
+          [1666095661.199921][16788:16788] CHIP:DMG: Encrypted Payload (76 bytes) =
+          [1666095661.199967][16788:16788] CHIP:DMG: {
+          [1666095661.200011][16788:16788] CHIP:DMG:     data = 00d7320062d7810003c31589377980d0f605ee088487c6447c4af8c6c81ca99435840ff42595614bb74bdc5fd0f637a32f55ea9fe14602448c8e6249a76e2b39c0b18ee6a2af4b2ca820e664
+          [1666095661.200062][16788:16788] CHIP:DMG:     buffer_ptr = 187651017181200
+          [1666095661.200123][16788:16788] CHIP:DMG: }
+          [1666095661.200322][16788:16788] CHIP:DMG:
+          [1666095661.200502][16788:16788] CHIP:DMG: ReportDataMessage =
+          [1666095661.200563][16788:16788] CHIP:DMG: {
+          [1666095661.200618][16788:16788] CHIP:DMG:         SubscriptionId = 0xba47e717,
+          [1666095661.200682][16788:16788] CHIP:DMG:         EventReportIBs =
+          [1666095661.200762][16788:16788] CHIP:DMG:         [
+          [1666095661.200824][16788:16788] CHIP:DMG:                 EventReportIB =
+          [1666095661.200918][16788:16788] CHIP:DMG:                 {
+          [1666095661.200993][16788:16788] CHIP:DMG:                         EventDataIB =
+          [1666095661.201084][16788:16788] CHIP:DMG:                         {
+          [1666095661.201172][16788:16788] CHIP:DMG:                                 EventPath =
+          [1666095661.201247][16788:16788] CHIP:DMG:                                 {
+          [1666095661.201335][16788:16788] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666095661.201435][16788:16788] CHIP:DMG:                                         Cluster = 0x28,
+          [1666095661.201535][16788:16788] CHIP:DMG:                                         Event = 0x1,
+          [1666095661.201629][16788:16788] CHIP:DMG:                                 },
+          [1666095661.201728][16788:16788] CHIP:DMG:
+          [1666095661.201798][16788:16788] CHIP:DMG:                                 EventNumber = 0x4,
+          [1666095661.201918][16788:16788] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1666095661.201998][16788:16788] CHIP:DMG:                                 SystemTimestamp = 0x6c599da,
+          [1666095661.202071][16788:16788] CHIP:DMG:                                 EventData =
+          [1666095661.202155][16788:16788] CHIP:DMG:                                 {
+          [1666095661.202251][16788:16788] CHIP:DMG:                                 },
+          [1666095661.202345][16788:16788] CHIP:DMG:                         },
+          [1666095661.202435][16788:16788] CHIP:DMG:
+          [1666095661.202508][16788:16788] CHIP:DMG:                 },
+          [1666095661.202596][16788:16788] CHIP:DMG:
+          [1666095661.202660][16788:16788] CHIP:DMG:         ],
       disabled: true
 
     - label: "Simulate a (re)start on the TH after the previous shutdown"
       PICS: BINFO.C.E00
       verification: |
-          ./chip-tool basic read-event start-up 1 0
+          ./chip-tool  basicinformation read-event start-up 1 0
 
-           verify that StartUp event has priority set as CRITICAL and software version field on TH(all-clusters-app) log
+           verify that StartUp event has priority set as CRITICAL(0x2) and software version field on TH(all-clusters-app) log
 
-          [1657193007.841105][5422:5427] CHIP:DMG:         ],
-          [1657193007.841137][5422:5427] CHIP:DMG:
-          [1657193007.841162][5422:5427] CHIP:DMG:         SuppressResponse = true,
-          [1657193007.841186][5422:5427] CHIP:DMG:         InteractionModelRevision = 1
-          [1657193007.841209][5422:5427] CHIP:DMG: }
-          [1657193007.841358][5422:5427] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1657193007.841387][5422:5427] CHIP:TOO:          Event number: 0
-          [1657193007.841409][5422:5427] CHIP:TOO:          Priority: Critical
-          [1657193007.841431][5422:5427] CHIP:TOO:          Timestamp: 132146
-          [1657193007.841531][5422:5427] CHIP:TOO:   StartUp: {
-          [1657193007.841570][5422:5427] CHIP:TOO:     SoftwareVersion: 1
-          [1657193007.841594][5422:5427] CHIP:TOO:    }
-          [1657193007.841691][5422:5427] CHIP:EM: Sending Standalone Ack for MessageCounter:91740387 on exchange 60385i"
+          [1666095714.120905][16801:16801] CHIP:EM: Handling via exchange: 5364r, Delegate: 0xaaaabb940288
+          [1666095714.121004][16801:16801] CHIP:IM: Received Read request
+          [1666095714.121170][16801:16801] CHIP:DMG: ReadRequestMessage =
+          [1666095714.121243][16801:16801] CHIP:DMG: {
+          [1666095714.121299][16801:16801] CHIP:DMG:         EventPathIBs =
+          [1666095714.121371][16801:16801] CHIP:DMG:         [
+          [1666095714.121436][16801:16801] CHIP:DMG:                 EventPath =
+          [1666095714.121511][16801:16801] CHIP:DMG:                 {
+          [1666095714.121590][16801:16801] CHIP:DMG:                         Endpoint = 0x0,
+          [1666095714.121667][16801:16801] CHIP:DMG:                         Cluster = 0x28,
+          [1666095714.121756][16801:16801] CHIP:DMG:                         Event = 0x0,
+          [1666095714.121840][16801:16801] CHIP:DMG:                 },
+          [1666095714.122028][16801:16801] CHIP:DMG:
+          [1666095714.122094][16801:16801] CHIP:DMG:         ],
+          [1666095714.122170][16801:16801] CHIP:DMG:
+          [1666095714.122234][16801:16801] CHIP:DMG:         isFabricFiltered = true,
+          [1666095714.122299][16801:16801] CHIP:DMG:         InteractionModelRevision = 1
+          [1666095714.122361][16801:16801] CHIP:DMG: },
+          [1666095714.122526][16801:16801] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1666095714.122751][16801:16801] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1666095714.122849][16801:16801] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1666095714.122939][16801:16801] CHIP:DMG: AccessControl: allowed
+          [1666095714.123208][16801:16801] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1666095714.123283][16801:16801] CHIP:DMG: AccessControl: allowed
+          [1666095714.123503][16801:16801] CHIP:DMG: Fetched 1 events
+          [1666095714.123581][16801:16801] CHIP:DMG: <RE> Sending report (payload has 45 bytes)...
+          [1666095714.124187][16801:16801] CHIP:EM: <<< [E:5364r M:137175071 (Ack:122333195)] (S) Msg TX to 1:000000000001B669 [CE46] --- Type 0001:05 (IM:ReportData)
+          [1666095714.124298][16801:16801] CHIP:IN: (S) Sending msg 137175071 on secure session with LSID: 4134
+          [1666095714.125008][16801:16801] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0e:be37%wlan0]:42507 | 137175071 | [Interaction Model  (1) / Report Data (0x05) / Session = 6804 / Exchange = 5364]
+          [1666095714.125108][16801:16801] CHIP:DMG: Header Flags =
+          [1666095714.125167][16801:16801] CHIP:DMG: {
+          [1666095714.125254][16801:16801] CHIP:DMG:     Exchange (0x06) =
+          [1666095714.125317][16801:16801] CHIP:DMG:     {
+          [1666095714.125378][16801:16801] CHIP:DMG:         AckMsg = 122333195
+          [1666095714.125436][16801:16801] CHIP:DMG:         NeedsAck = true
+          [1666095714.125491][16801:16801] CHIP:DMG:     }
+          [1666095714.125559][16801:16801] CHIP:DMG: }
+          [1666095714.125615][16801:16801] CHIP:DMG:
+          [1666095714.125681][16801:16801] CHIP:DMG: Encrypted Payload (79 bytes) =
+          [1666095714.125737][16801:16801] CHIP:DMG: {
+          [1666095714.125784][16801:16801] CHIP:DMG:     data = 00941a001f202d08fd6e34f74dcff1465a672c4c21f744f37ff898ebedf0afe4dc318d0fabb2ab1a235f77b70644801a87b621538403c586d44b81d596af74f7da65f18b461ef8ee4cedb3b86177f1
+          [1666095714.125842][16801:16801] CHIP:DMG:     buffer_ptr = 187651174387456
+          [1666095714.125949][16801:16801] CHIP:DMG: }
+          [1666095714.126003][16801:16801] CHIP:DMG:
+          [1666095714.126171][16801:16801] CHIP:DMG: ReportDataMessage =
+          [1666095714.126247][16801:16801] CHIP:DMG: {
+          [1666095714.126304][16801:16801] CHIP:DMG:         EventReportIBs =
+          [1666095714.126389][16801:16801] CHIP:DMG:         [
+          [1666095714.126453][16801:16801] CHIP:DMG:                 EventReportIB =
+          [1666095714.126546][16801:16801] CHIP:DMG:                 {
+          [1666095714.126606][16801:16801] CHIP:DMG:                         EventDataIB =
+          [1666095714.126698][16801:16801] CHIP:DMG:                         {
+          [1666095714.126786][16801:16801] CHIP:DMG:                                 EventPath =
+          [1666095714.126877][16801:16801] CHIP:DMG:                                 {
+          [1666095714.126976][16801:16801] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666095714.127079][16801:16801] CHIP:DMG:                                         Cluster = 0x28,
+          [1666095714.127171][16801:16801] CHIP:DMG:                                         Event = 0x0,
+          [1666095714.127270][16801:16801] CHIP:DMG:                                 },
+          [1666095714.127369][16801:16801] CHIP:DMG:
+          [1666095714.127463][16801:16801] CHIP:DMG:                                 EventNumber = 0x2,
+          [1666095714.127561][16801:16801] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1666095714.127660][16801:16801] CHIP:DMG:                                 SystemTimestamp = 0x6c60dde,
+          [1666095714.127746][16801:16801] CHIP:DMG:                                 EventData =
+          [1666095714.127828][16801:16801] CHIP:DMG:                                 {
+          [1666095714.127930][16801:16801] CHIP:DMG:                                         0x0 = 1,
+          [1666095714.128031][16801:16801] CHIP:DMG:                                 },
+          [1666095714.128123][16801:16801] CHIP:DMG:                         },
+          [1666095714.128200][16801:16801] CHIP:DMG:
+          [1666095714.128267][16801:16801] CHIP:DMG:                 },
+          [1666095714.128339][16801:16801] CHIP:DMG:
+          [1666095714.128414][16801:16801] CHIP:DMG:         ],
       disabled: true
 
     - label: "Simulate a leave current fabric operation on the TH"
@@ -91,12 +211,109 @@ tests:
           2. basic subscribe-event leave 1 100 1 0
           3. operationalcredentials remove-fabric 1 1 0
 
-          verify that leave event has priority as INFO on TH (all-clusters-app)
+          verify that leave event has priority as INFO(0x1) on TH (all-clusters-app)
 
-          [1655369668.996192][2323:2328] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0002
-          [1655369668.996235][2323:2328] CHIP:TOO:          Event number: 2
-          [1655369668.996273][2323:2328] CHIP:TOO:          Priority: Info
-          [1655369668.996311][2323:2328] CHIP:TOO:          Timestamp: 659361
-          [1655369668.998931][2323:2328] CHIP:TOO:   Leave: {
-          [1655369668.998986][2323:2328] CHIP:TOO:    }
+          [1666095741.182466][16801:16801] CHIP:EM: Handling via exchange: 6250r, Delegate: 0xaaaabb940288
+          [1666095741.182603][16801:16801] CHIP:DMG: InvokeRequestMessage =
+          [1666095741.182674][16801:16801] CHIP:DMG: {
+          [1666095741.182735][16801:16801] CHIP:DMG:         suppressResponse = false,
+          [1666095741.182803][16801:16801] CHIP:DMG:         timedRequest = false,
+          [1666095741.182875][16801:16801] CHIP:DMG:         InvokeRequests =
+          [1666095741.182954][16801:16801] CHIP:DMG:         [
+          [1666095741.183015][16801:16801] CHIP:DMG:                 CommandDataIB =
+          [1666095741.183083][16801:16801] CHIP:DMG:                 {
+          [1666095741.183146][16801:16801] CHIP:DMG:                         CommandPathIB =
+          [1666095741.183228][16801:16801] CHIP:DMG:                         {
+          [1666095741.183303][16801:16801] CHIP:DMG:                                 EndpointId = 0x0,
+          [1666095741.183377][16801:16801] CHIP:DMG:                                 ClusterId = 0x3e,
+          [1666095741.183457][16801:16801] CHIP:DMG:                                 CommandId = 0xa,
+          [1666095741.183529][16801:16801] CHIP:DMG:                         },
+          [1666095741.183605][16801:16801] CHIP:DMG:
+          [1666095741.183672][16801:16801] CHIP:DMG:                         CommandFields =
+          [1666095741.183743][16801:16801] CHIP:DMG:                         {
+          [1666095741.183818][16801:16801] CHIP:DMG:                                 0x0 = 1,
+          [1666095741.183898][16801:16801] CHIP:DMG:                         },
+          [1666095741.183967][16801:16801] CHIP:DMG:                 },
+          [1666095741.184041][16801:16801] CHIP:DMG:
+          [1666095741.184102][16801:16801] CHIP:DMG:         ],
+          [1666095741.184172][16801:16801] CHIP:DMG:
+          [1666095741.184231][16801:16801] CHIP:DMG:         InteractionModelRevision = 1
+          [1666095741.184290][16801:16801] CHIP:DMG: },
+          [1666095741.184438][16801:16801] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=a
+          [1666095741.184521][16801:16801] CHIP:DMG: AccessControl: allowed
+          [1666095741.184594][16801:16801] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000A
+          [1666095741.184670][16801:16801] CHIP:ZCL: OpCreds: Received a RemoveFabric Command for FabricIndex 0x1
+          [1666095741.185241][16801:16801] CHIP:EM: <<< [E:6250r M:228971067 (Ack:245528765)] (S) Msg TX to 1:000000000001B669 [CE46] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1666095741.185342][16801:16801] CHIP:IN: (S) Sending msg 228971067 on secure session with LSID: 4135
+          [1666095741.186065][16801:16801] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0e:be37%wlan0]:33876 | 228971067 | [Secure Channel  (0) / Standalone Ack (0x10) / Session = 6773 / Exchange = 6250]
+          [1666095741.186161][16801:16801] CHIP:DMG: Header Flags =
+          [1666095741.186219][16801:16801] CHIP:DMG: {
+          [1666095741.186306][16801:16801] CHIP:DMG:     Exchange (0x02) =
+          [1666095741.186364][16801:16801] CHIP:DMG:     {
+          [1666095741.186423][16801:16801] CHIP:DMG:         AckMsg = 245528765
+          [1666095741.186478][16801:16801] CHIP:DMG:     }
+          [1666095741.186550][16801:16801] CHIP:DMG: }
+          [1666095741.186605][16801:16801] CHIP:DMG:
+          [1666095741.186668][16801:16801] CHIP:DMG: Encrypted Payload (34 bytes) =
+          [1666095741.186723][16801:16801] CHIP:DMG: {
+          [1666095741.186771][16801:16801] CHIP:DMG:     data = 00751a003bd2a50d9cd081c206fbd887adb06448183f58abac5fe703921498ff907c
+          [1666095741.186824][16801:16801] CHIP:DMG:     buffer_ptr = 187651174355296
+          [1666095741.186877][16801:16801] CHIP:DMG: }
+          [1666095741.186928][16801:16801] CHIP:DMG:
+          [1666095741.187240][16801:16801] CHIP:EM: Flushed pending ack for MessageCounter:245528765 on exchange 6250r
+          [1666095741.187395][16801:16801] CHIP:EVL: LogEvent event number: 0x0000000000000004 priority: 1, endpoint id:  0x0 cluster id: 0x0000_0028 event id: 0x2 Sys timestamp: 0x0000000006C6D251
+          [1666095741.187518][16801:16801] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 34 DirtyGeneration = 0
+          [1666095741.187600][16801:16801] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1666095741.187669][16801:16801] CHIP:DMG: AccessControl: allowed
+          [1666095741.188070][16801:16801] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1666095741.188139][16801:16801] CHIP:DMG: AccessControl: allowed
+          [1666095741.188261][16801:16801] CHIP:DMG: Fetched 1 events
+          [1666095741.188337][16801:16801] CHIP:DMG: <RE> Sending report (payload has 49 bytes)...
+          [1666095741.188418][16801:16801] CHIP:DMG: IM RH moving to [AwaitingReportResponse]
+          [1666095741.188911][16801:16801] CHIP:EM: <<< [E:46776i M:228971068] (S) Msg TX to 1:000000000001B669 [CE46] --- Type 0001:05 (IM:ReportData)
+          [1666095741.189010][16801:16801] CHIP:IN: (S) Sending msg 228971068 on secure session with LSID: 4135
+          [1666095741.189659][16801:16801] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0e:be37%wlan0]:33876 | 228971068 | [Interaction Model  (1) / Report Data (0x05) / Session = 6773 / Exchange = 46776]
+          [1666095741.189755][16801:16801] CHIP:DMG: Header Flags =
+          [1666095741.189811][16801:16801] CHIP:DMG: {
+          [1666095741.189942][16801:16801] CHIP:DMG:     Exchange (0x05) =
+          [1666095741.190003][16801:16801] CHIP:DMG:     {
+          [1666095741.190053][16801:16801] CHIP:DMG:         Initiator = true
+          [1666095741.190106][16801:16801] CHIP:DMG:         NeedsAck = true
+          [1666095741.190159][16801:16801] CHIP:DMG:     }
+          [1666095741.190229][16801:16801] CHIP:DMG: }
+          [1666095741.190278][16801:16801] CHIP:DMG:
+          [1666095741.190342][16801:16801] CHIP:DMG: Encrypted Payload (79 bytes) =
+          [1666095741.190396][16801:16801] CHIP:DMG: {
+          [1666095741.190444][16801:16801] CHIP:DMG:     data = 00751a003cd2a50da5a4f51eb09603921cca9183807f8325f3787bbdbc974fe0c64b2797805fc13dd4fbfbbf46633bc2223ca949a306dc3946f2e3d1bfe9b63b6d027228362b95d169f9459cf7fecd
+          [1666095741.190505][16801:16801] CHIP:DMG:     buffer_ptr = 187651174391040
+          [1666095741.190559][16801:16801] CHIP:DMG: }
+          [1666095741.190604][16801:16801] CHIP:DMG:
+          [1666095741.190760][16801:16801] CHIP:DMG: ReportDataMessage =
+          [1666095741.190827][16801:16801] CHIP:DMG: {
+          [1666095741.190888][16801:16801] CHIP:DMG:         SubscriptionId = 0x48ce933e,
+          [1666095741.190950][16801:16801] CHIP:DMG:         EventReportIBs =
+          [1666095741.191025][16801:16801] CHIP:DMG:         [
+          [1666095741.191085][16801:16801] CHIP:DMG:                 EventReportIB =
+          [1666095741.191234][16801:16801] CHIP:DMG:                 {
+          [1666095741.191312][16801:16801] CHIP:DMG:                         EventDataIB =
+          [1666095741.191446][16801:16801] CHIP:DMG:                         {
+          [1666095741.191580][16801:16801] CHIP:DMG:                                 EventPath =
+          [1666095741.191737][16801:16801] CHIP:DMG:                                 {
+          [1666095741.191873][16801:16801] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666095741.191966][16801:16801] CHIP:DMG:                                         Cluster = 0x28,
+          [1666095741.192047][16801:16801] CHIP:DMG:                                         Event = 0x2,
+          [1666095741.192187][16801:16801] CHIP:DMG:                                 },
+          [1666095741.192270][16801:16801] CHIP:DMG:
+          [1666095741.192355][16801:16801] CHIP:DMG:                                 EventNumber = 0x4,
+          [1666095741.192445][16801:16801] CHIP:DMG:                                 PriorityLevel = 0x1,
+          [1666095741.192580][16801:16801] CHIP:DMG:                                 SystemTimestamp = 0x6c6d251,
+          [1666095741.192719][16801:16801] CHIP:DMG:                                 EventData =
+          [1666095741.192798][16801:16801] CHIP:DMG:                                 {
+          [1666095741.192914][16801:16801] CHIP:DMG:                                         0x0 = 1,
+          [1666095741.193061][16801:16801] CHIP:DMG:                                 },
+          [1666095741.193206][16801:16801] CHIP:DMG:                         },
+          [1666095741.193333][16801:16801] CHIP:DMG:
+          [1666095741.193395][16801:16801] CHIP:DMG:                 },
+          [1666095741.193569][16801:16801] CHIP:DMG:
+          [1666095741.193636][16801:16801] CHIP:DMG:         ],
       disabled: true

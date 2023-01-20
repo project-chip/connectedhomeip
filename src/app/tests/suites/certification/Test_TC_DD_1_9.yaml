@@ -43,7 +43,7 @@ tests:
       verification: |
           1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log
 
-          $ sudo ./chip-all-clusters-app --wifi
+          ./chip-all-clusters-app --wifi
 
           [13293:13293] CHIP:DL: Device Configuration:
           [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN
@@ -67,20 +67,21 @@ tests:
 
 
           2. Parse 11-digit Manual Pairing code
-          $ ./chip-tool payload parse-setup-payload 34970112332
+           ./chip-tool payload parse-setup-payload 34970112332
 
-          Verify in DUT as commissioner side:
-          CHIP:SPL: Parsing decimalRepresentation: 34970112332
-          CHIP:SPL: CommissioningFlow: 0
-          CHIP:SPL: VendorID: 0
-          CHIP:SPL: Version: 0
-          CHIP:SPL: ProductID: 0
-          CHIP:SPL: Discriminator: 3840
-          CHIP:SPL: SetUpPINCode: 20202021
-          CHIP:SPL: RendezvousInformation: 0
+          Verify in DUT(CHIP-TOOL)
+          [1667811737.160767][10335:10335] CHIP:SPL: Parsing decimalRepresentation: 34970112332
+          [1667811737.161131][10335:10335] CHIP:SPL: Version:             0
+          [1667811737.161191][10335:10335] CHIP:SPL: VendorID:            0
+          [1667811737.161234][10335:10335] CHIP:SPL: ProductID:           0
+          [1667811737.161286][10335:10335] CHIP:SPL: Custom flow:         0    (STANDARD)
+          [1667811737.161338][10335:10335] CHIP:SPL: Discovery Bitmask:   UNKNOWN
+          [1667811737.161389][10335:10335] CHIP:SPL: Short discriminator: 15   (0xf)
+          [1667811737.161440][10335:10335] CHIP:SPL: Passcode:            20202021
+
 
           3. Parse 21-digit Manual Pairing code
-          $ ./chip-tool payload parse-setup-payload 749701123365521327694
+           ./chip-tool payload parse-setup-payload 749701123365521327694
 
           Verify in DUT as commissoiner side:
           CHIP:SPL: Parsing decimalRepresentation: 749701123365521327694
@@ -95,13 +96,13 @@ tests:
           4. Parse payload by commissioning the TH
           ./chip-tool pairing code 1 34970112332
 
-          Verify in DUT as commissioner side:
+          Verify in DUT(CHIP-TOOL)
           [1653556303.582797][4071:4076] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1653556303.582850][4071:4076] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1653556303.583110][4071:4076] CHIP:TOO: Device commissioning completed with success
           [1653556303.583209][4071:4076] CHIP:DMG: ICR moving to [AwaitingDe]
           [1653556303.583255][4071:4076] CHIP:EM: Sending Standalone Ack for MessageCounter:9735725 on exchange 24476i

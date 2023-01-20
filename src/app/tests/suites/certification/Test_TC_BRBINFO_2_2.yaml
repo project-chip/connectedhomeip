@@ -15,6 +15,9 @@
 
 name: 3.2.2. [TC-BRBINFO-2.2] Events [DUT-Server]
 
+PICS:
+    - BRBINFO.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
@@ -53,7 +56,7 @@ tests:
           the bridged device or the connectivity to it."
       PICS: BRBINFO.S.E03
       verification: |
-          To verify thi ReachableChanged follow the below procedure
+          To verify that  the  ReachableChanged follow the below procedure
 
           1. ./chip-tool interactive start
           2. bridgeddevicebasic subscribe reachable 1 60 1 4
