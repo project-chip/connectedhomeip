@@ -19575,6 +19575,23 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeIntrinsicBalanceFactorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeIntrinsicBallastFactorWithParams:params];
+}
+- (void)writeAttributeIntrinsicBalanceFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeIntrinsicBallastFactorWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];
+}
+- (void)writeAttributeIntrinsicBalanceFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                               params:(MTRWriteParams * _Nullable)params
+{
+    [self writeAttributeIntrinsicBallastFactorWithValue:dataValueDictionary
+                                  expectedValueInterval:expectedValueIntervalMs
+                                                 params:params];
+}
 @end
 
 @implementation MTRClusterIlluminanceMeasurement

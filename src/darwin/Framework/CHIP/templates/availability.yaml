@@ -4600,6 +4600,8 @@
               - DeviceTypeList
           AccessControl:
               - ACL
+          BallastConfiguration:
+              - IntrinsicBallastFactor
           OccupancySensing:
               - PIROccupiedToUnoccupiedDelay
               - PIRUnoccupiedToOccupiedDelay
@@ -5583,6 +5585,8 @@
               - DeviceList
           AccessControl:
               - Acl
+          BallastConfiguration:
+              - IntrinsicBalanceFactor
           OccupancySensing:
               - PirOccupiedToUnoccupiedDelay
               - PirUnoccupiedToOccupiedDelay
@@ -5828,6 +5832,8 @@
               DeviceTypeList: DeviceList
           AccessControl:
               ACL: Acl
+          BallastConfiguration:
+              IntrinsicBallastFactor: IntrinsicBalanceFactor
           OccupancySensing:
               PIROccupiedToUnoccupiedDelay: PirOccupiedToUnoccupiedDelay
               PIRUnoccupiedToOccupiedDelay: PirUnoccupiedToOccupiedDelay
