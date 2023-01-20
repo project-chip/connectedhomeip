@@ -18,7 +18,8 @@
  */
 
 #pragma once
-#include "AppEvent.h"
+#include <lock/AppEvent.h>
+#include <lock/BoltLockManager.h>
 #include <platform/CHIPDeviceLayer.h>
 
 // Application-defined error codes in the CHIP_ERROR space.
@@ -28,6 +29,7 @@
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+#define APP_ERROR_ALLOCATION_FAILED CHIP_APPLICATION_ERROR(0x07)
 
 class AppTask
 {
@@ -40,7 +42,30 @@ public:
 
 private:
     CHIP_ERROR Init();
+
+    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(BoltLockManager::Action_t aAction);
+
+    void StartTimer(uint32_t aTimeoutMs);
+    void CancelTimer(void);
+
+    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void TimerEventHandler(TimerHandle_t xTimer);
+
     void DispatchEvent(AppEvent * event);
+
+    enum Function_t
+    {
+        kFunction_NoneSelected   = 0,
+        kFunction_SoftwareUpdate = 0,
+        kFunction_StartBleAdv    = 1,
+        kFunction_FactoryReset   = 2,
+        kFunction_Invalid
+    } Function;
+    Function_t mFunction;
+    bool mFunctionTimerActive;
+    bool mSyncClusterToButtonAction;
+
     static AppTask sAppTask;
     friend AppTask & GetAppTask(void);
 };

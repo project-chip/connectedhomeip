@@ -30,7 +30,7 @@ class ConstraintValidationError(Exception):
 
 
 class BaseConstraint(ABC):
-    '''Constrain Interface'''
+    '''Constraint Interface'''
 
     def __init__(self, types: list, is_null_allowed: bool = False):
         '''An empty type list provided that indicates any type is accepted'''
@@ -58,7 +58,8 @@ class _ConstraintHasValue(BaseConstraint):
         self._has_value = has_value
 
     def check_response(self, value) -> bool:
-        raise ConstraintValidationError('HasValue constraint currently not implemented')
+        raise ConstraintValidationError(
+            'HasValue constraint currently not implemented')
 
 
 class _ConstraintType(BaseConstraint):
@@ -355,3 +356,29 @@ def get_constraints(constraints: dict) -> list[BaseConstraint]:
             raise ConstraintParseError(f'Unknown constraint type:{constraint}')
 
     return _constraints
+
+
+def is_typed_constraint(constraint: str):
+    constraints = {
+        'hasValue': False,
+        'type': False,
+        'minLength': False,
+        'maxLength': False,
+        'isHexString': False,
+        'startsWith': True,
+        'endsWith': True,
+        'isUpperCase': False,
+        'isLowerCase': False,
+        'minValue': True,
+        'maxValue': True,
+        'contains': True,
+        'excludes': True,
+        'hasMasksSet': False,
+        'hasMasksClear': False,
+        'notValue': True,
+    }
+
+    is_typed = constraints.get(constraint)
+    if is_typed is None:
+        raise ConstraintParseError(f'Unknown constraint type:{constraint}')
+    return is_typed

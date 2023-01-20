@@ -1531,12 +1531,13 @@ MTR_NEWLY_AVAILABLE
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams")
 @interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : MTROTASoftwareUpdateProviderClusterQueryImageParams
+@end
 
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use vendorID");
+@interface MTROTASoftwareUpdateProviderClusterQueryImageParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull productId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use productID");
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull productId MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -1700,12 +1701,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams")
 @interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
     : MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams
+@end
 
-@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use providerNodeID");
+@interface MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use vendorID");
+@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
