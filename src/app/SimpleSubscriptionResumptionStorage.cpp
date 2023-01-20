@@ -93,7 +93,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Init(PersistentStorageDelegate *
     uint16_t len = sizeof(countMax);
     CHIP_ERROR err =
         mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
-    // If there's a previous MacCount and it's larger than CHIP_IM_MAX_NUM_SUBSCRIPTIONS,
+    // If there's a previous countMax and it's larger than CHIP_IM_MAX_NUM_SUBSCRIPTIONS,
     // clean up subscriptions beyond the limit
     if ((err == CHIP_NO_ERROR) && (countMax != CHIP_IM_MAX_NUM_SUBSCRIPTIONS))
     {
