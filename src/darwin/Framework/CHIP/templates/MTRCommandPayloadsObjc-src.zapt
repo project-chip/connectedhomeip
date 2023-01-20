@@ -58,12 +58,6 @@ NS_ASSUME_NONNULL_BEGIN
 {{#*inline "oldNameImpl"}}
 
 @implementation MTR{{cluster}}Cluster{{command}}Params
-{{#zcl_command_arguments}}
-{{#if (hasOldName (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
-
-{{> renamed_struct_field_impl cluster=parent.parent.name type=type newName=label oldName=(oldName (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
-{{/if}}
-{{/zcl_command_arguments}}
 @end
 {{/inline}}
 {{#if (not (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true)))}}
@@ -74,7 +68,8 @@ NS_ASSUME_NONNULL_BEGIN
           (not (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatCommandNameRemapping parent.name name))))}}
 {{> oldNameImpl cluster=(compatClusterNameRemapping parent.name)
                 command=(compatCommandNameRemapping parent.name name)}}
-{{else if (hasRenamedFields (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{/if}}
+{{#if (hasRenamedFields (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "deprecatedImpl"}}
 
 @implementation MTR{{cluster}}Cluster{{command}}Params (Deprecated)
