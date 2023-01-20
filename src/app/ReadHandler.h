@@ -384,18 +384,17 @@ private:
 
     enum class CloseOptions : uint8_t
     {
-        kDropPersistedSubscriptions,
-        kKeepPersistedSubscriptions
+        kDropPersistedSubscription,
+        kKeepPersistedSubscription
     };
     /**
      * Called internally to signal the completion of all work on this objecta and signal to a registered callback that it's
      * safe to release this object.
      *
-     *  @param    keepPersisted             Keep the subscription persisted in storage for later resumption. Ignored if
-     * CHIP_CONFIG_PERSIST_SUBSCRIPTIONS not enabled
+     *  @param    options             This specifies whether to drop or keep the subscription
      *
      */
-    void Close(CloseOptions options = CloseOptions::kDropPersistedSubscriptions);
+    void Close(CloseOptions options = CloseOptions::kDropPersistedSubscription);
 
     static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);

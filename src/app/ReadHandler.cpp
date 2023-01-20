@@ -139,7 +139,7 @@ ReadHandler::~ReadHandler()
 void ReadHandler::Close(CloseOptions options)
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    if (options == CloseOptions::kDropPersistedSubscriptions)
+    if (options == CloseOptions::kDropPersistedSubscription)
     {
         auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
@@ -147,9 +147,6 @@ void ReadHandler::Close(CloseOptions options)
             subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(), mSubscriptionId);
         }
     }
-#else
-    // We disregard the keepPersisted API that is only used if the subscription persistence feature is enabled.
-    (void) keepPersisted;
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     MoveToState(HandlerState::AwaitingDestruction);
     mManagementCallback.OnDone(*this);
@@ -370,7 +367,7 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
                  ChipLogValueExchange(apExchangeContext));
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     // TODO: Have a retry mechanism tied to wake interval for IC devices
-    Close(CloseOptions::kKeepPersistedSubscriptions);
+    Close(CloseOptions::kKeepPersistedSubscription);
 #else
     Close();
 #endif
