@@ -46,7 +46,7 @@ limitations under the License.
     <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">WindSupport</attribute>
     <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">WindSetting</attribute>
   </cluster>
-  <!-- Fan Control Cluster data types -->  
+  <!-- Fan Control Cluster data types -->
   <enum name="FanModeType" type="ENUM8">
     <cluster code="0x0202"/>
     <item name="Off" value="0x00"/>
@@ -65,7 +65,7 @@ limitations under the License.
     <item name="Off/Low/High/Auto" value="0x03"/>
     <item name="Off/On/Auto" value="0x04"/>
     <item name="Off/On" value="0x05"/>
-  </enum>  
+  </enum>
   <bitmap name="FanControlFeature" type="BITMAP32">
     <cluster code="0x0202" />
     <field name="Multi-Speed" mask="0x01" />
@@ -74,21 +74,21 @@ limitations under the License.
     <field name="Wind" mask="0x08" />
   </bitmap>
   <bitmap name="RockSupportMask" type="BITMAP8">
-      <cluster code="0x0202" />
-      <field name="RockLeftRight" mask="0x01" />
-      <field name="RockUpDown" mask="0x02" />
-      <field  name="RockRound" mask="0x04" />
+    <cluster code="0x0202" />
+    <field name="RockLeftRight" mask="0x01" />
+    <field name="RockUpDown" mask="0x02" />
+    <field name="RockRound" mask="0x04" />
   </bitmap>
   <bitmap name="WindSupportMask" type="BITMAP8">
-      <cluster code="0x0202" />
-      <field name="Sleep Wind" mask="0x01" />
-      <field name="Natural Wind" mask="0x02" />
+    <cluster code="0x0202" />
+    <field name="Sleep Wind" mask="0x01" />
+    <field name="Natural Wind" mask="0x02" />
   </bitmap>
   <bitmap name="WindSettingMask" type="BITMAP8">
-      <cluster code="0x0202" />
-      <field name="Sleep Wind" mask="0x01" />
-      <field name="Natural Wind" mask="0x02" />
-  </bitmap>    
+    <cluster code="0x0202" />
+    <field name="Sleep Wind" mask="0x01" />
+    <field name="Natural Wind" mask="0x02" />
+  </bitmap>
   <cluster>
     <name>Thermostat User Interface Configuration</name>
     <domain>HVAC</domain>
@@ -372,14 +372,19 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
+    <!-- Ballast Configuration Attribute Set -->
     <attribute side="server" code="0x0000" define="PHYSICAL_MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0x01" optional="false">PhysicalMinLevel</attribute>
     <attribute side="server" code="0x0001" define="PHYSICAL_MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0xFE" optional="false">PhysicalMaxLevel</attribute>
     <attribute side="server" code="0x0002" define="BALLAST_STATUS" type="BITMAP8" min="0x00" max="0x03" writable="false" default="0x00" optional="true">BallastStatus</attribute>
+    <!-- Ballast Settings Attribute Set -->
     <attribute side="server" code="0x0010" define="MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="false">MinLevel</attribute>
     <attribute side="server" code="0x0011" define="MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0xFE" optional="false">MaxLevel</attribute>
-    <attribute side="server" code="0x0014" define="INTRINSIC_BALLAST_FACTOR" type="INT8U" writable="true" isNullable="true" optional="true">IntrinsicBalanceFactor</attribute>
+    <!-- PowerOnLevel and PowerOnFadeTime are deprecated -->
+    <attribute side="server" code="0x0014" define="INTRINSIC_BALLAST_FACTOR" type="INT8U" writable="true" isNullable="true" optional="true">IntrinsicBallastFactor</attribute>
     <attribute side="server" code="0x0015" define="BALLAST_FACTOR_ADJUSTMENT" type="INT8U" min="0x64" writable="true" default="0xFF" isNullable="true" optional="true">BallastFactorAdjustment</attribute>
+    <!-- Lamp Information Attribute Set -->
     <attribute side="server" code="0x0020" define="LAMP_QUANTITY" type="INT8U" writable="false" optional="false">LampQuantity</attribute>
+    <!-- Lamp Settings Attribute Set -->
     <attribute side="server" code="0x0030" define="LAMP_TYPE" type="CHAR_STRING" length="16" writable="true" optional="true">LampType</attribute>
     <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" optional="true">LampManufacturer</attribute>
     <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampRatedHours</attribute>
