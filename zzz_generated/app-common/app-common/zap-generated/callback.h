@@ -8704,7 +8704,7 @@ bool emberAfKeypadInputClusterSendKeyCallback(
  * @brief Keypad Input Cluster SendKeyResponse Command callback (from server)
  */
 bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                      uint8_t status);
+                                                      uint8_t Status);
 /**
  * @brief Content Launcher Cluster LaunchContent Command callback (from client)
  */

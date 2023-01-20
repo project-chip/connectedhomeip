@@ -3520,13 +3520,13 @@ void CHIPKeypadInputClusterSendKeyResponseCallback::CallbackFn(
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.status), status);
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), Status);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status);
 }
 CHIPContentLauncherClusterLaunchResponseCallback::CHIPContentLauncherClusterLaunchResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>(CallbackFn, this)

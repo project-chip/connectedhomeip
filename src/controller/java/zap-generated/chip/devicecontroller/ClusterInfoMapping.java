@@ -6014,10 +6014,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status) {
+    public void onSuccess(Integer Status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
       callback.onSuccess(responseValues);
     }
 
