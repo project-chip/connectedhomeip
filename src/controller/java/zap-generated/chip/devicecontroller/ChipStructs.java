@@ -1454,11 +1454,11 @@ public class ChipStructs {
     }
   }
 
-  public static class TargetNavigatorClusterTargetInfo {
+  public static class TargetNavigatorClusterTargetInfoStruct {
     public Integer identifier;
     public String name;
 
-    public TargetNavigatorClusterTargetInfo(Integer identifier, String name) {
+    public TargetNavigatorClusterTargetInfoStruct(Integer identifier, String name) {
       this.identifier = identifier;
       this.name = name;
     }
@@ -1466,7 +1466,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TargetNavigatorClusterTargetInfo {\n");
+      output.append("TargetNavigatorClusterTargetInfoStruct {\n");
       output.append("\tidentifier: ");
       output.append(identifier);
       output.append("\n");
@@ -1502,13 +1502,13 @@ public class ChipStructs {
     }
   }
 
-  public static class MediaInputClusterInputInfo {
+  public static class MediaInputClusterInputInfoStruct {
     public Integer index;
     public Integer inputType;
     public String name;
     public String description;
 
-    public MediaInputClusterInputInfo(
+    public MediaInputClusterInputInfoStruct(
         Integer index, Integer inputType, String name, String description) {
       this.index = index;
       this.inputType = inputType;
@@ -1519,7 +1519,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("MediaInputClusterInputInfo {\n");
+      output.append("MediaInputClusterInputInfoStruct {\n");
       output.append("\tindex: ");
       output.append(index);
       output.append("\n");

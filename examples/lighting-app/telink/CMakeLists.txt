@@ -47,12 +47,13 @@ add_definitions(
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/LightingManager.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp)
+               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
+               ${TELINK_COMMON}/util/src/PWMDevice.cpp
+               ${TELINK_COMMON}/util/src/ColorFormat.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

@@ -34,8 +34,8 @@ tests:
       response:
           value:
               [
-                  { identifier: 1, name: "exampleName" },
-                  { identifier: 2, name: "exampleName" },
+                  { Identifier: 1, Name: "exampleName" },
+                  { Identifier: 2, Name: "exampleName" },
               ]
 
     - label: "Read attribute current navigator target"
