@@ -9,10 +9,10 @@
 
 import typing
 from dataclasses import dataclass, field
-from enum import IntEnum
 from enum import IntFlag
 
 from chip import ChipUtility
+from chip.clusters.enum import MatterIntEnum
 from chip.tlv import float32, uint
 
 from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
@@ -50,10 +50,15 @@ class {{asUpperCamelCase name}}(Cluster):
 {{#first}}
     class Enums:
 {{/first}}
-        class {{asType label}}(IntEnum):
+        class {{asType label}}(MatterIntEnum):
 {{#zcl_enum_items}}
             k{{asUpperCamelCase label}} = {{asHex value 2}}
 {{/zcl_enum_items}}
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
 
 {{/zcl_enums}}
 
