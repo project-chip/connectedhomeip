@@ -542,42 +542,43 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(&peerAddress, &msg);
-    PacketHeader packetHeader;
+    PacketHeader partialPacketHeader;
 
-    CHIP_ERROR err = packetHeader.DecodeFixed(msg);
+    CHIP_ERROR err = partialPacketHeader.DecodeFixed(msg);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed to decode packet header: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
 
-    if (packetHeader.IsEncrypted())
+    if (partialPacketHeader.IsEncrypted())
     {
-        if (packetHeader.IsGroupSession())
+        if (partialPacketHeader.IsGroupSession())
         {
-            SecureGroupMessageDispatch(packetHeader, peerAddress, std::move(msg));
+            SecureGroupMessageDispatch(partialPacketHeader, peerAddress, std::move(msg));
         }
         else
         {
-            SecureUnicastMessageDispatch(packetHeader, peerAddress, std::move(msg));
+            SecureUnicastMessageDispatch(partialPacketHeader, peerAddress, std::move(msg));
         }
     }
     else
     {
-        UnauthenticatedMessageDispatch(packetHeader, peerAddress, std::move(msg));
+        UnauthenticatedMessageDispatch(partialPacketHeader, peerAddress, std::move(msg));
     }
 }
 
-void SessionManager::UnauthenticatedMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                                    System::PacketBufferHandle && msg)
+void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partialPacketHeader,
+                                                    const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     // Drop unsecured messages with privacy enabled.
-    if (packetHeader.HasPrivacyFlag())
+    if (partialPacketHeader.HasPrivacyFlag())
     {
         ChipLogError(Inet, "Dropping unauthenticated message with privacy flag set");
         return;
     }
 
+    PacketHeader packetHeader;
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
     Optional<NodeId> source      = packetHeader.GetSourceNodeId();
@@ -649,22 +650,23 @@ void SessionManager::UnauthenticatedMessageDispatch(PacketHeader & packetHeader,
     }
 }
 
-void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                                  System::PacketBufferHandle && msg)
+void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPacketHeader,
+                                                  const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(packetHeader.GetSessionId());
+    Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(partialPacketHeader.GetSessionId());
 
     PayloadHeader payloadHeader;
 
     // Drop secure unicast messages with privacy enabled.
-    if (packetHeader.HasPrivacyFlag())
+    if (partialPacketHeader.HasPrivacyFlag())
     {
         ChipLogError(Inet, "Dropping secure unicast message with privacy flag set");
         return;
     }
 
+    PacketHeader packetHeader;
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
@@ -810,23 +812,23 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
     return decrypted;
 }
 
-void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                                System::PacketBufferHandle && msg)
+void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPacketHeader,
+                                                const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     PayloadHeader payloadHeader;
-    PacketHeader packetHeaderCopy;
+    PacketHeader packetHeaderCopy; /// Packet header decoded per group key, with privacy decrypted fields
     System::PacketBufferHandle msgCopy;
     Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
     VerifyOrReturn(nullptr != groups);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (!packetHeader.HasDestinationGroupId())
+    if (!partialPacketHeader.HasDestinationGroupId())
     {
         return; // malformed packet
     }
 
     // Check if Message Header is valid first
-    if (!(packetHeader.IsValidMCSPMsg() || packetHeader.IsValidGroupMsg()))
+    if (!(partialPacketHeader.IsValidMCSPMsg() || partialPacketHeader.IsValidGroupMsg()))
     {
         ChipLogError(Inet, "Invalid condition found in packet header");
         return;
@@ -834,7 +836,7 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
 
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
-    auto iter = groups->IterateGroupSessions(packetHeader.GetSessionId());
+    auto iter = groups->IterateGroupSessions(partialPacketHeader.GetSessionId());
     if (iter == nullptr)
     {
         ChipLogError(Inet, "Failed to retrieve Groups iterator. Discarding everything");
@@ -844,12 +846,12 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
     // Extract MIC from the end of the message.
     uint8_t * data     = msg->Start();
     uint16_t len       = msg->DataLength();
-    uint16_t footerLen = packetHeader.MICTagLength();
+    uint16_t footerLen = partialPacketHeader.MICTagLength();
     VerifyOrReturn(footerLen <= len);
 
     uint16_t taglen = 0;
     MessageAuthenticationCode mac;
-    ReturnOnFailure(mac.Decode(packetHeader, &data[len - footerLen], footerLen, &taglen));
+    ReturnOnFailure(mac.Decode(partialPacketHeader, &data[len - footerLen], footerLen, &taglen));
     VerifyOrReturn(taglen == footerLen);
 
     bool decrypted = false;
@@ -863,8 +865,9 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
             return;
         }
 
-        bool privacy = packetHeader.HasPrivacyFlag();
-        decrypted    = GroupKeyDecryptAttempt(packetHeader, packetHeaderCopy, payloadHeader, privacy, msgCopy, mac, groupContext);
+        bool privacy = partialPacketHeader.HasPrivacyFlag();
+        decrypted =
+            GroupKeyDecryptAttempt(partialPacketHeader, packetHeaderCopy, payloadHeader, privacy, msgCopy, mac, groupContext);
 
 #if CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
         if (privacy && !decrypted)
@@ -876,7 +879,8 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
                 ChipLogError(Inet, "Failed to clone Groupcast message buffer. Discarding.");
                 return;
             }
-            decrypted = GroupKeyDecryptAttempt(packetHeader, packetHeaderCopy, payloadHeader, false, msgCopy, mac, groupContext);
+            decrypted =
+                GroupKeyDecryptAttempt(partialPacketHeader, packetHeaderCopy, payloadHeader, false, msgCopy, mac, groupContext);
         }
 #endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
@@ -887,16 +891,15 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
         ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");
         return;
     }
-    msg          = std::move(msgCopy);
-    packetHeader = packetHeaderCopy;
+    msg = std::move(msgCopy);
 
     // MCSP check
-    if (packetHeader.IsValidMCSPMsg())
+    if (packetHeaderCopy.IsValidMCSPMsg())
     {
         // TODO: When MCSP Msg, create Secure Session instead of a Group session
 
         // TODO
-        // if (packetHeader.GetDestinationNodeId().Value() == ThisDeviceNodeID)
+        // if (packetHeaderCopy.GetDestinationNodeId().Value() == ThisDeviceNodeID)
         // {
         //     MCSP processing..
         // }
@@ -916,13 +919,13 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
     Transport::PeerMessageCounter * counter = nullptr;
 
     if (CHIP_NO_ERROR ==
-        mGroupPeerMsgCounter.FindOrAddPeer(groupContext.fabric_index, packetHeader.GetSourceNodeId().Value(),
-                                           packetHeader.IsSecureSessionControlMsg(), counter))
+        mGroupPeerMsgCounter.FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
+                                           packetHeaderCopy.IsSecureSessionControlMsg(), counter))
     {
 
         if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {
-            err = counter->VerifyOrTrustFirstGroup(packetHeader.GetMessageCounter());
+            err = counter->VerifyOrTrustFirstGroup(packetHeaderCopy.GetMessageCounter());
         }
         else
         {
@@ -932,7 +935,7 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
             return;
 
             // cache and sync
-            // err = counter->VerifyGroup(packetHeader.GetMessageCounter());
+            // err = counter->VerifyGroup(packetHeaderCopy.GetMessageCounter());
         }
 
         if (err != CHIP_NO_ERROR)
@@ -949,15 +952,15 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
         return;
     }
 
-    counter->CommitGroup(packetHeader.GetMessageCounter());
+    counter->CommitGroup(packetHeaderCopy.GetMessageCounter());
 
     if (mCB != nullptr)
     {
         // TODO : When MCSP is done, clean up session creation logic
         Transport::IncomingGroupSession groupSession(groupContext.group_id, groupContext.fabric_index,
-                                                     packetHeader.GetSourceNodeId().Value());
-        CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(groupSession),
+                                                     packetHeaderCopy.GetSourceNodeId().Value());
+        CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeaderCopy, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
+        mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, SessionHandle(groupSession),
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
     }
 }
