@@ -479,7 +479,7 @@ private:
     /**
      * @brief Parse, decrypt, validate, and dispatch a secure unicast message.
      *
-     * @param[in] packetHeader The partial PacketHeader of the message after processing with DecodeFixed.
+     * @param[in] partialPacketHeader The partial PacketHeader of the message after processing with DecodeFixed.
      * If the message decrypts successfully, this will be filled with a fully decoded PacketHeader.
      * @param[in] peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
      * @param msg The full message buffer, including header fields.
