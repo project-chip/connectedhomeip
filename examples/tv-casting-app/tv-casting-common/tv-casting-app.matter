@@ -1816,14 +1816,14 @@ client cluster MediaInput = 1287 {
     kNameUpdates = 0x1;
   }
 
-  struct InputInfo {
+  struct InputInfoStruct {
     int8u index = 0;
     InputTypeEnum inputType = 1;
     char_string<32> name = 2;
     char_string<32> description = 3;
   }
 
-  readonly attribute InputInfo inputList[] = 0;
+  readonly attribute InputInfoStruct inputList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectInputRequest {

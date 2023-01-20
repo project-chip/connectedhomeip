@@ -5054,6 +5054,8 @@
               - CredentialStruct
           TargetNavigator:
               - TargetInfoStruct
+          MediaInput:
+              - InputInfoStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5173,6 +5175,12 @@
               TargetInfoStruct:
                   - identifier
                   - name
+          MediaInput:
+              InputInfoStruct:
+                  - index
+                  - inputType
+                  - name
+                  - descriptionString
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5493,6 +5501,11 @@
                   - ExpiringUser
                   - ScheduleRestrictedUser
                   - RemoteOnlyUser
+          MediaInput:
+              InputTypeEnum:
+                  - HDMI
+                  - SCART
+                  - USB
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5656,6 +5669,8 @@
               - DlCredential
           TargetNavigator:
               - TargetInfo
+          MediaInput:
+              - InputInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5733,6 +5748,11 @@
                   - NotSupported
                   - Unrestricted
                   - MasterUser
+          MediaInput:
+              InputTypeEnum:
+                  - Hdmi
+                  - Scart
+                  - Usb
       bitmaps:
           DoorLock:
               - DlDaysMaskMap
@@ -5908,6 +5928,8 @@
               CredentialStruct: DlCredential
           TargetNavigator:
               TargetInfoStruct: TargetInfo
+          MediaInput:
+              InputInfoStruct: InputInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5998,6 +6020,11 @@
               UserTypeEnum:
                   UnrestrictedUser: Unrestricted
                   ProgrammingUser: MasterUser
+          MediaInput:
+              InputTypeEnum:
+                  HDMI: Hdmi
+                  SCART: Scart
+                  USB: Usb
       bitmaps:
           DoorLock:
               DaysMaskMap: DlDaysMaskMap

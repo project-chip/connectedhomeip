@@ -1005,7 +1005,7 @@ typedef void (*MediaPlaybackAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*MediaInputInputListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> & data);
 typedef void (*MediaInputGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*MediaInputAcceptedCommandListListAttributeCallback)(
@@ -9133,7 +9133,8 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> &
+            value);
 };
 
 class MTRMediaInputInputListListAttributeCallbackSubscriptionBridge : public MTRMediaInputInputListListAttributeCallbackBridge

@@ -5845,10 +5845,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.MediaInputClusterInputInfo> valueList) {
+    public void onSuccess(List<ChipStructs.MediaInputClusterInputInfoStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.MediaInputClusterInputInfo>");
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.MediaInputClusterInputInfoStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

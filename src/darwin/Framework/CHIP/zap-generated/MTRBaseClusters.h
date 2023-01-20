@@ -19028,13 +19028,22 @@ typedef NS_ENUM(uint8_t, MTRMediaInputInputType) {
     MTRMediaInputInputTypeAux API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRMediaInputInputTypeCoax API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRMediaInputInputTypeComposite API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRMediaInputInputTypeHdmi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
+    MTRMediaInputInputTypeHDMI MTR_NEWLY_AVAILABLE = 0x04,
+    MTRMediaInputInputTypeHdmi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRMediaInputInputTypeHDMI")
+    = 0x04,
     MTRMediaInputInputTypeInput API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
     MTRMediaInputInputTypeLine API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
     MTRMediaInputInputTypeOptical API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
     MTRMediaInputInputTypeVideo API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-    MTRMediaInputInputTypeScart API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
-    MTRMediaInputInputTypeUsb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
+    MTRMediaInputInputTypeSCART MTR_NEWLY_AVAILABLE = 0x09,
+    MTRMediaInputInputTypeScart API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRMediaInputInputTypeSCART")
+    = 0x09,
+    MTRMediaInputInputTypeUSB MTR_NEWLY_AVAILABLE = 0x0A,
+    MTRMediaInputInputTypeUsb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRMediaInputInputTypeUSB")
+    = 0x0A,
     MTRMediaInputInputTypeOther API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0B,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 

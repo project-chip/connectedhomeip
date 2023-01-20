@@ -3377,7 +3377,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMediaInputClusterInputInfo
+@implementation MTRMediaInputClusterInputInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3395,7 +3395,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRMediaInputClusterInputInfo alloc] init];
+    auto other = [[MTRMediaInputClusterInputInfoStruct alloc] init];
 
     other.index = self.index;
     other.inputType = self.inputType;
@@ -3412,6 +3412,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRMediaInputClusterInputInfo : MTRMediaInputClusterInputInfoStruct
 @end
 
 @implementation MTRContentLauncherClusterDimension

@@ -9122,7 +9122,7 @@ void MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9130,8 +9130,8 @@ void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * conte
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRMediaInputClusterInputInfo * newElement_0;
-            newElement_0 = [MTRMediaInputClusterInputInfo new];
+            MTRMediaInputClusterInputInfoStruct * newElement_0;
+            newElement_0 = [MTRMediaInputClusterInputInfoStruct new];
             newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
             newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()

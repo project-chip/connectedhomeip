@@ -20154,7 +20154,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface InputListAttributeCallback {
-      void onSuccess(List<ChipStructs.MediaInputClusterInputInfo> valueList);
+      void onSuccess(List<ChipStructs.MediaInputClusterInputInfoStruct> valueList);
 
       void onError(Exception ex);
 
