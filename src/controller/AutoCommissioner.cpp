@@ -22,7 +22,6 @@
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
-#include <zap-generated/CHIPClusters.h>
 
 namespace chip {
 namespace Controller {

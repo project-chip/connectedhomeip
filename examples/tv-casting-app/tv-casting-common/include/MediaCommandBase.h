@@ -36,8 +36,7 @@ public:
 
         sResponseCallback = responseCallback;
 
-        MediaClusterBase cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), mClusterId,
-                                 mTvEndpoint);
+        MediaClusterBase cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), mTvEndpoint);
         return cluster.InvokeCommand(request, nullptr, OnSuccess, OnFailure);
     }
 
