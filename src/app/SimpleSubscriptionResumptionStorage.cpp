@@ -191,14 +191,14 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     subscriptionInfo.mAttributePaths.Free();
     if (pathCount)
     {
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, kAttributePathTag));
-        TLV::TLVType attributeContainerType;
-        ReturnErrorOnFailure(reader.EnterContainer(attributeContainerType));
-
         subscriptionInfo.mAttributePaths.Calloc(pathCount);
         ReturnErrorCodeIf(subscriptionInfo.mAttributePaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
         for (uint16_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
         {
+            ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, kAttributePathTag));
+            TLV::TLVType attributeContainerType;
+            ReturnErrorOnFailure(reader.EnterContainer(attributeContainerType));
+
             ReturnErrorOnFailure(reader.Next(kEndpointIdTag));
             ReturnErrorOnFailure(reader.Get(subscriptionInfo.mAttributePaths[pathIndex].mEndpointId));
 
@@ -207,8 +207,9 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
 
             ReturnErrorOnFailure(reader.Next(kAttributeIdTag));
             ReturnErrorOnFailure(reader.Get(subscriptionInfo.mAttributePaths[pathIndex].mAttributeId));
+
+            ReturnErrorOnFailure(reader.ExitContainer(attributeContainerType));
         }
-        ReturnErrorOnFailure(reader.ExitContainer(attributeContainerType));
     }
     ReturnErrorOnFailure(reader.ExitContainer(attributesListType));
 
