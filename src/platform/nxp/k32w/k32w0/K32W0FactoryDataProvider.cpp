@@ -212,7 +212,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscr
     uint16_t temp          = 0;
 
     ReturnErrorOnFailure(SearchForId(kDiscriminatorId, (uint8_t *) &discriminator, sizeof(discriminator), temp));
-    setupDiscriminator = (uint16_t) (discriminator & 0x0000FFFF);
+    setupDiscriminator = (uint16_t)(discriminator & 0x0000FFFF);
 
     return CHIP_NO_ERROR;
 }
