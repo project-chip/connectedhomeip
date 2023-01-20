@@ -64,7 +64,7 @@ class CodegenBridgePregenerator:
     def __init__(self, sdk_root):
         self.sdk_root = sdk_root
 
-    def Accept(self, idl: InputIdlFile):
+    def Accept(self, idl: InputIdlFile, cpp_only: bool):
         # Bridge is highly specific, a single path is acceptable for dynamic
         # bridge codegen
         return idl.relative_path == "examples/dynamic-bridge-app/bridge-common/bridge-app.matter"
@@ -79,9 +79,12 @@ class CodegenJavaPregenerator:
     def __init__(self, sdk_root):
         self.sdk_root = sdk_root
 
-    def Accept(self, idl: InputIdlFile):
-        # Java is highly specific, a single path is acceptable for dynamic
-        # bridge codegen
+    def Accept(self, idl: InputIdlFile, cpp_only: bool):
+        if cpp_only:
+            return False
+
+        # Java is highly specific, a single path is acceptable for java
+        # codegen
         return idl.relative_path == "src/controller/data_model/controller-clusters.matter"
 
     def CreateTarget(self, idl: InputIdlFile, runner):
@@ -94,7 +97,7 @@ class CodegenCppAppPregenerator:
     def __init__(self, sdk_root):
         self.sdk_root = sdk_root
 
-    def Accept(self, idl: InputIdlFile):
+    def Accept(self, idl: InputIdlFile, cpp_only: bool):
         if idl.file_type != IdlFileType.MATTER:
             return False
 
