@@ -219,6 +219,7 @@ public:
     };
 
     SceneTable(){};
+
     virtual ~SceneTable() = default;
 
     // Not copyable
