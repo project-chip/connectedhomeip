@@ -83,8 +83,8 @@ config CHIP_DFU_OVER_BT_SMP
 	select MCUMGR_CMD_IMG_MGMT
 	select MCUMGR_CMD_OS_MGMT
 	# Enable custom SMP request to erase settings partition.
-	select MCUMGR_GRP_ZEPHYR_BASIC if SOC_SERIES_NRF53X
-	select MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE if SOC_SERIES_NRF53X
+	select MCUMGR_GRP_ZEPHYR_BASIC
+	select MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.
