@@ -27,4 +27,5 @@ wf200_plat_src = [
   "${examples_plat_dir}/wf200/wf200_init.c",
   "${examples_plat_dir}/wf200/efr_spi.c",
   "${examples_plat_dir}/wf200/host_if.cpp",
+  "${examples_plat_dir}/spi_multiplex.c",
 ]
