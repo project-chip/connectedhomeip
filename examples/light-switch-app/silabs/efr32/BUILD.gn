@@ -83,7 +83,7 @@ declare_args() {
 assert(!(disable_lcd && show_qr_code))
 
 # default read handler cannot be used without being an IC device (SED)
-assert(!(chip_config_use_icd_subscription_callbacks && !enable_sleepy_device))
+assert(!chip_config_use_icd_subscription_callbacks || enable_sleepy_device)
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))

@@ -29,10 +29,6 @@ class ICDSubscriptionCallback : public chip::app::ReadHandler::ApplicationCallba
     /**
      * @brief Function called when a subscription is requested.
      *        An ICD will use this function to negotiate the subscription max interval to match its idle time interval
-     *
-     * @param aReadHandler
-     * @param aSecureSession
-     * @return CHIP_ERROR
      */
     CHIP_ERROR OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
                                        chip::Transport::SecureSession & aSecureSession) override;

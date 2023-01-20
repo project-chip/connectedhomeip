@@ -126,4 +126,3 @@ source_set("efr32-ICD-subscription-callback") {
 
   public_configs = [ ":ICD-subscription-callback-config" ]
 }
-#public_configs = [ "" ]
