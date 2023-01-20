@@ -49,7 +49,6 @@ class FactoryDataWriter:
     PRODUCT_URL_NVM3_KEY = "0x87211:"
     PART_NUMBER_NVM3_KEY = "0x87212:"
 
-
     def generate_spake2p_verifier(self):
         """ Generate Spake2+ verifier using the external spake2p tool
 
@@ -170,11 +169,12 @@ class FactoryDataWriter:
         if self._args.gen_spake2p_path:
             self._args.spake2_verifier = self.generate_spake2p_verifier()
         if self._args.product_label:
-            assert(len(self._args.product_label) <= kMaxProductLabelLength), "Product Label exceeds the size limit"
+            assert (len(self._args.product_label) <= kMaxProductLabelLength), "Product Label exceeds the size limit"
         if self._args.product_url:
-            assert(len(self._args.product_url) <= kMaxProductUrlLenght), "Product URL exceeds the size limit"
+            assert (len(self._args.product_url) <= kMaxProductUrlLenght), "Product URL exceeds the size limit"
         if self._args.part_number:
-            assert(len(self._args.part_number) <= kMaxPartNumberLength), "Part number exceeds the size limit"
+            assert (len(self._args.part_number) <= kMaxPartNumberLength), "Part number exceeds the size limit"
+
     def add_SerialNo_To_CMD(self, cmdList):
         """ Add the jtag serial command to the commander command
 
@@ -280,10 +280,10 @@ class FactoryDataWriter:
         if self._args.product_label:
             productLabelByteArray = bytes(self._args.product_label, 'utf-8').hex()
             cmd.extend(["--object", self.PRODUCT_LABEL_NVM3_KEY + str(productLabelByteArray)])
-        
+
         if self._args.product_url:
-            productLabelByteArray = bytes(self._args.product_url, 'utf-8').hex()
-            cmd.extend(["--object", self.PRODUCT_LABEL_NVM3_KEY + str(productLabelByteArray)])
+            productUrlByteArray = bytes(self._args.product_url, 'utf-8').hex()
+            cmd.extend(["--object", self.PRODUCT_URL_NVM3_KEY + str(productUrlByteArray)])
 
         cmd.extend(["--outfile", self.OUT_FILE])
         results = subprocess.run(cmd)
