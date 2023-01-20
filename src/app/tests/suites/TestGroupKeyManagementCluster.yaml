@@ -33,7 +33,7 @@ tests:
       attribute: "maxGroupsPerFabric"
       response:
           constraints:
-              minValue: 2
+              minValue: 4
 
     - label: "Read maxGroupKeysPerFabric"
       command: "readAttribute"
@@ -123,6 +123,8 @@ tests:
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a2 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a2 },
               ]
       response:
           error: FAILURE
@@ -134,8 +136,9 @@ tests:
           value:
               [
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
-                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
               ]
 
     - label: "Read Group Keys"
@@ -145,8 +148,9 @@ tests:
           value:
               [
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
-                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
               ]
 
     - label: "Add Group 1"
@@ -183,6 +187,40 @@ tests:
               - name: "GroupID"
                 value: 0x0102
 
+    - label: "Add Group 3"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0103
+              - name: "GroupName"
+                value: "Group #3"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0103
+
+    - label: "Add Group 4"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0104
+              - name: "GroupName"
+                value: "Group #4"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0104
+
     - label: "Read GroupTable"
       command: "readAttribute"
       attribute: "GroupTable"
@@ -200,6 +238,18 @@ tests:
                       GroupId: 0x0102,
                       Endpoints: [1],
                       GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      endpoints: [1],
+                      GroupName: "Group #4",
                   },
               ]
 
@@ -266,6 +316,18 @@ tests:
                       GroupId: 0x0102,
                       Endpoints: [1],
                       GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      endpoints: [1],
+                      GroupName: "Group #4",
                   },
               ]
 
