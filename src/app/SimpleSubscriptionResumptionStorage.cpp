@@ -93,7 +93,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Init(PersistentStorageDelegate *
     uint16_t len = sizeof(countMax);
     CHIP_ERROR err =
         mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
-    // If there's a previous MacCount and it's larger than CHIP_IM_MAX_NUM_SUBSCRIPTIONS,
+    // If there's a previous countMax and it's larger than CHIP_IM_MAX_NUM_SUBSCRIPTIONS,
     // clean up subscriptions beyond the limit
     if ((err == CHIP_NO_ERROR) && (countMax != CHIP_IM_MAX_NUM_SUBSCRIPTIONS))
     {
@@ -181,6 +181,8 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     ReturnErrorOnFailure(reader.Next(kPathCountTag));
     ReturnErrorOnFailure(reader.Get(pathCount));
 
+    // If a stack struct is being reused to iterate, free the previous paths ScopedMemoryBuffer
+    subscriptionInfo.mAttributePaths.Free();
     subscriptionInfo.mAttributePaths = Platform::ScopedMemoryBufferWithSize<AttributePathParamsValues>();
     if (pathCount)
     {
@@ -204,6 +206,8 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     ReturnErrorOnFailure(reader.Next(kPathCountTag));
     ReturnErrorOnFailure(reader.Get(pathCount));
 
+    // If a stack struct is being reused to iterate, free the previous paths ScopedMemoryBuffer
+    subscriptionInfo.mEventPaths.Free();
     subscriptionInfo.mEventPaths = Platform::ScopedMemoryBufferWithSize<EventPathParamsValues>();
     if (pathCount)
     {
@@ -245,17 +249,17 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, Su
     ReturnErrorOnFailure(writer.Put(kFabricFilteredTag, subscriptionInfo.mFabricFiltered));
 
     ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mAttributePaths.AllocatedSize())));
-    for (size_t currentPathIndex = 0; currentPathIndex < subscriptionInfo.mAttributePaths.AllocatedSize(); currentPathIndex++)
+    for (size_t pathIndex = 0; pathIndex < subscriptionInfo.mAttributePaths.AllocatedSize(); pathIndex++)
     {
-        ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mEndpointId));
-        ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mClusterId));
-        ReturnErrorOnFailure(writer.Put(kAttributeIdTag, subscriptionInfo.mAttributePaths[currentPathIndex].mAttributeId));
+        ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mAttributePaths[pathIndex].mEndpointId));
+        ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mAttributePaths[pathIndex].mClusterId));
+        ReturnErrorOnFailure(writer.Put(kAttributeIdTag, subscriptionInfo.mAttributePaths[pathIndex].mAttributeId));
     }
 
     ReturnErrorOnFailure(writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptionInfo.mEventPaths.AllocatedSize())));
-    for (size_t currentPathIndex = 0; currentPathIndex < subscriptionInfo.mEventPaths.AllocatedSize(); currentPathIndex++)
+    for (size_t pathIndex = 0; pathIndex < subscriptionInfo.mEventPaths.AllocatedSize(); pathIndex++)
     {
-        if (subscriptionInfo.mEventPaths[currentPathIndex].mIsUrgentEvent)
+        if (subscriptionInfo.mEventPaths[pathIndex].mIsUrgentEvent)
         {
             ReturnErrorOnFailure(writer.Put(kEventPathTypeTag, EventPathType::kUrgent));
         }
@@ -263,9 +267,9 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, Su
         {
             ReturnErrorOnFailure(writer.Put(kEventPathTypeTag, EventPathType::kNonUrgent));
         }
-        ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mEventPaths[currentPathIndex].mEndpointId));
-        ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mEventPaths[currentPathIndex].mClusterId));
-        ReturnErrorOnFailure(writer.Put(kEventIdTag, subscriptionInfo.mEventPaths[currentPathIndex].mEventId));
+        ReturnErrorOnFailure(writer.Put(kEndpointIdTag, subscriptionInfo.mEventPaths[pathIndex].mEndpointId));
+        ReturnErrorOnFailure(writer.Put(kClusterIdTag, subscriptionInfo.mEventPaths[pathIndex].mClusterId));
+        ReturnErrorOnFailure(writer.Put(kEventIdTag, subscriptionInfo.mEventPaths[pathIndex].mEventId));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(subscriptionContainerType));
