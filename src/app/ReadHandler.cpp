@@ -41,8 +41,11 @@ using Status = Protocols::InteractionModel::Status;
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType) :
     mExchangeCtx(*this),
-    mManagementCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
-    mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+    mManagementCallback(apCallback)
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    ,
+    mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+#endif
 {
     VerifyOrDie(apExchangeContext != nullptr);
 

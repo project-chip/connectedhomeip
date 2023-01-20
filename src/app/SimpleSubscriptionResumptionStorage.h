@@ -28,6 +28,8 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Pool.h>
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
 namespace chip {
 namespace app {
 
@@ -137,3 +139,5 @@ protected:
 };
 } // namespace app
 } // namespace chip
+
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

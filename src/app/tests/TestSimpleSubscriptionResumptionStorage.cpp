@@ -18,6 +18,8 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
 #include <app/SimpleSubscriptionResumptionStorage.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
@@ -71,7 +73,7 @@ struct TestSubscriptionInfo : public chip::app::SubscriptionResumptionStorage::S
     }
 };
 
-void TestCount(nlTestSuite * inSuite, void * inContext)
+void TestSubscriptionCount(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -115,7 +117,7 @@ void TestCount(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, count == 0);
 }
 
-void TestMaxCount(nlTestSuite * inSuite, void * inContext)
+void TestSubscriptionMaxCount(nlTestSuite * inSuite, void * inContext)
 {
     // Force large MacCount value and check that Init resets it properly, and deletes extra subs:
 
@@ -152,7 +154,7 @@ void TestMaxCount(nlTestSuite * inSuite, void * inContext)
                        chip::DefaultStorageKeyAllocator::SubscriptionResumption(CHIP_IM_MAX_NUM_SUBSCRIPTIONS + 1).KeyName()));
 }
 
-void TestState(nlTestSuite * inSuite, void * inContext)
+void TestSubscriptionState(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -268,7 +270,7 @@ void TestState(nlTestSuite * inSuite, void * inContext)
 static constexpr chip::TLV::Tag kTestValue1Tag = chip::TLV::ContextTag(30);
 static constexpr chip::TLV::Tag kTestValue2Tag = chip::TLV::ContextTag(31);
 
-void TestStateUnexpectedFields(nlTestSuite * inSuite, void * inContext)
+void TestSubscriptionStateUnexpectedFields(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -325,7 +327,7 @@ void TestStateUnexpectedFields(nlTestSuite * inSuite, void * inContext)
     iterator->Release();
 }
 
-void TestStateTooBigToLoad(nlTestSuite * inSuite, void * inContext)
+void TestSubscriptionStateTooBigToLoad(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -385,7 +387,7 @@ void TestStateTooBigToLoad(nlTestSuite * inSuite, void * inContext)
     iterator->Release();
 }
 
-void TestStateJunkData(nlTestSuite * inSuite, void * inContext)
+void TestSubscriptionStateJunkData(nlTestSuite * inSuite, void * inContext)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -410,7 +412,7 @@ void TestStateJunkData(nlTestSuite * inSuite, void * inContext)
 /**
  *  Set up the test suite.
  */
-int Test_Setup(void * inContext)
+int TestSubscription_Setup(void * inContext)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
 
@@ -420,7 +422,7 @@ int Test_Setup(void * inContext)
 /**
  *  Tear down the test suite.
  */
-int Test_Teardown(void * inContext)
+int TestSubscription_Teardown(void * inContext)
 {
     chip::Platform::MemoryShutdown();
     return SUCCESS;
@@ -434,12 +436,12 @@ int Test_Teardown(void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestCount", TestCount),
-    NL_TEST_DEF("TestMaxCount", TestMaxCount),
-    NL_TEST_DEF("TestState", TestState),
-    NL_TEST_DEF("TestStateUnexpectedFields", TestStateUnexpectedFields),
-    NL_TEST_DEF("TestStateTooBigToLoad", TestStateTooBigToLoad),
-    NL_TEST_DEF("TestStateJunkData", TestStateJunkData),
+    NL_TEST_DEF("TestSubscriptionCount", TestSubscriptionCount),
+    NL_TEST_DEF("TestSubscriptionMaxCount", TestSubscriptionMaxCount),
+    NL_TEST_DEF("TestSubscriptionState", TestSubscriptionState),
+    NL_TEST_DEF("TestSubscriptionStateUnexpectedFields", TestSubscriptionStateUnexpectedFields),
+    NL_TEST_DEF("TestSubscriptionStateTooBigToLoad", TestSubscriptionStateTooBigToLoad),
+    NL_TEST_DEF("TestSubscriptionStateJunkData", TestSubscriptionStateJunkData),
 
     NL_TEST_SENTINEL()
 };
@@ -450,7 +452,7 @@ static nlTestSuite sSuite =
 {
     "Test-CHIP-SimpleSubscriptionResumptionStorage",
     &sTests[0],
-    &Test_Setup, &Test_Teardown
+    &TestSubscription_Setup, &TestSubscription_Teardown
 };
 // clang-format on
 
@@ -466,3 +468,15 @@ int TestSimpleSubscriptionResumptionStorage()
 }
 
 CHIP_REGISTER_TEST_SUITE(TestSimpleSubscriptionResumptionStorage)
+
+#else // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+/**
+ *  Main
+ */
+int TestSimpleSubscriptionResumptionStorage()
+{
+    return 0;
+}
+
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

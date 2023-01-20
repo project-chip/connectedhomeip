@@ -504,9 +504,11 @@ private:
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     // Callbacks to handle server-initiated session success/failure
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+#endif
 };
 } // namespace app
 } // namespace chip

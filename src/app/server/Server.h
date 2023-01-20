@@ -378,10 +378,12 @@ private:
 
     void InitFailSafe();
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      * @brief Called at Server::Init time to resume persisted subscriptions if the feature flag is enabled
      */
     void ResumeSubscriptions();
+#endif
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
     {

@@ -28,6 +28,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
 namespace chip {
 namespace app {
 
@@ -455,3 +457,5 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::DeleteAll(FabricIndex fabricInde
 
 } // namespace app
 } // namespace chip
+
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
