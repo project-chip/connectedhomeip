@@ -2144,6 +2144,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterQueryImageParams
+@end
+
+@implementation MTROTASoftwareUpdateProviderClusterQueryImageParams (Deprecated)
 
 - (void)setVendorId:(NSNumber * _Nonnull)vendorId
 {
@@ -2374,6 +2377,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams (Deprecated)
 
 - (void)setProviderNodeId:(NSNumber * _Nonnull)providerNodeId
 {

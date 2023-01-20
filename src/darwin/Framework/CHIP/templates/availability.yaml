@@ -4954,6 +4954,9 @@
                   - location
                   - requestorCanConsent
                   - metadataForProvider
+                  # Next two were introduced and deprecated at the same time, effectively
+                  - vendorId
+                  - productId
               QueryImageResponse:
                   - status
                   - delayedActionTime
@@ -4979,6 +4982,9 @@
                   - announcementReason
                   - metadataForNode
                   - endpoint
+                  # Next two were introduced and deprecated at the same time, effectively
+                  - providerNodeId
+                  - vendorId
           ClientMonitoring:
               RegisterClientMonitoring:
                   - clientNodeId
@@ -5647,6 +5653,14 @@
           ColorControl:
               MoveToColorTemperature:
                   - colorTemperature
+          OTASoftwareUpdateProvider:
+              QueryImage:
+                  - vendorId
+                  - productId
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider:
+                  - providerNodeId
+                  - vendorId
       structs:
           Descriptor:
               - DeviceType
