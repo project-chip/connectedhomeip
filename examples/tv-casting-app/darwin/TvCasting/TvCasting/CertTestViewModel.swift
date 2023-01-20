@@ -14,12 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-//
-//  CertTestViewModel.swift
-//  TvCasting
-//
-//  Created by Jain, Amit on 1/10/23.
-//
 
 import Foundation
 import os.log
