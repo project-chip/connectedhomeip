@@ -324,8 +324,8 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
         const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & targetInfo = iter.GetValue();
 
         jclass responseTypeClass = nullptr;
-        CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/TargetNavigatorTypes$TargetInfoStruct",
-                                                                  responseTypeClass);
+        CHIP_ERROR err =
+            JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/TargetNavigatorTypes$TargetInfo", responseTypeClass);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
