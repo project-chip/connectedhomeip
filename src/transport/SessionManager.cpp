@@ -658,6 +658,13 @@ void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, c
 
     PayloadHeader payloadHeader;
 
+    // Drop secure unicast messages with privacy enabled.
+    if (packetHeader.HasPrivacyFlag())
+    {
+        ChipLogError(Inet, "Dropping secure unicast message with privacy flag set");
+        return;
+    }
+
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
@@ -665,13 +672,6 @@ void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, c
     if (msg.IsNull())
     {
         ChipLogError(Inet, "Secure transport received Unicast NULL packet, discarding");
-        return;
-    }
-
-    // Drop secure unicast messages with privacy enabled.
-    if (packetHeader.HasPrivacyFlag())
-    {
-        ChipLogError(Inet, "Dropping secure unicast message with privacy flag set");
         return;
     }
 
@@ -759,7 +759,7 @@ void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, c
  * Helper function to implement a single attempt to decrypt a groupcast message
  * using the given group key and privacy setting.
  *
- * @param[in] packetHeader The partial packet header of the non-obfuscated fields of the message header
+ * @param[in] partialPacketHeader The partial packet header with non-obfuscated message fields (result of calling DecodeFixed).
  * @param[out] packetHeaderCopy A copy of the packet header, to be filled with privacy decrypted fields
  * @param[out] payloadHeader The payload header of the decrypted message
  * @param[in] applyPrivacy Whether to apply privacy deobfuscation
@@ -770,9 +770,10 @@ void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, c
  * @return true if the message was decrypted successfully
  * @return false if the message could not be decrypted
  */
-static bool GroupKeyDecryptAttempt(PacketHeader & packetHeader, PacketHeader & packetHeaderCopy, PayloadHeader & payloadHeader,
-                                   bool applyPrivacy, System::PacketBufferHandle & msgCopy, MessageAuthenticationCode & mac,
-                                   Credentials::GroupDataProvider::GroupSession & groupContext)
+static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, PacketHeader & packetHeaderCopy,
+                                   PayloadHeader & payloadHeader, bool applyPrivacy, System::PacketBufferHandle & msgCopy,
+                                   const MessageAuthenticationCode & mac,
+                                   const Credentials::GroupDataProvider::GroupSession & groupContext)
 {
     bool decrypted = false;
     CryptoContext context(groupContext.keyContext);
@@ -780,9 +781,9 @@ static bool GroupKeyDecryptAttempt(PacketHeader & packetHeader, PacketHeader & p
     if (applyPrivacy)
     {
         // Perform privacy deobfuscation, if applicable.
-        uint8_t * privacyHeader = packetHeader.PrivacyHeader(msgCopy->Start());
-        size_t privacyLength    = packetHeader.PrivacyHeaderLength();
-        if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac))
+        uint8_t * privacyHeader = partialPacketHeader.PrivacyHeader(msgCopy->Start());
+        size_t privacyLength    = partialPacketHeader.PrivacyHeaderLength();
+        if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, partialPacketHeader, mac))
         {
             return false;
         }

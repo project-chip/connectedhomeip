@@ -479,8 +479,9 @@ private:
     /**
      * @brief Parse, decrypt, validate, and dispatch a secure unicast message.
      *
-     * @param packetHeader The PacketHeader of the message processed with DecodeFixed.
-     * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param[in/out] packetHeader The partial PacketHeader of the message after processing with DecodeFixed.
+     * If the message decrypts successfully, this will be filled with a fully decoded PacketHeader.
+     * @param[in] peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
      * @param msg The full message buffer, including header fields.
      */
     void SecureUnicastMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,

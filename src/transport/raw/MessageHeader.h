@@ -366,18 +366,6 @@ public:
     uint16_t EncodeSizeBytes() const;
 
     /**
-     * Decodes the fixed portion of the header fields from the stream reader.
-     * The fixed header includes: message flags, session id, and security flags.
-     *
-     * @return CHIP_NO_ERROR on success.
-     *
-     * Possible failures:
-     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
-     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
-     */
-    CHIP_ERROR DecodeFixedCommon(Encoding::LittleEndian::Reader & reader);
-
-    /**
      * Decodes the fixed portion of the header fields from the given buffer.
      * The fixed header includes: message flags, session id, and security flags.
      *
@@ -462,6 +450,18 @@ public:
     }
 
 private:
+    /**
+     * Decodes the fixed portion of the header fields from the stream reader.
+     * The fixed header includes: message flags, session id, and security flags.
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
+     */
+    CHIP_ERROR DecodeFixedCommon(Encoding::LittleEndian::Reader & reader);
+
     /// Represents the current encode/decode header version (4 bits)
     static constexpr uint8_t kMsgHeaderVersion = 0x00;
 
