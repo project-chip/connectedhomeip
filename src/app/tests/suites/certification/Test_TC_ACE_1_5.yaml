@@ -86,7 +86,7 @@ tests:
                       FabricIndex: th1FabricIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [ commissionerNodeId ],
                       Targets:
                           [
                               { Cluster: 0x001f, Endpoint: 0, DeviceType: null }
@@ -115,7 +115,7 @@ tests:
                       FabricIndex: th2FabricIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [ commissionerNodeId ],
                       Targets:
                           [
                               { Cluster: 0x001f, Endpoint: 0, DeviceType: null }
@@ -169,7 +169,7 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ 112233 ],
+                      Subjects: [ commissionerNodeId ],
                       Targets: null
                   }
                 ]
