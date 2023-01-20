@@ -31,13 +31,7 @@
 
 class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
-public:
-    virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t type, uint16_t size, uint8_t * value);
 
-private:
-    void OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
-    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };
 
 #endif // DEVICE_LOCK_CALLBACKS_H

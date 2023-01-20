@@ -21,7 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-id.h>  
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -33,7 +33,6 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <app/server/Dnssd.h>
 #include <CHIPDeviceManager.h>
 #include <DeviceCallbacks.h>
 
