@@ -2157,12 +2157,11 @@
 }
 
 - (void)onOff_on:(ContentApp * _Nonnull)contentApp
-          responseCallback:(void (^_Nonnull)(bool))responseCallback
-               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-                    AppServer, "CastingServerBridge().onOff_on() called on Content App with endpoint ID %d", contentApp.endpointId);
+    ChipLogProgress(AppServer, "CastingServerBridge().onOff_on() called on Content App with endpoint ID %d", contentApp.endpointId);
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_on"];
     dispatch_async(_chipWorkQueue, ^{
@@ -2171,7 +2170,7 @@
 
         CHIP_ERROR err = CastingServer::GetInstance()->OnOff_On(&endpoint, [](CHIP_ERROR err) {
             void (^responseCallback)(bool) =
-            [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_on"];
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_on"];
             responseCallback(CHIP_NO_ERROR == err);
         });
         dispatch_async(clientQueue, ^{
@@ -2181,12 +2180,12 @@
 }
 
 - (void)onOff_off:(ContentApp * _Nonnull)contentApp
-          responseCallback:(void (^_Nonnull)(bool))responseCallback
-               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
     ChipLogProgress(
-                    AppServer, "CastingServerBridge().onOff_off() called on Content App with endpoint ID %d", contentApp.endpointId);
+        AppServer, "CastingServerBridge().onOff_off() called on Content App with endpoint ID %d", contentApp.endpointId);
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_off"];
     dispatch_async(_chipWorkQueue, ^{
@@ -2195,7 +2194,7 @@
 
         CHIP_ERROR err = CastingServer::GetInstance()->OnOff_Off(&endpoint, [](CHIP_ERROR err) {
             void (^responseCallback)(bool) =
-            [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_off"];
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_off"];
             responseCallback(CHIP_NO_ERROR == err);
         });
         dispatch_async(clientQueue, ^{
@@ -2205,12 +2204,12 @@
 }
 
 - (void)onOff_toggle:(ContentApp * _Nonnull)contentApp
-          responseCallback:(void (^_Nonnull)(bool))responseCallback
-               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
     ChipLogProgress(
-                    AppServer, "CastingServerBridge().onOff_toggle() called on Content App with endpoint ID %d", contentApp.endpointId);
+        AppServer, "CastingServerBridge().onOff_toggle() called on Content App with endpoint ID %d", contentApp.endpointId);
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_toggle"];
     dispatch_async(_chipWorkQueue, ^{
@@ -2219,7 +2218,7 @@
 
         CHIP_ERROR err = CastingServer::GetInstance()->OnOff_Toggle(&endpoint, [](CHIP_ERROR err) {
             void (^responseCallback)(bool) =
-            [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_toggle"];
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_toggle"];
             responseCallback(CHIP_NO_ERROR == err);
         });
         dispatch_async(clientQueue, ^{

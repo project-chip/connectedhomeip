@@ -1149,9 +1149,9 @@
  @param requestSentHandler Handler to call on sending the request
  */
 - (void)onOff_on:(ContentApp * _Nonnull)contentApp
-responseCallback:(void (^_Nonnull)(bool))responseCallback
-     clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 
 /*!
  @brief Send a OnOff:Off request to a TV
@@ -1165,9 +1165,9 @@ requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
  @param requestSentHandler Handler to call on sending the request
  */
 - (void)onOff_off:(ContentApp * _Nonnull)contentApp
-responseCallback:(void (^_Nonnull)(bool))responseCallback
-     clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 
 /*!
  @brief Send a OnOff:Toggle request to a TV
@@ -1181,8 +1181,8 @@ requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
  @param requestSentHandler Handler to call on sending the request
  */
 - (void)onOff_toggle:(ContentApp * _Nonnull)contentApp
-          responseCallback:(void (^_Nonnull)(bool))responseCallback
-               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 @end
 #endif /* CastingServerBridge_h */
