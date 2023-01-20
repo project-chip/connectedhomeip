@@ -206,6 +206,9 @@ public:
     /**
      * Generally this function has the same semantics as ScheduleWork
      * except it applies to background processing.
+     * 
+     * Delegates to PostBackgroundEvent (which will delegate to PostEvent if
+     * CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING is not true).
      */
     CHIP_ERROR ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
 

@@ -46,13 +46,13 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = 0;
-    mChipTimerActive        = false;
     // TODO: This nulling out of mEventLoopTask should happen when we shut down
     // the task, not here!
     mEventLoopTask           = NULL;
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     mBackgroundEventLoopTask = NULL;
 #endif
+    mChipTimerActive         = false;
 
     // We support calling Shutdown followed by InitChipStack, because some tests
     // do that.  To keep things simple for existing consumers, we keep not
@@ -74,7 +74,6 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
         }
     }
 
-    mShouldRunEventLoop.store(false);
     if (mChipEventQueue == NULL)
     {
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
@@ -96,8 +95,9 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
         xQueueReset(mChipEventQueue);
     }
 
+    mShouldRunEventLoop.store(false);
+
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
-    mShouldRunBackgroundEventLoop.store(false);
     if (mBackgroundEventQueue == NULL)
     {
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
@@ -116,6 +116,8 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     {
         xQueueReset(mBackgroundEventQueue);
     }
+
+    mShouldRunBackgroundEventLoop.store(false);
 #endif
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
@@ -172,7 +174,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const Chip
     {
         return CHIP_ERROR_INTERNAL;
     }
-    auto status = xQueueSend(mChipEventQueue, event, 1);
+    BaseType_t status = xQueueSend(mChipEventQueue, event, 1);
     if (status != pdTRUE)
     {
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
