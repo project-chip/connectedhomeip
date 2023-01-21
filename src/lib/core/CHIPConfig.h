@@ -1343,3 +1343,25 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @}
  */
+
+/**
+ *  @def CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+ *
+ *  @brief
+ *    Enable persistence and resumption of subscriptions on servers.
+ *
+ */
+#ifndef CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#define CHIP_CONFIG_PERSIST_SUBSCRIPTIONS 0
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+/**
+ * @def CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous subscription resumption iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS 2
+#endif
