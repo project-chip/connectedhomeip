@@ -56,6 +56,7 @@ declare_args() {
 
 bl_iot_sdk("sdk") {
   include_dirs = [
+    "${chip_root}/src/platform/bouffalolab/BL702",
     "${example_dir}",
     "${example_common_dir}",
   ]
