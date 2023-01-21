@@ -477,6 +477,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ccm.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher_wrap.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cmac.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/constant_time.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ctr_drbg.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecdh.c",
