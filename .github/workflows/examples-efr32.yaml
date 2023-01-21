@@ -82,6 +82,7 @@ jobs:
                 --enable-flashbundle \
                 --target efr32-brd4187c-window-covering \
                 --target efr32-brd4187c-switch \
+                --target efr32-brd4187c-switch-sed \
                 --target efr32-brd4187c-unit-test \
                 --target efr32-brd4187c-light \
                 --target efr32-brd4187c-light-rpc \
