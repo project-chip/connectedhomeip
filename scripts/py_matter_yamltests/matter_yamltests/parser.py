@@ -246,12 +246,12 @@ class _TestStepWithPlaceholders:
                 response_mapping = self._as_mapping(
                     definitions, self.cluster, command.output_param)
 
-        self._update_with_definition(
-            self.arguments_with_placeholders, argument_mapping)
-        self._update_with_definition(
-            self.response_with_placeholders, response_mapping)
+        self.argument_mapping = argument_mapping
+        self.response_mapping = response_mapping
+        self.update_arguments(self.arguments_with_placeholders)
+        self.update_response(self.response_with_placeholders)
 
-        # This performs a very basic sanity parse time check of constrains. This parsing happens
+        # This performs a very basic sanity parse time check of constraints. This parsing happens
         # again inside post processing response since at that time we will have required variables
         # to substitute in. This parsing check here has value since some test can take a really
         # long time to run so knowing earlier on that the test step would have failed at parsing
@@ -298,6 +298,14 @@ class _TestStepWithPlaceholders:
             target_name = target_name.lower()
 
         return target_name
+
+    def update_arguments(self, arguments_with_placeholders):
+        self._update_with_definition(
+            arguments_with_placeholders, self.argument_mapping)
+
+    def update_response(self, response_with_placeholders):
+        self._update_with_definition(
+            response_with_placeholders, self.response_mapping)
 
     def _update_with_definition(self, container: dict, mapping_type):
         if not container or not mapping_type:
@@ -387,6 +395,8 @@ class TestStep:
         self.response = copy.deepcopy(test.response_with_placeholders)
         self._update_placeholder_values(self.arguments)
         self._update_placeholder_values(self.response)
+        test.update_arguments(self.arguments)
+        test.update_response(self.response)
 
     @property
     def is_enabled(self):
