@@ -37,7 +37,7 @@ tests:
     - label: "DUT sends ResetCounts to TH."
       PICS: DGETH.C.C00.Tx
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool ethernetnetworkdiagnostics reset-counts 1 0
 
