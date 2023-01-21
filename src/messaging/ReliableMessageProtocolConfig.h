@@ -34,31 +34,54 @@ namespace chip {
 /**
  *  @def CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
  *
- *  @brief
- *    Active retransmit interval, or time to wait before retransmission after
- *    subsequent failures in milliseconds.
+ *  @brief Base retry interval of the present node when it is in the active state.
  *
- *  This is the default value, that might be adjusted by end device depending on its
- *  needs (e.g. sleeping period) using Service Discovery TXT record SAI key.
+ *  Base interval that a peer node should use to calculate the retransmission
+ *  timeout when it sends a message to the present node and the present node is
+ *  perceived by the peer as active.
  *
+ *  This value is announced to the peer using SAI (Sleepy Active Interval) key
+ *  in the advertised DNS Service Discovery TXT records. Additionally, it is
+ *  exchanged in the initial phase of the PASE/CASE session establishment.
+ *
+ *  In the case of a Thread device, the default value is increased to limit the
+ *  possibility of spurious retransmissions. The assumption is that the average
+ *  round-trip time of a big request-response pair is substantially longer in
+ *  a Thread network that potentially constists of multiple intermediate hops.
  */
 #ifndef CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+#if CHIP_ENABLE_OPENTHREAD && !CHIP_DEVICE_LAYER_TARGET_LINUX
+#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (800_ms32)
+#else
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (300_ms32)
-#endif // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+#endif
+#endif // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL && !CHIP_DEVICE_LAYER_TARGET_LINUX
 
 /**
  *  @def CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
  *
- *  @brief
- *    Initial base retransmission interval, or time to wait before retransmission after first
- *    failure in milliseconds.
+ *  @brief Base retry interval of the present node when it is in the idle state.
  *
- * This is the default value, that might be adjusted by end device depending on its
- * needs (e.g. sleeping period) using Service Discovery TXT record SII key.
+ *  Base interval that a peer node should use to calculate the retransmission
+ *  timeout when it sends a message to the present node and the present node is
+ *  perceived by the peer as idle.
+ *
+ *  This value is announced to the peer using SII (Sleepy Idle Interval) key
+ *  in the advertised DNS Service Discovery TXT records. Additionally, it is
+ *  exchanged in the initial phase of the PASE/CASE session establishment.
+ *
+ *  In the case of a Thread device, the default value is increased to limit the
+ *  possibility of spurious retransmissions. The assumption is that the average
+ *  round-trip time of a big request-response pair is substantially longer in
+ *  a Thread network that potentially constists of multiple intermediate hops.
  */
 #ifndef CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+#if CHIP_ENABLE_OPENTHREAD && !CHIP_DEVICE_LAYER_TARGET_LINUX
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (800_ms32)
+#else
 #define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (300_ms32)
-#endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+#endif
+#endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL && !CHIP_DEVICE_LAYER_TARGET_LINUX
 
 /**
  *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
@@ -120,6 +143,27 @@ namespace chip {
 #ifndef CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
 #define CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS (4)
 #endif // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+
+/**
+ *  @def CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+ *
+ *  @brief
+ *    A constant value that should be added to the calculated retransmission
+ *    timeout when the present node tramsmits a message.
+ *
+ *  The purpose for this constant is to limit the possibility of spurious
+ *  rertansmissions in the scenario in which a sender that operates in a high-
+ *  latency network (such as Thread) sends a message to a receiver that operates
+ *  in a low-latency network (such as Wi-Fi). In this scenario, the SAI and SII
+ *  parameters advertised by the receiver are low although the average round-
+ *  trip time of a big request-response pair is long due to the nature of the
+ *  sender.
+ */
+#ifndef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+#if CHIP_ENABLE_OPENTHREAD && !CHIP_DEVICE_LAYER_TARGET_LINUX
+#define CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST (500_ms)
+#endif
+#endif // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST && !CHIP_DEVICE_LAYER_TARGET_LINUX
 
 /**
  *  @brief

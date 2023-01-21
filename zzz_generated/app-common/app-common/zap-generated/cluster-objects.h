@@ -20547,7 +20547,7 @@ struct TypeInfo
 } // namespace WakeOnLan
 namespace Channel {
 namespace Structs {
-namespace ChannelInfo {
+namespace ChannelInfoStruct {
 enum class Fields
 {
     kMajorNumber       = 0,
@@ -20575,8 +20575,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ChannelInfo
-namespace LineupInfo {
+} // namespace ChannelInfoStruct
+namespace LineupInfoStruct {
 enum class Fields
 {
     kOperatorName   = 0,
@@ -20602,7 +20602,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace LineupInfo
+} // namespace LineupInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -20772,10 +20772,11 @@ namespace Attributes {
 namespace ChannelList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::ChannelInfo::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelList::Id; }
@@ -20785,10 +20786,10 @@ struct TypeInfo
 namespace Lineup {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::Type>;
-    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType>;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Lineup::Id; }
@@ -20798,10 +20799,10 @@ struct TypeInfo
 namespace CurrentChannel {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::Type>;
-    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType>;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
@@ -20861,7 +20862,7 @@ struct TypeInfo
 } // namespace Channel
 namespace TargetNavigator {
 namespace Structs {
-namespace TargetInfo {
+namespace TargetInfoStruct {
 enum class Fields
 {
     kIdentifier = 0,
@@ -20883,7 +20884,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace TargetInfo
+} // namespace TargetInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -20979,11 +20980,11 @@ namespace Attributes {
 namespace TargetList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType>;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetList::Id; }
@@ -21648,7 +21649,7 @@ struct TypeInfo
 } // namespace MediaPlayback
 namespace MediaInput {
 namespace Structs {
-namespace InputInfo {
+namespace InputInfoStruct {
 enum class Fields
 {
     kIndex       = 0,
@@ -21674,7 +21675,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace InputInfo
+} // namespace InputInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -21833,10 +21834,11 @@ namespace Attributes {
 namespace InputList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::MediaInput::Structs::InputInfo::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InputList::Id; }
@@ -22512,7 +22514,7 @@ struct TypeInfo
 } // namespace ContentLauncher
 namespace AudioOutput {
 namespace Structs {
-namespace OutputInfo {
+namespace OutputInfoStruct {
 enum class Fields
 {
     kIndex      = 0,
@@ -22536,7 +22538,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace OutputInfo
+} // namespace OutputInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -22629,10 +22631,11 @@ namespace Attributes {
 namespace OutputList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutputList::Id; }

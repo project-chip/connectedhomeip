@@ -9,6 +9,7 @@
 #import "MTRCluster_Internal.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRDevice_Internal.h"
 #import "MTRStructsObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
@@ -20,6 +21,9 @@ using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 using chip::Messaging::ExchangeManager;
 using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
@@ -80,12 +84,20 @@ MTR{{cluster}}Cluster{{command}}Params
       {{/if}}
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
         auto * typedBridge = static_cast<MTR{{>callbackName}}CallbackBridge *>(bridge);
-        chip::Optional<uint16_t> timedInvokeTimeoutMs;
+        Optional<uint16_t> timedInvokeTimeoutMs;
+        Optional<Timeout> invokeTimeout;
         ListFreer listFreer;
         {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
         if (params != nil) {
           if (params.timedInvokeTimeoutMs != nil) {
+            params.timedInvokeTimeoutMs = MTRClampedNumber(params.timedInvokeTimeoutMs, @(1), @(UINT16_MAX));
             timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+          }
+          if (params.serverSideProcessingTimeout != nil) {
+            // Clamp to a number of seconds that will not overflow 32-bit
+            // int when converted to ms.
+            auto * serverSideProcessingTimeout = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+            invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
           }
         }
         {{#if mustUseTimedInvoke}}
@@ -107,7 +119,7 @@ MTR{{cluster}}Cluster{{command}}Params
           {{/last}}
         {{/chip_cluster_command_arguments}}
 
-        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs);
+        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
     });
     std::move(*bridge).DispatchAction(self.device);
 }

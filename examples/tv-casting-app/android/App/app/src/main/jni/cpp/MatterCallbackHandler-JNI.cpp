@@ -321,7 +321,7 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
     auto iter = responseData.begin();
     while (iter.Next())
     {
-        const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & targetInfo = iter.GetValue();
+        const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & targetInfo = iter.GetValue();
 
         jclass responseTypeClass = nullptr;
         CHIP_ERROR err =

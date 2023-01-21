@@ -4954,6 +4954,9 @@
                   - location
                   - requestorCanConsent
                   - metadataForProvider
+                  # Next two were introduced and deprecated at the same time, effectively
+                  - vendorId
+                  - productId
               QueryImageResponse:
                   - status
                   - delayedActionTime
@@ -4979,6 +4982,9 @@
                   - announcementReason
                   - metadataForNode
                   - endpoint
+                  # Next two were introduced and deprecated at the same time, effectively
+                  - providerNodeId
+                  - vendorId
           ClientMonitoring:
               RegisterClientMonitoring:
                   - clientNodeId
@@ -5052,6 +5058,15 @@
               - FabricDescriptorStruct
           DoorLock:
               - CredentialStruct
+          TargetNavigator:
+              - TargetInfoStruct
+          MediaInput:
+              - InputInfoStruct
+          AudioOutput:
+              - OutputInfoStruct
+          Channel:
+              - ChannelInfoStruct
+              - LineupInfoStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5167,6 +5182,33 @@
               CredentialStruct:
                   - credentialType
                   - credentialIndex
+          TargetNavigator:
+              TargetInfoStruct:
+                  - identifier
+                  - name
+          MediaInput:
+              InputInfoStruct:
+                  - index
+                  - inputType
+                  - name
+                  - descriptionString
+          AudioOutput:
+              OutputInfoStruct:
+                  - index
+                  - outputType
+                  - name
+          Channel:
+              ChannelInfoStruct:
+                  - majorNumber
+                  - minorNumber
+                  - name
+                  - callSign
+                  - affiliateCallSign
+              LineupInfoStruct:
+                  - operatorName
+                  - lineupName
+                  - postalCode
+                  - lineupInfoType
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5487,6 +5529,18 @@
                   - ExpiringUser
                   - ScheduleRestrictedUser
                   - RemoteOnlyUser
+          MediaInput:
+              InputTypeEnum:
+                  - HDMI
+                  - SCART
+                  - USB
+          AudioOutput:
+              OutputTypeEnum:
+                  - HDMI
+                  - BT
+          Channel:
+              LineupInfoTypeEnum:
+                  - MSO
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5628,6 +5682,14 @@
           ColorControl:
               MoveToColorTemperature:
                   - colorTemperature
+          OTASoftwareUpdateProvider:
+              QueryImage:
+                  - vendorId
+                  - productId
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider:
+                  - providerNodeId
+                  - vendorId
       structs:
           Descriptor:
               - DeviceType
@@ -5648,6 +5710,15 @@
               - FabricDescriptor
           DoorLock:
               - DlCredential
+          TargetNavigator:
+              - TargetInfo
+          MediaInput:
+              - InputInfo
+          AudioOutput:
+              - OutputInfo
+          Channel:
+              - ChannelInfo
+              - LineupInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5725,6 +5796,18 @@
                   - NotSupported
                   - Unrestricted
                   - MasterUser
+          MediaInput:
+              InputTypeEnum:
+                  - Hdmi
+                  - Scart
+                  - Usb
+          AudioOutput:
+              OutputTypeEnum:
+                  - Hdmi
+                  - Bt
+          Channel:
+              LineupInfoTypeEnum:
+                  - Mso
       bitmaps:
           DoorLock:
               - DlDaysMaskMap
@@ -5898,6 +5981,15 @@
               FabricDescriptorStruct: FabricDescriptor
           DoorLock:
               CredentialStruct: DlCredential
+          TargetNavigator:
+              TargetInfoStruct: TargetInfo
+          MediaInput:
+              InputInfoStruct: InputInfo
+          AudioOutput:
+              OutputInfoStruct: OutputInfo
+          Channel:
+              ChannelInfoStruct: ChannelInfo
+              LineupInfoStruct: LineupInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5988,6 +6080,18 @@
               UserTypeEnum:
                   UnrestrictedUser: Unrestricted
                   ProgrammingUser: MasterUser
+          MediaInput:
+              InputTypeEnum:
+                  HDMI: Hdmi
+                  SCART: Scart
+                  USB: Usb
+          AudioOutput:
+              OutputTypeEnum:
+                  HDMI: Hdmi
+                  BT: Bt
+          Channel:
+              LineupInfoTypeEnum:
+                  MSO: Mso
       bitmaps:
           DoorLock:
               DaysMaskMap: DlDaysMaskMap

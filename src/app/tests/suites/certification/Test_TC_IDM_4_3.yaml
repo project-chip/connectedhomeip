@@ -49,7 +49,7 @@ tests:
           attribute which has been subscribed on the DUT by sending an IMWrite
           or Invoke message to the DUT from the TH. +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -127,13 +127,13 @@ tests:
           "DUT and TH activate the subscription for an attribute. Dont change
           the value of the attribute which has been subscribed."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
            onoff  subscribe on-off 10 200  1 1
-           on TH(chip-tool)  verify Verify that DUT is responds right attribute value for above command
+           on TH(chip-tool)  verify that DUT is responds right attribute value for above command
 
           [1657451491.078934][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451491.079004][11635:11640] CHIP:DMG: {
@@ -194,13 +194,13 @@ tests:
           specified during the subscription activation."
       PICS: MCORE.IDM.S.Attribute.DataType_Bool
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
 
-           basic subscribe local-config-disabled 100 200 1 0
+           basicinformation subscribe local-config-disabled 100 200 1 0
            on TH(chip-tool) verify that DUT is responds right attribute value for above command and then send write command to change the attribute value, verify the attribute value is modified or not.
           [1657451690.259096][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733078 from RetransTable on exchange 33639i
           [1657451690.259223][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -236,7 +236,7 @@ tests:
 
 
           here is an example command the TH can write an attribute in the basic cluster in the DUT to change the value that the TH subscribed in the above command.
-           basic write local-config-disabled 1 1 0
+          basicinformation write local-config-disabled 1 1 0
           055928 on exchange 33646i
           [1657451887.786344][11635:11640] CHIP:EM: Received message of type 0x5 with protocolId (0, 1) and MessageCounter:11055929 on exchange 8526r
           [1657451887.786450][11635:11640] CHIP:EM: Handling via exchange: 8526r, Delegate: 0xaaaacf201a78
@@ -282,14 +282,14 @@ tests:
           the subscription activation."
       PICS: MCORE.IDM.S.Attribute.DataType_String
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
 
-          basic subscribe node-label 10 100 1 0
+          basicinformation subscribe node-label 10 100 1 0
 
           on TH(chip-tool)  verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
@@ -325,7 +325,7 @@ tests:
           [1657452002.282717][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff940092b0]: Moving to [AwaitingSu]
 
           here is an example command the TH can write an attribute in the basic cluster in the DUT to change the value that the TH subscribed in the above command.
-           basic write node-label sve 1 0
+          basicinformation write node-label sve 1 0
           [1657452091.179574][11635:11640] CHIP:EM: Handling via exchange: 8527r, Delegate: 0xaaaacf201a78
           [1657452091.179661][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657452091.179685][11635:11640] CHIP:DMG: {
@@ -370,7 +370,7 @@ tests:
           specified during the subscription activation."
       PICS: MCORE.IDM.S.Attribute.DataType_UnsignedInteger
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
            Please use Interactive mode to Verify subscription test cases
@@ -486,7 +486,7 @@ tests:
           specified during the subscription activation."
       PICS: MCORE.IDM.S.Attribute.DataType_List
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
            Please use Interactive mode to Verify subscription test cases
@@ -496,7 +496,7 @@ tests:
            userlabel subscribe label-list 100 500 1 0
            On TH(chip-tool) verify that  DUT is responds right attribute value for above  command
           [1655896309.160632][1885:1890] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3773922725
-          [1655896309.160795][1885:1890] CHIP:TOO:   LabelList: 0 entries
+          [1655896309.160795][1885:1890] CHIP:TOO:   label list: 0 entries
           [1655896309.160851][1885:1890] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
 
           here is an example command the TH can write an attribute in the userlabel cluster in the DUT to change the value that the TH subscribed in the above command.
@@ -504,7 +504,7 @@ tests:
 
           [1655896422.936972][1899:1904] CHIP:DMG: }
           [1655896422.937347][1899:1904] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3773922728
-          [1655896422.937478][1899:1904] CHIP:TOO:   LabelList: 2 entries
+          [1655896422.937478][1899:1904] CHIP:TOO:   label list: 2 entries
           [1655896422.937612][1899:1904] CHIP:TOO:     [1]: {
           [1655896422.937658][1899:1904] CHIP:TOO:       Label: room
           [1655896422.937697][1899:1904] CHIP:TOO:       Value: bedroom 1
@@ -525,13 +525,13 @@ tests:
           KeepSubsriptions flag should be set to False Change the value of the
           attribute requested on the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
-          basic subscribe local-config-disabled 10 100  1 0 --keepSubscriptions 0
+          basicinformation subscribe local-config-disabled 10 100  1 0 --keepSubscriptions 0
           on TH(chip-tool) verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
           [1657453109.707943][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733139 from RetransTable on exchange 33658i
@@ -566,7 +566,7 @@ tests:
           [1657453109.710306][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff94005b60]: Moving to [AwaitingSu]
 
 
-           basic subscribe local-config-disabled 20 200  1 0 --keepSubscriptions 0
+           basicinformation subscribe local-config-disabled 20 200  1 0 --keepSubscriptions 0
           [1657453160.418709][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733142 from RetransTable on exchange 33659i
           [1657453160.418833][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657453160.418902][11635:11640] CHIP:DMG: {
@@ -600,7 +600,7 @@ tests:
 
 
 
-           basic write local-config-disabled 1 1 0
+          basicinformation write local-config-disabled 1 1 0
           [1657453182.701779][11635:11640] CHIP:EM: Handling via exchange: 8539r, Delegate: 0xaaaacf201a78
           [1657453182.701861][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657453182.701893][11635:11640] CHIP:DMG: {
@@ -638,7 +638,7 @@ tests:
           attribute After the Maximum interval time is elapsed, change the value
           of the attribute requested on the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -718,7 +718,7 @@ tests:
           "Activate the subscription between the DUT and the TH for an attribute
           There are no attribute value changes before MaxInterval elapses."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
            Please use Interactive mode to Verify subscription test cases
@@ -778,7 +778,7 @@ tests:
           to the DUT for another attribute with the KeepSubscriptions flag set
           to True. Change both the attribute values on the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
            Please use Interactive mode to Verify subscription test cases
@@ -925,7 +925,7 @@ tests:
           to the DUT for another attribute with the KeepSubscriptions flag set
           to False. Change both the attribute values on the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -1109,7 +1109,7 @@ tests:
           Attribute, Cluster = ClusterID ]]. Set the MinIntervalFloor to some
           value say N(seconds). Change the attribute on the DUT"
       verification: |
-          Please use Interactive mode to Verify subscription test cases
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           onoff subscribe-by-id 0x4001 200 700  1 0xFFFF

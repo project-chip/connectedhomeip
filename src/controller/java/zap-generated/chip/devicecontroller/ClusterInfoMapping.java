@@ -5500,12 +5500,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> data) {
+    public void onSuccess(Integer Status, Optional<String> Data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
-      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo DataResponseValue = new CommandResponseInfo("Data", "Optional<String>");
+      responseValues.put(DataResponseValue, Data);
       callback.onSuccess(responseValues);
     }
 
@@ -5526,10 +5526,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.ChannelClusterChannelInfo> valueList) {
+    public void onSuccess(List<ChipStructs.ChannelClusterChannelInfoStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.ChannelClusterChannelInfo>");
+          new CommandResponseInfo("valueList", "List<ChipStructs.ChannelClusterChannelInfoStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -5623,12 +5623,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> data) {
+    public void onSuccess(Integer Status, Optional<String> Data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
-      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo DataResponseValue = new CommandResponseInfo("Data", "Optional<String>");
+      responseValues.put(DataResponseValue, Data);
       callback.onSuccess(responseValues);
     }
 
@@ -5649,11 +5649,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.TargetNavigatorClusterTargetInfo> valueList) {
+    public void onSuccess(List<ChipStructs.TargetNavigatorClusterTargetInfoStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.TargetNavigatorClusterTargetInfo>");
+              "valueList", "List<ChipStructs.TargetNavigatorClusterTargetInfoStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -5845,10 +5845,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.MediaInputClusterInputInfo> valueList) {
+    public void onSuccess(List<ChipStructs.MediaInputClusterInputInfoStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.MediaInputClusterInputInfo>");
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.MediaInputClusterInputInfoStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -6013,10 +6014,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status) {
+    public void onSuccess(Integer Status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
       callback.onSuccess(responseValues);
     }
 
@@ -6232,10 +6233,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfo> valueList) {
+    public void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfoStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.AudioOutputClusterOutputInfo>");
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.AudioOutputClusterOutputInfoStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

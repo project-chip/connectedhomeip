@@ -190,6 +190,13 @@ public:
 
     // Event number counter.
     static StorageKeyName IMEventNumber() { return StorageKeyName::FromConst("g/im/ec"); }
+
+    // Subscription resumption
+    static StorageKeyName SubscriptionResumption(size_t index)
+    {
+        return StorageKeyName::Formatted("g/su/%x", static_cast<unsigned>(index));
+    }
+    static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
 };
 
 } // namespace chip

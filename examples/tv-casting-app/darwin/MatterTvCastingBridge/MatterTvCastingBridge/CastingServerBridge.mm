@@ -1637,12 +1637,12 @@
                     objCTargetList = [NSMutableArray arrayWithCapacity:targetInfoCount];
                     auto iter = targetList.begin();
                     while (iter.Next()) {
-                        const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & targetInfo
+                        const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & targetInfo
                             = iter.GetValue();
-                        TargetNavigator_TargetInfo * objCTargetInfo = [[TargetNavigator_TargetInfo alloc]
+                        TargetNavigator_TargetInfoStruct * objCTargetInfo = [[TargetNavigator_TargetInfoStruct alloc]
                             initWithIdentifier:@(targetInfo.identifier)
                                           name:[NSString stringWithUTF8String:targetInfo.name.data()]];
-                        [objCTargetList addObject:objCTargetInfo];
+                        [objCTargetList addObject:objCTargetInfoStruct];
                     }
                 }
                 callback(objCTargetList);

@@ -773,27 +773,41 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nullable coolSetpoint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRChannelClusterChannelInfo : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull majorNumber API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull minorNumber API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nullable name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nullable callSign API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nullable affiliateCallSign API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_AVAILABLE
+@interface MTRChannelClusterChannelInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull majorNumber MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull minorNumber MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable name MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable callSign MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable affiliateCallSign MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRChannelClusterLineupInfo : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull operatorName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nullable lineupName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nullable postalCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull lineupInfoType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRChannelClusterChannelInfoStruct")
+@interface MTRChannelClusterChannelInfo : MTRChannelClusterChannelInfoStruct
+@end
+MTR_NEWLY_AVAILABLE
+@interface MTRChannelClusterLineupInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull operatorName MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable lineupName MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable postalCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull lineupInfoType MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRTargetNavigatorClusterTargetInfo : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull identifier API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nonnull name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRChannelClusterLineupInfoStruct")
+@interface MTRChannelClusterLineupInfo : MTRChannelClusterLineupInfoStruct
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRTargetNavigatorClusterTargetInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull identifier MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull name MTR_NEWLY_AVAILABLE;
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRTargetNavigatorClusterTargetInfoStruct")
+@interface MTRTargetNavigatorClusterTargetInfo : MTRTargetNavigatorClusterTargetInfoStruct
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -802,12 +816,17 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nullable position API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRMediaInputClusterInputInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull index MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull inputType MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull name MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull descriptionString MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRMediaInputClusterInputInfo : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull index API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull inputType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nonnull name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nonnull descriptionString API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRMediaInputClusterInputInfoStruct")
+@interface MTRMediaInputClusterInputInfo : MTRMediaInputClusterInputInfoStruct
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -858,11 +877,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTRContentLauncherClusterStyleInformation * _Nullable waterMark API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRAudioOutputClusterOutputInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull index MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull outputType MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull name MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRAudioOutputClusterOutputInfo : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull index API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull outputType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nonnull name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRAudioOutputClusterOutputInfoStruct")
+@interface MTRAudioOutputClusterOutputInfo : MTRAudioOutputClusterOutputInfoStruct
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

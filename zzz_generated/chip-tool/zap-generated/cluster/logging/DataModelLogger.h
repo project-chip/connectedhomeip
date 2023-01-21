@@ -48,7 +48,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value);
+                           const chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -75,11 +75,11 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value);
+                           const chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value);
+                           const chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -102,7 +102,7 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType & value);
+                           const chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -122,7 +122,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AccessControl::Structs::Target::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & value);
+                           const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

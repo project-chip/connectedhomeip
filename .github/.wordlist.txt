@@ -1209,6 +1209,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+SiWx
 sizedb
 sl
 SLAAC
@@ -1454,6 +1455,7 @@ wic
 WiFiNetworkDiagnostics
 WindowCovering
 WindowCoveringGoToLiftPercentage
+WiseMCU
 wlan
 wmm
 WPA

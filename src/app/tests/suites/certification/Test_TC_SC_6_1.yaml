@@ -17,6 +17,9 @@ name:
     19.2.1. [TC-SC-6.1] Adding member to a group - DUT as Admin and TH as Group
     Member [DUT-Client]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
@@ -31,13 +34,9 @@ tests:
     - label: "Precondition"
       verification: |
           Group Member is commissioned with Admin
-      disabled: true
-
-    - label: "Precondition"
-      verification: |
           Execute this step before executing the test steps.
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 1 0
 
           Verify success response on the TH Log:
 
@@ -52,7 +51,7 @@ tests:
           ./chip-tool accesscontrol read  acl 1 0
 
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify the Read Request Message for the data sent in the above command on TH(Reference app)log:
 
           [1653571830.010685][3949:3949] CHIP:IM: Received Read request
           [1653571830.010772][3949:3949] CHIP:DMG: ReadRequestMessage =
@@ -89,9 +88,14 @@ tests:
           "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
           "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 1 0
+      disabled: true
 
-
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+    - label:
+          "DUT sends KeySetWrite command to GroupKeyManagement cluster to TH on
+          PIXIT.G.ENDPOINT"
+      PICS: GRPKEY.C.C00.Tx
+      verification: |
+          Verify TH recieves KeySetWrite command on TH(Reference app)log:
 
           [1651471040.120912][4012:4012] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:2398599 on exchange 35559r
           [1651471040.120980][4012:4012] CHIP:EM: Handling via exchange: 35559r, Delegate: 0xaaaaca97a088
@@ -141,21 +145,13 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends KeySetWrite command to GroupKeyManagement cluster to TH on
-          PIXIT.G.ENDPOINT"
-      PICS: GRPKEY.C.C00.Tx
-      verification: |
-
-      disabled: true
-
-    - label:
           "DUT binds GroupId with GroupKeySetID in the GroupKeyMap attribute
           list on GroupKeyManagement cluster"
       PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 1 0
 
-          verify On TH(Reference app) receives the right write Request Message for the data sent in the above command
+          Verify TH recieves GroupKeyMap attribute on TH(Reference app)log:
 
           [1659350562.020669][5824:5824] CHIP:EM: Received message of type 0x6 with protocolId (0, 1) and MessageCounter:167021683 on exchange 31153r
           [1659350562.020897][5824:5824] CHIP:EM: Handling via exchange: 31153r, Delegate: 0xaaaacb304f08
@@ -212,7 +208,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 0
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify TH recieves AddGroup command on TH(Reference app)log:
 
 
           [1651471107.658967][4012:4012] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:1630629 on exchange 50068r
@@ -255,7 +251,7 @@ tests:
           ./chip-tool groups view-group 0x0001 1 0
 
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify TH recieves ViewGroup command on TH(Reference app)log:
 
           [1651471144.500809][4012:4012] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:14671135 on exchange 13105r
           [1651471144.500886][4012:4012] CHIP:EM: Handling via exchange: 13105r, Delegate: 0xaaaaca97a088
@@ -294,7 +290,7 @@ tests:
           ./chip-tool groupkeymanagement key-set-read 42 1 0
 
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify TH recieves KeySetRead command on TH(Reference app)log:
 
 
           [1651471175.521361][4012:4012] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:1040181 on exchange 26813r
@@ -335,7 +331,7 @@ tests:
           ./chip-tool groupkeymanagement read group-key-map 1 0
 
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify TH recieves GroupKeyMap command on TH(Reference app)log:
 
           [1651471203.692194][4012:4012] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:11804966 on exchange 25369r
           [1651471203.692262][4012:4012] CHIP:EM: Handling via exchange: 25369r, Delegate: 0xaaaaca97a088
@@ -370,7 +366,7 @@ tests:
           ./chip-tool groupkeymanagement read group-table 1 0
 
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify TH recieves GroupTable command on TH(Reference app)log:
 
           [1651471240.121662][4012:4012] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:3204235 on exchange 21658r
           [1651471240.121724][4012:4012] CHIP:EM: Handling via exchange: 21658r, Delegate: 0xaaaaca97a088
