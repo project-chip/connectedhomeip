@@ -87,4 +87,4 @@ tests:
       response:
           value: [majorNumber: majornumber, minorNumber: minornumber + 1]
           constraints:
-              type: ChannelInfo
+              type: ChannelInfoStruct

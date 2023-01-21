@@ -1686,24 +1686,24 @@ client cluster Channel = 1284 {
     kLineupInfo = 0x2;
   }
 
-  struct ChannelInfo {
+  struct ChannelInfoStruct {
     int16u majorNumber = 0;
     int16u minorNumber = 1;
-    optional char_string<32> name = 2;
-    optional char_string<32> callSign = 3;
-    optional char_string<32> affiliateCallSign = 4;
+    optional char_string name = 2;
+    optional char_string callSign = 3;
+    optional char_string affiliateCallSign = 4;
   }
 
-  struct LineupInfo {
+  struct LineupInfoStruct {
     char_string operatorName = 0;
     optional char_string lineupName = 1;
     optional char_string postalCode = 2;
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
-  readonly attribute ChannelInfo channelList[] = 0;
-  readonly attribute nullable LineupInfo lineup = 1;
-  readonly attribute nullable ChannelInfo currentChannel = 2;
+  readonly attribute ChannelInfoStruct channelList[] = 0;
+  readonly attribute nullable LineupInfoStruct lineup = 1;
+  readonly attribute nullable ChannelInfoStruct currentChannel = 2;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ChangeChannelRequest {

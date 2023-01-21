@@ -8548,7 +8548,7 @@ void MTRWakeOnLANAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
 }
 
 void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8556,8 +8556,8 @@ void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * contex
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRChannelClusterChannelInfo * newElement_0;
-            newElement_0 = [MTRChannelClusterChannelInfo new];
+            MTRChannelClusterChannelInfoStruct * newElement_0;
+            newElement_0 = [MTRChannelClusterChannelInfoStruct new];
             newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
             newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
             if (entry_0.name.HasValue()) {
@@ -8608,14 +8608,14 @@ void MTRChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & value)
+void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType> & value)
 {
-    MTRChannelClusterLineupInfo * _Nullable objCValue;
+    MTRChannelClusterLineupInfoStruct * _Nullable objCValue;
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [MTRChannelClusterLineupInfo new];
+        objCValue = [MTRChannelClusterLineupInfoStruct new];
         objCValue.operatorName = [[NSString alloc] initWithBytes:value.Value().operatorName.data()
                                                           length:value.Value().operatorName.size()
                                                         encoding:NSUTF8StringEncoding];
@@ -8653,14 +8653,14 @@ void MTRChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
+void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & value)
 {
-    MTRChannelClusterChannelInfo * _Nullable objCValue;
+    MTRChannelClusterChannelInfoStruct * _Nullable objCValue;
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [MTRChannelClusterChannelInfo new];
+        objCValue = [MTRChannelClusterChannelInfoStruct new];
         objCValue.majorNumber = [NSNumber numberWithUnsignedShort:value.Value().majorNumber];
         objCValue.minorNumber = [NSNumber numberWithUnsignedShort:value.Value().minorNumber];
         if (value.Value().name.HasValue()) {

@@ -8570,7 +8570,7 @@ bool emberAfChannelClusterChangeChannelCallback(
  * @brief Channel Cluster ChangeChannelResponse Command callback (from server)
  */
 bool emberAfChannelClusterChangeChannelResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                        uint8_t status, chip::CharSpan data);
+                                                        uint8_t Status, chip::CharSpan Data);
 /**
  * @brief Channel Cluster ChangeChannelByNumber Command callback (from client)
  */

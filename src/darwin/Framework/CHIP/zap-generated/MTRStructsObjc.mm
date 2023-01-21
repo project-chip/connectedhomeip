@@ -3233,7 +3233,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRChannelClusterChannelInfo
+@implementation MTRChannelClusterChannelInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3253,7 +3253,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRChannelClusterChannelInfo alloc] init];
+    auto other = [[MTRChannelClusterChannelInfoStruct alloc] init];
 
     other.majorNumber = self.majorNumber;
     other.minorNumber = self.minorNumber;
@@ -3274,7 +3274,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRChannelClusterLineupInfo
+@implementation MTRChannelClusterChannelInfo : MTRChannelClusterChannelInfoStruct
+@end
+
+@implementation MTRChannelClusterLineupInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3292,7 +3295,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRChannelClusterLineupInfo alloc] init];
+    auto other = [[MTRChannelClusterLineupInfoStruct alloc] init];
 
     other.operatorName = self.operatorName;
     other.lineupName = self.lineupName;
@@ -3310,6 +3313,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRChannelClusterLineupInfo : MTRChannelClusterLineupInfoStruct
 @end
 
 @implementation MTRTargetNavigatorClusterTargetInfoStruct

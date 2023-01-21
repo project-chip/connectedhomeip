@@ -12171,28 +12171,28 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                            completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeLineupWithCompletion:(void (^)(MTRChannelClusterLineupInfo * _Nullable value,
+- (void)readAttributeLineupWithCompletion:(void (^)(MTRChannelClusterLineupInfoStruct * _Nullable value,
                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeLineupWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                             reportHandler:(void (^)(MTRChannelClusterLineupInfo * _Nullable value,
+                             reportHandler:(void (^)(MTRChannelClusterLineupInfoStruct * _Nullable value,
                                                NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeLineupWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                         endpoint:(NSNumber *)endpoint
                                            queue:(dispatch_queue_t)queue
-                                      completion:(void (^)(MTRChannelClusterLineupInfo * _Nullable value,
+                                      completion:(void (^)(MTRChannelClusterLineupInfoStruct * _Nullable value,
                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeCurrentChannelWithCompletion:(void (^)(MTRChannelClusterChannelInfo * _Nullable value,
+- (void)readAttributeCurrentChannelWithCompletion:(void (^)(MTRChannelClusterChannelInfoStruct * _Nullable value,
                                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeCurrentChannelWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                     reportHandler:(void (^)(MTRChannelClusterChannelInfo * _Nullable value,
+                                     reportHandler:(void (^)(MTRChannelClusterChannelInfoStruct * _Nullable value,
                                                        NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeCurrentChannelWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                 endpoint:(NSNumber *)endpoint
                                                    queue:(dispatch_queue_t)queue
-                                              completion:(void (^)(MTRChannelClusterChannelInfo * _Nullable value,
+                                              completion:(void (^)(MTRChannelClusterChannelInfoStruct * _Nullable value,
                                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -18988,7 +18988,10 @@ typedef NS_ENUM(uint8_t, MTRChannelStatus) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRChannelLineupInfoType) {
-    MTRChannelLineupInfoTypeMso API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTRChannelLineupInfoTypeMSO MTR_NEWLY_AVAILABLE = 0x00,
+    MTRChannelLineupInfoTypeMso API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRChannelLineupInfoTypeMSO")
+    = 0x00,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRChannelFeature) {
