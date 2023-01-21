@@ -2060,13 +2060,13 @@ client cluster AudioOutput = 1291 {
     kNameUpdates = 0x1;
   }
 
-  struct OutputInfo {
+  struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
     char_string<32> name = 2;
   }
 
-  readonly attribute OutputInfo outputList[] = 0;
+  readonly attribute OutputInfoStruct outputList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectOutputRequest {

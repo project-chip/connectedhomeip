@@ -181,10 +181,10 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & request);
+static void Finalize(chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & request,
                         Json::Value & value);
 

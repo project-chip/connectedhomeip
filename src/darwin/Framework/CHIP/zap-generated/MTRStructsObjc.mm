@@ -3622,7 +3622,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAudioOutputClusterOutputInfo
+@implementation MTRAudioOutputClusterOutputInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3638,7 +3638,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAudioOutputClusterOutputInfo alloc] init];
+    auto other = [[MTRAudioOutputClusterOutputInfoStruct alloc] init];
 
     other.index = self.index;
     other.outputType = self.outputType;
@@ -3654,6 +3654,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRAudioOutputClusterOutputInfo : MTRAudioOutputClusterOutputInfoStruct
 @end
 
 @implementation MTRApplicationLauncherClusterApplication
