@@ -27,6 +27,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "Scan QR code using concatenation (which supports the commissioning of
           all the TH devices)"
@@ -36,7 +41,7 @@ tests:
           https://github.com/project-chip/connectedhomeip/issues/5331
 
           1. Lauch TH chip-all-clusters-app
-          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi
+           sudo ./chip-all-clusters-app --wifi
 
           [13293:13293] CHIP:DL: Device Configuration:
           [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN

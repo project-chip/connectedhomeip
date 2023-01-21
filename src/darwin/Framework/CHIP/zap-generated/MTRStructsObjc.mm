@@ -3233,7 +3233,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRChannelClusterChannelInfo
+@implementation MTRChannelClusterChannelInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3253,7 +3253,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRChannelClusterChannelInfo alloc] init];
+    auto other = [[MTRChannelClusterChannelInfoStruct alloc] init];
 
     other.majorNumber = self.majorNumber;
     other.minorNumber = self.minorNumber;
@@ -3274,7 +3274,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRChannelClusterLineupInfo
+@implementation MTRChannelClusterChannelInfo : MTRChannelClusterChannelInfoStruct
+@end
+
+@implementation MTRChannelClusterLineupInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3292,7 +3295,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRChannelClusterLineupInfo alloc] init];
+    auto other = [[MTRChannelClusterLineupInfoStruct alloc] init];
 
     other.operatorName = self.operatorName;
     other.lineupName = self.lineupName;
@@ -3312,7 +3315,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTargetNavigatorClusterTargetInfo
+@implementation MTRChannelClusterLineupInfo : MTRChannelClusterLineupInfoStruct
+@end
+
+@implementation MTRTargetNavigatorClusterTargetInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3326,7 +3332,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTargetNavigatorClusterTargetInfo alloc] init];
+    auto other = [[MTRTargetNavigatorClusterTargetInfoStruct alloc] init];
 
     other.identifier = self.identifier;
     other.name = self.name;
@@ -3341,6 +3347,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTargetNavigatorClusterTargetInfo : MTRTargetNavigatorClusterTargetInfoStruct
 @end
 
 @implementation MTRMediaPlaybackClusterPlaybackPosition
@@ -3374,7 +3383,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMediaInputClusterInputInfo
+@implementation MTRMediaInputClusterInputInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3392,7 +3401,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRMediaInputClusterInputInfo alloc] init];
+    auto other = [[MTRMediaInputClusterInputInfoStruct alloc] init];
 
     other.index = self.index;
     other.inputType = self.inputType;
@@ -3409,6 +3418,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRMediaInputClusterInputInfo : MTRMediaInputClusterInputInfoStruct
 @end
 
 @implementation MTRContentLauncherClusterDimension
@@ -3616,7 +3628,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAudioOutputClusterOutputInfo
+@implementation MTRAudioOutputClusterOutputInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3632,7 +3644,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAudioOutputClusterOutputInfo alloc] init];
+    auto other = [[MTRAudioOutputClusterOutputInfoStruct alloc] init];
 
     other.index = self.index;
     other.outputType = self.outputType;
@@ -3648,6 +3660,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRAudioOutputClusterOutputInfo : MTRAudioOutputClusterOutputInfoStruct
 @end
 
 @implementation MTRApplicationLauncherClusterApplication

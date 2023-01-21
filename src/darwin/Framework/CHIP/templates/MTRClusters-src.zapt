@@ -3,6 +3,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRAsyncCallbackWorkQueue.h"
+#import "MTRBaseClusterUtils.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRClusterConstants.h"
 #import "MTRClusters_Internal.h"
@@ -22,6 +23,9 @@ using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 using chip::Messaging::ExchangeManager;
 using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
 
 static void MTRClustersLogEnqueue(NSString *logPrefix, MTRAsyncCallbackWorkQueue *workQueue) {
     MTR_LOG_INFO("%@ enqueueWorkItem %@", logPrefix, workQueue);
@@ -120,11 +124,21 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
             [workItem endWork];
           },
           ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
+            auto * typedBridge = static_cast<MTR{{>callbackName}}CallbackBridge *>(bridge);
+            Optional<uint16_t> timedInvokeTimeoutMs;
+            Optional<Timeout> invokeTimeout;
             ListFreer listFreer;
             {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
             if (timedInvokeTimeoutMsParam != nil) {
               timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+            }
+            if (params != nil) {
+              if (params.serverSideProcessingTimeout != nil) {
+                // Clamp to a number of seconds that will not overflow 32-bit
+                // int when converted to ms.
+                auto * serverSideProcessingTimeout = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+              }
             }
             {{#if mustUseTimedInvoke}}
             if (!timedInvokeTimeoutMs.HasValue()) {
@@ -145,8 +159,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
               {{/last}}
             {{/chip_cluster_command_arguments}}
 
-            chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+            return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
         });
         std::move(*bridge).DispatchAction(baseDevice);
     };

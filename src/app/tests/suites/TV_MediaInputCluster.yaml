@@ -35,16 +35,16 @@ tests:
           value:
               [
                   {
-                      index: 1,
-                      inputType: 4,
-                      name: "HDMI",
-                      description: "High-Definition Multimedia Interface",
+                      Index: 1,
+                      InputType: 4,
+                      Name: "HDMI",
+                      Description: "High-Definition Multimedia Interface",
                   },
                   {
-                      index: 2,
-                      inputType: 4,
-                      name: "HDMI",
-                      description: "High-Definition Multimedia Interface",
+                      Index: 2,
+                      InputType: 4,
+                      Name: "HDMI",
+                      Description: "High-Definition Multimedia Interface",
                   },
               ]
 
@@ -83,15 +83,15 @@ tests:
           value:
               [
                   {
-                      index: 1,
-                      inputType: 4,
-                      name: "HDMI Test",
-                      description: "High-Definition Multimedia Interface",
+                      Index: 1,
+                      InputType: 4,
+                      Name: "HDMI Test",
+                      Description: "High-Definition Multimedia Interface",
                   },
                   {
-                      index: 2,
-                      inputType: 4,
-                      name: "HDMI",
-                      description: "High-Definition Multimedia Interface",
+                      Index: 2,
+                      InputType: 4,
+                      Name: "HDMI",
+                      Description: "High-Definition Multimedia Interface",
                   },
               ]

@@ -429,7 +429,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value)
+                                     const chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -889,7 +889,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value)
+                                     const chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -953,7 +953,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value)
+                                     const chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1614,7 +1614,7 @@ CHIP_ERROR DataModelLogger::LogValue(
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType & value)
+                                     const chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2009,7 +2009,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & value)
+                                     const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -8530,17 +8530,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case Channel::Attributes::ChannelList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChannelList", 1, value);
         }
         case Channel::Attributes::Lineup::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Lineup", 1, value);
         }
         case Channel::Attributes::CurrentChannel::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentChannel", 1, value);
         }
@@ -8576,7 +8576,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case TargetNavigator::Attributes::TargetList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TargetList", 1, value);
         }
@@ -8683,7 +8684,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case MediaInput::Attributes::InputList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InputList", 1, value);
         }
@@ -8827,7 +8828,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case AudioOutput::Attributes::OutputList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OutputList", 1, value);
         }

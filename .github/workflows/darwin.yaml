@@ -31,12 +31,6 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
 
-        env:
-            # NOTE: Generally kept in sync within the repo using
-            #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.18-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
-
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
@@ -68,6 +62,12 @@ jobs:
                  unzip zap-mac.zip zap-cli
                  rm zap-mac.zip
                  ./zap-cli --version
+              env:
+                  # NOTE: Generally kept in sync within the repo using
+                  #       scripts/tools/zap/version_update.py
+                  # This is scoped to only the steps that don't use xcodebuild.
+                  ZAP_VERSION: v2023.01.18-nightly
+                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -122,14 +122,32 @@ jobs:
               timeout-minutes: 15
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+              env:
+                  # NOTE: Generally kept in sync within the repo using
+                  #       scripts/tools/zap/version_update.py
+                  # This is scoped to only the steps that don't use xcodebuild.
+                  ZAP_VERSION: v2023.01.18-nightly
+                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
             - name: Build example OTA Provider
               timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
+              env:
+                  # NOTE: Generally kept in sync within the repo using
+                  #       scripts/tools/zap/version_update.py
+                  # This is scoped to only the steps that don't use xcodebuild.
+                  ZAP_VERSION: v2023.01.18-nightly
+                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
             - name: Build example OTA Requestor
               timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false
+              env:
+                  # NOTE: Generally kept in sync within the repo using
+                  #       scripts/tools/zap/version_update.py
+                  # This is scoped to only the steps that don't use xcodebuild.
+                  ZAP_VERSION: v2023.01.18-nightly
+                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true

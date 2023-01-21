@@ -19351,7 +19351,7 @@ public class ChipClusters {
     }
 
     public interface ChannelListAttributeCallback {
-      void onSuccess(List<ChipStructs.ChannelClusterChannelInfo> valueList);
+      void onSuccess(List<ChipStructs.ChannelClusterChannelInfoStruct> valueList);
 
       void onError(Exception ex);
 
@@ -19522,7 +19522,7 @@ public class ChipClusters {
     }
 
     public interface TargetListAttributeCallback {
-      void onSuccess(List<ChipStructs.TargetNavigatorClusterTargetInfo> valueList);
+      void onSuccess(List<ChipStructs.TargetNavigatorClusterTargetInfoStruct> valueList);
 
       void onError(Exception ex);
 
@@ -20154,7 +20154,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface InputListAttributeCallback {
-      void onSuccess(List<ChipStructs.MediaInputClusterInputInfo> valueList);
+      void onSuccess(List<ChipStructs.MediaInputClusterInputInfoStruct> valueList);
 
       void onError(Exception ex);
 
@@ -20855,7 +20855,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface OutputListAttributeCallback {
-      void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfo> valueList);
+      void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfoStruct> valueList);
 
       void onError(Exception ex);
 

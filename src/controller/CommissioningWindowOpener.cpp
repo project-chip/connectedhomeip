@@ -22,7 +22,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <zap-generated/CHIPClusters.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
@@ -131,7 +130,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
 
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
-    AdministratorCommissioningCluster cluster(exchangeMgr, sessionHandle, kAdministratorCommissioningClusterEndpoint);
+    ClusterBase cluster(exchangeMgr, sessionHandle, kAdministratorCommissioningClusterEndpoint);
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
@@ -271,18 +270,18 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Messag
     switch (self->mNextStep)
     {
     case Step::kReadVID: {
-        BasicInformationCluster cluster(exchangeMgr, sessionHandle, kRootEndpointId);
-        err = cluster.ReadAttribute<app::Clusters::BasicInformation::Attributes::VendorID::TypeInfo>(context, OnVIDReadResponse,
-                                                                                                     OnVIDPIDReadFailureResponse);
+        ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+        err = cluster.ReadAttribute<BasicInformation::Attributes::VendorID::TypeInfo>(context, OnVIDReadResponse,
+                                                                                      OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
         messageIfError = "Could not read VID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING
         break;
     }
     case Step::kReadPID: {
-        BasicInformationCluster cluster(exchangeMgr, sessionHandle, kRootEndpointId);
-        err = cluster.ReadAttribute<app::Clusters::BasicInformation::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
-                                                                                                      OnVIDPIDReadFailureResponse);
+        ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+        err = cluster.ReadAttribute<BasicInformation::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
+                                                                                       OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
         messageIfError = "Could not read PID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING

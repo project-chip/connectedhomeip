@@ -147,13 +147,13 @@ tests:
       command: "AnnounceOTAProvider"
       arguments:
           values:
-              - name: "providerNodeId"
+              - name: "ProviderNodeID"
                 value: providerNodeId
-              - name: "vendorId"
+              - name: "VendorID"
                 value: 0
-              - name: "announcementReason"
+              - name: "AnnouncementReason"
                 value: 0
-              - name: "endpoint"
+              - name: "Endpoint"
                 value: endpoint
 
     - label: "Wait for transfer complete message"

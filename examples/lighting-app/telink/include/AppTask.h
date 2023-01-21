@@ -20,7 +20,7 @@
 
 #include "AppEvent.h"
 #include "LEDWidget.h"
-#include "LightingManager.h"
+#include "PWMDevice.h"
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_FACTORY_DATA
@@ -40,9 +40,10 @@ class AppTask
 public:
     CHIP_ERROR StartApp();
 
-    void PostLightingActionRequest(LightingManager::Action_t aAction);
-    void PostEvent(AppEvent * event);
+    void SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uint8_t * value);
+    void PostEvent(AppEvent * aEvent);
     void UpdateClusterState();
+    PWMDevice & GetPWMDevice() { return mBluePwmLed; }
 
     enum ButtonId_t
     {
@@ -59,8 +60,8 @@ private:
     friend AppTask & GetAppTask(void);
     CHIP_ERROR Init();
 
-    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(LightingManager::Action_t aAction, int32_t aActor);
+    static void ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor);
 
     void DispatchEvent(AppEvent * event);
 
@@ -88,6 +89,11 @@ private:
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
+    PWMDevice mBluePwmLed;
+#if USE_RGB_PWM
+    PWMDevice mGreenPwmLed;
+    PWMDevice mRedPwmLed;
+#endif
 
 #if CONFIG_CHIP_FACTORY_DATA
     // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;

@@ -98,7 +98,7 @@ tests:
 
           On TH_CR2 send the below command
 
-          ./chip-tool pairing code 1 35484132896  --commissioner-name beta
+          ./chip-tool pairing code 2 35484132896  --commissioner-name beta
 
           Verify you got below message on TH_CE(all-clusters-app) log
           Commissioning completed successfully
@@ -280,7 +280,7 @@ tests:
           [1658838344.192430][9291:9296] CHIP:DMG:                                 StatusIB =
           [1658838344.192461][9291:9296] CHIP:DMG:                                 {
           [1658838344.192500][9291:9296] CHIP:DMG:                                         status = 0x01 (FAILURE),
-          [1658838344.192538][9291:9296] CHIP:DMG:                                         cluster-status = 0x1,
+          [1658838344.192538][9291:9296] CHIP:DMG:                                         cluster-status = 0x2,
           [1658838344.192574][9291:9296] CHIP:DMG:                                 },
           [1658838344.192611][9291:9296] CHIP:DMG:
       disabled: true
@@ -301,7 +301,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -332,7 +332,7 @@ tests:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
-          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x1,
+          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
           [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },

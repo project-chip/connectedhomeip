@@ -38,13 +38,20 @@ tests:
           the TH. TH sends a success status response to the DUT. DUT sends a
           Subscribe Response Message to the TH to activate the subscription."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
            onoff subscribe on-off  100  3900(65 mins) 1 1
-          On TH(chip-tool), verify that the report data message is received from DUT and check it contains all the data which mentioned in expected outcome
+
+          Verify on the TH(reference app), a report data message is received and verify it contains the following data :
+           Report data - data of the attribute/event requested earlier.
+           Verify on the TH the Subscribe Response has the following fields,
+           SubscriptionId - Verify it is of type uint32.
+           MaxInterval - Verify it is of type uint32.
+           Verify that the MaxInterval is less than or equal MaxIntervalCeiling.
+
           m RetransTable on exchange 33626i
           [1657449840.232430][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657449840.232485][11635:11640] CHIP:DMG: {
@@ -94,13 +101,19 @@ tests:
           the TH. TH sends a success status response to the DUT. DUT sends a
           Subscribe Response Message to the TH to activate the subscription."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
-           basic subscribe location 10 2400 1 0
-          On TH(chip-tool), verify that the report data message is received from DUT and check it contains all the data which mentioned in expected outcome
+           basicinformation subscribe location 10 2400 1 0
+          Verify on the TH, a report data message is received and verify it contains the following data :
+           Report data - data of the attribute/event requested earlier.
+           Verify on the TH the Subscribe Response has the following fields,
+           SubscriptionId - Verify it is of type uint32.
+           MaxInterval - Verify it is of type uint32.
+           Verify that the MaxInterval is less than or equal to 60 mins.
+
           m RetransTable on exchange 33628i
           [1657450022.756280][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657450022.756349][11635:11640] CHIP:DMG: {
@@ -200,7 +213,7 @@ tests:
 
           onoff  subscribe start-up-on-off  50 800 1 1
 
-          On reference app verify that subscription is activated between TH and DUT
+           verify that subscription is activated between TH(chip-tool) and DUT(reference app) and DUT(reference-app) sends a report data action with the data of the attribute along with the data version to TH(chip-tool)
 
           [1657450742.453824][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733047 from RetransTable on exchange 33629i
           [1657450742.453885][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -232,7 +245,9 @@ tests:
           [1657450742.454768][11635:11640] CHIP:TOO:   StartUpOnOff: null
           [1657450742.454805][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff940092b0]: Moving to [AwaitingSu]
 
+           Start another subscription with the DataVersionFilter field set to the data version received above and Verify that the subscription is activated between TH and DUT.
            onoff  subscribe start-up-on-off  50 800 1 1 --data-version  0x1979c37
+
           [1657450845.854472][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733050 from RetransTable on exchange 33630i
           [1657450845.854526][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657450845.854555][11635:11640] CHIP:DMG: {
@@ -262,7 +277,7 @@ tests:
           Subscription between TH and DUT. Modify the attribute which has been
           subscribed to on the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -307,14 +322,14 @@ tests:
           "TH sends a subscription request action for an attribute and set the
           MinIntervalFloor value to be greater than MaxIntervalCeiling. +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
            onoff subscribe on-time 500 100 1 1
 
-          On TH(chip-tool) Verify that the DUT sends an error message
+          On TH(chip-tool) Verify that the DUT sends an error message and the subscription is not established.
           [1661754615.089845][103654:103659] CHIP:DMG: StatusResponseMessage =
           [1661754615.089857][103654:103659] CHIP:DMG: {
           [1661754615.089868][103654:103659] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
@@ -329,7 +344,7 @@ tests:
           attribute from all clusters on all endpoints. AttributePath =
           [[Attribute = Global Attribute]]. +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -344,9 +359,9 @@ tests:
           an endpoint on all clusters. AttributePath = [[Attribute = Global
           Attribute, Endpoint = EndpointID ]]. +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-           Please use Interactive mode to Verify subscription test cases
+          Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           any subscribe-by-id 0xFFFFFFFF 0xFFFD  10 300 1 0

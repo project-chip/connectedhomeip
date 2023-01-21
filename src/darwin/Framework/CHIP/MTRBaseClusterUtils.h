@@ -25,6 +25,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
+#include <system/SystemClock.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -378,11 +379,18 @@ protected:
     bool mCalledCallback = false;
 };
 
+/**
+ * timedInvokeTimeoutMs, if provided, is how long the server will wait for us to
+ * send the invoke after we sent the Timed Request message.
+ *
+ * invokeTimeout, if provided, will have possible MRP latency added to it and
+ * the result is how long we will wait for the server to respond.
+ */
 template <typename BridgeType, typename RequestDataType>
 CHIP_ERROR MTRStartInvokeInteraction(BridgeType * _Nonnull bridge, const RequestDataType & requestData,
     chip::Messaging::ExchangeManager & exchangeManager, const chip::SessionHandle & session,
     typename BridgeType::SuccessCallbackType successCb, MTRErrorCallback failureCb, chip::EndpointId endpoint,
-    chip::Optional<uint16_t> timedInvokeTimeoutMs)
+    chip::Optional<uint16_t> timedInvokeTimeoutMs, chip::Optional<chip::System::Clock::Timeout> invokeTimeout)
 {
     auto callback = chip::Platform::MakeUnique<MTRInvokeCallback<BridgeType, typename RequestDataType::ResponseType>>(
         bridge, successCb, failureCb);
@@ -395,7 +403,11 @@ CHIP_ERROR MTRStartInvokeInteraction(BridgeType * _Nonnull bridge, const Request
     chip::app::CommandPathParams commandPath(endpoint, 0, RequestDataType::GetClusterId(), RequestDataType::GetCommandId(),
         chip::app::CommandPathFlags::kEndpointIdValid);
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestData, timedInvokeTimeoutMs));
-    ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
+
+    if (invokeTimeout.HasValue()) {
+        invokeTimeout.SetValue(session->ComputeRoundTripTimeout(invokeTimeout.Value()));
+    }
+    ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 
     callback->AdoptCommandSender(std::move(commandSender));
     callback.release();

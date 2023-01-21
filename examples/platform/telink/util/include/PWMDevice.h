@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
@@ -18,14 +17,13 @@
 
 #pragma once
 
-#include "AppEvent.h"
-
 #include <system/SystemError.h>
 
 #include <cstdint>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/pwm.h>
 
-class LightingManager
+class PWMDevice
 {
 public:
     enum Action_t : uint8_t
@@ -33,6 +31,9 @@ public:
         ON_ACTION = 0,
         OFF_ACTION,
         LEVEL_ACTION,
+        COLOR_ACTION_XY,
+        COLOR_ACTION_HSV,
+        COLOR_ACTION_CT,
 
         INVALID_ACTION
     };
@@ -43,36 +44,27 @@ public:
         kState_Off,
     };
 
-    using LightingCallback_fn = void (*)(Action_t, int32_t);
+    using PWMCallback_fn = void (*)(Action_t, int32_t);
 
-    CHIP_ERROR Init(const device * pwmDevice, uint32_t pwmChannel, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel = 0);
+    CHIP_ERROR Init(const pwm_dt_spec * pwmDevice, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel = 0);
     void Set(bool aOn);
     bool IsTurnedOn() const { return mState == kState_On; }
     uint8_t GetLevel() const { return mLevel; }
     uint8_t GetMinLevel() const { return mMinLevel; }
     uint8_t GetMaxLevel() const { return mMaxLevel; }
-    bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value);
-    void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
+    bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t * value);
+    void SetCallbacks(PWMCallback_fn aActionInitiated_CB, PWMCallback_fn aActionCompleted_CB);
 
 private:
-    friend LightingManager & LightingMgr();
     State_t mState;
     uint8_t mMinLevel;
     uint8_t mMaxLevel;
     uint8_t mLevel;
-    const device * mPwmDevice;
-    uint32_t mPwmChannel;
+    const pwm_dt_spec * mPwmDevice;
 
-    LightingCallback_fn mActionInitiated_CB;
-    LightingCallback_fn mActionCompleted_CB;
+    PWMCallback_fn mActionInitiated_CB;
+    PWMCallback_fn mActionCompleted_CB;
 
     void SetLevel(uint8_t aLevel);
     void UpdateLight();
-
-    static LightingManager sLight;
 };
-
-inline LightingManager & LightingMgr(void)
-{
-    return LightingManager::sLight;
-}

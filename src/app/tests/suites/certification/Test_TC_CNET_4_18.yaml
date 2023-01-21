@@ -134,7 +134,7 @@ tests:
     - label: "DUT reads LastNetworkingStatus attribute from the TH"
       PICS: CNET.S.A0005
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 54 0
+          ./chip-tool networkcommissioning read last-networking-status 54 0
 
 
           Verify "LastNetworkingStatus response" on the TH(All-cluster-app) Log:

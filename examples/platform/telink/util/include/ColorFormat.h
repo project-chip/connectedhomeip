@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,38 +18,33 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include <stdint.h>
 
-struct AppEvent
+struct RgbColor_t
 {
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Lock,
-        kEventType_Install,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t PinNo;
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LockEvent;
-    };
-
-    EventHandler Handler;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
 };
+
+struct HsvColor_t
+{
+    uint8_t h;
+    uint8_t s;
+    uint8_t v;
+};
+
+struct XyColor_t
+{
+    uint16_t x;
+    uint16_t y;
+};
+
+struct CtColor_t
+{
+    uint16_t ctMireds;
+};
+
+RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY);
+RgbColor_t HsvToRgb(HsvColor_t hsv);
+RgbColor_t CTToRgb(CtColor_t ct);

@@ -27,6 +27,11 @@ tests:
     - label: "Note"
       verification: |
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+
+          Commission TH(all-clusters-app) to TH(chip-tool) using below command
+
+          TH(all-clusters-app) :  ./chip-all-clusters-app --trace_decode 1
+          TH(chip-tool) : ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
       disabled: true
 
     - label: "Commission DUT to TH"
@@ -38,26 +43,33 @@ tests:
       PICS: LTIME.C.Afffd
       verification: |
           ./chip-tool timeformatlocalization read  cluster-revision 1 0
-          Verify DUT receives  cluster-revision attribute response on the TH(all-clusters-app) Log:
-          [1659778215.939476][17263:17263] CHIP:IM: Received Read request
-          [1659778215.939559][17263:17263] CHIP:DMG: ReadRequestMessage =
-          [1659778215.939577][17263:17263] CHIP:DMG: {
-          [1659778215.939592][17263:17263] CHIP:DMG:         AttributePathIBs =
-          [1659778215.939611][17263:17263] CHIP:DMG:         [
-          [1659778215.939625][17263:17263] CHIP:DMG:                 AttributePathIB =
-          [1659778215.939650][17263:17263] CHIP:DMG:                 {
-          [1659778215.939670][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
-          [1659778215.939696][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
-          [1659778215.939716][17263:17263] CHIP:DMG:                         Attribute = 0x0000_FFFD,
-          [1659778215.939732][17263:17263] CHIP:DMG:                 }
-          [1659778215.939753][17263:17263] CHIP:DMG:
-          [1659778215.939766][17263:17263] CHIP:DMG:         ],
-          [1659778215.939786][17263:17263] CHIP:DMG:
-          [1659778215.939804][17263:17263] CHIP:DMG:         isFabricFiltered = true,
-          [1659778215.939821][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
-          [1659778215.939836][17263:17263] CHIP:DMG: },
-          [1659778215.939918][17263:17263] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1659778215.939984][17263:17263] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+           Verify " ClusterRevision " value is of unit16 and reflects the highest revision number, in RPI the value of  ClusterRevision is 1 on the TH(all-clusters-app) Log:
+          ReportDataMessage =
+          [1666853258.399517][19861:19861] CHIP:DMG: {
+          [1666853258.399520][19861:19861] CHIP:DMG:         AttributeReportIBs =
+          [1666853258.399527][19861:19861] CHIP:DMG:         [
+          [1666853258.399531][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853258.399537][19861:19861] CHIP:DMG:                 {
+          [1666853258.399541][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853258.399546][19861:19861] CHIP:DMG:                         {
+          [1666853258.399551][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853258.399555][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853258.399560][19861:19861] CHIP:DMG:                                 {
+          [1666853258.399565][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853258.399569][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853258.399574][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFD,
+          [1666853258.399579][19861:19861] CHIP:DMG:                                 }
+          [1666853258.399584][19861:19861] CHIP:DMG:
+          [1666853258.399589][19861:19861] CHIP:DMG:                                 Data = 1,
+          [1666853258.399593][19861:19861] CHIP:DMG:                         },
+          [1666853258.399598][19861:19861] CHIP:DMG:
+          [1666853258.399602][19861:19861] CHIP:DMG:                 },
+          [1666853258.399607][19861:19861] CHIP:DMG:
+          [1666853258.399611][19861:19861] CHIP:DMG:         ],
+          [1666853258.399617][19861:19861] CHIP:DMG:
+          [1666853258.399621][19861:19861] CHIP:DMG:         SuppressResponse = true,
+          [1666853258.399623][19861:19861] CHIP:DMG:         InteractionModelRevision = 1
+          [1666853258.399628][19861:19861] CHIP:DMG: }
       disabled: true
 
     - label: "{DUTread} (0xFFFC) FeatureMap attribute"
@@ -72,25 +84,179 @@ tests:
       PICS: LTIME.C.Afffb
       verification: |
           ./chip-tool timeformatlocalization read attribute-list 1 0
-          Verify DUT receives attribute-list attribute response on the TH(all-clusters-app) Log:
-          [1659778367.039215][17263:17263] CHIP:IM: Received Read request
-          [1659778367.039321][17263:17263] CHIP:DMG: ReadRequestMessage =
-          [1659778367.039342][17263:17263] CHIP:DMG: {
-          [1659778367.039357][17263:17263] CHIP:DMG:         AttributePathIBs =
-          [1659778367.039378][17263:17263] CHIP:DMG:         [
-          [1659778367.039397][17263:17263] CHIP:DMG:                 AttributePathIB =
-          [1659778367.039419][17263:17263] CHIP:DMG:                 {
-          [1659778367.039443][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
-          [1659778367.039468][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
-          [1659778367.039492][17263:17263] CHIP:DMG:                         Attribute = 0x0000_FFFB,
-          [1659778367.039515][17263:17263] CHIP:DMG:                 }
-          [1659778367.039540][17263:17263] CHIP:DMG:
-          [1659778367.039559][17263:17263] CHIP:DMG:         ],
-          [1659778367.039585][17263:17263] CHIP:DMG:
-          [1659778367.039602][17263:17263] CHIP:DMG:         isFabricFiltered = true,
-          [1659778367.039621][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
-          [1659778367.039640][17263:17263] CHIP:DMG: },
-          [1659778367.039748][17263:17263] CHIP:DMG: IM RH moving to [GeneratingReports]
+          Verify " AttributeList " value consists the list of mandatory attributes (values 0, 1 and 2), global attributes (65528, 65529, 65531, 65532, 65533) on the TH(all-clusters-app) Log:
+          ReportDataMessage =
+          [1666853311.208553][19861:19861] CHIP:DMG: {
+          [1666853311.208555][19861:19861] CHIP:DMG:         AttributeReportIBs =
+          [1666853311.208561][19861:19861] CHIP:DMG:         [
+          [1666853311.208564][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.208570][19861:19861] CHIP:DMG:                 {
+          [1666853311.208573][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.208577][19861:19861] CHIP:DMG:                         {
+          [1666853311.208582][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.208585][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.208588][19861:19861] CHIP:DMG:                                 {
+          [1666853311.208592][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.208595][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.208601][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.208607][19861:19861] CHIP:DMG:                                 }
+          [1666853311.208613][19861:19861] CHIP:DMG:
+          [1666853311.208617][19861:19861] CHIP:DMG:                                 Data = [
+          [1666853311.208621][19861:19861] CHIP:DMG:
+          [1666853311.208625][19861:19861] CHIP:DMG:                                 ],
+          [1666853311.208629][19861:19861] CHIP:DMG:                         },
+          [1666853311.208635][19861:19861] CHIP:DMG:
+          [1666853311.208638][19861:19861] CHIP:DMG:                 },
+          [1666853311.208648][19861:19861] CHIP:DMG:
+          [1666853311.208651][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.208658][19861:19861] CHIP:DMG:                 {
+          [1666853311.208662][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.208666][19861:19861] CHIP:DMG:                         {
+          [1666853311.208670][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.208676][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.208680][19861:19861] CHIP:DMG:                                 {
+          [1666853311.208684][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.208688][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.208693][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.208696][19861:19861] CHIP:DMG:                                         ListIndex = Null,
+          [1666853311.208703][19861:19861] CHIP:DMG:                                 }
+          [1666853311.208708][19861:19861] CHIP:DMG:
+          [1666853311.208713][19861:19861] CHIP:DMG:                                 Data = 0,
+          [1666853311.208717][19861:19861] CHIP:DMG:                         },
+          [1666853311.208724][19861:19861] CHIP:DMG:
+          [1666853311.208727][19861:19861] CHIP:DMG:                 },
+          [1666853311.208735][19861:19861] CHIP:DMG:
+          [1666853311.208738][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.208745][19861:19861] CHIP:DMG:                 {
+          [1666853311.208749][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.208753][19861:19861] CHIP:DMG:                         {
+          [1666853311.208758][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.208762][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.208767][19861:19861] CHIP:DMG:                                 {
+          [1666853311.208771][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.208776][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.208781][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.208786][19861:19861] CHIP:DMG:                                         ListIndex = Null,
+          [1666853311.208791][19861:19861] CHIP:DMG:                                 }
+          [1666853311.208797][19861:19861] CHIP:DMG:
+          [1666853311.208801][19861:19861] CHIP:DMG:                                 Data = 1,
+          [1666853311.208805][19861:19861] CHIP:DMG:                         },
+          [1666853311.208812][19861:19861] CHIP:DMG:
+          [1666853311.208815][19861:19861] CHIP:DMG:                 },
+          [1666853311.208824][19861:19861] CHIP:DMG:
+          [1666853311.208827][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.208834][19861:19861] CHIP:DMG:                 {
+          [1666853311.208838][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.208842][19861:19861] CHIP:DMG:                         {
+          [1666853311.208846][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.208850][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.208854][19861:19861] CHIP:DMG:                                 {
+          [1666853311.208858][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.208863][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.208867][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.208872][19861:19861] CHIP:DMG:                                         ListIndex = Null,
+          [1666853311.208877][19861:19861] CHIP:DMG:                                 }
+          [1666853311.208883][19861:19861] CHIP:DMG:
+          [1666853311.208887][19861:19861] CHIP:DMG:                                 Data = 2,
+          [1666853311.208892][19861:19861] CHIP:DMG:                         },
+          [1666853311.208899][19861:19861] CHIP:DMG:
+          [1666853311.208902][19861:19861] CHIP:DMG:                 },
+          [1666853311.208911][19861:19861] CHIP:DMG:
+          [1666853311.208914][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.208921][19861:19861] CHIP:DMG:                 {
+          [1666853311.208926][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.208929][19861:19861] CHIP:DMG:                         {
+          [1666853311.208934][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.208938][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.208943][19861:19861] CHIP:DMG:                                 {
+          [1666853311.208947][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.208952][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.208956][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.208960][19861:19861] CHIP:DMG:                                         ListIndex = Null,
+          [1666853311.208964][19861:19861] CHIP:DMG:                                 }
+          [1666853311.208970][19861:19861] CHIP:DMG:
+          [1666853311.208975][19861:19861] CHIP:DMG:                                 Data = 65528,
+          [1666853311.208979][19861:19861] CHIP:DMG:                         },
+          [1666853311.208984][19861:19861] CHIP:DMG:
+          [1666853311.208988][19861:19861] CHIP:DMG:                 },
+          [1666853311.208995][19861:19861] CHIP:DMG:
+          [1666853311.208998][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.209005][19861:19861] CHIP:DMG:                 {
+          [1666853311.209008][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.209013][19861:19861] CHIP:DMG:                         {
+          [1666853311.209017][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.209023][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.209028][19861:19861] CHIP:DMG:                                 {
+          [1666853311.209033][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.209039][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.209042][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.209047][19861:19861] CHIP:DMG:                                         ListIndex = Null,
+          [1666853311.209051][19861:19861] CHIP:DMG:                                 }
+          [1666853311.209055][19861:19861] CHIP:DMG:
+          [1666853311.209060][19861:19861] CHIP:DMG:                                 Data = 65529,
+          [1666853311.209064][19861:19861] CHIP:DMG:                         },
+          [1666853311.209069][19861:19861] CHIP:DMG:
+          [1666853311.209074][19861:19861] CHIP:DMG:                 },
+          [1666853311.209083][19861:19861] CHIP:DMG:
+          [1666853311.209086][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.209092][19861:19861] CHIP:DMG:                 {
+          [1666853311.209095][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.209100][19861:19861] CHIP:DMG:                         {
+          [1666853311.209104][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.209108][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.209113][19861:19861] CHIP:DMG:                                 {
+          [1666853311.209118][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.209122][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.209127][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.209131][19861:19861] CHIP:DMG:                                         ListIndex = Null,
+          [1666853311.209135][19861:19861] CHIP:DMG:                                 }
+          [1666853311.209140][19861:19861] CHIP:DMG:
+          [1666853311.209145][19861:19861] CHIP:DMG:                                 Data = 65531,
+          [1666853311.209149][19861:19861] CHIP:DMG:                         },
+          [1666853311.209155][19861:19861] CHIP:DMG:
+          [1666853311.209157][19861:19861] CHIP:DMG:                 },
+          [1666853311.209166][19861:19861] CHIP:DMG:
+          [1666853311.209169][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.209175][19861:19861] CHIP:DMG:                 {
+          [1666853311.209178][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.209183][19861:19861] CHIP:DMG:                         {
+          [1666853311.209187][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.209193][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.209197][19861:19861] CHIP:DMG:                                 {
+          [1666853311.209200][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.209204][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.209210][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.209214][19861:19861] CHIP:DMG:                                         ListIndex = Null,
+          [1666853311.209219][19861:19861] CHIP:DMG:                                 }
+          [1666853311.209224][19861:19861] CHIP:DMG:
+          [1666853311.209229][19861:19861] CHIP:DMG:                                 Data = 65532,
+          [1666853311.209233][19861:19861] CHIP:DMG:                         },
+          [1666853311.209240][19861:19861] CHIP:DMG:
+          [1666853311.209244][19861:19861] CHIP:DMG:                 },
+          [1666853311.209254][19861:19861] CHIP:DMG:
+          [1666853311.209257][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853311.209264][19861:19861] CHIP:DMG:                 {
+          [1666853311.209268][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853311.209272][19861:19861] CHIP:DMG:                         {
+          [1666853311.209276][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853311.209280][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853311.209285][19861:19861] CHIP:DMG:                                 {
+          [1666853311.209288][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853311.209294][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853311.209299][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
+          [1666853311.209303][19861:19861] CHIP:DMG:                                         ListIndex = Null,
+          [1666853311.209308][19861:19861] CHIP:DMG:                                 }
+          [1666853311.209313][19861:19861] CHIP:DMG:
+          [1666853311.209319][19861:19861] CHIP:DMG:                                 Data = 65533,
+          [1666853311.209323][19861:19861] CHIP:DMG:                         },
+          [1666853311.209329][19861:19861] CHIP:DMG:
+          [1666853311.209334][19861:19861] CHIP:DMG:                 },
+          [1666853311.209339][19861:19861] CHIP:DMG:
+          [1666853311.209343][19861:19861] CHIP:DMG:         ],
+          [1666853311.209364][19861:19861] CHIP:DMG:
+          [1666853311.209368][19861:19861] CHIP:DMG:         SuppressResponse = true,
+          [1666853311.209372][19861:19861] CHIP:DMG:         InteractionModelRevision = 1
+          [1666853311.209376][19861:19861] CHIP:DMG: }
       disabled: true
 
     - label: "{DUTread} (0xFFFA) EventList attribute"
@@ -103,49 +269,69 @@ tests:
       PICS: LTIME.C.Afff9
       verification: |
           ./chip-tool timeformatlocalization read accepted-command-list 1 0
-          Verify DUT receives AcceptedCommandList attribute response on the TH(all-clusters-app) Log:
+          Verify "AcceptedCommandList " consists the list of supported commands, Also verify that the DUT response with an empty list (0 entries) if there is no accepted command on the TH(all-clusters-app) Log:
 
-          [1659778416.327618][17263:17263] CHIP:IM: Received Read request
-          [1659778416.327695][17263:17263] CHIP:DMG: ReadRequestMessage =
-          [1659778416.327711][17263:17263] CHIP:DMG: {
-          [1659778416.327723][17263:17263] CHIP:DMG:         AttributePathIBs =
-          [1659778416.327738][17263:17263] CHIP:DMG:         [
-          [1659778416.327751][17263:17263] CHIP:DMG:                 AttributePathIB =
-          [1659778416.327767][17263:17263] CHIP:DMG:                 {
-          [1659778416.327783][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
-          [1659778416.327799][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
-          [1659778416.327815][17263:17263] CHIP:DMG:                         Attribute = 0x0000_FFF9,
-          [1659778416.327829][17263:17263] CHIP:DMG:                 }
-          [1659778416.327846][17263:17263] CHIP:DMG:
-          [1659778416.327859][17263:17263] CHIP:DMG:         ],
-          [1659778416.327876][17263:17263] CHIP:DMG:
-          [1659778416.327891][17263:17263] CHIP:DMG:         isFabricFiltered = true,
-          [1659778416.327905][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
-          [1659778416.327917][17263:17263] CHIP:DMG: },
+          ReportDataMessage =
+          [1666853382.409750][19861:19861] CHIP:DMG: {
+          [1666853382.409753][19861:19861] CHIP:DMG:         AttributeReportIBs =
+          [1666853382.409758][19861:19861] CHIP:DMG:         [
+          [1666853382.409761][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853382.409766][19861:19861] CHIP:DMG:                 {
+          [1666853382.409769][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853382.409772][19861:19861] CHIP:DMG:                         {
+          [1666853382.409776][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853382.409779][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853382.409782][19861:19861] CHIP:DMG:                                 {
+          [1666853382.409786][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853382.409790][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853382.409795][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFF9,
+          [1666853382.409798][19861:19861] CHIP:DMG:                                 }
+          [1666853382.409802][19861:19861] CHIP:DMG:
+          [1666853382.409805][19861:19861] CHIP:DMG:                                 Data = [
+          [1666853382.409809][19861:19861] CHIP:DMG:
+          [1666853382.409813][19861:19861] CHIP:DMG:                                 ],
+          [1666853382.409816][19861:19861] CHIP:DMG:                         },
+          [1666853382.409821][19861:19861] CHIP:DMG:
+          [1666853382.409824][19861:19861] CHIP:DMG:                 },
+          [1666853382.409828][19861:19861] CHIP:DMG:
+          [1666853382.409831][19861:19861] CHIP:DMG:         ],
+          [1666853382.409837][19861:19861] CHIP:DMG:
+          [1666853382.409840][19861:19861] CHIP:DMG:         SuppressResponse = true,
+          [1666853382.409843][19861:19861] CHIP:DMG:         InteractionModelRevision = 1
+          [1666853382.409846][19861:19861] CHIP:DMG: }
       disabled: true
 
     - label: "{DUTread} (0xFFF8) GeneratedCommandList attribute"
       PICS: LTIME.C.Afff8
       verification: |
           ./chip-tool timeformatlocalization read generated-command-list 1 0
-          Verify DUT receives GeneratedCommandList attribute response on the TH(all-clusters-app) Log:
-          [1659778463.618184][17263:17263] CHIP:IM: Received Read request
-          [1659778463.618262][17263:17263] CHIP:DMG: ReadRequestMessage =
-          [1659778463.618278][17263:17263] CHIP:DMG: {
-          [1659778463.618291][17263:17263] CHIP:DMG:         AttributePathIBs =
-          [1659778463.618310][17263:17263] CHIP:DMG:         [
-          [1659778463.618325][17263:17263] CHIP:DMG:                 AttributePathIB =
-          [1659778463.618345][17263:17263] CHIP:DMG:                 {
-          [1659778463.618364][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
-          [1659778463.618383][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
-          [1659778463.618402][17263:17263] CHIP:DMG:                         Attribute = 0x0000_FFF8,
-          [1659778463.618418][17263:17263] CHIP:DMG:                 }
-          [1659778463.618442][17263:17263] CHIP:DMG:
-          [1659778463.618458][17263:17263] CHIP:DMG:         ],
-          [1659778463.618479][17263:17263] CHIP:DMG:
-          [1659778463.618496][17263:17263] CHIP:DMG:         isFabricFiltered = true,
-          [1659778463.618513][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
-          [1659778463.618529][17263:17263] CHIP:DMG: },
-          [1659778463.618601][17263:17263] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1659778463.618663][17263:17263] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          Verify " GeneratedCommandList " consists the list of supported commands, Also verify that the DUT response with an empty list (0 entries) if there is no generated command on the TH(all-clusters-app) Log:
+          ReportDataMessage =
+          [1666853414.158719][19861:19861] CHIP:DMG: {
+          [1666853414.158722][19861:19861] CHIP:DMG:         AttributeReportIBs =
+          [1666853414.158729][19861:19861] CHIP:DMG:         [
+          [1666853414.158733][19861:19861] CHIP:DMG:                 AttributeReportIB =
+          [1666853414.158741][19861:19861] CHIP:DMG:                 {
+          [1666853414.158746][19861:19861] CHIP:DMG:                         AttributeDataIB =
+          [1666853414.158751][19861:19861] CHIP:DMG:                         {
+          [1666853414.158756][19861:19861] CHIP:DMG:                                 DataVersion = 0x1b209c0b,
+          [1666853414.158761][19861:19861] CHIP:DMG:                                 AttributePathIB =
+          [1666853414.158764][19861:19861] CHIP:DMG:                                 {
+          [1666853414.158768][19861:19861] CHIP:DMG:                                         Endpoint = 0x0,
+          [1666853414.158771][19861:19861] CHIP:DMG:                                         Cluster = 0x2c,
+          [1666853414.158775][19861:19861] CHIP:DMG:                                         Attribute = 0x0000_FFF8,
+          [1666853414.158778][19861:19861] CHIP:DMG:                                 }
+          [1666853414.158781][19861:19861] CHIP:DMG:
+          [1666853414.158785][19861:19861] CHIP:DMG:                                 Data = [
+          [1666853414.158788][19861:19861] CHIP:DMG:
+          [1666853414.158791][19861:19861] CHIP:DMG:                                 ],
+          [1666853414.158794][19861:19861] CHIP:DMG:                         },
+          [1666853414.158799][19861:19861] CHIP:DMG:
+          [1666853414.158801][19861:19861] CHIP:DMG:                 },
+          [1666853414.158806][19861:19861] CHIP:DMG:
+          [1666853414.158809][19861:19861] CHIP:DMG:         ],
+          [1666853414.158814][19861:19861] CHIP:DMG:
+          [1666853414.158817][19861:19861] CHIP:DMG:         SuppressResponse = true,
+          [1666853414.158820][19861:19861] CHIP:DMG:         InteractionModelRevision = 1
+          [1666853414.158822][19861:19861] CHIP:DMG: }
       disabled: true

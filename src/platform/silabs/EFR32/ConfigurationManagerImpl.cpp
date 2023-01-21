@@ -49,12 +49,6 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
-    CHIP_ERROR err;
-
-    // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<SILABSConfig>::Init();
-    SuccessOrExit(err);
-
     // TODO: Initialize the global GroupKeyStore object here (#1626)
 
     IncreaseBootCount();
@@ -63,10 +57,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     rebootCause = RMU_ResetCauseGet();
     RMU_ResetCauseClear();
 
-    err = CHIP_NO_ERROR;
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()

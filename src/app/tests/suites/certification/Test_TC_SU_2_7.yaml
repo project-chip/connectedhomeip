@@ -38,7 +38,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify that the chip-tool receives below StateTransition event notifications
+          Verify that the Chip-Tool receives the SateTransition event notification for the state changes like Querying,Downloading,Applying,Idle(Optional).
 
           1644017070772] [33044:1032132] CHIP: [TOO]   StateTransition: {
           [1644017070772] [33044:1032132] CHIP: [TOO]     PreviousState: 1
@@ -85,7 +85,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify that the chip-tool receives below StateTransition event notification
+          Verify that the Chip-Tool receives the SateTransition event notification for the state change to DelayedOnQuery
 
           [1651282443727] [28764:35514810] CHIP: [TOO]   StateTransition: {
           [1651282443727] [28764:35514810] CHIP: [TOO]     PreviousState: 1
@@ -118,7 +118,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify that the chip-tool receives below StateTransition event notification
+          Verify that the Chip-Tool receives the SateTransition event notification for the state change to Idle
 
           [1651282794539] [28929:35519901] CHIP: [TOO]   StateTransition: {
           [1651282794539] [28929:35519901] CHIP: [TOO]     PreviousState: 1
@@ -209,6 +209,8 @@ tests:
           otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+
+          Verify that the Chip-Tool receives the SateTransition event notification for the state change to DelayedOnApply
 
           [1651283503471] [29332:35530821] CHIP: [TOO]   StateTransition: {
           [1651283503471] [29332:35530821] CHIP: [TOO]     PreviousState: 1

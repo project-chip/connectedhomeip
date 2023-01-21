@@ -1372,14 +1372,14 @@ public class ChipStructs {
     }
   }
 
-  public static class ChannelClusterChannelInfo {
+  public static class ChannelClusterChannelInfoStruct {
     public Integer majorNumber;
     public Integer minorNumber;
     public Optional<String> name;
     public Optional<String> callSign;
     public Optional<String> affiliateCallSign;
 
-    public ChannelClusterChannelInfo(
+    public ChannelClusterChannelInfoStruct(
         Integer majorNumber,
         Integer minorNumber,
         Optional<String> name,
@@ -1395,7 +1395,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ChannelClusterChannelInfo {\n");
+      output.append("ChannelClusterChannelInfoStruct {\n");
       output.append("\tmajorNumber: ");
       output.append(majorNumber);
       output.append("\n");
@@ -1416,13 +1416,13 @@ public class ChipStructs {
     }
   }
 
-  public static class ChannelClusterLineupInfo {
+  public static class ChannelClusterLineupInfoStruct {
     public String operatorName;
     public Optional<String> lineupName;
     public Optional<String> postalCode;
     public Integer lineupInfoType;
 
-    public ChannelClusterLineupInfo(
+    public ChannelClusterLineupInfoStruct(
         String operatorName,
         Optional<String> lineupName,
         Optional<String> postalCode,
@@ -1436,7 +1436,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ChannelClusterLineupInfo {\n");
+      output.append("ChannelClusterLineupInfoStruct {\n");
       output.append("\toperatorName: ");
       output.append(operatorName);
       output.append("\n");
@@ -1454,11 +1454,11 @@ public class ChipStructs {
     }
   }
 
-  public static class TargetNavigatorClusterTargetInfo {
+  public static class TargetNavigatorClusterTargetInfoStruct {
     public Integer identifier;
     public String name;
 
-    public TargetNavigatorClusterTargetInfo(Integer identifier, String name) {
+    public TargetNavigatorClusterTargetInfoStruct(Integer identifier, String name) {
       this.identifier = identifier;
       this.name = name;
     }
@@ -1466,7 +1466,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TargetNavigatorClusterTargetInfo {\n");
+      output.append("TargetNavigatorClusterTargetInfoStruct {\n");
       output.append("\tidentifier: ");
       output.append(identifier);
       output.append("\n");
@@ -1502,13 +1502,13 @@ public class ChipStructs {
     }
   }
 
-  public static class MediaInputClusterInputInfo {
+  public static class MediaInputClusterInputInfoStruct {
     public Integer index;
     public Integer inputType;
     public String name;
     public String description;
 
-    public MediaInputClusterInputInfo(
+    public MediaInputClusterInputInfoStruct(
         Integer index, Integer inputType, String name, String description) {
       this.index = index;
       this.inputType = inputType;
@@ -1519,7 +1519,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("MediaInputClusterInputInfo {\n");
+      output.append("MediaInputClusterInputInfoStruct {\n");
       output.append("\tindex: ");
       output.append(index);
       output.append("\n");
@@ -1724,12 +1724,12 @@ public class ChipStructs {
     }
   }
 
-  public static class AudioOutputClusterOutputInfo {
+  public static class AudioOutputClusterOutputInfoStruct {
     public Integer index;
     public Integer outputType;
     public String name;
 
-    public AudioOutputClusterOutputInfo(Integer index, Integer outputType, String name) {
+    public AudioOutputClusterOutputInfoStruct(Integer index, Integer outputType, String name) {
       this.index = index;
       this.outputType = outputType;
       this.name = name;
@@ -1738,7 +1738,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AudioOutputClusterOutputInfo {\n");
+      output.append("AudioOutputClusterOutputInfoStruct {\n");
       output.append("\tindex: ");
       output.append(index);
       output.append("\n");

@@ -409,7 +409,7 @@ typedef void (*WakeOnLanAttributeListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ChannelChannelListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & data);
 typedef void (*ChannelGeneratedCommandListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ChannelAcceptedCommandListListAttributeCallback)(void * context,
@@ -418,7 +418,8 @@ typedef void (*ChannelAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*TargetNavigatorTargetListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &
+        data);
 typedef void (*TargetNavigatorGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TargetNavigatorAcceptedCommandListListAttributeCallback)(
@@ -433,7 +434,7 @@ typedef void (*MediaPlaybackAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*MediaInputInputListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> & data);
 typedef void (*MediaInputGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*MediaInputAcceptedCommandListListAttributeCallback)(
@@ -462,7 +463,7 @@ typedef void (*ContentLauncherAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*AudioOutputOutputListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> & data);
 typedef void (*AudioOutputGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AudioOutputAcceptedCommandListListAttributeCallback)(

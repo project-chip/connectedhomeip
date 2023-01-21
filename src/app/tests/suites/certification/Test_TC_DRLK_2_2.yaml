@@ -227,9 +227,10 @@ tests:
       PICS: DRLK.S.A0030
       command: "readAttribute"
       attribute: "WrongCodeEntryLimit"
-      constraints:
-          minValue: 1
-          maxValue: 255
+      response:
+          constraints:
+              minValue: 1
+              maxValue: 255
 
     #currently for loop is not implemented in yaml framework so converted this step as user prompt
     - label:
@@ -370,9 +371,10 @@ tests:
       PICS: DRLK.S.A0031
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
-      constraints:
-          minValue: 1
-          maxValue: 255
+      response:
+          constraints:
+              minValue: 1
+              maxValue: 255
 
     - label:
           "TH writes UserCodeTemporaryDisableTime attribute value as between 1

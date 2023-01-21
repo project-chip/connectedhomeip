@@ -35,32 +35,32 @@ tests:
           value:
               [
                   {
-                      majorNumber: 6,
-                      minorNumber: 0,
-                      name: "ABC",
-                      callSign: "KAAL-TV",
-                      affiliateCallSign: "KAAL",
+                      MajorNumber: 6,
+                      MinorNumber: 0,
+                      Name: "ABC",
+                      CallSign: "KAAL-TV",
+                      AffiliateCallSign: "KAAL",
                   },
                   {
-                      majorNumber: 9,
-                      minorNumber: 1,
-                      name: "PBS",
-                      callSign: "KCTS-TV",
-                      affiliateCallSign: "KCTS",
+                      MajorNumber: 9,
+                      MinorNumber: 1,
+                      Name: "PBS",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
                   },
                   {
-                      majorNumber: 9,
-                      minorNumber: 2,
-                      name: "PBS Kids",
-                      callSign: "KCTS-TV",
-                      affiliateCallSign: "KCTS",
+                      MajorNumber: 9,
+                      MinorNumber: 2,
+                      Name: "PBS Kids",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
                   },
                   {
-                      majorNumber: 9,
-                      minorNumber: 3,
-                      name: "World Channel",
-                      callSign: "KCTS-TV",
-                      affiliateCallSign: "KCTS",
+                      MajorNumber: 9,
+                      MinorNumber: 3,
+                      Name: "World Channel",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
                   },
               ]
 
@@ -70,10 +70,10 @@ tests:
       response:
           value:
               {
-                  operatorName: "Comcast",
-                  lineupName: "Comcast King County",
-                  postalCode: "98052",
-                  lineupInfoType: 0,
+                  OperatorName: "Comcast",
+                  LineupName: "Comcast King County",
+                  PostalCode: "98052",
+                  LineupInfoType: 0,
               }
 
     - label: "Read attribute current channel"
@@ -82,11 +82,11 @@ tests:
       response:
           value:
               {
-                  majorNumber: 6,
-                  minorNumber: 0,
-                  name: "ABC",
-                  callSign: "KAAL-TV",
-                  affiliateCallSign: "KAAL",
+                  MajorNumber: 6,
+                  MinorNumber: 0,
+                  Name: "ABC",
+                  CallSign: "KAAL-TV",
+                  AffiliateCallSign: "KAAL",
               }
 
     - label: "Change Channel Command"

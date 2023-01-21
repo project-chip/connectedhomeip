@@ -149,9 +149,9 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "Timeout"
+              - name: "timeout"
                 value: 60
-              - name: "PINCode"
+              - name: "pinCode"
                 value: "123456"
 
     - label: "Wait 60s"
