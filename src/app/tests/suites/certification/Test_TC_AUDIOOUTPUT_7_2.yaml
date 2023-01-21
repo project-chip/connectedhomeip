@@ -48,9 +48,9 @@ tests:
       command: "RenameOutput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: Index
-              - name: "name"
+              - name: "Name"
                 value: "CertTest"
 
     #Disabled due to issue- #13029

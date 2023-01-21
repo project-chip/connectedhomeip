@@ -39,48 +39,48 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
-              - name: "credentials"
+              - name: "Credentials"
                 value: null
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextUserIndex"
+              - name: "NextUserIndex"
                 value: null
 
     - label: "TH reads NumberOfYearDay SchedulesSupportedPerUser attribute"
@@ -108,13 +108,13 @@ tests:
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 960
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 1980
 
     #issue #18591
@@ -123,21 +123,21 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 960
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 1980
                 constraints:
                     minValue: 961
@@ -147,13 +147,13 @@ tests:
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 15
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 1020
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 2040
       response:
           error: INVALID_COMMAND
@@ -163,22 +163,22 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 15
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 15
-              - name: "status"
+              - name: "Status"
                 value: 0x85
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 constraints:
                     hasValue: false
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 constraints:
                     hasValue: false
 
@@ -187,19 +187,19 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 5
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
@@ -207,22 +207,22 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: NumberOfYearDaySchedulesSupportedPerUser
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 5
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: NumberOfYearDaySchedulesSupportedPerUser
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 5
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 constraints:
                     hasValue: false
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 constraints:
                     hasValue: false
 
@@ -231,9 +231,9 @@ tests:
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
@@ -241,22 +241,22 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 constraints:
                     hasValue: false
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 constraints:
                     hasValue: false
 
@@ -265,13 +265,13 @@ tests:
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 1080
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 2100
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
@@ -279,21 +279,21 @@ tests:
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x00
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 1080
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 2100
                 constraints:
                     minValue: 1081
@@ -303,9 +303,9 @@ tests:
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
       response:
           error: INVALID_COMMAND
@@ -315,9 +315,9 @@ tests:
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Cleanup the created user"
@@ -325,5 +325,5 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1

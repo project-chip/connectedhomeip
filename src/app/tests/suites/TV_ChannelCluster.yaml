@@ -93,27 +93,27 @@ tests:
       command: "changeChannel"
       arguments:
           values:
-              - name: "match"
+              - name: "Match"
                 value: "PBS"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Change Channel By Number Command"
       command: "changeChannelByNumber"
       arguments:
           values:
-              - name: "majorNumber"
+              - name: "MajorNumber"
                 value: 6
-              - name: "minorNumber"
+              - name: "MinorNumber"
                 value: 0
 
     - label: "Skip Channel Command"
       command: "skipChannel"
       arguments:
           values:
-              - name: "count"
+              - name: "Count"
                 value: 1

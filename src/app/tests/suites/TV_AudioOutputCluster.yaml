@@ -49,16 +49,16 @@ tests:
       command: "selectOutput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: 1
 
     - label: "Rename Output Command"
       command: "renameOutput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: 1
-              - name: "name"
+              - name: "Name"
                 value: "HDMI Test"
 
     - label: "Read attribute Audio Output list"

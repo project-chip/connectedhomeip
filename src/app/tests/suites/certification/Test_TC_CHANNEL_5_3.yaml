@@ -59,14 +59,14 @@ tests:
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: [majorNumber: majornumber, minorNumber: minornumber]
+          value: [MajorNumber: majornumber, MinorNumber: minornumber]
 
     - label: "Sends a SkipChannel command to the DUT"
       PICS: CHANNEL.S.C03.Rsp
       command: "SkipChannel"
       arguments:
           values:
-              - name: "count"
+              - name: "Count"
                 value: 1
 
     - label: "Verify that the channel has changed on the device"
@@ -85,6 +85,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: [majorNumber: majornumber, minorNumber: minornumber + 1]
+          value: [MajorNumber: majornumber, MinorNumber: minornumber + 1]
           constraints:
               type: ChannelInfoStruct
