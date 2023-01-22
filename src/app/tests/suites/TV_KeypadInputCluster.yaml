@@ -32,9 +32,9 @@ tests:
       command: "sendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 3
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
