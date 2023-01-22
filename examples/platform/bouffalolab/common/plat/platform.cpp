@@ -46,6 +46,20 @@
 #include <utils_list.h>
 #endif
 
+#if CONFIG_ENABLE_CHIP_SHELL
+#include <ChipShellCollection.h>
+#include <lib/shell/Engine.h>
+#endif
+
+#if PW_RPC_ENABLED
+#include "PigweedLogger.h"
+#include "Rpc.h"
+#endif
+
+#if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
+#include "uart.h"
+#endif
+
 #include <AppTask.h>
 #include <plat.h>
 
