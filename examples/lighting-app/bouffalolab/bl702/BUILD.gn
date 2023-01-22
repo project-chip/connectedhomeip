@@ -122,6 +122,7 @@ bouffalolab_executable("lighting_app") {
     "${examples_plat_common_dir}/plat/LEDWidget.cpp",
     "${examples_plat_common_dir}/plat/demo_pwm.c",
     "${examples_plat_common_dir}/plat/main.cpp",
+    "${examples_plat_common_dir}/plat/platform.cpp",
     "${examples_plat_common_dir}/plat/uart.c",
   ]
 

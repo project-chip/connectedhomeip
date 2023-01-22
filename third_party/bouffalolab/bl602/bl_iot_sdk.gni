@@ -355,6 +355,8 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/select.c",
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
+
+    defines = [ "EF_ENV_CACHE_TABLE_SIZE=32" ]
     cflags_c = [ "-Wno-sign-compare" ]
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
@@ -682,7 +684,10 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_wifi") {
-    defines = [ "BL602_MATTER_SUPPORT" ]
+    defines = [
+      "BL602_MATTER_SUPPORT",
+      "LWIP_IPV6",
+    ]
 
     include_dirs = [
       "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter",

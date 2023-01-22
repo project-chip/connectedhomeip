@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,30 +18,14 @@
 
 #pragma once
 
-// ---- Lighting Example App Config ----
-
 #define APP_TASK_NAME "APP"
-
-#define APP_BUTTON_PRESS_JITTER 50
-#define APP_BUTTON_PRESS_SHORT 1000
-#define APP_BUTTON_PRESS_LONG 4000
-
 #define APP_TASK_PRIORITY 15
+
 #define EXT_DISCOVERY_TIMEOUT_SECS 20
-#define APP_LIGHT_ENDPOINT_ID 1
-#define APP_REBOOT_RESET_COUNT 3
-#define APP_REBOOT_RESET_COUNT_KEY "app_reset_cnt"
 
 #ifdef __cplusplus
-extern "C" {
-#endif
-
-#define BL_LOG(...) printf(__VA_ARGS__);
-void appError(int err);
-
-#ifdef __cplusplus
-}
-
 #include <lib/core/CHIPError.h>
 void appError(CHIP_ERROR error);
+#else
+void appError(int err);
 #endif
