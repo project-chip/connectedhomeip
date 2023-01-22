@@ -17,8 +17,8 @@
  *    limitations under the License.
  */
 
-#include <plat.h>
 #include <LEDWidget.h>
+#include <plat.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>

@@ -35,8 +35,8 @@
 #include <PlatformManagerImpl.h>
 
 #if HEAP_MONITORING
-#include <lib/support/CHIPMem.h>
 #include <MemMonitoring.h>
+#include <lib/support/CHIPMem.h>
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
