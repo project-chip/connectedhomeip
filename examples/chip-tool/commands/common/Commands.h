@@ -32,7 +32,7 @@ public:
 
     void Register(const char * clusterName, commands_list commandsList);
     int Run(int argc, char ** argv);
-    int RunInteractive(int argc, char ** argv);
+    int RunInteractive(const char * command);
 
 private:
     CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false);
@@ -49,6 +49,10 @@ private:
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
+
+    bool DecodeArgumentsFromInteractiveMode(const char * command, std::vector<std::string> & args);
+    bool DecodeArgumentsFromBase64EncodedJson(const char * encodedData, std::vector<std::string> & args);
+    bool DecodeArgumentsFromStringStream(const char * command, std::vector<std::string> & args);
 
     std::map<std::string, CommandsVector> mClusters;
 #ifdef CONFIG_USE_LOCAL_STORAGE
