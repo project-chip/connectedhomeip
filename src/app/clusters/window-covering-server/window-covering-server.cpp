@@ -338,7 +338,7 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
 
 bool IsPercent100thsValid(Percent100ths percent100ths)
 {
-    if (CHECK_BOUNDS_VALID(WC_PERCENT100THS_MIN_OPEN, percent100ths, WC_PERCENT100THS_MAX_CLOSED))
+    if ((WC_PERCENT100THS_MIN_OPEN< percent100ths)||(percent100ths> WC_PERCENT100THS_MAX_CLOSED))
         return true;
 
     return false;

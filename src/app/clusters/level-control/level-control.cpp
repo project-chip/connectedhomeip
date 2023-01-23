@@ -1071,7 +1071,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 {
     app::DataModel::Nullable<uint8_t> resolvedLevel;
     app::DataModel::Nullable<uint8_t> temporaryCurrentLevelCache;
-    app::DataModel::Nullable<uint16_t> transitionTime;
+    app::DataModel::Nullable<uint16_t> transitionTime(0);
 
     uint16_t currentOnOffTransitionTime;
     EmberAfStatus status;

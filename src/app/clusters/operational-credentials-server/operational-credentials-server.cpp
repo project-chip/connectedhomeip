@@ -1051,7 +1051,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         }
         csrSpan = MutableByteSpan{ csr.Get(), csrLength };
 
-        Optional<FabricIndex> fabricIndexForCsr;
+        Optional<FabricIndex> fabricIndexForCsr(0);
         if (isForUpdateNoc)
         {
             fabricIndexForCsr.SetValue(commandObj->GetAccessingFabricIndex());

@@ -114,8 +114,7 @@ void emberAfEndpointConfigure()
 {
     uint16_t ep;
 
-    static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
-                  "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
+    assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max());
 
 #if !defined(EMBER_SCRIPTED_TEST)
     uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
@@ -139,7 +138,7 @@ void emberAfEndpointConfigure()
 
     emberEndpointCount                = FIXED_ENDPOINT_COUNT;
     DataVersion * currentDataVersions = fixedEndpointDataVersions;
-    for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
+    for (ep = 0; ep < emberEndpointCount; ep++)
     {
         emAfEndpoints[ep].endpoint       = endpointNumber(ep);
         emAfEndpoints[ep].deviceTypeList = endpointDeviceTypeList(ep);

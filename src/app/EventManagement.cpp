@@ -407,7 +407,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     CHIP_ERROR err               = CHIP_NO_ERROR;
     uint32_t requestSize         = 0;
     aEventNumber                 = 0;
-    CircularTLVWriter checkpoint = writer;
+    CircularTLVWriter checkpoint;
     CircularEventBuffer * buffer = nullptr;
     EventLoadOutContext ctxt     = EventLoadOutContext(writer, aEventOptions.mPriority, mLastEventNumber);
     EventOptions opts;

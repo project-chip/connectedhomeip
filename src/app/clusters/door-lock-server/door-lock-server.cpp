@@ -3238,7 +3238,7 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     EndpointId endpoint     = commandPath.mEndpointId;
     DlOperationError reason = DlOperationError::kUnspecified;
     Nullable<uint16_t> pinUserIdx; // Will get set to non-null if we find a user for the PIN.
-    Optional<uint16_t> pinCredIdx; // Will get set to a value if the PIN is one we know about.
+    Optional<uint16_t> pinCredIdx(0); // Will get set to a value if the PIN is one we know about.
     bool success   = false;
     bool sendEvent = true;
 
