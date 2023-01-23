@@ -23,7 +23,7 @@ namespace scenes {
 ExtensionFieldsSets::ExtensionFieldsSets()
 {
     // check if any of the clusters with scene attributes are enabled
-    if (this->kExentesionFieldsSetsSize == 1)
+    if (this->kExtensionFieldsSetsSize == 1)
     {
         // a size of 1 byte indicates an empty struct, or a struct that only contains :
         // the on-off cluster
@@ -40,9 +40,9 @@ ExtensionFieldsSets::ExtensionFieldsSets()
         this->empty = true;
 #endif
     }
-    else if (this->kExentesionFieldsSetsSize > 1)
+    else if (this->kExtensionFieldsSetsSize > 1)
     {
-        memset(&this->enabledFieldSets, 0, kExentesionFieldsSetsSize);
+        memset(&this->enabledFieldSets, 0, kExtensionFieldsSetsSize);
     }
 }
 
@@ -53,8 +53,7 @@ CHIP_ERROR ExtensionFieldsSets::Serialize(TLV::TLVWriter & writer) const
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(
-            writer.PutBytes(TagEnabledFielsSets(), (uint8_t *) &this->enabledFieldSets, kExentesionFieldsSetsSize));
+        ReturnErrorOnFailure(writer.PutBytes(TagEnabledFielsSets(), (uint8_t *) &this->enabledFieldSets, kExtensionFieldsSetsSize));
 
         return writer.EndContainer(container);
     }
@@ -73,7 +72,7 @@ CHIP_ERROR ExtensionFieldsSets::Deserialize(TLV::TLVReader & reader)
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
         ReturnErrorOnFailure(reader.Next(TagEnabledFielsSets()));
-        ReturnErrorOnFailure(reader.GetBytes((uint8_t *) &this->enabledFieldSets, kExentesionFieldsSetsSize));
+        ReturnErrorOnFailure(reader.GetBytes((uint8_t *) &this->enabledFieldSets, kExtensionFieldsSetsSize));
 
         return reader.ExitContainer(container);
     }
@@ -82,7 +81,7 @@ CHIP_ERROR ExtensionFieldsSets::Deserialize(TLV::TLVReader & reader)
         return CHIP_NO_ERROR;
     }
 }
-void ExtensionFieldsSets::clear()
+void ExtensionFieldsSets::Clear()
 {
     if (!this->empty)
     {

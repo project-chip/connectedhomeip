@@ -19,11 +19,11 @@
 
 #include <cstdint>
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp> // For VendorId
 #include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/PasscodeId.h>
-#include <lib/core/SceneId.h>
 
 namespace chip {
 
@@ -47,6 +47,8 @@ typedef uint32_t TransactionId;
 typedef uint16_t KeysetId;
 typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
+typedef GroupId SceneGroupID;
+typedef uint8_t SceneId;
 
 constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
 constexpr FabricId kUndefinedFabricId                     = 0ULL;
@@ -59,6 +61,10 @@ constexpr EndpointId kInvalidEndpointId = 0xFFFF;
 constexpr EndpointId kRootEndpointId    = 0;
 constexpr ListIndex kInvalidListIndex   = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
 constexpr KeysetId kInvalidKeysetId     = 0xFFFF;
+
+constexpr SceneGroupID kGlobalGroupSceneId = CHIP_CONFIG_SCENES_GLOBAL_SCENE_GROUP_ID;
+constexpr SceneId kUndefinedSceneId        = CHIP_CONFIG_SCENES_TABLE_NULL_INDEX;
+constexpr SceneId kUnusedEndpointId        = CHIP_CONFIG_SCENES_TABLE_UNUSED_ENDPOINT_ID;
 
 // Invalid IC identifier is provisional. Value will most likely change when identifying token is defined
 // https://github.com/project-chip/connectedhomeip/issues/24251

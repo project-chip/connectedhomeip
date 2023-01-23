@@ -24,12 +24,15 @@
 namespace chip {
 namespace scenes {
 
+typedef uint16_t SceneTransitionTime;
+typedef uint8_t TransitionTime100ms;
+
 class SceneTable
 {
 public:
     static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
-    static constexpr size_t kSceneNameMax       = ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
-    static constexpr uint8_t kMaxScenePerFabric = SCENE_MAX_PER_FABRIC;
+    static constexpr size_t kSceneNameMax       = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
+    static constexpr uint8_t kMaxScenePerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
     /// @brief struct used to identify a scene in storage by 3 ids, endpoint, group and scene
     struct SceneStorageId
     {
@@ -77,7 +80,7 @@ public:
             return reader.ExitContainer(container);
         }
 
-        void clear()
+        void Clear()
         {
             sceneEndpointId = kInvalidEndpointId;
             sceneGroupId    = kGlobalGroupSceneId;
@@ -171,12 +174,12 @@ public:
             }
         }
 
-        void clear()
+        void Clear()
         {
             this->SetName(nullptr);
             sceneTransitionTime = 0;
             transitionTime100   = 0;
-            extentsionFieldsSets.clear();
+            extentsionFieldsSets.Clear();
         }
 
         bool operator==(const SceneData & other)
@@ -223,7 +226,7 @@ public:
     virtual ~SceneTable() = default;
 
     // Not copyable
-    SceneTable(const SceneTable &) = delete;
+    SceneTable(const SceneTable &)             = delete;
     SceneTable & operator=(const SceneTable &) = delete;
 
     virtual CHIP_ERROR Init() = 0;

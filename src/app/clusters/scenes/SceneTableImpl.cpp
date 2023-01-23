@@ -23,11 +23,11 @@
 namespace chip {
 namespace scenes {
 
-using SceneTableEntry = SceneTableImpl::SceneTableEntry;
-using SceneStorageId  = SceneTableImpl::SceneStorageId;
-using SceneData       = SceneTableImpl::SceneData;
+using SceneTableEntry = DefaultSceneTableImpl::SceneTableEntry;
+using SceneStorageId  = DefaultSceneTableImpl::SceneStorageId;
+using SceneData       = DefaultSceneTableImpl::SceneData;
 
-struct FabricList : public CommonPersistentData::FabricList
+struct FabricHavingSceneList : public CommonPersistentData::FabricList
 {
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
@@ -50,7 +50,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
     static constexpr TLV::Tag TagNext() { return TLV::ContextTag(2); }
 
     chip::FabricIndex fabric_index = kUndefinedFabricIndex;
-    SceneTableImpl::SceneStorageId first_scene;
+    DefaultSceneTableImpl::SceneStorageId first_scene;
     uint16_t scene_count = 0;
     FabricIndex next     = kUndefinedFabricIndex;
 
@@ -66,7 +66,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
 
     void Clear() override
     {
-        first_scene.clear();
+        first_scene.Clear();
         scene_count = 0;
         next        = kUndefinedFabricIndex;
     }
@@ -100,10 +100,10 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         return reader.ExitContainer(container);
     }
 
-    // Register the fabric in the fabrics' linked-list
+    // Register the fabric in the list of fabrics having scenes
     CHIP_ERROR Register(PersistentStorageDelegate * storage)
     {
-        FabricList fabric_list;
+        FabricHavingSceneList fabric_list;
         CHIP_ERROR err = fabric_list.Load(storage);
         if (CHIP_ERROR_NOT_FOUND == err)
         {
@@ -140,7 +140,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
     // Remove the fabric from the fabrics' linked list
     CHIP_ERROR Unregister(PersistentStorageDelegate * storage) const
     {
-        FabricList fabric_list;
+        FabricHavingSceneList fabric_list;
         CHIP_ERROR err = fabric_list.Load(storage);
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
@@ -183,7 +183,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
     // Check the fabric is registered in the fabrics' linked list
     CHIP_ERROR Validate(PersistentStorageDelegate * storage) const
     {
-        FabricList fabric_list;
+        FabricHavingSceneList fabric_list;
         ReturnErrorOnFailure(fabric_list.Load(storage));
 
         // Existing fabric list, search for existing entry
@@ -240,8 +240,8 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBuffer
 
     void Clear() override
     {
-        storageData.clear();
-        next.clear();
+        storageData.Clear();
+        next.Clear();
     }
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
@@ -271,7 +271,8 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBuffer
         return reader.ExitContainer(container);
     }
 
-    bool Find(PersistentStorageDelegate * storage, const FabricSceneData & fabric, SceneTableImpl::SceneStorageId target_scene)
+    bool Find(PersistentStorageDelegate * storage, const FabricSceneData & fabric,
+              DefaultSceneTableImpl::SceneStorageId target_scene)
     {
         fabric_index = fabric.fabric_index;
         storageId    = fabric.first_scene;
@@ -298,27 +299,23 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBuffer
     }
 };
 
-void SceneTableImpl::SetStorageDelegate(PersistentStorageDelegate * storage)
+CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
 {
-    VerifyOrDie(storage != nullptr);
-    mStorage = storage;
-}
-
-CHIP_ERROR SceneTableImpl::Init()
-{
-    if (mStorage == nullptr)
+    if (storage == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    mStorage = storage;
     return CHIP_NO_ERROR;
 }
 
-void SceneTableImpl::Finish()
+void DefaultSceneTableImpl::Finish()
 {
     mSceneEntryIterators.ReleaseAll();
 }
 
-CHIP_ERROR SceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
+CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -359,7 +356,7 @@ CHIP_ERROR SceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const Sc
 
     return scene.Save(mStorage);
 }
-CHIP_ERROR SceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
+CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
 {
     FabricSceneData fabric(fabric_index);
     SceneTableData scene;
@@ -371,7 +368,7 @@ CHIP_ERROR SceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneSto
     entry.storageData = scene.storageData;
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR SceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
+CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
 {
     FabricSceneData fabric(fabric_index);
     SceneTableData scene;
@@ -404,13 +401,13 @@ CHIP_ERROR SceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, Scene
     return CHIP_NO_ERROR;
 }
 
-SceneTableImpl::SceneEntryIterator * SceneTableImpl::IterateSceneEntry(FabricIndex fabric_index)
+DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntry(FabricIndex fabric_index)
 {
     VerifyOrReturnError(IsInitialized(), nullptr);
     return mSceneEntryIterators.CreateObject(*this, fabric_index);
 }
 
-SceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(SceneTableImpl & provider, FabricIndex fabric_index) :
+DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabric_index) :
     mProvider(provider), mFabric(fabric_index)
 {
     FabricSceneData fabric(fabric_index);
@@ -423,12 +420,12 @@ SceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(SceneTableImpl & 
     }
 }
 
-size_t SceneTableImpl::SceneEntryIteratorImpl::Count()
+size_t DefaultSceneTableImpl::SceneEntryIteratorImpl::Count()
 {
     return mTotalScene;
 }
 
-bool SceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & output)
+bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & output)
 {
     VerifyOrReturnError(mSceneCount < mTotalScene, false);
 
@@ -442,23 +439,23 @@ bool SceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & output)
     return true;
 }
 
-void SceneTableImpl::SceneEntryIteratorImpl::Release()
+void DefaultSceneTableImpl::SceneEntryIteratorImpl::Release()
 {
     mProvider.mSceneEntryIterators.ReleaseObject(this);
 }
 
 namespace {
 
-SceneTableImpl * gSceneTable = nullptr;
+DefaultSceneTableImpl * gSceneTable = nullptr;
 
 } // namespace
 
-SceneTableImpl * GetSceneTable()
+DefaultSceneTableImpl * GetSceneTable()
 {
     return gSceneTable;
 }
 
-void SetSceneTable(SceneTableImpl * provider)
+void SetSceneTable(DefaultSceneTableImpl * provider)
 {
     gSceneTable = provider;
 }

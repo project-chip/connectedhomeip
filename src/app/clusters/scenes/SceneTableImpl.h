@@ -28,26 +28,19 @@ namespace scenes {
 /**
  * @brief Implementation of a storage in nonvolatile storage of the scene table.
  *
- * SceneTableImpl is an implementation that allows to store scenes using PersistentStorageDelegate.
+ * DefaultSceneTableImpl is an implementation that allows to store scenes using PersistentStorageDelegate.
  * It handles the storage of scenes by their ID, GroupID and EnpointID over multiple fabrics.
  * It is meant to be used exclusively when the scene cluster is enable for at least one endpoint
  * on the device.
  */
-class SceneTableImpl : public SceneTable
+class DefaultSceneTableImpl : public SceneTable
 {
 public:
-    SceneTableImpl() = default;
+    DefaultSceneTableImpl() = default;
 
-    ~SceneTableImpl() override {}
-    /**
-     * @brief Set the storage implementation used for non-volatile storage of configuration data.
-     *        This method MUST be called before Init().
-     *
-     * @param storage Pointer to storage instance to set. Cannot be nullptr, will assert.
-     */
-    void SetStorageDelegate(PersistentStorageDelegate * storage);
+    ~DefaultSceneTableImpl() override {}
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(PersistentStorageDelegate * storage);
     void Finish();
 
     //
@@ -56,8 +49,9 @@ public:
 
     // By id
     CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry);
-    CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneTableImpl::SceneStorageId scene_id, SceneTableEntry & entry);
-    CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneTableImpl::SceneStorageId scene_id);
+    CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id,
+                                  SceneTableEntry & entry);
+    CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id);
 
     // Iterators
     SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) override;
@@ -66,13 +60,13 @@ protected:
     class SceneEntryIteratorImpl : public SceneEntryIterator
     {
     public:
-        SceneEntryIteratorImpl(SceneTableImpl & provider, FabricIndex fabric_index);
+        SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabric_index);
         size_t Count() override;
         bool Next(SceneTableEntry & output) override;
         void Release() override;
 
     protected:
-        SceneTableImpl & mProvider;
+        DefaultSceneTableImpl & mProvider;
         FabricIndex mFabric = kUndefinedFabricIndex;
         SceneStorageId mNextSceneId;
         size_t mSceneCount = 0;
@@ -84,7 +78,7 @@ protected:
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
 
     const uint8_t mMaxScenePerFabric = kMaxScenePerFabric;
-}; // class SceneTableImpl
+}; // class DefaultSceneTableImpl
 
 /**
  * Instance getter for the global SceneTable.
@@ -93,7 +87,7 @@ protected:
  *
  * @return The global Scene Table
  */
-SceneTableImpl * GetSceneTable();
+DefaultSceneTableImpl * GetSceneTable();
 
 /**
  * Instance setter for the global Scene Table.
@@ -104,6 +98,6 @@ SceneTableImpl * GetSceneTable();
  *
  * @param[in] provider pointer to the Scene Table global isntance to use
  */
-void SetSceneTable(SceneTableImpl * provider);
+void SetSceneTable(DefaultSceneTableImpl * provider);
 } // namespace scenes
 } // namespace chip
