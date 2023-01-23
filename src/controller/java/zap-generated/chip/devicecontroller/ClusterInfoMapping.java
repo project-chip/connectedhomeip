@@ -6331,12 +6331,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, byte[] data) {
+    public void onSuccess(Integer Status, Optional<byte[]> Data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "byte[]");
-      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo DataResponseValue = new CommandResponseInfo("Data", "Optional<byte[]>");
+      responseValues.put(DataResponseValue, Data);
       callback.onSuccess(responseValues);
     }
 
@@ -11714,7 +11714,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ApplicationLauncherCluster) cluster)
                   .launchApp(
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
-                      (ChipStructs.ApplicationLauncherClusterApplication)
+                      (Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct>)
                           commandArguments.get("application"),
                       (Optional<byte[]>) commandArguments.get("data"));
             },
@@ -11730,7 +11730,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ApplicationLauncherCluster) cluster)
                   .stopApp(
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
-                      (ChipStructs.ApplicationLauncherClusterApplication)
+                      (Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct>)
                           commandArguments.get("application"));
             },
             () -> new DelegatedApplicationLauncherClusterLauncherResponseCallback(),
@@ -11745,7 +11745,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ApplicationLauncherCluster) cluster)
                   .hideApp(
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
-                      (ChipStructs.ApplicationLauncherClusterApplication)
+                      (Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct>)
                           commandArguments.get("application"));
             },
             () -> new DelegatedApplicationLauncherClusterLauncherResponseCallback(),

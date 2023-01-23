@@ -2094,25 +2094,25 @@ client cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  struct Application {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
+  struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
   }
 
   readonly attribute INT16U catalogList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
     optional OCTET_STRING data = 1;
   }
 
   request struct StopAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   request struct HideAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;

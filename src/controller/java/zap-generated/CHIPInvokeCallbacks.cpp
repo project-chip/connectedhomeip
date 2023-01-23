@@ -3651,21 +3651,31 @@ void CHIPApplicationLauncherClusterLauncherResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;[B)V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/Optional;)V",
+                                                  &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.status), status);
-    jobject data;
-    jbyteArray dataByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.data.size()));
-    env->SetByteArrayRegion(dataByteArray, 0, static_cast<jsize>(dataResponse.data.size()),
-                            reinterpret_cast<const jbyte *>(dataResponse.data.data()));
-    data = dataByteArray;
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), Status);
+    jobject Data;
+    if (!dataResponse.data.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, Data);
+    }
+    else
+    {
+        jobject DataInsideOptional;
+        jbyteArray DataInsideOptionalByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.data.Value().size()));
+        env->SetByteArrayRegion(DataInsideOptionalByteArray, 0, static_cast<jsize>(dataResponse.data.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.data.Value().data()));
+        DataInsideOptional = DataInsideOptionalByteArray;
+        chip::JniReferences::GetInstance().CreateOptional(DataInsideOptional, Data);
+    }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, Data);
 }
 CHIPAccountLoginClusterGetSetupPINResponseCallback::CHIPAccountLoginClusterGetSetupPINResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>(CallbackFn, this)

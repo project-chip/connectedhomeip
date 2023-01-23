@@ -1755,36 +1755,38 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationLauncherClusterApplication {
-    public Integer catalogVendorId;
-    public String applicationId;
+  public static class ApplicationLauncherClusterApplicationStruct {
+    public Integer catalogVendorID;
+    public String applicationID;
 
-    public ApplicationLauncherClusterApplication(Integer catalogVendorId, String applicationId) {
-      this.catalogVendorId = catalogVendorId;
-      this.applicationId = applicationId;
+    public ApplicationLauncherClusterApplicationStruct(
+        Integer catalogVendorID, String applicationID) {
+      this.catalogVendorID = catalogVendorID;
+      this.applicationID = applicationID;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplication {\n");
-      output.append("\tcatalogVendorId: ");
-      output.append(catalogVendorId);
+      output.append("ApplicationLauncherClusterApplicationStruct {\n");
+      output.append("\tcatalogVendorID: ");
+      output.append(catalogVendorID);
       output.append("\n");
-      output.append("\tapplicationId: ");
-      output.append(applicationId);
+      output.append("\tapplicationID: ");
+      output.append(applicationID);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class ApplicationLauncherClusterApplicationEP {
-    public ChipStructs.ApplicationLauncherClusterApplication application;
+  public static class ApplicationLauncherClusterApplicationEPStruct {
+    public ChipStructs.ApplicationLauncherClusterApplicationStruct application;
     public Optional<Integer> endpoint;
 
-    public ApplicationLauncherClusterApplicationEP(
-        ChipStructs.ApplicationLauncherClusterApplication application, Optional<Integer> endpoint) {
+    public ApplicationLauncherClusterApplicationEPStruct(
+        ChipStructs.ApplicationLauncherClusterApplicationStruct application,
+        Optional<Integer> endpoint) {
       this.application = application;
       this.endpoint = endpoint;
     }
@@ -1792,7 +1794,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplicationEP {\n");
+      output.append("ApplicationLauncherClusterApplicationEPStruct {\n");
       output.append("\tapplication: ");
       output.append(application);
       output.append("\n");

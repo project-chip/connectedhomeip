@@ -13206,7 +13206,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns
  * a Launch Response.
  */
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params
                  completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 /**
@@ -13214,7 +13214,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running.
  */
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 /**
@@ -13222,7 +13222,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible.
  */
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
@@ -13238,21 +13238,21 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                            completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeCurrentAppWithCompletion:(void (^)(MTRApplicationLauncherClusterApplicationEP * _Nullable value,
+- (void)readAttributeCurrentAppWithCompletion:(void (^)(MTRApplicationLauncherClusterApplicationEPStruct * _Nullable value,
                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributeCurrentAppWithValue:(MTRApplicationLauncherClusterApplicationEP * _Nullable)value
+- (void)writeAttributeCurrentAppWithValue:(MTRApplicationLauncherClusterApplicationEPStruct * _Nullable)value
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributeCurrentAppWithValue:(MTRApplicationLauncherClusterApplicationEP * _Nullable)value
+- (void)writeAttributeCurrentAppWithValue:(MTRApplicationLauncherClusterApplicationEPStruct * _Nullable)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeCurrentAppWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                 reportHandler:(void (^)(MTRApplicationLauncherClusterApplicationEP * _Nullable value,
+                                 reportHandler:(void (^)(MTRApplicationLauncherClusterApplicationEPStruct * _Nullable value,
                                                    NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeCurrentAppWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                             endpoint:(NSNumber *)endpoint
                                                queue:(dispatch_queue_t)queue
-                                          completion:(void (^)(MTRApplicationLauncherClusterApplicationEP * _Nullable value,
+                                          completion:(void (^)(MTRApplicationLauncherClusterApplicationEPStruct * _Nullable value,
                                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -39875,19 +39875,19 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                   queue:(dispatch_queue_t)queue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                             MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params
           completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
             MTR_NEWLY_DEPRECATED("Please use launchAppWithParams:completion:");
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
             MTR_NEWLY_DEPRECATED("Please use stopAppWithParams:completion:");
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")

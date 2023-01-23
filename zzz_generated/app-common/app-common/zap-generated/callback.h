@@ -8756,7 +8756,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(
  * @brief Application Launcher Cluster LauncherResponse Command callback (from server)
  */
 bool emberAfApplicationLauncherClusterLauncherResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               uint8_t status, chip::ByteSpan data);
+                                                               uint8_t Status, chip::ByteSpan Data);
 /**
  * @brief Account Login Cluster GetSetupPIN Command callback (from client)
  */

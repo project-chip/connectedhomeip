@@ -9858,17 +9858,18 @@ void MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::O
 }
 
 void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> &
+        value)
 {
-    MTRApplicationLauncherClusterApplicationEP * _Nullable objCValue;
+    MTRApplicationLauncherClusterApplicationEPStruct * _Nullable objCValue;
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [MTRApplicationLauncherClusterApplicationEP new];
-        objCValue.application = [MTRApplicationLauncherClusterApplication new];
-        objCValue.application.catalogVendorId = [NSNumber numberWithUnsignedShort:value.Value().application.catalogVendorId];
-        objCValue.application.applicationId = [[NSString alloc] initWithBytes:value.Value().application.applicationId.data()
-                                                                       length:value.Value().application.applicationId.size()
+        objCValue = [MTRApplicationLauncherClusterApplicationEPStruct new];
+        objCValue.application = [MTRApplicationLauncherClusterApplicationStruct new];
+        objCValue.application.catalogVendorID = [NSNumber numberWithUnsignedShort:value.Value().application.catalogVendorID];
+        objCValue.application.applicationID = [[NSString alloc] initWithBytes:value.Value().application.applicationID.data()
+                                                                       length:value.Value().application.applicationID.size()
                                                                      encoding:NSUTF8StringEncoding];
         if (value.Value().endpoint.HasValue()) {
             objCValue.endpoint = [NSNumber numberWithUnsignedShort:value.Value().endpoint.Value()];
@@ -12469,7 +12470,11 @@ void MTRApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.data = [NSData dataWithBytes:data.data.data() length:data.data.size()];
+        if (data.data.HasValue()) {
+            response.data = [NSData dataWithBytes:data.data.Value().data() length:data.data.Value().size()];
+        } else {
+            response.data = nil;
+        }
     }
     DispatchSuccess(context, response);
 };

@@ -7191,7 +7191,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [MTRApplicationLauncherClusterApplication new];
+        _application = nil;
 
         _data = nil;
         _timedInvokeTimeoutMs = nil;
@@ -7225,7 +7225,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [MTRApplicationLauncherClusterApplication new];
+        _application = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -7256,7 +7256,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [MTRApplicationLauncherClusterApplication new];
+        _application = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -7289,7 +7289,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = [NSData data];
+        _data = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;

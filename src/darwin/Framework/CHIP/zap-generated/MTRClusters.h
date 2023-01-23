@@ -5206,17 +5206,17 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -8580,7 +8580,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                   queue:(dispatch_queue_t)queue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                             MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -8588,7 +8588,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
             MTR_NEWLY_DEPRECATED("Please use launchAppWithParams:expectedValues:expectedValueInterval:completion:");
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -8596,7 +8596,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
             MTR_NEWLY_DEPRECATED("Please use stopAppWithParams:expectedValues:expectedValueInterval:completion:");
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,

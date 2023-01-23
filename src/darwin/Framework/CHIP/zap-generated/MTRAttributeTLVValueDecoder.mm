@@ -14116,15 +14116,15 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRApplicationLauncherClusterApplicationEP * _Nullable value;
+            MTRApplicationLauncherClusterApplicationEPStruct * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [MTRApplicationLauncherClusterApplicationEP new];
-                value.application = [MTRApplicationLauncherClusterApplication new];
-                value.application.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.Value().application.catalogVendorId];
-                value.application.applicationId = [[NSString alloc] initWithBytes:cppValue.Value().application.applicationId.data()
-                                                                           length:cppValue.Value().application.applicationId.size()
+                value = [MTRApplicationLauncherClusterApplicationEPStruct new];
+                value.application = [MTRApplicationLauncherClusterApplicationStruct new];
+                value.application.catalogVendorID = [NSNumber numberWithUnsignedShort:cppValue.Value().application.catalogVendorID];
+                value.application.applicationID = [[NSString alloc] initWithBytes:cppValue.Value().application.applicationID.data()
+                                                                           length:cppValue.Value().application.applicationID.size()
                                                                          encoding:NSUTF8StringEncoding];
                 if (cppValue.Value().endpoint.HasValue()) {
                     value.endpoint = [NSNumber numberWithUnsignedShort:cppValue.Value().endpoint.Value()];
