@@ -6626,14 +6626,16 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use identifyWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use identifyWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use triggerEffectWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use triggerEffectWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterGroups (Deprecated)
@@ -6648,46 +6650,53 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:
              (void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use addGroupWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use addGroupWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:
               (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use viewGroupWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use viewGroupWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getGroupMembershipWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getGroupMembershipWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:
                 (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use removeGroupWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use removeGroupWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use removeAllGroupsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use removeAllGroupsWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use removeAllGroupsWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use removeAllGroupsWithExpectedValues:expectedValueInterval:completion:");
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                       completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use addGroupIfIdentifyingWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use addGroupIfIdentifyingWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterScenes (Deprecated)
@@ -6702,70 +6711,80 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:
              (void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use addSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use addSceneWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:
               (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use viewSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use viewSceneWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:
                 (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use removeSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use removeSceneWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
                                       NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use removeAllScenesWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use removeAllScenesWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:
                (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use storeSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use storeSceneWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use recallSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use recallSceneWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getSceneMembershipWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getSceneMembershipWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use enhancedAddSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use enhancedAddSceneWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use enhancedViewSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use enhancedViewSceneWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:
               (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use copySceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use copySceneWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterOnOff (Deprecated)
@@ -6778,55 +6797,69 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
 - (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                              MTR_NEWLY_DEPRECATED("Please use offWithParams:expectedValues:expectedValueIntervalMs:completion:");
+        completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use offWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)offWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                                  MTR_NEWLY_DEPRECATED("Please use offWithExpectedValues:expectedValueIntervalMs:completion:");
+            completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use offWithExpectedValues:expectedValueInterval:completion:");
 - (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                              MTR_NEWLY_DEPRECATED("Please use onWithParams:expectedValues:expectedValueIntervalMs:completion:");
+        completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use onWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                                 MTR_NEWLY_DEPRECATED("Please use onWithExpectedValues:expectedValueIntervalMs:completion:");
+           completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use onWithExpectedValues:expectedValueInterval:completion:");
 - (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use toggleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use toggleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use toggleWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use toggleWithExpectedValues:expectedValueInterval:completion:");
 - (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use offWithEffectWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use offWithEffectWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use onWithRecallGlobalSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use onWithRecallGlobalSceneWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use onWithRecallGlobalSceneWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use onWithRecallGlobalSceneWithExpectedValues:expectedValueInterval:completion:");
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use onWithTimedOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use onWithTimedOffWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterOnOffSwitchConfiguration (Deprecated)
@@ -6849,53 +6882,65 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveToLevelWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveToLevelWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                              MTR_NEWLY_DEPRECATED("Please use moveWithParams:expectedValues:expectedValueIntervalMs:completion:");
+        completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stepWithParams:(MTRLevelControlClusterStepParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                              MTR_NEWLY_DEPRECATED("Please use stepWithParams:expectedValues:expectedValueIntervalMs:completion:");
+        completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stepWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stopWithParams:(MTRLevelControlClusterStopParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                              MTR_NEWLY_DEPRECATED("Please use stopWithParams:expectedValues:expectedValueIntervalMs:completion:");
+        completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveToLevelWithOnOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveToLevelWithOnOffWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveWithOnOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveWithOnOffWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stepWithOnOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stepWithOnOffWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stopWithOnOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopWithOnOffWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                        completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveToClosestFrequencyWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveToClosestFrequencyWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterBinaryInputBasic (Deprecated)
@@ -6960,74 +7005,86 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use instantActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use instantActionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use instantActionWithTransitionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use instantActionWithTransitionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use startActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use startActionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use startActionWithDurationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use startActionWithDurationWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stopActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopActionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use pauseActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use pauseActionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use pauseActionWithDurationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use pauseActionWithDurationWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resumeActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resumeActionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use enableActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use enableActionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                          completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use enableActionWithDurationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use enableActionWithDurationWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use disableActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use disableActionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use disableActionWithDurationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use disableActionWithDurationWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterBasic (Deprecated)
@@ -7041,13 +7098,15 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use mfgSpecificPingWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use mfgSpecificPingWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)mfgSpecificPingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use mfgSpecificPingWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use mfgSpecificPingWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterOtaSoftwareUpdateProvider (Deprecated)
@@ -7062,21 +7121,24 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use queryImageWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use queryImageWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use applyUpdateRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use applyUpdateRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use notifyUpdateAppliedWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use notifyUpdateAppliedWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterOtaSoftwareUpdateRequestor (Deprecated)
@@ -7090,8 +7152,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use announceOTAProviderWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use announceOTAProviderWithParams:expectedValues:expectedValueInterval:completion:");
 - (NSDictionary<NSString *, id> *)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use readAttributeDefaultOTAProvidersWithParams on MTRClusterOTASoftwareUpdateRequestor");
@@ -7163,30 +7226,34 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use armFailSafeWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use armFailSafeWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use setRegulatoryConfigWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use setRegulatoryConfigWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                       completionHandler:
                           (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use commissioningCompleteWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use commissioningCompleteWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completionHandler:
                                   (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
                                       NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use commissioningCompleteWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use commissioningCompleteWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterNetworkCommissioning (Deprecated)
@@ -7201,43 +7268,49 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use scanNetworksWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use scanNetworksWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                        completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use addOrUpdateWiFiNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use addOrUpdateWiFiNetworkWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                          completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                                NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use addOrUpdateThreadNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use addOrUpdateThreadNetworkWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use removeNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use removeNetworkWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use connectNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use connectNetworkWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use reorderNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use reorderNetworkWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterDiagnosticLogs (Deprecated)
@@ -7252,8 +7325,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use retrieveLogsRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use retrieveLogsRequestWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterGeneralDiagnostics (Deprecated)
@@ -7267,8 +7341,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testEventTriggerWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testEventTriggerWithParams:expectedValues:expectedValueInterval:completion:");
 - (NSDictionary<NSString *, id> *)readAttributeBootReasonsWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonWithParams on MTRClusterGeneralDiagnostics");
@@ -7285,13 +7360,15 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resetWatermarksWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resetWatermarksWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)resetWatermarksWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resetWatermarksWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resetWatermarksWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterThreadNetworkDiagnostics (Deprecated)
@@ -7305,13 +7382,15 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueInterval:completion:");
 - (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableWithParams on MTRClusterThreadNetworkDiagnostics");
@@ -7331,13 +7410,15 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueInterval:completion:");
 - (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use readAttributeBSSIDWithParams on MTRClusterWiFiNetworkDiagnostics");
@@ -7357,13 +7438,15 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterBridgedDeviceBasic (Deprecated)
@@ -7395,25 +7478,29 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use openCommissioningWindowWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use openCommissioningWindowWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use openBasicCommissioningWindowWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use openBasicCommissioningWindowWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use revokeCommissioningWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use revokeCommissioningWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use revokeCommissioningWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use revokeCommissioningWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterOperationalCredentials (Deprecated)
@@ -7428,56 +7515,64 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use attestationRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use attestationRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use certificateChainRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use certificateChainRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
                                  NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use CSRRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use CSRRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use addNOCWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use addNOCWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use updateNOCWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use updateNOCWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use updateFabricLabelWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use updateFabricLabelWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use removeFabricWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use removeFabricWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use addTrustedRootCertificateWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use addTrustedRootCertificateWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterGroupKeyManagement (Deprecated)
@@ -7491,28 +7586,32 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use keySetWriteWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use keySetWriteWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
                                  NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use keySetReadWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use keySetReadWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use keySetRemoveWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use keySetRemoveWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use keySetReadAllIndicesWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use keySetReadAllIndicesWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterFixedLabel (Deprecated)
@@ -7553,8 +7652,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use changeToModeWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use changeToModeWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterDoorLock (Deprecated)
@@ -7568,116 +7668,134 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use lockDoorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use lockDoorWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use unlockDoorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use unlockDoorWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use unlockWithTimeoutWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use unlockWithTimeoutWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use setWeekDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use setWeekDayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getWeekDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getWeekDayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use clearWeekDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use clearWeekDayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use setYearDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use setYearDayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getYearDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getYearDayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use clearYearDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use clearYearDayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use setHolidayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use setHolidayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getHolidayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getHolidayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use clearHolidayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use clearHolidayScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use setUserWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use setUserWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getUserWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getUserWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use clearUserWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use clearUserWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use setCredentialWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use setCredentialWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getCredentialStatusWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getCredentialStatusWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use clearCredentialWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use clearCredentialWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterWindowCovering (Deprecated)
@@ -7691,59 +7809,69 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use upOrOpenWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use upOrOpenWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)upOrOpenWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use upOrOpenWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use upOrOpenWithExpectedValues:expectedValueInterval:completion:");
 - (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use downOrCloseWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use downOrCloseWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use downOrCloseWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use downOrCloseWithExpectedValues:expectedValueInterval:completion:");
 - (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stopMotionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopMotionWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stopMotionWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopMotionWithExpectedValues:expectedValueInterval:completion:");
 - (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use goToLiftValueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use goToLiftValueWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use goToLiftPercentageWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use goToLiftPercentageWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use goToTiltValueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use goToTiltValueWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use goToTiltPercentageWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use goToTiltPercentageWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterBarrierControl (Deprecated)
@@ -7757,19 +7885,22 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use barrierControlGoToPercentWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use barrierControlGoToPercentWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use barrierControlStopWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use barrierControlStopWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use barrierControlStopWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use barrierControlStopWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterPumpConfigurationAndControl (Deprecated)
@@ -7792,32 +7923,37 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use setpointRaiseLowerWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use setpointRaiseLowerWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use setWeeklyScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use setWeeklyScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getWeeklyScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getWeeklyScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use clearWeeklyScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use clearWeeklyScheduleWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use clearWeeklyScheduleWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use clearWeeklyScheduleWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterFanControl (Deprecated)
@@ -7849,116 +7985,135 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveToHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveToHueWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveHueWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stepHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stepHueWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveToSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveToSaturationWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveSaturationWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stepSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stepSaturationWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                        completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveToHueAndSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveToHueAndSaturationWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveToColorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveToColorWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveColorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveColorWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stepColorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stepColorWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                        completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveToColorTemperatureWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveToColorTemperatureWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use enhancedMoveToHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use enhancedMoveToHueWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use enhancedMoveHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use enhancedMoveHueWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use enhancedStepHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use enhancedStepHueWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use enhancedMoveToHueAndSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use enhancedMoveToHueAndSaturationWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use colorLoopSetWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use colorLoopSetWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stopMoveStepWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopMoveStepWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use moveColorTemperatureWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use moveColorTemperatureWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stepColorTemperatureWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stepColorTemperatureWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterBallastConfiguration (Deprecated)
@@ -8093,20 +8248,23 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use changeChannelWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use changeChannelWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                       completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use changeChannelByNumberWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use changeChannelByNumberWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use skipChannelWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use skipChannelWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterTargetNavigator (Deprecated)
@@ -8121,8 +8279,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use navigateTargetWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use navigateTargetWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterMediaPlayback (Deprecated)
@@ -8137,126 +8296,145 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use playWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use playWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)playWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use playWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use playWithExpectedValues:expectedValueInterval:completion:");
 - (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use pauseWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use pauseWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
               completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use pauseWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use pauseWithExpectedValues:expectedValueInterval:completion:");
 - (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithExpectedValues:expectedValueInterval:completion:");
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:
               (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use startOverWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use startOverWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                   completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use startOverWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use startOverWithExpectedValues:expectedValueInterval:completion:");
 - (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:
              (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use previousWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use previousWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use previousWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use previousWithExpectedValues:expectedValueInterval:completion:");
 - (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use nextWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use nextWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use nextWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use nextWithExpectedValues:expectedValueInterval:completion:");
 - (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use rewindWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use rewindWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use rewindWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use rewindWithExpectedValues:expectedValueInterval:completion:");
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use fastForwardWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use fastForwardWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use fastForwardWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use fastForwardWithExpectedValues:expectedValueInterval:completion:");
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use skipForwardWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use skipForwardWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use skipBackwardWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use skipBackwardWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use seekWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use seekWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterMediaInput (Deprecated)
@@ -8270,36 +8448,42 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use selectInputWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use selectInputWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use showInputStatusWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use showInputStatusWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use showInputStatusWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use showInputStatusWithExpectedValues:expectedValueInterval:completion:");
 - (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use hideInputStatusWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use hideInputStatusWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use hideInputStatusWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use hideInputStatusWithExpectedValues:expectedValueInterval:completion:");
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use renameInputWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use renameInputWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterLowPower (Deprecated)
@@ -8312,13 +8496,16 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                              MTR_NEWLY_DEPRECATED("Please use sleepWithParams:expectedValues:expectedValueIntervalMs:completion:");
+        completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use sleepWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)sleepWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use sleepWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use sleepWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterKeypadInput (Deprecated)
@@ -8333,8 +8520,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use sendKeyWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use sendKeyWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterContentLauncher (Deprecated)
@@ -8349,15 +8537,17 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use launchContentWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use launchContentWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:
               (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use launchURLWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use launchURLWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterAudioOutput (Deprecated)
@@ -8371,14 +8561,16 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use selectOutputWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use selectOutputWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use renameOutputWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use renameOutputWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterApplicationLauncher (Deprecated)
@@ -8393,22 +8585,25 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use launchAppWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use launchAppWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use stopAppWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use stopAppWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use hideAppWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use hideAppWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterApplicationBasic (Deprecated)
@@ -8432,24 +8627,29 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getSetupPINWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getSetupPINWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                              MTR_NEWLY_DEPRECATED("Please use loginWithParams:expectedValues:expectedValueIntervalMs:completion:");
+        completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use loginWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use logoutWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use logoutWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use logoutWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use logoutWithExpectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterElectricalMeasurement (Deprecated)
@@ -8463,19 +8663,22 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                       completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getProfileInfoCommandWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getProfileInfoCommandWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use getProfileInfoCommandWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use getProfileInfoCommandWithExpectedValues:expectedValueInterval:completion:");
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use getMeasurementProfileCommandWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use getMeasurementProfileCommandWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 @interface MTRClusterTestCluster (Deprecated)
@@ -8488,106 +8691,123 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
 - (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(MTRStatusCompletion)completionHandler API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-                              MTR_NEWLY_DEPRECATED("Please use testWithParams:expectedValues:expectedValueIntervalMs:completion:");
+        completionHandler:(MTRStatusCompletion)completionHandler
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testWithExpectedValues:expectedValueInterval:completion:");
 - (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testNotHandledWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testNotHandledWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testNotHandledWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testNotHandledWithExpectedValues:expectedValueInterval:completion:");
 - (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testSpecificWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testSpecificWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testSpecificWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testSpecificWithExpectedValues:expectedValueInterval:completion:");
 - (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithExpectedValues:expectedValueInterval:completion:");
 - (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testAddArgumentsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testAddArgumentsWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testSimpleArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testSimpleArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                completionHandler:
                                    (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testStructArrayArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testStructArrayArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testStructArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                 completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testNestedStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testNestedStructArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                               completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testListStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testListStructArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testListInt8UArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testListInt8UArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
                                        expectedValues:
                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                     completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testNestedStructListArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testNestedStructListArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testListNestedStructListArgumentRequestWithParams:
             (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
                                            expectedValues:
@@ -8595,29 +8815,33 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                         completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                               NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testListNestedStructListArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testListNestedStructListArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                             completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testListInt8UReverseRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testListInt8UReverseRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testEnumsRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testEnumsRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                             completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testNullableOptionalRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testNullableOptionalRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
                                       expectedValues:
                                           (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -8625,40 +8849,46 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                    completionHandler:
                                        (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testComplexNullableOptionalRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testComplexNullableOptionalRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use simpleStructEchoRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use simpleStructEchoRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithExpectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithExpectedValues:expectedValueInterval:completion:");
 - (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
                                      expectedValues:
                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                   completionHandler:(MTRStatusCompletion)completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testSimpleOptionalArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testSimpleOptionalArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                          completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use testEmitTestEventRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+            MTR_NEWLY_DEPRECATED("Please use testEmitTestEventRequestWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
                                         expectedValues:
                                             (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -8667,8 +8897,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                          (void (^)(
                                              MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
-        "Please use testEmitTestFabricScopedEventRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+    NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED(
+            "Please use testEmitTestFabricScopedEventRequestWithParams:expectedValues:expectedValueInterval:completion:");
 @end
 
 NS_ASSUME_NONNULL_END
