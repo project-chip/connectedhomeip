@@ -476,7 +476,7 @@ public:
     CHIP_ERROR Get(CharSpan & v);
 
     /**
-     * Get the value of the Localized String Identifier.
+     * Get the Localized String Identifier contained in the current element..
      *
      * The method takes what's after the first Information Separator 1 <IS1>, and until end of string
      * or second <IS1>, and return the hex-decoded string identifier, if one was there.
