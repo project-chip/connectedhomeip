@@ -35173,6 +35173,36 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use readAttributeMaxLevelWithAttributeCache:endpoint:queue:completion:");
 
+- (void)readAttributeIntrinsicBalanceFactorWithCompletionHandler:
+    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use readAttributeIntrinsicBallastFactorWithCompletion:");
+- (void)writeAttributeIntrinsicBalanceFactorWithValue:(NSNumber * _Nullable)value
+                                    completionHandler:(MTRStatusCompletion)completionHandler
+    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use writeAttributeIntrinsicBallastFactorWithValue:completion:");
+- (void)writeAttributeIntrinsicBalanceFactorWithValue:(NSNumber * _Nullable)value
+                                               params:(MTRWriteParams * _Nullable)params
+                                    completionHandler:(MTRStatusCompletion)completionHandler
+    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use writeAttributeIntrinsicBallastFactorWithValue:params:completion:");
+- (void)subscribeAttributeIntrinsicBalanceFactorWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(MTRSubscribeParams * _Nullable)params
+                                        subscriptionEstablished:
+                                            (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                  reportHandler:
+                                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeIntrinsicBallastFactorWithParams:subscriptionEstablished:");
++ (void)readAttributeIntrinsicBalanceFactorWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                     endpoint:(NSNumber *)endpoint
+                                                        queue:(dispatch_queue_t)queue
+                                            completionHandler:
+                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use readAttributeIntrinsicBallastFactorWithAttributeCache:endpoint:queue:completion:");
+
 - (void)readAttributeBallastFactorAdjustmentWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

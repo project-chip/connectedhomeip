@@ -3733,6 +3733,9 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRClusterBallastConfigurationAttributeMaxLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID")
     = 0x00000011,
+    MTRClusterBallastConfigurationAttributeIntrinsicBalanceFactorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID")
+    = 0x00000014,
     MTRClusterBallastConfigurationAttributeBallastFactorAdjustmentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID")
     = 0x00000015,
