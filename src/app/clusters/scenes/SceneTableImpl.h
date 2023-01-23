@@ -26,7 +26,7 @@ namespace chip {
 namespace scenes {
 
 /**
- * @brief Implementation of a storage in permanent memory of the scene table.
+ * @brief Implementation of a storage in nonvolatile storage of the scene table.
  *
  * SceneTableImpl is an implementation that allows to store scenes in a permenent manner.
  * It handles the storage of scenes by their ID, GroupID and EnpointID over multiple fabrics.
