@@ -243,8 +243,10 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
 
         if (startupParams.otaProviderDelegate) {
-            if (![startupParams.otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
-                                                                                                controller:params:completion:)]
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:canStartNewBDXSession:completion:)]
+                && ![startupParams.otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
+                                                                                                   controller:params:completion:)]
                 && ![startupParams.otaProviderDelegate
                     respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completionHandler:)]) {
                 MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleQueryImageForNodeID");

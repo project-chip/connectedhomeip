@@ -74,6 +74,7 @@ public:
         VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
+        mDidReceiveBDXInit = true;
 
         mSystemLayer = systemLayer;
         mExchangeMgr = exchangeMgr;
@@ -119,6 +120,8 @@ public:
             mDelegateNotificationQueue = nil;
         }
     }
+
+    bool CanStartNewBDXSession() { return !mDidReceiveBDXInit; }
 
 private:
     CHIP_ERROR OnMessageToSend(TransferSession::OutputEvent & event)
@@ -396,10 +399,12 @@ private:
             mExchangeCtx = nullptr;
         }
 
+        mDidReceiveBDXInit = false;
         mInitialized = false;
     }
 
     bool mInitialized = false;
+    bool mDidReceiveBDXInit = false;
     Optional<FabricIndex> mFabricIndex;
     Optional<NodeId> mNodeId;
     id<MTROTAProviderDelegate> mDelegate = nil;
@@ -609,7 +614,14 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
     auto strongDelegate = mDelegate;
     dispatch_async(mDelegateNotificationQueue, ^{
-        if ([strongDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]) {
+        if ([strongDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
+                                                                        controller:params:canStartNewBDXSession:completion:)]) {
+            [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                           controller:controller
+                                               params:commandParams
+                                canStartNewBDXSession:gOtaSender.CanStartNewBDXSession()
+                                           completion:completionHandler];
+        } else if ([strongDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]) {
             [strongDelegate handleQueryImageForNodeID:@(nodeId)
                                            controller:controller
                                                params:commandParams

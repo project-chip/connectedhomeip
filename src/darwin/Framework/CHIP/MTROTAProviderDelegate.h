@@ -43,7 +43,7 @@ typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
  *
  * While the selectors on this protocol are marked @optional, in practice an
  * implementation must provide an implementation for one of each pair of
- * selectors (e.g. one of the two handleQueryImageForNodeID selectors must be
+ * selectors (e.g. one of the three handleQueryImageForNodeID selectors must be
  * implemented).  The selector ending in "completion:" will be used if present;
  * otherwise the one ending in "completionHandler:" will be used.
  */
@@ -58,6 +58,11 @@ typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
  * an error response to the client.  Otherwise it must have a non-nil data,
  * which will be returned to the client.
  */
+- (void)handleQueryImageForNodeID:(NSNumber *)nodeID
+                       controller:(MTRDeviceController *)controller
+                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
+            canStartNewBDXSession:(bool)canStartNewBDXSession
+                       completion:(MTRQueryImageCompletionHandler)completion MTR_NEWLY_AVAILABLE;
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
