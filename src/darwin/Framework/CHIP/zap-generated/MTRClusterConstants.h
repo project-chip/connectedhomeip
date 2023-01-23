@@ -3734,7 +3734,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID")
     = 0x00000011,
     MTRClusterBallastConfigurationAttributeIntrinsicBalanceFactorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID")
     = 0x00000014,
     MTRClusterBallastConfigurationAttributeBallastFactorAdjustmentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID")
@@ -3782,7 +3782,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastStatusID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeMinLevelID MTR_NEWLY_AVAILABLE = 0x00000010,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID MTR_NEWLY_AVAILABLE = 0x00000011,
-    MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID MTR_NEWLY_AVAILABLE = 0x00000014,
+    MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID MTR_NEWLY_AVAILABLE = 0x00000014,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID MTR_NEWLY_AVAILABLE = 0x00000015,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeLampQuantityID MTR_NEWLY_AVAILABLE = 0x00000020,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeLampTypeID MTR_NEWLY_AVAILABLE = 0x00000030,

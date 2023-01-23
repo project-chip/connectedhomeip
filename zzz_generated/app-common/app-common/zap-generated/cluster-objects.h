@@ -19494,7 +19494,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxLevel
-namespace IntrinsicBalanceFactor {
+namespace IntrinsicBallastFactor {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<uint8_t>;
@@ -19502,10 +19502,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBalanceFactor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBallastFactor::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace IntrinsicBalanceFactor
+} // namespace IntrinsicBallastFactor
 namespace BallastFactorAdjustment {
 struct TypeInfo
 {
@@ -19648,7 +19648,7 @@ struct TypeInfo
         Attributes::BallastStatus::TypeInfo::DecodableType ballastStatus       = static_cast<uint8_t>(0);
         Attributes::MinLevel::TypeInfo::DecodableType minLevel                 = static_cast<uint8_t>(0);
         Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                 = static_cast<uint8_t>(0);
-        Attributes::IntrinsicBalanceFactor::TypeInfo::DecodableType intrinsicBalanceFactor;
+        Attributes::IntrinsicBallastFactor::TypeInfo::DecodableType intrinsicBallastFactor;
         Attributes::BallastFactorAdjustment::TypeInfo::DecodableType ballastFactorAdjustment;
         Attributes::LampQuantity::TypeInfo::DecodableType lampQuantity = static_cast<uint8_t>(0);
         Attributes::LampType::TypeInfo::DecodableType lampType;

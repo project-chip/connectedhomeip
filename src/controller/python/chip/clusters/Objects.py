@@ -20722,7 +20722,7 @@ class BallastConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="ballastStatus", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="minLevel", Tag=0x00000010, Type=uint),
                 ClusterObjectFieldDescriptor(Label="maxLevel", Tag=0x00000011, Type=uint),
-                ClusterObjectFieldDescriptor(Label="intrinsicBalanceFactor", Tag=0x00000014, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="intrinsicBallastFactor", Tag=0x00000014, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="ballastFactorAdjustment", Tag=0x00000015, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="lampQuantity", Tag=0x00000020, Type=uint),
                 ClusterObjectFieldDescriptor(Label="lampType", Tag=0x00000030, Type=typing.Optional[str]),
@@ -20743,7 +20743,7 @@ class BallastConfiguration(Cluster):
     ballastStatus: 'typing.Optional[uint]' = None
     minLevel: 'uint' = None
     maxLevel: 'uint' = None
-    intrinsicBalanceFactor: 'typing.Union[None, Nullable, uint]' = None
+    intrinsicBallastFactor: 'typing.Union[None, Nullable, uint]' = None
     ballastFactorAdjustment: 'typing.Union[None, Nullable, uint]' = None
     lampQuantity: 'uint' = None
     lampType: 'typing.Optional[str]' = None
@@ -20844,7 +20844,7 @@ class BallastConfiguration(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class IntrinsicBalanceFactor(ClusterAttributeDescriptor):
+        class IntrinsicBallastFactor(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0301

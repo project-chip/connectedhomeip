@@ -8044,10 +8044,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxLevel", 1, value);
         }
-        case BallastConfiguration::Attributes::IntrinsicBalanceFactor::Id: {
+        case BallastConfiguration::Attributes::IntrinsicBallastFactor::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("IntrinsicBalanceFactor", 1, value);
+            return DataModelLogger::LogValue("IntrinsicBallastFactor", 1, value);
         }
         case BallastConfiguration::Attributes::BallastFactorAdjustment::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
