@@ -90,7 +90,7 @@ tests:
               }
 
     - label: "Change Channel Command"
-      command: "changeChannel"
+      command: "ChangeChannel"
       arguments:
           values:
               - name: "Match"
@@ -103,7 +103,7 @@ tests:
                 value: 0
 
     - label: "Change Channel By Number Command"
-      command: "changeChannelByNumber"
+      command: "ChangeChannelByNumber"
       arguments:
           values:
               - name: "MajorNumber"
@@ -112,7 +112,7 @@ tests:
                 value: 0
 
     - label: "Skip Channel Command"
-      command: "skipChannel"
+      command: "SkipChannel"
       arguments:
           values:
               - name: "Count"

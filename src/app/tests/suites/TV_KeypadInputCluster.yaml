@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Send Key Command"
-      command: "sendKey"
+      command: "SendKey"
       arguments:
           values:
               - name: "KeyCode"
