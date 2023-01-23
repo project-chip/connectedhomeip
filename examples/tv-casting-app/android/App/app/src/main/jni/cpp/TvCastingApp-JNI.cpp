@@ -330,7 +330,7 @@ exit:
 }
 
 CHIP_ERROR CreateParameter(JNIEnv * env, jobject jParameter,
-                           chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & parameter)
+                           chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type & parameter)
 {
     jclass jParameterClass = env->GetObjectClass(jParameter);
 
@@ -348,7 +348,8 @@ CHIP_ERROR CreateParameter(JNIEnv * env, jobject jParameter,
 }
 
 CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
-                               chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & search, ListFreer & listFreer)
+                               chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type & search,
+                               ListFreer & listFreer)
 {
     jclass jContentSearchClass;
     ReturnErrorOnFailure(
@@ -367,20 +368,21 @@ CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
     jmethodID jNextMid    = env->GetMethodID(env->GetObjectClass(jIterator), "next", "()Ljava/lang/Object;");
     jmethodID jHasNextMid = env->GetMethodID(env->GetObjectClass(jIterator), "hasNext", "()Z");
 
-    auto * parameterListHolder = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(parameterListSize);
+    auto * parameterListHolder =
+        new ListHolder<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(parameterListSize);
     listFreer.add(parameterListHolder);
     int parameterIndex = 0;
     while (env->CallBooleanMethod(jIterator, jHasNextMid))
     {
         jobject jParameter = env->CallObjectMethod(jIterator, jNextMid);
-        chip::app::Clusters::ContentLauncher::Structs::Parameter::Type parameter;
+        chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type parameter;
         ReturnErrorOnFailure(CreateParameter(env, jParameter, parameter));
         parameterListHolder->mList[parameterIndex].type           = parameter.type;
         parameterListHolder->mList[parameterIndex].value          = parameter.value;
         parameterListHolder->mList[parameterIndex].externalIDList = parameter.externalIDList;
         parameterIndex++;
     }
-    search.parameterList = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(
+    search.parameterList = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(
         parameterListHolder->mList, parameterListSize);
 
     return CHIP_NO_ERROR;
@@ -400,7 +402,7 @@ JNI_METHOD(jboolean, contentLauncher_1launchContent)
     chip::Optional<chip::CharSpan> data = MakeOptional(CharSpan::fromCharString(nativeData));
 
     ListFreer listFreer;
-    chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search;
+    chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type search;
     CHIP_ERROR err = CreateContentSearch(env, jSearch, search, listFreer);
 
     TargetEndpointInfo endpoint;

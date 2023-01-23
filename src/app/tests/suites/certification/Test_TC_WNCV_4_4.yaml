@@ -74,10 +74,8 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "TiltPercent100thsValue"
+              - name: "tiltPercent100thsValue"
                 value: 0x3000
-              - name: "TiltPercentageValue"
-                value: 0x3F
       response:
           error: CONSTRAINT_ERROR
 
@@ -88,10 +86,8 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "TiltPercent100thsValue"
+              - name: "tiltPercent100thsValue"
                 value: 10001
-              - name: "TiltPercentageValue"
-                value: 100
       response:
           error: CONSTRAINT_ERROR
 
@@ -102,9 +98,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "TiltPercent100thsValue"
+              - name: "tiltPercent100thsValue"
                 value: 0xFFFF
-              - name: "TiltPercentageValue"
-                value: 0xFF
       response:
           error: CONSTRAINT_ERROR

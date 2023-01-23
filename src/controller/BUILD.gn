@@ -67,18 +67,7 @@ static_library("controller") {
     "${chip_root}/src/transport",
   ]
 
-  deps = [
-    # NOTE:
-    #   awkward zapgen_zapgen dependency to get access to generated headers
-    #   but NOT to include generated CPP files (IMCommandHandler.cpp)
-    "${chip_root}/src/controller/data_model:data_model_zapgen_files",
-    "${chip_root}/src/lib/address_resolve",
-  ]
-
-  configs += [
-    # Get access to zzz_generated/CHIPClusters.h
-    "${chip_root}/src/controller/data_model:data_model_zapgen_config",
-  ]
+  deps = [ "${chip_root}/src/lib/address_resolve" ]
 
   defines = []
 }

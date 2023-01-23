@@ -6494,13 +6494,13 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID")
     = 0x00000001,
     MTRClusterContentLauncherCommandLaunchResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterContentLauncherCommandLaunchResponseID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterContentLauncherCommandLauncherResponseID")
     = 0x00000002,
 
     // Cluster ContentLauncher commands
     MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterContentLauncherCommandLaunchResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterContentLauncherCommandLauncherResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster AudioOutput deprecated command id names
     MTRClusterAudioOutputCommandSelectOutputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

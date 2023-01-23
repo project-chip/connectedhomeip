@@ -17,6 +17,9 @@ name:
     130.1.1. [TC-BRBINFO-1.1] Global Attributes for Bridged Device Basic
     Information Cluster Cluster [DUT-Server]
 
+PICS:
+    - BRBINFO.S
+
 config:
     nodeId: 0x12344321
     cluster: "Bridged Device Basic Information"

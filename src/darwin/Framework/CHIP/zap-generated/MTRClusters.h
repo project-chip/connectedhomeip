@@ -5110,12 +5110,12 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                     completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                     completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                 completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptHeaderWithParams:(MTRReadParams * _Nullable)params

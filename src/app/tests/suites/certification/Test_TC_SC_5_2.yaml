@@ -15,6 +15,9 @@
 
 name: 19.1.2. [TC-SC-5.2] Receiving a group message - TH to DUT
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
@@ -42,7 +45,8 @@ tests:
       verification: |
           ./chip-tool identify identify 0x0078 0xffffffffffff0001 1
 
-          Verify command send  to group on the TH Log:
+          Verify Identify command on the TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
 
           [1657785273.973231][1618:1623] CHIP:DL: HandlePlatformSpecificBLEEvent 32784[1657785273.973291][1618:1623] CHIP:TOO: Sending command to group 0x1
           [1657785273.973316][1618:1623] CHIP:TOO: Sending cluster (0x00000003) command (0x00000000) on Group 1
@@ -55,8 +59,8 @@ tests:
       verification: |
           ./chip-tool identify read identify-time 1 1
 
-          Verify   IdentifyTime ,on the TH Log:
+          Verify  Identify time is approximately equal to 0x0078 (120s),on the TH(chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1657785288.647504][1624:1629] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1130139861
-          [1657785288.647621][1624:1629] CHIP:TOO:   IdentifyTime: 106
+          [1657785288.647621][1624:1629] CHIP:TOO:   identify time: 120
       disabled: true

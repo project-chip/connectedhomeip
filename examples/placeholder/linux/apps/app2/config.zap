@@ -6741,7 +6741,7 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "LaunchResponse",
+              "name": "LauncherResponse",
               "code": 2,
               "mfgCode": null,
               "source": "server",

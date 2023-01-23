@@ -24,12 +24,17 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
     - label:
           "Disconnect node WiFi as a result of de-authentication or
           dis-association."
       PICS: DGWIFI.S.E00
       verification: |
-          Disconnection is an optional event so its not compulsory to get the expected outcome
+          Disconnection is an optional event so its not compulsory to get the expected outcome,Below is the log of RPI the result may be vary on the basis of dut implementation.
 
           ./chip-tool wifinetworkdiagnostics read-event disconnection 1 0
 
@@ -49,7 +54,7 @@ tests:
           dis-association. DUT exhausts all internal retries."
       PICS: DGWIFI.S.E01
       verification: |
-          AssociationFailure is an Optional event so its not compulsory to get the expected outcome
+          AssociationFailure is an Optional event so its not compulsory to get the expected outcome, Below is the log of RPI the result may be vary on the basis of dut implementation.
 
           ./chip-tool wifinetworkdiagnostics read-event association-failure 1 0
 
@@ -66,7 +71,7 @@ tests:
     - label: "Disconnect and reconnect node WiFi."
       PICS: DGWIFI.S.E02
       verification: |
-          ConnectionStatus is an Optional event so its not compulsory to get the expected outcome
+          ConnectionStatus is an Optional event so its not compulsory to get the expected outcome, Below is the log of RPI the result may be vary on the basis of dut implementation.
 
           ./chip-tool wifinetworkdiagnostics read-event connection-status 1 0
 

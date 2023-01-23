@@ -51,7 +51,7 @@ tests:
       command: "MoveToHueAndSaturation"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 200
               - name: "Saturation"
                 value: 50
@@ -95,7 +95,7 @@ tests:
       command: "MoveToHueAndSaturation"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 160
               - name: "Saturation"
                 value: 80

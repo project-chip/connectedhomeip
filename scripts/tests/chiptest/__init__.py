@@ -76,7 +76,10 @@ def tests_with_command(chip_tool: str, is_manual: bool):
 # TODO We will move away from hardcoded list of yamltests to run all file when yamltests
 # parser/runner reaches parity with the code gen version.
 def _hardcoded_python_yaml_tests():
-    currently_supported_yaml_tests = ["TestConstraints.yaml"]
+    currently_supported_yaml_tests = [
+        "TestClusterComplexTypes.yaml",
+        "TestConstraints.yaml",
+    ]
 
     for name in currently_supported_yaml_tests:
         yaml_test_path = _FindYamlTestPath(name)

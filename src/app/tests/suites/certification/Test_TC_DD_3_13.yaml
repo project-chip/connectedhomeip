@@ -67,8 +67,8 @@ tests:
           Version bit string follows the current Matter spec. documentation."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          Verify on the TH Commissionee side:
-          $ ./out/ble/all-clusters-app/chip-all-clusters-app --custom-flow 2 --capabilities 2
+          Verify on the TH (All-cluster-app)
+           ./chip-all-clusters-app --custom-flow 2 --capabilities 2
 
           [1657235055.253604][370941:370941] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
           [1657235055.253688][370941:370941] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
@@ -88,8 +88,8 @@ tests:
       verification: |
           1. Parse the payload of the TH commissionee
 
-          Verify on the DUT Commissioner side:
-          $ ./chip-tool payload parse-setup-payload MT:-24J0YXE00KA0648G00
+          Verify on the DUT (Chip-tool)
+           ./chip-tool payload parse-setup-payload MT:-24J0YXE00KA0648G00
           [1660352364702] [20244:11810896] CHIP: [SPL] Parsing base38Representation: MT:-24J0YXE00KA0648G00
           [1660352364702] [20244:11810896] CHIP: [SPL] Version:       0
           [1660352364702] [20244:11810896] CHIP: [SPL] VendorID:      65521
@@ -110,12 +110,12 @@ tests:
           commissioning process using BLE."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          Verify on the TH Commissionee side:
+          Verify on the TH (All-cluster-app)
           [1657235088.040328][370941:370941] CHIP:SVR: Commissioning completed successfully
           [1657235088.040371][370941:370941] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on the DUT Commissioner side:
-          $ ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
+          Verify on the DUT (Chip-tool):
+           ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
           [1657235087918] [31502:16832693] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657235087918] [31502:16832693] CHIP: [TOO] Device commissioning completed with success
       disabled: true
@@ -128,8 +128,8 @@ tests:
           documentation."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          Verify on the TH Commissionee side:
-          $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 2 --capabilities 4
+          Verify on the TH (All-cluster-app)
+          ./chip-all-clusters-app --custom-flow 2 --capabilities 4
 
           [1657235141.663008][370963:370963] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
           [1657235141.663082][370963:370963] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
@@ -149,8 +149,8 @@ tests:
       verification: |
           1. Parse the payload of the TH commissionee
 
-          Verify on the DUT Commissioner side:
-          $ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          Verify on the DUT (Chip-tool):
+           ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
           [1660352541112] [20246:11812333] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
           [1660352541113] [20246:11812333] CHIP: [SPL] Version:       0
           [1660352541113] [20246:11812333] CHIP: [SPL] VendorID:      65521
@@ -171,12 +171,12 @@ tests:
           commissioning process using IP Network."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          Verify on the TH Commissionee side:
+          Verify on the TH (All-cluster-app)
           [1657235198.977848][370963:370963] CHIP:SVR: Commissioning completed successfully
           [1657235198.977943][370963:370963] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on the DUT Commissioner side:
-          $ ./chip-tool pairing code 1  MT:-24J029Q00KA0648G00
+          Verify on the DUT (Chip-tool):
+           ./chip-tool pairing code 1  MT:-24J029Q00KA0648G00
           [1657235198856] [31506:16834043] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657235198856] [31506:16834043] CHIP: [TOO] Device commissioning completed with success
       disabled: true

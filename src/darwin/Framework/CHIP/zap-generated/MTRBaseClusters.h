@@ -12171,28 +12171,28 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                            completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeLineupWithCompletion:(void (^)(MTRChannelClusterLineupInfo * _Nullable value,
+- (void)readAttributeLineupWithCompletion:(void (^)(MTRChannelClusterLineupInfoStruct * _Nullable value,
                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeLineupWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                             reportHandler:(void (^)(MTRChannelClusterLineupInfo * _Nullable value,
+                             reportHandler:(void (^)(MTRChannelClusterLineupInfoStruct * _Nullable value,
                                                NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeLineupWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                         endpoint:(NSNumber *)endpoint
                                            queue:(dispatch_queue_t)queue
-                                      completion:(void (^)(MTRChannelClusterLineupInfo * _Nullable value,
+                                      completion:(void (^)(MTRChannelClusterLineupInfoStruct * _Nullable value,
                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeCurrentChannelWithCompletion:(void (^)(MTRChannelClusterChannelInfo * _Nullable value,
+- (void)readAttributeCurrentChannelWithCompletion:(void (^)(MTRChannelClusterChannelInfoStruct * _Nullable value,
                                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeCurrentChannelWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                     reportHandler:(void (^)(MTRChannelClusterChannelInfo * _Nullable value,
+                                     reportHandler:(void (^)(MTRChannelClusterChannelInfoStruct * _Nullable value,
                                                        NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeCurrentChannelWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                 endpoint:(NSNumber *)endpoint
                                                    queue:(dispatch_queue_t)queue
-                                              completion:(void (^)(MTRChannelClusterChannelInfo * _Nullable value,
+                                              completion:(void (^)(MTRChannelClusterChannelInfoStruct * _Nullable value,
                                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -12964,7 +12964,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Upon receipt, this SHALL launch the specified content with optional search criteria.
  */
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
-                     completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                     completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 /**
  * Command LaunchURL
@@ -12972,7 +12972,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Upon receipt, this SHALL launch content from the specified URL.
  */
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
-                 completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                 completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeAcceptHeaderWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -18988,7 +18988,10 @@ typedef NS_ENUM(uint8_t, MTRChannelStatus) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRChannelLineupInfoType) {
-    MTRChannelLineupInfoTypeMso API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTRChannelLineupInfoTypeMSO MTR_NEWLY_AVAILABLE = 0x00,
+    MTRChannelLineupInfoTypeMso API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRChannelLineupInfoTypeMSO")
+    = 0x00,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRChannelFeature) {
@@ -19028,13 +19031,22 @@ typedef NS_ENUM(uint8_t, MTRMediaInputInputType) {
     MTRMediaInputInputTypeAux API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRMediaInputInputTypeCoax API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRMediaInputInputTypeComposite API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRMediaInputInputTypeHdmi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
+    MTRMediaInputInputTypeHDMI MTR_NEWLY_AVAILABLE = 0x04,
+    MTRMediaInputInputTypeHdmi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRMediaInputInputTypeHDMI")
+    = 0x04,
     MTRMediaInputInputTypeInput API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
     MTRMediaInputInputTypeLine API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
     MTRMediaInputInputTypeOptical API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
     MTRMediaInputInputTypeVideo API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-    MTRMediaInputInputTypeScart API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
-    MTRMediaInputInputTypeUsb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
+    MTRMediaInputInputTypeSCART MTR_NEWLY_AVAILABLE = 0x09,
+    MTRMediaInputInputTypeScart API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRMediaInputInputTypeSCART")
+    = 0x09,
+    MTRMediaInputInputTypeUSB MTR_NEWLY_AVAILABLE = 0x0A,
+    MTRMediaInputInputTypeUsb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRMediaInputInputTypeUSB")
+    = 0x0A,
     MTRMediaInputInputTypeOther API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0B,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -19150,8 +19162,14 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRContentLauncherMetricType) {
-    MTRContentLauncherMetricTypePIXELS API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRContentLauncherMetricTypePERCENTAGE API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRContentLauncherMetricTypePixels MTR_NEWLY_AVAILABLE = 0x00,
+    MTRContentLauncherMetricTypePIXELS API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherMetricTypePixels")
+    = 0x00,
+    MTRContentLauncherMetricTypePercentage MTR_NEWLY_AVAILABLE = 0x01,
+    MTRContentLauncherMetricTypePERCENTAGE API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherMetricTypePercentage")
+    = 0x01,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRContentLauncherParameter) {
@@ -19168,6 +19186,7 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherParameter) {
     MTRContentLauncherParameterSport API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
     MTRContentLauncherParameterSportsTeam API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0B,
     MTRContentLauncherParameterType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0C,
+    MTRContentLauncherParameterVideo MTR_NEWLY_AVAILABLE = 0x0D,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
@@ -19181,8 +19200,14 @@ typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedStreamingProtocol) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRAudioOutputOutputType) {
-    MTRAudioOutputOutputTypeHdmi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRAudioOutputOutputTypeBt API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRAudioOutputOutputTypeHDMI MTR_NEWLY_AVAILABLE = 0x00,
+    MTRAudioOutputOutputTypeHdmi API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAudioOutputOutputTypeHDMI")
+    = 0x00,
+    MTRAudioOutputOutputTypeBT MTR_NEWLY_AVAILABLE = 0x01,
+    MTRAudioOutputOutputTypeBt API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAudioOutputOutputTypeBT")
+    = 0x01,
     MTRAudioOutputOutputTypeOptical API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRAudioOutputOutputTypeHeadphone API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
     MTRAudioOutputOutputTypeInternal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,

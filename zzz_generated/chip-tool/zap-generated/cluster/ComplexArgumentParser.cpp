@@ -137,13 +137,13 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Actions::Structs::Acti
     ComplexArgumentParser::Finalize(request.state);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & request,
+                                        chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AdditionalInfo.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AdditionalInfo.value", "value", value.isMember("value")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AdditionalInfoStruct.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AdditionalInfoStruct.value", "value", value.isMember("value")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
@@ -155,7 +155,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.value);
@@ -349,12 +349,12 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerSource::Structs::
     ComplexArgumentParser::Finalize(request.previous);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & request,
+                                        chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BrandingInformation.providerName", "providerName",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BrandingInformationStruct.providerName", "providerName",
                                                                   value.isMember("providerName")));
 
     char labelWithMember[kMaxLabelLength];
@@ -394,7 +394,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.providerName);
     ComplexArgumentParser::Finalize(request.background);
@@ -431,15 +431,16 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::BasicInformation::Stru
     ComplexArgumentParser::Finalize(request.caseSessionsPerFabric);
     ComplexArgumentParser::Finalize(request.subscriptionsPerFabric);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ChannelInfo.majorNumber", "majorNumber", value.isMember("majorNumber")));
+        ComplexArgumentParser::EnsureMemberExist("ChannelInfoStruct.majorNumber", "majorNumber", value.isMember("majorNumber")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ChannelInfo.minorNumber", "minorNumber", value.isMember("minorNumber")));
+        ComplexArgumentParser::EnsureMemberExist("ChannelInfoStruct.minorNumber", "minorNumber", value.isMember("minorNumber")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "majorNumber");
@@ -469,7 +470,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Channel::Structs::ChannelInfo::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.majorNumber);
     ComplexArgumentParser::Finalize(request.minorNumber);
@@ -478,13 +479,13 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Channel::Structs::Chan
     ComplexArgumentParser::Finalize(request.affiliateCallSign);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & request,
+                                        chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ContentSearch.parameterList", "parameterList", value.isMember("parameterList")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ContentSearchStruct.parameterList", "parameterList",
+                                                                  value.isMember("parameterList")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "parameterList");
@@ -493,7 +494,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.parameterList);
 }
@@ -550,14 +551,14 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Descriptor::Structs::D
     ComplexArgumentParser::Finalize(request.revision);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & request,
+                                        chip::app::Clusters::ContentLauncher::Structs::DimensionStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Dimension.width", "width", value.isMember("width")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Dimension.height", "height", value.isMember("height")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Dimension.metric", "metric", value.isMember("metric")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DimensionStruct.width", "width", value.isMember("width")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DimensionStruct.height", "height", value.isMember("height")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DimensionStruct.metric", "metric", value.isMember("metric")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "width");
@@ -572,7 +573,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::DimensionStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.width);
     ComplexArgumentParser::Finalize(request.height);
@@ -877,16 +878,18 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::GroupKeyManagement::St
     ComplexArgumentParser::Finalize(request.epochKey2);
     ComplexArgumentParser::Finalize(request.epochStartTime2);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("InputInfo.index", "index", value.isMember("index")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("InputInfo.inputType", "inputType", value.isMember("inputType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("InputInfo.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("InputInfoStruct.index", "index", value.isMember("index")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("InputInfo.description", "description", value.isMember("description")));
+        ComplexArgumentParser::EnsureMemberExist("InputInfoStruct.inputType", "inputType", value.isMember("inputType")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("InputInfoStruct.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("InputInfoStruct.description", "description", value.isMember("description")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "index");
@@ -904,7 +907,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::MediaInput::Structs::InputInfo::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.index);
     ComplexArgumentParser::Finalize(request.inputType);
@@ -934,15 +937,15 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Label
     ComplexArgumentParser::Finalize(request.label);
     ComplexArgumentParser::Finalize(request.value);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Channel::Structs::LineupInfo::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("LineupInfo.operatorName", "operatorName", value.isMember("operatorName")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("LineupInfo.lineupInfoType", "lineupInfoType", value.isMember("lineupInfoType")));
+        ComplexArgumentParser::EnsureMemberExist("LineupInfoStruct.operatorName", "operatorName", value.isMember("operatorName")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LineupInfoStruct.lineupInfoType", "lineupInfoType",
+                                                                  value.isMember("lineupInfoType")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "operatorName");
@@ -966,7 +969,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Channel::Structs::LineupInfo::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.operatorName);
     ComplexArgumentParser::Finalize(request.lineupName);
@@ -1519,15 +1522,16 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.securityPolicyPresent);
     ComplexArgumentParser::Finalize(request.channelMaskPresent);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("OutputInfo.index", "index", value.isMember("index")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("OutputInfoStruct.index", "index", value.isMember("index")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("OutputInfo.outputType", "outputType", value.isMember("outputType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("OutputInfo.name", "name", value.isMember("name")));
+        ComplexArgumentParser::EnsureMemberExist("OutputInfoStruct.outputType", "outputType", value.isMember("outputType")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("OutputInfoStruct.name", "name", value.isMember("name")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "index");
@@ -1542,20 +1546,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.index);
     ComplexArgumentParser::Finalize(request.outputType);
     ComplexArgumentParser::Finalize(request.name);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & request,
+                                        chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Parameter.type", "type", value.isMember("type")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Parameter.value", "value", value.isMember("value")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ParameterStruct.type", "type", value.isMember("type")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ParameterStruct.value", "value", value.isMember("value")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "type");
@@ -1573,7 +1577,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.type);
     ComplexArgumentParser::Finalize(request.value);
@@ -1809,16 +1813,16 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::UnitTesting::Structs::
     ComplexArgumentParser::Finalize(request.h);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & request,
+                                        chip::app::Clusters::ContentLauncher::Structs::StyleInformationStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     char labelWithMember[kMaxLabelLength];
-    if (value.isMember("imageUrl"))
+    if (value.isMember("imageURL"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageUrl");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageUrl, value["imageUrl"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageURL");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageURL, value["imageURL"]));
     }
 
     if (value.isMember("color"))
@@ -1836,9 +1840,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Structs::StyleInformationStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.imageUrl);
+    ComplexArgumentParser::Finalize(request.imageURL);
     ComplexArgumentParser::Finalize(request.color);
     ComplexArgumentParser::Finalize(request.size);
 }
@@ -1871,14 +1875,14 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs
     ComplexArgumentParser::Finalize(request.deviceType);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request,
+                                        chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TargetInfo.identifier", "identifier", value.isMember("identifier")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TargetInfo.name", "name", value.isMember("name")));
+        ComplexArgumentParser::EnsureMemberExist("TargetInfoStruct.identifier", "identifier", value.isMember("identifier")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TargetInfoStruct.name", "name", value.isMember("name")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "identifier");
@@ -1890,7 +1894,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.identifier);
     ComplexArgumentParser::Finalize(request.name);

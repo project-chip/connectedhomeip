@@ -4828,6 +4828,8 @@
               - RegisterClientMonitoring
               - UnregisterClientMonitoring
               - StayAwakeRequest
+          ContentLauncher:
+              - LauncherResponse
       command fields:
           UnitTesting:
               TestSpecificResponse:
@@ -4954,6 +4956,9 @@
                   - location
                   - requestorCanConsent
                   - metadataForProvider
+                  # Next two were introduced and deprecated at the same time, effectively
+                  - vendorId
+                  - productId
               QueryImageResponse:
                   - status
                   - delayedActionTime
@@ -4979,6 +4984,9 @@
                   - announcementReason
                   - metadataForNode
                   - endpoint
+                  # Next two were introduced and deprecated at the same time, effectively
+                  - providerNodeId
+                  - vendorId
           ClientMonitoring:
               RegisterClientMonitoring:
                   - clientNodeId
@@ -5024,6 +5032,10 @@
           ColorControl:
               MoveToColorTemperature:
                   - colorTemperatureMireds
+          ContentLauncher:
+              LauncherResponse:
+                  - status
+                  - data
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5052,6 +5064,22 @@
               - FabricDescriptorStruct
           DoorLock:
               - CredentialStruct
+          TargetNavigator:
+              - TargetInfoStruct
+          MediaInput:
+              - InputInfoStruct
+          AudioOutput:
+              - OutputInfoStruct
+          Channel:
+              - ChannelInfoStruct
+              - LineupInfoStruct
+          ContentLauncher:
+              - DimensionStruct
+              - AdditionalInfoStruct
+              - ParameterStruct
+              - ContentSearchStruct
+              - StyleInformationStruct
+              - BrandingInformationStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5167,6 +5195,61 @@
               CredentialStruct:
                   - credentialType
                   - credentialIndex
+          TargetNavigator:
+              TargetInfoStruct:
+                  - identifier
+                  - name
+          MediaInput:
+              InputInfoStruct:
+                  - index
+                  - inputType
+                  - name
+                  - descriptionString
+          AudioOutput:
+              OutputInfoStruct:
+                  - index
+                  - outputType
+                  - name
+          Channel:
+              ChannelInfoStruct:
+                  - majorNumber
+                  - minorNumber
+                  - name
+                  - callSign
+                  - affiliateCallSign
+              LineupInfoStruct:
+                  - operatorName
+                  - lineupName
+                  - postalCode
+                  - lineupInfoType
+          ContentLauncher:
+              DimensionStruct:
+                  - width
+                  - height
+                  - metric
+              AdditionalInfoStruct:
+                  - name
+                  - value
+              ParameterStruct:
+                  - type
+                  - value
+                  - externalIDList
+              ContentSearchStruct:
+                  - parameterList
+              StyleInformationStruct:
+                  - imageURL
+                  - color
+                  - size
+                  # Member that is actually deprecated, but we effectively
+                  # introduced it in this release.
+                  - imageUrl
+              BrandingInformationStruct:
+                  - providerName
+                  - background
+                  - logo
+                  - progressBar
+                  - splash
+                  - waterMark
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5487,6 +5570,24 @@
                   - ExpiringUser
                   - ScheduleRestrictedUser
                   - RemoteOnlyUser
+          MediaInput:
+              InputTypeEnum:
+                  - HDMI
+                  - SCART
+                  - USB
+          AudioOutput:
+              OutputTypeEnum:
+                  - HDMI
+                  - BT
+          Channel:
+              LineupInfoTypeEnum:
+                  - MSO
+          ContentLauncher:
+              MetricTypeEnum:
+                  - Pixels
+                  - Percentage
+              ParameterEnum:
+                  - Video
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5589,6 +5690,9 @@
               - Rssi
           GeneralDiagnostics:
               - BootReasons
+      commands:
+          ContentLauncher:
+              - LaunchResponse
       command fields:
           Groups:
               AddGroup:
@@ -5628,6 +5732,14 @@
           ColorControl:
               MoveToColorTemperature:
                   - colorTemperature
+          OTASoftwareUpdateProvider:
+              QueryImage:
+                  - vendorId
+                  - productId
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider:
+                  - providerNodeId
+                  - vendorId
       structs:
           Descriptor:
               - DeviceType
@@ -5648,6 +5760,22 @@
               - FabricDescriptor
           DoorLock:
               - DlCredential
+          TargetNavigator:
+              - TargetInfo
+          MediaInput:
+              - InputInfo
+          AudioOutput:
+              - OutputInfo
+          Channel:
+              - ChannelInfo
+              - LineupInfo
+          ContentLauncher:
+              - Dimension
+              - AdditionalInfo
+              - Parameter
+              - ContentSearch
+              - StyleInformation
+              - BrandingInformation
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5657,6 +5785,9 @@
                   - vendorId
                   - fabricId
                   - nodeId
+          ContentLauncher:
+              StyleInformationStruct:
+                  - imageUrl
       event fields:
           Switch:
               MultiPressComplete:
@@ -5725,6 +5856,22 @@
                   - NotSupported
                   - Unrestricted
                   - MasterUser
+          MediaInput:
+              InputTypeEnum:
+                  - Hdmi
+                  - Scart
+                  - Usb
+          AudioOutput:
+              OutputTypeEnum:
+                  - Hdmi
+                  - Bt
+          Channel:
+              LineupInfoTypeEnum:
+                  - Mso
+          ContentLauncher:
+              MetricTypeEnum:
+                  - PIXELS
+                  - PERCENTAGE
       bitmaps:
           DoorLock:
               - DlDaysMaskMap
@@ -5837,6 +5984,8 @@
       commands:
           OTASoftwareUpdateRequestor:
               AnnounceOTAProvider: AnnounceOtaProvider
+          ContentLauncher:
+              LauncherResponse: LaunchResponse
       command fields:
           OTASoftwareUpdateProvider:
               QueryImage:
@@ -5898,6 +6047,22 @@
               FabricDescriptorStruct: FabricDescriptor
           DoorLock:
               CredentialStruct: DlCredential
+          TargetNavigator:
+              TargetInfoStruct: TargetInfo
+          MediaInput:
+              InputInfoStruct: InputInfo
+          AudioOutput:
+              OutputInfoStruct: OutputInfo
+          Channel:
+              ChannelInfoStruct: ChannelInfo
+              LineupInfoStruct: LineupInfo
+          ContentLauncher:
+              DimensionStruct: Dimension
+              AdditionalInfoStruct: AdditionalInfo
+              ParameterStruct: Parameter
+              ContentSearchStruct: ContentSearch
+              StyleInformationStruct: StyleInformation
+              BrandingInformationStruct: BrandingInformation
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5907,6 +6072,9 @@
                   vendorID: vendorId
                   fabricID: fabricId
                   nodeID: nodeId
+          ContentLauncher:
+              StyleInformationStruct:
+                  imageURL: imageUrl
       event fields:
           Switch:
               MultiPressComplete:
@@ -5988,6 +6156,22 @@
               UserTypeEnum:
                   UnrestrictedUser: Unrestricted
                   ProgrammingUser: MasterUser
+          MediaInput:
+              InputTypeEnum:
+                  HDMI: Hdmi
+                  SCART: Scart
+                  USB: Usb
+          AudioOutput:
+              OutputTypeEnum:
+                  HDMI: Hdmi
+                  BT: Bt
+          Channel:
+              LineupInfoTypeEnum:
+                  MSO: Mso
+          ContentLauncher:
+              MetricTypeEnum:
+                  Pixels: PIXELS
+                  Percentage: PERCENTAGE
       bitmaps:
           DoorLock:
               DaysMaskMap: DlDaysMaskMap
