@@ -644,8 +644,13 @@ class ReplTestRunner:
             if attribute is None:
                 # When we cannot find the attribute it is because it is a global attribute like
                 # FeatureMap. Fortunately for these types we can get away with using
-                # 'response.value' directly for the time being.
-                decoded_response['value'] = response.value
+                # 'response.value' directly if it is a list and mapping to int if not a list.
+                if isinstance(response.value, list):
+                    decoded_response['value'] = response.value
+                else:
+                    decoded_response['value'] = Converter.from_data_model_to_test_definition(
+                        self._test_spec_definition, cluster_name, int, response.value)
+
             else:
                 decoded_response['value'] = Converter.from_data_model_to_test_definition(
                     self._test_spec_definition, cluster_name, attribute.definition, response.value)
