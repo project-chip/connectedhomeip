@@ -149,10 +149,10 @@ namespace chip {
  *
  *  @brief
  *    A constant value that should be added to the calculated retransmission
- *    timeout when the present node tramsmits a message.
+ *    timeout when the present node transmits a message.
  *
  *  The purpose for this constant is to limit the possibility of spurious
- *  rertansmissions in the scenario in which a sender that operates in a high-
+ *  retransmissions in the scenario in which a sender that operates in a high-
  *  latency network (such as Thread) sends a message to a receiver that operates
  *  in a low-latency network (such as Wi-Fi). In this scenario, the SAI and SII
  *  parameters advertised by the receiver are low although the average round-
