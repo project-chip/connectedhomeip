@@ -1933,7 +1933,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
             output.fabric_index    = fabric.fabric_index;
             output.group_id        = mapping.group_id;
             output.security_policy = keyset.policy;
-            output.key             = &mGroupKeyContext;
+            output.keyContext      = &mGroupKeyContext;
             return true;
         }
     }

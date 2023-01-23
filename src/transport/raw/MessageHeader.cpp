@@ -131,13 +131,10 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
     return static_cast<uint16_t>(size);
 }
 
-CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
+CHIP_ERROR PacketHeader::DecodeFixedCommon(Encoding::LittleEndian::Reader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    LittleEndian::Reader reader(data, size);
     int version;
-    // TODO: De-uint16-ify everything related to this library
-    uint16_t octets_read;
 
     uint8_t msgFlags;
     SuccessOrExit(err = reader.Read8(&msgFlags).StatusCode());
@@ -150,6 +147,28 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     uint8_t securityFlags;
     SuccessOrExit(err = reader.Read8(&securityFlags).StatusCode());
     SetSecurityFlags(securityFlags);
+
+exit:
+
+    return err;
+}
+
+CHIP_ERROR PacketHeader::DecodeFixed(const System::PacketBufferHandle & buf)
+{
+    const uint8_t * const data = buf->Start();
+    uint16_t size              = buf->DataLength();
+    LittleEndian::Reader reader(data, size);
+    return DecodeFixedCommon(reader);
+}
+
+CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    LittleEndian::Reader reader(data, size);
+    // TODO: De-uint16-ify everything related to this library
+    uint16_t octets_read;
+
+    SuccessOrExit(err = DecodeFixedCommon(reader));
 
     SuccessOrExit(err = reader.Read32(&mMessageCounter).StatusCode());
 
