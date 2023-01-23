@@ -235,9 +235,11 @@
     "SoftwareDiagnostics": [
         "Test_TC_DGSW_2_1",
         "Test_TC_DGSW_2_2",
-        "Test_TC_DGSW_2_3"
+        "Test_TC_DGSW_2_3",
+        "Test_TC_DGSW_3_2"
     ],
-    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
+    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_3_2"],
+    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2", "Test_TC_DGWIFI_3_2"],
     "WindowCovering": ["Test_TC_WNCV_6_1", "Test_TC_WNCV_7_1"],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "OccupancySensing": ["Test_TC_OCC_3_1"],
@@ -297,12 +299,7 @@
         "Test_TC_S_3_1"
     ],
     "PumpConfigurationControl": ["Test_TC_PCC_3_1"],
-    "AccessControl": [
-        "Test_TC_ACL_2_5",
-        "Test_TC_ACL_2_6",
-        "Test_TC_ACL_2_8",
-        "Test_TC_ACL_2_10"
-    ],
+    "AccessControl": ["Test_TC_ACL_2_5", "Test_TC_ACL_2_6", "Test_TC_ACL_2_10"],
     "UserLabel": [],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_2_2",
@@ -318,6 +315,7 @@
         "DeviceManagement",
         "DiagnosticsLogs",
         "Descriptor",
+        "EthernetNetworkDiagnostics",
         "GeneralCommissioning",
         "GeneralDiagnostics",
         "Identify",
