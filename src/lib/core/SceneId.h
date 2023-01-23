@@ -50,7 +50,7 @@
 /**
  * @brief The maximum number of scenes allowed on a single fabric
  */
-#define SCENE_MAX_PER_FABRIC SCENE_MAX_NUMBER / 2
+#define SCENE_MAX_PER_FABRIC (SCENE_MAX_NUMBER / 2)
 
 namespace chip {
 
