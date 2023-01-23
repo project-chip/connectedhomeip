@@ -2893,6 +2893,54 @@ void CheckTLVGetLocalizedStringIdentifier(nlTestSuite * inSuite, void * inContex
         NL_TEST_ASSERT(inSuite, testCase.expectedResult == err);
         NL_TEST_ASSERT(inSuite, testCase.expectedLSID == readerLSID);
     }
+
+    // Error case: A case of TLVReader buffer underrun.
+    // Expected error after Next() call is: CHIP_ERROR_TLV_UNDERRUN
+    {
+        uint8_t backingStore[100];
+        TLVWriter writer;
+        TLVReader reader;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        writer.Init(backingStore);
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), sCharSpanTestCases[1].testString);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten() - 1);
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_TLV_UNDERRUN);
+    }
+
+    // Error case: the reader is on a bytestring, not utf-8 string.
+    // Expected error after Get(Optional<LocalizedStringIdentifier> &) call is: CHIP_ERROR_WRONG_TLV_TYPE
+    {
+        uint8_t backingStore[100];
+        TLVWriter writer;
+        TLVReader reader;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        writer.Init(backingStore);
+
+        err = writer.PutBytes(ProfileTag(TestProfile_1, 1), reinterpret_cast<const uint8_t *>(sCharSpanTestCases[1].testString),
+                              static_cast<uint32_t>(strlen(sCharSpanTestCases[1].testString)));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        Optional<LocalizedStringIdentifier> readerLSID;
+        err = reader.Get(readerLSID);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
+        NL_TEST_ASSERT(inSuite, readerLSID == Optional<LocalizedStringIdentifier>());
+    }
 }
 
 void CheckTLVSkipCircular(nlTestSuite * inSuite, void * inContext)

@@ -481,12 +481,13 @@ public:
      * The method takes what's after the first Information Separator 1 <IS1>, and until end of string
      * or second <IS1>, and return the hex-decoded string identifier, if one was there.
      *
-     * @param[out]  lsid                   Optional Localized String Identifier. Returns empty
-     *                                     if the value is not found or it was invalidly encoded.
+     * @param[out]  lsid                       Optional Localized String Identifier. Returns empty
+     *                                         if the value is not found or it was invalidly encoded.
      *
-     * @retval #CHIP_NO_ERROR              If the method succeeded.
-     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV character string, or
-     *                                     the reader is not positioned on an element.
+     * @retval #CHIP_NO_ERROR                  If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE      If the current element is not a TLV character string, or
+     *                                         the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT If the Localized String Identifier is malformed.
      */
     CHIP_ERROR Get(Optional<LocalizedStringIdentifier> & lsid);
 
