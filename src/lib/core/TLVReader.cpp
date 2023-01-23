@@ -347,7 +347,7 @@ CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
     const uint8_t * lsidPtr = infoSeparator1 + 1;
     len -= static_cast<uint32_t>(lsidPtr - bytes);
 
-    const uint8_t * infoSeparator2 = reinterpret_cast<const uint8_t *>(memchr(lsidPtr, kUnicodeInformationSeparator1, len));
+    const uint8_t * infoSeparator2 = static_cast<const uint8_t *>(memchr(lsidPtr, kUnicodeInformationSeparator1, len));
     if (infoSeparator2 != nullptr)
     {
         len = static_cast<uint32_t>(infoSeparator2 - lsidPtr);
