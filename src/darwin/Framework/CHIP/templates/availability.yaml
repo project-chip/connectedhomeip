@@ -5086,6 +5086,9 @@
               - ContentSearchStruct
               - StyleInformationStruct
               - BrandingInformationStruct
+          ApplicationLauncher:
+              - ApplicationStruct
+              - ApplicationEPStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5260,6 +5263,17 @@
                   - progressBar
                   - splash
                   - waterMark
+          ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorID
+                  - applicationID
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - catalogVendorId
+                  - applicationId
+              ApplicationEPStruct:
+                  - application
+                  - endpoint
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5792,6 +5806,9 @@
               - ContentSearch
               - StyleInformation
               - BrandingInformation
+          ApplicationLauncher:
+              - Application
+              - ApplicationEP
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5804,6 +5821,10 @@
           ContentLauncher:
               StyleInformationStruct:
                   - imageUrl
+          ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorId
+                  - applicationId
       event fields:
           Switch:
               MultiPressComplete:
@@ -6085,6 +6106,9 @@
               ContentSearchStruct: ContentSearch
               StyleInformationStruct: StyleInformation
               BrandingInformationStruct: BrandingInformation
+          ApplicationLauncher:
+              ApplicationStruct: Application
+              ApplicationEPStruct: ApplicationEP
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -6097,6 +6121,10 @@
           ContentLauncher:
               StyleInformationStruct:
                   imageURL: imageUrl
+          ApplicationLauncher:
+              ApplicationStruct:
+                  catalogVendorID: catalogVendorId
+                  applicationID: applicationId
       event fields:
           Switch:
               MultiPressComplete:

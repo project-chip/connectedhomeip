@@ -133,8 +133,8 @@ CHIP_ERROR Delegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
             {
                 ApplicationEPType currentApp;
                 CatalogVendorApp * vendorApp           = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
-                currentApp.application.catalogVendorId = vendorApp->catalogVendorId;
-                currentApp.application.applicationId   = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+                currentApp.application.catalogVendorID = vendorApp->catalogVendorId;
+                currentApp.application.applicationID   = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
                 currentApp.endpoint                    = Optional<EndpointId>(app->GetEndpointId());
                 return aEncoder.Encode(currentApp);
             }
@@ -224,8 +224,15 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
     auto & application  = commandData.application;
     app::CommandResponseHelper<LauncherResponseType> responder(command, commandPath);
 
-    std::string appId(application.applicationId.data(), application.applicationId.size());
-    CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
+    // TODO: We should be able to not have an `application` if the AP feature is
+    // off: https://github.com/project-chip/connectedhomeip/issues/24595
+    if (!application.HasValue())
+    {
+        command->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+    std::string appId(application.Value().applicationID.data(), application.Value().applicationID.size());
+    CatalogVendorApp vendorApp(application.Value().catalogVendorID, appId.c_str());
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
@@ -256,7 +263,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
 
             ChipLogError(Zcl, "ApplicationLauncher handling launch on ContentApp");
             app->GetApplicationLauncherDelegate()->HandleLaunchApp(responder, data.HasValue() ? data.Value() : ByteSpan(),
-                                                                   application);
+                                                                   application.Value());
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -291,7 +298,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
         ChipLogError(Zcl, "ApplicationLauncher handling launch");
-        delegate->HandleLaunchApp(responder, data.HasValue() ? data.Value() : ByteSpan(), application);
+        delegate->HandleLaunchApp(responder, data.HasValue() ? data.Value() : ByteSpan(), application.Value());
     }
 
 exit:
@@ -315,8 +322,15 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
     auto & application  = commandData.application;
     app::CommandResponseHelper<LauncherResponseType> responder(command, commandPath);
 
-    std::string appId(application.applicationId.data(), application.applicationId.size());
-    CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
+    // TODO: We should be able to not have an `application` if the AP feature is
+    // off: https://github.com/project-chip/connectedhomeip/issues/24595
+    if (!application.HasValue())
+    {
+        command->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+    std::string appId(application.Value().applicationID.data(), application.Value().applicationID.size());
+    CatalogVendorApp vendorApp(application.Value().catalogVendorID, appId.c_str());
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
@@ -349,7 +363,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
             app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kStopped);
 
             ChipLogError(Zcl, "ApplicationLauncher handling stop on ContentApp");
-            app->GetApplicationLauncherDelegate()->HandleStopApp(responder, application);
+            app->GetApplicationLauncherDelegate()->HandleStopApp(responder, application.Value());
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -375,7 +389,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
             appBasic->SetApplicationStatus(ApplicationStatusEnum::kStopped);
         }
 
-        delegate->HandleStopApp(responder, application);
+        delegate->HandleStopApp(responder, application.Value());
     }
 
 exit:
@@ -399,8 +413,15 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
     auto & application  = commandData.application;
     app::CommandResponseHelper<LauncherResponseType> responder(command, commandPath);
 
-    std::string appId(application.applicationId.data(), application.applicationId.size());
-    CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
+    // TODO: We should be able to not have an `application` if the AP feature is
+    // off: https://github.com/project-chip/connectedhomeip/issues/24595
+    if (!application.HasValue())
+    {
+        command->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+    std::string appId(application.Value().applicationID.data(), application.Value().applicationID.size());
+    CatalogVendorApp vendorApp(application.Value().catalogVendorID, appId.c_str());
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
@@ -430,7 +451,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
             ContentAppPlatform::GetInstance().UnsetIfCurrentApp(app);
 
             ChipLogError(Zcl, "ApplicationLauncher handling stop on ContentApp");
-            app->GetApplicationLauncherDelegate()->HandleHideApp(responder, application);
+            app->GetApplicationLauncherDelegate()->HandleHideApp(responder, application.Value());
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -455,7 +476,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
             appBasic->SetApplicationStatus(ApplicationStatusEnum::kActiveHidden);
         }
 
-        delegate->HandleHideApp(responder, application);
+        delegate->HandleHideApp(responder, application.Value());
     }
 
 exit:
