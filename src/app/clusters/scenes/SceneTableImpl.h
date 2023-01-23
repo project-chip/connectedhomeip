@@ -28,7 +28,7 @@ namespace scenes {
 /**
  * @brief Implementation of a storage in nonvolatile storage of the scene table.
  *
- * SceneTableImpl is an implementation that allows to store scenes in a permenent manner.
+ * SceneTableImpl is an implementation that allows to store scenes using PersistentStorageDelegate.
  * It handles the storage of scenes by their ID, GroupID and EnpointID over multiple fabrics.
  * It is meant to be used exclusively when the scene cluster is enable for at least one endpoint
  * on the device.
