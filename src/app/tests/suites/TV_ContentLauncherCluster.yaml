@@ -44,11 +44,11 @@ tests:
       command: "launchContent"
       arguments:
           values:
-              - name: "autoPlay"
+              - name: "AutoPlay"
                 value: true
-              - name: "data"
+              - name: "Data"
                 value: "exampleData"
-              - name: "search"
+              - name: "Search"
                 value:
                     {
                         ParameterList:
@@ -63,20 +63,20 @@ tests:
                     }
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "exampleData"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Launch URL Command"
       command: "launchURL"
       arguments:
           values:
-              - name: "contentURL"
+              - name: "ContentURL"
                 value: "exampleUrl"
-              - name: "displayString"
+              - name: "DisplayString"
                 value: "exampleDisplayString"
-              - name: "brandingInformation"
+              - name: "BrandingInformation"
                 value:
                     {
                         ProviderName: "exampleName",
@@ -113,7 +113,7 @@ tests:
                     }
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "exampleData"
-              - name: "status"
+              - name: "Status"
                 value: 0
