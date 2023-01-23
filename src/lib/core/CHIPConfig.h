@@ -1176,7 +1176,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * This is a temporary workaround for interoperability with those erroneous early-SVE2 implementations.
  * The cost of this compatibity mode is twice as many decryption steps per received group message.
  *
- * TODO: Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
+ * TODO(#24573): Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
  */
 #ifndef CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
 #define CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2 1
