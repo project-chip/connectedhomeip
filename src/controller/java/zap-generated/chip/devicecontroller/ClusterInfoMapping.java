@@ -294,7 +294,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedAddGroupResponseCallback
+  public static class DelegatedGroupsClusterAddGroupResponseCallback
       implements ChipClusters.GroupsCluster.AddGroupResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -319,7 +319,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedViewGroupResponseCallback
+  public static class DelegatedGroupsClusterViewGroupResponseCallback
       implements ChipClusters.GroupsCluster.ViewGroupResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -346,7 +346,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetGroupMembershipResponseCallback
+  public static class DelegatedGroupsClusterGetGroupMembershipResponseCallback
       implements ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -372,7 +372,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRemoveGroupResponseCallback
+  public static class DelegatedGroupsClusterRemoveGroupResponseCallback
       implements ChipClusters.GroupsCluster.RemoveGroupResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -469,7 +469,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedAddSceneResponseCallback
+  public static class DelegatedScenesClusterAddSceneResponseCallback
       implements ChipClusters.ScenesCluster.AddSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -496,7 +496,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedViewSceneResponseCallback
+  public static class DelegatedScenesClusterViewSceneResponseCallback
       implements ChipClusters.ScenesCluster.ViewSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -537,7 +537,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRemoveSceneResponseCallback
+  public static class DelegatedScenesClusterRemoveSceneResponseCallback
       implements ChipClusters.ScenesCluster.RemoveSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -564,7 +564,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRemoveAllScenesResponseCallback
+  public static class DelegatedScenesClusterRemoveAllScenesResponseCallback
       implements ChipClusters.ScenesCluster.RemoveAllScenesResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -590,7 +590,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedStoreSceneResponseCallback
+  public static class DelegatedScenesClusterStoreSceneResponseCallback
       implements ChipClusters.ScenesCluster.StoreSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -617,7 +617,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetSceneMembershipResponseCallback
+  public static class DelegatedScenesClusterGetSceneMembershipResponseCallback
       implements ChipClusters.ScenesCluster.GetSceneMembershipResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1597,7 +1597,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedQueryImageResponseCallback
+  public static class DelegatedOtaSoftwareUpdateProviderClusterQueryImageResponseCallback
       implements ChipClusters.OtaSoftwareUpdateProviderCluster.QueryImageResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1650,7 +1650,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedApplyUpdateResponseCallback
+  public static class DelegatedOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback
       implements ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2168,7 +2168,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedArmFailSafeResponseCallback
+  public static class DelegatedGeneralCommissioningClusterArmFailSafeResponseCallback
       implements ChipClusters.GeneralCommissioningCluster.ArmFailSafeResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2194,7 +2194,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedSetRegulatoryConfigResponseCallback
+  public static class DelegatedGeneralCommissioningClusterSetRegulatoryConfigResponseCallback
       implements ChipClusters.GeneralCommissioningCluster.SetRegulatoryConfigResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2220,7 +2220,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCommissioningCompleteResponseCallback
+  public static class DelegatedGeneralCommissioningClusterCommissioningCompleteResponseCallback
       implements ChipClusters.GeneralCommissioningCluster.CommissioningCompleteResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2318,7 +2318,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedScanNetworksResponseCallback
+  public static class DelegatedNetworkCommissioningClusterScanNetworksResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2356,7 +2356,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedNetworkConfigResponseCallback
+  public static class DelegatedNetworkCommissioningClusterNetworkConfigResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2388,7 +2388,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedConnectNetworkResponseCallback
+  public static class DelegatedNetworkCommissioningClusterConnectNetworkResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.ConnectNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2493,7 +2493,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRetrieveLogsResponseCallback
+  public static class DelegatedDiagnosticLogsClusterRetrieveLogsResponseCallback
       implements ChipClusters.DiagnosticLogsCluster.RetrieveLogsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3392,7 +3392,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedAttestationResponseCallback
+  public static class DelegatedOperationalCredentialsClusterAttestationResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.AttestationResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3420,7 +3420,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCertificateChainResponseCallback
+  public static class DelegatedOperationalCredentialsClusterCertificateChainResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.CertificateChainResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3445,7 +3445,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCSRResponseCallback
+  public static class DelegatedOperationalCredentialsClusterCSRResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.CSRResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3473,7 +3473,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedNOCResponseCallback
+  public static class DelegatedOperationalCredentialsClusterNOCResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.NOCResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3656,7 +3656,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedKeySetReadResponseCallback
+  public static class DelegatedGroupKeyManagementClusterKeySetReadResponseCallback
       implements ChipClusters.GroupKeyManagementCluster.KeySetReadResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3680,7 +3680,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedKeySetReadAllIndicesResponseCallback
+  public static class DelegatedGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback
       implements ChipClusters.GroupKeyManagementCluster.KeySetReadAllIndicesResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -4168,7 +4168,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetWeekDayScheduleResponseCallback
+  public static class DelegatedDoorLockClusterGetWeekDayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.GetWeekDayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -4220,7 +4220,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetYearDayScheduleResponseCallback
+  public static class DelegatedDoorLockClusterGetYearDayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.GetYearDayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -4260,7 +4260,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetHolidayScheduleResponseCallback
+  public static class DelegatedDoorLockClusterGetHolidayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -4301,7 +4301,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetUserResponseCallback
+  public static class DelegatedDoorLockClusterGetUserResponseCallback
       implements ChipClusters.DoorLockCluster.GetUserResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -4358,7 +4358,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedSetCredentialResponseCallback
+  public static class DelegatedDoorLockClusterSetCredentialResponseCallback
       implements ChipClusters.DoorLockCluster.SetCredentialResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -4388,7 +4388,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetCredentialStatusResponseCallback
+  public static class DelegatedDoorLockClusterGetCredentialStatusResponseCallback
       implements ChipClusters.DoorLockCluster.GetCredentialStatusResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -4721,7 +4721,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetWeeklyScheduleResponseCallback
+  public static class DelegatedThermostatClusterGetWeeklyScheduleResponseCallback
       implements ChipClusters.ThermostatCluster.GetWeeklyScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -5489,7 +5489,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedChangeChannelResponseCallback
+  public static class DelegatedChannelClusterChangeChannelResponseCallback
       implements ChipClusters.ChannelCluster.ChangeChannelResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -5612,7 +5612,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedNavigateTargetResponseCallback
+  public static class DelegatedTargetNavigatorClusterNavigateTargetResponseCallback
       implements ChipClusters.TargetNavigatorCluster.NavigateTargetResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -5736,7 +5736,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedPlaybackResponseCallback
+  public static class DelegatedMediaPlaybackClusterPlaybackResponseCallback
       implements ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6004,7 +6004,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedSendKeyResponseCallback
+  public static class DelegatedKeypadInputClusterSendKeyResponseCallback
       implements ChipClusters.KeypadInputCluster.SendKeyResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6099,8 +6099,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedLaunchResponseCallback
-      implements ChipClusters.ContentLauncherCluster.LaunchResponseCallback,
+  public static class DelegatedContentLauncherClusterLauncherResponseCallback
+      implements ChipClusters.ContentLauncherCluster.LauncherResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6110,12 +6110,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> data) {
+    public void onSuccess(Integer Status, Optional<String> Data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
-      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo DataResponseValue = new CommandResponseInfo("Data", "Optional<String>");
+      responseValues.put(DataResponseValue, Data);
       callback.onSuccess(responseValues);
     }
 
@@ -6320,7 +6320,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedLauncherResponseCallback
+  public static class DelegatedApplicationLauncherClusterLauncherResponseCallback
       implements ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6540,7 +6540,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetSetupPINResponseCallback
+  public static class DelegatedAccountLoginClusterGetSetupPINResponseCallback
       implements ChipClusters.AccountLoginCluster.GetSetupPINResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6807,7 +6807,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestSpecificResponseCallback
+  public static class DelegatedUnitTestingClusterTestSpecificResponseCallback
       implements ChipClusters.UnitTestingCluster.TestSpecificResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6832,7 +6832,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestAddArgumentsResponseCallback
+  public static class DelegatedUnitTestingClusterTestAddArgumentsResponseCallback
       implements ChipClusters.UnitTestingCluster.TestAddArgumentsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6857,7 +6857,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestListInt8UReverseResponseCallback
+  public static class DelegatedUnitTestingClusterTestListInt8UReverseResponseCallback
       implements ChipClusters.UnitTestingCluster.TestListInt8UReverseResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6881,7 +6881,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestEnumsResponseCallback
+  public static class DelegatedUnitTestingClusterTestEnumsResponseCallback
       implements ChipClusters.UnitTestingCluster.TestEnumsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6907,7 +6907,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestNullableOptionalResponseCallback
+  public static class DelegatedUnitTestingClusterTestNullableOptionalResponseCallback
       implements ChipClusters.UnitTestingCluster.TestNullableOptionalResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6945,7 +6945,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBooleanResponseCallback
+  public static class DelegatedUnitTestingClusterBooleanResponseCallback
       implements ChipClusters.UnitTestingCluster.BooleanResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6968,7 +6968,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedSimpleStructResponseCallback
+  public static class DelegatedUnitTestingClusterSimpleStructResponseCallback
       implements ChipClusters.UnitTestingCluster.SimpleStructResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -6992,7 +6992,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestEmitTestEventResponseCallback
+  public static class DelegatedUnitTestingClusterTestEmitTestEventResponseCallback
       implements ChipClusters.UnitTestingCluster.TestEmitTestEventResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -7752,7 +7752,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupID"),
                       (String) commandArguments.get("groupName"));
             },
-            () -> new DelegatedAddGroupResponseCallback(),
+            () -> new DelegatedGroupsClusterAddGroupResponseCallback(),
             groupsaddGroupCommandParams);
     groupsClusterInteractionInfoMap.put("addGroup", groupsaddGroupInteractionInfo);
     Map<String, CommandParameterInfo> groupsviewGroupCommandParams =
@@ -7769,7 +7769,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.GroupsCluster.ViewGroupResponseCallback) callback,
                       (Integer) commandArguments.get("groupID"));
             },
-            () -> new DelegatedViewGroupResponseCallback(),
+            () -> new DelegatedGroupsClusterViewGroupResponseCallback(),
             groupsviewGroupCommandParams);
     groupsClusterInteractionInfoMap.put("viewGroup", groupsviewGroupInteractionInfo);
     Map<String, CommandParameterInfo> groupsgetGroupMembershipCommandParams =
@@ -7787,7 +7787,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback) callback,
                       (ArrayList<Integer>) commandArguments.get("groupList"));
             },
-            () -> new DelegatedGetGroupMembershipResponseCallback(),
+            () -> new DelegatedGroupsClusterGetGroupMembershipResponseCallback(),
             groupsgetGroupMembershipCommandParams);
     groupsClusterInteractionInfoMap.put(
         "getGroupMembership", groupsgetGroupMembershipInteractionInfo);
@@ -7805,7 +7805,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.GroupsCluster.RemoveGroupResponseCallback) callback,
                       (Integer) commandArguments.get("groupID"));
             },
-            () -> new DelegatedRemoveGroupResponseCallback(),
+            () -> new DelegatedGroupsClusterRemoveGroupResponseCallback(),
             groupsremoveGroupCommandParams);
     groupsClusterInteractionInfoMap.put("removeGroup", groupsremoveGroupInteractionInfo);
     Map<String, CommandParameterInfo> groupsremoveAllGroupsCommandParams =
@@ -7878,7 +7878,7 @@ public class ClusterInfoMapping {
                       (ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>)
                           commandArguments.get("extensionFieldSets"));
             },
-            () -> new DelegatedAddSceneResponseCallback(),
+            () -> new DelegatedScenesClusterAddSceneResponseCallback(),
             scenesaddSceneCommandParams);
     scenesClusterInteractionInfoMap.put("addScene", scenesaddSceneInteractionInfo);
     Map<String, CommandParameterInfo> scenesviewSceneCommandParams =
@@ -7900,7 +7900,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupId"),
                       (Integer) commandArguments.get("sceneId"));
             },
-            () -> new DelegatedViewSceneResponseCallback(),
+            () -> new DelegatedScenesClusterViewSceneResponseCallback(),
             scenesviewSceneCommandParams);
     scenesClusterInteractionInfoMap.put("viewScene", scenesviewSceneInteractionInfo);
     Map<String, CommandParameterInfo> scenesremoveSceneCommandParams =
@@ -7922,7 +7922,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupId"),
                       (Integer) commandArguments.get("sceneId"));
             },
-            () -> new DelegatedRemoveSceneResponseCallback(),
+            () -> new DelegatedScenesClusterRemoveSceneResponseCallback(),
             scenesremoveSceneCommandParams);
     scenesClusterInteractionInfoMap.put("removeScene", scenesremoveSceneInteractionInfo);
     Map<String, CommandParameterInfo> scenesremoveAllScenesCommandParams =
@@ -7940,7 +7940,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.ScenesCluster.RemoveAllScenesResponseCallback) callback,
                       (Integer) commandArguments.get("groupId"));
             },
-            () -> new DelegatedRemoveAllScenesResponseCallback(),
+            () -> new DelegatedScenesClusterRemoveAllScenesResponseCallback(),
             scenesremoveAllScenesCommandParams);
     scenesClusterInteractionInfoMap.put("removeAllScenes", scenesremoveAllScenesInteractionInfo);
     Map<String, CommandParameterInfo> scenesstoreSceneCommandParams =
@@ -7962,7 +7962,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupId"),
                       (Integer) commandArguments.get("sceneId"));
             },
-            () -> new DelegatedStoreSceneResponseCallback(),
+            () -> new DelegatedScenesClusterStoreSceneResponseCallback(),
             scenesstoreSceneCommandParams);
     scenesClusterInteractionInfoMap.put("storeScene", scenesstoreSceneInteractionInfo);
     Map<String, CommandParameterInfo> scenesrecallSceneCommandParams =
@@ -8008,7 +8008,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.ScenesCluster.GetSceneMembershipResponseCallback) callback,
                       (Integer) commandArguments.get("groupId"));
             },
-            () -> new DelegatedGetSceneMembershipResponseCallback(),
+            () -> new DelegatedScenesClusterGetSceneMembershipResponseCallback(),
             scenesgetSceneMembershipCommandParams);
     scenesClusterInteractionInfoMap.put(
         "getSceneMembership", scenesgetSceneMembershipInteractionInfo);
@@ -8786,7 +8786,7 @@ public class ClusterInfoMapping {
                       (Optional<Boolean>) commandArguments.get("requestorCanConsent"),
                       (Optional<byte[]>) commandArguments.get("metadataForProvider"));
             },
-            () -> new DelegatedQueryImageResponseCallback(),
+            () -> new DelegatedOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(),
             otaSoftwareUpdateProviderqueryImageCommandParams);
     otaSoftwareUpdateProviderClusterInteractionInfoMap.put(
         "queryImage", otaSoftwareUpdateProviderqueryImageInteractionInfo);
@@ -8813,7 +8813,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("updateToken"),
                       (Long) commandArguments.get("newVersion"));
             },
-            () -> new DelegatedApplyUpdateResponseCallback(),
+            () -> new DelegatedOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(),
             otaSoftwareUpdateProviderapplyUpdateRequestCommandParams);
     otaSoftwareUpdateProviderClusterInteractionInfoMap.put(
         "applyUpdateRequest", otaSoftwareUpdateProviderapplyUpdateRequestInteractionInfo);
@@ -8937,7 +8937,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("expiryLengthSeconds"),
                       (Long) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedArmFailSafeResponseCallback(),
+            () -> new DelegatedGeneralCommissioningClusterArmFailSafeResponseCallback(),
             generalCommissioningarmFailSafeCommandParams);
     generalCommissioningClusterInteractionInfoMap.put(
         "armFailSafe", generalCommissioningarmFailSafeInteractionInfo);
@@ -8971,7 +8971,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("countryCode"),
                       (Long) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedSetRegulatoryConfigResponseCallback(),
+            () -> new DelegatedGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(),
             generalCommissioningsetRegulatoryConfigCommandParams);
     generalCommissioningClusterInteractionInfoMap.put(
         "setRegulatoryConfig", generalCommissioningsetRegulatoryConfigInteractionInfo);
@@ -8986,7 +8986,7 @@ public class ClusterInfoMapping {
                               .CommissioningCompleteResponseCallback)
                           callback);
             },
-            () -> new DelegatedCommissioningCompleteResponseCallback(),
+            () -> new DelegatedGeneralCommissioningClusterCommissioningCompleteResponseCallback(),
             generalCommissioningcommissioningCompleteCommandParams);
     generalCommissioningClusterInteractionInfoMap.put(
         "commissioningComplete", generalCommissioningcommissioningCompleteInteractionInfo);
@@ -9015,7 +9015,7 @@ public class ClusterInfoMapping {
                       (Optional<byte[]>) commandArguments.get("ssid"),
                       (Optional<Long>) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedScanNetworksResponseCallback(),
+            () -> new DelegatedNetworkCommissioningClusterScanNetworksResponseCallback(),
             networkCommissioningscanNetworksCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "scanNetworks", networkCommissioningscanNetworksInteractionInfo);
@@ -9047,7 +9047,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("credentials"),
                       (Optional<Long>) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedNetworkConfigResponseCallback(),
+            () -> new DelegatedNetworkCommissioningClusterNetworkConfigResponseCallback(),
             networkCommissioningaddOrUpdateWiFiNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "addOrUpdateWiFiNetwork", networkCommissioningaddOrUpdateWiFiNetworkInteractionInfo);
@@ -9076,7 +9076,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("operationalDataset"),
                       (Optional<Long>) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedNetworkConfigResponseCallback(),
+            () -> new DelegatedNetworkCommissioningClusterNetworkConfigResponseCallback(),
             networkCommissioningaddOrUpdateThreadNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "addOrUpdateThreadNetwork", networkCommissioningaddOrUpdateThreadNetworkInteractionInfo);
@@ -9102,7 +9102,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("networkID"),
                       (Optional<Long>) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedNetworkConfigResponseCallback(),
+            () -> new DelegatedNetworkCommissioningClusterNetworkConfigResponseCallback(),
             networkCommissioningremoveNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "removeNetwork", networkCommissioningremoveNetworkInteractionInfo);
@@ -9128,7 +9128,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("networkID"),
                       (Optional<Long>) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedConnectNetworkResponseCallback(),
+            () -> new DelegatedNetworkCommissioningClusterConnectNetworkResponseCallback(),
             networkCommissioningconnectNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "connectNetwork", networkCommissioningconnectNetworkInteractionInfo);
@@ -9160,7 +9160,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("networkIndex"),
                       (Optional<Long>) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedNetworkConfigResponseCallback(),
+            () -> new DelegatedNetworkCommissioningClusterNetworkConfigResponseCallback(),
             networkCommissioningreorderNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "reorderNetwork", networkCommissioningreorderNetworkInteractionInfo);
@@ -9196,7 +9196,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("requestedProtocol"),
                       (byte[]) commandArguments.get("transferFileDesignator"));
             },
-            () -> new DelegatedRetrieveLogsResponseCallback(),
+            () -> new DelegatedDiagnosticLogsClusterRetrieveLogsResponseCallback(),
             diagnosticLogsretrieveLogsRequestCommandParams);
     diagnosticLogsClusterInteractionInfoMap.put(
         "retrieveLogsRequest", diagnosticLogsretrieveLogsRequestInteractionInfo);
@@ -9410,7 +9410,7 @@ public class ClusterInfoMapping {
                           callback,
                       (byte[]) commandArguments.get("attestationNonce"));
             },
-            () -> new DelegatedAttestationResponseCallback(),
+            () -> new DelegatedOperationalCredentialsClusterAttestationResponseCallback(),
             operationalCredentialsattestationRequestCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "attestationRequest", operationalCredentialsattestationRequestInteractionInfo);
@@ -9432,7 +9432,7 @@ public class ClusterInfoMapping {
                           callback,
                       (Integer) commandArguments.get("certificateType"));
             },
-            () -> new DelegatedCertificateChainResponseCallback(),
+            () -> new DelegatedOperationalCredentialsClusterCertificateChainResponseCallback(),
             operationalCredentialscertificateChainRequestCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "certificateChainRequest", operationalCredentialscertificateChainRequestInteractionInfo);
@@ -9457,7 +9457,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("CSRNonce"),
                       (Optional<Boolean>) commandArguments.get("isForUpdateNOC"));
             },
-            () -> new DelegatedCSRResponseCallback(),
+            () -> new DelegatedOperationalCredentialsClusterCSRResponseCallback(),
             operationalCredentialsCSRRequestCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "CSRRequest", operationalCredentialsCSRRequestInteractionInfo);
@@ -9500,7 +9500,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("caseAdminSubject"),
                       (Integer) commandArguments.get("adminVendorId"));
             },
-            () -> new DelegatedNOCResponseCallback(),
+            () -> new DelegatedOperationalCredentialsClusterNOCResponseCallback(),
             operationalCredentialsaddNOCCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "addNOC", operationalCredentialsaddNOCInteractionInfo);
@@ -9525,7 +9525,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("NOCValue"),
                       (Optional<byte[]>) commandArguments.get("ICACValue"));
             },
-            () -> new DelegatedNOCResponseCallback(),
+            () -> new DelegatedOperationalCredentialsClusterNOCResponseCallback(),
             operationalCredentialsupdateNOCCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "updateNOC", operationalCredentialsupdateNOCInteractionInfo);
@@ -9544,7 +9544,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.OperationalCredentialsCluster.NOCResponseCallback) callback,
                       (String) commandArguments.get("label"));
             },
-            () -> new DelegatedNOCResponseCallback(),
+            () -> new DelegatedOperationalCredentialsClusterNOCResponseCallback(),
             operationalCredentialsupdateFabricLabelCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "updateFabricLabel", operationalCredentialsupdateFabricLabelInteractionInfo);
@@ -9563,7 +9563,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.OperationalCredentialsCluster.NOCResponseCallback) callback,
                       (Integer) commandArguments.get("fabricIndex"));
             },
-            () -> new DelegatedNOCResponseCallback(),
+            () -> new DelegatedOperationalCredentialsClusterNOCResponseCallback(),
             operationalCredentialsremoveFabricCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "removeFabric", operationalCredentialsremoveFabricInteractionInfo);
@@ -9622,7 +9622,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.GroupKeyManagementCluster.KeySetReadResponseCallback) callback,
                       (Integer) commandArguments.get("groupKeySetID"));
             },
-            () -> new DelegatedKeySetReadResponseCallback(),
+            () -> new DelegatedGroupKeyManagementClusterKeySetReadResponseCallback(),
             groupKeyManagementkeySetReadCommandParams);
     groupKeyManagementClusterInteractionInfoMap.put(
         "keySetRead", groupKeyManagementkeySetReadInteractionInfo);
@@ -9661,7 +9661,7 @@ public class ClusterInfoMapping {
                           callback,
                       (ArrayList<Integer>) commandArguments.get("groupKeySetIDs"));
             },
-            () -> new DelegatedKeySetReadAllIndicesResponseCallback(),
+            () -> new DelegatedGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(),
             groupKeyManagementkeySetReadAllIndicesCommandParams);
     groupKeyManagementClusterInteractionInfoMap.put(
         "keySetReadAllIndices", groupKeyManagementkeySetReadAllIndicesInteractionInfo);
@@ -9830,7 +9830,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("weekDayIndex"),
                       (Integer) commandArguments.get("userIndex"));
             },
-            () -> new DelegatedGetWeekDayScheduleResponseCallback(),
+            () -> new DelegatedDoorLockClusterGetWeekDayScheduleResponseCallback(),
             doorLockgetWeekDayScheduleCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "getWeekDaySchedule", doorLockgetWeekDayScheduleInteractionInfo);
@@ -9917,7 +9917,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("yearDayIndex"),
                       (Integer) commandArguments.get("userIndex"));
             },
-            () -> new DelegatedGetYearDayScheduleResponseCallback(),
+            () -> new DelegatedDoorLockClusterGetYearDayScheduleResponseCallback(),
             doorLockgetYearDayScheduleCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "getYearDaySchedule", doorLockgetYearDayScheduleInteractionInfo);
@@ -9998,7 +9998,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback) callback,
                       (Integer) commandArguments.get("holidayIndex"));
             },
-            () -> new DelegatedGetHolidayScheduleResponseCallback(),
+            () -> new DelegatedDoorLockClusterGetHolidayScheduleResponseCallback(),
             doorLockgetHolidayScheduleCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "getHolidaySchedule", doorLockgetHolidayScheduleInteractionInfo);
@@ -10086,7 +10086,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.DoorLockCluster.GetUserResponseCallback) callback,
                       (Integer) commandArguments.get("userIndex"));
             },
-            () -> new DelegatedGetUserResponseCallback(),
+            () -> new DelegatedDoorLockClusterGetUserResponseCallback(),
             doorLockgetUserCommandParams);
     doorLockClusterInteractionInfoMap.put("getUser", doorLockgetUserInteractionInfo);
     Map<String, CommandParameterInfo> doorLockclearUserCommandParams =
@@ -10149,7 +10149,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userType"),
                       10000);
             },
-            () -> new DelegatedSetCredentialResponseCallback(),
+            () -> new DelegatedDoorLockClusterSetCredentialResponseCallback(),
             doorLocksetCredentialCommandParams);
     doorLockClusterInteractionInfoMap.put("setCredential", doorLocksetCredentialInteractionInfo);
     Map<String, CommandParameterInfo> doorLockgetCredentialStatusCommandParams =
@@ -10163,7 +10163,7 @@ public class ClusterInfoMapping {
                       (ChipStructs.DoorLockClusterCredentialStruct)
                           commandArguments.get("credential"));
             },
-            () -> new DelegatedGetCredentialStatusResponseCallback(),
+            () -> new DelegatedDoorLockClusterGetCredentialStatusResponseCallback(),
             doorLockgetCredentialStatusCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "getCredentialStatus", doorLockgetCredentialStatusInteractionInfo);
@@ -10422,7 +10422,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("daysToReturn"),
                       (Integer) commandArguments.get("modeToReturn"));
             },
-            () -> new DelegatedGetWeeklyScheduleResponseCallback(),
+            () -> new DelegatedThermostatClusterGetWeeklyScheduleResponseCallback(),
             thermostatgetWeeklyScheduleCommandParams);
     thermostatClusterInteractionInfoMap.put(
         "getWeeklySchedule", thermostatgetWeeklyScheduleInteractionInfo);
@@ -11282,7 +11282,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.ChannelCluster.ChangeChannelResponseCallback) callback,
                       (String) commandArguments.get("match"));
             },
-            () -> new DelegatedChangeChannelResponseCallback(),
+            () -> new DelegatedChannelClusterChangeChannelResponseCallback(),
             channelchangeChannelCommandParams);
     channelClusterInteractionInfoMap.put("changeChannel", channelchangeChannelInteractionInfo);
     Map<String, CommandParameterInfo> channelchangeChannelByNumberCommandParams =
@@ -11349,7 +11349,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("target"),
                       (Optional<String>) commandArguments.get("data"));
             },
-            () -> new DelegatedNavigateTargetResponseCallback(),
+            () -> new DelegatedTargetNavigatorClusterNavigateTargetResponseCallback(),
             targetNavigatornavigateTargetCommandParams);
     targetNavigatorClusterInteractionInfoMap.put(
         "navigateTarget", targetNavigatornavigateTargetInteractionInfo);
@@ -11363,7 +11363,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.MediaPlaybackCluster) cluster)
                   .play((ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackplayCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("play", mediaPlaybackplayInteractionInfo);
     Map<String, CommandParameterInfo> mediaPlaybackpauseCommandParams =
@@ -11374,7 +11374,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.MediaPlaybackCluster) cluster)
                   .pause((ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackpauseCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("pause", mediaPlaybackpauseInteractionInfo);
     Map<String, CommandParameterInfo> mediaPlaybackstopPlaybackCommandParams =
@@ -11386,7 +11386,7 @@ public class ClusterInfoMapping {
                   .stopPlayback(
                       (ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackstopPlaybackCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put(
         "stopPlayback", mediaPlaybackstopPlaybackInteractionInfo);
@@ -11398,7 +11398,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.MediaPlaybackCluster) cluster)
                   .startOver((ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackstartOverCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("startOver", mediaPlaybackstartOverInteractionInfo);
     Map<String, CommandParameterInfo> mediaPlaybackpreviousCommandParams =
@@ -11409,7 +11409,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.MediaPlaybackCluster) cluster)
                   .previous((ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackpreviousCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("previous", mediaPlaybackpreviousInteractionInfo);
     Map<String, CommandParameterInfo> mediaPlaybacknextCommandParams =
@@ -11420,7 +11420,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.MediaPlaybackCluster) cluster)
                   .next((ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybacknextCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("next", mediaPlaybacknextInteractionInfo);
     Map<String, CommandParameterInfo> mediaPlaybackrewindCommandParams =
@@ -11431,7 +11431,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.MediaPlaybackCluster) cluster)
                   .rewind((ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackrewindCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("rewind", mediaPlaybackrewindInteractionInfo);
     Map<String, CommandParameterInfo> mediaPlaybackfastForwardCommandParams =
@@ -11443,7 +11443,7 @@ public class ClusterInfoMapping {
                   .fastForward(
                       (ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackfastForwardCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put(
         "fastForward", mediaPlaybackfastForwardInteractionInfo);
@@ -11463,7 +11463,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback,
                       (Long) commandArguments.get("deltaPositionMilliseconds"));
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackskipForwardCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put(
         "skipForward", mediaPlaybackskipForwardInteractionInfo);
@@ -11483,7 +11483,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback,
                       (Long) commandArguments.get("deltaPositionMilliseconds"));
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackskipBackwardCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put(
         "skipBackward", mediaPlaybackskipBackwardInteractionInfo);
@@ -11501,7 +11501,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback,
                       (Long) commandArguments.get("position"));
             },
-            () -> new DelegatedPlaybackResponseCallback(),
+            () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackseekCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("seek", mediaPlaybackseekInteractionInfo);
     commandMap.put("mediaPlayback", mediaPlaybackClusterInteractionInfoMap);
@@ -11596,7 +11596,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.KeypadInputCluster.SendKeyResponseCallback) callback,
                       (Integer) commandArguments.get("keyCode"));
             },
-            () -> new DelegatedSendKeyResponseCallback(),
+            () -> new DelegatedKeypadInputClusterSendKeyResponseCallback(),
             keypadInputsendKeyCommandParams);
     keypadInputClusterInteractionInfoMap.put("sendKey", keypadInputsendKeyInteractionInfo);
     commandMap.put("keypadInput", keypadInputClusterInteractionInfoMap);
@@ -11618,13 +11618,13 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ContentLauncherCluster) cluster)
                   .launchContent(
-                      (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
-                      (ChipStructs.ContentLauncherClusterContentSearch)
+                      (ChipClusters.ContentLauncherCluster.LauncherResponseCallback) callback,
+                      (ChipStructs.ContentLauncherClusterContentSearchStruct)
                           commandArguments.get("search"),
                       (Boolean) commandArguments.get("autoPlay"),
                       (Optional<String>) commandArguments.get("data"));
             },
-            () -> new DelegatedLaunchResponseCallback(),
+            () -> new DelegatedContentLauncherClusterLauncherResponseCallback(),
             contentLauncherlaunchContentCommandParams);
     contentLauncherClusterInteractionInfoMap.put(
         "launchContent", contentLauncherlaunchContentInteractionInfo);
@@ -11645,13 +11645,13 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ContentLauncherCluster) cluster)
                   .launchURL(
-                      (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
+                      (ChipClusters.ContentLauncherCluster.LauncherResponseCallback) callback,
                       (String) commandArguments.get("contentURL"),
                       (Optional<String>) commandArguments.get("displayString"),
-                      (Optional<ChipStructs.ContentLauncherClusterBrandingInformation>)
+                      (Optional<ChipStructs.ContentLauncherClusterBrandingInformationStruct>)
                           commandArguments.get("brandingInformation"));
             },
-            () -> new DelegatedLaunchResponseCallback(),
+            () -> new DelegatedContentLauncherClusterLauncherResponseCallback(),
             contentLauncherlaunchURLCommandParams);
     contentLauncherClusterInteractionInfoMap.put(
         "launchURL", contentLauncherlaunchURLInteractionInfo);
@@ -11720,7 +11720,7 @@ public class ClusterInfoMapping {
                           commandArguments.get("application"),
                       (Optional<byte[]>) commandArguments.get("data"));
             },
-            () -> new DelegatedLauncherResponseCallback(),
+            () -> new DelegatedApplicationLauncherClusterLauncherResponseCallback(),
             applicationLauncherlaunchAppCommandParams);
     applicationLauncherClusterInteractionInfoMap.put(
         "launchApp", applicationLauncherlaunchAppInteractionInfo);
@@ -11735,7 +11735,7 @@ public class ClusterInfoMapping {
                       (ChipStructs.ApplicationLauncherClusterApplication)
                           commandArguments.get("application"));
             },
-            () -> new DelegatedLauncherResponseCallback(),
+            () -> new DelegatedApplicationLauncherClusterLauncherResponseCallback(),
             applicationLauncherstopAppCommandParams);
     applicationLauncherClusterInteractionInfoMap.put(
         "stopApp", applicationLauncherstopAppInteractionInfo);
@@ -11750,7 +11750,7 @@ public class ClusterInfoMapping {
                       (ChipStructs.ApplicationLauncherClusterApplication)
                           commandArguments.get("application"));
             },
-            () -> new DelegatedLauncherResponseCallback(),
+            () -> new DelegatedApplicationLauncherClusterLauncherResponseCallback(),
             applicationLauncherhideAppCommandParams);
     applicationLauncherClusterInteractionInfoMap.put(
         "hideApp", applicationLauncherhideAppInteractionInfo);
@@ -11774,7 +11774,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("tempAccountIdentifier"),
                       10000);
             },
-            () -> new DelegatedGetSetupPINResponseCallback(),
+            () -> new DelegatedAccountLoginClusterGetSetupPINResponseCallback(),
             accountLogingetSetupPINCommandParams);
     accountLoginClusterInteractionInfoMap.put(
         "getSetupPIN", accountLogingetSetupPINInteractionInfo);
@@ -11902,7 +11902,7 @@ public class ClusterInfoMapping {
                   .testSpecific(
                       (ChipClusters.UnitTestingCluster.TestSpecificResponseCallback) callback);
             },
-            () -> new DelegatedTestSpecificResponseCallback(),
+            () -> new DelegatedUnitTestingClusterTestSpecificResponseCallback(),
             unitTestingtestSpecificCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testSpecific", unitTestingtestSpecificInteractionInfo);
@@ -11939,7 +11939,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("arg1"),
                       (Integer) commandArguments.get("arg2"));
             },
-            () -> new DelegatedTestAddArgumentsResponseCallback(),
+            () -> new DelegatedUnitTestingClusterTestAddArgumentsResponseCallback(),
             unitTestingtestAddArgumentsCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testAddArguments", unitTestingtestAddArgumentsInteractionInfo);
@@ -11953,7 +11953,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
                       (ChipStructs.UnitTestingClusterSimpleStruct) commandArguments.get("arg1"));
             },
-            () -> new DelegatedBooleanResponseCallback(),
+            () -> new DelegatedUnitTestingClusterBooleanResponseCallback(),
             unitTestingtestStructArgumentRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testStructArgumentRequest", unitTestingtestStructArgumentRequestInteractionInfo);
@@ -11967,7 +11967,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
                       (ChipStructs.UnitTestingClusterNestedStruct) commandArguments.get("arg1"));
             },
-            () -> new DelegatedBooleanResponseCallback(),
+            () -> new DelegatedUnitTestingClusterBooleanResponseCallback(),
             unitTestingtestNestedStructArgumentRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testNestedStructArgumentRequest",
@@ -11983,7 +11983,7 @@ public class ClusterInfoMapping {
                       (ArrayList<ChipStructs.UnitTestingClusterSimpleStruct>)
                           commandArguments.get("arg1"));
             },
-            () -> new DelegatedBooleanResponseCallback(),
+            () -> new DelegatedUnitTestingClusterBooleanResponseCallback(),
             unitTestingtestListStructArgumentRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testListStructArgumentRequest", unitTestingtestListStructArgumentRequestInteractionInfo);
@@ -12002,7 +12002,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
                       (ArrayList<Integer>) commandArguments.get("arg1"));
             },
-            () -> new DelegatedBooleanResponseCallback(),
+            () -> new DelegatedUnitTestingClusterBooleanResponseCallback(),
             unitTestingtestListInt8UArgumentRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testListInt8UArgumentRequest", unitTestingtestListInt8UArgumentRequestInteractionInfo);
@@ -12017,7 +12017,7 @@ public class ClusterInfoMapping {
                       (ChipStructs.UnitTestingClusterNestedStructList)
                           commandArguments.get("arg1"));
             },
-            () -> new DelegatedBooleanResponseCallback(),
+            () -> new DelegatedUnitTestingClusterBooleanResponseCallback(),
             unitTestingtestNestedStructListArgumentRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testNestedStructListArgumentRequest",
@@ -12034,7 +12034,7 @@ public class ClusterInfoMapping {
                       (ArrayList<ChipStructs.UnitTestingClusterNestedStructList>)
                           commandArguments.get("arg1"));
             },
-            () -> new DelegatedBooleanResponseCallback(),
+            () -> new DelegatedUnitTestingClusterBooleanResponseCallback(),
             unitTestingtestListNestedStructListArgumentRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testListNestedStructListArgumentRequest",
@@ -12055,7 +12055,7 @@ public class ClusterInfoMapping {
                           callback,
                       (ArrayList<Integer>) commandArguments.get("arg1"));
             },
-            () -> new DelegatedTestListInt8UReverseResponseCallback(),
+            () -> new DelegatedUnitTestingClusterTestListInt8UReverseResponseCallback(),
             unitTestingtestListInt8UReverseRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testListInt8UReverseRequest", unitTestingtestListInt8UReverseRequestInteractionInfo);
@@ -12080,7 +12080,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("arg1"),
                       (Integer) commandArguments.get("arg2"));
             },
-            () -> new DelegatedTestEnumsResponseCallback(),
+            () -> new DelegatedUnitTestingClusterTestEnumsResponseCallback(),
             unitTestingtestEnumsRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testEnumsRequest", unitTestingtestEnumsRequestInteractionInfo);
@@ -12100,7 +12100,7 @@ public class ClusterInfoMapping {
                           callback,
                       (Optional<Integer>) commandArguments.get("arg1"));
             },
-            () -> new DelegatedTestNullableOptionalResponseCallback(),
+            () -> new DelegatedUnitTestingClusterTestNullableOptionalResponseCallback(),
             unitTestingtestNullableOptionalRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testNullableOptionalRequest", unitTestingtestNullableOptionalRequestInteractionInfo);
@@ -12114,7 +12114,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.UnitTestingCluster.SimpleStructResponseCallback) callback,
                       (ChipStructs.UnitTestingClusterSimpleStruct) commandArguments.get("arg1"));
             },
-            () -> new DelegatedSimpleStructResponseCallback(),
+            () -> new DelegatedUnitTestingClusterSimpleStructResponseCallback(),
             unitTestingsimpleStructEchoRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "simpleStructEchoRequest", unitTestingsimpleStructEchoRequestInteractionInfo);
@@ -12177,7 +12177,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("arg2"),
                       (Boolean) commandArguments.get("arg3"));
             },
-            () -> new DelegatedTestEmitTestEventResponseCallback(),
+            () -> new DelegatedUnitTestingClusterTestEmitTestEventResponseCallback(),
             unitTestingtestEmitTestEventRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testEmitTestEventRequest", unitTestingtestEmitTestEventRequestInteractionInfo);

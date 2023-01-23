@@ -49,7 +49,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
                                                  const DecodableList<ParameterType> & parameterList, bool autoplay,
                                                  const chip::CharSpan & data)
 {
-    Commands::LaunchResponse::Type response;
+    Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -103,7 +103,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
                                              const chip::CharSpan & displayString,
                                              const BrandingInformationType & brandingInformation)
 {
-    Commands::LaunchResponse::Type response;
+    Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 

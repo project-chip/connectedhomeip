@@ -3528,8 +3528,8 @@ void CHIPKeypadInputClusterSendKeyResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status);
 }
-CHIPContentLauncherClusterLaunchResponseCallback::CHIPContentLauncherClusterLaunchResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>(CallbackFn, this)
+CHIPContentLauncherClusterLauncherResponseCallback::CHIPContentLauncherClusterLauncherResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPContentLauncherClusterLauncherResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3545,7 +3545,7 @@ CHIPContentLauncherClusterLaunchResponseCallback::CHIPContentLauncherClusterLaun
     }
 }
 
-CHIPContentLauncherClusterLaunchResponseCallback::~CHIPContentLauncherClusterLaunchResponseCallback()
+CHIPContentLauncherClusterLauncherResponseCallback::~CHIPContentLauncherClusterLauncherResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3556,8 +3556,8 @@ CHIPContentLauncherClusterLaunchResponseCallback::~CHIPContentLauncherClusterLau
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPContentLauncherClusterLaunchResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & dataResponse)
+void CHIPContentLauncherClusterLauncherResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3567,9 +3567,10 @@ void CHIPContentLauncherClusterLaunchResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPContentLauncherClusterLaunchResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPContentLauncherClusterLaunchResponseCallback>);
+    std::unique_ptr<CHIPContentLauncherClusterLauncherResponseCallback,
+                    void (*)(CHIPContentLauncherClusterLauncherResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPContentLauncherClusterLauncherResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPContentLauncherClusterLauncherResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3580,25 +3581,25 @@ void CHIPContentLauncherClusterLaunchResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.status), status);
-    jobject data;
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), Status);
+    jobject Data;
     if (!dataResponse.data.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, data);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, Data);
     }
     else
     {
-        jobject dataInsideOptional;
-        dataInsideOptional =
+        jobject DataInsideOptional;
+        DataInsideOptional =
             env->NewStringUTF(std::string(dataResponse.data.Value().data(), dataResponse.data.Value().size()).c_str());
-        chip::JniReferences::GetInstance().CreateOptional(dataInsideOptional, data);
+        chip::JniReferences::GetInstance().CreateOptional(DataInsideOptional, Data);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, Data);
 }
 CHIPApplicationLauncherClusterLauncherResponseCallback::CHIPApplicationLauncherClusterLauncherResponseCallback(
     jobject javaCallback) :

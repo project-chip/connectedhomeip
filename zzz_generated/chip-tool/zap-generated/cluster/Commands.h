@@ -6727,7 +6727,7 @@ public:
 
 private:
     chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type> mComplex_Search;
+    TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type> mComplex_Search;
 };
 
 /*
@@ -6761,7 +6761,7 @@ public:
 
 private:
     chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type mRequest;
-    TypedComplexArgument<chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>>
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type>>
         mComplex_BrandingInformation;
 };
 

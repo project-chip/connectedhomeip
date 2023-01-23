@@ -24182,11 +24182,12 @@ class ContentLauncher(Cluster):
             kSport = 0x0A
             kSportsTeam = 0x0B
             kType = 0x0C
+            kVideo = 0x0D
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 13,
+            kUnknownEnumValue = 14,
 
 
     class Bitmaps:
@@ -24201,7 +24202,7 @@ class ContentLauncher(Cluster):
 
     class Structs:
         @dataclass
-        class Dimension(ClusterObject):
+        class DimensionStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -24216,7 +24217,7 @@ class ContentLauncher(Cluster):
             metric: 'ContentLauncher.Enums.MetricTypeEnum' = 0
 
         @dataclass
-        class AdditionalInfo(ClusterObject):
+        class AdditionalInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -24229,66 +24230,66 @@ class ContentLauncher(Cluster):
             value: 'str' = ""
 
         @dataclass
-        class Parameter(ClusterObject):
+        class ParameterStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="type", Tag=0, Type=ContentLauncher.Enums.ParameterEnum),
                             ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=str),
-                            ClusterObjectFieldDescriptor(Label="externalIDList", Tag=2, Type=typing.Optional[typing.List[ContentLauncher.Structs.AdditionalInfo]]),
+                            ClusterObjectFieldDescriptor(Label="externalIDList", Tag=2, Type=typing.Optional[typing.List[ContentLauncher.Structs.AdditionalInfoStruct]]),
                     ])
 
             type: 'ContentLauncher.Enums.ParameterEnum' = 0
             value: 'str' = ""
-            externalIDList: 'typing.Optional[typing.List[ContentLauncher.Structs.AdditionalInfo]]' = None
+            externalIDList: 'typing.Optional[typing.List[ContentLauncher.Structs.AdditionalInfoStruct]]' = None
 
         @dataclass
-        class ContentSearch(ClusterObject):
+        class ContentSearchStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="parameterList", Tag=0, Type=typing.List[ContentLauncher.Structs.Parameter]),
+                            ClusterObjectFieldDescriptor(Label="parameterList", Tag=0, Type=typing.List[ContentLauncher.Structs.ParameterStruct]),
                     ])
 
-            parameterList: 'typing.List[ContentLauncher.Structs.Parameter]' = field(default_factory=lambda: [])
+            parameterList: 'typing.List[ContentLauncher.Structs.ParameterStruct]' = field(default_factory=lambda: [])
 
         @dataclass
-        class StyleInformation(ClusterObject):
+        class StyleInformationStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="imageUrl", Tag=0, Type=typing.Optional[str]),
+                            ClusterObjectFieldDescriptor(Label="imageURL", Tag=0, Type=typing.Optional[str]),
                             ClusterObjectFieldDescriptor(Label="color", Tag=1, Type=typing.Optional[str]),
-                            ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=typing.Optional[ContentLauncher.Structs.Dimension]),
+                            ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=typing.Optional[ContentLauncher.Structs.DimensionStruct]),
                     ])
 
-            imageUrl: 'typing.Optional[str]' = None
+            imageURL: 'typing.Optional[str]' = None
             color: 'typing.Optional[str]' = None
-            size: 'typing.Optional[ContentLauncher.Structs.Dimension]' = None
+            size: 'typing.Optional[ContentLauncher.Structs.DimensionStruct]' = None
 
         @dataclass
-        class BrandingInformation(ClusterObject):
+        class BrandingInformationStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="providerName", Tag=0, Type=str),
-                            ClusterObjectFieldDescriptor(Label="background", Tag=1, Type=typing.Optional[ContentLauncher.Structs.StyleInformation]),
-                            ClusterObjectFieldDescriptor(Label="logo", Tag=2, Type=typing.Optional[ContentLauncher.Structs.StyleInformation]),
-                            ClusterObjectFieldDescriptor(Label="progressBar", Tag=3, Type=typing.Optional[ContentLauncher.Structs.StyleInformation]),
-                            ClusterObjectFieldDescriptor(Label="splash", Tag=4, Type=typing.Optional[ContentLauncher.Structs.StyleInformation]),
-                            ClusterObjectFieldDescriptor(Label="waterMark", Tag=5, Type=typing.Optional[ContentLauncher.Structs.StyleInformation]),
+                            ClusterObjectFieldDescriptor(Label="background", Tag=1, Type=typing.Optional[ContentLauncher.Structs.StyleInformationStruct]),
+                            ClusterObjectFieldDescriptor(Label="logo", Tag=2, Type=typing.Optional[ContentLauncher.Structs.StyleInformationStruct]),
+                            ClusterObjectFieldDescriptor(Label="progressBar", Tag=3, Type=typing.Optional[ContentLauncher.Structs.StyleInformationStruct]),
+                            ClusterObjectFieldDescriptor(Label="splash", Tag=4, Type=typing.Optional[ContentLauncher.Structs.StyleInformationStruct]),
+                            ClusterObjectFieldDescriptor(Label="waterMark", Tag=5, Type=typing.Optional[ContentLauncher.Structs.StyleInformationStruct]),
                     ])
 
             providerName: 'str' = ""
-            background: 'typing.Optional[ContentLauncher.Structs.StyleInformation]' = None
-            logo: 'typing.Optional[ContentLauncher.Structs.StyleInformation]' = None
-            progressBar: 'typing.Optional[ContentLauncher.Structs.StyleInformation]' = None
-            splash: 'typing.Optional[ContentLauncher.Structs.StyleInformation]' = None
-            waterMark: 'typing.Optional[ContentLauncher.Structs.StyleInformation]' = None
+            background: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
+            logo: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
+            progressBar: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
+            splash: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
+            waterMark: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
 
 
 
@@ -24298,18 +24299,18 @@ class ContentLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050A
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'LaunchResponse'
+            response_type: typing.ClassVar[str] = 'LauncherResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="search", Tag=0, Type=ContentLauncher.Structs.ContentSearch),
+                            ClusterObjectFieldDescriptor(Label="search", Tag=0, Type=ContentLauncher.Structs.ContentSearchStruct),
                             ClusterObjectFieldDescriptor(Label="autoPlay", Tag=1, Type=bool),
                             ClusterObjectFieldDescriptor(Label="data", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            search: 'ContentLauncher.Structs.ContentSearch' = field(default_factory=lambda: ContentLauncher.Structs.ContentSearch())
+            search: 'ContentLauncher.Structs.ContentSearchStruct' = field(default_factory=lambda: ContentLauncher.Structs.ContentSearchStruct())
             autoPlay: 'bool' = False
             data: 'typing.Optional[str]' = None
 
@@ -24318,7 +24319,7 @@ class ContentLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050A
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'LaunchResponse'
+            response_type: typing.ClassVar[str] = 'LauncherResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24326,15 +24327,15 @@ class ContentLauncher(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="contentURL", Tag=0, Type=str),
                             ClusterObjectFieldDescriptor(Label="displayString", Tag=1, Type=typing.Optional[str]),
-                            ClusterObjectFieldDescriptor(Label="brandingInformation", Tag=2, Type=typing.Optional[ContentLauncher.Structs.BrandingInformation]),
+                            ClusterObjectFieldDescriptor(Label="brandingInformation", Tag=2, Type=typing.Optional[ContentLauncher.Structs.BrandingInformationStruct]),
                     ])
 
             contentURL: 'str' = ""
             displayString: 'typing.Optional[str]' = None
-            brandingInformation: 'typing.Optional[ContentLauncher.Structs.BrandingInformation]' = None
+            brandingInformation: 'typing.Optional[ContentLauncher.Structs.BrandingInformationStruct]' = None
 
         @dataclass
-        class LaunchResponse(ClusterCommand):
+        class LauncherResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050A
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False

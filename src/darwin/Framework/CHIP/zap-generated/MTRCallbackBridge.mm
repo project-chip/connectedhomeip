@@ -12441,10 +12441,10 @@ void MTRKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void MTRContentLauncherClusterLaunchResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data)
+void MTRContentLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & data)
 {
-    auto * response = [MTRContentLauncherClusterLaunchResponseParams new];
+    auto * response = [MTRContentLauncherClusterLauncherResponseParams new];
     {
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }

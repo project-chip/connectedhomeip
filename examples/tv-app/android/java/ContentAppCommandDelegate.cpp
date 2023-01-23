@@ -35,7 +35,7 @@ namespace chip {
 namespace AppPlatform {
 
 using CommandHandlerInterface    = chip::app::CommandHandlerInterface;
-using LaunchResponseType         = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+using LaunchResponseType         = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
 using PlaybackResponseType       = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
 using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
 
@@ -120,7 +120,7 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
     case app::Clusters::ContentLauncher::Id: {
         LaunchResponseType launchResponse;
         std::string statusFieldId =
-            std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LaunchResponse::Fields::kStatus));
+            std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LauncherResponse::Fields::kStatus));
         if (value[statusFieldId].empty())
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Failure);
@@ -131,7 +131,7 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
             launchResponse.status =
                 static_cast<app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(value[statusFieldId].asInt());
             std::string dataFieldId =
-                std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LaunchResponse::Fields::kData));
+                std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LauncherResponse::Fields::kData));
             if (!value[dataFieldId].empty())
             {
                 launchResponse.data = chip::MakeOptional(CharSpan::fromCharString(value[dataFieldId].asCString()));

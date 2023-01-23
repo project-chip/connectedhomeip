@@ -151,8 +151,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -348,7 +349,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::DecodableType & value)
+                          const chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -476,8 +477,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -541,7 +543,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ContentLauncher::Structs::Dimension::DecodableType & value)
+                                     const chip::app::Clusters::ContentLauncher::Structs::DimensionStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1646,7 +1648,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType & value)
+                                     const chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1944,15 +1946,16 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ContentLauncher::Structs::StyleInformation::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ContentLauncher::Structs::StyleInformationStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("ImageUrl", indent + 1, value.imageUrl);
+        CHIP_ERROR err = LogValue("ImageURL", indent + 1, value.imageURL);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ImageUrl'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ImageURL'");
             return err;
         }
     }
@@ -4076,7 +4079,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ContentLauncher::Commands::LaunchResponse::DecodableType & value)
+                                     const ContentLauncher::Commands::LauncherResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -10472,10 +10475,10 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
     case ContentLauncher::Id: {
         switch (path.mCommandId)
         {
-        case ContentLauncher::Commands::LaunchResponse::Id: {
-            ContentLauncher::Commands::LaunchResponse::DecodableType value;
+        case ContentLauncher::Commands::LauncherResponse::Id: {
+            ContentLauncher::Commands::LauncherResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LaunchResponse", 1, value);
+            return DataModelLogger::LogValue("LauncherResponse", 1, value);
         }
         }
         break;

@@ -51,13 +51,13 @@ tests:
               - name: "search"
                 value:
                     {
-                        parameterList:
+                        ParameterList:
                             [
                                 {
-                                    type: 1,
-                                    value: "exampleValue",
-                                    externalIDList:
-                                        [{ name: "name", value: "value" }],
+                                    Type: 1,
+                                    Value: "exampleValue",
+                                    ExternalIDList:
+                                        [{ Name: "name", Value: "value" }],
                                 },
                             ],
                     }
@@ -79,36 +79,36 @@ tests:
               - name: "brandingInformation"
                 value:
                     {
-                        providerName: "exampleName",
-                        background:
+                        ProviderName: "exampleName",
+                        Background:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
-                        logo:
+                        Logo:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
-                        progressBar:
+                        ProgressBar:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
-                        splash:
+                        Splash:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
-                        waterMark:
+                        WaterMark:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
                     }
       response:

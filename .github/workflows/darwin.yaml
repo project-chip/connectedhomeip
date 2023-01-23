@@ -66,8 +66,8 @@ jobs:
                   # NOTE: Generally kept in sync within the repo using
                   #       scripts/tools/zap/version_update.py
                   # This is scoped to only the steps that don't use xcodebuild.
-                  ZAP_VERSION: v2023.01.18-nightly
-                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
+                  ZAP_VERSION: v2023.01.19-nightly
+                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -126,8 +126,8 @@ jobs:
                   # NOTE: Generally kept in sync within the repo using
                   #       scripts/tools/zap/version_update.py
                   # This is scoped to only the steps that don't use xcodebuild.
-                  ZAP_VERSION: v2023.01.18-nightly
-                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
+                  ZAP_VERSION: v2023.01.19-nightly
+                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
             - name: Build example OTA Provider
               timeout-minutes: 10
               run: |
@@ -136,8 +136,8 @@ jobs:
                   # NOTE: Generally kept in sync within the repo using
                   #       scripts/tools/zap/version_update.py
                   # This is scoped to only the steps that don't use xcodebuild.
-                  ZAP_VERSION: v2023.01.18-nightly
-                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
+                  ZAP_VERSION: v2023.01.19-nightly
+                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
             - name: Build example OTA Requestor
               timeout-minutes: 10
               run: |
@@ -146,8 +146,8 @@ jobs:
                   # NOTE: Generally kept in sync within the repo using
                   #       scripts/tools/zap/version_update.py
                   # This is scoped to only the steps that don't use xcodebuild.
-                  ZAP_VERSION: v2023.01.18-nightly
-                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
+                  ZAP_VERSION: v2023.01.19-nightly
+                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true

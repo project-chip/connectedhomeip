@@ -7015,7 +7015,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _search = [MTRContentLauncherClusterContentSearch new];
+        _search = [MTRContentLauncherClusterContentSearchStruct new];
 
         _autoPlay = @(0);
 
@@ -7084,7 +7084,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRContentLauncherClusterLaunchResponseParams
+@implementation MTRContentLauncherClusterLauncherResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7099,7 +7099,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRContentLauncherClusterLaunchResponseParams alloc] init];
+    auto other = [[MTRContentLauncherClusterLauncherResponseParams alloc] init];
 
     other.status = self.status;
     other.data = self.data;
@@ -7115,6 +7115,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRContentLauncherClusterLaunchResponseParams
 @end
 @implementation MTRAudioOutputClusterSelectOutputParams
 - (instancetype)init

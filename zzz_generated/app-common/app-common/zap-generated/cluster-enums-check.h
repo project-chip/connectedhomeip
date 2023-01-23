@@ -2041,9 +2041,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Parame
     case EnumType::kSport:
     case EnumType::kSportsTeam:
     case EnumType::kType:
+    case EnumType::kVideo:
         return val;
     default:
-        return static_cast<EnumType>(13);
+        return static_cast<EnumType>(14);
     }
 }
 
