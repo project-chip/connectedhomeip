@@ -18,6 +18,7 @@ import functools
 import glob
 import os
 import tempfile
+import traceback
 
 # isort: off
 
@@ -112,6 +113,7 @@ def main(setup_code, yaml_path, node_id):
                 else:
                     raise Exception(f'Failed to encode test step {test_step.label}')
         except Exception:
+            print(traceback.format_exc())
             exit(-2)
 
         runner.shutdown()
