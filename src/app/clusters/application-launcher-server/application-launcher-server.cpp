@@ -252,9 +252,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not found");
                 LauncherResponseType response;
-                const char * buf = "data";
-                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
+                response.status = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -289,9 +287,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
         {
             ChipLogError(Zcl, "ApplicationLauncher target app not found");
             LauncherResponseType response;
-            const char * buf = "data";
-            response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-            response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
+            response.status = ApplicationLauncherStatusEnum::kAppNotAvailable;
             responder.Success(response);
             return true;
         }
@@ -350,9 +346,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                const char * buf = "data";
-                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
+                response.status = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -441,9 +435,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                const char * buf = "data";
-                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
+                response.status = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
