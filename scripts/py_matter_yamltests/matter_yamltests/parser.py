@@ -38,6 +38,7 @@ _TEST_SECTION = [
     'endpoint',
     'identity',
     'fabricFiltered',
+    'groupId',
     'verification',
     'nodeId',
     'attribute',
@@ -198,6 +199,7 @@ class _TestStepWithPlaceholders:
         self.label = _value_or_none(test, 'label')
         self.optional = _value_or_none(test, 'optional')
         self.node_id = _value_or_config(test, 'nodeId', config)
+        self.group_id = _value_or_config(test, 'groupId', config)
         self.cluster = _value_or_config(test, 'cluster', config)
         self.command = _value_or_config(test, 'command', config)
         self.attribute = _value_or_none(test, 'attribute')
@@ -425,6 +427,10 @@ class TestStep:
     @property
     def node_id(self):
         return self._test.node_id
+
+    @property
+    def group_id(self):
+        return self._test.group_id
 
     @property
     def cluster(self):
