@@ -25,6 +25,9 @@
 constexpr const char * kInteractiveModePrompt          = ">>> ";
 constexpr const char * kInteractiveModeHistoryFilePath = "/tmp/chip_tool_history";
 constexpr const char * kInteractiveModeStopCommand     = "quit()";
+constexpr const char * kCategoryError                  = "Error";
+constexpr const char * kCategoryProgress               = "Info";
+constexpr const char * kCategoryDetail                 = "Debug";
 
 namespace {
 
@@ -38,6 +41,133 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     ClearLine();
     chip::Logging::Platform::LogV(module, category, msg, args);
     ClearLine();
+}
+
+struct InteractiveServerResultLog
+{
+    std::string module;
+    std::string message;
+    std::string messageType;
+};
+
+struct InteractiveServerResult
+{
+    bool mEnabled       = false;
+    bool mIsAsyncReport = false;
+    int mStatus         = EXIT_SUCCESS;
+    std::vector<std::string> mResults;
+    std::vector<InteractiveServerResultLog> mLogs;
+
+    void Setup(bool isAsyncReport)
+    {
+        mEnabled       = true;
+        mIsAsyncReport = isAsyncReport;
+    }
+
+    void Reset()
+    {
+        mEnabled       = false;
+        mIsAsyncReport = false;
+        mStatus        = EXIT_SUCCESS;
+        mResults.clear();
+        mLogs.clear();
+    }
+
+    bool IsAsyncReport() const { return mIsAsyncReport; }
+
+    void MaybeAddLog(const char * module, uint8_t category, const char * base64Message)
+    {
+        VerifyOrReturn(mEnabled);
+
+        const char * messageType = nullptr;
+        switch (category)
+        {
+        case chip::Logging::kLogCategory_Error:
+            messageType = kCategoryError;
+            break;
+        case chip::Logging::kLogCategory_Progress:
+            messageType = kCategoryProgress;
+            break;
+        case chip::Logging::kLogCategory_Detail:
+            messageType = kCategoryDetail;
+            break;
+        }
+
+        mLogs.push_back(InteractiveServerResultLog({ module, base64Message, messageType }));
+    }
+
+    void MaybeAddResult(const char * result)
+    {
+        VerifyOrReturn(mEnabled);
+        mResults.push_back(result);
+    }
+
+    std::string AsJsonString() const
+    {
+        std::string resultsStr;
+        if (mResults.size())
+        {
+            for (const auto & result : mResults)
+            {
+                resultsStr = resultsStr + result + ",";
+            }
+
+            // Remove last comma.
+            resultsStr.pop_back();
+        }
+
+        if (mStatus != EXIT_SUCCESS)
+        {
+            if (resultsStr.size())
+            {
+                resultsStr = resultsStr + ",";
+            }
+            resultsStr = resultsStr + "{ \"error\": \"FAILURE\" }";
+        }
+
+        std::string logsStr;
+        if (mLogs.size())
+        {
+            for (const auto & log : mLogs)
+            {
+                logsStr = logsStr + "{";
+                logsStr = logsStr + "  \"module\": \"" + log.module + "\",";
+                logsStr = logsStr + "  \"category\": \"" + log.messageType + "\",";
+                logsStr = logsStr + "  \"message\": \"" + log.message + "\"";
+                logsStr = logsStr + "},";
+            }
+
+            // Remove last comma.
+            logsStr.pop_back();
+        }
+
+        std::string jsonLog;
+        jsonLog = jsonLog + "{";
+        jsonLog = jsonLog + "  \"results\": [" + resultsStr + "],";
+        jsonLog = jsonLog + "  \"logs\": [" + logsStr + "]";
+        jsonLog = jsonLog + "}";
+
+        return jsonLog;
+    }
+};
+
+InteractiveServerResult gInteractiveServerResult;
+
+void ENFORCE_FORMAT(3, 0) InteractiveServerLoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
+{
+    va_list args_copy;
+    va_copy(args_copy, args);
+
+    chip::Logging::Platform::LogV(module, category, msg, args);
+
+    char message[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    vsnprintf(message, sizeof(message), msg, args_copy);
+    va_end(args_copy);
+
+    char base64Message[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE * 2] = {};
+    chip::Base64Encode(chip::Uint8::from_char(message), static_cast<uint16_t>(strlen(message)), base64Message);
+
+    gInteractiveServerResult.MaybeAddLog(module, category, base64Message);
 }
 
 char * GetCommand(char * command)
@@ -63,15 +193,44 @@ char * GetCommand(char * command)
 
 CHIP_ERROR InteractiveServerCommand::RunCommand()
 {
+    // Logs needs to be redirected in order to refresh the screen appropriately when something
+    // is dumped to stdout while the user is typing a command.
+    chip::Logging::SetLogRedirectCallback(InteractiveServerLoggingCallback);
+
+    DataModelLogger::SetJSONDelegate(this);
     ReturnErrorOnFailure(mWebSocketServer.Run(mPort, this));
 
+    gInteractiveServerResult.Reset();
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
 }
 
+void SendOverWebSocket(intptr_t context)
+{
+    auto server = reinterpret_cast<WebSocketServer *>(context);
+    server->Send(gInteractiveServerResult.AsJsonString().c_str());
+    gInteractiveServerResult.Reset();
+}
+
 bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
 {
-    return ParseCommand(msg);
+    bool isAsyncReport = strlen(msg) == 0;
+    gInteractiveServerResult.Setup(isAsyncReport);
+    VerifyOrReturnValue(!isAsyncReport, true);
+
+    auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(SendOverWebSocket, reinterpret_cast<intptr_t>(&mWebSocketServer));
+    return shouldStop;
+}
+
+CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
+{
+    gInteractiveServerResult.MaybeAddResult(json);
+    if (gInteractiveServerResult.IsAsyncReport())
+    {
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(SendOverWebSocket, reinterpret_cast<intptr_t>(&mWebSocketServer));
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InteractiveStartCommand::RunCommand()
@@ -83,10 +242,11 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     chip::Logging::SetLogRedirectCallback(LoggingCallback);
 
     char * command = nullptr;
+    int status;
     while (true)
     {
         command = GetCommand(command);
-        if (command != nullptr && !ParseCommand(command))
+        if (command != nullptr && !ParseCommand(command, &status))
         {
             break;
         }
@@ -102,7 +262,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-bool InteractiveCommand::ParseCommand(char * command)
+bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
     if (strcmp(command, kInteractiveModeStopCommand) == 0)
     {
@@ -111,6 +271,8 @@ bool InteractiveCommand::ParseCommand(char * command)
     }
 
     ClearLine();
-    mHandler->RunInteractive(command);
+
+    *status = mHandler->RunInteractive(command);
+
     return true;
 }

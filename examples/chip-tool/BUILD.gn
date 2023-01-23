@@ -110,6 +110,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",

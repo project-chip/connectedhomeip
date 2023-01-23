@@ -109,6 +109,8 @@ public:
         CHIP_ERROR error = status.ToChipError();
         if (CHIP_NO_ERROR != error)
         {
+            ReturnOnFailure(DataModelLogger::LogErrorAsJSON(path, status));
+
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
             mError = error;
         }
@@ -116,6 +118,8 @@ public:
 
     void OnError(const chip::app::WriteClient * client, CHIP_ERROR error) override
     {
+        ReturnOnFailure(DataModelLogger::LogErrorAsJSON(error));
+
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
         mError = error;
     }
