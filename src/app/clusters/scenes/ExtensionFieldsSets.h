@@ -25,8 +25,9 @@
 namespace chip {
 namespace scenes {
 
-typedef struct fieldSets_s
+typedef struct
 {
+
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
     bool onOff;
 #endif
@@ -68,32 +69,32 @@ typedef struct fieldSets_s
     uint8_t targetPositionLiftPercent100ths;
     uint8_t targetPositionTiltPercent100ths;
 #endif
-} fieldSets_t;
+} FieldSets;
 
 class ExtensionFieldsSets
 {
 public:
-    static constexpr size_t kExentesionFieldsSetsSize = sizeof(fieldSets_t);
+    static constexpr size_t kExtensionFieldsSetsSize = sizeof(FieldSets);
     static constexpr TLV::Tag TagEnabledFielsSets() { return TLV::ContextTag(1); }
-    fieldSets_t enabledFieldSets;
+    FieldSets enabledFieldSets;
     bool empty = false;
 
     ExtensionFieldsSets();
-    virtual ~ExtensionFieldsSets() = default;
+    ~ExtensionFieldsSets(){};
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader);
 
-    void clear();
+    void Clear();
 
     bool operator==(const ExtensionFieldsSets & other)
     {
-        return (!memcmp(&this->enabledFieldSets, &other.enabledFieldSets, kExentesionFieldsSetsSize));
+        return (!memcmp(&this->enabledFieldSets, &other.enabledFieldSets, kExtensionFieldsSetsSize));
     }
 
     void operator=(const ExtensionFieldsSets & other)
     {
-        memcpy(&this->enabledFieldSets, &other.enabledFieldSets, kExentesionFieldsSetsSize);
+        memcpy(&this->enabledFieldSets, &other.enabledFieldSets, kExtensionFieldsSetsSize);
     }
 };
 } // namespace scenes

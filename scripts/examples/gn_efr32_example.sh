@@ -144,7 +144,6 @@ else
     shift
     while [ $# -gt 0 ]; do
         case $1 in
-
             --clean)
                 DIR_CLEAN=true
                 shift

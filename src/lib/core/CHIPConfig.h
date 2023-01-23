@@ -1355,10 +1355,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
 
 /**
- * @}
- */
-
-/**
  * @def CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
  *
  * @brief Defines the number of simultaneous subscription resumption iterators that can be allocated
@@ -1368,3 +1364,55 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS 2
 #endif
+/**
+ * @brief Indicates the absence of a Scene table entry.
+ */
+#ifndef CHIP_CONFIG_SCENES_TABLE_NULL_INDEX
+#define CHIP_CONFIG_SCENES_TABLE_NULL_INDEX 0xFF
+#endif
+
+/**
+ * @brief Value used when setting or getting the endpoint in a Scene table
+ * entry.  It indicates that the entry is not in use.
+ */
+#ifndef CHIP_CONFIG_SCENES_TABLE_UNUSED_ENDPOINT_ID
+#define CHIP_CONFIG_SCENES_TABLE_UNUSED_ENDPOINT_ID 0x00
+#endif
+/**
+ * @brief The maximum number of scenes according to spec
+ */
+#ifndef CHIP_CONFIG_SCENES_MAX_NUMBER
+#define CHIP_CONFIG_SCENES_MAX_NUMBER 16
+#endif
+
+/**
+ * @brief Maximum length of Scene names, not including the length byte.
+ */
+#ifndef CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH
+#define CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH 16
+#endif
+
+/**
+ * @brief The group identifier for the global scene.
+ */
+#ifndef CHIP_CONFIG_SCENES_GLOBAL_SCENE_GROUP_ID
+#define CHIP_CONFIG_SCENES_GLOBAL_SCENE_GROUP_ID 0x0000
+#endif
+
+/**
+ * @brief The scene identifier for the global scene.
+ */
+#ifndef CHIP_CONFIG_SCENES_GLOBAL_SCENE_SCENE_ID
+#define CHIP_CONFIG_SCENES_GLOBAL_SCENE_SCENE_ID 0x00
+#endif
+
+/**
+ * @brief The maximum number of scenes allowed on a single fabric
+ */
+#ifndef CHIP_CONFIG_SCENES_MAX_PER_FABRIC
+#define CHIP_CONFIG_SCENES_MAX_PER_FABRIC (CHIP_CONFIG_SCENES_MAX_NUMBER / 2)
+#endif
+
+/**
+ * @}
+ */

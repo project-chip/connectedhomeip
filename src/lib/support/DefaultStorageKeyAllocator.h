@@ -191,14 +191,12 @@ public:
     // Event number counter.
     static StorageKeyName IMEventNumber() { return StorageKeyName::FromConst("g/im/ec"); }
 
-<<<<<<< HEAD
     // Subscription resumption
     static StorageKeyName SubscriptionResumption(size_t index)
     {
         return StorageKeyName::Formatted("g/su/%x", static_cast<unsigned>(index));
     }
     static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
-=======
     // Scene Storage
     static StorageKeyName SceneFabricList() { return StorageKeyName::FromConst("g/sfl"); }
     static StorageKeyName FabricScenesKey(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/s", fabric); }
@@ -207,7 +205,6 @@ public:
     {
         return StorageKeyName::Formatted("f/%x/s/e%xg%xs%x", fabric, endpoint, group, scene);
     }
->>>>>>> 47da6c11b4 (Implementation of persistant storage of scene table along with test.)
 };
 
 } // namespace chip
