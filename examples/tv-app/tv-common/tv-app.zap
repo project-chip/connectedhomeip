@@ -12063,7 +12063,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "ApplicationBasicApplication",
+              "type": "ApplicationStruct",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
