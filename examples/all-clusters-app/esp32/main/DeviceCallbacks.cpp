@@ -93,8 +93,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
                                                      uint8_t type, uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG,
-             "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: "
-             "'0x%02x', Attribute ID: '0x%04x'",
+             "PostAttributeChangeCallback - Cluster ID: '0x%04" PRIx32 "', EndPoint ID: '0x%02x' , Attribute ID: '0x%04" PRIx32 "'",
              clusterId, endpointId, attributeId);
 
     switch (clusterId)
@@ -115,7 +114,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
         OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, size, value);
         break;
     default:
-        ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
+        ESP_LOGI(TAG, "Unhandled cluster ID: %" PRIu32, clusterId);
         break;
     }
 
@@ -126,7 +125,7 @@ void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointI
 {
     using namespace app::Clusters::OnOff::Attributes;
 
-    VerifyOrExit(attributeId == OnOff::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == OnOff::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
@@ -144,7 +143,7 @@ void AppDeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpoi
     bool onOffState    = mEndpointOnOffState[endpointId - 1];
     uint8_t brightness = onOffState ? *value : 0;
 
-    VerifyOrExit(attributeId == CurrentLevel::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == CurrentLevel::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
@@ -162,7 +161,7 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
     using namespace app::Clusters::ColorControl::Attributes;
 
     VerifyOrExit(attributeId == CurrentHue::Id || attributeId == CurrentSaturation::Id,
-                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04x", attributeId));
+                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (endpointId == 1)
     {
