@@ -357,6 +357,8 @@ CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
         return CHIP_NO_ERROR;
     }
     VerifyOrReturnError(len <= kMaxLocalizedStringIdentifierLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    // Leading zeroes are not allowed.
+    VerifyOrReturnError(static_cast<char>(lsidPtr[0]) != '0', CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     char idStr[kMaxLocalizedStringIdentifierLen] = { '0', '0', '0', '0' };
     memcpy(&idStr[kMaxLocalizedStringIdentifierLen - len], lsidPtr, len);

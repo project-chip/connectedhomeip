@@ -2854,9 +2854,10 @@ void CheckTLVGetLocalizedStringIdentifier(nlTestSuite * inSuite, void * inContex
         // Test String                                               Expected LocalizedStringIdentifier from Get()      Expected Return
         // =============================================================================================================================================
         {  "This is a test case #0",                                 chip::Optional<LocalizedStringIdentifier>(),       CHIP_NO_ERROR                  },
-        {  "This is a test case #1" IS1_CHAR "0123",                 chip::Optional<LocalizedStringIdentifier>(0x0123), CHIP_NO_ERROR                  },
-        {  "This is a test case #2" IS1_CHAR "0123" IS1_CHAR "3210", chip::Optional<LocalizedStringIdentifier>(0x0123), CHIP_NO_ERROR                  },
-        {  "This is a test case #3" IS1_CHAR "012",                  chip::Optional<LocalizedStringIdentifier>(0x012),  CHIP_NO_ERROR                  },
+        {  "This is a test case #1" IS1_CHAR "0123",                 chip::Optional<LocalizedStringIdentifier>(),       CHIP_ERROR_INVALID_TLV_ELEMENT },
+        {  "This is a test case #2" IS1_CHAR "123" IS1_CHAR "3210",  chip::Optional<LocalizedStringIdentifier>(0x123),  CHIP_NO_ERROR                  },
+        {  "This is a test case #3" IS1_CHAR "012",                  chip::Optional<LocalizedStringIdentifier>(),       CHIP_ERROR_INVALID_TLV_ELEMENT },
+        {  "This is a test case #3" IS1_CHAR "12",                   chip::Optional<LocalizedStringIdentifier>(0x12),   CHIP_NO_ERROR                  },
         {  "Thé" IS1_CHAR "",                                        chip::Optional<LocalizedStringIdentifier>(),       CHIP_NO_ERROR                  },
         {  "Thé" IS1_CHAR "7",                                       chip::Optional<LocalizedStringIdentifier>(0x7),    CHIP_NO_ERROR                  },
         {  "Thé" IS1_CHAR "1FA",                                     chip::Optional<LocalizedStringIdentifier>(0x1FA),  CHIP_NO_ERROR                  },
@@ -2904,7 +2905,7 @@ void CheckTLVGetLocalizedStringIdentifier(nlTestSuite * inSuite, void * inContex
 
         writer.Init(backingStore);
 
-        err = writer.PutString(ProfileTag(TestProfile_1, 1), sCharSpanTestCases[1].testString);
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), sCharSpanTestCases[2].testString);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = writer.Finalize();
@@ -2925,8 +2926,8 @@ void CheckTLVGetLocalizedStringIdentifier(nlTestSuite * inSuite, void * inContex
 
         writer.Init(backingStore);
 
-        err = writer.PutBytes(ProfileTag(TestProfile_1, 1), reinterpret_cast<const uint8_t *>(sCharSpanTestCases[1].testString),
-                              static_cast<uint32_t>(strlen(sCharSpanTestCases[1].testString)));
+        err = writer.PutBytes(ProfileTag(TestProfile_1, 1), reinterpret_cast<const uint8_t *>(sCharSpanTestCases[2].testString),
+                              static_cast<uint32_t>(strlen(sCharSpanTestCases[2].testString)));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = writer.Finalize();
