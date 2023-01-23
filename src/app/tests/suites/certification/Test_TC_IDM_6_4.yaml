@@ -44,9 +44,15 @@ tests:
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event start-up 10 100 1 0
+          basicinformation subscribe-event start-up 10 100 1 0
 
-          On TH (On the reference app), On reference app verify that  the subscription message received has the all fields which mentioned in expected outcome
+          On TH (On the reference app), On reference app verify that  the subscription message received has the all fields which mentioned below
+          KeepSubscriptions which is of type bool.
+          MinIntervalFloor which is of type uint16.
+          MaxIntervalCeiling which is of type uint16.
+          EventRequests - list of request paths to cluster events. Should be a valid EventPathIB from the Valid Event Paths table and not target a group.
+          EventFilters - list of minimum event numbers per specific node. (Optional)
+          FabricFiltered which is of type bool.
 
           colId (0, 1) and MessageCounter:190733237 on exchange 33689r
           [1657455555.193832][11525:11525] CHIP:EM: Handling via exchange: 33689r, Delegate: 0xaaaae00c1430
@@ -128,7 +134,7 @@ tests:
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event-by-id 0x000 20 400 1 0
+          basicinformation subscribe-event-by-id 0x000 20 400 1 0
           Verify DUT is responsds with  status response  for the data sent in the above command
           On TH (On the reference app)
           6 from Retrans Table on exchange 33690r

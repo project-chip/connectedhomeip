@@ -28,6 +28,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/TLV.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -298,10 +299,13 @@ CHIP_ERROR TLVReader::Get(ByteSpan & v)
     return CHIP_NO_ERROR;
 }
 
+namespace {
+constexpr int kUnicodeInformationSeparator1       = 0x1F;
+constexpr size_t kMaxLocalizedStringIdentifierLen = 2 * sizeof(LocalizedStringIdentifier);
+} // namespace
+
 CHIP_ERROR TLVReader::Get(CharSpan & v)
 {
-    constexpr int kUnicodeInformationSeparator1 = 0x1F;
-
     if (!TLVTypeIsUTF8String(ElementType()))
     {
         return CHIP_ERROR_WRONG_TLV_TYPE;
@@ -321,6 +325,49 @@ CHIP_ERROR TLVReader::Get(CharSpan & v)
     }
 
     v = CharSpan(Uint8::to_const_char(bytes), len);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
+{
+    lsid.ClearValue();
+    VerifyOrReturnError(TLVTypeIsUTF8String(ElementType()), CHIP_ERROR_WRONG_TLV_TYPE);
+
+    const uint8_t * bytes;
+    ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+
+    uint32_t len = GetLength();
+
+    const uint8_t * infoSeparator1 = static_cast<const uint8_t *>(memchr(bytes, kUnicodeInformationSeparator1, len));
+    if (infoSeparator1 == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    const uint8_t * lsidPtr = infoSeparator1 + 1;
+    len -= static_cast<uint32_t>(lsidPtr - bytes);
+
+    const uint8_t * infoSeparator2 = static_cast<const uint8_t *>(memchr(lsidPtr, kUnicodeInformationSeparator1, len));
+    if (infoSeparator2 != nullptr)
+    {
+        len = static_cast<uint32_t>(infoSeparator2 - lsidPtr);
+    }
+    if (len == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(len <= kMaxLocalizedStringIdentifierLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    // Leading zeroes are not allowed.
+    VerifyOrReturnError(static_cast<char>(lsidPtr[0]) != '0', CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+    char idStr[kMaxLocalizedStringIdentifierLen] = { '0', '0', '0', '0' };
+    memcpy(&idStr[kMaxLocalizedStringIdentifierLen - len], lsidPtr, len);
+
+    LocalizedStringIdentifier id;
+    VerifyOrReturnError(Encoding::UppercaseHexToUint16(idStr, sizeof(idStr), id) == sizeof(LocalizedStringIdentifier),
+                        CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+    lsid.SetValue(id);
     return CHIP_NO_ERROR;
 }
 

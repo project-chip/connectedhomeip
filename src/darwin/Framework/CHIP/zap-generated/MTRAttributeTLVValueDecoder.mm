@@ -11325,8 +11325,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
-        case Attributes::IntrinsicBalanceFactor::Id: {
-            using TypeInfo = Attributes::IntrinsicBalanceFactor::TypeInfo;
+        case Attributes::IntrinsicBallastFactor::Id: {
+            using TypeInfo = Attributes::IntrinsicBallastFactor::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -12834,8 +12834,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRChannelClusterChannelInfo * newElement_0;
-                    newElement_0 = [MTRChannelClusterChannelInfo new];
+                    MTRChannelClusterChannelInfoStruct * newElement_0;
+                    newElement_0 = [MTRChannelClusterChannelInfoStruct new];
                     newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
                     newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
                     if (entry_0.name.HasValue()) {
@@ -12877,11 +12877,11 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRChannelClusterLineupInfo * _Nullable value;
+            MTRChannelClusterLineupInfoStruct * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [MTRChannelClusterLineupInfo new];
+                value = [MTRChannelClusterLineupInfoStruct new];
                 value.operatorName = [[NSString alloc] initWithBytes:cppValue.Value().operatorName.data()
                                                               length:cppValue.Value().operatorName.size()
                                                             encoding:NSUTF8StringEncoding];
@@ -12910,11 +12910,11 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRChannelClusterChannelInfo * _Nullable value;
+            MTRChannelClusterChannelInfoStruct * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [MTRChannelClusterChannelInfo new];
+                value = [MTRChannelClusterChannelInfoStruct new];
                 value.majorNumber = [NSNumber numberWithUnsignedShort:cppValue.Value().majorNumber];
                 value.minorNumber = [NSNumber numberWithUnsignedShort:cppValue.Value().minorNumber];
                 if (cppValue.Value().name.HasValue()) {
@@ -13945,8 +13945,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRAudioOutputClusterOutputInfo * newElement_0;
-                    newElement_0 = [MTRAudioOutputClusterOutputInfo new];
+                    MTRAudioOutputClusterOutputInfoStruct * newElement_0;
+                    newElement_0 = [MTRAudioOutputClusterOutputInfoStruct new];
                     newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
                     newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
                     newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()

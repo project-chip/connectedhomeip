@@ -74,8 +74,6 @@ tests:
           values:
               - name: "tiltPercent100thsValue"
                 value: 3000
-              - name: "tiltPercentageValue"
-                value: 30
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
     - label: "2b: DUT updates its attributes"
@@ -143,8 +141,6 @@ tests:
           values:
               - name: "tiltPercent100thsValue"
                 value: 6005
-              - name: "tiltPercentageValue"
-                value: 60
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
     - label: "4b: DUT updates its attributes"

@@ -23,7 +23,7 @@
 
 using chip::app::AttributeValueEncoder;
 using AudioOutputDelegate = chip::app::Clusters::AudioOutput::Delegate;
-using OutputInfoType      = chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type;
+using OutputInfoType      = chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type;
 
 class AudioOutputManager : public AudioOutputDelegate
 {

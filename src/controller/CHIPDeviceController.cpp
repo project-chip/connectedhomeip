@@ -38,7 +38,6 @@
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <zap-generated/CHIPClusters.h>
 
 #include <app/server/Dnssd.h>
 
@@ -969,8 +968,7 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * 
 
     OperationalCredentials::Commands::CertificateChainRequest::Type request;
     request.certificateType = static_cast<OperationalCredentials::CertificateChainTypeEnum>(certificateType);
-    return SendCommand<OperationalCredentialsCluster>(device, request, OnCertificateChainResponse,
-                                                      OnCertificateChainFailureResponse, timeout);
+    return SendCommand(device, request, OnCertificateChainResponse, OnCertificateChainFailureResponse, timeout);
 
     return CHIP_NO_ERROR;
 }
@@ -1006,8 +1004,7 @@ CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * devic
     OperationalCredentials::Commands::AttestationRequest::Type request;
     request.attestationNonce = attestationNonce;
 
-    ReturnErrorOnFailure(
-        SendCommand<OperationalCredentialsCluster>(device, request, OnAttestationResponse, OnAttestationFailureResponse, timeout));
+    ReturnErrorOnFailure(SendCommand(device, request, OnAttestationResponse, OnAttestationFailureResponse, timeout));
     ChipLogDetail(Controller, "Sent Attestation request, waiting for the Attestation Information");
     return CHIP_NO_ERROR;
 }
@@ -1140,7 +1137,7 @@ void DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningSta
     request.expiryLengthSeconds = armFailSafeTimeout;
     request.breadcrumb          = breadcrumb;
     ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
-    SendCommand<GeneralCommissioningCluster>(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
+    SendCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
 }
 
 void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
@@ -1162,9 +1159,8 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
         ChipLogProgress(Controller, "Changing fail-safe timer to %u seconds to handle DA failure", request.expiryLengthSeconds);
         // Per spec, anything we do with the fail-safe armed must not time out
         // in less than kMinimumCommissioningStepTimeout.
-        SendCommand<GeneralCommissioningCluster>(mDeviceBeingCommissioned, request, OnArmFailSafeExtendedForDeviceAttestation,
-                                                 OnFailedToExtendedArmFailSafeDeviceAttestation,
-                                                 MakeOptional(kMinimumCommissioningStepTimeout));
+        SendCommand(mDeviceBeingCommissioned, request, OnArmFailSafeExtendedForDeviceAttestation,
+                    OnFailedToExtendedArmFailSafeDeviceAttestation, MakeOptional(kMinimumCommissioningStepTimeout));
     }
     else
     {
@@ -1217,8 +1213,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     OperationalCredentials::Commands::CSRRequest::Type request;
     request.CSRNonce = csrNonce;
 
-    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateSigningRequest,
-                                                                    OnCSRFailureResponse, timeout));
+    ReturnErrorOnFailure(SendCommand(device, request, OnOperationalCertificateSigningRequest, OnCSRFailureResponse, timeout));
     ChipLogDetail(Controller, "Sent CSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
@@ -1340,8 +1335,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     request.caseAdminSubject = adminSubject;
     request.adminVendorId    = mVendorId;
 
-    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse,
-                                                                    OnAddNOCFailureResponse, timeout));
+    ReturnErrorOnFailure(SendCommand(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse, timeout));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1425,8 +1419,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, 
 
     OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
     request.rootCACertificate = rcac;
-    ReturnErrorOnFailure(
-        SendCommand<OperationalCredentialsCluster>(device, request, OnRootCertSuccessResponse, OnRootCertFailureResponse, timeout));
+    ReturnErrorOnFailure(SendCommand(device, request, OnRootCertSuccessResponse, OnRootCertFailureResponse, timeout));
 
     ChipLogProgress(Controller, "Sent root certificate to the device");
 
@@ -1576,8 +1569,8 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         ChipLogProgress(Controller, "Expiring failsafe on proxy %p", proxy);
         mDeviceBeingCommissioned = proxy;
         // We actually want to do the same thing on success or failure because we're already in a failure state
-        SendCommand<GeneralCommissioningCluster>(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure,
-                                                 /* timeout = */ NullOptional);
+        SendCommand(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure,
+                    /* timeout = */ NullOptional);
     }
 }
 
@@ -2187,7 +2180,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             request.ssid.Emplace(params.GetWiFiCredentials().Value().ssid);
         }
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
         break;
     }
     case CommissioningStage::kNeedsNetworkCreds: {
@@ -2253,7 +2246,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         request.newRegulatoryConfig = regulatoryConfig;
         request.countryCode         = countryCode;
         request.breadcrumb          = breadcrumb;
-        SendCommand<GeneralCommissioningCluster>(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kSendPAICertificateRequest:
@@ -2398,7 +2391,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         request.ssid        = params.GetWiFiCredentials().Value().ssid;
         request.credentials = params.GetWiFiCredentials().Value().credentials;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kThreadNetworkSetup: {
@@ -2411,7 +2404,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
         request.operationalDataset = params.GetThreadOperationalDataset().Value();
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kWiFiNetworkEnable: {
@@ -2424,7 +2417,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kThreadNetworkEnable: {
@@ -2441,7 +2434,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = extendedPanId;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kFindOperational: {
@@ -2453,8 +2446,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kSendComplete: {
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint,
-                                                 timeout);
+        SendCommand(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kCleanup:

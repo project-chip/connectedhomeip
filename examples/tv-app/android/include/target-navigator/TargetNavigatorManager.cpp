@@ -54,11 +54,11 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                 if (value[attrId].isArray())
                 {
                     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                        int i                = 0;
-                        std::string targetId = to_string(
-                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Fields::kIdentifier));
+                        int i                  = 0;
+                        std::string targetId   = to_string(static_cast<uint32_t>(
+                            chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kIdentifier));
                         std::string targetName = to_string(
-                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Fields::kName));
+                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kName));
                         for (Json::Value & entry : value[attrId])
                         {
                             if (!entry[targetId].isUInt() || !entry[targetName].isString() || entry[targetId].asUInt() > 255)

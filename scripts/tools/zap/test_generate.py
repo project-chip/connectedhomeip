@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -122,6 +122,12 @@ class GeneratorTest:
                                 f"Copying updated golden image from {actual} to {expected}")
                             subprocess.check_call(["cp", actual, expected])
                         else:
+                            print("*"*80)
+                            print("* Golden image regeneration seems to have failed.")
+                            print("* Documentation regarding code-generation logic available at docs/code_generation.md")
+                            print("*\n* Specifically to update golden images, you may want to run:")
+                            print("*\n* ./scripts/tools/zap/test_generate.py --output out/gen --regenerate")
+                            print("*\n" + "*"*80)
                             raise
 
 

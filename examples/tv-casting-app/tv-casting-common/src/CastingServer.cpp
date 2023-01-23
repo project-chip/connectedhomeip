@@ -315,7 +315,7 @@ CastingServer::ContentLauncherLaunchURL(TargetEndpointInfo * endpoint, const cha
                                         std::function<void(CHIP_ERROR)> launchURLResponseCallback)
 {
     return ContentLauncher_LaunchURL(endpoint, contentUrl, contentDisplayStr,
-                                     MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type()),
+                                     MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type()),
                                      launchURLResponseCallback);
 }
 
@@ -520,17 +520,16 @@ void CastingServer::Disconnect()
  */
 CHIP_ERROR CastingServer::ContentLauncher_LaunchURL(
     TargetEndpointInfo * endpoint, const char * contentUrl, const char * contentDisplayStr,
-    chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+    chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type> brandingInformation,
     std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mLaunchURLCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
     return mLaunchURLCommand.Invoke(contentUrl, contentDisplayStr, brandingInformation, responseCallback);
 }
 
-CHIP_ERROR CastingServer::ContentLauncher_LaunchContent(TargetEndpointInfo * endpoint,
-                                                        chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
-                                                        bool autoPlay, chip::Optional<chip::CharSpan> data,
-                                                        std::function<void(CHIP_ERROR)> responseCallback)
+CHIP_ERROR CastingServer::ContentLauncher_LaunchContent(
+    TargetEndpointInfo * endpoint, chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type search, bool autoPlay,
+    chip::Optional<chip::CharSpan> data, std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mLaunchContentCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
     return mLaunchContentCommand.Invoke(search, autoPlay, data, responseCallback);

@@ -76,7 +76,10 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
                 return;
             }
 
-            mRequestor->NotifyUpdateApplied();
+            if (mSendNotifyUpdateApplied)
+            {
+                mRequestor->NotifyUpdateApplied();
+            }
         });
     }
     else if ((mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle))

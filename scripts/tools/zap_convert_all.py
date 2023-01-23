@@ -33,25 +33,30 @@ def checkPythonVersion():
         exit(1)
 
 
-zapFilesToSkip = [
+zapFilesToSkip = {
     # examples/chef/sample_app_util/test_files/sample_zap_file.zap is
     # not a real .zap file; it's input to generating .zap files.  So
     # the path to zcl.json in it is just wrong, and we should skip it.
     "examples/chef/sample_app_util/test_files/sample_zap_file.zap",
-]
+}
 
 
 def getTargets():
+    ROOTS_TO_SEARCH = [
+        './examples',
+        './src/darwin',
+        './src/controller/data_model',
+        './scripts/tools/zap/tests/inputs',
+    ]
+
     targets = []
-    targets.extend([[str(filepath)]
-                   for filepath in Path('./examples').rglob('*.zap')
-                    if str(filepath) not in zapFilesToSkip])
-    targets.extend([[str(filepath)]
-                   for filepath in Path('./src/darwin').rglob('*.zap')
-                    if str(filepath) not in zapFilesToSkip])
-    targets.extend([[str(filepath)] for filepath in Path(
-        './src/controller/data_model').rglob('*.zap')
-        if str(filepath) not in zapFilesToSkip])
+    for root in ROOTS_TO_SEARCH:
+        for filepath in Path(root).rglob('*.zap'):
+            path = str(filepath)
+            if path in zapFilesToSkip:
+                continue
+            targets.append(path)
+
     return targets
 
 
@@ -62,7 +67,9 @@ def runArgumentsParser():
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
+    parser.add_argument('--dry-run', action='store_true', dest='dry_run')
     parser.set_defaults(parallel=True)
+    parser.set_defaults(dry_run=False)
 
     return parser.parse_args()
 
@@ -84,6 +91,11 @@ def main():
     os.chdir(CHIP_ROOT_DIR)
 
     targets = getTargets()
+
+    if args.dry_run:
+        for target in targets:
+            print(f"Should convert {target}")
+        sys.exit(0)
 
     if args.parallel:
         # Ensure each zap run is independent

@@ -70,6 +70,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 constexpr uint16_t kOptionAutoApplyImage       = 'a';
 constexpr uint16_t kOptionRequestorCanConsent  = 'c';
+constexpr uint16_t kOptionDisableNotify        = 'd';
 constexpr uint16_t kOptionOtaDownloadPath      = 'f';
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionUserConsentState     = 'u';
@@ -81,10 +82,12 @@ uint32_t gWatchdogTimeoutSec      = 0;
 chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 bool gAutoApplyImage                           = false;
+bool gSendNotifyUpdateApplied                  = true;
 
 OptionDef cmdLineOptionsDef[] = {
     { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
     { "requestorCanConsent", chip::ArgParser::kArgumentRequired, kOptionRequestorCanConsent },
+    { "disableNotifyUpdateApplied", chip::ArgParser::kNoArgument, kOptionDisableNotify },
     { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
@@ -92,6 +95,7 @@ OptionDef cmdLineOptionsDef[] = {
     {},
 };
 
+// Options for various test scenarios
 OptionSet cmdLineOptions = {
     HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
     "  -a, --autoApplyImage\n"
@@ -100,6 +104,9 @@ OptionSet cmdLineOptions = {
     "  -c, --requestorCanConsent <true | false>\n"
     "       Value for the RequestorCanConsent field in the QueryImage command.\n"
     "       If not supplied, the value is determined by the driver.\n"
+    "  -d, --disableNotifyUpdateApplied\n"
+    "       If supplied, disable sending of the NotifyUpdateApplied command.\n"
+    "       Otherwise, after successfully loading into the updated image, send the NotifyUpdateApplied command.\n"
     "  -f, --otaDownloadPath <file path>\n"
     "       If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
     "       Otherwise, the default location for the downloaded image is at /tmp/test.bin\n"
@@ -181,6 +188,7 @@ static void InitOTARequestor(void)
 
     // Watchdog timeout can be set any time before a query image is sent
     gRequestorUser.SetWatchdogTimeout(gWatchdogTimeoutSec);
+    gRequestorUser.SetSendNotifyUpdateApplied(gSendNotifyUpdateApplied);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
@@ -312,6 +320,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         break;
     case kOptionWatchdogTimeout:
         gWatchdogTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        break;
+    case kOptionDisableNotify:
+        // By default, NotifyUpdateApplied should always be sent. In the presence of this option, disable sending of the command.
+        gSendNotifyUpdateApplied = false;
         break;
     default:
         ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

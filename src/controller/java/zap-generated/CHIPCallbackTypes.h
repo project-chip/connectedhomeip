@@ -1393,8 +1393,8 @@ typedef void (*CHIPBallastConfigurationClusterMinLevelAttributeCallbackType)(
     void *, chip::app::Clusters::BallastConfiguration::Attributes::MinLevel::TypeInfo::DecodableArgType);
 typedef void (*CHIPBallastConfigurationClusterMaxLevelAttributeCallbackType)(
     void *, chip::app::Clusters::BallastConfiguration::Attributes::MaxLevel::TypeInfo::DecodableArgType);
-typedef void (*CHIPBallastConfigurationClusterIntrinsicBalanceFactorAttributeCallbackType)(
-    void *, chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBalanceFactor::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterIntrinsicBallastFactorAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBallastFactor::TypeInfo::DecodableArgType);
 typedef void (*CHIPBallastConfigurationClusterBallastFactorAdjustmentAttributeCallbackType)(
     void *, chip::app::Clusters::BallastConfiguration::Attributes::BallastFactorAdjustment::TypeInfo::DecodableArgType);
 typedef void (*CHIPBallastConfigurationClusterLampQuantityAttributeCallbackType)(
@@ -1652,8 +1652,8 @@ typedef void (*CHIPKeypadInputClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::KeypadInput::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPKeypadInputClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-typedef void (*CHIPContentLauncherClusterLaunchResponseCallbackType)(
-    void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType &);
+typedef void (*CHIPContentLauncherClusterLauncherResponseCallbackType)(
+    void *, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &);
 
 typedef void (*CHIPContentLauncherClusterAcceptHeaderAttributeCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableType &);

@@ -14,6 +14,13 @@
 
 name: 10.3.1. [TC-RH-3.1] Attributes with Client as DUT
 
+PICS:
+    - RH.C
+    - RH.C.AM-READ
+    - RH.C.AO-READ
+    - RH.C.AM-WRITE
+    - RH.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Relative Humidity Measurement"

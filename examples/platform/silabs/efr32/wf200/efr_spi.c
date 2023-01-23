@@ -48,6 +48,12 @@
 #include "sl_wfx_task.h"
 #include "wfx_host_events.h"
 
+#if defined(EFR32MG24)
+#include "spi_multiplex.h"
+StaticSemaphore_t spi_sem_peripharal;
+SemaphoreHandle_t spi_sem_sync_hdl;
+peripheraltype_t pr_type = EXP_HDR;
+#endif
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
@@ -91,9 +97,9 @@ sl_status_t sl_wfx_host_init_bus(void)
      * not controlled by EUSART so there is no write to the corresponding
      * EUSARTROUTE register to do this.
      */
-    MY_USART->CTRL |= (1u << _USART_CTRL_SMSDELAY_SHIFT);
 
 #if defined(EFR32MG12)
+    MY_USART->CTRL |= (1u << _USART_CTRL_SMSDELAY_SHIFT);
     MY_USART->ROUTEPEN = USART_ROUTEPEN_TXPEN | USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_CLKPEN;
 #endif
 
@@ -106,6 +112,10 @@ sl_status_t sl_wfx_host_init_bus(void)
     spi_sem = xSemaphoreCreateBinaryStatic(&xEfrSpiSemaBuffer);
     xSemaphoreGive(spi_sem);
 
+#if defined(EFR32MG24)
+    spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripharal);
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif
     return SL_STATUS_OK;
 }
 
@@ -236,6 +246,18 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
                                                   uint8_t * buffer, uint16_t buffer_length)
 {
     sl_status_t result = SL_STATUS_FAIL;
+#if defined(EFR32MG24)
+    if (pr_type != EXP_HDR)
+    {
+        pr_type = EXP_HDR;
+        set_spi_baudrate(pr_type);
+    }
+    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
+    {
+        return SL_STATUS_TIMEOUT;
+    }
+    sl_wfx_host_spi_cs_assert();
+#endif
     const bool is_read = (type == SL_WFX_BUS_READ);
 
     while (!(MY_USART->STATUS & USART_STATUS_TXBL))
@@ -286,7 +308,10 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
             result = SL_STATUS_TIMEOUT;
         }
     }
-
+#if defined(EFR32MG24)
+    sl_wfx_host_spi_cs_deassert();
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif
     return result;
 }
 
@@ -403,6 +428,10 @@ void sl_wfx_host_gpio_init(void)
     // Enable GPIO clock.
     CMU_ClockEnable(cmuClock_GPIO, true);
 
+#if defined(EFR32MG24)
+    // configure WF200 CS pin.
+    GPIO_PinModeSet(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN, gpioModePushPull, 1);
+#endif
     // Configure WF200 reset pin.
     GPIO_PinModeSet(SL_WFX_HOST_PINOUT_RESET_PORT, SL_WFX_HOST_PINOUT_RESET_PIN, gpioModePushPull, 0);
     // Configure WF200 WUP pin.

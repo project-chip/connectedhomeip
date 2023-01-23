@@ -17357,7 +17357,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface IntrinsicBalanceFactorAttributeCallback {
+    public interface IntrinsicBallastFactorAttributeCallback {
       void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
@@ -17484,24 +17484,24 @@ public class ChipClusters {
       subscribeMaxLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readIntrinsicBalanceFactorAttribute(
-        IntrinsicBalanceFactorAttributeCallback callback) {
-      readIntrinsicBalanceFactorAttribute(chipClusterPtr, callback);
+    public void readIntrinsicBallastFactorAttribute(
+        IntrinsicBallastFactorAttributeCallback callback) {
+      readIntrinsicBallastFactorAttribute(chipClusterPtr, callback);
     }
 
-    public void writeIntrinsicBalanceFactorAttribute(
+    public void writeIntrinsicBallastFactorAttribute(
         DefaultClusterCallback callback, Integer value) {
-      writeIntrinsicBalanceFactorAttribute(chipClusterPtr, callback, value, null);
+      writeIntrinsicBallastFactorAttribute(chipClusterPtr, callback, value, null);
     }
 
-    public void writeIntrinsicBalanceFactorAttribute(
+    public void writeIntrinsicBallastFactorAttribute(
         DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      writeIntrinsicBalanceFactorAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+      writeIntrinsicBallastFactorAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
-    public void subscribeIntrinsicBalanceFactorAttribute(
-        IntrinsicBalanceFactorAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeIntrinsicBalanceFactorAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeIntrinsicBallastFactorAttribute(
+        IntrinsicBallastFactorAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeIntrinsicBallastFactorAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readBallastFactorAdjustmentAttribute(
@@ -17729,18 +17729,18 @@ public class ChipClusters {
     private native void subscribeMaxLevelAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readIntrinsicBalanceFactorAttribute(
-        long chipClusterPtr, IntrinsicBalanceFactorAttributeCallback callback);
+    private native void readIntrinsicBallastFactorAttribute(
+        long chipClusterPtr, IntrinsicBallastFactorAttributeCallback callback);
 
-    private native void writeIntrinsicBalanceFactorAttribute(
+    private native void writeIntrinsicBallastFactorAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
         Integer value,
         @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeIntrinsicBalanceFactorAttribute(
+    private native void subscribeIntrinsicBallastFactorAttribute(
         long chipClusterPtr,
-        IntrinsicBalanceFactorAttributeCallback callback,
+        IntrinsicBallastFactorAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -19351,7 +19351,7 @@ public class ChipClusters {
     }
 
     public interface ChannelListAttributeCallback {
-      void onSuccess(List<ChipStructs.ChannelClusterChannelInfo> valueList);
+      void onSuccess(List<ChipStructs.ChannelClusterChannelInfoStruct> valueList);
 
       void onError(Exception ex);
 
@@ -20584,16 +20584,16 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void launchContent(
-        LaunchResponseCallback callback,
-        ChipStructs.ContentLauncherClusterContentSearch search,
+        LauncherResponseCallback callback,
+        ChipStructs.ContentLauncherClusterContentSearchStruct search,
         Boolean autoPlay,
         Optional<String> data) {
       launchContent(chipClusterPtr, callback, search, autoPlay, data, null);
     }
 
     public void launchContent(
-        LaunchResponseCallback callback,
-        ChipStructs.ContentLauncherClusterContentSearch search,
+        LauncherResponseCallback callback,
+        ChipStructs.ContentLauncherClusterContentSearchStruct search,
         Boolean autoPlay,
         Optional<String> data,
         int timedInvokeTimeoutMs) {
@@ -20601,18 +20601,18 @@ public class ChipClusters {
     }
 
     public void launchURL(
-        LaunchResponseCallback callback,
+        LauncherResponseCallback callback,
         String contentURL,
         Optional<String> displayString,
-        Optional<ChipStructs.ContentLauncherClusterBrandingInformation> brandingInformation) {
+        Optional<ChipStructs.ContentLauncherClusterBrandingInformationStruct> brandingInformation) {
       launchURL(chipClusterPtr, callback, contentURL, displayString, brandingInformation, null);
     }
 
     public void launchURL(
-        LaunchResponseCallback callback,
+        LauncherResponseCallback callback,
         String contentURL,
         Optional<String> displayString,
-        Optional<ChipStructs.ContentLauncherClusterBrandingInformation> brandingInformation,
+        Optional<ChipStructs.ContentLauncherClusterBrandingInformationStruct> brandingInformation,
         int timedInvokeTimeoutMs) {
       launchURL(
           chipClusterPtr,
@@ -20625,21 +20625,21 @@ public class ChipClusters {
 
     private native void launchContent(
         long chipClusterPtr,
-        LaunchResponseCallback Callback,
-        ChipStructs.ContentLauncherClusterContentSearch search,
+        LauncherResponseCallback Callback,
+        ChipStructs.ContentLauncherClusterContentSearchStruct search,
         Boolean autoPlay,
         Optional<String> data,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void launchURL(
         long chipClusterPtr,
-        LaunchResponseCallback Callback,
+        LauncherResponseCallback Callback,
         String contentURL,
         Optional<String> displayString,
-        Optional<ChipStructs.ContentLauncherClusterBrandingInformation> brandingInformation,
+        Optional<ChipStructs.ContentLauncherClusterBrandingInformationStruct> brandingInformation,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    public interface LaunchResponseCallback {
+    public interface LauncherResponseCallback {
       void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
@@ -20855,7 +20855,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface OutputListAttributeCallback {
-      void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfo> valueList);
+      void onSuccess(List<ChipStructs.AudioOutputClusterOutputInfoStruct> valueList);
 
       void onError(Exception ex);
 

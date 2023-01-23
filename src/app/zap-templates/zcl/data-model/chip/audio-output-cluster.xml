@@ -24,33 +24,33 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for controlling the Output on a media device such as a TV.</description>
-    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="ARRAY" entryType="OutputInfo" length="254"          writable="false"  optional="false">OutputList</attribute>
-    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="INT8U" default="0x00"         min="0x00" max="0xFF" writable="false"  optional="true">CurrentOutput</attribute>
+    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="ARRAY" entryType="OutputInfoStruct" length="254"          writable="false"  optional="false">OutputList</attribute>
+    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="INT8U" default="0x00"               min="0x00" max="0xFF" writable="false"  optional="true">CurrentOutput</attribute>
 
     <command source="client" code="0x00" name="SelectOutput" optional="false">
       <description>Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List.</description>
-      <arg name="index" type="INT8U"/>
+      <arg name="Index" type="INT8U"/>
     </command>
 
     <command source="client" code="0x01" name="RenameOutput" optional="true">
       <description>Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus.</description>
-      <arg name="index" type="INT8U"/>
-      <arg name="name" type="CHAR_STRING"/>
+      <arg name="Index" type="INT8U"/>
+      <arg name="Name" type="CHAR_STRING"/>
     </command>
 
   </cluster>
 
-  <struct name="OutputInfo">
+  <struct name="OutputInfoStruct">
     <cluster code="0x050b"/>
-    <item name="index" type="INT8U"/>
-    <item name="outputType" type="OutputTypeEnum"/>
-    <item name="name" type="CHAR_STRING" length="32"/>
+    <item name="Index" type="INT8U"/>
+    <item name="OutputType" type="OutputTypeEnum"/>
+    <item name="Name" type="CHAR_STRING" length="32"/>
   </struct>
 
   <enum name="OutputTypeEnum" type="ENUM8">
     <cluster code="0x050b"/>
-    <item name="Hdmi" value="0x00"/>
-    <item name="Bt" value="0x01"/>
+    <item name="HDMI" value="0x00"/>
+    <item name="BT" value="0x01"/>
     <item name="Optical" value="0x02"/>
     <item name="Headphone" value="0x03"/>
     <item name="Internal" value="0x04"/>

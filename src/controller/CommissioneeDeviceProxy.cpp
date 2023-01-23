@@ -26,8 +26,6 @@
 
 #include <controller/CommissioneeDeviceProxy.h>
 
-#include <zap-generated/CHIPClusters.h>
-
 #include <app/CommandSender.h>
 #include <app/ReadPrepareParams.h>
 #include <app/util/DataModelHandler.h>

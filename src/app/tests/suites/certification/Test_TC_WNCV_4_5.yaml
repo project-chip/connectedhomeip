@@ -48,10 +48,8 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.C05.Rsp
       arguments:
           values:
-              - name: "LiftPercent100thsValue"
+              - name: "liftPercent100thsValue"
                 value: 9000
-              - name: "LiftPercentageValue"
-                value: 90
 
     #
     # TODO: For some reason, the window-covering server impl arms a 5s timer before it actually
@@ -86,10 +84,8 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "TiltPercent100thsValue"
+              - name: "tiltPercent100thsValue"
                 value: 9000
-              - name: "TiltPercentageValue"
-                value: 90
 
     #
     # TODO: For some reason, the window-covering server impl arms a 5s timer before it actually

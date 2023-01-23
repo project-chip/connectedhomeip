@@ -47,7 +47,7 @@ tests:
       command: "LaunchApp"
       arguments:
           values:
-              - name: "Data"
+              - name: "data"
                 value: "Hello World"
               - name: "application"
                 value:

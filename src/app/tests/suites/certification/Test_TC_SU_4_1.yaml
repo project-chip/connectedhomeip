@@ -29,7 +29,7 @@ tests:
           first fabric to the DUT. TH2 is set as the default Provider for the
           fabric."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]" 0x0000001234567890 0
+          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
 
           verify success response on chip-tool logs:
 
@@ -42,9 +42,9 @@ tests:
       verification: |
           ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
 
-          verify on chip-tool logs:
+          verify DefaultOtaProviders on chip-tool logs:
 
-          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOTAProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
           [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 1
           [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
@@ -70,9 +70,9 @@ tests:
       verification: |
           ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
 
-          verify on chip-tool logs:
+          verify DefaultOtaProviders on chip-tool logs:
 
-          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOTAProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
           [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 1
           [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
@@ -81,9 +81,9 @@ tests:
 
           ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
 
-          verify on chip-tool logs:
+          verify DefaultOtaProviders on chip-tool logs:
 
-          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOTAProviders: 1 entries
+          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277543492] [26864:35434761] CHIP: [TOO]     [1]: {
           [1651277543492] [26864:35434761] CHIP: [TOO]       ProviderNodeID: 5
           [1651277543492] [26864:35434761] CHIP: [TOO]       Endpoint: 0
@@ -100,15 +100,15 @@ tests:
       verification: |
           ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 10, "endpoint": 0}, {"fabricIndex": 1, "providerNodeID": 20, "endpoint": 0}]" 0x0000001234567890 0
 
-          verify on chip-tool logs:
+          verify Constraint_Error on chip-tool logs:
 
           [1651278243153] [27005:35448520] CHIP: [TOO] Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
 
           ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
 
-          verify on chip-tool logs:
+          verify DefaultOtaProviders on chip-tool logs:
 
-          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOTAProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
           [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 10
           [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
@@ -117,9 +117,9 @@ tests:
 
           chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
 
-          verify on chip-tool logs:
+          verify DefaultOtaProviders on chip-tool logs:
 
-          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOTAProviders: 1 entries
+          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277543492] [26864:35434761] CHIP: [TOO]     [1]: {
           [1651277543492] [26864:35434761] CHIP: [TOO]       ProviderNodeID: 5
           [1651277543492] [26864:35434761] CHIP: [TOO]       Endpoint: 0
@@ -135,16 +135,16 @@ tests:
       verification: |
           chip-tool otasoftwareupdaterequestor write default-ota-providers "[]" 0x858 0 --commissioner-name beta
 
-          verify on chip-tool logs:
+          verify the Success response on chip-tool logs:
 
           status = 0x00 (SUCCESS),
 
 
           ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
 
-          verify on chip-tool logs:
+          verify DefaultOtaProviders on chip-tool logs:
 
-          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOTAProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
           [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 10
           [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
@@ -153,9 +153,9 @@ tests:
 
           ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
 
-          verify on chip-tool logs:
+          verify DefaultOtaProviders on chip-tool logs:
 
-          [1651280268033] [27804:35481732] CHIP: [TOO]   DefaultOTAProviders: 0 entries
+          [1651280268033] [27804:35481732] CHIP: [TOO]   DefaultOtaProviders: 0 entries
       disabled: true
 
     - label:

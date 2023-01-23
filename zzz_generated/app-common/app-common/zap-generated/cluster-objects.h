@@ -19494,7 +19494,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxLevel
-namespace IntrinsicBalanceFactor {
+namespace IntrinsicBallastFactor {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<uint8_t>;
@@ -19502,10 +19502,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBalanceFactor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBallastFactor::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace IntrinsicBalanceFactor
+} // namespace IntrinsicBallastFactor
 namespace BallastFactorAdjustment {
 struct TypeInfo
 {
@@ -19648,7 +19648,7 @@ struct TypeInfo
         Attributes::BallastStatus::TypeInfo::DecodableType ballastStatus       = static_cast<uint8_t>(0);
         Attributes::MinLevel::TypeInfo::DecodableType minLevel                 = static_cast<uint8_t>(0);
         Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                 = static_cast<uint8_t>(0);
-        Attributes::IntrinsicBalanceFactor::TypeInfo::DecodableType intrinsicBalanceFactor;
+        Attributes::IntrinsicBallastFactor::TypeInfo::DecodableType intrinsicBallastFactor;
         Attributes::BallastFactorAdjustment::TypeInfo::DecodableType ballastFactorAdjustment;
         Attributes::LampQuantity::TypeInfo::DecodableType lampQuantity = static_cast<uint8_t>(0);
         Attributes::LampType::TypeInfo::DecodableType lampType;
@@ -20547,7 +20547,7 @@ struct TypeInfo
 } // namespace WakeOnLan
 namespace Channel {
 namespace Structs {
-namespace ChannelInfo {
+namespace ChannelInfoStruct {
 enum class Fields
 {
     kMajorNumber       = 0,
@@ -20575,8 +20575,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ChannelInfo
-namespace LineupInfo {
+} // namespace ChannelInfoStruct
+namespace LineupInfoStruct {
 enum class Fields
 {
     kOperatorName   = 0,
@@ -20602,7 +20602,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace LineupInfo
+} // namespace LineupInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -20772,10 +20772,11 @@ namespace Attributes {
 namespace ChannelList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::ChannelInfo::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelList::Id; }
@@ -20785,10 +20786,10 @@ struct TypeInfo
 namespace Lineup {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::Type>;
-    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType>;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Lineup::Id; }
@@ -20798,10 +20799,10 @@ struct TypeInfo
 namespace CurrentChannel {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::Type>;
-    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType>;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
@@ -22135,7 +22136,7 @@ struct TypeInfo
 } // namespace KeypadInput
 namespace ContentLauncher {
 namespace Structs {
-namespace Dimension {
+namespace DimensionStruct {
 enum class Fields
 {
     kWidth  = 0,
@@ -22159,8 +22160,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Dimension
-namespace AdditionalInfo {
+} // namespace DimensionStruct
+namespace AdditionalInfoStruct {
 enum class Fields
 {
     kName  = 0,
@@ -22182,8 +22183,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace AdditionalInfo
-namespace Parameter {
+} // namespace AdditionalInfoStruct
+namespace ParameterStruct {
 enum class Fields
 {
     kType           = 0,
@@ -22196,7 +22197,7 @@ struct Type
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    Optional<DataModel::List<const Structs::AdditionalInfo::Type>> externalIDList;
+    Optional<DataModel::List<const Structs::AdditionalInfoStruct::Type>> externalIDList;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -22208,15 +22209,15 @@ struct DecodableType
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    Optional<DataModel::DecodableList<Structs::AdditionalInfo::DecodableType>> externalIDList;
+    Optional<DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType>> externalIDList;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace Parameter
-namespace ContentSearch {
+} // namespace ParameterStruct
+namespace ContentSearchStruct {
 enum class Fields
 {
     kParameterList = 0,
@@ -22225,7 +22226,7 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const Structs::Parameter::Type> parameterList;
+    DataModel::List<const Structs::ParameterStruct::Type> parameterList;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -22235,18 +22236,18 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<Structs::Parameter::DecodableType> parameterList;
+    DataModel::DecodableList<Structs::ParameterStruct::DecodableType> parameterList;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace ContentSearch
-namespace StyleInformation {
+} // namespace ContentSearchStruct
+namespace StyleInformationStruct {
 enum class Fields
 {
-    kImageUrl = 0,
+    kImageURL = 0,
     kColor    = 1,
     kSize     = 2,
 };
@@ -22254,9 +22255,9 @@ enum class Fields
 struct Type
 {
 public:
-    Optional<chip::CharSpan> imageUrl;
+    Optional<chip::CharSpan> imageURL;
     Optional<chip::CharSpan> color;
-    Optional<Structs::Dimension::Type> size;
+    Optional<Structs::DimensionStruct::Type> size;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -22267,8 +22268,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace StyleInformation
-namespace BrandingInformation {
+} // namespace StyleInformationStruct
+namespace BrandingInformationStruct {
 enum class Fields
 {
     kProviderName = 0,
@@ -22283,11 +22284,11 @@ struct Type
 {
 public:
     chip::CharSpan providerName;
-    Optional<Structs::StyleInformation::Type> background;
-    Optional<Structs::StyleInformation::Type> logo;
-    Optional<Structs::StyleInformation::Type> progressBar;
-    Optional<Structs::StyleInformation::Type> splash;
-    Optional<Structs::StyleInformation::Type> waterMark;
+    Optional<Structs::StyleInformationStruct::Type> background;
+    Optional<Structs::StyleInformationStruct::Type> logo;
+    Optional<Structs::StyleInformationStruct::Type> progressBar;
+    Optional<Structs::StyleInformationStruct::Type> splash;
+    Optional<Structs::StyleInformationStruct::Type> waterMark;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -22298,7 +22299,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace BrandingInformation
+} // namespace BrandingInformationStruct
 } // namespace Structs
 
 namespace Commands {
@@ -22314,10 +22315,10 @@ struct Type;
 struct DecodableType;
 } // namespace LaunchURL
 
-namespace LaunchResponse {
+namespace LauncherResponse {
 struct Type;
 struct DecodableType;
-} // namespace LaunchResponse
+} // namespace LauncherResponse
 
 } // namespace Commands
 
@@ -22337,13 +22338,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    Structs::ContentSearch::Type search;
+    Structs::ContentSearchStruct::Type search;
     bool autoPlay = static_cast<bool>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType;
+    using ResponseType = Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -22354,7 +22355,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    Structs::ContentSearch::DecodableType search;
+    Structs::ContentSearchStruct::DecodableType search;
     bool autoPlay = static_cast<bool>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22377,11 +22378,11 @@ public:
 
     chip::CharSpan contentURL;
     Optional<chip::CharSpan> displayString;
-    Optional<Structs::BrandingInformation::Type> brandingInformation;
+    Optional<Structs::BrandingInformationStruct::Type> brandingInformation;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType;
+    using ResponseType = Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -22394,11 +22395,11 @@ public:
 
     chip::CharSpan contentURL;
     Optional<chip::CharSpan> displayString;
-    Optional<Structs::BrandingInformation::DecodableType> brandingInformation;
+    Optional<Structs::BrandingInformationStruct::DecodableType> brandingInformation;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURL
-namespace LaunchResponse {
+namespace LauncherResponse {
 enum class Fields
 {
     kStatus = 0,
@@ -22409,7 +22410,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
@@ -22425,14 +22426,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace LaunchResponse
+}; // namespace LauncherResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -22513,7 +22514,7 @@ struct TypeInfo
 } // namespace ContentLauncher
 namespace AudioOutput {
 namespace Structs {
-namespace OutputInfo {
+namespace OutputInfoStruct {
 enum class Fields
 {
     kIndex      = 0,
@@ -22537,7 +22538,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace OutputInfo
+} // namespace OutputInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -22630,10 +22631,11 @@ namespace Attributes {
 namespace OutputList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutputList::Id; }

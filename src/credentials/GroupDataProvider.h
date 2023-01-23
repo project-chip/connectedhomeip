@@ -113,7 +113,7 @@ public:
         GroupId group_id = kUndefinedGroupId;
         FabricIndex fabric_index;
         SecurityPolicy security_policy;
-        Crypto::SymmetricKeyContext * key = nullptr;
+        Crypto::SymmetricKeyContext * keyContext = nullptr;
     };
 
     // An EpochKey is a single key usable to determine an operational group key

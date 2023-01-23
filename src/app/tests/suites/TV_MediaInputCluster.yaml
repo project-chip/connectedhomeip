@@ -58,7 +58,7 @@ tests:
       command: "selectInput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: 1
 
     - label: "Hide Input Status Command"
@@ -71,9 +71,9 @@ tests:
       command: "renameInput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: 1
-              - name: "name"
+              - name: "Name"
                 value: "HDMI Test"
 
     - label: "Read attribute media input list"

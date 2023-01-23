@@ -30,10 +30,10 @@ tests:
           specific node that is, [Node = Specific, Endpoint = Specific, Cluster
           = Specific, Event = Specific]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
-          sudo ./chip-tool basic read-event start-up 1  0
+          ./chip-tool  basicinformation read-event start-up 1  0
 
           On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
@@ -83,7 +83,7 @@ tests:
           node that is, [Node = Specific, Endpoint = Specific, Cluster =
           Specific, Event = Wildcard]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            ./chip-tool any read-event-by-id 0x0028 0x0FFFFFFFF 1 0
           On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
@@ -176,9 +176,9 @@ tests:
           node that is, [Node = Specific, Endpoint = Wildcard, Cluster =
           Specific, Event = Specific]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          sudo ./chip-tool basic read-event start-up 1  0xFFFF
+           ./chip-tool  basicinformation read-event start-up 1  0xFFFF
 
           On TH(chip-tool), verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
@@ -228,9 +228,9 @@ tests:
           that is, [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
           Event = Wildcard]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          sudo ./chip-tool basic read-event-by-id 0xFFFFFFFF 1  0xFFFF
+          ./chip-tool  basicinformation read-event-by-id 0xFFFFFFFF 1  0xFFFF
           On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
           [1653051699.893049][11691:11696] CHIP:DMG: ReportDataMessage =
@@ -279,7 +279,7 @@ tests:
           [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
           Wildcard]."
       verification: |
-          sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1  0xFFFF
+          ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1  0xFFFF
           On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
           [1653051769.144914][11706:11711] CHIP:DMG: ReportDataMessage =
           [1653051769.144939][11706:11711] CHIP:DMG: {
@@ -415,7 +415,7 @@ tests:
           which requires a privilege that is not granted for the cluster in the
           path."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access
@@ -511,7 +511,7 @@ tests:
       verification: |
           To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]" 1 0
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
           On TH(chip-tool) verify DUT sends Report Data Message with no entry for that event in EventReports list.
 
@@ -532,7 +532,7 @@ tests:
           EventMin field set to a number less than what was received in the
           previous step."
       verification: |
-          sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+          ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
 
           On TH(chip-tool) verify that the DUT sends Report Data Message with EventReports
@@ -565,9 +565,9 @@ tests:
           [1655986008.401906][4813:4818] CHIP:TOO:    }
           [1655986008.402045][4813:4818] CHIP:EM: Sending Standalone Ack for MessageCounter:51662085 on exchange 4386i
 
-          sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --event-min 0
+          ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --event-min 0
 
-          On TH verify that the DUT sends Report Data Message with EventReports for event numbers higher than the EventMin field.
+          On TH verify that the DUT sends Report Data Message with EventReports for event numbers higher than or Equal to the EventMin field.
 
           [1655986113.735628][4843:4848] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
           [1655986113.735661][4843:4848] CHIP:TOO:          Event number: 0
@@ -604,8 +604,8 @@ tests:
           EventMin field set to a number much greater than what was received in
           the previous step."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-          sudo ./chip-tool basic read-event start-up 1 0 --event-min 131073
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+           ./chip-tool  basicinformation read-event start-up 1 0 --event-min 131073
 
           On TH(chip-tool) verify that the DUT sends  Report Data Message with empty EventReports
           [1650622225.700153][3069:3074] CHIP:DMG: ReportDataMessage =
