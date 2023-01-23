@@ -102,7 +102,7 @@ tests:
 
     - label: "Sends a Stop command"
       PICS: MEDIAPLAYBACK.S.C02.Rsp
-      command: "StopPlayback"
+      command: "Stop"
       response:
           values:
               - name: "status"

@@ -5976,7 +5976,7 @@ class ChipClusters:
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "StopPlayback",
+                    "commandName": "Stop",
                     "args": {
                     },
                 },

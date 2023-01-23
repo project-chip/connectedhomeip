@@ -12403,16 +12403,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)pauseWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 /**
- * Command StopPlayback
+ * Command Stop
  *
  * Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location
  * where media was originally launched.
  */
-- (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
-                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)stopPlaybackWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)stopWithParams:(MTRMediaPlaybackClusterStopParams * _Nullable)params
+            completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)stopWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 /**
  * Command StartOver
  *
@@ -12528,16 +12528,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                         completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeSampledPositionWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackPosition * _Nullable value,
+- (void)readAttributeSampledPositionWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable value,
                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeSampledPositionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                      reportHandler:(void (^)(MTRMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                      reportHandler:(void (^)(MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable value,
                                                         NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeSampledPositionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                  endpoint:(NSNumber *)endpoint
                                                     queue:(dispatch_queue_t)queue
-                                               completion:(void (^)(MTRMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                               completion:(void (^)(MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributePlaybackSpeedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
@@ -38780,12 +38780,11 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                    NSError * _Nullable error))completionHandler
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-            MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithParams:completion:");
+            MTR_NEWLY_DEPRECATED("Please use stopWithParams:completion:");
 - (void)stopPlaybackWithCompletionHandler:
     (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
-        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-            MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithCompletion:");
+        API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))MTR_NEWLY_DEPRECATED("Please use stopWithCompletion:");
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
           completionHandler:
               (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler

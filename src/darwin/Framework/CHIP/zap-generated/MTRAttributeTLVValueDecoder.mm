@@ -13248,11 +13248,11 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRMediaPlaybackClusterPlaybackPosition * _Nullable value;
+            MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [MTRMediaPlaybackClusterPlaybackPosition new];
+                value = [MTRMediaPlaybackClusterPlaybackPositionStruct new];
                 value.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.Value().updatedAt];
                 if (cppValue.Value().position.IsNull()) {
                     value.position = nil;

@@ -810,10 +810,15 @@ MTR_NEWLY_DEPRECATED("Please use MTRTargetNavigatorClusterTargetInfoStruct")
 @interface MTRTargetNavigatorClusterTargetInfo : MTRTargetNavigatorClusterTargetInfoStruct
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRMediaPlaybackClusterPlaybackPositionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull updatedAt MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable position MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRMediaPlaybackClusterPlaybackPosition : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull updatedAt API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable position API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRMediaPlaybackClusterPlaybackPositionStruct")
+@interface MTRMediaPlaybackClusterPlaybackPosition : MTRMediaPlaybackClusterPlaybackPositionStruct
 @end
 
 MTR_NEWLY_AVAILABLE

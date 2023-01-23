@@ -6521,7 +6521,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRMediaPlaybackClusterStopPlaybackParams
+@implementation MTRMediaPlaybackClusterStopParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6533,7 +6533,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMediaPlaybackClusterStopPlaybackParams alloc] init];
+    auto other = [[MTRMediaPlaybackClusterStopParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -6547,6 +6547,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRMediaPlaybackClusterStopPlaybackParams
 @end
 @implementation MTRMediaPlaybackClusterStartOverParams
 - (instancetype)init

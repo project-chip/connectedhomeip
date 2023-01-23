@@ -15305,24 +15305,25 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         value_position);
                 }
 
-                jclass playbackPositionStructClass_1;
+                jclass playbackPositionStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterPlaybackPosition", playbackPositionStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterPlaybackPositionStruct",
+                    playbackPositionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterPlaybackPosition");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterPlaybackPositionStruct");
                     return nullptr;
                 }
-                jmethodID playbackPositionStructCtor_1 =
-                    env->GetMethodID(playbackPositionStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
-                if (playbackPositionStructCtor_1 == nullptr)
+                jmethodID playbackPositionStructStructCtor_1 =
+                    env->GetMethodID(playbackPositionStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
+                if (playbackPositionStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterPlaybackPosition constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterPlaybackPositionStruct constructor");
                     return nullptr;
                 }
 
-                value =
-                    env->NewObject(playbackPositionStructClass_1, playbackPositionStructCtor_1, value_updatedAt, value_position);
+                value = env->NewObject(playbackPositionStructStructClass_1, playbackPositionStructStructCtor_1, value_updatedAt,
+                                       value_position);
             }
             return value;
         }

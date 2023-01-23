@@ -1478,11 +1478,11 @@ public class ChipStructs {
     }
   }
 
-  public static class MediaPlaybackClusterPlaybackPosition {
+  public static class MediaPlaybackClusterPlaybackPositionStruct {
     public Long updatedAt;
     public @Nullable Long position;
 
-    public MediaPlaybackClusterPlaybackPosition(Long updatedAt, @Nullable Long position) {
+    public MediaPlaybackClusterPlaybackPositionStruct(Long updatedAt, @Nullable Long position) {
       this.updatedAt = updatedAt;
       this.position = position;
     }
@@ -1490,7 +1490,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("MediaPlaybackClusterPlaybackPosition {\n");
+      output.append("MediaPlaybackClusterPlaybackPositionStruct {\n");
       output.append("\tupdatedAt: ");
       output.append(updatedAt);
       output.append("\n");

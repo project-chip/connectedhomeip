@@ -8975,13 +8975,14 @@ void MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType> &
+        value)
 {
-    MTRMediaPlaybackClusterPlaybackPosition * _Nullable objCValue;
+    MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable objCValue;
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [MTRMediaPlaybackClusterPlaybackPosition new];
+        objCValue = [MTRMediaPlaybackClusterPlaybackPositionStruct new];
         objCValue.updatedAt = [NSNumber numberWithUnsignedLongLong:value.Value().updatedAt];
         if (value.Value().position.IsNull()) {
             objCValue.position = nil;

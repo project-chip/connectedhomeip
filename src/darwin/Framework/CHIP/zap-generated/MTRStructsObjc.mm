@@ -3352,7 +3352,7 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRTargetNavigatorClusterTargetInfo : MTRTargetNavigatorClusterTargetInfoStruct
 @end
 
-@implementation MTRMediaPlaybackClusterPlaybackPosition
+@implementation MTRMediaPlaybackClusterPlaybackPositionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3366,7 +3366,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRMediaPlaybackClusterPlaybackPosition alloc] init];
+    auto other = [[MTRMediaPlaybackClusterPlaybackPositionStruct alloc] init];
 
     other.updatedAt = self.updatedAt;
     other.position = self.position;
@@ -3381,6 +3381,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRMediaPlaybackClusterPlaybackPosition : MTRMediaPlaybackClusterPlaybackPositionStruct
 @end
 
 @implementation MTRMediaInputClusterInputInfoStruct
