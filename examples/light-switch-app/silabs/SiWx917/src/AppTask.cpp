@@ -62,9 +62,6 @@
 
 #define SYSTEM_STATE_LED &sl_led_led0
 
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_LIGHT_SWITCH &sl_button_btn1
-
 namespace {
 
 constexpr chip::EndpointId kLightSwitchEndpoint   = 1;
@@ -260,14 +257,19 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    VerifyOrReturn(buttonHandle != NULL);
-
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
-
-    button_event.Handler = SwitchActionEventHandler;
-    sAppTask.PostEvent(&button_event);
+    if (button == 1)
+    {
+        button_event.Handler = SwitchActionEventHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    else if (button == 0)
+    {
+        button_event.Handler = BaseApplication::ButtonHandler;
+        sAppTask.PostEvent(&button_event);
+    }
 }
