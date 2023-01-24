@@ -1281,6 +1281,7 @@ struct CASESession::Sigma3Work
     ByteSpan initiatorICAC;
 
     uint8_t rootCertBuf[kMaxCHIPCertLength];
+    ByteSpan fabricRCAC;
 
     P256ECDSASignature tbsData3Signature;
 
@@ -1410,6 +1411,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
         {
             MutableByteSpan fabricRCAC{ work.rootCertBuf };
             SuccessOrExit(err = mFabricsTable->FetchRootCert(mFabricIndex, fabricRCAC));
+            work.fabricRCAC = fabricRCAC;
             // TODO probably should make SetEffectiveTime static and call closer to VerifyCredentials
             SuccessOrExit(err = SetEffectiveTime());
         }
@@ -1462,11 +1464,10 @@ void CASESession::HandleSigma3b(Sigma3Work & work)
     // Step 5/6
     // Validate initiator identity located in msg->Start()
     // Constructing responder identity
-    ByteSpan fabricRCAC{ work.rootCertBuf };
     CompressedFabricId unused;
     FabricId initiatorFabricId;
     P256PublicKey initiatorPublicKey;
-    SuccessOrExit(err = FabricTable::VerifyCredentials(work.initiatorNOC, work.initiatorICAC, fabricRCAC, work.validContext, unused, initiatorFabricId, work.initiatorNodeId, initiatorPublicKey));
+    SuccessOrExit(err = FabricTable::VerifyCredentials(work.initiatorNOC, work.initiatorICAC, work.fabricRCAC, work.validContext, unused, initiatorFabricId, work.initiatorNodeId, initiatorPublicKey));
     VerifyOrExit(work.fabricId == initiatorFabricId, err = CHIP_ERROR_INVALID_CASE_PARAMETER);
 
     // TODO - Validate message signature prior to validating the received operational credentials.
