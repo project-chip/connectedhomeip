@@ -21,8 +21,6 @@
 
 using namespace chip::app::Clusters;
 
-DataModelLoggerJSONDelegate * DataModelLogger::mJSONDelegate = nullptr;
-
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType & value)
