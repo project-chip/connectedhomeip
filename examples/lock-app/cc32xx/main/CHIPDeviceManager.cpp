@@ -64,6 +64,11 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     // Start a task to run the CHIP Device event loop.
     return PlatformMgr().StartEventLoopTask();
 }
+
+void CHIPDeviceManagerCallbacks::DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) {}
+
+CHIPDeviceManagerCallbacks::~CHIPDeviceManagerCallbacks() {}
+
 } // namespace DeviceManager
 } // namespace chip
 

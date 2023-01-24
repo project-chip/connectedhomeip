@@ -86,6 +86,7 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/BoltLockManager.cpp",
     "${project_dir}/main/CXXExceptionStubs.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
+   # "${project_dir}/main/DeviceCallbacks.cpp",
     "${project_dir}/main/CHIPDeviceManager.cpp",
     "${project_dir}/main/CommonDeviceCallbacks.cpp",
   ]

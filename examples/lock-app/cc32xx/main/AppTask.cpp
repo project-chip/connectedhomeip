@@ -34,7 +34,8 @@
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <CHIPDeviceManager.h>
-#include <DeviceCallbacks.h>
+#include <CommonDeviceCallbacks.h>
+//#include <DeviceCallbacks.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -71,7 +72,7 @@ static Button_Handle gButtonRightHandle;
 
 AppTask AppTask::sAppTask;
 
-static AppDeviceCallbacks EchoCallbacks;
+static CommonDeviceCallbacks EchoCallbacks;
 
 int AppTask::StartAppTask()
 {

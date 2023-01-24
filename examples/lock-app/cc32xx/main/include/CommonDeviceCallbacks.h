@@ -23,7 +23,7 @@
 class CommonDeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 };
 
 class DeviceCallbacksDelegate
