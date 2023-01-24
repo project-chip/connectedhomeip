@@ -3784,35 +3784,58 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRApplicationLauncherClusterApplicationEP : MTRApplicationLauncherClusterApplicationEPStruct
 @end
 
-@implementation MTRApplicationBasicClusterApplicationBasicApplication
+@implementation MTRApplicationBasicClusterApplicationStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _catalogVendorId = @(0);
+        _catalogVendorID = @(0);
 
-        _applicationId = @"";
+        _applicationID = @"";
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRApplicationBasicClusterApplicationBasicApplication alloc] init];
+    auto other = [[MTRApplicationBasicClusterApplicationStruct alloc] init];
 
-    other.catalogVendorId = self.catalogVendorId;
-    other.applicationId = self.applicationId;
+    other.catalogVendorID = self.catalogVendorID;
+    other.applicationID = self.applicationID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorId:%@; applicationId:%@; >",
-                                             NSStringFromClass([self class]), _catalogVendorId, _applicationId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorID:%@; applicationID:%@; >",
+                                             NSStringFromClass([self class]), _catalogVendorID, _applicationID];
     return descriptionString;
 }
 
+- (void)setCatalogVendorId:(NSNumber * _Nonnull)catalogVendorId
+{
+    self.catalogVendorID = catalogVendorId;
+}
+
+- (NSNumber * _Nonnull)catalogVendorId
+{
+    return self.catalogVendorID;
+}
+
+- (void)setApplicationId:(NSString * _Nonnull)applicationId
+{
+    self.applicationID = applicationId;
+}
+
+- (NSString * _Nonnull)applicationId
+{
+    return self.applicationID;
+}
+
+@end
+
+@implementation MTRApplicationBasicClusterApplicationBasicApplication : MTRApplicationBasicClusterApplicationStruct
 @end
 
 @implementation MTRUnitTestingClusterSimpleStruct

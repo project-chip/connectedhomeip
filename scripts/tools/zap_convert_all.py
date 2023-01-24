@@ -78,7 +78,7 @@ def convertOne(target):
     """
     Helper method that may be run in parallel to convert a single target.
     """
-    subprocess.check_call(['./scripts/tools/zap/convert.py'] + target)
+    subprocess.check_call(['./scripts/tools/zap/convert.py'] + [target])
 
 
 def main():

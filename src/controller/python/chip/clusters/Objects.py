@@ -24950,7 +24950,7 @@ class ApplicationBasic(Cluster):
                 ClusterObjectFieldDescriptor(Label="vendorID", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="applicationName", Tag=0x00000002, Type=str),
                 ClusterObjectFieldDescriptor(Label="productID", Tag=0x00000003, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="application", Tag=0x00000004, Type=ApplicationBasic.Structs.ApplicationBasicApplication),
+                ClusterObjectFieldDescriptor(Label="application", Tag=0x00000004, Type=ApplicationBasic.Structs.ApplicationStruct),
                 ClusterObjectFieldDescriptor(Label="status", Tag=0x00000005, Type=ApplicationBasic.Enums.ApplicationStatusEnum),
                 ClusterObjectFieldDescriptor(Label="applicationVersion", Tag=0x00000006, Type=str),
                 ClusterObjectFieldDescriptor(Label="allowedVendorList", Tag=0x00000007, Type=typing.List[uint]),
@@ -24965,7 +24965,7 @@ class ApplicationBasic(Cluster):
     vendorID: 'typing.Optional[uint]' = None
     applicationName: 'str' = None
     productID: 'typing.Optional[uint]' = None
-    application: 'ApplicationBasic.Structs.ApplicationBasicApplication' = None
+    application: 'ApplicationBasic.Structs.ApplicationStruct' = None
     status: 'ApplicationBasic.Enums.ApplicationStatusEnum' = None
     applicationVersion: 'str' = None
     allowedVendorList: 'typing.List[uint]' = None
@@ -24991,17 +24991,17 @@ class ApplicationBasic(Cluster):
 
     class Structs:
         @dataclass
-        class ApplicationBasicApplication(ClusterObject):
+        class ApplicationStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="catalogVendorId", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="applicationId", Tag=1, Type=str),
+                            ClusterObjectFieldDescriptor(Label="catalogVendorID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="applicationID", Tag=1, Type=str),
                     ])
 
-            catalogVendorId: 'uint' = 0
-            applicationId: 'str' = ""
+            catalogVendorID: 'uint' = 0
+            applicationID: 'str' = ""
 
 
 
@@ -25083,9 +25083,9 @@ class ApplicationBasic(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ApplicationBasic.Structs.ApplicationBasicApplication)
+                return ClusterObjectFieldDescriptor(Type=ApplicationBasic.Structs.ApplicationStruct)
 
-            value: 'ApplicationBasic.Structs.ApplicationBasicApplication' = field(default_factory=lambda: ApplicationBasic.Structs.ApplicationBasicApplication())
+            value: 'ApplicationBasic.Structs.ApplicationStruct' = field(default_factory=lambda: ApplicationBasic.Structs.ApplicationStruct())
 
         @dataclass
         class Status(ClusterAttributeDescriptor):

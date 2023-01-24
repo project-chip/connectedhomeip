@@ -10010,13 +10010,13 @@ void MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge:
 }
 
 void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value)
+    void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType & value)
 {
-    MTRApplicationBasicClusterApplicationBasicApplication * _Nonnull objCValue;
-    objCValue = [MTRApplicationBasicClusterApplicationBasicApplication new];
-    objCValue.catalogVendorId = [NSNumber numberWithUnsignedShort:value.catalogVendorId];
-    objCValue.applicationId = [[NSString alloc] initWithBytes:value.applicationId.data()
-                                                       length:value.applicationId.size()
+    MTRApplicationBasicClusterApplicationStruct * _Nonnull objCValue;
+    objCValue = [MTRApplicationBasicClusterApplicationStruct new];
+    objCValue.catalogVendorID = [NSNumber numberWithUnsignedShort:value.catalogVendorID];
+    objCValue.applicationID = [[NSString alloc] initWithBytes:value.applicationID.data()
+                                                       length:value.applicationID.size()
                                                      encoding:NSUTF8StringEncoding];
     DispatchSuccess(context, objCValue);
 };

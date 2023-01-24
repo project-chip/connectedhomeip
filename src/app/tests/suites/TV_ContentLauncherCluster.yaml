@@ -41,7 +41,7 @@ tests:
           value: 0
 
     - label: "Launch Content Command"
-      command: "launchContent"
+      command: "LaunchContent"
       arguments:
           values:
               - name: "AutoPlay"
@@ -69,7 +69,7 @@ tests:
                 value: 0
 
     - label: "Launch URL Command"
-      command: "launchURL"
+      command: "LaunchURL"
       arguments:
           values:
               - name: "ContentURL"

@@ -73,7 +73,7 @@ tests:
       attribute: "Application"
       response:
           constraints:
-              type: ApplicationBasicApplication
+              type: ApplicationStruct
 
     - label: "Reads the Status attribute"
       PICS: APBSC.S.A0005

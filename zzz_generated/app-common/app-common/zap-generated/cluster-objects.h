@@ -43,6 +43,29 @@ namespace Clusters {
 namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
+namespace ApplicationStruct {
+enum class Fields
+{
+    kCatalogVendorID = 0,
+    kApplicationID   = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t catalogVendorID = static_cast<uint16_t>(0);
+    chip::CharSpan applicationID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ApplicationStruct
 namespace LabelStruct {
 enum class Fields
 {
@@ -22706,29 +22729,7 @@ struct TypeInfo
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace ApplicationStruct {
-enum class Fields
-{
-    kCatalogVendorID = 0,
-    kApplicationID   = 1,
-};
-
-struct Type
-{
-public:
-    uint16_t catalogVendorID = static_cast<uint16_t>(0);
-    chip::CharSpan applicationID;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ApplicationStruct
+namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
 namespace ApplicationEPStruct {
 enum class Fields
 {
@@ -22996,29 +22997,7 @@ struct TypeInfo
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
 namespace Structs {
-namespace ApplicationBasicApplication {
-enum class Fields
-{
-    kCatalogVendorId = 0,
-    kApplicationId   = 1,
-};
-
-struct Type
-{
-public:
-    uint16_t catalogVendorId = static_cast<uint16_t>(0);
-    chip::CharSpan applicationId;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ApplicationBasicApplication
+namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
 } // namespace Structs
 
 namespace Attributes {
@@ -23076,9 +23055,9 @@ struct TypeInfo
 namespace Application {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type;
-    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &;
+    using Type             = chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::Type;
+    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Application::Id; }

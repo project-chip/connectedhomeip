@@ -5089,6 +5089,8 @@
           ApplicationLauncher:
               - ApplicationStruct
               - ApplicationEPStruct
+          ApplicationBasic:
+              - ApplicationStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5274,6 +5276,14 @@
               ApplicationEPStruct:
                   - application
                   - endpoint
+          ApplicationBasic:
+              ApplicationStruct:
+                  - catalogVendorID
+                  - applicationID
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - catalogVendorId
+                  - applicationId
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5809,6 +5819,8 @@
           ApplicationLauncher:
               - Application
               - ApplicationEP
+          ApplicationBasic:
+              - ApplicationBasicApplication
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5822,6 +5834,10 @@
               StyleInformationStruct:
                   - imageUrl
           ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorId
+                  - applicationId
+          ApplicationBasic:
               ApplicationStruct:
                   - catalogVendorId
                   - applicationId
@@ -6109,6 +6125,8 @@
           ApplicationLauncher:
               ApplicationStruct: Application
               ApplicationEPStruct: ApplicationEP
+          ApplicationBasic:
+              ApplicationStruct: ApplicationBasicApplication
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -6122,6 +6140,10 @@
               StyleInformationStruct:
                   imageURL: imageUrl
           ApplicationLauncher:
+              ApplicationStruct:
+                  catalogVendorID: catalogVendorId
+                  applicationID: applicationId
+          ApplicationBasic:
               ApplicationStruct:
                   catalogVendorID: catalogVendorId
                   applicationID: applicationId
