@@ -112,12 +112,12 @@ def main(setup_code, yaml_path, node_id, pics_file):
                     raise Exception(f'Failed to encode test step {test_step.label}')
                 if not test_action.pics_enabled:
                     continue
-                if test_action is not None:
-                    response = runner.execute(test_action)
-                    decoded_response = runner.decode(response)
-                    post_processing_result = test_step.post_process_response(decoded_response)
-                    if not post_processing_result.is_success():
-                        raise Exception(f'Test step failed {test_step.label}')
+
+                response = runner.execute(test_action)
+                decoded_response = runner.decode(response)
+                post_processing_result = test_step.post_process_response(decoded_response)
+                if not post_processing_result.is_success():
+                    raise Exception(f'Test step failed {test_step.label}')
         except Exception:
             print(traceback.format_exc())
             exit(-2)
