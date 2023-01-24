@@ -252,11 +252,11 @@ jobject SampledPositionSuccessHandlerJNI::ConvertToJObject(
     jobject jSampledPosition = nullptr;
     if (!responseData.IsNull())
     {
-        const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & playbackPosition =
+        const chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType & playbackPosition =
             responseData.Value();
 
         jclass responseTypeClass = nullptr;
-        CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackPosition",
+        CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackPositionStruct",
                                                                   responseTypeClass);
         if (err != CHIP_NO_ERROR)
         {
