@@ -27,11 +27,15 @@ pw_python_package("matter_yamltests") {
 
   sources = [
     "matter_yamltests/__init__.py",
+    "matter_yamltests/adapter.py",
     "matter_yamltests/constraints.py",
     "matter_yamltests/definitions.py",
     "matter_yamltests/errors.py",
     "matter_yamltests/fixes.py",
+    "matter_yamltests/hooks.py",
     "matter_yamltests/parser.py",
+    "matter_yamltests/parser_builder.py",
+    "matter_yamltests/parser_config.py",
     "matter_yamltests/pics_checker.py",
     "matter_yamltests/pseudo_clusters/__init__.py",
     "matter_yamltests/pseudo_clusters/clusters/delay_commands.py",
@@ -39,6 +43,8 @@ pw_python_package("matter_yamltests") {
     "matter_yamltests/pseudo_clusters/clusters/system_commands.py",
     "matter_yamltests/pseudo_clusters/pseudo_cluster.py",
     "matter_yamltests/pseudo_clusters/pseudo_clusters.py",
+    "matter_yamltests/runner.py",
+    "matter_yamltests/websocket_runner.py",
     "matter_yamltests/yaml_loader.py",
   ]
 
@@ -47,6 +53,7 @@ pw_python_package("matter_yamltests") {
   tests = [
     "test_spec_definitions.py",
     "test_pics_checker.py",
+    "test_parser_builder.py",
     "test_pseudo_clusters.py",
     "test_yaml_loader.py",
   ]
