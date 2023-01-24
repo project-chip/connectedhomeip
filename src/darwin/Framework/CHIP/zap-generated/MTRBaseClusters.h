@@ -18798,9 +18798,18 @@ typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatus) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRThermostatSetpointAdjustMode) {
-    MTRThermostatSetpointAdjustModeHeatSetpoint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRThermostatSetpointAdjustModeCoolSetpoint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRThermostatSetpointAdjustModeHeatAndCoolSetpoints API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
+    MTRThermostatSetpointAdjustModeHeat MTR_NEWLY_AVAILABLE = 0x00,
+    MTRThermostatSetpointAdjustModeHeatSetpoint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatSetpointAdjustModeHeat")
+    = 0x00,
+    MTRThermostatSetpointAdjustModeCool MTR_NEWLY_AVAILABLE = 0x01,
+    MTRThermostatSetpointAdjustModeCoolSetpoint API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatSetpointAdjustModeCool")
+    = 0x01,
+    MTRThermostatSetpointAdjustModeBoth MTR_NEWLY_AVAILABLE = 0x02,
+    MTRThermostatSetpointAdjustModeHeatAndCoolSetpoints API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatSetpointAdjustModeBoth")
+    = 0x02,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRThermostatControlSequence) {
@@ -18823,9 +18832,14 @@ typedef NS_ENUM(uint8_t, MTRThermostatSystemMode) {
     MTRThermostatSystemModeAuto API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRThermostatSystemModeCool API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
     MTRThermostatSystemModeHeat API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRThermostatSystemModeEmergencyHeating API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
+    MTRThermostatSystemModeEmergencyHeat MTR_NEWLY_AVAILABLE = 0x05,
+    MTRThermostatSystemModeEmergencyHeating API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatSystemModeEmergencyHeat")
+    = 0x05,
     MTRThermostatSystemModePrecooling API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
     MTRThermostatSystemModeFanOnly API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
+    MTRThermostatSystemModeDry MTR_NEWLY_AVAILABLE = 0x08,
+    MTRThermostatSystemModeSleep MTR_NEWLY_AVAILABLE = 0x09,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatDayOfWeek) {
@@ -18836,21 +18850,36 @@ typedef NS_OPTIONS(uint8_t, MTRThermostatDayOfWeek) {
     MTRThermostatDayOfWeekThursday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
     MTRThermostatDayOfWeekFriday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x20,
     MTRThermostatDayOfWeekSaturday API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x40,
-    MTRThermostatDayOfWeekAwayOrVacation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x80,
+    MTRThermostatDayOfWeekAway MTR_NEWLY_AVAILABLE = 0x80,
+    MTRThermostatDayOfWeekAwayOrVacation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatDayOfWeekAway")
+    = 0x80,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatModeForSequence) {
-    MTRThermostatModeForSequenceHeatSetpointFieldPresent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRThermostatModeForSequenceCoolSetpointFieldPresent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
+    MTRThermostatModeForSequenceHeatSetpointPresent MTR_NEWLY_AVAILABLE = 0x1,
+    MTRThermostatModeForSequenceHeatSetpointFieldPresent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatModeForSequenceHeatSetpointPresent")
+    = 0x1,
+    MTRThermostatModeForSequenceCoolSetpointPresent MTR_NEWLY_AVAILABLE = 0x2,
+    MTRThermostatModeForSequenceCoolSetpointFieldPresent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatModeForSequenceCoolSetpointPresent")
+    = 0x2,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
     MTRThermostatFeatureHeating API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRThermostatFeatureCooling API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
     MTRThermostatFeatureOccupancy API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-    MTRThermostatFeatureSchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
+    MTRThermostatFeatureScheduleConfiguration MTR_NEWLY_AVAILABLE = 0x8,
+    MTRThermostatFeatureSchedule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatFeatureScheduleConfiguration")
+    = 0x8,
     MTRThermostatFeatureSetback API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
-    MTRThermostatFeatureAutomode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x20,
+    MTRThermostatFeatureAutoMode MTR_NEWLY_AVAILABLE = 0x20,
+    MTRThermostatFeatureAutomode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThermostatFeatureAutoMode")
+    = 0x20,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequenceType) {

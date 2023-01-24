@@ -1171,9 +1171,9 @@ server cluster FixedLabel = 64 {
 
 client cluster Thermostat = 513 {
   enum SetpointAdjustMode : ENUM8 {
-    kHeatSetpoint = 0;
-    kCoolSetpoint = 1;
-    kHeatAndCoolSetpoints = 2;
+    kHeat = 0;
+    kCool = 1;
+    kBoth = 2;
   }
 
   enum ThermostatControlSequence : ENUM8 {
@@ -1196,9 +1196,11 @@ client cluster Thermostat = 513 {
     kAuto = 1;
     kCool = 3;
     kHeat = 4;
-    kEmergencyHeating = 5;
+    kEmergencyHeat = 5;
     kPrecooling = 6;
     kFanOnly = 7;
+    kDry = 8;
+    kSleep = 9;
   }
 
   bitmap DayOfWeek : BITMAP8 {
@@ -1209,21 +1211,21 @@ client cluster Thermostat = 513 {
     kThursday = 0x10;
     kFriday = 0x20;
     kSaturday = 0x40;
-    kAwayOrVacation = 0x80;
+    kAway = 0x80;
   }
 
   bitmap ModeForSequence : BITMAP8 {
-    kHeatSetpointFieldPresent = 0x1;
-    kCoolSetpointFieldPresent = 0x2;
+    kHeatSetpointPresent = 0x1;
+    kCoolSetpointPresent = 0x2;
   }
 
   bitmap ThermostatFeature : BITMAP32 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
-    kSchedule = 0x8;
+    kScheduleConfiguration = 0x8;
     kSetback = 0x10;
-    kAutomode = 0x20;
+    kAutoMode = 0x20;
   }
 
   readonly attribute nullable int16s localTemperature = 0;

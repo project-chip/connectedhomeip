@@ -5622,6 +5622,15 @@
                   - Percentage
               ParameterEnum:
                   - Video
+          Thermostat:
+              ThermostatSystemMode:
+                  - EmergencyHeat
+                  - Dry
+                  - Sleep
+              SetpointAdjustMode:
+                  - Heat
+                  - Cool
+                  - Both
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5700,6 +5709,15 @@
                   - ConstantTemperature
                   - Automatic
                   - Local
+          Thermostat:
+              ThermostatFeature:
+                  - ScheduleConfiguration
+                  - AutoMode
+              DayOfWeek:
+                  - Away
+              ModeForSequence:
+                  - HeatSetpointPresent
+                  - CoolSetpointPresent
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5925,6 +5943,13 @@
               MetricTypeEnum:
                   - PIXELS
                   - PERCENTAGE
+          Thermostat:
+              ThermostatSystemMode:
+                  - EmergencyHeating
+              SetpointAdjustMode:
+                  - HeatSetpoint
+                  - CoolSetpoint
+                  - HeatAndCoolSetpoints
       bitmaps:
           DoorLock:
               - DlDaysMaskMap
@@ -5947,6 +5972,15 @@
                   - UsersManagement
                   - Notifications
                   - YearDaySchedules
+          Thermostat:
+              ThermostatFeature:
+                  - Schedule
+                  - Automode
+              DayOfWeek:
+                  - AwayOrVacation
+              ModeForSequence:
+                  - HeatSetpointFieldPresent
+                  - CoolSetpointFieldPresent
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -6244,6 +6278,13 @@
               MetricTypeEnum:
                   Pixels: PIXELS
                   Percentage: PERCENTAGE
+          Thermostat:
+              ThermostatSystemMode:
+                  EmergencyHeat: EmergencyHeating
+              SetpointAdjustMode:
+                  Heat: HeatSetpoint
+                  Cool: CoolSetpoint
+                  Both: HeatAndCoolSetpoints
       bitmaps:
           DoorLock:
               DaysMaskMap: DlDaysMaskMap
@@ -6266,3 +6307,12 @@
                   User: UsersManagement
                   Notification: Notifications
                   YearDayAccessSchedules: YearDaySchedules
+          Thermostat:
+              ThermostatFeature:
+                  ScheduleConfiguration: Schedule
+                  AutoMode: Automode
+              DayOfWeek:
+                  Away: AwayOrVacation
+              ModeForSequence:
+                  HeatSetpointPresent: HeatSetpointFieldPresent
+                  CoolSetpointPresent: CoolSetpointFieldPresent

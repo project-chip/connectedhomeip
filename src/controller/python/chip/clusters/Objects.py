@@ -17548,9 +17548,9 @@ class Thermostat(Cluster):
 
     class Enums:
         class SetpointAdjustMode(MatterIntEnum):
-            kHeatSetpoint = 0x00
-            kCoolSetpoint = 0x01
-            kHeatAndCoolSetpoints = 0x02
+            kHeat = 0x00
+            kCool = 0x01
+            kBoth = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
@@ -17585,9 +17585,11 @@ class Thermostat(Cluster):
             kAuto = 0x01
             kCool = 0x03
             kHeat = 0x04
-            kEmergencyHeating = 0x05
+            kEmergencyHeat = 0x05
             kPrecooling = 0x06
             kFanOnly = 0x07
+            kDry = 0x08
+            kSleep = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
@@ -17604,19 +17606,19 @@ class Thermostat(Cluster):
             kThursday = 0x10
             kFriday = 0x20
             kSaturday = 0x40
-            kAwayOrVacation = 0x80
+            kAway = 0x80
 
         class ModeForSequence(IntFlag):
-            kHeatSetpointFieldPresent = 0x1
-            kCoolSetpointFieldPresent = 0x2
+            kHeatSetpointPresent = 0x1
+            kCoolSetpointPresent = 0x2
 
         class ThermostatFeature(IntFlag):
             kHeating = 0x1
             kCooling = 0x2
             kOccupancy = 0x4
-            kSchedule = 0x8
+            kScheduleConfiguration = 0x8
             kSetback = 0x10
-            kAutomode = 0x20
+            kAutoMode = 0x20
 
 
     class Structs:
