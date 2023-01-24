@@ -107,6 +107,10 @@ def main(setup_code, yaml_path, node_id, pics_file):
             runner = ReplTestRunner(
                 clusters_definitions, certificate_authority_manager, dev_ctrl)
 
+            if not yaml.is_test_pics_enabled:
+                _StackShutDown()
+                return
+
             # Executing and validating test
             for test_step in yaml.tests:
                 test_action = runner.encode(test_step)

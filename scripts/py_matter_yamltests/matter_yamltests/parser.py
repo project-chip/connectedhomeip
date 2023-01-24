@@ -845,6 +845,7 @@ class TestParser:
 
         pics_checker = PICSChecker(pics_file)
         tests = _value_or_none(data, 'tests')
+        self.is_test_pics_enabled = pics_checker.check(self.PICS)
         self.tests = YamlTests(
             self._parsing_config_variable_storage, definitions, pics_checker, tests)
 
