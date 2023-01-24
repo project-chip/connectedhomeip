@@ -89,8 +89,8 @@ static CHIP_ERROR LoadTestFabric_Node01_01(nlTestSuite * inSuite, FabricTable & 
     static Crypto::P256Keypair opKey_Node01_01;
 
     FabricIndex fabricIndex;
-    memcpy((uint8_t *) (opKeysSerialized), TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + TestCerts::sTestCert_Node01_01_PublicKey_Len, TestCerts::sTestCert_Node01_01_PrivateKey,
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len);
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_01_PublicKey_Len, TestCerts::sTestCert_Node01_01_PrivateKey,
            TestCerts::sTestCert_Node01_01_PrivateKey_Len);
 
     ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len);
@@ -119,8 +119,8 @@ static CHIP_ERROR LoadTestFabric_Node01_02(nlTestSuite * inSuite, FabricTable & 
     FabricIndex fabricIndex;
     static Crypto::P256Keypair opKey_Node01_02;
 
-    memcpy((uint8_t *) (opKeysSerialized), TestCerts::sTestCert_Node01_02_PublicKey, TestCerts::sTestCert_Node01_02_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + TestCerts::sTestCert_Node01_02_PublicKey_Len, TestCerts::sTestCert_Node01_02_PrivateKey,
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_02_PublicKey, TestCerts::sTestCert_Node01_02_PublicKey_Len);
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_02_PublicKey_Len, TestCerts::sTestCert_Node01_02_PrivateKey,
            TestCerts::sTestCert_Node01_02_PrivateKey_Len);
 
     ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len);
@@ -151,8 +151,8 @@ static CHIP_ERROR LoadTestFabric_Node02_01(nlTestSuite * inSuite, FabricTable & 
     FabricIndex fabricIndex;
     static Crypto::P256Keypair opKey_Node02_01;
 
-    memcpy((uint8_t *) (opKeysSerialized), TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + TestCerts::sTestCert_Node02_01_PublicKey_Len, TestCerts::sTestCert_Node02_01_PrivateKey,
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len);
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node02_01_PublicKey_Len, TestCerts::sTestCert_Node02_01_PrivateKey,
            TestCerts::sTestCert_Node02_01_PrivateKey_Len);
 
     ByteSpan rcacSpan(TestCerts::sTestCert_Root02_Chip, TestCerts::sTestCert_Root02_Chip_Len);
@@ -514,7 +514,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     constexpr uint16_t kVendorId = 0xFFF1u;
 
     chip::Crypto::P256Keypair fabric11Node55Keypair; // Fabric ID 11,
-    NL_TEST_ASSERT(inSuite, fabric11Node55Keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric11Node55Keypair.Initialize(Crypto::ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // Initialize a fabric table.
     ScopedFabricTable fabricTableHolder;
@@ -2523,7 +2523,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
 
         Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypairForCASE();
         NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
-        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA));
 
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
@@ -2550,7 +2550,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
 
         Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypairForCASE();
         NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
-        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA));
 
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));

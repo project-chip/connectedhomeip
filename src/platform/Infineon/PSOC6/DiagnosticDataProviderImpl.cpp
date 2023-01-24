@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include "cyhal_system.h"
 #include <cy_lwip.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Infineon/PSOC6/DiagnosticDataProviderImpl.h>
@@ -160,7 +161,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         /* Update Network Interface list */
         ifp->name                            = CharSpan::fromCharString(net_interface->name);
         ifp->isOperational                   = net_interface->flags & NETIF_FLAG_LINK_UP;
-        ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
         ifp->offPremiseServicesReachableIPv4 = mipv4_offpremise;
         ifp->offPremiseServicesReachableIPv6 = mipv6_offpremise;
         ifp->hardwareAddress                 = ByteSpan(net_interface->hwaddr, net_interface->hwaddr_len);
@@ -249,7 +250,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     whd_security_t security;
     cy_rslt_t result = CY_RSLT_SUCCESS;
 
-    if (whd_wifi_get_ap_info(whd_ifs[CY_WCM_INTERFACE_TYPE_STA], &bss_info, &security) != CY_RSLT_SUCCESS)
+    result = whd_wifi_get_ap_info(whd_ifs[CY_WCM_INTERFACE_TYPE_STA], &bss_info, &security);
+    if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "whd_wifi_get_ap_info failed: %d", (int) result);
         SuccessOrExit(CHIP_ERROR_INTERNAL);
@@ -258,17 +260,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     /* VHT Capable */
     if (bss_info.vht_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_AC;
     }
     /* HT Capable */
     else if (bss_info.n_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
     }
     /* 11g Capable */
     else
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11G;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_G;
     }
 
 exit:
@@ -542,6 +544,58 @@ CHIP_ERROR DiagnosticDataProviderImpl::WiFiCounters(WiFiStatsCountType type, uin
         free(cntdata);
     }
     return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    /* Obtain all available task information */
+    TaskStatus_t * taskStatusArray;
+    ThreadMetrics * head = nullptr;
+    unsigned long arraySize, x, dummy;
+    arraySize = uxTaskGetNumberOfTasks();
+
+    taskStatusArray = (TaskStatus_t *) pvPortMalloc(arraySize * sizeof(TaskStatus_t));
+
+    if (taskStatusArray != NULL)
+    {
+        /* Generate raw status information about each task. */
+        arraySize = uxTaskGetSystemState(taskStatusArray, arraySize, &dummy);
+        /* For each populated position in the taskStatusArray array,
+           format the raw data as human readable ASCII data. */
+
+        for (x = 0; x < arraySize; x++)
+        {
+            ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
+
+            Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
+            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            thread->id = taskStatusArray[x].xTaskNumber;
+
+            thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
+            /* Unsupported metrics */
+            thread->stackSize.Emplace(0);
+            thread->stackFreeCurrent.Emplace(0);
+
+            thread->Next = head;
+            head         = thread;
+        }
+
+        *threadMetricsOut = head;
+        /* The array is no longer needed, free the memory it consumes. */
+        vPortFree(taskStatusArray);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        vPortFree(del);
+    }
 }
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()

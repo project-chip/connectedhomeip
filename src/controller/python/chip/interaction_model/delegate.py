@@ -14,16 +14,16 @@
    limitations under the License.
 '''
 
-from abc import abstractmethod
-from construct import Struct, Int64ul, Int32ul, Int16ul, Int8ul
-from ctypes import CFUNCTYPE, c_void_p, c_uint32, c_uint64, c_uint8, c_uint16, c_ssize_t
 import ctypes
-import chip.native
 import threading
-import chip.tlv
-import chip.exceptions
 import typing
+from ctypes import CFUNCTYPE, c_uint8, c_uint32, c_uint64, c_void_p
 from dataclasses import dataclass
+
+import chip.exceptions
+import chip.native
+import chip.tlv
+from construct import Int8ul, Int16ul, Int32ul, Int64ul, Struct
 
 # The type should match CommandStatus in interaction_model/Delegate.h
 # CommandStatus should not contain padding

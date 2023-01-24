@@ -147,14 +147,14 @@ Status BekenWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
 
 CHIP_ERROR BekenWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    ChipLogProgress(NetworkProvisioning, "BekenWiFiDriver::ConnectWiFiNetwork....ssid:%s", ssid);
+    ChipLogProgress(NetworkProvisioning, "BekenWiFiDriver::ConnectWiFiNetwork....ssid:%s", StringOrNullMarker(ssid));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
     wifi_sta_config_t sta_config;
     memset(&sta_config, 0x0, sizeof(sta_config));
     sta_config.security = WIFI_SECURITY_AUTO; // can't use WIFI_DEFAULT_STA_CONFIG because of C99 designator error
-    strncpy(sta_config.ssid, ssid, ssidLen);
-    strncpy(sta_config.password, key, keyLen);
+    Platform::CopyString(sta_config.ssid, ssidLen, ssid);
+    Platform::CopyString(sta_config.password, keyLen, key);
 
     BK_LOG_ON_ERR(bk_wifi_sta_set_config(&sta_config));
     BK_LOG_ON_ERR(bk_wifi_sta_start());

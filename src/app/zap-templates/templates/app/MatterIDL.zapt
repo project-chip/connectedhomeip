@@ -30,7 +30,7 @@
 
   {{/chip_cluster_specific_structs}}
   {{#zcl_events}}
-  {{priority}} event {{!ensure space}}
+  {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
   {{~#chip_access_elements entity="event"~}}
       {{~#first~}}access({{~/first~}}
       {{~#not_first~}}, {{/not_first~}}
@@ -117,7 +117,7 @@
 {{#user_endpoints}}
 endpoint {{endpointId}} {
   {{#if deviceIdentifier}}
-  device type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}};
+  device type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}}, version {{endpointVersion}};
   {{/if~}}
 
   {{#user_clusters}}

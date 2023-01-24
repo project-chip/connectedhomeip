@@ -58,9 +58,9 @@ bool IsTestEventTriggerEnabled()
 
 bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
 {
-    for (auto * it = byteSpan.begin(); it != byteSpan.end(); ++it)
+    for (unsigned char it : byteSpan)
     {
-        if (*it != 0)
+        if (it != 0)
         {
             return false;
         }
@@ -197,7 +197,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     case TotalOperationalHours::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetTotalOperationalHours, aEncoder);
     }
-    case BootReasons::Id: {
+    case BootReason::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetBootReason, aEncoder);
     }
     case TestEventTriggersEnabled::Id: {
@@ -242,11 +242,11 @@ GeneralDiagnosticsServer & GeneralDiagnosticsServer::Instance()
 }
 
 // Gets called when the device has been rebooted.
-void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonType bootReason)
+void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonEnum bootReason)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnDeviceReboot");
 
-    ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
+    ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReason::Id);
 
     // GeneralDiagnostics cluster should exist only for endpoint 0.
     if (emberAfContainsServer(0, GeneralDiagnostics::Id))
@@ -276,9 +276,9 @@ void GeneralDiagnosticsServer::OnHardwareFaultsDetect(const GeneralFaults<kMaxHa
 
         // Record HardwareFault event
         EventNumber eventNumber;
-        DataModel::List<const HardwareFaultType> currentList(reinterpret_cast<const HardwareFaultType *>(current.data()),
+        DataModel::List<const HardwareFaultEnum> currentList(reinterpret_cast<const HardwareFaultEnum *>(current.data()),
                                                              current.size());
-        DataModel::List<const HardwareFaultType> previousList(reinterpret_cast<const HardwareFaultType *>(previous.data()),
+        DataModel::List<const HardwareFaultEnum> previousList(reinterpret_cast<const HardwareFaultEnum *>(previous.data()),
                                                               previous.size());
         Events::HardwareFaultChange::Type event{ currentList, previousList };
 
@@ -303,8 +303,8 @@ void GeneralDiagnosticsServer::OnRadioFaultsDetect(const GeneralFaults<kMaxRadio
 
         // Record RadioFault event
         EventNumber eventNumber;
-        DataModel::List<const RadioFaultType> currentList(reinterpret_cast<const RadioFaultType *>(current.data()), current.size());
-        DataModel::List<const RadioFaultType> previousList(reinterpret_cast<const RadioFaultType *>(previous.data()),
+        DataModel::List<const RadioFaultEnum> currentList(reinterpret_cast<const RadioFaultEnum *>(current.data()), current.size());
+        DataModel::List<const RadioFaultEnum> previousList(reinterpret_cast<const RadioFaultEnum *>(previous.data()),
                                                            previous.size());
         Events::RadioFaultChange::Type event{ currentList, previousList };
 
@@ -329,9 +329,9 @@ void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNet
 
         // Record NetworkFault event
         EventNumber eventNumber;
-        DataModel::List<const NetworkFaultType> currentList(reinterpret_cast<const NetworkFaultType *>(current.data()),
+        DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
                                                             current.size());
-        DataModel::List<const NetworkFaultType> previousList(reinterpret_cast<const NetworkFaultType *>(previous.data()),
+        DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
                                                              previous.size());
         Events::NetworkFaultChange::Type event{ currentList, previousList };
 
@@ -364,29 +364,26 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
 
     auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
 
+    // Spec says "EnableKeyMismatch" but this never existed prior to 1.0 SVE2 and mismatches
+    // test plans as well. ConstraintError is specified for most other errors, so
+    // we keep the behavior as close as possible, except for EnableKeyMismatch which
+    // is going to be a ConstraintError.
     if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(commandData.enableKey))
     {
-        commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
     }
 
     CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTrigger(commandData.eventTrigger);
-    Status returnStatus                 = StatusIB(handleEventTriggerResult).mStatus;
 
-    // When HandleEventTrigger returns INVALID_ARGUMENT we convert that into InvalidCommand to be spec
-    // compliant.
-    if (handleEventTriggerResult == CHIP_ERROR_INVALID_ARGUMENT)
-    {
-        returnStatus = Status::InvalidCommand;
-    }
-
-    commandObj->AddStatus(commandPath, returnStatus);
+    // When HandleEventTrigger fails, we simply convert any error to INVALID_COMMAND
+    commandObj->AddStatus(commandPath, (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success);
     return true;
 }
 
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
-    BootReasonType bootReason;
+    BootReasonEnum bootReason;
 
     registerAttributeAccessOverride(&gAttrAccess);
     ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);

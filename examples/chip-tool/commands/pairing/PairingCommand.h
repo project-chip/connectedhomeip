@@ -20,6 +20,7 @@
 
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
+#include <controller/CurrentFabricRemover.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
@@ -55,7 +56,8 @@ public:
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType),
-        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }
+        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
+        mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
 
@@ -78,28 +80,37 @@ public:
         case PairingMode::None:
             break;
         case PairingMode::Code:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("discover-once", 0, 1, &mDiscoverOnce);
+            AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery);
             break;
         case PairingMode::Ble:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             break;
         case PairingMode::OnNetwork:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::SoftAP:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::Ethernet:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         }
 
@@ -163,6 +174,9 @@ private:
     NodeId mNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
+    chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
+    chip::Optional<bool> mPaseOnly;
+    chip::Optional<bool> mSkipCommissioningComplete;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
@@ -172,4 +186,10 @@ private:
     char * mOnboardingPayload;
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
+
+    // For unpair
+    chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
+    chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
+
+    static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
 };

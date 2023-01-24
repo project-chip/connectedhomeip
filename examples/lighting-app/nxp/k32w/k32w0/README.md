@@ -16,30 +16,28 @@ network.
 
 <hr>
 
--   [CHIP K32W061 Lighting Example Application](#chip-k32w-lighting-example-application) -
+-   [CHIP K32W061 Lighting Example Application](#chip-k32w061-lighting-example-application)
 -   [Introduction](#introduction)
     -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
--   [Flashing and debugging](#flashdebug)
--   [Pigweed Tokenizer](#tokenizer)
-    -   [Detokenizer script](#detokenizer)
-    -   [Notes](#detokenizer-notes)
-    -   [Known issues](#detokenizer-known-issues)
--   [Tinycrypt ECC operations](#tinycrypt)
-    -   [Building steps](#tinycrypt-building-steps)
+    -   [Known issues](#known-issues)
+-   [Manufacturing data](#manufacturing-data)
+-   [Flashing and debugging](#flashing-and-debugging)
+-   [Pigweed Tokenizer](#pigweed-tokenizer)
+    -   [Detokenizer script](#detokenizer-script)
+    -   [Notes](#notes)
+    -   [Known issues](#known-issues-1)
+-   [Tinycrypt ECC operations](#tinycrypt-ecc-operations)
+    -   [Building steps](#building-steps)
 -   [OTA](#ota)
-
-    -   [Writing the SSBL](#ssbl)
-    -   [Writing the PSECT](#psect)
-    -   [Writing the application](#appwrite)
-    -   [OTA Testing](#otatesting)
-    -   [Known issues](#otaissues)
-
-    </hr>
-
-<a name="intro"></a>
+    -   [Writing the SSBL](#writing-the-ssbl)
+    -   [Writing the PSECT](#writing-the-psect)
+    -   [Writing the application](#writing-the-application)
+    -   [OTA Testing](#ota-testing)
+    -   [Known issues](#known-issues-2)
+        </hr>
 
 ## Introduction
 
@@ -167,25 +165,39 @@ DS3, which can be found on the DK6 board.
 Also, by long pressing the **USERINTERFACE** button, the factory reset action
 will be initiated.
 
-<a name="building"></a>
+### Identify cluster LED state
+
+The Identify cluster server supports two identification commands: **Identify**
+and **TriggerEffect**. These commands allow a user to identify a particular
+device. For these commands, the **LED D3** is used.
+
+The **Identify command** will use the **LED D3** to flash with a period of 0.5
+seconds.
+
+The **TriggerEffect command** will use the **LED D3** with the following
+effects:
+
+-   _Blink_ &mdash; flash with a 1 second period for 2 seconds
+-   _Breathe_ &mdash; flash with a 1 second period for 15 seconds
+-   _Okay_ &mdash; flash with a 1 second period for 4 seconds
+-   _Channel change_ &mdash; same as Blink
+-   _Finish effect_ &mdash; complete current effect sequence and terminate
+-   _Stop effect_ &mdash; terminate as soon as possible
 
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W0 SDK 2.6.6 for Project CHIP](https://mcuxpresso.nxp.com/).
-    Creating an nxp.com account is required before being able to download the
-    SDK. Once the account is created, login and follow the steps for downloading
-    SDK_2_6_6_K32W061DK6 (required for K32W061 flavor). The SDK Builder UI
-    selection should be similar with the one from the image below.
-    ![MCUXpresso SDK Download](../../../../platform/nxp/k32w/k32w0/doc/images/mcux-sdk-download.JPG)
+-   Download
+    [K32W0 SDK 2.6.7](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_7_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
     -   without Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_6_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_7_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"tinycrypt\" chip_with_se05x=0 chip_pw_tokenizer_logging=true mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\""
@@ -227,7 +239,15 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-light-example.
 
-<a name="flashdebug"></a>
+## Known issues
+
+-   When using Secure element and cross-compiling on Linux, log messages from
+    the Plug&Trust middleware stack may not echo to the console.
+
+## Manufacturing data
+
+See
+[Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 
 ## Flashing and debugging
 
@@ -238,16 +258,12 @@ All you have to do is to replace the Openthread binaries from the above
 documentation with _out/debug/chip-k32w0x-light-example.bin_ if DK6Programmer is
 used or with _out/debug/chip-k32w0x-light-example_ if MCUXpresso is used.
 
-<a name="tokenizer"></a>
-
 ## Pigweed tokenizer
 
 The tokenizer is a pigweed module that allows hashing the strings. This greatly
 reduces the flash needed for logs. The module can be enabled by building with
 the gn argument _chip_pw_tokenizer_logging=true_. The detokenizer script is
 needed for parsing the hashed scripts.
-
-<a name="detokenizer"></a>
 
 ### Detokenizer script
 
@@ -277,8 +293,6 @@ where the decoded logs will be stored. This parameter is required for file usage
 and optional for serial usage. If not provided when used with serial port, it
 will show the decoded log only at the stdout and not save it to file.
 
-<a name="detokenizer-notes"></a>
-
 ### Notes
 
 The token database is created automatically after building the binary if the
@@ -292,8 +306,6 @@ detokenizer script to see logs of a lighting app:
 ```
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-light-example-database.bin -o device.txt
 ```
-
-<a name="detokenizer-known-issues"></a>
 
 ### Known issues
 
@@ -312,11 +324,7 @@ If run, closed and rerun with the serial option on the same serial port, the
 detokenization script will get stuck and not show any logs. The solution is to
 unplug and plug the board and then rerun the script.
 
-<a name="tinycrypt"></a>
-
 ## Tinycrypt ECC operations
-
-<a name="tinycrypt-building-steps"></a>
 
 ### Building steps
 
@@ -332,8 +340,6 @@ To disable tinycrypt ecc operations, simply build with _chip_crypto=\"mbedtls\"_
 and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls
 implementation from `NXPmicro/mbedtls` library will be used.
 
-<a name="ota"></a>
-
 ## OTA
 
 The internal flash needs to be prepared for the OTA process. First 16K of the
@@ -341,8 +347,6 @@ internal flash needs to be populated with a Secondary Stage Bootloader (SSBL)
 related data while the last 8.5K of flash space is holding image directory
 related data (PSECT). The space between these two zones will be filled by the
 application.
-
-<a name="ssbl"></a>
 
 ### Writing the SSBL
 
@@ -373,8 +377,6 @@ k32w061dk6_ssbl.bin must be written at address 0 in the internal flash:
 DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl.bin"
 ```
 
-<a name="psect"></a>
-
 ### Writing the PSECT
 
 First, image directory 0 must be written:
@@ -395,19 +397,17 @@ Here is the interpretation of the fields:
 Second, image directory 1 must be written:
 
 ```
-DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00400000CD040101
+DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00400000C9040101
 ```
 
 Here is the interpretation of the fields:
 
 ```
 00400000 -> start address 0x00004000
-CD04     -> 0x4CD pages of 512-bytes (= 614,5kB)
+CD04     -> 0x4C9 pages of 512-bytes (= 612,5kB)
 01       -> bootable flag
 01       -> image type for the application
 ```
-
-<a name="appwrite"></a>
 
 ### Writing the application
 
@@ -421,8 +421,6 @@ If debugging is needed, MCUXpresso can be used then for flashing the
 application. Please make sure that the application is written at address 0x4000:
 
 ![FLASH_LOCATION](../../../../platform/nxp/k32w/k32w0/doc/images/flash_location.JPG)
-
-<a name="otatesting"></a>
 
 ### OTA Testing
 
@@ -463,45 +461,43 @@ used for connecting the RPis to WiFi.
 Build the Linux OTA provider application:
 
 ```
-doru@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
+user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
 ```
 
 Build OTA image and start the OTA Provider Application:
 
 ```
-doru@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 chip-k32w0x-light-example.bin chip-k32w0x-light-example.ota
-doru@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
-doru@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
+user@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 chip-k32w0x-light-example.bin chip-k32w0x-light-example.ota
+user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
+user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
 ```
 
 Build Linux chip-tool:
 
 ```
-doru@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
+user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
 ```
 
 Provision the OTA provider application and assign node id _1_. Also, grant ACL
 entries to allow OTA requestors:
 
 ```
-doru@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
-doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing onnetwork 1 20202021
-doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing onnetwork 1 20202021
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
 ```
 
 Provision the device and assign node id _2_:
 
 ```
-doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021   3840
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021   3840
 ```
 
 Start the OTA process:
 
 ```
-doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 ```
-
-<a name="otaissues"></a>
 
 ## Known issues
 
@@ -518,7 +514,7 @@ doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupd
     command:
 
 ```
-doru@computer1:~/connectedhomeip$ : sudo docker kill $container_id
+user@computer1:~/connectedhomeip$ : sudo docker kill $container_id
 ```
 
 -   In order to avoid MDNS issues, only one interface should be active at one
@@ -526,8 +522,8 @@ doru@computer1:~/connectedhomeip$ : sudo docker kill $container_id
     disable multicast on that interface:
 
 ```
-doru@computer1:~/connectedhomeip$ sudo ip link set dev eth0 down
-doru@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
+user@computer1:~/connectedhomeip$ sudo ip link set dev eth0 down
+user@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
 ```
 
 -   If OTBR Docker image is used, then the "-B" parameter should point to the

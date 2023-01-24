@@ -52,8 +52,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SuccessOrExit(err);
 #endif // CHIP_DISABLE_PLATFORM_KVS
 
-    mRunLoopSem = dispatch_semaphore_create(0);
-
     // Ensure there is a dispatch queue available
     static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
@@ -121,6 +119,8 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 
 void PlatformManagerImpl::_RunEventLoop()
 {
+    mRunLoopSem = dispatch_semaphore_create(0);
+
     _StartEventLoopTask();
 
     //
@@ -128,6 +128,8 @@ void PlatformManagerImpl::_RunEventLoop()
     // _StopEventLoopTask()
     //
     dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
+    dispatch_release(mRunLoopSem);
+    mRunLoopSem = nullptr;
 }
 
 void PlatformManagerImpl::_Shutdown()
@@ -158,6 +160,15 @@ bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const
     return !mWorkQueue || mIsWorkQueueSuspended || dispatch_get_current_queue() == mWorkQueue;
 };
 #endif
+
+CHIP_ERROR PlatformManagerImpl::PrepareCommissioning()
+{
+    auto error = CHIP_NO_ERROR;
+#if CONFIG_NETWORK_LAYER_BLE
+    error = Internal::BLEMgrImpl().PrepareConnection();
+#endif // CONFIG_NETWORK_LAYER_BLE
+    return error;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

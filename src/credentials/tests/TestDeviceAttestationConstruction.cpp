@@ -18,7 +18,7 @@
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>

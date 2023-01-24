@@ -16,19 +16,37 @@
  *
  */
 
+/**
+ * This file allocate/free memory using the chip platform abstractions
+ * (Platform::MemoryCalloc and Platform::MemoryFree) for hosting a subset of the
+ * data model internal types until they are consumed by the DataModel::Encode machinery:
+ *   - chip::app:DataModel::List<T>
+ *   - chip::ByteSpan
+ *   - chip::CharSpan
+ *
+ * Memory allocation happens during the 'Setup' phase, while memory deallocation happens
+ * during the 'Finalize' phase.
+ *
+ * The 'Finalize' phase during the destructor phase, and if needed, 'Finalize' will call
+ * the 'Finalize' phase of its descendant.
+ */
+
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
+#include <commands/common/HexConversion.h>
 #include <json/json.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
 
 #include "JsonParser.h"
 
-constexpr uint8_t kMaxLabelLength = 100;
+constexpr uint8_t kMaxLabelLength  = 100;
+constexpr const char kNullString[] = "null";
 
 class ComplexArgumentParser
 {
@@ -171,17 +189,48 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        if (strlen(value.asCString()) % 2 != 0)
+        auto str         = value.asString();
+        auto size        = str.size();
+        uint8_t * buffer = nullptr;
+
+        if (IsStrString(str.c_str()))
         {
-            ChipLogError(chipTool, "Error while encoding %s as an octet string: Odd number of characters.", label);
-            return CHIP_ERROR_INVALID_STRING_LENGTH;
+            // Skip the prefix
+            str.erase(0, kStrStringPrefixLen);
+            size = str.size();
+
+            buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size, sizeof(uint8_t)));
+            memcpy(buffer, str.c_str(), size);
+        }
+        else
+        {
+            if (IsHexString(str.c_str()))
+            {
+                // Skip the prefix
+                str.erase(0, kHexStringPrefixLen);
+                size = str.size();
+            }
+
+            CHIP_ERROR err = HexToBytes(
+                chip::CharSpan(str.c_str(), size),
+                [&buffer](size_t allocSize) {
+                    buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(allocSize, sizeof(uint8_t)));
+                    return buffer;
+                },
+                &size);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                if (buffer != nullptr)
+                {
+                    chip::Platform::MemoryFree(buffer);
+                }
+
+                return err;
+            }
         }
 
-        size_t size       = strlen(value.asCString());
-        auto buffer       = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size / 2, sizeof(uint8_t)));
-        size_t octetCount = chip::Encoding::HexToBytes(value.asCString(), size, buffer, size / 2);
-
-        request = chip::ByteSpan(buffer, octetCount);
+        request = chip::ByteSpan(buffer, size);
         return CHIP_NO_ERROR;
     }
 
@@ -195,7 +244,7 @@ public:
 
         size_t size = strlen(value.asCString());
         auto buffer = static_cast<char *>(chip::Platform::MemoryCalloc(size, sizeof(char)));
-        strncpy(buffer, value.asCString(), size);
+        memcpy(buffer, value.asCString(), size);
 
         request = chip::CharSpan(buffer, size);
         return CHIP_NO_ERROR;
@@ -325,7 +374,11 @@ public:
     CHIP_ERROR Parse(const char * label, const char * json)
     {
         Json::Value value;
-        if (!JsonParser::ParseComplexArgument(label, json, value))
+        if (strcmp(kNullString, json) == 0)
+        {
+            value = Json::nullValue;
+        }
+        else if (!JsonParser::ParseComplexArgument(label, json, value))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }

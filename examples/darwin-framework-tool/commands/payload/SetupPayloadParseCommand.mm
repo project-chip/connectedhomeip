@@ -61,13 +61,7 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
     NSString * codeString = [NSString stringWithCString:mCode encoding:NSASCIIStringEncoding];
     NSError * error;
     MTRSetupPayload * payload;
-    MTROnboardingPayloadType codeType;
-    if (IsQRCode(codeString)) {
-        codeType = MTROnboardingPayloadTypeQRCode;
-    } else {
-        codeType = MTROnboardingPayloadTypeManualCode;
-    }
-    payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:codeString ofType:codeType error:&error];
+    payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:codeString error:&error];
     if (error) {
         LogNSError("Error: ", error);
         return CHIP_ERROR_INTERNAL;
@@ -82,39 +76,35 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
     NSLog(@"Version:       %@", payload.version);
     NSLog(@"VendorID:      %@", payload.vendorID);
     NSLog(@"ProductID:     %@", payload.productID);
-    NSLog(@"Custom flow:   %lu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
+    NSLog(@"Custom flow:   %tu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
     {
-        if (payload.rendezvousInformation == nil) {
+        if (payload.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
             NSLog(@"Capabilities:  UNKNOWN");
         } else {
             NSMutableString * humanFlags = [[NSMutableString alloc] init];
 
-            auto value = [payload.rendezvousInformation unsignedLongValue];
-            if (value == MTRDiscoveryCapabilitiesNone) {
-                [humanFlags appendString:@"NONE"];
-            } else {
-                if (value & MTRDiscoveryCapabilitiesSoftAP) {
-                    [humanFlags appendString:@"SoftAP"];
+            auto value = payload.discoveryCapabilities;
+            if (value & MTRDiscoveryCapabilitiesSoftAP) {
+                [humanFlags appendString:@"SoftAP"];
+            }
+            if (value & MTRDiscoveryCapabilitiesBLE) {
+                if (!humanFlags) {
+                    [humanFlags appendString:@", "];
                 }
-                if (value & MTRDiscoveryCapabilitiesBLE) {
-                    if (!humanFlags) {
-                        [humanFlags appendString:@", "];
-                    }
-                    [humanFlags appendString:@"BLE"];
+                [humanFlags appendString:@"BLE"];
+            }
+            if (value & MTRDiscoveryCapabilitiesOnNetwork) {
+                if (!humanFlags) {
+                    [humanFlags appendString:@", "];
                 }
-                if (value & MTRDiscoveryCapabilitiesOnNetwork) {
-                    if (!humanFlags) {
-                        [humanFlags appendString:@", "];
-                    }
-                    [humanFlags appendString:@"ON NETWORK"];
-                }
+                [humanFlags appendString:@"ON NETWORK"];
             }
 
-            NSLog(@"Capabilities:  0x%02lX (%@)", value, humanFlags);
+            NSLog(@"Capabilities:  0x%02lX (%@)", static_cast<long>(value), humanFlags);
         }
     }
     NSLog(@"Discriminator: %@", payload.discriminator);
-    NSLog(@"Passcode:      %@", payload.setUpPINCode);
+    NSLog(@"Passcode:      %@", payload.setupPasscode);
 
     if (payload.serialNumber) {
         NSLog(@"SerialNumber: %@", payload.serialNumber);
@@ -126,8 +116,8 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
         return CHIP_ERROR_INTERNAL;
     }
     for (const MTROptionalQRCodeInfo * info : optionalVendorData) {
-        bool isTypeString = [info.infoType isEqual:@(MTROptionalQRCodeInfoTypeString)];
-        bool isTypeInt32 = [info.infoType isEqual:@(MTROptionalQRCodeInfoTypeInt32)];
+        bool isTypeString = (info.type == MTROptionalQRCodeInfoTypeString);
+        bool isTypeInt32 = (info.type == MTROptionalQRCodeInfoTypeInt32);
         VerifyOrReturnError(isTypeString || isTypeInt32, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (isTypeString) {

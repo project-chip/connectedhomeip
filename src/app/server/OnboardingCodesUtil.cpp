@@ -56,16 +56,7 @@ void PrintOnboardingCodes(const chip::PayloadContents & payload)
 
     if (GetQRCode(qrCode, payload) == CHIP_NO_ERROR)
     {
-        chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
-        const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * qrCode.size() + 1;
-        qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
-
-        ChipLogProgress(AppServer, "SetupQRCode: [%s]", qrCode.data());
-        if (GetQRCodeUrl(qrCodeBuffer.Get(), qrCodeBufferMaxSize, qrCode) == CHIP_NO_ERROR)
-        {
-            ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
-            ChipLogProgress(AppServer, "%s", qrCodeBuffer.Get());
-        }
+        PrintQrCodeURL(qrCode);
     }
     else
     {
@@ -80,6 +71,20 @@ void PrintOnboardingCodes(const chip::PayloadContents & payload)
     else
     {
         ChipLogError(AppServer, "Getting manual pairing code failed!");
+    }
+}
+
+void PrintQrCodeURL(const chip::MutableCharSpan qrCode)
+{
+    chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
+    const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * qrCode.size() + 1;
+    qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
+
+    ChipLogProgress(AppServer, "SetupQRCode: [%s]", qrCode.data());
+    if (GetQRCodeUrl(qrCodeBuffer.Get(), qrCodeBufferMaxSize, qrCode) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
+        ChipLogProgress(AppServer, "%s", qrCodeBuffer.Get());
     }
 }
 
@@ -105,12 +110,12 @@ CHIP_ERROR GetPayloadContents(chip::PayloadContents & aPayload, chip::Rendezvous
     err = GetCommissionableDataProvider()->GetSetupPasscode(aPayload.setUpPINCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupPasscode() failed: %" CHIP_ERROR_FORMAT, err.Format());
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
         ChipLogProgress(AppServer, "*** Using default EXAMPLE passcode %u ***",
                         static_cast<unsigned>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
         aPayload.setUpPINCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
 #else
+        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupPasscode() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
 #endif
     }

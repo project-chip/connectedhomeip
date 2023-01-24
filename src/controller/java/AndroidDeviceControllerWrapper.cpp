@@ -20,6 +20,9 @@
 
 #include <algorithm>
 #include <memory>
+#include <vector>
+
+#include <string.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
@@ -28,15 +31,16 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
+#ifndef JAVA_MATTER_CONTROLLER_TEST
 #include <platform/android/CHIPP256KeypairBridge.h>
-
+#endif // JAVA_MATTER_CONTROLLER_TEST
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;
@@ -50,10 +54,18 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
     }
     mController->Shutdown();
 
+#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (mKeypairBridge != nullptr)
     {
         chip::Platform::Delete(mKeypairBridge);
         mKeypairBridge = nullptr;
+    }
+#endif // JAVA_MATTER_CONTROLLER_TEST
+
+    if (mDeviceAttestationDelegateBridge != nullptr)
+    {
+        delete mDeviceAttestationDelegateBridge;
+        mDeviceAttestationDelegateBridge = nullptr;
     }
 }
 
@@ -70,12 +82,17 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
-    JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, const chip::CATValues & cats, chip::System::Layer * systemLayer,
-    chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
-    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+    JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
+    chip::System::Layer * systemLayer, chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
+    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    ExampleOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+#else
+    AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+#endif
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
-    bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, CHIP_ERROR * errInfoOnFailure)
+    bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -121,11 +138,22 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(
         new AndroidDeviceControllerWrapper(std::move(controller), std::move(opCredsIssuerPtr)));
 
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    if (wrapper->mExampleStorage.Init() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Init Storage failure");
+        return nullptr;
+    }
+    chip::PersistentStorageDelegate * wrapperStorage = &wrapper->mExampleStorage;
+    wrapper->SetJavaObjectRef(vm, deviceControllerObj);
+    chip::Controller::ExampleOperationalCredentialsIssuer * opCredsIssuer = wrapper->mOpCredsIssuer.get();
+#else
     chip::PersistentStorageDelegate * wrapperStorage = wrapper.get();
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
 
     chip::Controller::AndroidOperationalCredentialsIssuer * opCredsIssuer = wrapper->mOpCredsIssuer.get();
+#endif
 
     // Initialize device attestation verifier
     // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
@@ -156,6 +184,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     params.SetFailsafeTimerSeconds(failsafeTimerSeconds);
     params.SetAttemptWiFiNetworkScan(attemptNetworkScanWiFi);
     params.SetAttemptThreadNetworkScan(attemptNetworkScanThread);
+    params.SetSkipCommissioningComplete(skipCommissioningComplete);
     wrapper->UpdateCommissioningParameters(params);
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
@@ -173,9 +202,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         return nullptr;
     }
     initParams.opCertStore = &wrapper->mOpCertStore;
-
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    opCredsIssuer->Initialize(wrapper->mExampleStorage);
+#else
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
     opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef);
+#endif
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     if (!noc.Alloc(kMaxCHIPDERCertLength))
@@ -204,13 +236,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
     Crypto::P256Keypair ephemeralKey;
-
-    if (rootCertificate != nullptr && intermediateCertificate != nullptr && nodeOperationalCertificate != nullptr &&
-        keypairDelegate != nullptr)
+#ifndef JAVA_MATTER_CONTROLLER_TEST
+    if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
     {
         CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
         nativeKeypairBridge->SetDelegate(keypairDelegate);
-        *errInfoOnFailure = nativeKeypairBridge->Initialize();
+        *errInfoOnFailure = nativeKeypairBridge->Initialize(Crypto::ECPKeyTarget::ECDSA);
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {
             return nullptr;
@@ -220,16 +251,34 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.hasExternallyOwnedOperationalKeypair = true;
 
         JniByteArray jniRcac(env, rootCertificate);
-        JniByteArray jniIcac(env, intermediateCertificate);
         JniByteArray jniNoc(env, nodeOperationalCertificate);
 
-        setupParams.controllerRCAC = jniRcac.byteSpan();
-        setupParams.controllerICAC = jniIcac.byteSpan();
-        setupParams.controllerNOC  = jniNoc.byteSpan();
+        // Make copies of the cert that outlive the scope so that future factor init does not
+        // cause loss of scope from the JNI refs going away. Also, this keeps the certs
+        // handy for debugging commissioner init.
+        wrapper->mRcacCertificate = std::vector<uint8_t>(jniRcac.byteSpan().begin(), jniRcac.byteSpan().end());
+
+        // Intermediate cert could be missing. Let's only copy it if present
+        wrapper->mIcacCertificate.clear();
+        if (intermediateCertificate != nullptr)
+        {
+            JniByteArray jniIcac(env, intermediateCertificate);
+            wrapper->mIcacCertificate = std::vector<uint8_t>(jniIcac.byteSpan().begin(), jniIcac.byteSpan().end());
+        }
+
+        wrapper->mNocCertificate = std::vector<uint8_t>(jniNoc.byteSpan().begin(), jniNoc.byteSpan().end());
+
+        setupParams.controllerRCAC = chip::ByteSpan(wrapper->mRcacCertificate.data(), wrapper->mRcacCertificate.size());
+        setupParams.controllerICAC = chip::ByteSpan(wrapper->mIcacCertificate.data(), wrapper->mIcacCertificate.size());
+        setupParams.controllerNOC  = chip::ByteSpan(wrapper->mNocCertificate.data(), wrapper->mNocCertificate.size());
     }
     else
+#endif // JAVA_MATTER_CONTROLLER_TEST
     {
-        *errInfoOnFailure = ephemeralKey.Initialize();
+        ChipLogProgress(Controller,
+                        "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");
+
+        *errInfoOnFailure = ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA);
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {
             return nullptr;
@@ -237,9 +286,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.operationalKeypair                   = &ephemeralKey;
         setupParams.hasExternallyOwnedOperationalKeypair = false;
 
-        *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId,
-                                                                           /* fabricId = */ 1, cats, ephemeralKey.Pubkey(),
-                                                                           rcacSpan, icacSpan, nocSpan);
+        *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, fabricId, cats, ephemeralKey.Pubkey(), rcacSpan,
+                                                                           icacSpan, nocSpan);
 
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {
@@ -271,15 +319,17 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         return nullptr;
     }
-    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+    ChipLogProgress(Controller, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
                     static_cast<unsigned>(wrapper->Controller()->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     chip::ByteSpan ipkSpan;
+    std::vector<uint8_t> ipkBuffer;
     if (ipkEpochKey != nullptr)
     {
         JniByteArray jniIpk(env, ipkEpochKey);
-        ipkSpan = jniIpk.byteSpan();
+        ipkBuffer = std::vector<uint8_t>(jniIpk.byteSpan().begin(), jniIpk.byteSpan().end());
+        ipkSpan   = chip::ByteSpan(ipkBuffer.data(), ipkBuffer.size());
     }
     else
     {
@@ -288,6 +338,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(
         &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
+
+    memset(ipkBuffer.data(), 0, ipkBuffer.size());
+
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
@@ -415,6 +468,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
     {
         env->ReleaseByteArrayElements(operationalDatasetBytes, operationalDataset, 0);
         env->DeleteGlobalRef(operationalDatasetBytes);
+        operationalDatasetBytes = nullptr;
     }
 }
 
@@ -624,7 +678,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksFailure(CHIP_ERROR error)
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    ChipLogProgress(chipTool, "KVS: Getting key %s", key);
+    ChipLogProgress(chipTool, "KVS: Getting key %s", StringOrNullMarker(key));
 
     size_t read_size = 0;
 
@@ -637,12 +691,12 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, voi
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    ChipLogProgress(chipTool, "KVS: Setting key %s", key);
+    ChipLogProgress(chipTool, "KVS: Setting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
 {
-    ChipLogProgress(chipTool, "KVS: Deleting key %s", key);
+    ChipLogProgress(chipTool, "KVS: Deleting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include <app-common/zap-generated/enums.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMemString.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/DiagnosticDataProviderImpl.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -33,7 +34,11 @@
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "spi_flash_mmap.h"
+#else
 #include "esp_spi_flash.h"
+#endif
 #include "esp_system.h"
 #include "esp_wifi.h"
 
@@ -45,15 +50,15 @@ using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace {
 
-InterfaceType GetInterfaceType(const char * if_desc)
+InterfaceTypeEnum GetInterfaceType(const char * if_desc)
 {
     if (strncmp(if_desc, "ap", strnlen(if_desc, 2)) == 0 || strncmp(if_desc, "sta", strnlen(if_desc, 3)) == 0)
-        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     if (strncmp(if_desc, "openthread", strnlen(if_desc, 10)) == 0)
-        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
     if (strncmp(if_desc, "eth", strnlen(if_desc, 3)) == 0)
-        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
-    return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+    return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -210,11 +215,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         {
             NetworkInterface * ifp = new NetworkInterface();
             esp_netif_ip_info_t ipv4_info;
-            strncpy(ifp->Name, esp_netif_get_ifkey(ifa), Inet::InterfaceId::kMaxIfNameLength);
-            ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-            ifp->name                                          = CharSpan::fromCharString(ifp->Name);
-            ifp->isOperational                                 = true;
-            ifp->type                                          = GetInterfaceType(esp_netif_get_desc(ifa));
+            Platform::CopyString(ifp->Name, esp_netif_get_ifkey(ifa));
+            ifp->name          = CharSpan::fromCharString(ifp->Name);
+            ifp->isOperational = true;
+            ifp->type          = GetInterfaceType(esp_netif_get_desc(ifa));
             ifp->offPremiseServicesReachableIPv4.SetNull();
             ifp->offPremiseServicesReachableIPv6.SetNull();
             if (esp_netif_get_mac(ifa, ifp->MacAddress) != ESP_OK)

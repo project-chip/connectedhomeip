@@ -19,18 +19,13 @@
 from __future__ import annotations
 
 import ctypes
-from dataclasses import dataclass, field
-from typing import *
-from ctypes import *
-from rich.pretty import pprint
-import json
 import logging
-import builtins
-import base64
+from ctypes import *
+from typing import *
+
 import chip.exceptions
-from chip import ChipDeviceCtrl
-from chip import ChipStack
-from chip import FabricAdmin
+from chip import ChipStack, FabricAdmin
+from chip.native import PyChipError
 from chip.storage import PersistentStorage
 
 
@@ -74,7 +69,7 @@ class CertificateAuthority:
         self._Handle().pychip_OpCreds_InitializeDelegate.restype = c_void_p
         self._Handle().pychip_OpCreds_InitializeDelegate.argtypes = [ctypes.py_object, ctypes.c_uint32, ctypes.c_void_p]
 
-        self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.restype = c_uint32
+        self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.restype = PyChipError
         self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.argtypes = [ctypes.c_void_p, ctypes.c_bool]
 
         if (persistentStorage is None):
@@ -104,7 +99,7 @@ class CertificateAuthority:
             Each FabricAdmin that is added there-after will insert a dictionary item into that list containing
             'fabricId' and 'vendorId' keys.
         '''
-        if (not(self._isActive)):
+        if (not (self._isActive)):
             raise RuntimeError("Object isn't active")
 
         self.logger().warning("Loading fabric admins from storage...")
@@ -124,7 +119,7 @@ class CertificateAuthority:
             This will update the REPL keys in persistent storage IF a 'caList' key is present. If it isn't,
             will avoid making any updates.
         '''
-        if (not(self._isActive)):
+        if (not (self._isActive)):
             raise RuntimeError(
                 f"CertificateAuthority object was previously shutdown and is no longer valid!")
 
@@ -172,7 +167,7 @@ class CertificateAuthority:
     def GetOpCredsContext(self):
         ''' Returns a pointer to the underlying C++ OperationalCredentialsAdapter.
         '''
-        if (not(self._isActive)):
+        if (not (self._isActive)):
             raise RuntimeError("Object isn't active")
 
         return self._closure
@@ -191,12 +186,9 @@ class CertificateAuthority:
 
     @maximizeCertChains.setter
     def maximizeCertChains(self, enabled: bool):
-        res = self._chipStack.Call(
+        self._chipStack.Call(
             lambda: self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed(ctypes.c_void_p(self._closure), ctypes.c_bool(enabled))
-        )
-
-        if res != 0:
-            raise self._chipStack.ErrorToException(res)
+        ).raise_on_error()
 
         self._maximizeCertChains = enabled
 
@@ -246,7 +238,7 @@ class CertificateAuthorityManager:
         ''' Loads any existing CertificateAuthority instances present in persistent storage.
             If the 'caList' key is not present in the REPL config, it will create one.
         '''
-        if (not(self._isActive)):
+        if (not (self._isActive)):
             raise RuntimeError("Object is not active")
 
         self.logger().warning("Loading certificate authorities from storage...")
@@ -269,7 +261,7 @@ class CertificateAuthorityManager:
             This will write to the REPL keys in persistent storage to setup an empty list for the 'CA Index'
             item.
         '''
-        if (not(self._isActive)):
+        if (not (self._isActive)):
             raise RuntimeError("Object is not active")
 
         if (caIndex is None):

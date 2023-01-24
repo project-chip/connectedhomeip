@@ -18,7 +18,7 @@ limitations under the License.
   <domain name="CHIP"/>
   <enum name="CommissioningError" type="ENUM8">
     <cluster code="0x0030"/>
-    <item name="Ok" value="0x0"/>
+    <item name="OK" value="0x0"/>
     <item name="ValueOutsideRange" value="0x1"/>
     <item name="InvalidAuthentication" value="0x2"/>
     <item name="NoFailSafe" value="0x3"/>
@@ -46,33 +46,33 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="administer"/>
     </attribute>
-    <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
-    <attribute side="server" code="0x02" define="REGULATORYCONFIG" type="RegulatoryLocationType" writable="false" optional="false">RegulatoryConfig</attribute>
-    <attribute side="server" code="0x03" define="LOCATIONCAPABILITY" type="RegulatoryLocationType" writable="false" optional="false">LocationCapability</attribute>
+    <attribute side="server" code="0x01" define="BASIC_COMMISSIONING_INFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
+    <attribute side="server" code="0x02" define="REGULATORY_CONFIG" type="RegulatoryLocationType" writable="false" optional="false">RegulatoryConfig</attribute>
+    <attribute side="server" code="0x03" define="LOCATION_CAPABILITY" type="RegulatoryLocationType" writable="false" optional="false">LocationCapability</attribute>
     <attribute side="server" code="0x04" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" writable="false" default="1" optional="false">SupportsConcurrentConnection</attribute>
 
     <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">
       <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
-      <arg name="expiryLengthSeconds" type="INT16U"/>
-      <arg name="breadcrumb" type="INT64U"/>
+      <arg name="ExpiryLengthSeconds" type="INT16U"/>
+      <arg name="Breadcrumb" type="INT64U"/>
       <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x01" name="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsaferesponse">
       <description>Success/failure response for ArmFailSafe command</description>
-      <arg name="errorCode" type="CommissioningError"/>
-      <arg name="debugText" type="CHAR_STRING"/>
+      <arg name="ErrorCode" type="CommissioningError"/>
+      <arg name="DebugText" type="CHAR_STRING"/>
     </command>
     <command source="client" code="0x02" name="SetRegulatoryConfig" response="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfig">
       <description>Set the regulatory configuration to be used during commissioning</description>
       <arg name="NewRegulatoryConfig" type="RegulatoryLocationType"/>
-      <arg name="countryCode" type="CHAR_STRING"/>
-      <arg name="breadcrumb" type="INT64U"/>
+      <arg name="CountryCode" type="CHAR_STRING"/>
+      <arg name="Breadcrumb" type="INT64U"/>
       <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x03" name="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfigresponse">
       <description>Success/failure response for SetRegulatoryConfig command</description>
-      <arg name="errorCode" type="CommissioningError"/>
-      <arg name="debugText" type="CHAR_STRING"/>
+      <arg name="ErrorCode" type="CommissioningError"/>
+      <arg name="DebugText" type="CHAR_STRING"/>
     </command>
     <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" isFabricScoped="true" optional="false" cli="chip fabric_commissioning commissioningcomplete">
       <description>Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period.</description>
@@ -80,8 +80,8 @@ limitations under the License.
     </command>
     <command source="server" code="0x05" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
       <description>Indicates to client whether CommissioningComplete command succeeded</description>
-      <arg name="errorCode" type="CommissioningError"/>
-      <arg name="debugText" type="CHAR_STRING"/>
+      <arg name="ErrorCode" type="CommissioningError"/>
+      <arg name="DebugText" type="CHAR_STRING"/>
     </command>
   </cluster>
 </configurator>

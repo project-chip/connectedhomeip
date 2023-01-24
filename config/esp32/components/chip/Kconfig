@@ -171,16 +171,23 @@ menu "CHIP Core"
             help
                 Enable this option to enable OTA Requestor for example
 
+        config OTA_AUTO_REBOOT_ON_APPLY
+            bool "Reboot the device after applying the OTA image"
+            depends on ENABLE_OTA_REQUESTOR
+            default y
+            help
+                Enable this option to reboot the device after applying the new image.
+
+        config OTA_AUTO_REBOOT_DELAY_MS
+            int "OTA reboot delay time (ms)"
+            depends on OTA_AUTO_REBOOT_ON_APPLY
+            default 5000
+            help
+                The delay time for OTA reboot on applying.
+
     endmenu # "System Options"
 
     menu "Security Options"
-
-        config MAX_SESSION_KEYS
-            int "Max Session Keys"
-            range 0 65535
-            default 8
-            help
-                The maximum number of simultaneously active session keys.
 
         menu "Debugging"
 
@@ -192,17 +199,6 @@ menu "CHIP Core"
 
                     WARNING: This option makes it possible to circumvent basic CHIP security functionality,
                     including message encryption. Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
-
-            config DISABLE_PROVISIONING_AUTH
-                bool "Disable Provisioning Authentication Checks"
-                default n
-                help
-                    Disable authentication checks for CHIP provisioning operations.  This makes it possible to
-                    perform device provisioning operations (e.g. adding a network or joining a fabric) without
-                    establishing a secure session.
-
-                    WARNING: This option makes it possible to circumvent basic CHIP security functionality.
-                    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 
         endmenu # "Debugging"
 
@@ -246,14 +242,6 @@ menu "CHIP Device Layer"
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
 
-        config SERVICE_DIRECTORY_CACHE_SIZE
-            int "CHIP Service Directory Cache Size"
-            range 0 65535
-            default 512
-            help
-                The size (in bytes) of the service directory cache.  This limits the maximum size of the directory
-                that can be returned in response to a service directory query.
-        
         config ENABLE_EXTENDED_DISCOVERY
             bool "Enable Extended discovery Support"
             default n
@@ -301,15 +289,9 @@ menu "CHIP Device Layer"
                 This is a default value which is used when a hardware version has not been stored in device
                 persistent storage (e.g. by a factory provisioning process).
 
-        config DEVICE_SOFTWARE_VERSION
-            string "Device Software Version String"
-            default "v1.0"
-            help
-                A string identifying the software version running on the device.
-
         config DEVICE_SOFTWARE_VERSION_NUMBER
             int "Device Software Version Number"
-            default 1
+            default 0
             help
                 Software version number running on the device.
 
@@ -351,7 +333,7 @@ menu "CHIP Device Layer"
         config WIFI_STATION_RECONNECT_INTERVAL
             int "WiFi Station Interface Reconnect Interval (ms)"
             range 0 65535
-            default 5000
+            default 100
             depends on ENABLE_WIFI_STATION
             help
                 The interval at which the CHIP platform will attempt to reconnect to the configured WiFi network (in milliseconds).
@@ -503,11 +485,14 @@ menu "CHIP Device Layer"
 
                 When set, WoBLE advertisements will stop while a WoBLE connection is active.
 
-        config DEINIT_BLE_ON_COMMISSIONING_COMPLETE
-	    bool "Disable and DeInit BLE on commissioning complete"
+        config USE_BLE_ONLY_FOR_COMMISSIONING
+	    bool "Use BLE only for commissioning"
 	    default y
-	    help 
-                Disable and deinit BLE and reclaim all its memory, once the commissioning is successful and Commissioning complete event is received in the application.	
+	    help
+            Disable this flag if BLE is used for any other purpose than commissioning.
+            When enabled, it deinitialized the BLE on successful commissioning, and on
+            bootup do not initialize the BLE if device is already provisioned with Wi-Fi/Thread credentials.
+
     endmenu
 
     menu "CHIP Thread Options"
@@ -522,15 +507,54 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "CHIP Trait Manager"
+    menu "Ethernet Options"
+        visible if ENABLE_ETHERNET_TELEMETRY
 
-        config ENABLE_TRAIT_MANAGER
-            bool "Enable Trait Manager"
-            default y
+        config GPIO_RANGE_MIN
+            int
+            depends on ENABLE_ETHERNET_TELEMETRY
+            default 0
+
+        config GPIO_RANGE_MAX
+            int
+            depends on ENABLE_ETHERNET_TELEMETRY
+            default 33 if IDF_TARGET_ESP32
+            default 46 if IDF_TARGET_ESP32S2
+            default 19 if IDF_TARGET_ESP32C3
+            default 48 if IDF_TARGET_ESP32S3
+            default 26 if IDF_TARGET_ESP32H2
+
+        config ETH_MDC_GPIO
+            int "SMI MDC GPIO number"
+            depends on ENABLE_ETHERNET_TELEMETRY
+            range GPIO_RANGE_MIN GPIO_RANGE_MAX
+            default 23 if ENABLE_ETHERNET_TELEMETRY
             help
-                Enable support for the CHIP Trait Manager.
+                Set the GPIO number used by SMI MDC.
 
-                The Trait Manager is an experimental feature of the CHIP Device Layer.
+        config ETH_MDIO_GPIO
+            int "SMI MDIO GPIO number"
+            depends on ENABLE_ETHERNET_TELEMETRY
+            range GPIO_RANGE_MIN GPIO_RANGE_MAX
+            default 18 if ENABLE_ETHERNET_TELEMETRY
+            help
+                Set the GPIO number used by SMI MDIO.
+
+        config ETH_PHY_RST_GPIO
+            int "PHY Reset GPIO number"
+            depends on ENABLE_ETHERNET_TELEMETRY
+            range -1 GPIO_RANGE_MAX
+            default 5 if ENABLE_ETHERNET_TELEMETRY
+            help
+                Set the GPIO number used to reset PHY chip.
+                Set to -1 to disable PHY chip hardware reset.
+
+        config ETH_PHY_ADDR
+            int "PHY Address"
+            range 0 31
+            default 1 if ENABLE_ETHERNET_TELEMETRY
+            help
+                Set PHY address according your board schematic.
 
     endmenu
 
@@ -647,6 +671,13 @@ menu "CHIP Device Layer"
                 Details like Supported calendar types, supported locales, and fixed labels will be read from factory
                 partition.
 
+        config ENABLE_ESP32_LOCATIONCAPABILITY
+            depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER
+            bool "Enable ESP32 Device LocationCapability "
+            default n
+            help
+                Enable ESP32 Device LocationCapability
+
     endmenu
 
 
@@ -674,6 +705,20 @@ menu "CHIP Device Layer"
                 WARNING: This option makes it possible to circumvent basic chip security functionality.
                 Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 
+        config TEST_EVENT_TRIGGER_ENABLED
+            bool "Enable Test Event Trigger"
+            default y
+            help
+                Enable TestEventTrigger in GeneralDiagnostics cluster.
+
+        config TEST_EVENT_TRIGGER_ENABLE_KEY
+            string "Test Event Trigger Enable Key"
+            depends on TEST_EVENT_TRIGGER_ENABLED
+            default "00112233445566778899aabbccddeeff"
+            help
+                The EnableKey in hex string format used by TestEventTrigger command in GeneralDiagnostics
+                cluster. The length of the string should be 32.
+
         config ENABLE_FIXED_TUNNEL_SERVER
             bool "Use Fixed Tunnel Server"
             default n
@@ -691,13 +736,6 @@ menu "CHIP Device Layer"
                 The IP address and port of the server to which the device should establish a service tunnel.
                 The supplied address must be a dot-notation IP address--not a host name.  The port number is
                 optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
-
-        config LOG_PROVISIONING_HASH
-            bool "Enable Provisioning Hash Logging"
-            default n
-            help
-                Compute and log a hash of the device's provisioning data on boot.  The generated hash value confirms
-                to the form described in the CHIP: Factory Provisioning Specification.
 
     endmenu
 
@@ -730,6 +768,12 @@ menu "CHIP Device Layer"
             help
                 Enable automatically uploading CHIP tunnel telemetry via trait on an interval.
 
+        config ENABLE_ETHERNET_TELEMETRY
+            bool "Enable Ethernet Telemetry"
+            default n
+            help
+                Enable ethernet support for boards with Internal Ethernet
+
     endmenu
 
     menu "Event Logging Options"
@@ -740,15 +784,6 @@ menu "CHIP Device Layer"
             default 4096
             help
                 A size, in bytes, of the individual critical production event logging buffer.
-
-                This critical production event buffer must exist.
-
-        config EVENT_LOGGING_PROD_BUFFER_SIZE
-            int "Event Logging Production Buffer Size"
-            range 0 65535
-            default 2048
-            help
-                A size, in bytes, of the individual production event logging buffer.
 
                 This critical production event buffer must exist.
 
@@ -773,12 +808,11 @@ menu "CHIP Device Layer"
                 for the debug level events are disabled.
 
 
-	config CHIP_ENABLE_SCHEMA_CHECK
-	   bool "Enable Schema Check"
+	config CHIP_CONFIG_IM_PRETTY_PRINT
+	   bool "Enable IM Pretty Print"
 	   default y
 	   help
-	     If enabled, it checks incoming messages are following the expected schema,
-             and incoming message payloads are logged in detail.
+	     If enabled, incoming message payloads are logged in detail.
 	     To see detailed logging please set default log level to Debug.
 	     (Component config --> Log output --> Default log verbosity --> Debug)
 
@@ -836,7 +870,7 @@ menu "CHIP Device Layer"
             default "nvs"
             help
                 Label of the partition to store key-values in the "chip-counters" namespace.
-        
+
         config CHIP_KVS_NAMESPACE_PARTITION_LABEL
             string "chip-kvs namespace partition label"
             default "nvs"

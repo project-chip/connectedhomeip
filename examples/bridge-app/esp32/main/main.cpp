@@ -21,7 +21,7 @@
 #include "nvs_flash.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/reporting/reporting.h>
@@ -100,7 +100,7 @@ static Device gLight4("Light 4", "Den");
 /* BRIDGED DEVICE ENDPOINT: contains the following clusters:
    - On/Off
    - Descriptor
-   - Bridged Device Basic
+   - Bridged Device Basic Information
 */
 
 // Declare On/Off cluster attributes
@@ -116,7 +116,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_DEVICE_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttrib
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_PARTS_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-// Declare Bridged Device Basic information cluster attributes
+// Declare Bridged Device Basic Information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_NODE_LABEL_ATTRIBUTE_ID, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0),               /* Reachable */
@@ -136,9 +136,9 @@ constexpr CommandId onOffIncomingCommands[] = {
 };
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs, onOffIncomingCommands, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr,
+DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, onOffIncomingCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr,
                             nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
@@ -153,7 +153,7 @@ DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
  */
 
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION (1u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (1u)
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
@@ -167,7 +167,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
-            while (1)
+            while (true)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
                 ret =
@@ -229,7 +229,7 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION;
+        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
     }
     else
     {
@@ -278,11 +278,11 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     {
         Device * dev = gDevices[endpointIndex];
 
-        if (clusterId == ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID)
+        if (clusterId == BridgedDeviceBasicInformation::Id)
         {
             return HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
         }
-        else if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+        else if (clusterId == OnOff::Id)
         {
             return HandleReadOnOffAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
         }
@@ -300,7 +300,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     {
         Device * dev = gDevices[endpointIndex];
 
-        if ((dev->IsReachable()) && (clusterId == ZCL_ON_OFF_CLUSTER_ID))
+        if ((dev->IsReachable()) && (clusterId == OnOff::Id))
         {
             return HandleWriteOnOffAttribute(dev, attributeMetadata->attributeId, buffer);
         }
@@ -328,7 +328,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 {
     if (itemChangedMask & Device::kChanged_Reachable)
     {
-        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::Reachable::Id);
+        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::Reachable::Id);
     }
 
     if (itemChangedMask & Device::kChanged_State)
@@ -338,7 +338,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 
     if (itemChangedMask & Device::kChanged_Name)
     {
-        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::NodeLabel::Id);
+        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::NodeLabel::Id);
     }
 }
 

@@ -69,19 +69,11 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote CHIP Time service
- * using the CHIP Time Sync protocol.
- */
-//#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
-
-/**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.
  */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (256)
 
 #define MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED 0
 

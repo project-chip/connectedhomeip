@@ -22,10 +22,9 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
-#include "qrcodegen.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -39,6 +38,7 @@
 #include <setup_payload/SetupPayload.h>
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
 
@@ -119,6 +119,23 @@ void NetWorkCommissioningInstInit()
 {
     sWiFiNetworkCommissioningInstance.Init();
 }
+
+void OnIdentifyStart(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void OnIdentifyStop(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    OnIdentifyStart,
+    OnIdentifyStop,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE,
+};
 
 static void InitServer(intptr_t context)
 {
@@ -288,18 +305,18 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LightActionEventHandler(AppEvent * event)
 {
-    bool initiated = false;
     LightingManager::Action_t action;
-    int32_t actor  = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    int32_t actor;
 
-    if (event->Type == AppEvent::kEventType_Light)
+    switch (event->Type)
     {
+    case AppEvent::kEventType_Light: {
         action = static_cast<LightingManager::Action_t>(event->LightEvent.Action);
         actor  = event->LightEvent.Actor;
+        break;
     }
-    else if (event->Type == AppEvent::kEventType_Button)
-    {
+
+    case AppEvent::kEventType_Button: {
         if (LightMgr().IsLightOn())
         {
             action = LightingManager::OFF_ACTION;
@@ -308,21 +325,18 @@ void AppTask::LightActionEventHandler(AppEvent * event)
         {
             action = LightingManager::ON_ACTION;
         }
+
         actor = AppEvent::kEventType_Button;
-    }
-    else
-    {
-        err = APP_ERROR_UNHANDLED_EVENT;
+        break;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        initiated = LightMgr().InitiateAction(actor, action);
+    default:
+        return;
+    }
 
-        if (!initiated)
-        {
-            P6_LOG("Action is already in progress or active.");
-        }
+    if (!LightMgr().InitiateAction(actor, action))
+    {
+        P6_LOG("Action is already in progress or active.");
     }
 }
 
@@ -540,8 +554,8 @@ void AppTask::UpdateClusterState(intptr_t context)
     uint8_t newValue = LightMgr().IsLightOn();
 
     // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = emberAfWriteAttribute(1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue,
+                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         P6_LOG("ERR: updating on/off %x", status);

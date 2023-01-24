@@ -152,8 +152,6 @@ ble.connUpdateParamsPeripheral.reqMaxConnInt               = 50;
 
 ble.advSet1.$name                                         = "ti_ble5stack_broadcaster_advertisement_set0";
 ble.advSet1.advParam1.$name                               = "ti_ble5stack_broadcaster_advertisement_params0";
-ble.advSet1.advParam1.primIntMin                    = 100;
-ble.advSet1.advParam1.primIntMax                    = 200;
 
 /* DMM */
 dmm.project                                          = "ti_thread_thermostat_remote_display";

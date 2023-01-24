@@ -39,52 +39,52 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
-              - name: "credentials"
+              - name: "Credentials"
                 value: null
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextUserIndex"
+              - name: "NextUserIndex"
                 value: null
 
     - label: "TH reads NumberOfYearDay SchedulesSupportedPerUser attribute"
-      PICS: DRLK.S.F04 && DRLK.S.A0015
+      PICS: DRLK.S.F0a && DRLK.S.A0015
       command: "readAttribute"
       attribute: "NumberOfYearDaySchedulesSupportedPerUser"
       response:
@@ -94,7 +94,7 @@ tests:
               maxValue: 255
 
     - label: "TH reads NumberOfTotalUsers Supported attribute"
-      PICS: DRLK.C.F08 && DRLK.S.A0011
+      PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
@@ -104,13 +104,13 @@ tests:
               maxValue: 65534
 
     - label: "TH sends Set Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0e.Rsp
+      PICS: DRLK.S.F0a && DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
           values:
               - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
               - name: "LocalStartTime"
                 value: 960
@@ -119,21 +119,21 @@ tests:
 
     #issue #18591
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
               - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
               - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
               - name: "LocalStartTime"
                 value: 960
@@ -149,7 +149,7 @@ tests:
           values:
               - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 15
               - name: "LocalStartTime"
                 value: 1020
@@ -159,21 +159,21 @@ tests:
           error: INVALID_COMMAND
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
               - name: "YearDayIndex"
-                value: 2
-              - name: "userIndex"
-                value: 21
+                value: 0
+              - name: "UserIndex"
+                value: 15
       response:
           values:
               - name: "YearDayIndex"
-                value: 2
-              - name: "userIndex"
-                value: 21
-              - name: "status"
+                value: 0
+              - name: "UserIndex"
+                value: 15
+              - name: "Status"
                 value: 0x85
               - name: "LocalStartTime"
                 constraints:
@@ -187,37 +187,37 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 5
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
               - name: "YearDayIndex"
-                value: 10
-              - name: "userIndex"
+                value: NumberOfYearDaySchedulesSupportedPerUser
+              - name: "UserIndex"
                 value: 5
       response:
           values:
               - name: "YearDayIndex"
-                value: 10
-              - name: "userIndex"
+                value: NumberOfYearDaySchedulesSupportedPerUser
+              - name: "UserIndex"
                 value: 5
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
               - name: "LocalStartTime"
                 constraints:
@@ -231,27 +231,27 @@ tests:
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx && DRLK.S.C10.Rsp
+      PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx && DRLK.S.C10.Rsp
       command: "GetYearDaySchedule"
       arguments:
           values:
               - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
               - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
               - name: "LocalStartTime"
                 constraints:
@@ -267,7 +267,7 @@ tests:
           values:
               - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
               - name: "LocalStartTime"
                 value: 1080
@@ -275,21 +275,21 @@ tests:
                 value: 2100
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
               - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
               - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x00
               - name: "LocalStartTime"
                 value: 1080
@@ -299,25 +299,25 @@ tests:
                     minValue: 1081
 
     - label: "TH sends Clear Year Day Schedule to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C10.Rsp
+      PICS: DRLK.S.F0a && DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
       response:
           error: INVALID_COMMAND
 
     - label: "Clear a year day schedule for the first user"
-      PICS: DRLK.S.F04 && DRLK.S.C10.Rsp
+      PICS: DRLK.S.F0a && DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Cleanup the created user"
@@ -325,5 +325,5 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1

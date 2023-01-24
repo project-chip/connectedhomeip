@@ -39,6 +39,7 @@ class App:
         self.lastLogIndex = 0
         self.kvsPathSet = {'/tmp/chip_kvs'}
         self.options = None
+        self.killed = False
 
     def start(self, options=None):
         if not self.process:
@@ -85,9 +86,13 @@ class App:
     def kill(self):
         if self.process:
             self.process.kill()
+        self.killed = True
 
     def wait(self, timeout=None):
         while True:
+            # If the App was never started, AND was killed, exit immediately
+            if self.killed:
+                return 0
             # If the App was never started, wait cannot be called on the process
             if self.process == None:
                 time.sleep(0.1)
@@ -148,6 +153,7 @@ class TestTarget(Enum):
     TV = auto()
     LOCK = auto()
     OTA = auto()
+    BRIDGE = auto()
 
 
 @dataclass
@@ -158,9 +164,11 @@ class ApplicationPaths:
     ota_provider_app: typing.List[str]
     ota_requestor_app: typing.List[str]
     tv_app: typing.List[str]
+    bridge_app: typing.List[str]
+    chip_repl_yaml_tester_cmd: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app]
+        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app, self.bridge_app, self.chip_repl_yaml_tester_cmd]
 
 
 @dataclass
@@ -208,6 +216,7 @@ class TestDefinition:
     run_name: str
     target: TestTarget
     is_manual: bool
+    use_chip_repl_yaml_tester: bool = False
 
     def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int], dry_run=False):
         """
@@ -224,13 +233,15 @@ class TestDefinition:
                 target_app = paths.lock_app
             elif self.target == TestTarget.OTA:
                 target_app = paths.ota_requestor_app
+            elif self.target == TestTarget.BRIDGE:
+                target_app = paths.bridge_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
 
             for path in paths.items():
-                # Do not add chip-tool to the register
-                if path == paths.chip_tool:
+                # Do not add chip-tool or chip-repl-yaml-tester-cmd to the register
+                if path == paths.chip_tool or path == paths.chip_repl_yaml_tester_cmd:
                     continue
 
                 # For the app indicated by self.target, give it the 'default' key to add to the register
@@ -269,7 +280,12 @@ class TestDefinition:
             if dry_run:
                 logging.info(" ".join(pairing_cmd))
                 logging.info(" ".join(test_cmd))
-
+            elif self.use_chip_repl_yaml_tester:
+                chip_repl_yaml_tester_cmd = paths.chip_repl_yaml_tester_cmd
+                python_cmd = chip_repl_yaml_tester_cmd + \
+                    ['--setup-code', app.setupCode] + ['--yaml-path', self.run_name]
+                runner.RunSubprocess(python_cmd, name='CHIP_REPL_YAML_TESTER',
+                                     dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 runner.RunSubprocess(pairing_cmd,
                                      name='PAIR', dependencies=[apps_register])

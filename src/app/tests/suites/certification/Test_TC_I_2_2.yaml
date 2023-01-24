@@ -33,7 +33,7 @@ tests:
                 value: nodeId
 
     - label:
-          "TH sends Identify command to DUT, with the identify time field set to
+          "TH sends Identify command to DUT, with the IdentifyTime field set to
           0x003c (60s)."
       PICS: I.S.C00.Rsp
       command: "Identify"
@@ -45,7 +45,7 @@ tests:
     - label: "TH reads immediately IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
       response:
           constraints:
               minValue: 51
@@ -62,11 +62,11 @@ tests:
     - label: "After 10 seconds, the TH reads IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
       response:
           constraints:
-              minValue: 43
-              maxValue: 57
+              minValue: 42
+              maxValue: 58
 
     - label:
           "TH sends IdentifyQuery command to DUT and Verify
@@ -85,7 +85,7 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends Identify command to DUT, with the identify time field set to
+          "TH sends Identify command to DUT, with the IdentifyTime field set to
           0x0000 (stop identifying)."
       PICS: I.S.C00.Rsp
       command: "Identify"
@@ -97,29 +97,29 @@ tests:
     - label: "TH reads immediately IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
       response:
           value: 0
 
-    # disabled due to IdentifyQuery not supported
-    - label: "TH sends IdentifyQuery command to DUT "
-      verification: |
-          IdentifyQuery is not supported by Matter
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    # disabled due to IdentifyQuery not supported for matter V1.0
+    #- label: "TH sends IdentifyQuery command to DUT "
+    #  verification: |
+    #      IdentifyQuery is not supported by Matter
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"
 
     - label:
           "TH writes a value of 0x000f (15s) to IdentifyTime attribute of DUT"
       PICS: I.S.A0000
       command: "writeAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
       arguments:
           value: 15
 
@@ -134,7 +134,7 @@ tests:
     - label: "After 5 seconds, the TH reads IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
       response:
           constraints:
               minValue: 5

@@ -70,36 +70,64 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 
 CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
+    auto params = CommissioningParameters();
+    params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
+
     switch (mNetworkType)
     {
     case PairingNetworkType::WiFi:
-        return CommissioningParameters().SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+        params.SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+        break;
     case PairingNetworkType::Thread:
-        return CommissioningParameters().SetThreadOperationalDataset(mOperationalDataset);
+        params.SetThreadOperationalDataset(mOperationalDataset);
+        break;
     case PairingNetworkType::Ethernet:
     case PairingNetworkType::None:
-        return CommissioningParameters();
+        break;
     }
-    return CommissioningParameters();
+
+    return params;
 }
 
 CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
 {
-    return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload);
+    DiscoveryType discoveryType =
+        mUseOnlyOnNetworkDiscovery.ValueOr(false) ? DiscoveryType::kDiscoveryNetworkOnly : DiscoveryType::kAll;
+    return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, discoveryType);
 }
 
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 {
     CommissioningParameters commissioningParams = GetCommissioningParameters();
-    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams);
+
+    // If no network discovery behavior and no network credentials are provided, assume that the pairing command is trying to pair
+    // with an on-network device.
+    if (!mUseOnlyOnNetworkDiscovery.HasValue())
+    {
+        auto threadCredentials = commissioningParams.GetThreadOperationalDataset();
+        auto wiFiCredentials   = commissioningParams.GetWiFiCredentials();
+        mUseOnlyOnNetworkDiscovery.SetValue(!threadCredentials.HasValue() && !wiFiCredentials.HasValue());
+    }
+    DiscoveryType discoveryType = mUseOnlyOnNetworkDiscovery.Value() ? DiscoveryType::kDiscoveryNetworkOnly : DiscoveryType::kAll;
+
+    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, discoveryType);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    RendezvousParameters params =
-        RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
-    CommissioningParameters commissioningParams = GetCommissioningParameters();
-    return CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mPaseOnly.ValueOr(false))
+    {
+        err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
+    }
+    else
+    {
+        auto commissioningParams = GetCommissioningParameters();
+        err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+    }
+    return err;
 }
 
 CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
@@ -133,9 +161,8 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
-    CHIP_ERROR err = CurrentCommissioner().UnpairDevice(remoteId);
-    SetCommandExitStatus(err);
-    return err;
+    mCurrentFabricRemover = Platform::MakeUnique<Controller::CurrentFabricRemover>(&CurrentCommissioner());
+    return mCurrentFabricRemover->RemoveCurrentFabric(remoteId, &mCurrentFabricRemoveCallback);
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -170,7 +197,7 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     {
         ChipLogProgress(chipTool, "Pairing Success");
         ChipLogProgress(chipTool, "PASE establishment successful");
-        if (mPairingMode == PairingMode::CodePaseOnly)
+        if (mPairingMode == PairingMode::CodePaseOnly || mPaseOnly.ValueOr(false))
         {
             SetCommandExitStatus(err);
         }
@@ -224,7 +251,8 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
     nodeData.resolutionData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
-    // Stop Mdns discovery. Is it the right method ?
+    // Stop Mdns discovery.
+    CurrentCommissioner().StopCommissionableDiscovery();
     CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
 
     Inet::InterfaceId interfaceId =
@@ -235,4 +263,21 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
     {
         SetCommandExitStatus(err);
     }
+}
+
+void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_ERROR err)
+{
+    PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnCurrentFabricRemove: context is null"));
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(chipTool, "Device unpair completed with success: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "Device unpair Failure: " ChipLogFormatX64 " %s", ChipLogValueX64(nodeId), ErrorStr(err));
+    }
+
+    command->SetCommandExitStatus(err);
 }

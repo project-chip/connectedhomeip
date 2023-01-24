@@ -42,8 +42,7 @@ config:
         defaultValue: "MT:-24J0AFN00KA0648G00"
     PakeVerifier:
         type: octet_string
-        defaultValue:
-            "\xb9\x61\x70\xaa\xe8\x03\x34\x68\x84\x72\x4f\xe9\xa3\xb2\x87\xc3\x03\x30\xc2\xa6\x60\x37\x5d\x17\xbb\x20\x5a\x8c\xf1\xae\xcb\x35\x04\x57\xf8\xab\x79\xee\x25\x3a\xb6\xa8\xe4\x6b\xb0\x9e\x54\x3a\xe4\x22\x73\x6d\xe5\x01\xe3\xdb\x37\xd4\x41\xfe\x34\x49\x20\xd0\x95\x48\xe4\xc1\x82\x40\x63\x0c\x4f\xf4\x91\x3c\x53\x51\x38\x39\xb7\xc0\x7f\xcc\x06\x27\xa1\xb8\x57\x3a\x14\x9f\xcd\x1f\xa4\x66\xcf"
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -76,7 +75,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -84,34 +83,127 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
       response:
           value: 2
 
-    - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
-      command: "readAttribute"
-      attribute: "AdminFabricIndex"
-      PICS: CADMIN.S.A0001
-      response:
-          constraints:
-              notValue: null
+    #Need YAML support to save FabricId value from Fabrics list attribute
+    #Issue https://github.com/project-chip/connectedhomeip/issues/13029
+    - label:
+          "TH_CR1 reads AdminFabricIndex attribute from DUT_CE and Verify TH_CR1
+          reads the AdminFabricIndex value successfully and verify the value to
+          be the same as the Fabric Index of the Fabrics attribute list entry in
+          TH_CR1"
+      PICS: CADMIN.S.A0001 && PICS_USER_PROMPT
+      verification: |
+          On TH_CR1 send the below command
 
-    - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
-      command: "readAttribute"
-      attribute: "AdminVendorId"
-      PICS: CADMIN.S.A0002
-      response:
-          constraints:
-              notValue: null
+          ./chip-tool administratorcommissioning read admin-fabric-index  1 0
+
+          Verify on TH_CR1(chip-tool) log successfully reads the AdminFabricIndex
+
+          [1658838491.852418][9309:9314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 2423106591
+          [1658838491.852516][9309:9314] CHIP:TOO:   AdminFabricIndex: 1
+          [1658838491.852595][9309:9314] CHIP:EM: Sending Standalone Ack for MessageCounter:72459812 on exchange 35132i
+
+
+          Verify the AdminFabricIndex value above matches with the Fabric Index in the Fabrics list of TH_CR1
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          Verify 1 entry in the Fabrics list attributeOn TH_CR1(chip-tool) Log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3621507058
+          [1649245801.244173][10091:10096] CHIP:TOO:   Fabrics: 1 entries
+          [1649245801.244305][10091:10096] CHIP:TOO:     [1]: {
+          [1649245801.244348][10091:10096] CHIP:TOO:       RootPublicKey: 045541017FCEFD0D83963C9ED7F21380C6B789EB989B5D20DC318FAE92D60D0F685666505E9C4F86C49ADC71AB3A8B9B44FD43214CF9BE2B6D47DE01F28FE1544F
+          [1649245801.244400][10091:10096] CHIP:TOO:       VendorId: 65521
+          [1649245801.244431][10091:10096] CHIP:TOO:       FabricId: 1
+          [1649245801.244461][10091:10096] CHIP:TOO:       NodeId: 1
+          [1649245801.244491][10091:10096] CHIP:TOO:       Label:
+          [1649245801.244521][10091:10096] CHIP:TOO:       FabricIndex: 1
+          [1649245801.244552][10091:10096] CHIP:TOO:      }
+          [1649245801.244671][10091:10096] CHIP:EM: Sending Standalone Ack for MessageCounter:8407998 on exchange 12989i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/13029
+    - label:
+          "TH_CR1 reads AdminVendorId attribute from DUT_CE and Verify TH_CR1
+          reads the AdminVendorId value successfully and verify this value to be
+          the same as the Vendor ID field of Fabrics attribute list entry in
+          TH_CR1"
+      PICS: CADMIN.S.A0002 && PICS_USER_PROMPT
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool administratorcommissioning read admin-vendor-id 1 0
+
+          Verify on TH_CR1(chip-tool) log successfully reads the AdminVendorId
+
+          [1659096764.946339][11666:11671] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 1299585105
+          [1659096764.946483][11666:11671] CHIP:TOO:   AdminVendorId: 65521
+          [1659096764.946718][11666:11671] CHIP:EM: Sending Standalone Ack for MessageCounter:83111931 on exchange 26316i
+
+          Verify the AdminVendorId value above matches with the VendorId in the Fabrics list of TH_CR1
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          Verify 1 entry in the Fabrics list attributeOn TH_CR1(chip-tool) Log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3621507058
+          [1649245801.244173][10091:10096] CHIP:TOO:   Fabrics: 1 entries
+          [1649245801.244305][10091:10096] CHIP:TOO:     [1]: {
+          [1649245801.244348][10091:10096] CHIP:TOO:       RootPublicKey: 045541017FCEFD0D83963C9ED7F21380C6B789EB989B5D20DC318FAE92D60D0F685666505E9C4F86C49ADC71AB3A8B9B44FD43214CF9BE2B6D47DE01F28FE1544F
+          [1649245801.244400][10091:10096] CHIP:TOO:       VendorId: 65521
+          [1649245801.244431][10091:10096] CHIP:TOO:       FabricId: 1
+          [1649245801.244461][10091:10096] CHIP:TOO:       NodeId: 1
+          [1649245801.244491][10091:10096] CHIP:TOO:       Label:
+          [1649245801.244521][10091:10096] CHIP:TOO:       FabricIndex: 1
+          [1649245801.244552][10091:10096] CHIP:TOO:      }
+          [1649245801.244671][10091:10096] CHIP:EM: Sending Standalone Ack for MessageCounter:8407998 on exchange 12989i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Check for DNS-SD advertisement CM is not possible in YAML
+    - label: "Verify that the DNS-SD advertisement shows CM=1"
+      verification: |
+          On TH_CR1 send the below command
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+          + wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+          = wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2755]
+            port = [5540]
+            txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
@@ -136,7 +228,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -144,8 +236,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -169,7 +259,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -177,12 +267,10 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR1 opens a 2nd commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -190,16 +278,17 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
+          clusterError: 2
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       identity: "alpha"
@@ -211,14 +300,14 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId2 },
-                  { Label: "", nodeID: nodeId3 },
+                  { Label: "", NodeID: nodeId },
+                  { Label: "", NodeID: nodeId2 },
+                  { Label: "", NodeID: nodeId3 },
               ]
           constraints:
               type: list
 
-    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+    - label: "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -228,7 +317,7 @@ tests:
 
     - label: "TH_CR1 re-opens new commissioning window on DUT_CE using ECM"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -236,26 +325,54 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
       response:
           value: 1
 
+    #Check for DNS-SD advertisement CM is not possible in YAML
+    - label: "Verify that the DNS-SD advertisement shows CM=2"
+      verification: |
+          On TH_CR1 send the below command
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+          + wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+          = wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2755]
+            port = [5540]
+            txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          = wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2755]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR3 opens a 2nd commissioning window on DUT_CE"
       identity: "gamma"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -263,16 +380,17 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
+          clusterError: 2
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       identity: "alpha"
@@ -284,9 +402,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId2 },
-                  { Label: "", nodeID: nodeId3 },
+                  { Label: "", NodeID: nodeId },
+                  { Label: "", NodeID: nodeId2 },
+                  { Label: "", NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -301,7 +419,7 @@ tests:
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -309,18 +427,18 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 opens a 2nd commissioning window on DUT_CE using ECM"
       identity: "beta"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C00.Rsp
@@ -328,18 +446,19 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
+          clusterError: 2
 
-    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+    - label: "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -348,7 +467,7 @@ tests:
                 value: 180000
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -356,7 +475,7 @@ tests:
           value: 0
 
     - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "AdminFabricIndex"
       PICS: CADMIN.S.A0001
@@ -364,7 +483,7 @@ tests:
           value: null
 
     - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "AdminVendorId"
       PICS: CADMIN.S.A0002

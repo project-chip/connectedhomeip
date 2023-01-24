@@ -26,6 +26,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <lib/support/CodeUtils.h>
 
 #include <cstdio>
@@ -74,9 +75,9 @@ using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::
                                          uint8_t timestampType, uint8_t * data, uint32_t dataLen,
                                          std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
 using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, SubscriptionId subscriptionId);
-using OnResubscriptionAttemptedCallback = void (*)(PyObject * appContext, uint32_t aTerminationCause,
+using OnResubscriptionAttemptedCallback = void (*)(PyObject * appContext, PyChipError aTerminationCause,
                                                    uint32_t aNextResubscribeIntervalMsec);
-using OnReadErrorCallback               = void (*)(PyObject * appContext, uint32_t chiperror);
+using OnReadErrorCallback               = void (*)(PyObject * appContext, PyChipError chiperror);
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 using OnReportBeginCallback             = void (*)(PyObject * appContext);
 using OnReportEndCallback               = void (*)(PyObject * appContext);
@@ -135,10 +136,7 @@ public:
         {
             version = aPath.mDataVersion.Value();
         }
-        else
-        {
-            ChipLogError(DataManagement, "expect aPath has valid mDataVersion");
-        }
+
         gOnReadAttributeDataCallback(mAppContext, version, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }
@@ -151,7 +149,7 @@ public:
     CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
         ReturnErrorOnFailure(ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
-        gOnResubscriptionAttemptedCallback(mAppContext, aTerminationCause.AsInteger(),
+        gOnResubscriptionAttemptedCallback(mAppContext, ToPyChipError(aTerminationCause),
                                            apReadClient->ComputeTimeTillNextSubscription());
         return CHIP_NO_ERROR;
     }
@@ -195,7 +193,7 @@ public:
             to_underlying(apStatus == nullptr ? Protocols::InteractionModel::Status::Success : apStatus->mStatus));
     }
 
-    void OnError(CHIP_ERROR aError) override { gOnReadErrorCallback(mAppContext, aError.AsInteger()); }
+    void OnError(CHIP_ERROR aError) override { gOnReadErrorCallback(mAppContext, ToPyChipError(aError)); }
 
     void OnReportBegin() override { gOnReportBeginCallback(mAppContext); }
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
@@ -247,18 +245,16 @@ struct __attribute__((packed)) PyReadAttributeParams
 };
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
-chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
-                                                                uint16_t timedWriteTimeoutMs, uint16_t interactionTimeoutMs,
-                                                                size_t n, ...);
-chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient,
-                                                              ReadClientCallback ** pCallback, DeviceProxy * device,
-                                                              uint8_t * readParamsBuf, size_t n, size_t total, ...);
+PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, uint16_t timedWriteTimeoutMs,
+                                               uint16_t interactionTimeoutMs, uint16_t busyWaitMs, size_t n, ...);
+PyChipError pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
+                                             DeviceProxy * device, uint8_t * readParamsBuf, size_t n, size_t total, ...);
 }
 
 using OnWriteResponseCallback = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                          chip::AttributeId attributeId,
                                          std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
-using OnWriteErrorCallback    = void (*)(PyObject * appContext, uint32_t chiperror);
+using OnWriteErrorCallback    = void (*)(PyObject * appContext, PyChipError chiperror);
 using OnWriteDoneCallback     = void (*)(PyObject * appContext);
 
 OnWriteResponseCallback gOnWriteResponseCallback = nullptr;
@@ -280,7 +276,7 @@ public:
 
     void OnError(const WriteClient * apWriteClient, CHIP_ERROR aProtocolError) override
     {
-        gOnWriteErrorCallback(mAppContext, aProtocolError.AsInteger());
+        gOnWriteErrorCallback(mAppContext, ToPyChipError(aProtocolError));
     }
 
     void OnDone(WriteClient * apWriteClient) override
@@ -326,9 +322,8 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
     gOnReportEndCallback               = onReportEndCallback;
 }
 
-chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
-                                                                uint16_t timedWriteTimeoutMs, uint16_t interactionTimeoutMs,
-                                                                size_t n, ...)
+PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, uint16_t timedWriteTimeoutMs,
+                                               uint16_t interactionTimeoutMs, uint16_t busyWaitMs, size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -375,9 +370,14 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
     client.release();
     callback.release();
 
+    if (busyWaitMs)
+    {
+        usleep(busyWaitMs * 1000);
+    }
+
 exit:
     va_end(args);
-    return err.AsInteger();
+    return ToPyChipError(err);
 }
 
 void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apCallback)
@@ -394,9 +394,9 @@ void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_
     pReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(livenessTimeoutMs));
 }
 
-chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
-                                                    DeviceProxy * device, uint8_t * readParamsBuf, size_t numAttributePaths,
-                                                    size_t numDataversionFilters, size_t numEventPaths, ...)
+PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
+                                   DeviceProxy * device, uint8_t * readParamsBuf, size_t numAttributePaths,
+                                   size_t numDataversionFilters, size_t numEventPaths, uint64_t * eventNumberFilter, ...)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     PyReadAttributeParams pyParams = {};
@@ -406,7 +406,7 @@ chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClien
     std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
 
     va_list args;
-    va_start(args, numEventPaths);
+    va_start(args, eventNumberFilter);
 
     std::unique_ptr<AttributePathParams[]> attributePaths(new AttributePathParams[numAttributePaths]);
     std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[numDataversionFilters]);
@@ -467,6 +467,14 @@ chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClien
             params.mpEventPathParamsList    = eventPaths.get();
             params.mEventPathParamsListSize = numEventPaths;
         }
+        if (eventNumberFilter != nullptr)
+        {
+            static_assert(sizeof(chip::EventNumber) == sizeof(*eventNumberFilter) &&
+                              std::is_unsigned<chip::EventNumber>::value ==
+                                  std::is_unsigned<std::remove_pointer<decltype(eventNumberFilter)>::type>::value,
+                          "EventNumber type mismatch");
+            params.mEventNumber = MakeOptional(EventNumber(*eventNumberFilter));
+        }
 
         params.mIsFabricFiltered = pyParams.isFabricFiltered;
 
@@ -499,6 +507,6 @@ chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClien
 
 exit:
     va_end(args);
-    return err.AsInteger();
+    return ToPyChipError(err);
 }
 }

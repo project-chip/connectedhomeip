@@ -25,6 +25,9 @@ concurrency:
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     test_suites_chip_tool_darwin:
         name: Test Suites - Darwin
@@ -36,12 +39,16 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+            # NOTE: Generally kept in sync within the repo using
+            #       scripts/tools/zap/version_update.py
+            ZAP_VERSION: v2023.01.19-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -69,11 +76,21 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+            - name: Install zap
+              run: |
+                 sudo mkdir -p $ZAP_INSTALL_PATH
+                 sudo chown `whoami` $ZAP_INSTALL_PATH
+                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
+                      --output $ZAP_INSTALL_PATH/zap-mac.zip
+                 cd $ZAP_INSTALL_PATH
+                 unzip zap-mac.zip zap-cli
+                 rm zap-mac.zip
+                 ./zap-cli --version
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -94,6 +111,7 @@ jobs:
                         --target darwin-x64-ota-provider-${BUILD_VARIANT} \
                         --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
+                        --target darwin-x64-bridge-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -112,9 +130,10 @@ jobs:
                      --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
                      --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
             - name: Uploading core files
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -122,13 +141,13 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}

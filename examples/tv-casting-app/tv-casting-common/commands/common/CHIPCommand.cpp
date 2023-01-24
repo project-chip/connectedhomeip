@@ -86,12 +86,13 @@ void CHIPCommand::StopWaiting()
 
 chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
 {
-    auto item = mCommissioners.find(GetIdentity());
+    CommissionerIdentity identity{ GetIdentity(), chip::kUndefinedNodeId };
+    auto item = mCommissioners.find(identity);
     return *item->second;
 }
 
 constexpr chip::FabricId kIdentityOtherFabricId = 4;
-std::map<std::string, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
+std::map<CHIPCommand::CommissionerIdentity, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
 
 std::string CHIPCommand::GetIdentity()
 {

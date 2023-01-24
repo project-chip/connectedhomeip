@@ -30,7 +30,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
-#include <settings/settings.h>
+#include <zephyr/settings/settings.h>
 
 namespace chip {
 namespace DeviceLayer {

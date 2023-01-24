@@ -21,7 +21,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
@@ -32,7 +32,7 @@ tests:
 
     - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends the ScanNetwork command to the TH"

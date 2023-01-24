@@ -1,5 +1,5 @@
 {
-  "featureLevel": 77,
+  "featureLevel": 89,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -83,7 +83,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "identify time",
+              "name": "IdentifyTime",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -235,7 +235,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -622,7 +622,7 @@
           "name": "On/off Switch Configuration",
           "code": 7,
           "mfgCode": null,
-          "define": "ON_OFF_SWITCH_CONFIG_CLUSTER",
+          "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -648,7 +648,7 @@
           "name": "On/off Switch Configuration",
           "code": 7,
           "mfgCode": null,
-          "define": "ON_OFF_SWITCH_CONFIG_CLUSTER",
+          "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -871,7 +871,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "device list",
+              "name": "DeviceTypeList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -887,7 +887,7 @@
               "reportableChange": 0
             },
             {
-              "name": "server list",
+              "name": "ServerList",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -903,7 +903,7 @@
               "reportableChange": 0
             },
             {
-              "name": "client list",
+              "name": "ClientList",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -919,7 +919,7 @@
               "reportableChange": 0
             },
             {
-              "name": "parts list",
+              "name": "PartsList",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -1085,10 +1085,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -1111,10 +1111,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -1460,7 +1460,7 @@
           "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_PROVIDER_CLUSTER",
+          "define": "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -1512,7 +1512,7 @@
           "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_PROVIDER_CLUSTER",
+          "define": "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [
@@ -1588,12 +1588,12 @@
           "name": "OTA Software Update Requestor",
           "code": 42,
           "mfgCode": null,
-          "define": "OTA_REQUESTOR_CLUSTER",
+          "define": "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
             {
-              "name": "AnnounceOtaProvider",
+              "name": "AnnounceOTAProvider",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -1624,12 +1624,12 @@
           "name": "OTA Software Update Requestor",
           "code": 42,
           "mfgCode": null,
-          "define": "OTA_REQUESTOR_CLUSTER",
+          "define": "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
             {
-              "name": "DefaultOtaProviders",
+              "name": "DefaultOTAProviders",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -1638,7 +1638,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1768,7 +1768,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "en-US",
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2589,11 +2589,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BootReasons",
+              "name": "BootReason",
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BootReasonEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2886,10 +2886,10 @@
           "mfgCode": null,
           "define": "THREAD_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
-              "name": "channel",
+              "name": "Channel",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3001,7 +3001,7 @@
               "reportableChange": 0
             },
             {
-              "name": "NeighborTableList",
+              "name": "NeighborTable",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -3017,7 +3017,7 @@
               "reportableChange": 0
             },
             {
-              "name": "RouteTableList",
+              "name": "RouteTable",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -3049,7 +3049,7 @@
               "reportableChange": 0
             },
             {
-              "name": "weighting",
+              "name": "Weighting",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -3817,7 +3817,7 @@
               "reportableChange": 0
             },
             {
-              "name": "delay",
+              "name": "Delay",
               "code": 58,
               "mfgCode": null,
               "side": "server",
@@ -3849,7 +3849,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ChannelMask",
+              "name": "ChannelPage0Mask",
               "code": 60,
               "mfgCode": null,
               "side": "server",
@@ -3972,10 +3972,10 @@
           "mfgCode": null,
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
-              "name": "bssid",
+              "name": "BSSID",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -4039,7 +4039,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Rssi",
+              "name": "RSSI",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -4258,14 +4258,14 @@
           "mfgCode": null,
           "define": "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "PHYRate",
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "PHYRateType",
+              "type": "PHYRateEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4489,7 +4489,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -4541,7 +4541,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -4553,7 +4553,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "CommissioningWindowStatusEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -5077,7 +5077,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5140,10 +5140,10 @@
           "mfgCode": null,
           "define": "USER_LABEL_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5261,7 +5261,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "identify time",
+              "name": "IdentifyTime",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5277,7 +5277,7 @@
               "reportableChange": 0
             },
             {
-              "name": "identify type",
+              "name": "IdentifyType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -5509,7 +5509,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5712,7 +5712,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddSceneResponse",
@@ -6413,7 +6413,7 @@
               "code": 15,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "LevelControlOptions",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -6653,7 +6653,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "device list",
+              "name": "DeviceTypeList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6669,7 +6669,7 @@
               "reportableChange": 0
             },
             {
-              "name": "server list",
+              "name": "ServerList",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6685,7 +6685,7 @@
               "reportableChange": 0
             },
             {
-              "name": "client list",
+              "name": "ClientList",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6701,7 +6701,7 @@
               "reportableChange": 0
             },
             {
-              "name": "parts list",
+              "name": "PartsList",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -6955,6 +6955,62 @@
           "enabled": 0,
           "commands": [
             {
+              "name": "MoveToHue",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "MoveHue",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "StepHue",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "MoveToSaturation",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "MoveSaturation",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "StepSaturation",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "MoveToHueAndSaturation",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "MoveToColor",
               "code": 7,
               "mfgCode": null,
@@ -6973,6 +7029,78 @@
             {
               "name": "StepColor",
               "code": 9,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "MoveToColorTemperature",
+              "code": 10,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "EnhancedMoveToHue",
+              "code": 64,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "EnhancedMoveHue",
+              "code": 65,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "EnhancedStepHue",
+              "code": 66,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "EnhancedMoveToHueAndSaturation",
+              "code": 67,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "ColorLoopSet",
+              "code": 68,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "StopMoveStep",
+              "code": 71,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "MoveColorTemperature",
+              "code": 75,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "StepColorTemperature",
+              "code": 76,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -7135,7 +7263,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ColorTemperature",
+              "name": "ColorTemperatureMireds",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -7987,7 +8115,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "occupancy",
+              "name": "Occupancy",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8003,7 +8131,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type",
+              "name": "OccupancySensorType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8019,7 +8147,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type bitmap",
+              "name": "OccupancySensorTypeBitmap",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -8035,7 +8163,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR occupied to unoccupied delay",
+              "name": "PIROccupiedToUnoccupiedDelay",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -8051,7 +8179,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR unoccupied to occupied delay",
+              "name": "PIRUnoccupiedToOccupiedDelay",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -8067,7 +8195,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR unoccupied to occupied threshold",
+              "name": "PIRUnoccupiedToOccupiedThreshold",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -8083,7 +8211,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic occupied to unoccupied delay",
+              "name": "UltrasonicOccupiedToUnoccupiedDelay",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -8099,7 +8227,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic unoccupied to occupied delay",
+              "name": "UltrasonicUnoccupiedToOccupiedDelay",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -8115,7 +8243,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic unoccupied to occupied threshold",
+              "name": "UltrasonicUnoccupiedToOccupiedThreshold",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -8131,7 +8259,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact occupied to unoccupied delay",
+              "name": "PhysicalContactOccupiedToUnoccupiedDelay",
               "code": 48,
               "mfgCode": null,
               "side": "server",
@@ -8147,7 +8275,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact unoccupied to occupied delay",
+              "name": "PhysicalContactUnoccupiedToOccupiedDelay",
               "code": 49,
               "mfgCode": null,
               "side": "server",
@@ -8163,7 +8291,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact unoccupied to occupied threshold",
+              "name": "PhysicalContactUnoccupiedToOccupiedThreshold",
               "code": 50,
               "mfgCode": null,
               "side": "server",

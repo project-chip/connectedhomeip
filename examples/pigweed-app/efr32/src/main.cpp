@@ -16,9 +16,13 @@
  */
 
 #include "AppConfig.h"
-#include "LEDWidget.h"
 #include "init_efrPlatform.h"
 #include "sl_system_kernel.h"
+
+#ifdef ENABLE_WSTK_LEDS
+#include "LEDWidget.h"
+#include "sl_simple_led_instances.h"
+#endif // ENABLE_WSTK_LEDS
 
 #include "pw_rpc/echo_service_nanopb.h"
 #include "pw_sys_io/sys_io.h"
@@ -56,7 +60,7 @@ void RunRpcService(void *)
 int main(void)
 {
     init_efrPlatform();
-    EFR32_LOG("***** CHIP EFR32 pigweed example *****\r\n");
+    SILABS_LOG("***** CHIP EFR32 pigweed example *****\r\n");
 
     pw_sys_io_Init();
     // Initialize LEDs

@@ -26,7 +26,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
@@ -51,6 +51,7 @@ public:
 
     // Implement SessionDelegate
     NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
+    void OnSessionReleased() override;
 
     Optional<uint16_t> GetLocalSessionId() const
     {
@@ -142,7 +143,10 @@ protected:
 
         Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
-        Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(statusReport.Size()));
+        auto handle = System::PacketBufferHandle::New(statusReport.Size());
+        VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
+        Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(handle));
+
         statusReport.WriteToBuffer(bbuf);
 
         System::PacketBufferHandle msg = bbuf.Finalize();
@@ -191,6 +195,12 @@ protected:
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear();
+
+    /**
+     * Notify our delegate about a session establishment error, if we have not
+     * notified it of an error or success before.
+     */
+    void NotifySessionEstablishmentError(CHIP_ERROR error);
 
 protected:
     CryptoContext::SessionRole mRole;

@@ -37,7 +37,7 @@
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -296,7 +296,7 @@ CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert,
 
     VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(signature.SetLength(cert->mSignature.size()));
-    memcpy(signature, cert->mSignature.data(), cert->mSignature.size());
+    memcpy(signature.Bytes(), cert->mSignature.data(), cert->mSignature.size());
 
     memcpy(caPublicKey, caCert->mPublicKey.data(), caCert->mPublicKey.size());
 
@@ -607,15 +607,18 @@ bool ChipRDN::IsEqual(const ChipRDN & other) const
     return mString.data_equal(other.mString);
 }
 
-ChipDN::ChipDN() {}
+ChipDN::ChipDN()
+{
+    Clear();
+}
 
 ChipDN::~ChipDN() {}
 
 void ChipDN::Clear()
 {
-    for (uint8_t i = 0; i < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES; i++)
+    for (auto & dn : rdn)
     {
-        rdn[i].Clear();
+        dn.Clear();
     }
 }
 
@@ -872,11 +875,11 @@ CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
             ReturnErrorOnFailure(reader.Get(chipAttr));
             if (attrOID == chip::ASN1::kOID_AttributeType_MatterNodeId)
             {
-                VerifyOrReturnError(IsOperationalNodeId(attrOID), CHIP_ERROR_WRONG_NODE_ID);
+                VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_NODE_ID);
             }
             else if (attrOID == chip::ASN1::kOID_AttributeType_MatterFabricId)
             {
-                VerifyOrReturnError(IsValidFabricId(attrOID), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(IsValidFabricId(chipAttr), CHIP_ERROR_INVALID_ARGUMENT);
             }
             ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
         }

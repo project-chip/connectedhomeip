@@ -53,6 +53,42 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductName(char *
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetPartNumber(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductURL(char * buf, size_t bufSize)
+{
+#if CHIP_DEVICE_LAYER_TARGET_ESP32
+    CHIP_ERROR err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_ProductURL, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductLabel(char * buf, size_t bufSize)
+{
+#if CHIP_DEVICE_LAYER_TARGET_ESP32
+    CHIP_ERROR err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_ProductLabel, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char * buf, size_t bufSize)
 {
     ChipError err       = CHIP_NO_ERROR;
@@ -66,7 +102,7 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char 
         ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
         serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        err = CHIP_NO_ERROR;
+        err          = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     ReturnErrorOnFailure(err);
@@ -150,14 +186,19 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetRotatingDeviceIdUn
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
-                  "Length of unique ID for rotating device ID is smaller than minimum.");
-    constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+    if (chip::DeviceLayer::ConfigurationMgr().GetRotatingDeviceIdUniqueId(uniqueIdSpan) != CHIP_NO_ERROR)
+    {
+        static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >=
+                          ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
+                      "Length of unique ID for rotating device ID is smaller than minimum.");
 
-    ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
-    uniqueIdSpan.reduce_size(sizeof(uniqueId));
+        constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+
+        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+        uniqueIdSpan.reduce_size(sizeof(uniqueId));
+    }
     return CHIP_NO_ERROR;
 #endif
     return err;

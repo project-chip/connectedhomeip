@@ -55,7 +55,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the PlatformManager singleton object for Linux platforms.
+ * Concrete implementation of the PlatformManager singleton object for Infineon PSoC6 platforms.
  */
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
@@ -94,6 +94,8 @@ public:
     void ReadCounters(WiFiStatsCountType Counttype, uint64_t & count, wl_cnt_ver_30_t * cnt, wl_cnt_ge40mcst_v1_t * cnt_ge40);
     /* Function to update ipv4 and ipv6 off premise service capability bit */
     void UpdateoffPremiseService(bool ipv4service, bool ipv6service);
+    CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
+    void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
     /* These variables will be set to 0 during start up and will be updated when reset-counts
      * zcl command is received.
      * These are considered as base for below attributes of WiFi Diagnostics Cluster:

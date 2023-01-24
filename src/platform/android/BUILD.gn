@@ -46,8 +46,6 @@ static_library("android") {
     "ConnectivityManagerImpl.h",
     "DeviceInstanceInfoProviderImpl.cpp",
     "DeviceInstanceInfoProviderImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdImpl.cpp",
@@ -99,7 +97,10 @@ android_library("java") {
     "java/chip/platform/ServiceResolver.java",
   ]
 
-  javac_flags = [ "-Xlint:deprecation" ]
+  javac_flags = [
+    "-Xlint:deprecation",
+    "-parameters",  # Store infomation about method parameters
+  ]
 }
 
 java_prebuilt("android_sdk") {

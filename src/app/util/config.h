@@ -15,58 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/***************************************************************************/
-/**
- * @brief This file is the main configuration settings
- *for the Zigbee app. The zigbee app can become a Home
- *Automation (HA) device, a Smart Energy (SE) device,
- *or a Custom Zigbee device.
- *
- * This application can be configured using
- *AppBuilder. AppBuilder generates a file containing
- *defines that setup what pieces of the code is used
- *(which clusters, security settings, zigbee device
- *type, serial port, etc). These defines are added to
- *a new file and included by setting
- *ZA_GENERATED_HEADER to the new filename so these
- *defines are sourced first.
- *
- * This file also contains default values for the
- *defines so some can be set by the user but defaults
- *are always available.
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories, Inc.
- *www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon
- *Laboratories Inc.  Your use of this software is
- *governed by the terms of  Silicon Labs Master
- *Software License Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement.
- *This software  is distributed to you in Source Code
- *format and is governed by the sections of the MSLA
- *applicable to Source Code.
- *
- ******************************************************************************/
-
 #pragma once
 
 // include generated configuration information from AppBuilder.
@@ -82,8 +30,6 @@
 #else
 #include <zap-generated/endpoint_config.h>
 #endif
-
-#include <zap-generated/gen_tokens.h> // For GENERATED_TOKEN_LOADER/SAVER macros
 
 // *******************************************************************
 // pre-defined Devices

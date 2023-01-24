@@ -1,0 +1,10 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Generating nrf-nrf52840dk-pump
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr;
+west build --cmake-only -d {out}/nrf-nrf52840dk-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
+
+# Building nrf-nrf52840dk-pump
+ninja -C {out}/nrf-nrf52840dk-pump

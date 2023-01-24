@@ -44,7 +44,7 @@ public:
 
     void HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
+        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override;
 
     // Application API to send the QueryImage command and start the image update process with the next available Provider
     CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex) override;
@@ -232,7 +232,7 @@ private:
     /**
      * Send QueryImage request using values matching Basic cluster
      */
-    CHIP_ERROR SendQueryImageRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR SendQueryImageRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Validate and extract mandatory information from QueryImageResponse
@@ -263,17 +263,17 @@ private:
     /**
      * Start download of the software image returned in QueryImageResponse
      */
-    CHIP_ERROR StartDownload(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR StartDownload(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Send ApplyUpdate request using values obtained from QueryImageResponse
      */
-    CHIP_ERROR SendApplyUpdateRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR SendApplyUpdateRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Send NotifyUpdateApplied request
      */
-    CHIP_ERROR SendNotifyUpdateAppliedRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR SendNotifyUpdateAppliedRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Store current update information to KVS
@@ -288,7 +288,7 @@ private:
     /**
      * Session connection callbacks
      */
-    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

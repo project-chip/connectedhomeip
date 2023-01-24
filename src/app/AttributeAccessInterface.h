@@ -28,8 +28,8 @@
 #include <app/data-model/List.h> // So we can encode lists
 #include <app/data-model/TagBoundEncoder.h>
 #include <app/util/basic-types.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 /**
@@ -343,6 +343,11 @@ public:
         aArg.SetFabricIndex(AccessingFabricIndex());
         return CHIP_NO_ERROR;
     }
+
+    /**
+     * Is the next element of the stream NULL.
+     */
+    bool WillDecodeNull() const { return mReader.GetType() == TLV::kTLVType_Null; }
 
     bool TriedDecode() const { return mTriedDecode; }
 

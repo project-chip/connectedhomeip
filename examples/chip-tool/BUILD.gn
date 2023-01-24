@@ -58,6 +58,11 @@ static_library("chip-tool-utils") {
     "commands/common/Commands.cpp",
     "commands/common/Commands.h",
     "commands/common/CredentialIssuerCommands.h",
+    "commands/common/HexConversion.h",
+    "commands/common/RemoteDataModelLogger.cpp",
+    "commands/common/RemoteDataModelLogger.h",
+    "commands/delay/SleepCommand.cpp",
+    "commands/delay/WaitForCommissioneeCommand.cpp",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
@@ -66,6 +71,8 @@ static_library("chip-tool-utils") {
     # TODO - enable CommissionedListCommand once DNS Cache is implemented
     #    "commands/pairing/CommissionedListCommand.cpp",
     #    "commands/pairing/CommissionedListCommand.h",
+    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+    "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "commands/pairing/CloseSessionCommand.cpp",
     "commands/pairing/CloseSessionCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
@@ -75,13 +82,17 @@ static_library("chip-tool-utils") {
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
     "commands/storage/StorageManagementCommand.cpp",
-    "config/PersistentStorage.cpp",
   ]
 
   deps = []
 
   if (config_use_interactive_mode) {
-    sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+    sources += [
+      "commands/interactive/InteractiveCommands.cpp",
+      "commands/interactive/WebSocketServer.cpp",
+      "commands/interactive/WebSocketServer.h",
+      "commands/interactive/WebSocketServerDelegate.h",
+    ]
     deps += [ "${editline_root}:editline" ]
   }
 
@@ -101,9 +112,11 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
+    "${chip_root}/third_party/libwebsockets",
   ]
 
   public_configs = [ ":config" ]
@@ -119,7 +132,10 @@ static_library("chip-tool-utils") {
 executable("chip-tool") {
   sources = [ "main.cpp" ]
 
-  deps = [ ":chip-tool-utils" ]
+  deps = [
+    ":chip-tool-utils",
+    "${chip_root}/src/platform/logging:force_stdio",
+  ]
 
   output_dir = root_out_dir
 }

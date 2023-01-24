@@ -44,7 +44,14 @@ public:
         InitializeJNIObjects(manager);
     }
 
-    const char * Read(const chip::app::ConcreteReadAttributePath & aPath);
+    ~ContentAppAttributeDelegate()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
+        env->DeleteGlobalRef(mContentAppEndpointManager);
+    }
+
+    std::string Read(const chip::app::ConcreteReadAttributePath & aPath);
 
 private:
     void InitializeJNIObjects(jobject manager)

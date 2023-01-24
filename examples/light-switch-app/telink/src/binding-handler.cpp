@@ -26,15 +26,15 @@
 #include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
 
-#if defined(ENABLE_CHIP_SHELL)
+#if defined(CONFIG_CHIP_LIB_SHELL)
 #include "lib/shell/Engine.h"
 #include "lib/shell/commands/Help.h"
-#endif // ENABLE_CHIP_SHELL
+#endif // CONFIG_CHIP_LIB_SHELL
 
 using namespace chip;
 using namespace chip::app;
 
-#if defined(ENABLE_CHIP_SHELL)
+#if defined(CONFIG_CHIP_LIB_SHELL)
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
@@ -47,7 +47,7 @@ Engine sShellSwitchGroupsSubCommands;
 Engine sShellSwitchGroupsOnOffSubCommands;
 
 Engine sShellSwitchBindingSubCommands;
-#endif // defined(ENABLE_CHIP_SHELL)
+#endif // defined(CONFIG_CHIP_LIB_SHELL)
 
 namespace {
 
@@ -133,7 +133,14 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
     }
 }
 
-#ifdef ENABLE_CHIP_SHELL
+void LightSwitchContextReleaseHandler(void * context)
+{
+    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "Invalid context for Light switch context release handler"));
+
+    Platform::Delete(static_cast<BindingCommandData *>(context));
+}
+
+#ifdef CONFIG_CHIP_LIB_SHELL
 
 /********************************************************
  * Switch shell functions
@@ -377,7 +384,7 @@ static void RegisterSwitchCommands()
 
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
 }
-#endif // ENABLE_CHIP_SHELL
+#endif // CONFIG_CHIP_LIB_SHELL
 
 void InitBindingHandlerInternal(intptr_t arg)
 {
@@ -385,6 +392,7 @@ void InitBindingHandlerInternal(intptr_t arg)
     chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
 } // namespace
@@ -413,8 +421,6 @@ void SwitchWorkerFunction(intptr_t context)
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
     BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
-
-    Platform::Delete(data);
 }
 
 void BindingWorkerFunction(intptr_t context)
@@ -433,7 +439,7 @@ CHIP_ERROR InitBindingHandler()
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
-#if defined(ENABLE_CHIP_SHELL)
+#if defined(CONFIG_CHIP_LIB_SHELL)
     RegisterSwitchCommands();
 #endif
     return CHIP_NO_ERROR;

@@ -22,7 +22,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
@@ -33,7 +33,7 @@ tests:
 
     - label: "Commission TH and DUT on Thread setup"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads the MaxNetworks attribute from the TH"
@@ -134,7 +134,7 @@ tests:
     - label: "DUT reads LastNetworkingStatus attribute from the TH"
       PICS: CNET.S.A0005
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 54 0
+          ./chip-tool networkcommissioning read last-networking-status 54 0
 
 
           Verify "LastNetworkingStatus response" on the TH(All-cluster-app) Log:

@@ -275,10 +275,24 @@ static bool validateExtFlashImage(NVS_Handle handle, size_t otaHeaderLen)
     return (crc == header.crc32);
 }
 
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    NVS_Handle handle;
+    NVS_Params nvsParams;
+    NVS_Params_init(&nvsParams);
+    handle = NVS_open(CONFIG_NVSEXTERNAL, &nvsParams);
+
+    if (NULL != handle)
+    {
+        eraseExtFlashMetaHeader(handle);
+        NVS_close(handle);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_NO_ERROR;
+}
+
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    NVS_Params nvsParams;
-    NVS_Handle handle;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -291,22 +305,26 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-    NVS_Params_init(&nvsParams);
-    handle = NVS_open(CONFIG_NVSEXTERNAL, &nvsParams);
-    if (NULL == handle)
+    if (NULL == imageProcessor->mNvsHandle)
     {
-        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
-        return;
+        NVS_Params nvsParams;
+        NVS_Params_init(&nvsParams);
+        imageProcessor->mNvsHandle = NVS_open(CONFIG_NVSEXTERNAL, &nvsParams);
+
+        if (NULL == imageProcessor->mNvsHandle)
+        {
+            imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
+            return;
+        }
     }
 
-    if (!eraseExtFlashMetaHeader(handle))
+    if (!eraseExtFlashMetaHeader(imageProcessor->mNvsHandle))
     {
-        NVS_close(handle);
+        NVS_close(imageProcessor->mNvsHandle);
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
 
-    imageProcessor->mNvsHandle = handle;
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
@@ -406,12 +424,17 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         uint8_t * header = reinterpret_cast<uint8_t *>(&(imageProcessor->mFixedOtaHeader));
         if (imageProcessor->mBlock.size() + imageProcessor->mParams.downloadedBytes < sizeof(imageProcessor->mFixedOtaHeader))
         {
+            // the first block is smaller than the header, somehow
             memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
         }
         else
         {
+            // we have received the whole header, fill it up
             memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(),
                    sizeof(imageProcessor->mFixedOtaHeader) - imageProcessor->mParams.downloadedBytes);
+
+            // update the total size for download tracking
+            imageProcessor->mParams.totalFileBytes = imageProcessor->mFixedOtaHeader.totalSize;
         }
     }
 

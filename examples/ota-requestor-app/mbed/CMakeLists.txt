@@ -55,8 +55,6 @@ target_include_directories(${APP_TARGET} PRIVATE
 target_sources(${APP_TARGET} PRIVATE
                main/main.cpp
                main/AppTask.cpp
-               ${GEN_DIR}//ota-requestor-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
 )
@@ -64,7 +62,6 @@ target_sources(${APP_TARGET} PRIVATE
 chip_configure_data_model(${APP_TARGET}
     INCLUDE_SERVER
     ZAP_FILE ${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap
-    GEN_DIR ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

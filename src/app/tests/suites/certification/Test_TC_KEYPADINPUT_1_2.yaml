@@ -50,15 +50,32 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Read the global attribute: FeatureMap"
-      PICS: KEYPADINPUT.S.NV || KEYPADINPUT.S.LK || KEYPADINPUT.S.NK
+    - label: "Given (KEYPADINPUT.S.NV) FeatureMap bit mask is set or not"
+      PICS: KEYPADINPUT.S.NV
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 1
-              maxValue: 7
+              hasMasksSet: [0x1]
+
+    - label: "Given (KEYPADINPUT.S.LK) FeatureMap bit mask is set or not"
+      PICS: KEYPADINPUT.S.LK
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Given (KEYPADINPUT.S.NK) FeatureMap bit mask is set or not"
+      PICS: KEYPADINPUT.S.NK
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

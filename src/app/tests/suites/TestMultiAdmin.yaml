@@ -70,7 +70,7 @@ tests:
           error: FAILURE
 
     - label: "Open Commissioning Window from alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -98,15 +98,15 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value: [{ "nodeID": nodeId }]
+          value: [{ "NodeID": nodeId }]
 
     - label: "Close Commissioning Window after failed commissioning"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       timedInteractionTimeoutMs: 10000
 
     - label: "Open Commissioning Window from alpha again"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -136,7 +136,7 @@ tests:
 
     - label: "Open Commissioning Window from beta"
       identity: "beta"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -166,7 +166,7 @@ tests:
 
     - label: "read the mandatory attribute: NodeLabel from alpha"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -175,7 +175,7 @@ tests:
 
     - label: "write the mandatory attribute NodeLabel from beta"
       identity: "beta"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       arguments:
@@ -183,7 +183,7 @@ tests:
 
     - label: "read the mandatory attribute: NodeLabel from gamma"
       identity: "gamma"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -192,7 +192,7 @@ tests:
 
     - label: "write the mandatory attribute NodeLabel back to default"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       arguments:

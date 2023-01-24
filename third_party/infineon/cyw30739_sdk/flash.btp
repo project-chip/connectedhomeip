@@ -36,12 +36,12 @@ DevicePreset "30739 Flash"
 	DLConfigSerialControlBaudRate = 115200
 	DLConfigEEPROMAccessSpeed = 100
 	DLConfigVSOffset = 0
-	ConfigDSLocation = 0x505000
-	ConfigDS2Location = 0x519000
+	ConfigDSLocation = 0x509000
+	ConfigDS2Location = 0x51d000
 	DLConfigSSLocation = 0x500000
 	DLConfigIncludeBTWSecurityKey = 0
 	DLConfigVSLocation = 0x501000
-	DLConfigVSLength = 0x2000
+	DLConfigVSLength = 0x4000
 	DLConfigRemoteDeviceCount = 0
 	DLConfigBD_ADDRBase = "30739A0*****"
 	DLConfigFixedBD_ADDRFlag = "Can change"

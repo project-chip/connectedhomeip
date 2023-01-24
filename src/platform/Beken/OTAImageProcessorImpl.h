@@ -19,7 +19,7 @@
 #pragma once
 
 #include "flash_namespace_value.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
+
 #include <cstring>
 #include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>

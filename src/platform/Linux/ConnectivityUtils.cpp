@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@
 #include <unistd.h>
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
@@ -242,24 +243,24 @@ double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
     return result;
 }
 
-InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
-    InterfaceType ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
-    int sock          = -1;
+    InterfaceTypeEnum ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
+    int sock              = -1;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to open socket");
-        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
     }
 
     // Test wireless extensions for CONNECTION_WIFI
     struct iwreq pwrq = {};
-    strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
+    Platform::CopyString(pwrq.ifr_name, ifname);
 
     if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
     {
-        ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     }
     else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
     {
@@ -267,10 +268,10 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
         ecmd.cmd                = ETHTOOL_GSET;
         struct ifreq ifr        = {};
         ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
-        strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+        Platform::CopyString(ifr.ifr_name, ifname);
 
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
-            ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+            ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
     }
 
     close(sock);
@@ -419,11 +420,10 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
             {
-                strncpy(ifname, ifa->ifa_name, bufSize);
-                ifname[bufSize - 1] = '\0';
-                err                 = CHIP_NO_ERROR;
+                Platform::CopyString(ifname, bufSize, ifa->ifa_name);
+                err = CHIP_NO_ERROR;
                 break;
             }
         }
@@ -440,7 +440,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiParameter(int skfd,            /* Socket to
                                                struct iwreq * pwrq) /* Fixed part of the request */
 {
     /* Set device name */
-    strncpy(pwrq->ifr_name, ifname, IFNAMSIZ);
+    Platform::CopyString(pwrq->ifr_name, ifname);
 
     /* Do the request */
     if (ioctl(skfd, request, pwrq) < 0)
@@ -458,7 +458,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiStats(int skfd, const char * ifname, struct
     wrq.u.data.pointer = (caddr_t) stats;
     wrq.u.data.length  = sizeof(struct iw_statistics);
     wrq.u.data.flags   = 1; /*Clear updated flag */
-    strncpy(wrq.ifr_name, ifname, IFNAMSIZ);
+    Platform::CopyString(wrq.ifr_name, ifname);
 
     return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
 }
@@ -614,11 +614,10 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET)
             {
-                strncpy(ifname, ifa->ifa_name, bufSize);
-                ifname[bufSize - 1] = '\0';
-                err                 = CHIP_NO_ERROR;
+                Platform::CopyString(ifname, bufSize, ifa->ifa_name);
+                err = CHIP_NO_ERROR;
                 break;
             }
         }
@@ -629,7 +628,7 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate)
+CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -640,7 +639,7 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::
     struct ifreq ifr        = {};
 
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
-    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+    Platform::CopyString(ifr.ifr_name, ifname);
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
@@ -659,34 +658,34 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::
     switch (speed)
     {
     case 10:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_M;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE10_M;
         break;
     case 100:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_100_M;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE100_M;
         break;
     case 1000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_1000_M;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE1_G;
         break;
     case 25000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_2__5_G;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE2_5_G;
         break;
     case 5000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_5_G;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE5_G;
         break;
     case 10000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_G;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE10_G;
         break;
     case 40000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_40_G;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE40_G;
         break;
     case 100000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_100_G;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE100_G;
         break;
     case 200000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_200_G;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE200_G;
         break;
     case 400000:
-        pHYRate = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_400_G;
+        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE400_G;
         break;
     default:
         ChipLogError(DeviceLayer, "Undefined speed! (%d)\n", speed);
@@ -709,7 +708,7 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullD
     struct ifreq ifr        = {};
 
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
-    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+    Platform::CopyString(ifr.ifr_name, ifname);
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {

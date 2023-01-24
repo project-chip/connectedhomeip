@@ -46,31 +46,50 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = 0;
-    mEventLoopTask          = NULL;
-    mChipTimerActive        = false;
+    // TODO: This nulling out of mEventLoopTask should happen when we shut down
+    // the task, not here!
+    mEventLoopTask   = NULL;
+    mChipTimerActive = false;
 
-#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
-    mChipStackLock = xSemaphoreCreateMutexStatic(&mChipStackLockMutex);
-#else
-    mChipStackLock  = xSemaphoreCreateMutex();
-#endif // CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+    // We support calling Shutdown followed by InitChipStack, because some tests
+    // do that.  To keep things simple for existing consumers, we keep not
+    // destroying our lock and queue in shutdown, but rather check whether they
+    // already exist here before trying to create them.
 
     if (mChipStackLock == NULL)
     {
-        ChipLogError(DeviceLayer, "Failed to create CHIP stack lock");
-        ExitNow(err = CHIP_ERROR_NO_MEMORY);
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+        mChipStackLock = xSemaphoreCreateMutexStatic(&mChipStackLockMutex);
+#else
+        mChipStackLock  = xSemaphoreCreateMutex();
+#endif // CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+
+        if (mChipStackLock == NULL)
+        {
+            ChipLogError(DeviceLayer, "Failed to create CHIP stack lock");
+            ExitNow(err = CHIP_ERROR_NO_MEMORY);
+        }
     }
 
-#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
-    mChipEventQueue =
-        xQueueCreateStatic(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent), mEventQueueBuffer, &mEventQueueStruct);
-#else
-    mChipEventQueue = xQueueCreate(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent));
-#endif
     if (mChipEventQueue == NULL)
     {
-        ChipLogError(DeviceLayer, "Failed to allocate CHIP event queue");
-        ExitNow(err = CHIP_ERROR_NO_MEMORY);
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
+        mChipEventQueue = xQueueCreateStatic(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent), mEventQueueBuffer,
+                                             &mEventQueueStruct);
+#else
+        mChipEventQueue = xQueueCreate(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent));
+#endif
+        if (mChipEventQueue == NULL)
+        {
+            ChipLogError(DeviceLayer, "Failed to allocate CHIP event queue");
+            ExitNow(err = CHIP_ERROR_NO_MEMORY);
+        }
+    }
+    else
+    {
+        // Clear out any events that might be stuck in the queue, so we start
+        // with a clean slate, as if we had just re-created the queue.
+        xQueueReset(mChipEventQueue);
     }
 
     mShouldRunEventLoop.store(false);
@@ -145,7 +164,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
     ChipDeviceEvent event;
 
     // Lock the CHIP stack.
-    Impl()->LockChipStack();
+    StackLock lock;
 
     bool oldShouldRunEventLoop = false;
     if (!mShouldRunEventLoop.compare_exchange_strong(oldShouldRunEventLoop /* expected */, true /* desired */))
@@ -198,13 +217,13 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
             waitTime = portMAX_DELAY;
         }
 
-        // Unlock the CHIP stack, allowing other threads to enter CHIP while the event loop thread is sleeping.
-        Impl()->UnlockChipStack();
-
-        BaseType_t eventReceived = xQueueReceive(mChipEventQueue, &event, waitTime);
-
-        // Lock the CHIP stack.
-        Impl()->LockChipStack();
+        BaseType_t eventReceived = pdFALSE;
+        {
+            // Unlock the CHIP stack, allowing other threads to enter CHIP while
+            // the event loop thread is sleeping.
+            StackUnlock unlock;
+            eventReceived = xQueueReceive(mChipEventQueue, &event, waitTime);
+        }
 
         // If an event was received, dispatch it.  Continue receiving events from the queue and
         // dispatching them until the queue is empty.
@@ -236,6 +255,9 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * ar
 {
     ChipLogDetail(DeviceLayer, "CHIP task running");
     static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunEventLoop();
+    // TODO: At this point, should we not
+    // vTaskDelete(static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->mEventLoopTask)?
+    // Or somehow get our caller to do it once this thread is joined?
 }
 
 template <class ImplClass>
@@ -275,6 +297,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
+    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
 template <class ImplClass>

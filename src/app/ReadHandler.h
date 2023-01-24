@@ -28,6 +28,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/AttributePathParams.h>
+#include <app/CASESessionManager.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>
 #include <app/EventPathParams.h>
@@ -36,8 +37,11 @@
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
+#include <app/OperationalSessionSetup.h>
+#include <app/SubscriptionResumptionStorage.h>
+#include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -165,6 +169,17 @@ public:
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     *
+     *  Constructor in preparation for resuming a persisted subscription
+     *
+     *  The callback passed in has to outlive this handler object.
+     *
+     */
+    ReadHandler(ManagementCallback & apCallback);
+#endif
+
     const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
     const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
     const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
@@ -243,6 +258,18 @@ private:
      */
     void OnInitialRequest(System::PacketBufferHandle && aPayload);
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     *
+     *  @brief Resume a persisted subscription
+     *
+     *  Used after ReadHandler(ManagementCallback & apCallback). This will start a CASE session
+     *  with the subscriber if one doesn't already exist, and send full priming report when connected.
+     */
+    void ResumeSubscription(CASESessionManager & caseSessionManager,
+                            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
+#endif
+
     /**
      *  Send ReportData to initiator
      *
@@ -252,6 +279,8 @@ private:
      *  @retval #Others If fails to send report data
      *  @retval #CHIP_NO_ERROR On success.
      *
+     *  If an error is returned, the ReadHandler guarantees that it is not in
+     *  a state where it's waiting for a response.
      */
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 
@@ -263,6 +292,9 @@ private:
     bool IsIdle() const { return mState == HandlerState::Idle; }
     bool IsReportable() const
     {
+        // Important: Anything that changes the state IsReportable depends on in
+        // a way that causes IsReportable to become true must call ScheduleRun
+        // on the reporting engine.
         return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::HoldReport) &&
             (IsDirty() || !mFlags.Has(ReadHandlerFlags::HoldSync));
     }
@@ -299,7 +331,7 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearForceDirtyFlag() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
+    void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -317,7 +349,7 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
-    void UnblockUrgentEventDelivery() { mFlags.Set(ReadHandlerFlags::ForceDirty); }
+    void UnblockUrgentEventDelivery();
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
@@ -350,11 +382,19 @@ private:
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };
 
+    enum class CloseOptions
+    {
+        kDropPersistedSubscription,
+        kKeepPersistedSubscription
+    };
     /**
      * Called internally to signal the completion of all work on this objecta and signal to a registered callback that it's
      * safe to release this object.
+     *
+     *  @param    options             This specifies whether to drop or keep the subscription
+     *
      */
-    void Close();
+    void Close(CloseOptions options = CloseOptions::kDropPersistedSubscription);
 
     static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -362,7 +402,7 @@ private:
     CHIP_ERROR SendSubscribeResponse();
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
-    CHIP_ERROR ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser);
+    CHIP_ERROR ProcessAttributePaths(AttributePathIBs::Parser & aAttributePathListParser);
     CHIP_ERROR ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser);
     CHIP_ERROR ProcessEventFilters(EventFilterIBs::Parser & aEventFiltersParser);
     CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
@@ -373,6 +413,17 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
+
+    void PersistSubscription();
+
+    // Helpers for managing our state flags properly.
+    void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
+    void ClearStateFlag(ReadHandlerFlags aFlag);
+
+    // Helpers for continuing the subscription resumption
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                      const SessionHandle & sessionHandle);
+    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 
@@ -429,6 +480,11 @@ private:
     SessionHolder mSessionHandle;
 
     Messaging::ExchangeHolder mExchangeCtx;
+#if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
+    // TODO: this should be replaced by a pointer to the InteractionModelEngine that created the ReadHandler
+    // once InteractionModelEngine is no longer a singleton (see issue 23625)
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+#endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
 
     ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
     ObjectList<EventPathParams> * mpEventPathList           = nullptr;
@@ -447,6 +503,12 @@ private:
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    // Callbacks to handle server-initiated session success/failure
+    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+#endif
 };
 } // namespace app
 } // namespace chip

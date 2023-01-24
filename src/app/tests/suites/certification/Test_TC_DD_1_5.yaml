@@ -23,7 +23,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
@@ -141,9 +141,4 @@ tests:
           2. DUT"s NFC tag should have a Reader type equal to 2 or greater
 
           Note: chip-tool does not support physically scanning an NFC tag
-      disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
       disabled: true

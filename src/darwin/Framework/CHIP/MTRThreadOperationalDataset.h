@@ -19,70 +19,99 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * MTRThreadOperationalDataset allows converting between an "expanded" view of
+ * the dataset (with the separate fields) and a single-blob NSData view.
+ *
+ * The latter can be used to pass Thread network credentials via
+ * MTRCommissioningParameters.
+ */
 @interface MTRThreadOperationalDataset : NSObject
 
 /**
- * The expected lengths of each of the NSData fields in the CHIPThreadOperationalDataset
- *
- * initWithNetworkName must be provided NSData fields with at least these lengths otherwise
- * the object will fail to init.
+ * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
  */
 extern size_t const MTRSizeThreadNetworkName;
-extern size_t const MTRSizeThreadExtendedPanId;
+extern size_t const MTRSizeThreadExtendedPanId MTR_NEWLY_DEPRECATED("Please use MTRSizeThreadExtendedPANID");
+extern size_t const MTRSizeThreadExtendedPANID MTR_NEWLY_AVAILABLE;
 extern size_t const MTRSizeThreadMasterKey;
 extern size_t const MTRSizeThreadPSKc;
+extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
 
 /**
- *  The Thread Network name
+ * The Thread Network name
  */
-@property (nonatomic, nullable, copy, readonly) NSString * networkName;
+@property (nonatomic, copy, readonly) NSString * networkName;
 /**
- *  The Thread Network extendended PAN ID
+ * The Thread Network extendended PAN ID
  */
-@property (nonatomic, nullable, copy, readonly) NSData * extendedPANID;
+@property (nonatomic, copy, readonly) NSData * extendedPANID;
 /**
- *  The 16 byte Master Key
+ * The 16 byte Master Key
  */
-@property (nonatomic, nullable, copy, readonly) NSData * masterKey;
+@property (nonatomic, copy, readonly) NSData * masterKey;
 /**
- *  The Thread PSKc
+ * The Thread PSKc
  */
-@property (nonatomic, nullable, copy, readonly) NSData * PSKc;
+@property (nonatomic, copy, readonly) NSData * PSKc;
 /**
- *  The Thread network channel
+ * The Thread network channel.  Always an unsigned 16-bit integer.
  */
-@property (nonatomic, readwrite) uint16_t channel;
+@property (nonatomic, copy, readonly) NSNumber * channelNumber MTR_NEWLY_AVAILABLE;
 /**
- *  A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
+ * A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
  */
-@property (nonatomic, nullable, copy, readonly) NSData * panID;
+@property (nonatomic, copy, readonly) NSData * panID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- *  Create a Thread Operational Dataset object with the individual network fields.
- *  This initializer will return nil if any of the NSData fields don't match the expected size.
+ * Create a Thread Operational Dataset object with the individual network
+ * fields.
  *
- *  Note: The panID is expected to be a uint16_t stored as 2-bytes in host order
+ * @param extendedPANID Must be MTRSizeThreadExtendedPANID bytes.  Otherwise nil
+ *                      will be returned.
+ * @param masterKey Must be MTRSizeThreadMasterKey bytes. Otherwise nil will be
+ *                  returned.
+ * @param PSKc Must be MTRSizeThreadPSKc bytes.  Otherwise nil will be returned.
+ * @param channelNumber Must be an unsigned 16-bit value.
+ * @param panID Must be MTRSizeThreadPANID bytes.  Otherwise nil will be
+ *              returned.  In particular, it's expected to be a 16-bit unsigned
+ *              integer stored as 2 bytes in host order.
  */
+- (instancetype _Nullable)initWithNetworkName:(NSString *)networkName
+                                extendedPANID:(NSData *)extendedPANID
+                                    masterKey:(NSData *)masterKey
+                                         PSKc:(NSData *)PSKc
+                                channelNumber:(NSNumber *)channelNumber
+                                        panID:(NSData *)panID MTR_NEWLY_AVAILABLE;
+
+/**
+ * Create a Thread Operational Dataset object with a RCP formatted active operational dataset.
+ * This initializer will return nil if the input data cannot be parsed correctly
+ */
+- (instancetype _Nullable)initWithData:(NSData *)data;
+
+/**
+ * Get the underlying data that represents the Thread Active Operational Dataset
+ * This can be used for the threadOperationalDataset of MTRCommissioningParameters.
+ */
+- (NSData *)data;
+
+@end
+
+@interface MTRThreadOperationalDataset (Deprecated)
+
+@property (nonatomic, readwrite) uint16_t channel MTR_NEWLY_DEPRECATED("Please use channelNumber");
+
 - (nullable instancetype)initWithNetworkName:(NSString *)networkName
                                extendedPANID:(NSData *)extendedPANID
                                    masterKey:(NSData *)masterKey
                                         PSKc:(NSData *)PSKc
                                      channel:(uint16_t)channel
-                                       panID:(NSData *)panID;
-
-/**
- *  Create a Thread Operational Dataset object with a RCP formatted active operational dataset.
- *  This initializer will return nil if the input data cannot be parsed correctly
- */
-- (nullable instancetype)initWithData:(NSData *)data;
-
-/**
- * Get the underlying data that represents the Thread Active Operational Dataset
- */
-- (NSData *)data;
+                                       panID:(NSData *)panID
+    MTR_NEWLY_DEPRECATED("Please use initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID");
 
 @end
 

@@ -301,6 +301,20 @@
 #endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 
 /**
+ *  @def CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+ *
+ *  @brief
+ *    Length of the shared secret to use for unit tests or when CHIP_CONFIG_SECURITY_TEST_MODE is enabled.
+ *
+ *    Note that the default value of 32 includes the null terminator.
+ *    WARNING: `strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE)` will result in different keys
+ *              than expected and give unexpected results for shared secrets that contain '\x00'.
+ */
+#ifndef CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+#define CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH 32
+#endif // CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+
+/**
  *  @def CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
  *
  *  @brief
@@ -359,6 +373,16 @@
 #ifndef CHIP_AUTOMATION_LOGGING
 #define CHIP_AUTOMATION_LOGGING 1
 #endif // CHIP_AUTOMATION_LOGGING
+
+/**
+ *  @def CHIP_LOG_FILTERING
+ *
+ *  @brief
+ *    If asserted (1), enable runtime log level configuration.
+ */
+#ifndef CHIP_LOG_FILTERING
+#define CHIP_LOG_FILTERING 1
+#endif
 
 /**
  * CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
@@ -896,7 +920,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum size of the lambda which can be post into system event queue.
  */
 #ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
-#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (24)
 #endif
 
 /**
@@ -960,6 +984,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+ *
+ * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
+ *
+ * Binds to number of GroupMapping entries per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
@@ -967,7 +1002,11 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of GroupState entries to support per fabric
  */
 #ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 3
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC (4 * CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC)
+#endif
+
+#if CHIP_CONFIG_MAX_GROUPS_PER_FABRIC < (4 * CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC)
+#error "Please ensure CHIP_CONFIG_MAX_GROUPS_PER_FABRIC meets minimum requirements. See Group Limits in the specification."
 #endif
 
 /**
@@ -978,22 +1017,11 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 2
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 3
 #endif
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
 #error "Please ensure CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC > 0 to support at least the IPK."
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
- *
- * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
- *
- * Binds to number of GroupMapping entries per fabric
- */
-#ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
 #endif
 
 /**
@@ -1023,7 +1051,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * example access control code.
  */
 #ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
-#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 3
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 4
 #endif
 
 /**
@@ -1146,6 +1174,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
+ * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
+ * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
+ * This is a temporary workaround for interoperability with those erroneous early-SVE2 implementations.
+ * The cost of this compatibity mode is twice as many decryption steps per received group message.
+ *
+ * TODO(#24573): Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
+ */
+#ifndef CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
+#define CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2 1
+#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
+
+/**
  *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
  *
  *  @brief
@@ -1246,6 +1287,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES 2
 #endif // CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES
 
+/**
+ * def CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+ *
+ * @brief Determines the maximum number of node resolve results (PeerAddresses) to keep
+ *        for establishing an operational session.
+ *
+ */
+#ifndef CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+#define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 1
+#endif // CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+
 /*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
  *
@@ -1283,5 +1335,47 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
 
 /**
+ * @def CHIP_CONFIG_NUM_CD_KEY_SLOTS
+ *
+ * @brief Number of custom CD signing keys supported by default CD keystore
+ *
+ */
+#ifndef CHIP_CONFIG_NUM_CD_KEY_SLOTS
+#define CHIP_CONFIG_NUM_CD_KEY_SLOTS 5
+#endif // CHIP_CONFIG_NUM_CD_KEY_SLOTS
+
+/**
+ * @def CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
+ *
+ * @brief Defines the number of clients that can register for monitoring with a server
+ * see ClientMonitoring cluster for specification
+ */
+#ifndef CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
+#define CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC 1
+#endif // CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
+
+/**
  * @}
  */
+
+/**
+ *  @def CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+ *
+ *  @brief
+ *    Enable persistence and resumption of subscriptions on servers.
+ *
+ */
+#ifndef CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#define CHIP_CONFIG_PERSIST_SUBSCRIPTIONS 0
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+/**
+ * @def CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous subscription resumption iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS 2
+#endif

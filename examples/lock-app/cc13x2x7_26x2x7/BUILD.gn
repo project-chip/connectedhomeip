@@ -74,6 +74,7 @@ ti_simplelink_executable("lock_app") {
   output_name = "chip-${ti_simplelink_board}-lock-example.out"
 
   sources = [
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/BoltLockManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
@@ -96,6 +97,7 @@ ti_simplelink_executable("lock_app") {
   include_dirs = [
     "${project_dir}",
     "${project_dir}/main",
+    "${chip_root}/examples/providers/",
   ]
 
   cflags = [

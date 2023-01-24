@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
                 const gchar * value_str = g_variant_get_string(value, nullptr);
                 if (value_str == nullptr)
                     continue;
-                ChipLogProgress(DeviceLayer, "Thread role changed to: %s", value_str);
+                ChipLogProgress(DeviceLayer, "Thread role changed to: %s", StringOrNullMarker(value_str));
                 me->ThreadDevcieRoleChangedHandler(value_str);
             }
         }
@@ -496,9 +496,10 @@ CHIP_ERROR ThreadStackManagerImpl::_SetSEDIntervalsConfig(const ConnectivityMana
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff)
+CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
     (void) onOff;
+    (void) delayIdle;
 
     ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -681,8 +682,8 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
 
     switch (attributeId)
     {
-    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
-    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
+    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
         err = encoder.EncodeEmptyList();
         break;

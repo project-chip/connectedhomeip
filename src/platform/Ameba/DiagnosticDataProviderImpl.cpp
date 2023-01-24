@@ -24,6 +24,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMemString.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
 
 #include <lwip_netconf.h>
@@ -87,8 +88,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         {
             ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
 
-            strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
-            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
             thread->id = taskStatusArray[x].xTaskNumber;
 
@@ -196,15 +196,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         {
             NetworkInterface * ifp = new NetworkInterface();
 
-            strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
-            ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
+            Platform::CopyString(ifp->Name, ifa->name);
 
             ifp->name          = CharSpan::fromCharString(ifp->Name);
             ifp->isOperational = true;
             if ((ifa->flags) & NETIF_FLAG_ETHERNET)
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
             else
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
             ifp->offPremiseServicesReachableIPv4.SetNull();
             ifp->offPremiseServicesReachableIPv6.SetNull();
 
@@ -274,7 +273,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
 {
     // Support 802.11a/n Wi-Fi in AmebaD chipset
-    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
     return CHIP_NO_ERROR;
 }
 

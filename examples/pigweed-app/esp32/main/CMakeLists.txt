@@ -14,7 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-idf_component_register(INCLUDE_DIRS 
+idf_component_register(INCLUDE_DIRS
                      "${CMAKE_CURRENT_LIST_DIR}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/pw_sys_io/public"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
@@ -22,7 +22,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
                      "${IDF_PATH}/components/freertos/include/freertos"
-                    
+
                       SRC_DIRS
                      "${CMAKE_CURRENT_LIST_DIR}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
@@ -43,4 +43,5 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
     pw_log
     pw_rpc.nanopb.echo_service
     pw_rpc.server
+    pw_sys_io
 )

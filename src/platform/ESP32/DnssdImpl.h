@@ -16,6 +16,7 @@
 #pragma once
 
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <mdns.h>
 
@@ -49,8 +50,7 @@ struct BrowseContext : public GenericContext
                   Inet::IPAddressType addrType, DnssdBrowseCallback cb, void * cbCtx)
 
     {
-        memset(mType, 0, sizeof(mType));
-        strncpy(mType, type, strnlen(type, kDnssdTypeMaxSize));
+        Platform::CopyString(mType, type);
         mContextType  = ContextType::Browse;
         mAddressType  = addrType;
         mProtocol     = protocol;
@@ -104,23 +104,19 @@ struct ResolveContext : public GenericContext
     ResolveContext(DnssdService * service, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle, DnssdResolveCallback cb,
                    void * cbCtx)
     {
-        memset(mType, 0, sizeof(mType));
-        memset(mInstanceName, 0, sizeof(mInstanceName));
-        strncpy(mType, service->mType, strnlen(service->mType, kDnssdTypeMaxSize));
-        mType[kDnssdTypeMaxSize] = 0;
-        strncpy(mInstanceName, service->mName, strnlen(service->mName, Common::kInstanceNameMaxLength));
-        mInstanceName[Common::kInstanceNameMaxLength] = 0;
-        mContextType                                  = ContextType::Resolve;
-        mProtocol                                     = service->mProtocol;
-        mResolveCb                                    = cb;
-        mCbContext                                    = cbCtx;
-        mInterfaceId                                  = ifId;
-        mSearchHandle                                 = searchHandle;
-        mResolveState                                 = ResolveState::QuerySrv;
-        mResult                                       = nullptr;
-        mService                                      = nullptr;
-        mAddresses                                    = nullptr;
-        mAddressCount                                 = 0;
+        Platform::CopyString(mType, type);
+        Platform::CopyString(mInstanceName, service->mName);
+        mContextType  = ContextType::Resolve;
+        mProtocol     = service->mProtocol;
+        mResolveCb    = cb;
+        mCbContext    = cbCtx;
+        mInterfaceId  = ifId;
+        mSearchHandle = searchHandle;
+        mResolveState = ResolveState::QuerySrv;
+        mResult       = nullptr;
+        mService      = nullptr;
+        mAddresses    = nullptr;
+        mAddressCount = 0;
     }
 
     ~ResolveContext()

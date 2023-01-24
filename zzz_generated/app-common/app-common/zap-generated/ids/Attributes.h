@@ -418,9 +418,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace Descriptor {
 namespace Attributes {
 
-namespace DeviceList {
+namespace DeviceTypeList {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace DeviceList
+} // namespace DeviceTypeList
 
 namespace ServerList {
 static constexpr AttributeId Id = 0x00000001;
@@ -571,7 +571,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Attributes {
 
 namespace DataModelRevision {
@@ -675,7 +675,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 namespace Attributes {
@@ -706,9 +706,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace OtaSoftwareUpdateRequestor {
 namespace Attributes {
 
-namespace DefaultOtaProviders {
+namespace DefaultOTAProviders {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace DefaultOtaProviders
+} // namespace DefaultOTAProviders
 
 namespace UpdatePossible {
 static constexpr AttributeId Id = 0x00000001;
@@ -1176,9 +1176,9 @@ namespace TotalOperationalHours {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace TotalOperationalHours
 
-namespace BootReasons {
+namespace BootReason {
 static constexpr AttributeId Id = 0x00000004;
-} // namespace BootReasons
+} // namespace BootReason
 
 namespace ActiveHardwareFaults {
 static constexpr AttributeId Id = 0x00000005;
@@ -1292,13 +1292,13 @@ namespace OverrunCount {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace OverrunCount
 
-namespace NeighborTableList {
+namespace NeighborTable {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace NeighborTableList
+} // namespace NeighborTable
 
-namespace RouteTableList {
+namespace RouteTable {
 static constexpr AttributeId Id = 0x00000008;
-} // namespace RouteTableList
+} // namespace RouteTable
 
 namespace PartitionId {
 static constexpr AttributeId Id = 0x00000009;
@@ -1745,7 +1745,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace TimeSynchronization
 
-namespace BridgedDeviceBasic {
+namespace BridgedDeviceBasicInformation {
 namespace Attributes {
 
 namespace VendorName {
@@ -1829,7 +1829,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BridgedDeviceBasic
+} // namespace BridgedDeviceBasicInformation
 
 namespace Switch {
 namespace Attributes {
@@ -3046,9 +3046,9 @@ namespace CompensationText {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace CompensationText
 
-namespace ColorTemperature {
+namespace ColorTemperatureMireds {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace ColorTemperature
+} // namespace ColorTemperatureMireds
 
 namespace ColorMode {
 static constexpr AttributeId Id = 0x00000008;
@@ -3272,9 +3272,9 @@ namespace MaxLevel {
 static constexpr AttributeId Id = 0x00000011;
 } // namespace MaxLevel
 
-namespace IntrinsicBalanceFactor {
+namespace IntrinsicBallastFactor {
 static constexpr AttributeId Id = 0x00000014;
-} // namespace IntrinsicBalanceFactor
+} // namespace IntrinsicBallastFactor
 
 namespace BallastFactorAdjustment {
 static constexpr AttributeId Id = 0x00000015;
@@ -3580,17 +3580,17 @@ namespace OccupancySensorTypeBitmap {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace OccupancySensorTypeBitmap
 
-namespace PirOccupiedToUnoccupiedDelay {
+namespace PIROccupiedToUnoccupiedDelay {
 static constexpr AttributeId Id = 0x00000010;
-} // namespace PirOccupiedToUnoccupiedDelay
+} // namespace PIROccupiedToUnoccupiedDelay
 
-namespace PirUnoccupiedToOccupiedDelay {
+namespace PIRUnoccupiedToOccupiedDelay {
 static constexpr AttributeId Id = 0x00000011;
-} // namespace PirUnoccupiedToOccupiedDelay
+} // namespace PIRUnoccupiedToOccupiedDelay
 
-namespace PirUnoccupiedToOccupiedThreshold {
+namespace PIRUnoccupiedToOccupiedThreshold {
 static constexpr AttributeId Id = 0x00000012;
-} // namespace PirUnoccupiedToOccupiedThreshold
+} // namespace PIRUnoccupiedToOccupiedThreshold
 
 namespace UltrasonicOccupiedToUnoccupiedDelay {
 static constexpr AttributeId Id = 0x00000020;
@@ -4605,7 +4605,49 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 
-namespace TestCluster {
+namespace ClientMonitoring {
+namespace Attributes {
+
+namespace IdleModeInterval {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace IdleModeInterval
+
+namespace ActiveModeInterval {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveModeInterval
+
+namespace ActiveModeThreshold {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ActiveModeThreshold
+
+namespace ExpectedClients {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ExpectedClients
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ClientMonitoring
+
+namespace UnitTesting {
 namespace Attributes {
 
 namespace Boolean {
@@ -4932,6 +4974,10 @@ namespace NullableRangeRestrictedInt16s {
 static constexpr AttributeId Id = 0x00004029;
 } // namespace NullableRangeRestrictedInt16s
 
+namespace WriteOnlyInt8u {
+static constexpr AttributeId Id = 0x0000402A;
+} // namespace WriteOnlyInt8u
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -4953,7 +4999,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TestCluster
+} // namespace UnitTesting
 
 namespace FaultInjection {
 namespace Attributes {

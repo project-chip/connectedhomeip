@@ -37,6 +37,7 @@ declare_args() {
   board = "k32w061dk6"
   chip_with_ntag = 1
   chip_with_high_power = 0
+  chip_with_factory_data = 0
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -64,6 +65,13 @@ template("k32w0_sdk") {
                chip_with_ot_cli == 0 && chip_with_se05x == 0),
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
+  assert(chip_with_low_power == 0 ||
+             (invoker.chip_detail_logging == false &&
+                  invoker.chip_progress_logging == false &&
+                  invoker.chip_automation_logging == false &&
+                  invoker.chip_error_logging == false),
+         "Please disable all logs when low power is enabled!")
+
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
     build_for_k32w061 = 0
@@ -75,7 +83,7 @@ template("k32w0_sdk") {
            "Please build for only one platform")
     device = "K32W061"
     board = "k32w061dk6"
-    chip_with_ntag = 1
+    chip_with_ntag = 0
     chip_with_high_power = 0
   }
   if (build_for_k32w041am == 1) {
@@ -221,8 +229,7 @@ template("k32w0_sdk") {
       "USE_SDK_OSA=0",
       "gSerialManagerMaxInterfaces_c=2",
       "FSL_RTOS_FREE_RTOS=1",
-      "gTotalHeapSize_c=0xC8BC",
-      "gUartDebugConsole_d=1",
+      "gTotalHeapSize_c=0x10000",
       "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
       "APP_SERIAL_INTERFACE_INSTANCE=1",
       "gOTA_externalFlash_d=1",
@@ -238,7 +245,6 @@ template("k32w0_sdk") {
       "ENABLE_RAM_VECTOR_TABLE=1",
       "gTMR_Enabled_d=1",
       "gTimestamp_Enabled_d=0",
-      "K32W_LOG_ENABLED=1",
       "CHIP_ENABLE_OPENTHREAD=1",
       "gOtaMemPoolId_c=1",
       "PoolsDetails_c=_block_size_ 32 _number_of_blocks_ 6 _pool_id_(0) _eol_ _block_size_ 256 _number_of_blocks_ 3 _pool_id_(0) _eol_ _block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_ _block_size_ 268  _number_of_blocks_ 8 _pool_id_(gOtaMemPoolId_c) _eol_",
@@ -295,7 +301,7 @@ template("k32w0_sdk") {
       } else {
         defines += [
           "gKeyBoardSupported_d=1",
-          "gKBD_KeysCount_c=1",
+          "gKBD_KeysCount_c=2",
         ]
       }
 
@@ -322,11 +328,15 @@ template("k32w0_sdk") {
         "mAppUseTickLessMode_c=1",
         "App_SuppressTickInStopMode=0",
         "cPWR_DiscardRunningTimerForPowerDown=1",
+        "K32W_LOG_ENABLED=0",
+        "gUartDebugConsole_d=0",
       ]
     } else {
       defines += [
         "cPWR_UsePowerDownMode=0",
         "cPWR_FullPowerDownMode=0",
+        "K32W_LOG_ENABLED=1",
+        "gUartDebugConsole_d=1",
       ]
     }
 
@@ -356,6 +366,10 @@ template("k32w0_sdk") {
         "CONFIG_CHIP_NFC_COMMISSIONING=1",
         "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
       ]
+    }
+
+    if (chip_with_factory_data == 1) {
+      defines += [ "CONFIG_CHIP_K32W0_REAL_FACTORY_DATA=1" ]
     }
 
     if (defined(invoker.defines)) {

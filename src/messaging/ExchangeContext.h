@@ -183,6 +183,10 @@ public:
     // Set the response timeout for the exchange context, regardless of the underlying session type. Using
     // UseSuggestedResponseTimeout to set a timeout based on the type of the session and the application processing time instead of
     // using this function is recommended.
+    //
+    // If a timeout of 0 is provided, it implies no response is expected. Consequently, ExchangeDelegate::OnResponseTimeout will not
+    // be called.
+    //
     void SetResponseTimeout(Timeout timeout);
 
     // This API is used by commands that need to shut down all existing
@@ -212,7 +216,24 @@ public:
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    SessionHolder & GetSessionHolder() { return mSession; }
+
+    enum class InjectedFailureType : uint8_t
+    {
+        kFailOnSend = 0x01
+    };
+
+    void InjectFailure(InjectedFailureType failureType) { mInjectedFailures.Set(failureType); }
+
+    void ClearInjectedFailures() { mInjectedFailures.ClearAll(); }
+#endif
+
 private:
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    BitFlags<InjectedFailureType> mInjectedFailures;
+#endif
+
     class ExchangeSessionHolder : public SessionHolderWithDelegate
     {
     public:

@@ -32,8 +32,7 @@ config:
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
     PakeVerifier:
         type: octet_string
-        defaultValue:
-            "\xb9\x61\x70\xaa\xe8\x03\x34\x68\x84\x72\x4f\xe9\xa3\xb2\x87\xc3\x03\x30\xc2\xa6\x60\x37\x5d\x17\xbb\x20\x5a\x8c\xf1\xae\xcb\x35\x04\x57\xf8\xab\x79\xee\x25\x3a\xb6\xa8\xe4\x6b\xb0\x9e\x54\x3a\xe4\x22\x73\x6d\xe5\x01\xe3\xdb\x37\xd4\x41\xfe\x34\x49\x20\xd0\x95\x48\xe4\xc1\x82\x40\x63\x0c\x4f\xf4\x91\x3c\x53\x51\x38\x39\xb7\xc0\x7f\xcc\x06\x27\xa1\xb8\x57\x3a\x14\x9f\xcd\x1f\xa4\x66\xcf"
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -64,7 +63,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -72,21 +71,44 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
+
+    #Check for DNS-SD advertisement CM is not possible in YAML
+    - label: "Verify that the DNS-SD advertisement shows CM=2"
+      verification: |
+          On TH_CR1 send the below command
+
+          avahi-browse -rt _matterc._udp
+
+          +   eth0 IPv6 4D0262FE51384D5A                              _matterc._udp        local
+          =   eth0 IPv6 4D0262FE51384D5A                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "writeAttribute"
       PICS: BINFO.S.A0005
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       arguments:
           value: "chiptest"
@@ -96,7 +118,7 @@ tests:
           attribute of DUT_CE"
       command: "readAttribute"
       PICS: BINFO.S.A0005
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       response:
           value: "chiptest"
@@ -126,13 +148,46 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
+    #Check for DNS-SD advertisement is not possible in YAML
+    - label:
+          "Verify DUT_CE is now discoverable over DNS-SD with two SRV Records"
+      verification: |
+          On TH_CR2 send the below command
+
+          Verify if the DUT_CE is broadcasting using
+
+          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          +   eth0 IPv6 9B9C01C971F4119F-0000000000000001             _matter._tcp         local
+          +   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
+          =   eth0 IPv6 9B9C01C971F4119F-0000000000000001             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       PICS: OPCREDS.S.A0001
+      fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }]
+          value: [{ Label: "", NodeID: nodeId }, { Label: "", NodeID: nodeId2 }]
           constraints:
               type: list
 
@@ -144,7 +199,7 @@ tests:
       PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
+          value: [{ Label: "", NodeID: nodeId }, { Label: "", NodeID: nodeId2 }]
           constraints:
               type: list
 
@@ -152,7 +207,7 @@ tests:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "writeAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       arguments:
@@ -162,7 +217,7 @@ tests:
           "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "readAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       response:
@@ -176,7 +231,7 @@ tests:
           attribute of DUT_CE"
       identity: "beta"
       command: "writeAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       arguments:
@@ -187,7 +242,7 @@ tests:
           attribute of DUT_CE"
       identity: "beta"
       command: "readAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       response:
@@ -197,7 +252,7 @@ tests:
               maxLength: 32
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       identity: "beta"
@@ -206,13 +261,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label: "Wait for the commissioning window in step 13 to timeout"
@@ -225,7 +280,7 @@ tests:
 
     - label:
           "TH_CR2 reads the window status to verify the DUT_CE window is closed"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       PICS: CADMIN.S.A0000
       command: "readAttribute"
       attribute: "WindowStatus"
@@ -233,7 +288,7 @@ tests:
           value: 0
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using ECM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       identity: "beta"
@@ -242,13 +297,13 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
+              - name: "PAKEPasscodeVerifier"
                 value: PakeVerifier
-              - name: "discriminator"
+              - name: "Discriminator"
                 value: discriminator
-              - name: "iterations"
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
     - label:
@@ -265,3 +320,4 @@ tests:
                 value: payload
       response:
           error: FAILURE
+          clusterError: 9

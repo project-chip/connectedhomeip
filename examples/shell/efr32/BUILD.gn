@@ -47,7 +47,7 @@ efr32_sdk("sdk") {
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
+    "BOARD_ID=${silabs_board}",
     "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
   ]
 }
@@ -61,7 +61,8 @@ efr32_executable("shell_app") {
     "src/main.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      use_wf200 || use_rs911x) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
@@ -75,6 +76,11 @@ efr32_executable("shell_app") {
     "${examples_plat_dir}:efr-matter-shell",
   ]
 
+  # Factory Data Provider
+  if (use_efr32_factory_data_provider) {
+    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
+  }
+
   include_dirs = [ "include" ]
 
   defines = []
@@ -84,7 +90,7 @@ efr32_executable("shell_app") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

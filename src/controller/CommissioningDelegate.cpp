@@ -113,6 +113,10 @@ const char * StageToString(CommissioningStage stage)
         return "Cleanup";
         break;
 
+    case kNeedsNetworkCreds:
+        return "NeedsNetworkCreds";
+        break;
+
     default:
         return "???";
         break;

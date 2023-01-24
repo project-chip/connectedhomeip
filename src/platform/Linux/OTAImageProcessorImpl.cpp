@@ -68,11 +68,6 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         return CHIP_ERROR_INTERNAL;
     }
 
-    if ((block.data() == nullptr) || block.empty())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
     // Store block data for HandleProcessBlock to access
     CHIP_ERROR err = SetBlock(block);
     if (err != CHIP_NO_ERROR)

@@ -15,28 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/*****************************************************************************
- * @file
- * @brief Application event code that is common to both the SOC and EZSP platforms.
- *******************************************************************************
- ******************************************************************************/
-
 #include <app/util/af-event.h>
 
 #include <app/util/af.h>
@@ -59,7 +37,7 @@ struct EmberEventData
     /** The control structure for the event. */
     EmberEventControl * control;
     /** The procedure to call when the event fires. */
-    void (*handler)(void);
+    void (*handler)();
 };
 
 // *****************************************************************************
@@ -202,17 +180,6 @@ EmberStatus emberAfScheduleClusterTick(EndpointId endpoint, ClusterId clusterId,
                                        (sleepControl == EMBER_AF_STAY_AWAKE ? EMBER_AF_STAY_AWAKE : EMBER_AF_OK_TO_SLEEP));
 }
 
-EmberStatus emberAfScheduleClientTickExtended(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs,
-                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
-{
-    return emberAfScheduleTickExtended(endpoint, clusterId, EMBER_AF_CLIENT_CLUSTER_TICK, delayMs, pollControl, sleepControl);
-}
-
-EmberStatus emberAfScheduleClientTick(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs)
-{
-    return emberAfScheduleClientTickExtended(endpoint, clusterId, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
-}
-
 EmberStatus emberAfScheduleServerTickExtended(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs,
                                               EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
 {
@@ -233,11 +200,6 @@ EmberStatus emberAfDeactivateClusterTick(EndpointId endpoint, ClusterId clusterI
         return EMBER_SUCCESS;
     }
     return EMBER_BAD_ARGUMENT;
-}
-
-EmberStatus emberAfDeactivateClientTick(EndpointId endpoint, ClusterId clusterId)
-{
-    return emberAfDeactivateClusterTick(endpoint, clusterId, EMBER_AF_CLIENT_CLUSTER_TICK);
 }
 
 EmberStatus emberAfDeactivateServerTick(EndpointId endpoint, ClusterId clusterId)

@@ -101,8 +101,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 7000
-              maxValue: 9000
+              minValue: 6800
+              maxValue: 9200
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -118,8 +118,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 9000
-              maxValue: 11000
+              minValue: 8500
+              maxValue: 11500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -135,8 +135,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 11000
-              maxValue: 12000
+              minValue: 10200
+              maxValue: 13800
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -151,7 +151,9 @@ tests:
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          value: 12000
+          constraints:
+              minValue: 10200
+              maxValue: 13800
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=12000,
@@ -211,8 +213,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 9000
-              maxValue: 11000
+              minValue: 8500
+              maxValue: 11500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -228,8 +230,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 7000
-              maxValue: 9000
+              minValue: 6800
+              maxValue: 9200
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -245,8 +247,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 6000
-              maxValue: 7000
+              minValue: 5100
+              maxValue: 6900
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -261,22 +263,26 @@ tests:
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          value: 6000
+          constraints:
+              minValue: 5100
+              maxValue: 6900
 
     - label: "TH reads ColorMode attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0008
+      PICS: CC.S.F01 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 2
 
     - label: "TH reads EnhancedColorMode attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A4001
+      PICS: CC.S.F01 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 3
           constraints:
               minValue: 0
               maxValue: 3

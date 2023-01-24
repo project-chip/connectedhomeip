@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
@@ -33,7 +33,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <blog.h>
 #include <easyflash.h>
 #include <utils_log.h>
 
@@ -76,108 +75,75 @@ const BL602Config::Key BL602Config::kCounterKey_TotalOperationalHours = { "total
 
 CHIP_ERROR BL602Config::Init()
 {
-    EfErrCode err = easyflash_init();
-    if (EF_NO_ERR == err)
-        return CHIP_NO_ERROR;
-
-    log_error("easyflash_init() failed. err: %d\r\n", err);
-    return CHIP_ERROR_NO_MEMORY;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    bool tmpVal;
-    size_t ret, valLen;
+    size_t valLen  = 0;
 
-    ret = ef_get_env_blob(key.name, &tmpVal, sizeof(tmpVal), &valLen);
-    if (ret <= 0)
+    ef_get_env_blob(key.name, &val, 1, &valLen);
+    if (0 == valLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    val = tmpVal;
-
-exit:
     return err;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint32_t tmpVal;
-    size_t ret, valLen;
+    size_t valLen  = 0;
 
-    ret = ef_get_env_blob(key.name, &tmpVal, sizeof(tmpVal), &valLen);
-    if (ret <= 0)
+    ef_get_env_blob(key.name, &val, sizeof(val), &valLen);
+    if (0 == valLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    val = tmpVal;
-
-exit:
     return err;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint64_t tmpVal;
-    size_t ret, valLen;
+    size_t valLen  = 0;
 
-    ret = ef_get_env_blob(key.name, &tmpVal, sizeof(tmpVal), &valLen);
-    if (ret <= 0)
+    ef_get_env_blob(key.name, &val, sizeof(val), &valLen);
+    if (0 == valLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    val = tmpVal;
-exit:
     return err;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    char tmpVal[bufSize] = { 0 };
-    size_t ret;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ret = ef_get_env_blob(key.name, tmpVal, sizeof(tmpVal) - 1, NULL);
-    if ('\0' == tmpVal[0])
+    outLen = 0;
+    ef_get_env_blob(key.name, buf, bufSize, &outLen);
+    if (0 == outLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    outLen = ret;
-    strncpy(buf, tmpVal, outLen);
-
-exit:
     return err;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    char tmpVal[bufSize] = { 0 };
-    size_t ret;
-    size_t savedLen = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ret = ef_get_env_blob(key.name, tmpVal, sizeof(tmpVal), &savedLen);
-    if (0 == savedLen)
+    ef_get_env_blob(key.name, buf, bufSize, &outLen);
+    if (0 == outLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    outLen = ret;
-    memcpy(buf, tmpVal, outLen);
-
-exit:
     return err;
 }
 
@@ -221,7 +187,7 @@ CHIP_ERROR BL602Config::WriteConfigValue(Key key, uint64_t val)
     EfErrCode ret = ef_set_env_blob(key.name, &val, sizeof(val));
     if (ret != EF_NO_ERR)
     {
-        log_error("WriteConfigValue() failed. key: %s, ret: %d\r\n", key.name, ret);
+        log_error("WriteConfigValue() failed. key: %s, ret: %d\r\n", StringOrNullMarker(key.name), ret);
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     SuccessOrExit(err);
@@ -266,7 +232,7 @@ CHIP_ERROR BL602Config::WriteConfigValueStr(Key key, const char * str, size_t st
     {
         strCopy.Calloc(strLen + 1);
         VerifyOrExit(strCopy, err = CHIP_ERROR_NO_MEMORY);
-        strncpy(strCopy.Get(), str, strLen);
+        Platform::CopyString(strCopy.Get(), strLen + 1, str);
     }
     err = BL602Config::WriteConfigValueStr(key, strCopy.Get());
 
@@ -344,7 +310,7 @@ CHIP_ERROR BL602Config::ClearConfigValue(Key key)
 
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "Easyflash erase: %s", key.name);
+    ChipLogProgress(DeviceLayer, "Easyflash erase: %s", StringOrNullMarker(key.name));
 
 exit:
     return err;

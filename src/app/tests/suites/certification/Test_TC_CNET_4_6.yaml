@@ -22,25 +22,25 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label: "Commission TH and DUT on Thread setup"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "The cluster Identifier 49 (0x0031) is present in the ServerList
           attribute"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "The FeatureMap attribute value is 2"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -63,8 +63,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork command to the DUT with NetworkID argument
-          value as Userth_op and Breadcrumb argument value as 1"
+          "TH sends RemoveNetwork command to the DUT with NetworkID field set to
+          PIXIT.CNET.THREAD_1ST_O PERATIONALDATASET and Breadcrumb field set to
+          1"
       PICS: CNET.S.C04.Rsp
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
@@ -81,8 +82,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID argument
-          value as Userth_op and Breadcrumb argument value as 1"
+          "TH sends ConnectNetwork command to the DUT with NetworkID field set
+          to PIXIT.CNET.THREAD_1ST_O PERATIONALDATASET and Breadcrumb field set
+          to 1"
       PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0

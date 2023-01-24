@@ -64,17 +64,6 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
- *
- * A string identifying the software version running on the device.
- * CHIP service currently expects the software version to be in the format
- * {MAJOR_VERSION}.0d{MINOR_VERSION}
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
  *
  * A uint32_t identifying the software version running on the device.
@@ -90,14 +79,6 @@
  * Enable support for Chip-over-BLE (CHIPoBLE).
  */
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote Chip Time service
- * using the Chip Time Sync protocol.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
 /**
  * CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER

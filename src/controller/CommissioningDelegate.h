@@ -32,29 +32,33 @@ class DeviceCommissioner;
 enum CommissioningStage : uint8_t
 {
     kError,
-    kSecurePairing,
-    kReadCommissioningInfo,
-    kArmFailsafe,
-    kConfigRegulatory,
-    kSendPAICertificateRequest,
-    kSendDACCertificateRequest,
-    kSendAttestationRequest,
-    kAttestationVerification,
-    kSendOpCertSigningRequest,
-    kValidateCSR,
-    kGenerateNOCChain,
-    kSendTrustedRootCert,
-    kSendNOC,
-    kWiFiNetworkSetup,
-    kThreadNetworkSetup,
-    kWiFiNetworkEnable,
-    kThreadNetworkEnable,
-    kFindOperational,
-    kSendComplete,
-    kCleanup,
-    // ScanNetworks can happen anytime after kArmFailsafe.
-    // However, the circ tests fail if it is earlier in the list
+    kSecurePairing,             ///< Establish a PASE session with the device
+    kReadCommissioningInfo,     ///< Query General Commissioning Attributes and Network Features
+    kArmFailsafe,               ///< Send ArmFailSafe (0x30:0) command to the device
+    kConfigRegulatory,          ///< Send SetRegulatoryConfig (0x30:2) command to the device
+    kSendPAICertificateRequest, ///< Send PAI CertificateChainRequest (0x3E:2) command to the device
+    kSendDACCertificateRequest, ///< Send DAC CertificateChainRequest (0x3E:2) command to the device
+    kSendAttestationRequest,    ///< Send AttestationRequest (0x3E:0) command to the device
+    kAttestationVerification,   ///< Verify AttestationResponse (0x3E:1) validity
+    kSendOpCertSigningRequest,  ///< Send CSRRequest (0x3E:4) command to the device
+    kValidateCSR,               ///< Verify CSRResponse (0x3E:5) validity
+    kGenerateNOCChain,          ///< TLV encode Node Operational Credentials (NOC) chain certs
+    kSendTrustedRootCert,       ///< Send AddTrustedRootCertificate (0x3E:11) command to the device
+    kSendNOC,                   ///< Send AddNOC (0x3E:6) command to the device
+    kWiFiNetworkSetup,          ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kThreadNetworkSetup,        ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
+    kWiFiNetworkEnable,         ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
+    kThreadNetworkEnable,       ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kFindOperational,           ///< Perform operational discovery and establish a CASE session with the device
+    kSendComplete,              ///< Send CommissioningComplete (0x30:4) command to the device
+    kCleanup,                   ///< Call delegates with status, free memory, clear timers and state
+    /// Send ScanNetworks (0x31:0) command to the device.
+    /// ScanNetworks can happen anytime after kArmFailsafe.
+    /// However, the cirque tests fail if it is earlier in the list
     kScanNetworks,
+    /// Waiting for the higher layer to provide network credentials before continuing the workflow.
+    /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
+    /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
 };
 
@@ -103,6 +107,15 @@ public:
     // default kDefaultFailsafeTimeout.
     // This value should be set before running PerformCommissioningStep for the kArmFailsafe step.
     const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+
+    // Value to use when re-setting the commissioning failsafe timer immediately prior to operational discovery.
+    // If a CASE failsafe timer value is passed in as part of the commissioning parameters, then the failsafe timer
+    // will be reset using this value before operational discovery begins. If not supplied, then the AutoCommissioner
+    // will not automatically reset the failsafe timer before operational discovery begins. It can be useful for the
+    // commissioner to set the CASE failsafe timer to a small value (ex. 30s) when the regular failsafe timer is set
+    // to a larger value to accommodate user interaction during setup (network credential selection, user consent
+    // after device attestation).
+    const Optional<uint16_t> GetCASEFailsafeTimerSeconds() const { return mCASEFailsafeTimerSeconds; }
 
     // The location (indoor/outdoor) of the node being commissioned.
     // The node regulartory location (indoor/outdoor) should be set by the commissioner explicitly as it may be different than the
@@ -164,9 +177,9 @@ public:
     // Epoch key for the identity protection key for the node being commissioned. In the AutoCommissioner, this is set by by the
     // kGenerateNOCChain stage through the OperationalCredentialsDelegate.
     // This value must be set before calling PerformCommissioningStep for the kSendNOC step.
-    const Optional<AesCcm128KeySpan> GetIpk() const
+    const Optional<IdentityProtectionKeySpan> GetIpk() const
     {
-        return mIpk.HasValue() ? Optional<AesCcm128KeySpan>(mIpk.Value().Span()) : Optional<AesCcm128KeySpan>();
+        return mIpk.HasValue() ? Optional<IdentityProtectionKeySpan>(mIpk.Value().Span()) : Optional<IdentityProtectionKeySpan>();
     }
 
     // Admin subject id used for the case access control entry created if the AddNOC command succeeds. In the AutoCommissioner, this
@@ -195,6 +208,10 @@ public:
     // stage.
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
+
+    // Node ID when a matching fabric is found in the Node Operational Credentials cluster.
+    // In the AutoCommissioner, this is set from kReadCommissioningInfo stage.
+    const Optional<NodeId> GetRemoteNodeId() const { return mRemoteNodeId; }
 
     // Node vendor ID from the basic information cluster. In the AutoCommissioner, this is automatically set from report from the
     // kReadCommissioningInfo stage.
@@ -229,6 +246,12 @@ public:
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
         mFailsafeTimerSeconds.SetValue(seconds);
+        return *this;
+    }
+
+    CommissioningParameters & SetCASEFailsafeTimerSeconds(uint16_t seconds)
+    {
+        mCASEFailsafeTimerSeconds.SetValue(seconds);
         return *this;
     }
 
@@ -298,9 +321,9 @@ public:
         mIcac.SetValue(icac);
         return *this;
     }
-    CommissioningParameters & SetIpk(const AesCcm128KeySpan ipk)
+    CommissioningParameters & SetIpk(const IdentityProtectionKeySpan ipk)
     {
-        mIpk.SetValue(AesCcm128Key(ipk));
+        mIpk.SetValue(IdentityProtectionKey(ipk));
         return *this;
     }
     CommissioningParameters & SetAdminSubject(const NodeId adminSubject)
@@ -326,6 +349,11 @@ public:
     CommissioningParameters & SetDAC(const ByteSpan & dac)
     {
         mDAC = MakeOptional(dac);
+        return *this;
+    }
+    CommissioningParameters & SetRemoteNodeId(NodeId id)
+    {
+        mRemoteNodeId = MakeOptional(id);
         return *this;
     }
     CommissioningParameters & SetRemoteVendorId(VendorId id)
@@ -378,9 +406,49 @@ public:
         return *this;
     }
 
+    // Only perform the PASE steps of commissioning.
+    // Commissioning will be completed by another admin on the network.
+    Optional<bool> GetSkipCommissioningComplete() const { return mSkipCommissioningComplete; }
+    CommissioningParameters & SetSkipCommissioningComplete(bool skipCommissioningComplete)
+    {
+        mSkipCommissioningComplete = MakeOptional(skipCommissioningComplete);
+        return *this;
+    }
+
+    // Check for matching fabric on target device by reading fabric list and looking for a
+    // fabricId and RootCert match. If a match is detected, then use GetNodeId() to
+    // access the nodeId for the device on the matching fabric.
+    bool GetCheckForMatchingFabric() const { return mCheckForMatchingFabric; }
+    CommissioningParameters & SetCheckForMatchingFabric(bool checkForMatchingFabric)
+    {
+        mCheckForMatchingFabric = checkForMatchingFabric;
+        return *this;
+    }
+
+    // Clear all members that depend on some sort of external buffer.  Can be
+    // used to make sure that we are not holding any dangling pointers.
+    void ClearExternalBufferDependentValues()
+    {
+        mCSRNonce.ClearValue();
+        mAttestationNonce.ClearValue();
+        mWiFiCreds.ClearValue();
+        mCountryCode.ClearValue();
+        mThreadOperationalDataset.ClearValue();
+        mNOCChainGenerationParameters.ClearValue();
+        mRootCert.ClearValue();
+        mNoc.ClearValue();
+        mIcac.ClearValue();
+        mIpk.ClearValue();
+        mAttestationElements.ClearValue();
+        mAttestationSignature.ClearValue();
+        mPAI.ClearValue();
+        mDAC.ClearValue();
+    }
+
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
+    Optional<uint16_t> mCASEFailsafeTimerSeconds;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDeviceRegulatoryLocation;
     Optional<ByteSpan> mCSRNonce;
     Optional<ByteSpan> mAttestationNonce;
@@ -391,13 +459,14 @@ private:
     Optional<ByteSpan> mRootCert;
     Optional<ByteSpan> mNoc;
     Optional<ByteSpan> mIcac;
-    Optional<AesCcm128Key> mIpk;
+    Optional<IdentityProtectionKey> mIpk;
     Optional<NodeId> mAdminSubject;
     // Items that come from the device in commissioning steps
     Optional<ByteSpan> mAttestationElements;
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
+    Optional<NodeId> mRemoteNodeId;
     Optional<VendorId> mRemoteVendorId;
     Optional<uint16_t> mRemoteProductId;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDefaultRegulatoryLocation;
@@ -407,6 +476,8 @@ private:
         nullptr; // Delegate to handle device attestation failures during commissioning
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
+    Optional<bool> mSkipCommissioningComplete;
+    bool mCheckForMatchingFabric = false;
 };
 
 struct RequestedCertificate
@@ -433,13 +504,13 @@ struct CSRResponse
 
 struct NocChain
 {
-    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, AesCcm128KeySpan newIpk, NodeId newAdminSubject) :
+    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, IdentityProtectionKeySpan newIpk, NodeId newAdminSubject) :
         noc(newNoc), icac(newIcac), rcac(newRcac), ipk(newIpk), adminSubject(newAdminSubject)
     {}
     ByteSpan noc;
     ByteSpan icac;
     ByteSpan rcac;
-    AesCcm128KeySpan ipk;
+    IdentityProtectionKeySpan ipk;
     NodeId adminSubject;
 };
 
@@ -481,6 +552,7 @@ struct ReadCommissioningInfo
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
+    NodeId nodeId = kUndefinedNodeId;
 };
 
 struct AttestationErrorInfo

@@ -26,8 +26,6 @@
 
 #include <controller/CommissioneeDeviceProxy.h>
 
-#include <controller-clusters/zap-generated/CHIPClusters.h>
-
 #include <app/CommandSender.h>
 #include <app/ReadPrepareParams.h>
 #include <app/util/DataModelHandler.h>
@@ -109,7 +107,14 @@ CHIP_ERROR CommissioneeDeviceProxy::SetConnected(const SessionHandle & session)
     return CHIP_NO_ERROR;
 }
 
-CommissioneeDeviceProxy::~CommissioneeDeviceProxy() {}
+CommissioneeDeviceProxy::~CommissioneeDeviceProxy()
+{
+    auto session = GetSecureSession();
+    if (session.HasValue())
+    {
+        session.Value()->AsSecureSession()->MarkForEviction();
+    }
+}
 
 CHIP_ERROR CommissioneeDeviceProxy::SetPeerId(ByteSpan rcac, ByteSpan noc)
 {

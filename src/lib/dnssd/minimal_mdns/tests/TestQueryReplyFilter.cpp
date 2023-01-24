@@ -112,7 +112,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestQueryReplyFilter(void)
+int TestQueryReplyFilter()
 {
     nlTestSuite theSuite = { "QueryReplyFilter", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

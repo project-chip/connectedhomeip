@@ -16,31 +16,30 @@
 #
 
 import asyncio
+import copy
+import ctypes
+import faulthandler
+import inspect
+import logging
+import os
+import secrets
+import sys
+import threading
+import time
 from dataclasses import dataclass
 from inspect import Attribute
-import inspect
 from typing import Any
-import typing
-from chip import ChipDeviceCtrl
-from chip import ChipCommissionableNodeCtrl
-import chip.interaction_model as IM
-import threading
-import os
-import sys
-import logging
-import time
-import ctypes
+
+import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
-from chip.utils import CommissioningBuildingBlocks
-from chip.ChipStack import *
-import chip.native
+import chip.discovery
 import chip.FabricAdmin
-import chip.CertificateAuthority
-import copy
-import secrets
-import faulthandler
-import ipdb
+import chip.interaction_model as IM
+import chip.native
+from chip import ChipDeviceCtrl
+from chip.ChipStack import *
+from chip.utils import CommissioningBuildingBlocks
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -223,15 +222,14 @@ class BaseTestHelper:
     def TestDiscovery(self, discriminator: int):
         self.logger.info(
             f"Discovering commissionable nodes with discriminator {discriminator}")
-        self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
-            ctypes.c_uint16(int(discriminator)))
-        res = self._WaitForOneDiscoveredDevice()
+        res = self.devCtrl.DiscoverCommissionableNodes(
+            chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
         if not res:
             self.logger.info(
                 f"Device not found")
             return False
-        self.logger.info(f"Found device at {res}")
-        return res
+        self.logger.info(f"Found device {res[0]}")
+        return res[0]
 
     def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info(
@@ -349,7 +347,7 @@ class BaseTestHelper:
             "Attempting to open enhanced commissioning window - this should fail since the failsafe is armed")
         try:
             res = asyncio.run(self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
-                commissioningTimeout=180, PAKEVerifier=verifier, discriminator=discriminator, iterations=iterations, salt=salt), timedRequestTimeoutMs=10000))
+                commissioningTimeout=180, PAKEPasscodeVerifier=verifier, discriminator=discriminator, iterations=iterations, salt=salt), timedRequestTimeoutMs=10000))
             # we actually want the exception here because we want to see a failure, so return False here
             self.logger.error(
                 'Incorrectly succeeded in opening enhanced commissioning window')
@@ -395,16 +393,16 @@ class BaseTestHelper:
 
         # Read out an attribute using the new controller. It has no privileges, so this should fail with an UnsupportedAccess error.
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+        if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"1: Received data instead of an error:{res}")
             return False
 
         # Grant the new controller privilege by adding the CAT tag to the subject.
-        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid, targetCatTags=[0x0001_0001])
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=nodeid, targetCatTags=[0x0001_0001])
 
         # Read out the attribute again - this time, it should succeed.
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
             self.logger.error(f"2: Received something other than data:{res}")
             return False
 
@@ -426,7 +424,7 @@ class BaseTestHelper:
         # Read out the ACL list from one of the newly minted controllers which has no access. This should return an IM error.
         #
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+        if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"1: Received data instead of an error:{res}")
             return False
 
@@ -435,7 +433,7 @@ class BaseTestHelper:
         # Doing this ensures that we're not somehow aliasing the CASE sessions.
         #
         res = await self.devCtrl.ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
             self.logger.error(f"2: Received something other than data:{res}")
             return False
 
@@ -444,42 +442,42 @@ class BaseTestHelper:
         # under-neath.
         #
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+        if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"3: Received data instead of an error:{res}")
             return False
 
         #
         # Grant the new controller admin privileges. Reading out the ACL cluster should now yield data.
         #
-        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid)
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=nodeid)
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
             self.logger.error(f"4: Received something other than data:{res}")
             return False
 
         #
         # Grant the second new controller admin privileges as well. Reading out the ACL cluster should now yield data.
         #
-        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid)
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=nodeid)
         res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
             self.logger.error(f"5: Received something other than data:{res}")
             return False
 
         #
         # Grant the second new controller just view privilege. Reading out the ACL cluster should return no data.
         #
-        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.Privilege.kView, targetNodeId=nodeid)
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView, targetNodeId=nodeid)
         res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+        if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"6: Received data5 instead of an error:{res}")
             return False
 
         #
         # Read the Basic cluster from the 2nd controller. This is possible with just view privileges.
         #
-        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.Basic.Attributes.ClusterRevision)])
-        if (type(res[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]) != Clusters.Basic.Attributes.ClusterRevision.attribute_type.Type):
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.BasicInformation.Attributes.ClusterRevision)])
+        if (type(res[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ClusterRevision]) != Clusters.BasicInformation.Attributes.ClusterRevision.attribute_type.Type):
             self.logger.error(f"7: Received something other than data:{res}")
             return False
 
@@ -556,7 +554,7 @@ class BaseTestHelper:
         #
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl.CloseSession(nodeid)
-            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         self.logger.info("Testing CASE defunct logic")
 
@@ -573,12 +571,12 @@ class BaseTestHelper:
         def OnValueChange(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
             nonlocal sawValueChange
             self.logger.info("Saw value change!")
-            if (path.AttributeType == Clusters.TestCluster.Attributes.Int8u and path.Path.EndpointId == 1):
+            if (path.AttributeType == Clusters.UnitTesting.Attributes.Int8u and path.Path.EndpointId == 1):
                 sawValueChange = True
 
         self.logger.info("Testing CASE defunct logic")
 
-        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.TestCluster.Attributes.Int8u)], reportInterval=(0, 1))
+        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.UnitTesting.Attributes.Int8u)], reportInterval=(0, 1))
         sub.SetAttributeUpdateCallback(OnValueChange)
 
         #
@@ -590,7 +588,7 @@ class BaseTestHelper:
         # Now write the attribute from fabric2, give it some time before checking if the report
         # was received.
         #
-        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.Int8u(4))])
+        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
         time.sleep(2)
 
         sub.Shutdown()
@@ -610,18 +608,18 @@ class BaseTestHelper:
         self.logger.info("Testing fabric-isolated CASE eviction")
 
         sawValueChange = False
-        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.TestCluster.Attributes.Int8u)], reportInterval=(0, 1))
+        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.UnitTesting.Attributes.Int8u)], reportInterval=(0, 1))
         sub.SetAttributeUpdateCallback(OnValueChange)
 
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl2.CloseSession(nodeid)
-            await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         #
         # Now write the attribute from fabric2, give it some time before checking if the report
         # was received.
         #
-        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.Int8u(4))])
+        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
         time.sleep(2)
 
         sub.Shutdown()
@@ -636,14 +634,14 @@ class BaseTestHelper:
         self.logger.info("Testing fabric-isolated CASE eviction (reverse)")
 
         sawValueChange = False
-        sub = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.TestCluster.Attributes.Int8u)], reportInterval=(0, 1))
+        sub = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.UnitTesting.Attributes.Int8u)], reportInterval=(0, 1))
         sub.SetAttributeUpdateCallback(OnValueChange)
 
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl.CloseSession(nodeid)
-            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
-        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.Int8u(4))])
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
         time.sleep(2)
 
         sub.Shutdown()
@@ -723,8 +721,8 @@ class BaseTestHelper:
 
     async def TestFabricSensitive(self, nodeid: int):
         expectedDataFabric1 = [
-            Clusters.TestCluster.Structs.TestFabricScoped(),
-            Clusters.TestCluster.Structs.TestFabricScoped()
+            Clusters.UnitTesting.Structs.TestFabricScoped(),
+            Clusters.UnitTesting.Structs.TestFabricScoped()
         ]
 
         expectedDataFabric1[0].fabricIndex = 100
@@ -747,7 +745,7 @@ class BaseTestHelper:
 
         self.logger.info("Writing data from fabric1...")
 
-        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric1))])
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped(expectedDataFabric1))])
 
         expectedDataFabric2 = copy.deepcopy(expectedDataFabric1)
 
@@ -768,15 +766,15 @@ class BaseTestHelper:
 
         self.logger.info("Writing data from fabric2...")
 
-        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric2))])
+        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped(expectedDataFabric2))])
 
         #
         # Now read the data back filtered from fabric1 and ensure it matches.
         #
         self.logger.info("Reading back data from fabric1...")
 
-        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric1 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
@@ -791,8 +789,8 @@ class BaseTestHelper:
 
         self.logger.info("Reading back data from fabric2...")
 
-        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric2 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
@@ -832,19 +830,19 @@ class BaseTestHelper:
                     # which should automatically be initialized with defaults and compare that
                     # against what we got back.
                     #
-                    expectedDefaultData = Clusters.TestCluster.Structs.TestFabricScoped()
+                    expectedDefaultData = Clusters.UnitTesting.Structs.TestFabricScoped()
                     expectedDefaultData.fabricIndex = otherFabric
 
                     if (item != expectedDefaultData):
                         raise AssertionError("Got back mismatched data")
 
-        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
+        readListDataFabric = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric1,
                               self.currentFabric2, expectedDataFabric1)
 
-        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
+        readListDataFabric = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric2,
                               self.currentFabric1, expectedDataFabric2)
 
@@ -861,21 +859,21 @@ class BaseTestHelper:
 
         expectedDataFabric1.pop(1)
 
-        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric1))])
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped(expectedDataFabric1))])
 
         self.logger.info(
             "Reading back data (again) from fabric2 to ensure it hasn't changed")
 
-        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric2 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         if (expectedDataFabric2 != readListDataFabric2):
             raise AssertionError("Got back mismatched data")
 
         self.logger.info(
             "Reading back data (again) from fabric1 to ensure it hasn't changed")
 
-        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric1 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         self.logger.info("Comparing data on fabric1...")
         expectedDataFabric1[0].fabricIndex = self.currentFabric1
@@ -903,7 +901,7 @@ class BaseTestHelper:
             async with cv:
                 cv.notify()
 
-        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)], reportInterval=(0, 5))
+        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)], reportInterval=(0, 5))
 
         #
         # Register async callbacks that will fire when a re-sub is attempted or succeeds.
@@ -919,7 +917,7 @@ class BaseTestHelper:
         subscription.OverrideLivenessTimeoutMs(100)
 
         async with cv:
-            if (not(resubAttempted) or not(resubSucceeded)):
+            if (not (resubAttempted) or not (resubSucceeded)):
                 res = await asyncio.wait_for(cv.wait(), 3)
                 if not res:
                     self.logger.error("Timed out waiting for resubscription to succeed")
@@ -931,11 +929,7 @@ class BaseTestHelper:
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")
         try:
-            err = self.devCtrl.CloseSession(nodeid)
-            if err != 0:
-                self.logger.exception(
-                    f"Failed to close sessions with device {nodeid}: {err}")
-                return False
+            self.devCtrl.CloseSession(nodeid)
             return True
         except Exception as ex:
             self.logger.exception(
@@ -1039,7 +1033,7 @@ class BaseTestHelper:
         failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():
             try:
-                res = self.devCtrl.ZCLReadAttribute(cluster="Basic",
+                res = self.devCtrl.ZCLReadAttribute(cluster="BasicInformation",
                                                     attribute=basic_attr,
                                                     nodeid=nodeid,
                                                     endpoint=endpoint,
@@ -1054,7 +1048,7 @@ class BaseTestHelper:
         return True
 
     def TestWriteBasicAttributes(self, nodeid: int, endpoint: int, group: int):
-        @dataclass
+        @ dataclass
         class AttributeWriteRequest:
             cluster: str
             attribute: str
@@ -1062,9 +1056,9 @@ class BaseTestHelper:
             expected_status: IM.Status = IM.Status.Success
 
         requests = [
-            AttributeWriteRequest("Basic", "NodeLabel", "Test"),
-            AttributeWriteRequest("Basic", "Location",
-                                  "a pretty loooooooooooooog string", IM.Status.InvalidValue),
+            AttributeWriteRequest("BasicInformation", "NodeLabel", "Test"),
+            AttributeWriteRequest("BasicInformation", "Location",
+                                  "a pretty loooooooooooooog string", IM.Status.ConstraintError),
         ]
         failed_zcl = []
         for req in requests:
@@ -1177,9 +1171,9 @@ class BaseTestHelper:
         try:
             cluster = self.devCtrl.GetClusterHandler()
             clusterInfo = cluster.GetClusterInfoById(0xFFF1FC05)  # TestCluster
-            if clusterInfo["clusterName"] != "TestCluster":
+            if clusterInfo["clusterName"] != "UnitTesting":
                 raise Exception(
-                    f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected TestCluster")
+                    f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected 'UnitTesting'")
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")
             return False

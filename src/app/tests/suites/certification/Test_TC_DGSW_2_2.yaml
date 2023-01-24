@@ -13,35 +13,44 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 43.2.2. [TC-DGSW-2.2] Event functionality with server as DUT
+name: 3.2.2. [TC-DGSW-2.2] Event Functionality [{DUT_Sever}]
 
 PICS:
-    - DGSW.S.E
     - DGSW.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Software Diagnostics"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+    - label: "Note"
+      verification: |
+          NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+          Events to be executed as following
+          1. Compile app using below command in connectedhomeip folder
+          a. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
+          2. Build respective app (all-clusters-app)
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT ps  -aef|grep all-clusters-app
+          5. Follow the Verification step below to generate the event in 2nd terminal of DUT
+      disabled: true
+
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
 
     - label:
-          "Reads a list of SoftwareFault struct from DUT and data type in each
-          field of the struct must match the value listed in spec"
+          "DUT sends an event report to TH. TH reads a list of SoftwareFault
+          struct from DUT."
+      PICS: DGSW.S.E00
       verification: |
           Provision DUT and TH.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
-          echo '{"Name":"SoftwareFault"}' > /tmp/chip_all_clusters_fifo-<PID>   (PID of all-clusters-app by using command provided in note above)
+          echo '{"Name":"SoftwareFault"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app by using command provided in note above)
 
 
           On  TH Send the below command
@@ -64,12 +73,4 @@ tests:
           [1655375196.292341][35133:35138] CHIP:TOO:       FaultRecording: 546875204A756E2031362031303A32363A313420323032320A
           [1655375196.292391][35133:35138] CHIP:TOO:      }
           [1655375196.292438][35133:35138] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGSW.S.E00
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter '0' for success"
-              - name: "expectedValue"
-                value: 0
+      disabled: true

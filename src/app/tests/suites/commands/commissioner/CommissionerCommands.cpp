@@ -32,7 +32,11 @@ CommissionerCommands::PairWithCode(const char * identity,
     memset(code, '\0', sizeof(code));
     memcpy(code, value.payload.data(), value.payload.size());
     ChipLogError(chipTool, "Pairing Code is %s", code);
-    return GetCommissioner(identity).PairDevice(value.nodeId, code);
+
+    // To reduce the scanning latency in some setups, and since the primary use for PairWithCode is to commission a device to
+    // another commissioner, assume that the commissionable device is available on the network.
+    chip::Controller::DiscoveryType discoveryType = chip::Controller::DiscoveryType::kDiscoveryNetworkOnly;
+    return GetCommissioner(identity).PairDevice(value.nodeId, code, discoveryType);
 }
 
 CHIP_ERROR CommissionerCommands::Unpair(const char * identity,
@@ -50,23 +54,23 @@ chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
 
     if (CHIP_ERROR_INVALID_PUBLIC_KEY == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidPublicKey));
     }
     if (CHIP_ERROR_WRONG_NODE_ID == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNodeOpId));
     }
     if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNOC));
     }
     if (CHIP_ERROR_FABRIC_EXISTS == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kFabricConflict));
     }
     if (CHIP_ERROR_INVALID_FABRIC_INDEX == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidFabricIndex));
     }
 
     return StatusIB(err);

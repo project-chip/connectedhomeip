@@ -60,7 +60,15 @@ class GnBuilder(Builder):
             '--root=%s' % self.root
         ]
 
-        extra_args = self.GnBuildArgs()
+        extra_args = []
+
+        if self.options.pw_command_launcher:
+            extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
+
+        if self.options.pregen_dir:
+            extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
+
+        extra_args.extend(self.GnBuildArgs() or [])
         if extra_args:
             cmd += ['--args=%s' % ' '.join(extra_args)]
 
@@ -87,6 +95,17 @@ class GnBuilder(Builder):
         cmd = ['ninja', '-C', self.output_dir]
         if self.build_command:
             cmd.append(self.build_command)
+
+        extra_env = self.GnBuildEnv()
+        if extra_env:
+            # convert the command into a bash command that includes
+            # setting environment variables
+            cmd = [
+                'bash', '-c', '\n' + ' '.join(
+                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
+                    [shlex.join(cmd)]
+                )
+            ]
 
         self._Execute(cmd, title='Building ' + self.identifier)
 

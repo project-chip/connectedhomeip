@@ -73,11 +73,35 @@ void NetWorkCommissioningInstInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        break;
+    }
+    return;
+}
+
 Identify gIdentify0 = {
     chip::EndpointId{ 0 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
 };
 
 Identify gIdentify1 = {
@@ -85,6 +109,7 @@ Identify gIdentify1 = {
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
 };
 
 #ifdef CONFIG_PLATFORM_8721D
@@ -106,6 +131,7 @@ static void InitServer(intptr_t context)
     initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    // TODO: Use our own DeviceInfoProvider
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     NetWorkCommissioningInstInit();
@@ -116,7 +142,9 @@ static void InitServer(intptr_t context)
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
 
+#if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
+#endif
 }
 
 extern "C" void ChipTest(void)
@@ -130,11 +158,10 @@ extern "C" void ChipTest(void)
 
     initPref();
 
-    // Initialize device attestation, commissionable data and device instance info
-    // TODO: Use our own DeviceInstanceInfoProvider
-    // SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    mFactoryDataProvider.Init();
     SetCommissionableDataProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
@@ -142,10 +169,12 @@ extern "C" void ChipTest(void)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!\r\n");
     }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
-    }
+
+    // Set DeviceInstanceInfoProvider after CHIPDeviceManager init
+    // CHIPDeviceManager init will set GenericDeviceInsanceInfoProvider first
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+#endif
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 

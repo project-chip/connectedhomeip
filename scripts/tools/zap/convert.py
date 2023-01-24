@@ -21,6 +21,8 @@ import os
 import subprocess
 import sys
 
+from zap_execution import ZapTool
+
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
 
@@ -60,11 +62,13 @@ def runArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Convert .zap files to the current zap version')
     parser.add_argument('zap', help='Path to the application .zap file')
+    parser.add_argument('--run-bootstrap', default=None, action='store_true',
+                        help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     args = parser.parse_args()
 
     zap_file = getFilePath(args.zap)
 
-    return zap_file
+    return zap_file, args.run_bootstrap
 
 
 def detectZclFile(zapFile):
@@ -79,7 +83,8 @@ def detectZclFile(zapFile):
 
         # found the right path, try to figure out the actual path
         if package["pathRelativity"] == "relativeToZap":
-            path = os.path.abspath(os.path.join(os.path.dirname(zapFile), package["path"]))
+            path = os.path.abspath(os.path.join(
+                os.path.dirname(zapFile), package["path"]))
         else:
             path = package["path"]
 
@@ -89,18 +94,21 @@ def detectZclFile(zapFile):
 def runConversion(zap_file):
     templates_file = getFilePath('src/app/zap-templates/app-templates.json')
     zcl_file = detectZclFile(zap_file)
-
-    generator_dir = getDirPath('third_party/zap/repo')
-    os.chdir(generator_dir)
-    subprocess.check_call(['node', './src-script/zap-convert.js',
-                          '-z', zcl_file, '-g', templates_file, '-o', zap_file, zap_file])
+    tool = ZapTool()
+    tool.run('convert', '-z', zcl_file, '-g',
+             templates_file, '-o', zap_file, zap_file)
 
 
 def main():
     checkPythonVersion()
+    zap_file, run_bootstrap = runArgumentsParser()
+
+    if run_bootstrap:
+        subprocess.check_call(getFilePath(
+            "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+
     os.chdir(CHIP_ROOT_DIR)
 
-    zap_file = runArgumentsParser()
     runConversion(zap_file)
 
 

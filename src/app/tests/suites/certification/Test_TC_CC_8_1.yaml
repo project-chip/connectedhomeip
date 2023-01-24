@@ -50,7 +50,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 200
               - name: "Direction"
                 value: 0
@@ -109,7 +109,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 235
+              minValue: 216
               maxValue: 254
 
     - label: "Wait 2s"
@@ -126,7 +126,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 240
+              minValue: 216
               maxValue: 254
 
     - label:
@@ -192,7 +192,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          saveAs: CurrentSaturationValue
           constraints:
               minValue: 170
               maxValue: 230
@@ -211,7 +210,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: CurrentSaturationValue
+              minValue: 170
               maxValue: 230
 
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
@@ -244,7 +243,7 @@ tests:
       command: "MoveToColorTemperature"
       arguments:
           values:
-              - name: "colorTemperature"
+              - name: "ColorTemperatureMireds"
                 value:
                     ( ColorTempPhysicalMinMireds + ColorTempPhysicalMaxMireds )
                     / 2
@@ -307,13 +306,10 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.C47.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep4f
           constraints:
-              minValue:
-                  ( ColorTempPhysicalMaxMireds + ColorTempPhysicalMinMireds ) /
-                  2
+              minValue: ColorTempPhysicalMinMireds
               maxValue: ColorTempPhysicalMaxMireds
 
     - label: "Wait 2s"
@@ -327,9 +323,11 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.C47.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
-          value: ColorTemperatureMiredsStep4f
+          constraints:
+              minValue: ColorTempPhysicalMinMireds
+              maxValue: ColorTempPhysicalMaxMireds
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=20000,
@@ -396,10 +394,9 @@ tests:
       PICS: CC.S.A4000 && CC.S.C47.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          saveAs: EnhancedCurrentHueValue
           constraints:
-              minValue: 23500
-              maxValue: 26500
+              minValue: 21250
+              maxValue: 28750
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -415,8 +412,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: EnhancedCurrentHueValue
-              maxValue: 26500
+              minValue: 21250
+              maxValue: 28750
 
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp

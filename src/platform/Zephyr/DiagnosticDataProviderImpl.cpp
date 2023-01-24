@@ -28,13 +28,13 @@
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
 #include <platform/Zephyr/SysHeapMalloc.h>
 
-#include <drivers/hwinfo.h>
-#include <sys/util.h>
+#include <zephyr/drivers/hwinfo.h>
+#include <zephyr/sys/util.h>
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <platform/nrfconnect/Reboot.h>
 #elif defined(CONFIG_MCUBOOT_IMG_MANAGER)
-#include <dfu/mcuboot.h>
+#include <zephyr/dfu/mcuboot.h>
 #endif
 
 #include <malloc.h>
@@ -116,7 +116,7 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
-inline DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(DetermineBootReason())
+DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(DetermineBootReason())
 {
     ChipLogDetail(DeviceLayer, "Boot reason: %u", static_cast<uint16_t>(mBootReason));
 }
@@ -258,19 +258,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             switch (interfaceType)
             {
             case Inet::InterfaceType::Unknown:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
                 break;
             case Inet::InterfaceType::WiFi:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
                 break;
             case Inet::InterfaceType::Ethernet:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
                 break;
             case Inet::InterfaceType::Thread:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_THREAD;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
                 break;
             case Inet::InterfaceType::Cellular:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_CELLULAR;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR;
                 break;
             }
         }
@@ -326,11 +326,6 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         netifp                 = netifp->Next;
         delete del;
     }
-}
-
-DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
-{
-    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

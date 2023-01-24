@@ -17,6 +17,11 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRCluster.h>
+
+@class MTRSetupPayload;
+@class MTRDeviceController;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -77,6 +82,22 @@ typedef void (^MTRDeviceResponseHandler)(NSArray<NSDictionary<NSString *, id> *>
 typedef void (^MTRDeviceReportHandler)(NSArray * values);
 typedef void (^MTRDeviceErrorHandler)(NSError * error);
 
+/**
+ * Handler for subscribeWithQueue: resubscription scheduling notifications.
+ * This will be called when subscription loss is detected.
+ *
+ * @param error An error indicating the reason the subscription has been lost.
+ * @param resubscriptionDelay A delay, in milliseconds, before the next
+ *        automatic resubscription will be attempted.
+ */
+typedef void (^MTRDeviceResubscriptionScheduledHandler)(NSError * error, NSNumber * resubscriptionDelay);
+
+/**
+ * Handler for openCommissioningWindowWithSetupPasscode.
+ */
+API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+typedef void (^MTRDeviceOpenCommissioningWindowHandler)(MTRSetupPayload * _Nullable payload, NSError * _Nullable error);
+
 extern NSString * const MTRAttributePathKey;
 extern NSString * const MTRCommandPathKey;
 extern NSString * const MTREventPathKey;
@@ -96,14 +117,36 @@ extern NSString * const MTRNullValueType;
 extern NSString * const MTRStructureValueType;
 extern NSString * const MTRArrayValueType;
 
+@class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
 @class MTRReadParams;
 @class MTRSubscribeParams;
+
+typedef NS_ENUM(uint8_t, MTRTransportType) {
+    MTRTransportTypeUndefined = 0,
+    MTRTransportTypeUDP,
+    MTRTransportTypeBLE,
+    MTRTransportTypeTCP,
+} MTR_NEWLY_AVAILABLE;
 
 @interface MTRBaseDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Create a device object with the given node id and controller.  This
+ * will always succeed, even if there is no such node id on the controller's
+ * fabric, but attempts to actually use the MTRBaseDevice will fail
+ * (asynchronously) in that case.
+ */
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller MTR_NEWLY_AVAILABLE;
+
+/**
+ * The transport used by the current session with this device, or
+ * `MTRTransportTypeUndefined` if no session is currently active.
+ */
+@property (readonly) MTRTransportType sessionTransportType MTR_NEWLY_AVAILABLE;
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
@@ -126,35 +169,55 @@ extern NSString * const MTRArrayValueType;
  * instances.  Errors for specific paths, not the whole subscription, will be
  * reported via those objects.
  *
- * errorHandler will be called any time there is an error for the
- * entire subscription (with a non-nil "error"), and terminate the subscription.
+ * errorHandler will be called any time there is an error for the entire
+ * subscription (with a non-nil "error"), and terminate the subscription.  This
+ * will generally not be invoked if auto-resubscription is enabled, unless there
+ * is a fatal error during a resubscription attempt.
  *
  * Both report handlers are not supported over XPC at the moment.
  *
- * subscriptionEstablished block, if not nil, will be called once the
+ * The subscriptionEstablished block, if not nil, will be called once the
  * subscription is established.  This will be _after_ the first (priming) call
  * to both report handlers.  Note that if the MTRSubscribeParams are set to
  * automatically resubscribe this can end up being called more than once.
+ *
+ * The resubscriptionScheduled block, if not nil, will be called if
+ * auto-resubscription is enabled, subscription loss is detected, and a
+ * resubscription is scheduled.  This can be called multiple times in a row
+ * without an intervening subscriptionEstablished call if the resubscription
+ * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(uint16_t)minInterval
-                maxInterval:(uint16_t)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
-             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
-         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
-               errorHandler:(MTRDeviceErrorHandler)errorHandler
-    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler;
+                        params:(MTRSubscribeParams *)params
+    clusterStateCacheContainer:(MTRClusterStateCacheContainer * _Nullable)clusterStateCacheContainer
+        attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+            eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+                  errorHandler:(MTRDeviceErrorHandler)errorHandler
+       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+       resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled MTR_NEWLY_AVAILABLE;
 
 /**
- * Read attribute in a designated attribute path
+ * Reads attributes from the device.
+ *
+ * Nil values for endpointID, clusterID, attributeID indicate wildcards
+ * (e.g. nil attributeID means "read all the attributes from the endpoint(s) and
+ * cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, attributeID are non-nil, a single
+ * attribute will be read.
+ *
+ * If all of endpointID, clusterID, attributeID are nil, all attributes on the
+ * device will be read.
+ *
+ * A non-nil attributeID along with a nil clusterID will only succeed if the
+ * attribute ID is for a global attribute that applies to all clusters.
  */
-- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
-                             params:(MTRReadParams * _Nullable)params
-                        clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(MTRDeviceResponseHandler)completion;
+- (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                           clusterID:(NSNumber * _Nullable)clusterID
+                         attributeID:(NSNumber * _Nullable)attributeID
+                              params:(MTRReadParams * _Nullable)params
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Write to attribute in a designated attribute path
@@ -166,16 +229,16 @@ extern NSString * const MTRArrayValueType;
  *
  * @param completion  response handler will receive either values or error.
  *
- *                    Received values are an NSArray object with response-value element as described in
- *                    readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion:.
+ *                    Received values are documented in the definition of
+ *                    MTRDeviceResponseHandler.
  */
-- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
-                           clusterId:(NSNumber *)clusterId
-                         attributeId:(NSNumber *)attributeId
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
-                         clientQueue:(dispatch_queue_t)clientQueue
-                          completion:(MTRDeviceResponseHandler)completion;
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Invoke a command with a designated command path
@@ -189,26 +252,38 @@ extern NSString * const MTRArrayValueType;
  *
  * @param completion  response handler will receive either values or error.
  */
-- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                          commandId:(NSNumber *)commandId
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
-                        clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(MTRDeviceResponseHandler)completion;
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
- * Subscribe an attribute in a designated attribute path
+ * Subscribes to the specified attributes on the device.
+ *
+ * Nil values for endpointID, clusterID, attributeID indicate wildcards
+ * (e.g. nil attributeID means "subscribe to all the attributes from the
+ * endpoint(s) and cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, attributeID are non-nil, a single attribute
+ * will be subscribed to.
+ *
+ * If all of endpointID, clusterID, attributeID are nil, all attributes on the
+ * device will be subscribed to.
+ *
+ * A non-nil attributeID along with a nil clusterID will only succeed if the
+ * attribute ID is for a global attribute that applies to all clusters.
  */
-- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
-                             minInterval:(NSNumber *)minInterval
-                             maxInterval:(NSNumber *)maxInterval
-                                  params:(MTRSubscribeParams * _Nullable)params
-                             clientQueue:(dispatch_queue_t)clientQueue
-                           reportHandler:(MTRDeviceResponseHandler)reportHandler
-                 subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
+- (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                                  clusterID:(NSNumber * _Nullable)clusterID
+                                attributeID:(NSNumber * _Nullable)attributeID
+                                     params:(MTRSubscribeParams * _Nullable)params
+                                      queue:(dispatch_queue_t)queue
+                              reportHandler:(MTRDeviceResponseHandler)reportHandler
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+    MTR_NEWLY_AVAILABLE;
 
 /**
  * Deregister all local report handlers for a remote device
@@ -217,65 +292,207 @@ extern NSString * const MTRArrayValueType;
  * There could be multiple clients accessing a node through a remote controller object and hence it is not appropriate
  * for one of those clients to shut down the entire stack to stop receiving reports.
  */
-- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion;
+- (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_NEWLY_AVAILABLE;
+
+/**
+ * Open a commissioning window on the device.
+ *
+ * On success, completion will be called on queue with the MTRSetupPayload that
+ * can be used to commission the device.
+ *
+ * @param setupPasscode The setup passcode to use for the commissioning window.
+ *                      See MTRSetupPayload's generateRandomSetupPasscode for
+ *                      generating a valid random passcode.
+ * @param discriminator The discriminator to use for the commissionable
+ *                      advertisement.
+ * @param duration      Duration, in seconds, during which the commissioning
+ *                      window will be open.
+ */
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 @end
 
-@interface MTRAttributePath : NSObject <NSCopying>
-@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * attribute;
+/**
+ * A path indicating a specific cluster on a device (i.e. without any
+ * wildcards).
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy) NSNumber * endpoint;
+@property (nonatomic, readonly, copy) NSNumber * cluster;
 
-+ (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint
-                                  clusterId:(NSNumber *)clusterId
-                                attributeId:(NSNumber *)attributeId;
++ (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
-@interface MTREventPath : NSObject
-@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * event;
+/**
+ * A path indicating a specific attribute on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRAttributePath : MTRClusterPath <NSCopying>
+@property (nonatomic, readonly, copy) NSNumber * attribute;
 
-+ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId eventId:(NSNumber *)eventId;
++ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                attributeID:(NSNumber *)attributeID MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
-@interface MTRCommandPath : NSObject
-@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * command;
+/**
+ * A path indicating a specific event that can be emitted on a device
+ * (i.e. without any wildcards).  There can be multiple instances of actual
+ * events for a given event path.
+ */
+@interface MTREventPath : MTRClusterPath <NSCopying>
+@property (nonatomic, readonly, copy) NSNumber * event;
 
-+ (instancetype)commandPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId commandId:(NSNumber *)commandId;
++ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
+                              clusterID:(NSNumber *)clusterID
+                                eventID:(NSNumber *)eventID MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+/**
+ * A path indicating a specific command on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRCommandPath : MTRClusterPath <NSCopying>
+@property (nonatomic, readonly, copy) NSNumber * command;
+
++ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
 @interface MTRAttributeReport : NSObject
-@property (nonatomic, readonly, strong, nonnull) MTRAttributePath * path;
+@property (nonatomic, readonly, copy) MTRAttributePath * path;
 // value is nullable because nullable attributes can have nil as value.
-@property (nonatomic, readonly, strong, nullable) id value;
+@property (nonatomic, readonly, copy, nullable) id value;
 // If this specific path resulted in an error, the error (in the
 // MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
 // path.
-@property (nonatomic, readonly, strong, nullable) NSError * error;
+@property (nonatomic, readonly, copy, nullable) NSError * error;
 @end
 
 @interface MTREventReport : NSObject
-@property (nonatomic, readonly, strong, nonnull) MTREventPath * path;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * eventNumber; // chip::EventNumber type (uint64_t)
-@property (nonatomic, readonly, strong, nonnull) NSNumber * priority; // chip::app::PriorityLevel type (uint8_t)
-@property (nonatomic, readonly, strong, nonnull) NSNumber * timestamp; // chip::app::Timestamp.mValue type (uint64_t)
-@property (nonatomic, readonly, strong, nullable) id value;
+@property (nonatomic, readonly, copy) MTREventPath * path;
+@property (nonatomic, readonly, copy) NSNumber * eventNumber; // EventNumber type (uint64_t)
+@property (nonatomic, readonly, copy) NSNumber * priority; // PriorityLevel type (uint8_t)
+@property (nonatomic, readonly, copy) NSNumber * timestamp; // Timestamp type (uint64_t)
+// An instance of one of the event payload interfaces.
+@property (nonatomic, readonly, copy) id value;
+
 // If this specific path resulted in an error, the error (in the
 // MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
 // path.
-@property (nonatomic, readonly, strong, nullable) NSError * error;
+@property (nonatomic, readonly, copy, nullable) NSError * error;
+@end
+
+@interface MTRBaseDevice (Deprecated)
+
+/**
+ * Deprecated MTRBaseDevice APIs.
+ */
+- (void)subscribeWithQueue:(dispatch_queue_t)queue
+                minInterval:(uint16_t)minInterval
+                maxInterval:(uint16_t)maxInterval
+                     params:(MTRSubscribeParams * _Nullable)params
+             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+               errorHandler:(MTRDeviceErrorHandler)errorHandler
+    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
+    MTR_NEWLY_DEPRECATED(
+        "Please use "
+        "subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:"
+        "subscriptionEstablished:resubscriptionScheduled:");
+
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                             params:(MTRReadParams * _Nullable)params
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED("Please use readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:");
+
+- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
+                               value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                         clientQueue:(dispatch_queue_t)clientQueue
+                          completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED("Please use writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:");
+
+- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
+                      commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED(
+        "Please use invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion");
+
+- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(MTRSubscribeParams * _Nullable)params
+                             clientQueue:(dispatch_queue_t)clientQueue
+                           reportHandler:(MTRDeviceResponseHandler)reportHandler
+                 subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
+    MTR_NEWLY_DEPRECATED("Please use "
+                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:"
+                         "reportHandler:subscriptionEstablished:");
+
+- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue
+                                     completion:(dispatch_block_t)completion
+    MTR_NEWLY_DEPRECATED("Pease use deregisterReportHandlersWithQueue:completion:");
+
+@end
+
+@interface MTRAttributePath (Deprecated)
+
++ (instancetype)attributePathWithEndpointId:(NSNumber *)endpointId
+                                  clusterId:(NSNumber *)clusterId
+                                attributeId:(NSNumber *)attributeId
+    MTR_NEWLY_DEPRECATED("Please use attributePathWithEndpointID:clusterID:attributeID:");
+
+@end
+
+@interface MTREventPath (Deprecated)
+
++ (instancetype)eventPathWithEndpointId:(NSNumber *)endpointId
+                              clusterId:(NSNumber *)clusterId
+                                eventId:(NSNumber *)eventId
+    MTR_NEWLY_DEPRECATED("Please use eventPathWithEndpointID:clusterID:eventID:");
+
+@end
+
+@interface MTRCommandPath (Deprecated)
+
++ (instancetype)commandPathWithEndpointId:(NSNumber *)endpointId
+                                clusterId:(NSNumber *)clusterId
+                                commandId:(NSNumber *)commandId
+    MTR_NEWLY_DEPRECATED("Please use commandPathWithEndpointID:clusterID:commandID:");
+
 @end
 
 NS_ASSUME_NONNULL_END

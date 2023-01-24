@@ -22,21 +22,20 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath,
-                                                           const EmberAfAttributeMetadata * aMetadata, const ByteSpan & aValue)
+CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: we may want to have a small cache for values that change a lot, so
     // we only write them once a bunch of changes happen or on timer or
     // shutdown.
-    DefaultStorageKeyAllocator key;
     if (!CanCastTo<uint16_t>(aValue.size()))
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    return mStorage->SyncSetKeyValue(key.AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue.data(),
-                                     static_cast<uint16_t>(aValue.size()));
+    return mStorage->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId).KeyName(),
+        aValue.data(), static_cast<uint16_t>(aValue.size()));
 }
 
 CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
@@ -44,10 +43,10 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    DefaultStorageKeyAllocator key;
     uint16_t size = static_cast<uint16_t>(min(aValue.size(), static_cast<size_t>(UINT16_MAX)));
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key.AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-                                                   aValue.data(), size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(
+        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId).KeyName(),
+        aValue.data(), size));
     EmberAfAttributeType type = aMetadata->attributeType;
     if (emberAfIsStringAttributeType(type))
     {

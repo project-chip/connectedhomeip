@@ -3,10 +3,19 @@
         "TestAccessControlCluster",
         "Test_TC_ACL_1_1",
         "Test_TC_ACL_2_1",
-        "Test_TC_ACL_2_2"
+        "Test_TC_ACL_2_2",
+        "Test_TC_ACL_2_3",
+        "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_7",
+        "Test_TC_ACL_2_8",
+        "Test_TC_ACL_2_9"
     ],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
+    "BridgedDeviceBasicInformation": [
+        "Test_TC_BRBINFO_1_1",
+        "Test_TC_BRBINFO_2_1"
+    ],
     "Actions": ["Test_TC_ACT_1_1"],
     "ColorControl": [
         "Test_TC_CC_1_1",
@@ -56,7 +65,11 @@
         "Test_TC_ILL_2_1",
         "Test_TC_ILL_2_2"
     ],
-    "OccupancySensing": ["Test_TC_OCC_1_1", "Test_TC_OCC_2_1"],
+    "OccupancySensing": [
+        "Test_TC_OCC_1_1",
+        "Test_TC_OCC_2_1",
+        "Test_TC_OCC_2_3"
+    ],
     "LevelControl": [
         "Test_TC_LVL_1_1",
         "Test_TC_LVL_2_1",
@@ -68,7 +81,7 @@
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_1_1"],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
-    "UnitLocalization": ["Test_TC_LUNIT_1_1"],
+    "UnitLocalization": ["Test_TC_LUNIT_1_2", "Test_TC_LUNIT_3_1"],
     "UserLabel": [
         "Test_TC_ULABEL_1_1",
         "Test_TC_ULABEL_2_1",
@@ -90,6 +103,7 @@
         "Test_TC_APBSC_1_10",
         "Test_TC_CONTENTLAUNCHER_1_11",
         "Test_TC_ALOGIN_1_12",
+        "Test_TC_ALOGIN_12_1",
         "Test_TC_LOWPOWER_2_1",
         "Test_TC_KEYPADINPUT_3_2",
         "Test_TC_KEYPADINPUT_3_3",
@@ -102,6 +116,7 @@
         "Test_TC_MEDIAINPUT_3_11",
         "Test_TC_MEDIAINPUT_3_12",
         "Test_TC_MEDIAINPUT_3_13",
+        "Test_TC_WAKEONLAN_4_1",
         "Test_TC_CHANNEL_5_1",
         "Test_TC_CHANNEL_5_2",
         "Test_TC_CHANNEL_5_3",
@@ -139,7 +154,7 @@
     ],
     "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
-    "SecureChannel": ["Test_TC_SC_4_2"],
+    "SecureChannel": [],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": [
@@ -223,16 +238,16 @@
         "TestFanControl",
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
-        "TestCommissioningWindow"
+        "TestCommissioningWindow",
+        "TestCommissionerNodeId",
+        "TestClientMonitoringCluster"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
-    "SoftwareDiagnostics": [
-        "Test_TC_DGSW_1_1",
-        "Test_TC_DGSW_2_1",
-        "Test_TC_DGSW_2_2",
-        "Test_TC_DGSW_2_3"
+    "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
+    "Subscriptions": [
+        "TestSubscribe_OnOff",
+        "TestSubscribe_AdministratorCommissioning"
     ],
-    "Subscriptions": ["TestSubscribe_OnOff"],
     "DoorLock": [
         "DL_UsersAndCredentials",
         "DL_LockUnlock",
@@ -242,6 +257,7 @@
         "Test_TC_DRLK_2_3",
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
+        "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
         "Test_TC_DRLK_2_9"
     ],
@@ -255,6 +271,7 @@
     "collection": [
         "AccessControl",
         "BooleanState",
+        "BridgedDeviceBasicInformation",
         "Actions",
         "Binding",
         "ColorControl",

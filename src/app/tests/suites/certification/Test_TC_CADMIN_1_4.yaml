@@ -61,7 +61,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000
@@ -69,14 +69,34 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
+
+    #Check for DNS-SD advertisement CM is not possible in YAML
+    - label: "Verify that the DNS-SD advertisement shows CM=1"
+      verification: |
+          On TH_CR1 send the below command
+
+          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          +   eth0 IPv6 B2822245F1F43570                              _matterc._udp        local
+          =   eth0 IPv6 B2822245F1F43570                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "writeAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
       arguments:
@@ -86,7 +106,7 @@ tests:
           "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "readAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
       response:
@@ -116,13 +136,45 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
+    #Check for DNS-SD advertisement is not possible in YAML
+    - label:
+          "Verify DUT_CE is now discoverable over DNS-SD with two SRV Records"
+      verification: |
+          On TH_CR2 send the below command
+
+          Verify if the DUT_CE is broadcasting using
+
+          ubuntu@ubuntu:~/may16_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          +   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
+          +   eth0 IPv6 3C26C93CF201458F-0000000000000001             _matter._tcp         local
+          =   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 3C26C93CF201458F-0000000000000001             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       command: "readAttribute"
       cluster: "Operational Credentials"
       PICS: OPCREDS.S.A0001
       attribute: "Fabrics"
+      fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }]
+          value: [{ Label: "", NodeID: nodeId }, { Label: "", NodeID: nodeId2 }]
           constraints:
               type: list
 
@@ -132,8 +184,9 @@ tests:
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       PICS: OPCREDS.S.A0001
+      fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId2 }]
+          value: [{ Label: "", NodeID: nodeId }, { Label: "", NodeID: nodeId2 }]
           constraints:
               type: list
 
@@ -141,7 +194,7 @@ tests:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "writeAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
       arguments:
@@ -151,7 +204,7 @@ tests:
           "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "readAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
       response:
@@ -161,22 +214,22 @@ tests:
               maxLength: 32
 
     - label:
-          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          "TH_CR2 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       identity: "beta"
       command: "writeAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
       arguments:
           value: "chiptest"
 
     - label:
-          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          "TH_CR2 reads the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       identity: "beta"
       command: "readAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
       response:
@@ -186,7 +239,7 @@ tests:
               maxLength: 32
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
       PICS: CADMIN.S.C01.Rsp
@@ -195,8 +248,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "Wait for the commissioning window in step 13 to timeout"
       cluster: "DelayCommands"
@@ -208,7 +259,7 @@ tests:
 
     - label:
           "TH_CR2 reads the window status to verify the DUT_CE window is closed"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       PICS: CADMIN.S.A0000
       command: "readAttribute"
       attribute: "WindowStatus"
@@ -216,7 +267,7 @@ tests:
           value: 0
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
       PICS: CADMIN.S.C01.Rsp
@@ -225,8 +276,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label:
           "TH_CR1 starts a commissioning process with DUT_CE before the timeout
@@ -242,3 +291,4 @@ tests:
                 value: payload
       response:
           error: FAILURE
+          clusterError: 9

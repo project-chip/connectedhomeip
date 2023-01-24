@@ -45,14 +45,18 @@
  *
  * 0xFFF1: Test vendor.
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+#endif // CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
  * 0x8009: example persistent-storage
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8009
+#endif // CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -82,14 +86,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote Chip Time service
- * using the Chip Time Sync protocol.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
-/**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
  * Enables the use of a hard-coded default serial number if none
@@ -110,16 +106,6 @@
  * Enable Thread CLI interface at initialisation.
  */
 #define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 1
-
-/**
- *  @def CHIP_CONFIG_MAX_FABRICS
- *
- *  @brief
- *    Maximum number of fabrics the device can participate in.  Each fabric can
- *    provision the device with its unique operational credentials and manage
- *    its own access control lists.
- */
-#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
 
 /**
  *  @name Interaction Model object pool configuration.

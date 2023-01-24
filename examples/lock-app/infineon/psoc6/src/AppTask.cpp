@@ -21,12 +21,10 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
-#include "qrcodegen.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
@@ -82,8 +80,8 @@ using namespace ::chip::System;
 #define APP_EVENT_QUEUE_SIZE 10
 
 using chip::app::Clusters::DoorLock::DlLockState;
-using chip::app::Clusters::DoorLock::DlOperationError;
-using chip::app::Clusters::DoorLock::DlOperationSource;
+using chip::app::Clusters::DoorLock::OperationErrorEnum;
+using chip::app::Clusters::DoorLock::OperationSourceEnum;
 namespace {
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -131,6 +129,23 @@ void NetWorkCommissioningInstInit()
 {
     sWiFiNetworkCommissioningInstance.Init();
 }
+
+void OnIdentifyStart(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void OnIdentifyStop(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    OnIdentifyStart,
+    OnIdentifyStop,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE,
+};
 
 static void InitServer(intptr_t context)
 {
@@ -314,6 +329,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     P6_LOG("App Task started");
 
+    // Users and credentials should be checked once from flash on boot
+    LockMgr().ReadConfigValues();
+
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
@@ -369,41 +387,53 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LockActionEventHandler(AppEvent * event)
 {
-    bool initiated = false;
     LockManager::Action_t action;
     int32_t actor;
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (event->Type == AppEvent::kEventType_Lock)
+    switch (event->Type)
     {
+    case AppEvent::kEventType_Lock: {
         action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
         actor  = event->LockEvent.Actor;
+        break;
     }
-    else if (event->Type == AppEvent::kEventType_Button)
-    {
-        if (LockMgr().NextState() == true)
+
+    case AppEvent::kEventType_Button: {
+
+        P6_LOG("%s [Action: %d]", __FUNCTION__, event->ButtonEvent.Action);
+
+        if (event->ButtonEvent.Action == APP_BUTTON_LONG_PRESS)
         {
-            action = LockManager::LOCK_ACTION;
+            P6_LOG("Sending a lock jammed event");
+
+            /* Generating Door Lock Jammed event */
+            DoorLockServer::Instance().SendLockAlarmEvent(1 /* Endpoint Id */, AlarmCodeEnum::kLockJammed);
+
+            return;
         }
         else
         {
-            action = LockManager::UNLOCK_ACTION;
+            if (LockMgr().NextState() == true)
+            {
+                action = LockManager::LOCK_ACTION;
+            }
+            else
+            {
+                action = LockManager::UNLOCK_ACTION;
+            }
+
+            actor = AppEvent::kEventType_Button;
         }
-        actor = AppEvent::kEventType_Button;
-    }
-    else
-    {
-        err = APP_ERROR_UNHANDLED_EVENT;
+        break;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        initiated = LockMgr().InitiateAction(actor, action);
+    default:
+        return;
+    }
 
-        if (!initiated)
-        {
-            P6_LOG("Action is already in progress or active.");
-        }
+    if (!LockMgr().InitiateAction(actor, action))
+    {
+        P6_LOG("Action is already in progress or active.");
     }
 }
 
@@ -633,7 +663,7 @@ void AppTask::UpdateCluster(intptr_t context)
     bool unlocked        = LockMgr().NextState();
     DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
 
-    DlOperationSource source = DlOperationSource::kUnspecified;
+    OperationSourceEnum source = OperationSourceEnum::kUnspecified;
 
     // write the new lock value
     EmberAfStatus status =

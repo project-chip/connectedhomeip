@@ -42,7 +42,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::Protocols;
 
-using BootReasonType = GeneralDiagnostics::BootReasonType;
+using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 static InteractionModel::Status verifyModeValue(const EndpointId endpointId, const uint8_t newMode);
 
@@ -145,7 +145,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
             {
                 Attributes::OnMode::TypeInfo::Type onMode;
-                bool onOffValueForStartUp = 0;
+                bool onOffValueForStartUp = false;
                 if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
                     !emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
                     OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
@@ -215,7 +215,7 @@ inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 
 } // namespace
 
-void MatterModeSelectPluginServerInitCallback(void)
+void MatterModeSelectPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gModeSelectAttrAccess);
 }

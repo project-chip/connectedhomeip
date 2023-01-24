@@ -62,9 +62,8 @@ public:
 
     /**
      * @brief
-     *   Called when a session is unresponsive for a while (detected by MRP)
-     *
-     *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
+     *   Called when a session is unresponsive for a while (detected by MRP). Callees SHALL NOT make synchronous calls into
+     * SessionManager to allocate a new session. If they desire to do so, it MUST be done asynchronously.
      */
     virtual void OnSessionHang() {}
 };

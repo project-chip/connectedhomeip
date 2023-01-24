@@ -22,18 +22,18 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label: "Factory reset the DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Commmission TH and DUT on Ethernet setup"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -42,7 +42,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 1 0
 
-          Verify "server list" on the TH(Chip-tool) Log:
+          Verify "server list has value 49" on the TH(Chip-tool) Log:
 
           [1646226258.250313][2446:2451] CHIP:DMG:        SuppressResponse = true,
           [1646226258.250337][2446:2451] CHIP:DMG:        InteractionModelRevision = 1
@@ -130,7 +130,7 @@ tests:
     - label: "TH reads InterfaceEnabled attribute from the DUT"
       PICS: CNET.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"

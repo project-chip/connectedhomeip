@@ -9,10 +9,10 @@ staleLabel: stale
 
 pulls:
   # Number of days of inactivity before a pull request becomes stale
-  daysUntilStale: 7
+  daysUntilStale: 60
 
   # Number of days of inactivity before a stale pull request is closed
-  daysUntilClose: 7
+  daysUntilClose: 30
 
   # Comment to post when marking a pull request as stale. Set to `false` to disable
   markComment: >

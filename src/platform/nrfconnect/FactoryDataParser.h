@@ -42,6 +42,9 @@ struct FactoryData
     uint16_t product_id;
     struct FactoryDataString vendor_name;
     struct FactoryDataString product_name;
+    struct FactoryDataString part_number;
+    struct FactoryDataString product_url;
+    struct FactoryDataString product_label;
     uint16_t hw_ver;
     struct FactoryDataString hw_ver_str;
     struct FactoryDataString rd_uid;
@@ -72,6 +75,20 @@ struct FactoryData
  * @returns true on success, false otherwise.
  */
 bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData);
+
+/**
+ * @brief Tries to find an entry within the given factory data user data field.
+ * The parser parses only the uint32 type of ints. To read int-related objects the buffer size must be aligned to uint32.
+ * That means, to obtain uint8 or uint16 value users should provide the buffer with size at least sizeof(uint32_t).
+ *
+ * @param factoryData An address of object of factory data that contains user field filled.
+ * @param entry An entry name to be find out.
+ * @param buffer Output buffer to store found key value.
+ * @param bufferSize Size of buffer. That size should have size at least equal to expected key value.
+ * @param outlen Actual size of found user data field.
+ * @return true on success, false otherwise
+ */
+bool FindUserDataEntry(struct FactoryData * factoryData, const char * entry, void * buffer, size_t bufferSize, size_t * outlen);
 
 #ifdef __cplusplus
 }

@@ -28,11 +28,10 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventPathIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR EventPathIBs::Parser::PrettyPrint() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t NumPath = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventPathIBs =");
@@ -51,11 +50,9 @@ CHIP_ERROR EventPathIBs::Parser::CheckSchemaValidity() const
             ReturnErrorOnFailure(path.Init(reader));
 
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(path.CheckSchemaValidity());
+            ReturnErrorOnFailure(path.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++NumPath;
     }
 
     PRETTY_PRINT("],");
@@ -69,7 +66,7 @@ CHIP_ERROR EventPathIBs::Parser::CheckSchemaValidity() const
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 EventPathIB::Builder & EventPathIBs::Builder::CreatePath()
 {

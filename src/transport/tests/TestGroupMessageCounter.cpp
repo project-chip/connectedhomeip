@@ -45,17 +45,17 @@ public:
     {
         uint32_t temp = 0;
 
-        DefaultStorageKeyAllocator key;
+        StorageKeyName key = StorageKeyName::Uninitialized();
 
         if (isControl)
         {
             mGroupControlCounter = value;
-            key.GroupControlCounter();
+            key                  = DefaultStorageKeyAllocator::GroupControlCounter();
         }
         else
         {
             mGroupDataCounter = value;
-            key.GroupDataCounter();
+            key               = DefaultStorageKeyAllocator::GroupDataCounter();
         }
 
         if (mStorage == nullptr)

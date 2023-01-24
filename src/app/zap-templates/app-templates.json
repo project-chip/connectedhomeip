@@ -16,49 +16,11 @@
             "path": "partials/header.zapt"
         },
         {
-            "name": "clusters_header",
-            "path": "partials/clusters_header.zapt"
-        },
-        {
-            "name": "cluster_header",
-            "path": "partials/cluster_header.zapt"
-        },
-        {
             "name": "im_command_handler_cluster_commands",
             "path": "partials/im_command_handler_cluster_commands.zapt"
-        },
-        {
-            "name": "idl_structure_definition",
-            "path": "partials/idl/structure_definition.zapt"
-        },
-        {
-            "name": "idl_structure_member",
-            "path": "partials/idl/structure_member.zapt"
-        },
-        {
-            "name": "idl_command_request_response",
-            "path": "partials/idl/command_request_response.zapt"
-        },
-        {
-            "name": "idl_command_request_struct",
-            "path": "partials/idl/command_request_struct.zapt"
-        },
-        {
-            "name": "idl_command_response_struct",
-            "path": "partials/idl/command_response_struct.zapt"
         }
     ],
     "templates": [
-        {
-            "path": "templates/app/callbacks/PluginApplicationCallbacks.zapt",
-            "name": "Matter Application Callbacks header",
-            "output": "PluginApplicationCallbacks.h"
-        },
-        {
-            "path": "templates/app/callback-stub-src.zapt",
-            "name": "ZCL callback-stub source",
-            "output": "callback-stub.cpp"
-        },
         {
             "path": "templates/app/endpoint_config.zapt",
             "name": "ZCL endpoint configuration",
@@ -68,11 +30,6 @@
             "path": "templates/app/gen_config.zapt",
             "name": "ZCL gen_config header",
             "output": "gen_config.h"
-        },
-        {
-            "path": "templates/app/gen_tokens.zapt",
-            "name": "ZCL gen_tokens header",
-            "output": "gen_tokens.h"
         },
         {
             "path": "templates/app/CHIPClientCallbacks.zapt",
@@ -88,11 +45,6 @@
             "path": "templates/app/CHIPClusters.zapt",
             "name": "C++ ZCL API Header",
             "output": "CHIPClusters.h"
-        },
-        {
-            "path": "templates/app/MatterIDL.zapt",
-            "name": "Human-readable Matter IDL",
-            "output": "Clusters.matter"
         },
         {
             "path": "templates/app/access.zapt",

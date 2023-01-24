@@ -30,6 +30,7 @@
 #endif
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -37,6 +38,7 @@
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/platform.h>
+#include <platform/Infineon/CYW30739/FactoryDataProvider.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <sparcommon.h>
 #include <stdio.h>
@@ -45,8 +47,8 @@
 #include <wiced_platform.h>
 
 using chip::app::Clusters::DoorLock::DlLockState;
-using chip::app::Clusters::DoorLock::DlOperationError;
-using chip::app::Clusters::DoorLock::DlOperationSource;
+using chip::app::Clusters::DoorLock::OperationErrorEnum;
+using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
 using namespace ::chip::DeviceLayer::Internal;
@@ -59,15 +61,21 @@ using namespace CYW30739DoorLock::LockInitParams;
 wiced_bool_t syncClusterToButtonAction = false;
 
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+static FactoryDataProvider sFactoryDataProvider;
+
 static void InitApp(intptr_t args);
 static void ActionInitiated(LockManager::Action_t aAction, int32_t aActor);
 static void ActionCompleted(LockManager::Action_t aAction);
-static void WriteClusterState(uint8_t value);
 static void UpdateClusterState(intptr_t context);
 
 #ifndef _countof
 #define _countof(a) (sizeof(a) / sizeof(a[0]))
 #endif
+
+// NOTE! This key is for test/certification only and should not be available in production devices!
+uint8_t sTestEventTriggerEnableKey[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                                                                                         0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+                                                                                         0xcc, 0xdd, 0xee, 0xff };
 
 static wiced_led_config_t chip_lighting_led_config[2] = {
     {
@@ -174,8 +182,10 @@ void InitApp(intptr_t args)
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     /* Start CHIP datamodel server */
+    static chip::OTATestEventTriggerDelegate testEventTriggerDelegate{ chip::ByteSpan(sTestEventTriggerEnableKey) };
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
@@ -185,7 +195,7 @@ void InitApp(intptr_t args)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
 
     // Initial lock state
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
@@ -255,8 +265,6 @@ void InitApp(intptr_t args)
 
     LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
-
     ConfigurationMgr().LogDeviceConfig();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -277,7 +285,7 @@ void ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
         ChipLogDetail(Zcl, "Unlock Action has been initiated");
     }
 
-    if (aActor == LockManager::ACTOR_BUTTON)
+    if (aActor == AppEvent::kEventType_Button)
     {
         syncClusterToButtonAction = true;
     }
@@ -300,7 +308,7 @@ void UpdateClusterState(intptr_t context)
     bool unlocked        = LockMgr().NextState();
     DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
 
-    DlOperationSource source = DlOperationSource::kUnspecified;
+    OperationSourceEnum source = OperationSourceEnum::kUnspecified;
 
     // write the new lock value
     EmberAfStatus status =

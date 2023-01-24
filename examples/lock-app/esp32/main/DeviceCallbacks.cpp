@@ -24,11 +24,11 @@
  **/
 
 #include "DeviceCallbacks.h"
-#include "AppConfig.h"
-#include "BoltLockManager.h"
+#include <lock/AppConfig.h>
+#include <lock/BoltLockManager.h>
 
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 static const char * TAG = "lock-devicecallbacks";
 
@@ -45,7 +45,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 
     switch (clusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case app::Clusters::OnOff::Id:
         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
 
@@ -59,7 +59,8 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 
 void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id,
+                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (*value)
     {

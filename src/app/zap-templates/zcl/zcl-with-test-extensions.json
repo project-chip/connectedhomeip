@@ -21,10 +21,11 @@
         "binding-cluster.xml",
         "boolean-state-cluster.xml",
         "actions-cluster.xml",
-        "bridged-device-basic.xml",
+        "bridged-device-basic-information.xml",
         "chip-ota.xml",
         "chip-types.xml",
         "channel-cluster.xml",
+        "client-monitoring-cluster.xml",
         "clusters-extensions.xml",
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
@@ -83,7 +84,7 @@
         "zll-devices.xml",
         "zll.xml"
     ],
-    "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
+    "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]
@@ -107,12 +108,12 @@
             "TargetsPerAccessControlEntry",
             "AccessControlEntriesPerFabric"
         ],
-        "AdministratorCommissioning": [
+        "Administrator Commissioning": [
             "WindowStatus",
             "AdminFabricIndex",
             "AdminVendorId"
         ],
-        "Basic": [
+        "Basic Information": [
             "DataModelRevision",
             "VendorName",
             "VendorID",
@@ -157,7 +158,7 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReasons"
+            "BootReason"
         ],
         "Group Key Management": [
             "ClusterRevision",
@@ -177,14 +178,14 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
-        "Test Cluster": [
+        "Unit Testing": [
             "struct_attr",
             "nullable_struct",
             "general_error_boolean",
             "cluster_error_boolean"
         ],
         "Thread Network Diagnostics": [
-            "channel",
+            "Channel",
             "RoutingRole",
             "NetworkName",
             "PanId",
@@ -192,7 +193,7 @@
             "MeshLocalPrefix",
             "OverrunCount",
             "PartitionId",
-            "weighting",
+            "Weighting",
             "DataVersion",
             "StableDataVersion",
             "LeaderRouterId",
@@ -246,11 +247,11 @@
             "OperationalDatasetComponents"
         ],
         "WiFi Network Diagnostics": [
-            "bssid",
+            "BSSID",
             "SecurityType",
             "WiFiVersion",
             "ChannelNumber",
-            "Rssi",
+            "RSSI",
             "BeaconLostCount",
             "BeaconRxCount",
             "PacketMulticastRxCount",
