@@ -41,7 +41,7 @@ tests:
           value: null
 
     - label: "Launch App Command"
-      command: "launchApp"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "Data"
@@ -56,7 +56,7 @@ tests:
                 value: 0
 
     - label: "Stop App Command"
-      command: "stopApp"
+      command: "StopApp"
       arguments:
           values:
               - name: "Application"
@@ -69,7 +69,7 @@ tests:
                 value: 0
 
     - label: "Hide App Command"
-      command: "hideApp"
+      command: "HideApp"
       arguments:
           values:
               - name: "Application"

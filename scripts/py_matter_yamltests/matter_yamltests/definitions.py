@@ -64,25 +64,24 @@ class SpecDefinitions:
 
             self.__clusters_by_name[name] = cluster.code
             self.__commands_by_name[name] = {
-                c.name.lower(): c.code for c in cluster.commands}
+                c.name: c.code for c in cluster.commands}
             self.__responses_by_name[name] = {}
             self.__attributes_by_name[name] = {
-                a.definition.name.lower(): a.definition.code for a in cluster.attributes}
+                a.definition.name: a.definition.code for a in cluster.attributes}
             self.__events_by_name[name] = {
-                e.name.lower(): e.code for e in cluster.events}
+                e.name: e.code for e in cluster.events}
 
             self.__bitmaps_by_name[name] = {
-                b.name.lower(): b for b in cluster.bitmaps}
+                b.name: b for b in cluster.bitmaps}
             self.__enums_by_name[name] = {
-                e.name.lower(): e for e in cluster.enums}
+                e.name: e for e in cluster.enums}
             self.__structs_by_name[name] = {
-                s.name.lower(): s for s in cluster.structs}
+                s.name: s for s in cluster.structs}
 
             for struct in cluster.structs:
                 if struct.tag == StructTag.RESPONSE:
                     self.__responses_by_id[code][struct.code] = struct
-                    self.__responses_by_name[name][struct.name.lower(
-                    )] = struct.code
+                    self.__responses_by_name[name][struct.name] = struct.code
 
     def get_cluster_name(self, cluster_id: int) -> str:
         cluster = self.__clusters_by_id.get(cluster_id)
@@ -153,9 +152,6 @@ class SpecDefinitions:
 
         # The idl parser remove spaces
         cluster_name = cluster_name.replace(' ', '')
-        # Many YAML tests formats the name using camelCase despites that the spec mandates
-        # CamelCase. To be compatible with the current tests, everything is converted to lower case.
-        target_name = target_name.lower()
 
         cluster_id = self.__clusters_by_name.get(cluster_name)
         if cluster_id is None:
@@ -164,26 +160,40 @@ class SpecDefinitions:
         target = None
 
         if target_type == _ItemType.Request:
+            self.__enforce_casing(
+                target_name, self.__commands_by_name.get(cluster_name))
             target_id = self.__commands_by_name.get(
                 cluster_name).get(target_name)
             target = self.__get_by_id(cluster_id, target_id, target_type)
         elif target_type == _ItemType.Response:
+            self.__enforce_casing(
+                target_name, self.__responses_by_name.get(cluster_name))
             target_id = self.__responses_by_name.get(
                 cluster_name).get(target_name)
             target = self.__get_by_id(cluster_id, target_id, target_type)
         elif target_type == _ItemType.Event:
+            self.__enforce_casing(
+                target_name, self.__events_by_name.get(cluster_name))
             target_id = self.__events_by_name.get(
                 cluster_name).get(target_name)
             target = self.__get_by_id(cluster_id, target_id, target_type)
         elif target_type == _ItemType.Attribute:
+            self.__enforce_casing(
+                target_name, self.__attributes_by_name.get(cluster_name))
             target_id = self.__attributes_by_name.get(
                 cluster_name).get(target_name)
             target = self.__get_by_id(cluster_id, target_id, target_type)
         elif target_type == _ItemType.Bitmap:
+            self.__enforce_casing(
+                target_name, self.__bitmaps_by_name.get(cluster_name))
             target = self.__bitmaps_by_name.get(cluster_name).get(target_name)
         elif target_type == _ItemType.Enum:
+            self.__enforce_casing(
+                target_name, self.__enums_by_name.get(cluster_name))
             target = self.__enums_by_name.get(cluster_name).get(target_name)
         elif target_type == _ItemType.Struct:
+            self.__enforce_casing(
+                target_name, self.__structs_by_name.get(cluster_name))
             target = self.__structs_by_name.get(cluster_name).get(target_name)
 
         return target
@@ -204,3 +214,12 @@ class SpecDefinitions:
             return None
 
         return targets.get(target_id)
+
+    def __enforce_casing(self, target_name: str, targets: list):
+        if targets.get(target_name) is not None:
+            return
+
+        for name in targets:
+            if name.lower() == target_name.lower():
+                raise KeyError(
+                    f'Unknown target {target_name}. Did you mean {name} ?')
