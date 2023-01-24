@@ -75,6 +75,7 @@ void IRQ074_Handler(void)
 
 void IRQ021_Handler(void)
 {
+    // TODO: Replace with rsi_delay once that is fixed
     for (int i = 0; i < 10000; i++)
         __asm__("nop;");
     /* clear NPSS GPIO interrupt*/
