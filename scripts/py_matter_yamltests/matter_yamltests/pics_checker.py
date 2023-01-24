@@ -53,8 +53,7 @@ class PICSChecker():
 
         self.__expression_index = 0
         tokens = self.__tokenize(pics)
-        if self.__pics is not None:
-            return self.__evaluate_expression(tokens, self.__pics)
+        return self.__evaluate_expression(tokens, self.__pics)
 
     def __parse(self, pics_file: str):
         pics = {}
