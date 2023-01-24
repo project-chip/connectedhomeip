@@ -77,7 +77,6 @@ def test_wifi_provisioning(device, network):
     assert ret is not None and len(ret) == 2
 
     ip_address = ret[0]
-    port = ret[1]
 
     assert device_ip_address == ip_address
 
