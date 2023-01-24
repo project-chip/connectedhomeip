@@ -55,6 +55,12 @@ private:
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
+#endif
+
     // Wi-Fi access point - not supported
     ConnectivityManager::WiFiAPMode _GetWiFiAPMode(void);
     CHIP_ERROR _SetWiFiAPMode(ConnectivityManager::WiFiAPMode val);

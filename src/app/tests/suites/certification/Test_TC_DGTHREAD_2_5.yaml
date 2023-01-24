@@ -26,6 +26,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          Commission TH to DUT
+      disabled: true
+
     - label: "Induce a DUT by an Unspecified failure"
       PICS: DGTHREAD.S.E01
       verification: |

@@ -18,10 +18,14 @@
 
 #include "WebSocketServer.h"
 
+#include <lib/support/ScopedBuffer.h>
+
 constexpr uint16_t kDefaultWebSocketServerPort = 9002;
 constexpr uint16_t kMaxMessageBufferLen        = 8192;
 
 namespace {
+lws * gWebSocketInstance = nullptr;
+
 void LogWebSocketCallbackReason(lws_callback_reasons reason)
 {
 #if CHIP_DETAIL_LOGGING
@@ -121,6 +125,14 @@ static int OnWebSocketCallback(lws * wsi, lws_callback_reasons reason, void * us
     {
         lws_callback_on_writable(wsi);
     }
+    else if (LWS_CALLBACK_ESTABLISHED == reason)
+    {
+        gWebSocketInstance = wsi;
+    }
+    else if (LWS_CALLBACK_WSI_DESTROY == reason)
+    {
+        gWebSocketInstance = nullptr;
+    }
 
     return 0;
 }
@@ -143,5 +155,17 @@ CHIP_ERROR WebSocketServer::Run(chip::Optional<uint16_t> port, WebSocketServerDe
     VerifyOrReturnError(nullptr != context, CHIP_ERROR_INTERNAL);
 
     lws_context_default_loop_run_destroy(context);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WebSocketServer::Send(const char * msg)
+{
+    VerifyOrReturnError(nullptr != gWebSocketInstance, CHIP_ERROR_INCORRECT_STATE);
+
+    chip::Platform::ScopedMemoryBuffer<unsigned char> buffer;
+    VerifyOrReturnError(buffer.Calloc(LWS_PRE + strlen(msg)), CHIP_ERROR_NO_MEMORY);
+    memcpy(&buffer[LWS_PRE], (void *) msg, strlen(msg));
+    lws_write(gWebSocketInstance, &buffer[LWS_PRE], strlen(msg), LWS_WRITE_TEXT);
+
     return CHIP_NO_ERROR;
 }

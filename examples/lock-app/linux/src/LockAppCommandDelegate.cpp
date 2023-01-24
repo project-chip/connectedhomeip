@@ -107,11 +107,11 @@ void LockAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "Lock App: Unable to execute command to set the door state: invalid type for DoorState"));
 
         auto doorState = params["DoorState"].asUInt();
-        VerifyOrExit(doorState < to_underlying(DlDoorState::kUnknownEnumValue),
+        VerifyOrExit(doorState < to_underlying(DoorStateEnum::kUnknownEnumValue),
                      ChipLogError(NotSpecified,
                                   "Lock App: Unable to execute command to set door state: DoorState is out of range [doorState=%u]",
                                   doorState));
-        LockManager::Instance().SetDoorState(endpointId, static_cast<DlDoorState>(doorState));
+        LockManager::Instance().SetDoorState(endpointId, static_cast<DoorStateEnum>(doorState));
     }
     else if (self->mCommandName == "SendDoorLockAlarm")
     {
@@ -125,11 +125,11 @@ void LockAppCommandHandler::HandleCommand(intptr_t context)
 
         auto alarmCode = params["AlarmCode"].asUInt();
         VerifyOrExit(
-            alarmCode < to_underlying(DlAlarmCode::kUnknownEnumValue),
+            alarmCode < to_underlying(AlarmCodeEnum::kUnknownEnumValue),
             ChipLogError(NotSpecified,
                          "Lock App: Unable to execute command to send lock alarm: AlarmCode is out of range [alarmCode=%u]",
                          alarmCode));
-        LockManager::Instance().SendLockAlarm(endpointId, static_cast<DlAlarmCode>(alarmCode));
+        LockManager::Instance().SendLockAlarm(endpointId, static_cast<AlarmCodeEnum>(alarmCode));
     }
     else
     {

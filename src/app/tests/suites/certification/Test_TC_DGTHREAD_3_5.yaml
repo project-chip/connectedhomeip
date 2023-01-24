@@ -26,6 +26,12 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1.Commission TH to DUT
+          2.DUT subscribes to NetworkFaultChange, ConnectionStatus events on the Thread Network Diagnostics cluster of the TH
+      disabled: true
+
     - label: "Simulate an Unspecified failure on TH"
       PICS: DGTHREAD.C.E01
       verification: |

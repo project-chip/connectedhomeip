@@ -258,19 +258,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             switch (interfaceType)
             {
             case Inet::InterfaceType::Unknown:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
                 break;
             case Inet::InterfaceType::WiFi:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
                 break;
             case Inet::InterfaceType::Ethernet:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
                 break;
             case Inet::InterfaceType::Thread:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_THREAD;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
                 break;
             case Inet::InterfaceType::Cellular:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_CELLULAR;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR;
                 break;
             }
         }

@@ -166,8 +166,9 @@ tests:
           "TH reads RxErrInvalidScrAddrCount attribute value from DUT and verify
           data type"
       verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
           ./chip-tool threadnetworkdiagnostics read rx-err-invalid-src-addr-count 54 0
-          Verify "RxErrInvalidSrcAddrCount response" on the TH(Chip-tool) Log:
+          Verify "RxErrInvalidSrcAddrCount value is unit32" on the TH(Chip-tool) Log:
 
           [1649826953.827775][3727:3732] CHIP:DMG:        SuppressResponse = true,
           [1649826953.827837][3727:3732] CHIP:DMG:        InteractionModelRevision = 1

@@ -49,7 +49,7 @@ tests:
       command: "Seek"
       arguments:
           values:
-              - name: "Position"
+              - name: "position"
                 value: 10000
       response:
           values:

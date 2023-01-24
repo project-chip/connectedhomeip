@@ -16,7 +16,6 @@
 name: 43.2.1. [TC-DGSW-2.1] Attributes with server as DUT
 
 PICS:
-    - DGSW.S.A
     - DGSW.S
 
 config:
@@ -33,6 +32,8 @@ tests:
     - label: "TH reads a list of ThreadMetrics struct attribute from DUT."
       PICS: DGSW.S.A0000
       verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
           ./chip-tool softwarediagnostics read thread-metrics 1 0
 
           Verify the thread-metrics attribute has entries with ThreadMetrics Struct.
@@ -69,6 +70,8 @@ tests:
     - label: "TH reads an attribute value from DUT."
       PICS: DGSW.S.A0001
       verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
           ./chip-tool softwarediagnostics read current-heap-free 1 0
 
           Verify the value of CurrentHeapFree is in range uint64
@@ -81,6 +84,8 @@ tests:
     - label: "TH reads an attribute value from DUT."
       PICS: DGSW.S.A0002
       verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
 
           Verify the value of CurrentHeapUsed is in range uint64

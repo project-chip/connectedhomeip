@@ -221,6 +221,24 @@ using namespace chip::Credentials;
     return AsData(derCertBytes);
 }
 
++ (NSData * _Nullable)extractPublicKeyFromCertificateSigningRequest:(MTRCSRDERBytes)certificateSigningRequest
+                                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
+    auto requestSpan = AsByteSpan(certificateSigningRequest);
+    P256PublicKey publicKey;
+    CHIP_ERROR err = VerifyCertificateSigningRequest(requestSpan.data(), requestSpan.size(), publicKey);
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("extractPublicKeyFromCertificateSigningRequest: %s", chip::ErrorStr(err));
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    P256PublicKeySpan publicKeySpan(publicKey.ConstBytes());
+    return AsData(publicKeySpan);
+}
+
 @end
 
 @implementation MTRCertificates (Deprecated)

@@ -29,12 +29,17 @@ tests:
           To execute this test case set onmode to any integer value because as default it value has null.
       disabled: true
 
+    - label: "Precondition"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
     - label: "TH reads the OnMode attribute from the DUT"
       PICS: MOD.S.A0005 && MOD.S.F00
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          on TH(chip-tool),Verify that the DUT response is an integer. Record this value for usage in steps 2b.
+          on TH(chip-tool),Verify that the DUT response is an integer. Record this value for usage in steps 2b and below is the sample log provided for the raspi platform:
 
           [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
           [1649678983.680002][10871:10876] CHIP:TOO:   OnMode: 0
@@ -45,7 +50,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH(chip-tool),Verify that the DUT response is an integer. Record this value for usage in steps 2b.
+          on TH(chip-tool),Verify that the DUT response is an integer. Record this value for usage in steps 2b and below is the sample log provided for the raspi platform:
 
           [1649679034.895848][10879:10884] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
           [1649679034.895972][10879:10884] CHIP:TOO:   CurrentMode: 0
@@ -65,7 +70,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          on TH(chip-tool),Verify that the DUT response provides a list of supported modes
+          Verify on TH(chip-tool) logs supported modes provides a list of mode, each mode should be a struct containing a label and All of these values should be no larger than 16 bits  for usage in step 2d and below is the sample log provided for the raspi platform:
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
@@ -108,7 +113,7 @@ tests:
       verification: |
           ./chip-tool modeselect change-to-mode 7 1 1
 
-          on TH(chip-tool),Verify that the DUT response with a successful (value 0x00) status response.
+          on TH(chip-tool),Verify that the DUT response with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
           [1645777419.711572][4798:4803] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
       disabled: true
@@ -118,7 +123,7 @@ tests:
       verification: |
           ./chip-tool onoff off 1 1
 
-          on TH(chip-tool),Verify that the DUT response with a successful (value 0x00) status response.
+          on TH(chip-tool),Verify that the DUT response with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
           [1649679101.658594][10886:10891] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000 Status=0x0
       disabled: true
@@ -128,7 +133,7 @@ tests:
       verification: |
           ./chip-tool onoff on 1 1
 
-          on TH(chip-tool),Verify that the DUT response with a successful (value 0x00) status response.
+          on TH(chip-tool),Verify that the DUT response with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
           [1649679156.146015][10893:10898] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
       disabled: true
@@ -138,7 +143,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH(chip-tool),Verify that the DUT response is the integer recorded in step 1.
+          on TH(chip-tool),Verify that the DUT response is the integer recorded in step 1 and below is the sample log provided for the raspi platform:
 
           [1649679202.069163][10899:10904] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
           [1649679202.069278][10899:10904] CHIP:TOO:   CurrentMode: 0

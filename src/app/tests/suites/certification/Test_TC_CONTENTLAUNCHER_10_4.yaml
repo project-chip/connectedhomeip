@@ -26,13 +26,18 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+      disabled: true
+
     - label: "DUT sends LaunchContent command to TH"
       PICS: CONTENTLAUNCHER.C.C00.Tx
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool contentlauncher launch-content "{"parameterList": []}" 1 1 1
-          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": []}" 1 1 1
+          ./chip-tool contentlauncher launch-content '{"parameterList": []}' 1 1 1
+          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": []}'' 1 1 1
 
 
           The log below shows the resulting log on the TH (tv-app or all-clusters-app):

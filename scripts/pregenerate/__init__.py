@@ -13,17 +13,15 @@
 # limitations under the License.
 
 
+import fnmatch
 import logging
 import os
+from dataclasses import dataclass, field
+from typing import Iterator, List, Optional
 
-from typing import Iterator
-
-from .types import InputIdlFile, IdlFileType
-
-
-from .pregenerators import CodegenJavaPregenerator
-from .pregenerators import CodegenBridgePregenerator
-from .pregenerators import CodegenCppAppPregenerator
+from .types import IdlFileType, InputIdlFile
+from .using_codegen import CodegenBridgePregenerator, CodegenCppAppPregenerator, CodegenJavaPregenerator
+from .using_zap import ZapApplicationPregenerator
 
 
 def FindAllIdls(sdk_root: str) -> Iterator[InputIdlFile]:
@@ -49,7 +47,26 @@ def FindAllIdls(sdk_root: str) -> Iterator[InputIdlFile]:
                                        relative_path=os.path.join(root[sdk_root_length+1:], file))
 
 
-def FindPregenerationTargets(sdk_root: str):
+@dataclass
+class TargetFilter:
+    # If set, only the specified files are accepted for codegen
+    file_type: Optional[IdlFileType] = None
+
+    # If non-empty only the given paths will be code-generated
+    path_glob: List[str] = field(default_factory=list)
+
+
+# TODO: the build GlobMatcher is more complete by supporting `{}` grouping
+#       For now this limited glob seems sufficient.
+class GlobMatcher:
+    def __init__(self, pattern: str):
+        self.pattern = pattern
+
+    def matches(self, s: str):
+        return fnmatch.fnmatch(s, self.pattern)
+
+
+def FindPregenerationTargets(sdk_root: str, filter: TargetFilter, runner):
     """Finds all relevand pre-generation targets in the given
        SDK root.
 
@@ -58,12 +75,28 @@ def FindPregenerationTargets(sdk_root: str):
     """
 
     generators = [
+        # Jinja-based codegen
         CodegenBridgePregenerator(sdk_root),
         CodegenJavaPregenerator(sdk_root),
         CodegenCppAppPregenerator(sdk_root),
+
+        # ZAP codegen
+        ZapApplicationPregenerator(sdk_root),
     ]
 
+    path_matchers = [GlobMatcher(pattern) for pattern in filter.path_glob]
+
     for idl in FindAllIdls(sdk_root):
+        if filter.file_type is not None:
+            if idl.file_type != filter.file_type:
+                logging.debug(f"Will not process file of type {idl.file_type}: {idl.relative_path}")
+                continue
+
+        if path_matchers:
+            if all([not matcher.matches(idl.relative_path) for matcher in path_matchers]):
+                logging.debug(f"Glob not matched for {idl.relative_path}")
+                continue
+
         for generator in generators:
             if generator.Accept(idl):
-                yield generator.CreateTarget(idl)
+                yield generator.CreateTarget(idl, runner=runner)

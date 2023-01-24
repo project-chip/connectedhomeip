@@ -26,33 +26,13 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Factory Reset the DUT"
+    - label: "Preconditions"
       verification: |
-
-      disabled: true
-
-    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "The cluster Identifier 49 (0x0031) is present in the ServerList
-          attribute"
-      verification: |
-
-      disabled: true
-
-    - label: "The FeatureMap attribute value is 1"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "MaxNetworks attribute value is at least 1 which is saved as
-          MaxNetworksValue for future use"
-      verification: |
-
+          1. Factory Reset the DUT
+          2. Commission TH and DUT to setup the Thread
+          3. The cluster Identifier 49 (0x0031) is present in the ServerList attribute
+          4. The FeatureMap attribute value is 1
+          5. MaxNetworks attribute value is at least 1 which is saved as MaxNetworksValue for future use
       disabled: true
 
     - label:
@@ -74,9 +54,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  RemoveNetwork  Command to the  DUT with  NetworkID
-          field  set to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID, which  does
-          not match  the provisioned  network, and  Breadcrumb field  set to 1"
+          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
+          PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID, which does not match the
+          provisioned network, and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0

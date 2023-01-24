@@ -209,6 +209,7 @@ chip_python_wheel_action("chip-core") {
         "chip/clusters/Attribute.py",
         "chip/clusters/Command.py",
         "chip/clusters/__init__.py",
+        "chip/clusters/enum.py",
         "chip/configuration/__init__.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
@@ -289,6 +290,7 @@ chip_python_wheel_action("chip-core") {
   }
 
   py_package_reqs = [
+    "aenum",
     "coloredlogs",
     "construct",
     "dacite",

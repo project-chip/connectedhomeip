@@ -15,6 +15,9 @@
 
 name: 19.1.1. [TC-SC-5.1] Adding member to a group
 
+PICS:
+    - PICS_MCORE_ROLE_COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Groups"

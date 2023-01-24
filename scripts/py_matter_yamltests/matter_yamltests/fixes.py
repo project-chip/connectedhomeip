@@ -59,6 +59,10 @@ def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
 
     This handles any c-style hex escapes (e.g. \x5a) and hex: prefix
     '''
+    # Step 0: Check if this is already of type bytes
+    if isinstance(s, bytes):
+        return s
+
     # Step 1: handle explicit "hex:" prefix
     if s.startswith('hex:'):
         return binascii.unhexlify(s[4:])

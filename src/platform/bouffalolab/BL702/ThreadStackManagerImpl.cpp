@@ -48,18 +48,10 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ot_alarmInit();
-#ifdef OT_THREAD_PORT_1_3
-    otRadio_opt_t opt;
-    opt.byte = 0;
-    ot_radioInit(opt);
-#else
-    ot_radioInit();
-#endif
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInstanceInitSingle());
     SuccessOrExit(err);
 
     mbedtls_platform_set_calloc_free(pvPortCalloc, vPortFree);
@@ -82,12 +74,7 @@ ot_system_event_t ot_system_event_var = OT_SYSTEM_EVENT_NONE;
 
 void otSysProcessDrivers(otInstance * aInstance)
 {
-#ifdef OT_THREAD_PORT_1_3
     ot_system_event_t sevent = otrGetNotifyEvent();
-#else
-    ot_system_event_t sevent = OT_SYSTEM_EVENT_NONE;
-    OT_GET_NOTIFY(sevent);
-#endif
 
     ot_alarmTask(sevent);
     ot_radioTask(sevent);
@@ -126,7 +113,6 @@ extern "C" void otPlatFree(void * aPtr)
     free(aPtr);
 }
 
-#ifdef OT_THREAD_PORT_1_3
 extern "C" uint32_t otrEnterCrit(void)
 {
     if (xPortIsInsideInterrupt())
@@ -172,4 +158,3 @@ extern "C" void otrNotifyEvent(ot_system_event_t sevent)
 
     otSysEventSignalPending();
 }
-#endif

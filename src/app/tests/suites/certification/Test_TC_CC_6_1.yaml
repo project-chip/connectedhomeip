@@ -84,7 +84,7 @@ tests:
       command: "MoveToColorTemperature"
       arguments:
           values:
-              - name: "colorTemperature"
+              - name: "ColorTemperatureMireds"
                 value: 310
               - name: "TransitionTime"
                 value: 0
@@ -108,7 +108,7 @@ tests:
       command: "MoveToColorTemperature"
       arguments:
           values:
-              - name: "colorTemperature"
+              - name: "ColorTemperatureMireds"
                 value: 250
               - name: "TransitionTime"
                 value: 300

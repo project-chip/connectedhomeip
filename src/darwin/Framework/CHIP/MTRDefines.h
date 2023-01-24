@@ -26,3 +26,6 @@
 #endif
 
 typedef NSData * MTRTLVBytes;
+typedef NSData * MTRCSRDERBytes;
+typedef NSData * MTRCertificateDERBytes;
+typedef NSData * MTRCertificateTLVBytes;

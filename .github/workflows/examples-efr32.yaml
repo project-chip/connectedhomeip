@@ -38,7 +38,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: connectedhomeip/chip-build-efr32:0.6.30
+      image: connectedhomeip/chip-build-efr32:0.6.34
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -82,6 +82,7 @@ jobs:
                 --enable-flashbundle \
                 --target efr32-brd4187c-window-covering \
                 --target efr32-brd4187c-switch \
+                --target efr32-brd4187c-switch-sed \
                 --target efr32-brd4187c-unit-test \
                 --target efr32-brd4187c-light \
                 --target efr32-brd4187c-light-rpc \

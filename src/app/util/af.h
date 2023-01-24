@@ -81,6 +81,14 @@ bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId)
 bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 
 /**
+ * @brief Returns true if endpoint contains the ZCL client with specified id.
+ *
+ * This function returns true if
+ * the endpoint contains client of a given cluster.
+ */
+bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
+/**
  * @brief write an attribute, performing all the checks.
  *
  * This function will attempt to write the attribute value from

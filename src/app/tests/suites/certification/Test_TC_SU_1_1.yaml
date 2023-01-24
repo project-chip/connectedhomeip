@@ -32,6 +32,11 @@ tests:
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
           Verify on the OTA Requestor logs receives AnnounceOTAProvider:
+          Verify that the  following mandatory fields.
+          ProviderNodeID of the OTA-P/TH2 on the accessing fabric.
+          Vendor Id of the node invoking this command. Should be same as it appears in the Node’s Basic Information Cluster.
+          AnnouncementReason - Should be SimpleAnnouncement.
+          Endpoint number of the OTA-P/TH2 on the ProviderNodeID.
 
           [1645743053311] [97809:20280821] CHIP: [SWU] OTA Requestor received AnnounceOTAProvider
           [1645743053311] [97809:20280821] CHIP: [SWU]   FabricIndex: 1

@@ -42,7 +42,7 @@ tests:
           accurate date, time and timezone"
       verification: |
           Verify in TH as server side
-          sudo ./chip-all-clusters-app --wifi --discriminator 3841
+          ./chip-all-clusters-app --wifi --discriminator 3841
 
           [1653471956.966855][10713:10713] CHIP:SPT: PASE PBKDF iterations set to 1000
           [1653471956.966887][10713:10713] CHIP:SPT: LinuxCommissionableDataProvider didn"t get a PASE salt, generating one.
@@ -95,7 +95,7 @@ tests:
 
 
           Verify in TH as server side
-          $ ./out/all-clusters-app/chip-all-clusters-app
+          ./chip-all-clusters-app
           ...
           [1657226543.948995][369114:369114] CHIP:IN: SecureSession[0xaaaab60788e0]: Activated - Type:1 LSID:201
           [1657226543.949023][369114:369114] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:201 PSID:47293!
@@ -192,7 +192,8 @@ tests:
           CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
           CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
           CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
           CHIP:DIS:      Long discriminator:     3840
           CHIP:DIS:      Vendor ID:              9050
           CHIP:DIS:      Product ID:             65279
@@ -206,7 +207,8 @@ tests:
           CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
           CHIP:DIS:      Address 2:              192.168.1.12
           CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
           CHIP:DIS:      Long discriminator:     3840
           CHIP:DIS:      Vendor ID:              9050
           CHIP:DIS:      Product ID:             65279
@@ -220,7 +222,8 @@ tests:
           CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
           CHIP:DIS:      Address 2:              192.168.1.12
           CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
           CHIP:DIS:      Long discriminator:     3840
           CHIP:DIS:      Vendor ID:              9050
           CHIP:DIS:      Product ID:             65279
@@ -234,7 +237,8 @@ tests:
           CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
           CHIP:DIS:      Address 2:              192.168.1.12
           CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
           CHIP:DIS:      Long discriminator:     3840
           CHIP:DIS:      Vendor ID:              9050
           CHIP:DIS:      Product ID:             65279
@@ -248,7 +252,8 @@ tests:
           CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
           CHIP:DIS:      Address 2:              192.168.1.12
           CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
           CHIP:DIS:      Long discriminator:     3840
           CHIP:DIS:      Vendor ID:              9050
           CHIP:DIS:      Product ID:             65279
@@ -262,7 +267,8 @@ tests:
           CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
           CHIP:DIS:      Address 2:              192.168.1.12
           CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
           CHIP:DIS:      Long discriminator:     3840
           CHIP:DIS:      Vendor ID:              9050
           CHIP:DIS:      Product ID:             65279

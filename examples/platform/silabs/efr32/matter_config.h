@@ -22,6 +22,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
+#ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+#include "ICDSubscriptionCallback.h"
+#endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+
 class EFR32MatterConfig
 {
 public:
@@ -32,4 +36,8 @@ private:
     static void InitWiFi(void);
     static void ConnectivityEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
+
+#ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+    static ICDSubscriptionCallback mICDSubscriptionHandler;
+#endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 };

@@ -552,16 +552,16 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPContentLauncherClusterLaunchResponseCallback
-    : public Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>
+class CHIPContentLauncherClusterLauncherResponseCallback
+    : public Callback::Callback<CHIPContentLauncherClusterLauncherResponseCallbackType>
 {
 public:
-    CHIPContentLauncherClusterLaunchResponseCallback(jobject javaCallback);
+    CHIPContentLauncherClusterLauncherResponseCallback(jobject javaCallback);
 
-    ~CHIPContentLauncherClusterLaunchResponseCallback();
+    ~CHIPContentLauncherClusterLauncherResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data);
+                           const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

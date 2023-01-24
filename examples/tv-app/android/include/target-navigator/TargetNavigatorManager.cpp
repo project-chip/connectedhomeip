@@ -54,11 +54,11 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                 if (value[attrId].isArray())
                 {
                     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                        int i                = 0;
-                        std::string targetId = to_string(
-                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Fields::kIdentifier));
+                        int i                  = 0;
+                        std::string targetId   = to_string(static_cast<uint32_t>(
+                            chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kIdentifier));
                         std::string targetName = to_string(
-                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Fields::kName));
+                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kName));
                         for (Json::Value & entry : value[attrId])
                         {
                             if (!entry[targetId].isUInt() || !entry[targetName].isString() || entry[targetId].asUInt() > 255)
@@ -68,7 +68,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                                 i++;
                                 continue;
                             }
-                            Structs::TargetInfo::Type outputInfo;
+                            Structs::TargetInfoStruct::Type outputInfo;
                             outputInfo.identifier = static_cast<uint8_t>(entry[targetId].asUInt());
                             outputInfo.name       = CharSpan::fromCharString(entry[targetName].asCString());
                             ReturnErrorOnFailure(encoder.Encode(outputInfo));
@@ -86,7 +86,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
         int i = 0;
         for (std::string & entry : mTargets)
         {
-            Structs::TargetInfo::Type outputInfo;
+            Structs::TargetInfoStruct::Type outputInfo;
             outputInfo.identifier = static_cast<uint8_t>(i + 1);
             outputInfo.name       = CharSpan::fromCharString(entry.c_str());
             ReturnErrorOnFailure(encoder.Encode(outputInfo));

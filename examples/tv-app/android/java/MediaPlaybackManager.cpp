@@ -292,7 +292,7 @@ exit:
 
 CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
-    Structs::PlaybackPosition::Type response;
+    Structs::PlaybackPositionStruct::Type response;
     response.updatedAt = 0;
     response.position  = Nullable<uint64_t>(0);
 
