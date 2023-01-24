@@ -81,8 +81,8 @@ def _hardcoded_python_yaml_tests():
     }
 
     invalid_tests = {
-        "tests.yaml", # src/app/tests/suites/certification/tests.yaml is not a real test
-        "PICS.yaml", #  src/app/tests/suites/certification/PICS.yaml is not a real test
+        "tests.yaml",  # src/app/tests/suites/certification/tests.yaml is not a real test
+        "PICS.yaml",  # src/app/tests/suites/certification/PICS.yaml is not a real test
     }
 
     # By default assume all yaml files are valid test cases, however only a
@@ -109,6 +109,7 @@ def _hardcoded_python_yaml_tests():
 
     if found_supported_tests != currently_supported_yaml_tests:
         raise Exception("Did not find YAMLs for all supported tests: %r" % (currently_supported_yaml_tests - found_supported_tests))
+
 
 def AllTests(chip_tool: str, run_yamltests_with_chip_repl: bool):
     if run_yamltests_with_chip_repl:
