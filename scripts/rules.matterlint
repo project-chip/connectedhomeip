@@ -12,7 +12,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/basic-information-cluster.xml
 load "../src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml";
-load "../src/app/zap-templates/zcl/data-model/chip/bridged-device-basic.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-ota.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-types.xml";

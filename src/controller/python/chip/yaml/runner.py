@@ -107,6 +107,7 @@ class InvokeAction(BaseAction):
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
         super().__init__(test_step.label, test_step.identity)
+        self._busy_wait_ms = test_step.busy_wait_ms
         self._command_name = stringcase.pascalcase(test_step.command)
         self._cluster = cluster
         self._interation_timeout_ms = test_step.timed_interaction_timeout_ms
@@ -142,7 +143,8 @@ class InvokeAction(BaseAction):
         try:
             resp = asyncio.run(dev_ctrl.SendCommand(
                 self._node_id, self._endpoint, self._request_object,
-                timedRequestTimeoutMs=self._interation_timeout_ms))
+                timedRequestTimeoutMs=self._interation_timeout_ms,
+                busyWaitMs=self._busy_wait_ms))
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -357,8 +359,10 @@ class WriteAttributeAction(BaseAction):
         '''
         super().__init__(test_step.label, test_step.identity)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
+        self._busy_wait_ms = test_step.busy_wait_ms
         self._cluster = cluster
         self._endpoint = test_step.endpoint
+        self._interation_timeout_ms = test_step.timed_interaction_timeout_ms
         self._node_id = test_step.node_id
         self._request_object = None
 
@@ -389,10 +393,11 @@ class WriteAttributeAction(BaseAction):
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
         try:
             resp = asyncio.run(
-                dev_ctrl.WriteAttribute(self._node_id, [(self._endpoint, self._request_object)]))
-        except chip.interaction_model.InteractionModelError:
-            # TODO Should we be doing the same thing as InvokeAction on InteractionModelError?
-            raise
+                dev_ctrl.WriteAttribute(self._node_id, [(self._endpoint, self._request_object)],
+                                        timedRequestTimeoutMs=self._interation_timeout_ms,
+                                        busyWaitMs=self._busy_wait_ms))
+        except chip.interaction_model.InteractionModelError as error:
+            return _ActionResult(status=_ActionStatus.ERROR, response=error)
         if len(resp) == 1 and isinstance(resp[0], AttributeStatus):
             if resp[0].Status == chip.interaction_model.Status.Success:
                 return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
@@ -470,15 +475,13 @@ class ReplTestRunner:
     Uses ChipDeviceCtrl from chip-repl to execute parsed YAML TestSteps.
     '''
 
-    def __init__(self, test_spec_definition, certificate_authority_manager):
+    def __init__(self, test_spec_definition, certificate_authority_manager, alpha_dev_ctrl):
         self._test_spec_definition = test_spec_definition
         self._context = _ExecutionContext(data_model_lookup=PreDefinedDataModelLookup())
         self._certificate_authority_manager = certificate_authority_manager
         self._dev_ctrls = {}
 
-        ca_list = certificate_authority_manager.activeCaList
-        dev_ctrl = ca_list[0].adminList[0].NewController()
-        self._dev_ctrls['alpha'] = dev_ctrl
+        self._dev_ctrls['alpha'] = alpha_dev_ctrl
 
     def _invoke_action_factory(self, test_step, cluster: str):
         '''Creates cluster invoke action command from TestStep.

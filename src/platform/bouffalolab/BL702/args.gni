@@ -22,7 +22,7 @@ chip_device_platform = "bl702"
 
 riscv_platform_config = "${bouffalolab_iot_sdk_build_root}/common/rsicv.gni"
 
-mbedtls_target = "${bouffalolab_iot_sdk_build_root}/bl702:mbedtls"
+mbedtls_target = "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk"
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_tcp_endpoint = false

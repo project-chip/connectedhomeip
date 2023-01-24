@@ -732,7 +732,8 @@ private:
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const Optional<ByteSpan> & icaCertBuf,
-                                          AesCcm128KeySpan ipk, NodeId adminSubject, Optional<System::Clock::Timeout> timeout);
+                                          IdentityProtectionKeySpan ipk, NodeId adminSubject,
+                                          Optional<System::Clock::Timeout> timeout);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a reference to the device object.
      */
@@ -784,7 +785,7 @@ private:
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, CHIP_ERROR error);
 
-    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     static void OnDeviceAttestationInformationVerification(void * context,
@@ -792,7 +793,8 @@ private:
                                                            Credentials::AttestationVerificationResult result);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                           const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
+                                           const ByteSpan & rcac, Optional<IdentityProtectionKeySpan> ipk,
+                                           Optional<NodeId> adminSubject);
     static void OnArmFailSafe(void * context,
                               const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnSetRegulatoryConfigResponse(
@@ -859,26 +861,27 @@ private:
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
-    template <typename ClusterObjectT, typename RequestObjectT>
+    template <typename RequestObjectT>
     CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                            CommandResponseFailureCallback failureCb, Optional<System::Clock::Timeout> timeout)
     {
-        return SendCommand<ClusterObjectT>(device, request, successCb, failureCb, 0, timeout);
+        return SendCommand(device, request, successCb, failureCb, 0, timeout);
     }
 
-    template <typename ClusterObjectT, typename RequestObjectT>
+    template <typename RequestObjectT>
     CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                            CommandResponseFailureCallback failureCb, EndpointId endpoint, Optional<System::Clock::Timeout> timeout)
     {
-        ClusterObjectT cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint);
+        ClusterBase cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint);
         cluster.SetCommandTimeout(timeout);
 
         return cluster.InvokeCommand(request, this, successCb, failureCb);
     }
 
-    static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
+    static CHIP_ERROR
+    ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum err);
 
     // Sends commissioning complete callbacks to the delegate depending on the status. Sends
     // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.

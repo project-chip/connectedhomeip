@@ -37,8 +37,9 @@ tests:
     - label: "DUT reads Vendor Id attribute from TH"
       PICS: BINFO.C.A0002
       verification: |
+          ./chip-tool  basicinformation read vendor-id  1 0
+
           On TH,  Verify that TH read and shows Vendor Id value
-          ./chip-tool basic read vendor-id  1 0
 
           [1660776352.802689][3357:3357] CHIP:DMG:
           [1660776352.802776][3357:3357] CHIP:DMG: ReportDataMessage =
@@ -78,8 +79,9 @@ tests:
     - label: "DUT reads Vendor Id attribute from TH"
       PICS: BINFO.C.A0002
       verification: |
+          ./chip-tool  basicinformation read vendor-id  1 0
+
           On TH,  Verify that TH read and shows Vendor Id value
-          ./chip-tool basic read vendor-id  1 0
 
           [1660776352.802689][3357:3357] CHIP:DMG:
           [1660776352.802776][3357:3357] CHIP:DMG: ReportDataMessage =

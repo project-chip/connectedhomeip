@@ -16,7 +16,6 @@
 name: 43.2.3. [TC-DGSW-2.3] Command received functionality with server as DUT
 
 PICS:
-    - DGSW.S.C
     - DGSW.S
 
 config:

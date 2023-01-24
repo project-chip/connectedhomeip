@@ -19,7 +19,6 @@
 #include <controller/CurrentFabricRemover.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
 
 using namespace chip::app::Clusters;
 
@@ -35,15 +34,17 @@ CHIP_ERROR CurrentFabricRemover::RemoveCurrentFabric(NodeId remoteNodeId, Callba
     return mController->GetConnectedDevice(remoteNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
-CHIP_ERROR CurrentFabricRemover::ReadCurrentFabricIndex(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+CHIP_ERROR CurrentFabricRemover::ReadCurrentFabricIndex(Messaging::ExchangeManager & exchangeMgr,
+                                                        const SessionHandle & sessionHandle)
 {
-    using TypeInfo = chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo;
-    OperationalCredentialsCluster cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+    using TypeInfo = OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo;
+    ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
 
     return cluster.ReadAttribute<TypeInfo>(this, OnSuccessReadCurrentFabricIndex, OnReadAttributeFailure);
 }
 
-CHIP_ERROR CurrentFabricRemover::SendRemoveFabricIndex(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+CHIP_ERROR CurrentFabricRemover::SendRemoveFabricIndex(Messaging::ExchangeManager & exchangeMgr,
+                                                       const SessionHandle & sessionHandle)
 {
     if (mFabricIndex == kUndefinedFabricIndex)
     {
@@ -53,13 +54,13 @@ CHIP_ERROR CurrentFabricRemover::SendRemoveFabricIndex(Messaging::ExchangeManage
     OperationalCredentials::Commands::RemoveFabric::Type request;
     request.fabricIndex = mFabricIndex;
 
-    OperationalCredentialsCluster cluster(exchangeMgr, sessionHandle, 0);
+    ClusterBase cluster(exchangeMgr, sessionHandle, 0);
 
     return cluster.InvokeCommand(request, this, OnSuccessRemoveFabric, OnCommandFailure);
 }
 
 void CurrentFabricRemover::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                               SessionHandle & sessionHandle)
+                                               const SessionHandle & sessionHandle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto * self    = static_cast<CurrentFabricRemover *>(context);

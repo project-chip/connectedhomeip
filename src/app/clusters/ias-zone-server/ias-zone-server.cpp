@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-event.h>
@@ -34,6 +34,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IasZone;
+using namespace chip::app::Clusters::IasZone::Commands;
 
 #define UNDEFINED_ZONE_ID 0xFF
 #define DELAY_TIMER_MS (1 * MILLISECOND_TICKS_PER_SECOND)
@@ -171,8 +172,7 @@ static void enrollWithClient(EndpointId endpoint)
 {
     EmberStatus status;
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), IasZone::Id,
-                              ZCL_ZONE_ENROLL_REQUEST_COMMAND_ID, "vv", EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE,
-                              EMBER_AF_MANUFACTURER_CODE);
+                              ZoneEnrollRequest::Id, "vv", EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE, EMBER_AF_MANUFACTURER_CODE);
     status = sendToClient(endpoint);
     if (status == EMBER_SUCCESS)
     {
@@ -354,8 +354,8 @@ static EmberStatus sendZoneUpdate(uint16_t zoneStatus, uint16_t timeSinceStatusO
         return EMBER_INVALID_CALL;
     }
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), IasZone::Id,
-                              ZCL_ZONE_STATUS_CHANGE_NOTIFICATION_COMMAND_ID, "vuuv", zoneStatus,
-                              0 /*extended status, must be zero per spec*/, emberAfPluginIasZoneServerGetZoneId(endpoint),
+                              ZoneStatusChangeNotification::Id, "vuuv", zoneStatus, 0 /*extended status, must be zero per spec*/,
+                              emberAfPluginIasZoneServerGetZoneId(endpoint),
                               timeSinceStatusOccurredQs /* called "delay" in the spec */);
     status = sendToClient(endpoint);
 
@@ -728,7 +728,7 @@ void emberAfIasZoneClusterServerMessageSentCallback(const MessageSendDestination
     }
 
     commandId = message[IAS_ZONE_SERVER_PAYLOAD_COMMAND_IDX];
-    if (commandId != ZCL_ZONE_STATUS_CHANGE_NOTIFICATION_COMMAND_ID)
+    if (commandId != ZoneStatusChangeNotification::Id)
     {
         return;
     }

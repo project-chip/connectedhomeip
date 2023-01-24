@@ -67,23 +67,25 @@ tests:
           spec. documentation."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          Verify on the TH as commissionee side:
+          Verifiy on TH(ALL-CLUSTER-APP):
 
-          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2 --ble-device 1
+           ./chip-all-clusters-app --capabilities 2 --ble-device 1
           ...
-          [1657232267.387816][370320:370320] CHIP:DL: Device Configuration:
-          [1657232267.387853][370320:370320] CHIP:DL:   Serial Number: (not set)
-          [1657232267.387907][370320:370320] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1657232267.387942][370320:370320] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1657232267.387974][370320:370320] CHIP:DL:   Hardware Version: 0
-          [1657232267.387996][370320:370320] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1657232267.388017][370320:370320] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
-          [1657232267.388045][370320:370320] CHIP:DL:   Manufacturing Date: (not set)
-          [1657232267.388067][370320:370320] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1657232267.388101][370320:370320] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
-          [1657232267.388128][370320:370320] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1657232267.388148][370320:370320] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
-          [1657232267.388182][370320:370320] CHIP:SVR: Manual pairing code: [749701123365521327694]
+          [1667888323.966941][3151:3151] CHIP:DL: Device Configuration:
+          [1667888323.967057][3151:3151] CHIP:DL:   Serial Number: TEST_SN
+          [1667888323.967179][3151:3151] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1667888323.967270][3151:3151] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1667888323.967351][3151:3151] CHIP:DL:   Hardware Version: 0
+          [1667888323.967409][3151:3151] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1667888323.967489][3151:3151] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1667888323.967566][3151:3151] CHIP:DL:   Manufacturing Date: (not set)
+          [1667888323.967616][3151:3151] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1667888323.967720][3151:3151] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
+          [1667888323.967788][3151:3151] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1667888323.967841][3151:3151] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1667888323.967940][3151:3151] CHIP:SVR: Manual pairing code: [34970112332]
+          [1667888323.968031][3151:3151] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to ea7ea7b8
+          [1667888323.981832][3151:3153] CHIP:DL: TRACE: Bus acquired for name MATTER-3840
       disabled: true
 
     - label: "Scan the QR code from the previous step using the DUT."
@@ -99,14 +101,8 @@ tests:
           using BLE"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          Verify on the TH as commissionee side:
-
-          [1657232374.956508][370357:370357] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1657232374.956534][370357:370357] CHIP:SVR: Commissioning completed successfully
-          [1657232374.956577][370357:370357] CHIP:DIS: Updating services using commissioning mode 0
-
-          Verify on the DUT Commissioner side:
-          $ ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
+          Verify on the DUT (CHIP-TOOL):
+           ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
 
           [1657232374820] [31379:16804218] CHIP: [CTL] Received CommissioningComplete response, errorCode=0
           [1657232374820] [31379:16804218] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
@@ -114,6 +110,12 @@ tests:
           [1657232374820] [31379:16804218] CHIP: [CTL] Performing next commissioning step "Cleanup"
           [1657232374820] [31379:16804218] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657232374820] [31379:16804218] CHIP: [TOO] Device commissioning completed with success
+
+          Verifiy on TH(ALL-CLUSTER-APP):
+
+          [1657232374.956508][370357:370357] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
+          [1657232374.956534][370357:370357] CHIP:SVR: Commissioning completed successfully
+          [1657232374.956577][370357:370357] CHIP:DIS: Updating services using commissioning mode 0
       disabled: true
 
     - label:
@@ -124,9 +126,9 @@ tests:
           spec. documentation."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 0 --capabilities 4
+          ./chip-all-clusters-app --custom-flow 0 --capabilities 4
 
-          Verify on the TH as commissionee side:
+          Verifiy on TH(ALL-CLUSTER-APP):
           [1651105420.610637][27312:27312] CHIP:DL: Device Configuration:
           [1651105420.610695][27312:27312] CHIP:DL:   Serial Number: TEST_SN
           [1651105420.610727][27312:27312] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
@@ -154,13 +156,8 @@ tests:
           using IP Network"
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          Verify on the TH Commissionee side:
-
-          [1651105530.973166][27371:27371] CHIP:SVR: Commissioning completed successfully
-          [1651105530.973215][27371:27371] CHIP:DIS: Updating services using commissioning mode 0
-
-          Verify on the DUT Commissioner:
-          $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+          Verify on the DUT (CHIP-TOOL):
+           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651105530854] [95067:65607294] CHIP: [CTL] Received CommissioningComplete response
           [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
@@ -168,6 +165,11 @@ tests:
           [1651105530854] [95067:65607294] CHIP: [CTL] Performing next commissioning step "Cleanup"
           [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1651105530854] [95067:65607294] CHIP: [TOO] Device commissioning completed with success
+
+          Verifiy on TH(ALL-CLUSTER-APP):
+
+          [1651105530.973166][27371:27371] CHIP:SVR: Commissioning completed successfully
+          [1651105530.973215][27371:27371] CHIP:DIS: Updating services using commissioning mode 0
       disabled: true
 
     - label:

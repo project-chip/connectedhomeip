@@ -35,8 +35,12 @@ tests:
     - label: "Reads Type attribute from DUT"
       verification: |
           ./chip-tool windowcovering read type 1 1
+
+          Verify "Type " attribute   If (WNCV.S.F00(LF) &!WNCV.S.F01(TL)) supports value must be between [min=0, max=5] or equals to 9, If (!WNCV.S.F00(LF) &
+          WNCV.S.F01(TL)) supports value must be only equal to 7, If (WNCV.S.F00(LF) & WNCV.S.F01(TL)) supports value is either 6 or 8 on the TH(Chip-tool) Log:
+
           [1650882457.304607][8640:8645] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 366273182
-          [1650882457.304694][8640:8645] CHIP:TOO:   Type: enum8
+          [1650882457.304694][8640:8645] CHIP:TOO:   Type: 8
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && WNCV.S.A0000

@@ -107,7 +107,7 @@ public final class ChipIdLookup {
       return "EthernetNetworkDiagnostics";
     }
     if (clusterId == 57L) {
-      return "BridgedDeviceBasic";
+      return "BridgedDeviceBasicInformation";
     }
     if (clusterId == 59L) {
       return "Switch";
@@ -2249,7 +2249,7 @@ public final class ChipIdLookup {
         return "MaxLevel";
       }
       if (attributeId == 20L) {
-        return "IntrinsicBalanceFactor";
+        return "IntrinsicBallastFactor";
       }
       if (attributeId == 21L) {
         return "BallastFactorAdjustment";

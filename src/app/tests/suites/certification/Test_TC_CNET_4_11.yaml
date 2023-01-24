@@ -225,7 +225,7 @@ tests:
       disabled: true
 
     - label:
-          "TH reads  Breadcrumb  attribute from
+          "TH reads Breadcrumb attribute from
           the  General  Commissioning  cluster of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
@@ -385,8 +385,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads  Breadcrumb  attribute from
-          the  General  Commissioning  cluster of the DUT"
+          "TH reads Breadcrumb attribute from the  General Commissioning cluster
+          of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0

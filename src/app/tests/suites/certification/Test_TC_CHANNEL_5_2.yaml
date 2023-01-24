@@ -50,9 +50,9 @@ tests:
       command: "ChangeChannelByNumber"
       arguments:
           values:
-              - name: "majorNumber"
+              - name: "MajorNumber"
                 value: majornumber
-              - name: "minorNumber"
+              - name: "MinorNumber"
                 value: minornumber
 
     - label: "Verify that the channel has changed on the device"
@@ -71,4 +71,4 @@ tests:
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: [majorNumber: majornumber, minorNumber: minornumber]
+          value: [MajorNumber: majornumber, MinorNumber: minornumber]

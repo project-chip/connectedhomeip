@@ -50,7 +50,7 @@ tests:
           values:
               - name: "Index"
                 value: Index
-              - name: "name"
+              - name: "Name"
                 value: "CertTest"
 
     #Disabled due to issue- #13029

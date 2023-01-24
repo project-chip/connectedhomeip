@@ -21,10 +21,58 @@
 #include "Command.h"
 
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include <string>
 
+#include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+
+#include "../clusters/JsonParser.h"
+
+namespace {
+
+char kInteractiveModeName[]                         = "";
+constexpr size_t kInteractiveModeArgumentsMaxLength = 32;
+constexpr const char * kOptionalArgumentPrefix      = "--";
+constexpr const char * kJsonClusterKey              = "cluster";
+constexpr const char * kJsonCommandKey              = "command";
+constexpr const char * kJsonCommandSpecifierKey     = "command_specifier";
+constexpr const char * kJsonArgumentsKey            = "arguments";
+
+std::vector<std::string> GetArgumentsFromJson(Command * command, Json::Value & value, bool optional)
+{
+    std::vector<std::string> args;
+    for (size_t i = 0; i < command->GetArgumentsCount(); i++)
+    {
+        auto argName = command->GetArgumentName(i);
+        for (auto const & memberName : value.getMemberNames())
+        {
+            if (strcasecmp(argName, memberName.c_str()) != 0)
+            {
+                continue;
+            }
+
+            if (command->GetArgumentIsOptional(i) != optional)
+            {
+                continue;
+            }
+
+            if (optional)
+            {
+                args.push_back(std::string(kOptionalArgumentPrefix) + argName);
+            }
+
+            auto argValue = value[memberName].asString();
+            args.push_back(std::move(argValue));
+            break;
+        }
+    }
+    return args;
+};
+
+} // namespace
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
@@ -55,15 +103,38 @@ exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-int Commands::RunInteractive(int argc, char ** argv)
+int Commands::RunInteractive(const char * command)
 {
-    CHIP_ERROR err = RunCommand(argc, argv, true);
-    if (err == CHIP_NO_ERROR)
+    std::vector<std::string> arguments;
+    VerifyOrReturnValue(DecodeArgumentsFromInteractiveMode(command, arguments), EXIT_FAILURE);
+
+    if (arguments.size() > (kInteractiveModeArgumentsMaxLength - 1 /* for interactive mode name */))
     {
-        return EXIT_SUCCESS;
+        ChipLogError(chipTool, "Too many arguments. Ignoring.");
+        arguments.resize(kInteractiveModeArgumentsMaxLength - 1);
     }
-    ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
-    return EXIT_FAILURE;
+
+    int argc                                        = 0;
+    char * argv[kInteractiveModeArgumentsMaxLength] = {};
+    argv[argc++]                                    = kInteractiveModeName;
+
+    for (auto & arg : arguments)
+    {
+        argv[argc] = new char[arg.size() + 1];
+        strcpy(argv[argc++], arg.c_str());
+    }
+
+    auto err = RunCommand(argc, argv, true);
+
+    // Do not delete arg[0]
+    for (auto i = 1; i < argc; i++)
+    {
+        delete[] argv[i];
+    }
+
+    VerifyOrReturnValue(CHIP_NO_ERROR == err, EXIT_FAILURE, ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err)));
+
+    return EXIT_SUCCESS;
 }
 
 CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
@@ -367,4 +438,91 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
     {
         fprintf(stderr, "%s\n", description.c_str());
     }
+}
+
+bool Commands::DecodeArgumentsFromInteractiveMode(const char * command, std::vector<std::string> & args)
+{
+    // Remote clients may not know the ordering of arguments, so instead of a strict ordering arguments can
+    // be passed in as a json payload encoded in base64 and are reordered on the fly.
+    return IsJsonString(command) ? DecodeArgumentsFromBase64EncodedJson(command, args)
+                                 : DecodeArgumentsFromStringStream(command, args);
+}
+
+bool Commands::DecodeArgumentsFromBase64EncodedJson(const char * json, std::vector<std::string> & args)
+{
+    Json::Value jsonValue;
+    bool parsed = JsonParser::ParseCustomArgument(json, json + kJsonStringPrefixLen, jsonValue);
+    VerifyOrReturnValue(parsed, false, ChipLogError(chipTool, "Error while parsing json."));
+    VerifyOrReturnValue(jsonValue.isObject(), false, ChipLogError(chipTool, "Unexpected json type."));
+    VerifyOrReturnValue(jsonValue.isMember(kJsonClusterKey), false,
+                        ChipLogError(chipTool, "'%s' key not found in json.", kJsonClusterKey));
+    VerifyOrReturnValue(jsonValue.isMember(kJsonCommandKey), false,
+                        ChipLogError(chipTool, "'%s' key not found in json.", kJsonCommandKey));
+    VerifyOrReturnValue(jsonValue.isMember(kJsonArgumentsKey), false,
+                        ChipLogError(chipTool, "'%s' key not found in json.", kJsonArgumentsKey));
+    VerifyOrReturnValue(IsBase64String(jsonValue[kJsonArgumentsKey].asString().c_str()), false,
+                        ChipLogError(chipTool, "'arguments' is not a base64 string."));
+
+    auto clusterName = jsonValue[kJsonClusterKey].asString();
+    auto commandName = jsonValue[kJsonCommandKey].asString();
+    auto arguments   = jsonValue[kJsonArgumentsKey].asString();
+
+    auto cluster = GetCluster(clusterName);
+    VerifyOrReturnValue(cluster != mClusters.end(), false,
+                        ChipLogError(chipTool, "Cluster '%s' is not supported.", clusterName.c_str()));
+
+    auto command = GetCommand(cluster->second, commandName);
+
+    if (jsonValue.isMember(kJsonCommandSpecifierKey) && IsGlobalCommand(commandName))
+    {
+        auto commandSpecifierName = jsonValue[kJsonCommandSpecifierKey].asString();
+        command                   = GetGlobalCommand(cluster->second, commandName, commandSpecifierName);
+    }
+    VerifyOrReturnValue(nullptr != command, false, ChipLogError(chipTool, "Unknown command."));
+
+    auto encodedData = arguments.c_str();
+    encodedData += kBase64StringPrefixLen;
+
+    size_t encodedDataSize        = strlen(encodedData);
+    size_t expectedMaxDecodedSize = BASE64_MAX_DECODED_LEN(encodedDataSize);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> decodedData;
+    VerifyOrReturnValue(decodedData.Calloc(expectedMaxDecodedSize + 1 /* for null */), false);
+
+    size_t decodedDataSize = chip::Base64Decode(encodedData, static_cast<uint16_t>(encodedDataSize), decodedData.Get());
+    VerifyOrReturnValue(decodedDataSize != 0, false, ChipLogError(chipTool, "Error while decoding base64 data."));
+
+    decodedData.Get()[decodedDataSize] = '\0';
+
+    Json::Value jsonArguments;
+    bool parsedArguments = JsonParser::ParseCustomArgument(encodedData, chip::Uint8::to_char(decodedData.Get()), jsonArguments);
+    VerifyOrReturnValue(parsedArguments, false, ChipLogError(chipTool, "Error while parsing json."));
+    VerifyOrReturnValue(jsonArguments.isObject(), false, ChipLogError(chipTool, "Unexpected json type, expects and object."));
+
+    auto mandatoryArguments = GetArgumentsFromJson(command, jsonArguments, false /* addOptional */);
+    auto optionalArguments  = GetArgumentsFromJson(command, jsonArguments, true /* addOptional */);
+
+    args.push_back(std::move(clusterName));
+    args.push_back(std::move(commandName));
+    if (jsonValue.isMember(kJsonCommandSpecifierKey))
+    {
+        auto commandSpecifierName = jsonValue[kJsonCommandSpecifierKey].asString();
+        args.push_back(std::move(commandSpecifierName));
+    }
+    args.insert(args.end(), mandatoryArguments.begin(), mandatoryArguments.end());
+    args.insert(args.end(), optionalArguments.begin(), optionalArguments.end());
+
+    return true;
+}
+
+bool Commands::DecodeArgumentsFromStringStream(const char * command, std::vector<std::string> & args)
+{
+    std::string arg;
+    std::stringstream ss(command);
+    while (ss >> std::quoted(arg, '\''))
+    {
+        args.push_back(std::move(arg));
+    }
+
+    return true;
 }

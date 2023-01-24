@@ -26,6 +26,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          DUT supports BDX
+      disabled: true
+
     - label: "Reboot DUT"
       verification: |
 
@@ -50,10 +55,39 @@ tests:
           [1651207333.386037][2441:2446] CHIP:DMG:                                },
       disabled: true
 
+    - label:
+          "Verify that the DUT initiates a BDX Transfer, sending a BDX SendInit
+          message with the File Designator field of the message set to the value
+          of the TransferFileDesignator field of the RetrieveLogsRequest"
+      verification: |
+          Not Verifiable
+      disabled: true
+
     - label: "TH Sends BDX SendAccept message"
       PICS: DLOG.S.C01.Tx
       verification: |
           Not Verifiable
+      disabled: true
+
+    - label:
+          "Verify that DUT sends RetrieveLogsResponse Command,Verify that the
+          Status field is set to Success,If LogContent size < 1024 octets,Verify
+          that the BDX transfer is not initiated from DUT Verify that DUT sends
+          RetrieveLogsResponse command with a Status field set to Exhausted
+          Note: In this case steps 5 and 6 does not hold good. else Verify that
+          the BDX transfer is initiated from DUT Verify that the LogContent
+          field of RetrieveLogsResponse is empty Verify that DUT sends
+          RetrieveLogsResponse command with a Status field set to Success Verify
+          that UTCTimeStamp is included in the RetrieveLogsResponse command
+          Verify that TimeSinceBoot is included in the RetrieveLogsResponse
+          command Note: In this case steps 5 and 6 holds good."
+      verification: |
+          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
+
+          [1651207369.743117][2450:2455] CHIP:DMG:                                StatusIB =
+          [1651207369.743155][2450:2455] CHIP:DMG:                                {
+          [1651207369.743192][2450:2455] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1651207369.743228][2450:2455] CHIP:DMG:                                },
       disabled: true
 
     - label:
@@ -71,8 +105,24 @@ tests:
       disabled: true
 
     - label:
+          "Verify that the DUT initiates a BDX Transfer, sending a BDX SendInit
+          message with the File Designator field of the message set to the value
+          of the TransferFileDesignator field of the RetrieveLogsRequest"
+      PICS: DLOG.S.C01.Tx
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
           "TH Sends StatusReport(GeneralCode: FAILURE, ProtocolId: BDX,
           ProtocolCode: TRANSFER_METHOD_NOT_SUPPORTED)"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Verify that DUT sends RetrieveLogsResponse command with a Status
+          field set to Denied"
       verification: |
           Not Verifiable
       disabled: true
@@ -87,4 +137,26 @@ tests:
           [1651207416.783676][2465:2470] CHIP:DMG:                                {
           [1651207416.783722][2465:2470] CHIP:DMG:                                        status = 0x00 (SUCCESS),
           [1651207416.783766][2465:2470] CHIP:DMG:                                },
+      disabled: true
+
+    - label:
+          "Verify that the BDX transfer is not initiated from DUT, Verify that
+          the LogContent field of RetrieveLogsResponse has the size < = 1024
+          octets"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Verify that DUT sends RetrieveLogsResponse command with a Status
+          field set to Success, Verify that UTCTimeStamp is included in the
+          RetrieveLogsResponse command,Verify that TimeSinceBoot is included in
+          the RetrieveLogsResponse command"
+      verification: |
+          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
+
+          [1651207438.423557][2475:2480] CHIP:DMG:                                StatusIB =
+          [1651207438.423594][2475:2480] CHIP:DMG:                                {
+          [1651207438.423648][2475:2480] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1651207438.423708][2475:2480] CHIP:DMG:                                },
       disabled: true

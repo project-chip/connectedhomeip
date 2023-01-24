@@ -39,7 +39,7 @@ tests:
       verification: |
           avahi-browse -rt _matter._tcp
 
-          Verify on the TH Log:
+          Verify the advertisement on the TH Log:
 
           + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
           = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local

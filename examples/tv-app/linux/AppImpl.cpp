@@ -89,7 +89,7 @@ MyPincodeService gMyPincodeService;
 class MyPostCommissioningListener : public PostCommissioningListener
 {
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                                SessionHandle & sessionHandle) override
+                                const SessionHandle & sessionHandle) override
     {
         // read current binding list
         chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
@@ -184,7 +184,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
     }
 
     void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                      SessionHandle & sessionHandle)
+                      const SessionHandle & sessionHandle)
     {
         mVendorId    = vendorId;
         mProductId   = productId;
@@ -349,17 +349,17 @@ constexpr CommandId contentLauncherIncomingCommands[] = {
     kInvalidCommandId,
 };
 constexpr CommandId contentLauncherOutgoingCommands[] = {
-    app::Clusters::ContentLauncher::Commands::LaunchResponse::Id,
+    app::Clusters::ContentLauncher::Commands::LauncherResponse::Id,
     kInvalidCommandId,
 };
 // TODO: Sort out when the optional commands here should be listed.
 constexpr CommandId mediaPlaybackIncomingCommands[] = {
-    app::Clusters::MediaPlayback::Commands::Play::Id,         app::Clusters::MediaPlayback::Commands::Pause::Id,
-    app::Clusters::MediaPlayback::Commands::StopPlayback::Id, app::Clusters::MediaPlayback::Commands::StartOver::Id,
-    app::Clusters::MediaPlayback::Commands::Previous::Id,     app::Clusters::MediaPlayback::Commands::Next::Id,
-    app::Clusters::MediaPlayback::Commands::Rewind::Id,       app::Clusters::MediaPlayback::Commands::FastForward::Id,
-    app::Clusters::MediaPlayback::Commands::SkipForward::Id,  app::Clusters::MediaPlayback::Commands::SkipBackward::Id,
-    app::Clusters::MediaPlayback::Commands::Seek::Id,         kInvalidCommandId,
+    app::Clusters::MediaPlayback::Commands::Play::Id,        app::Clusters::MediaPlayback::Commands::Pause::Id,
+    app::Clusters::MediaPlayback::Commands::Stop::Id,        app::Clusters::MediaPlayback::Commands::StartOver::Id,
+    app::Clusters::MediaPlayback::Commands::Previous::Id,    app::Clusters::MediaPlayback::Commands::Next::Id,
+    app::Clusters::MediaPlayback::Commands::Rewind::Id,      app::Clusters::MediaPlayback::Commands::FastForward::Id,
+    app::Clusters::MediaPlayback::Commands::SkipForward::Id, app::Clusters::MediaPlayback::Commands::SkipBackward::Id,
+    app::Clusters::MediaPlayback::Commands::Seek::Id,        kInvalidCommandId,
 };
 constexpr CommandId mediaPlaybackOutgoingCommands[] = {
     app::Clusters::MediaPlayback::Commands::PlaybackResponse::Id,

@@ -216,7 +216,7 @@ limitations under the License.
   </enum>
   <enum name="HueMoveMode" type="ENUM8">
     <cluster code="0x0300"/>
-    <item name="stop" value="0x0"/>
+    <item name="Stop" value="0x0"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
@@ -227,7 +227,7 @@ limitations under the License.
   </enum>
   <enum name="SaturationMoveMode" type="ENUM8">
     <cluster code="0x0300"/>
-    <item name="stop" value="0x0"/>
+    <item name="Stop" value="0x0"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>

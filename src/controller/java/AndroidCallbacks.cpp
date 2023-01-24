@@ -58,7 +58,7 @@ GetConnectedDeviceCallback::~GetConnectedDeviceCallback()
 }
 
 void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                                     SessionHandle & sessionHandle)
+                                                     const SessionHandle & sessionHandle)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);

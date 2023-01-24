@@ -149,7 +149,7 @@ const int16_t initialMeasuredValue = 100;
 // LIGHT ENDPOINT: contains the following clusters:
 //   - On/Off
 //   - Descriptor
-//   - Bridged Device Basic
+//   - Bridged Device Basic Information
 
 // Declare On/Off cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(onOffAttrs)
@@ -164,7 +164,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_DEVICE_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttrib
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_PARTS_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-// Declare Bridged Device Basic information cluster attributes
+// Declare Bridged Device Basic Information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_NODE_LABEL_ATTRIBUTE_ID, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0),               /* Reachable */
@@ -187,7 +187,8 @@ constexpr CommandId onOffIncomingCommands[] = {
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
 DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, onOffIncomingCommands, nullptr),
     DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr,
+                            nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
@@ -229,7 +230,7 @@ Action action3(0x1003, "Turn Off Room 1", Actions::ActionTypeEnum::kAutomation, 
 // POWER SOURCE ENDPOINT: contains the following clusters:
 //   - Power Source
 //   - Descriptor
-//   - Bridged Device Basic
+//   - Bridged Device Basic Information
 
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(powerSourceAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_POWER_SOURCE_BAT_CHARGE_LEVEL_ATTRIBUTE_ID, ENUM8, 1, 0),
@@ -239,7 +240,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_POWER_SOURCE_BAT_CHARGE_LEVEL_ATTRIBUTE_ID, ENUM8,
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedPowerSourceClusters)
 DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(PowerSource::Id, powerSourceAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedPowerSourceEndpoint, bridgedPowerSourceClusters);
@@ -256,11 +257,12 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),  
 // TEMPERATURE SENSOR ENDPOINT: contains the following clusters:
 //   - Temperature measurement
 //   - Descriptor
-//   - Bridged Device Basic
+//   - Bridged Device Basic Information
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedTempSensorClusters)
 DECLARE_DYNAMIC_CLUSTER(TemperatureMeasurement::Id, tempSensorAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
@@ -271,12 +273,13 @@ DataVersion gTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
 //
 // COMPOSED DEVICE ENDPOINT: contains the following clusters:
 //   - Descriptor
-//   - Bridged Device Basic
+//   - Bridged Device Basic Information
 
 // Composed Device Configuration
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedComposedDeviceClusters)
 DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedComposedDeviceEndpoint, bridgedComposedDeviceClusters);
 DataVersion gComposedDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];
@@ -290,8 +293,8 @@ DataVersion gComposedPowerSourceDataVersions[ArraySize(bridgedPowerSourceCluster
 // =================================================================================
 
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_FEATURE_MAP (0u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (1u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 #define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (1u)
@@ -427,12 +430,12 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 {
     if (itemChangedMask & Device::kChanged_Reachable)
     {
-        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::Reachable::Id);
+        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::Reachable::Id);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
     {
-        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::NodeLabel::Id);
+        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::NodeLabel::Id);
     }
 }
 
@@ -498,11 +501,11 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION;
+        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
     }
     else if ((attributeId == ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID) && (maxReadLength == 4))
     {
-        *buffer = (uint32_t) ZCL_BRIDGED_DEVICE_BASIC_FEATURE_MAP;
+        *buffer = (uint32_t) ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
     }
     else
     {
@@ -642,7 +645,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     {
         Device * dev = gDevices[endpointIndex];
 
-        if (clusterId == BridgedDeviceBasic::Id)
+        if (clusterId == BridgedDeviceBasicInformation::Id)
         {
             ret = HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
         }

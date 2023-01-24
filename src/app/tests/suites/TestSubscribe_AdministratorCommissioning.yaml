@@ -16,7 +16,7 @@ name: Subscribe Tests - Administrator Commissioning Cluster
 
 config:
     nodeId: 0x12344321
-    cluster: "AdministratorCommissioning"
+    cluster: "Administrator Commissioning"
     endpoint: 0
     ourVendorId:
         type: int16u
