@@ -48,8 +48,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
                                                      uint8_t type, uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG,
-             "PostAttributeChangeCallback - Cluster ID: '0x%04" PRIx32 "', EndPoint ID: '0x%02" PRIx16
-             "' , Attribute ID: '0x%04" PRIx32 "'",
+             "PostAttributeChangeCallback - Cluster ID: '0x%04" PRIx32 "', EndPoint ID: '0x%02x', Attribute ID: '0x%04" PRIx32 "'",
              clusterId, endpointId, attributeId);
 
     switch (clusterId)
@@ -80,7 +79,7 @@ void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointI
 {
     VerifyOrExit(attributeId == OnOff::Attributes::OnOff::Id,
                  ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04" PRIx32 "'", attributeId));
-    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02" PRIx16 "'", endpointId));
+    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     AppLED.Set(*value);
 
@@ -92,7 +91,7 @@ void AppDeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpoi
 {
     VerifyOrExit(attributeId == LevelControl::Attributes::CurrentLevel::Id,
                  ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04" PRIx32 "'", attributeId));
-    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02" PRIx16 "'", endpointId));
+    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     AppLED.SetBrightness(*value);
 
@@ -109,7 +108,7 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
     VerifyOrExit(attributeId == ColorControl::Attributes::CurrentHue::Id ||
                      attributeId == ColorControl::Attributes::CurrentSaturation::Id,
                  ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04" PRIx32 "'", attributeId));
-    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02" PRIx16 "'", endpointId));
+    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     if (attributeId == ColorControl::Attributes::CurrentHue::Id)
     {
