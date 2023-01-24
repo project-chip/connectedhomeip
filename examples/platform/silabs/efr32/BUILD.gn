@@ -110,6 +110,19 @@ source_set("efr32-factory-data-provider") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/setup_payload",
   ]
+}
 
-  #public_configs = [ "" ]
+config("ICD-subscription-callback-config") {
+  defines = [ "CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS=1" ]
+}
+
+source_set("efr32-ICD-subscription-callback") {
+  sources = [
+    "../ICDSubscriptionCallback.cpp",
+    "../ICDSubscriptionCallback.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/app:app" ]
+
+  public_configs = [ ":ICD-subscription-callback-config" ]
 }

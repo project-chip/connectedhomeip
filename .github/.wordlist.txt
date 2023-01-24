@@ -159,7 +159,7 @@ bouffalolab
 BRD
 breakpoint
 bredr
-BridgedDeviceBasic
+BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
 BromateConcentrationMeasurement
@@ -416,6 +416,7 @@ diffsyms
 dimmable
 dirname
 dirs
+disableNotifyUpdateApplied
 disambiguated
 discoverable
 DispatchEvent
@@ -1209,6 +1210,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+SiWx
 sizedb
 sl
 SLAAC
@@ -1454,6 +1456,7 @@ wic
 WiFiNetworkDiagnostics
 WindowCovering
 WindowCoveringGoToLiftPercentage
+WiseMCU
 wlan
 wmm
 WPA

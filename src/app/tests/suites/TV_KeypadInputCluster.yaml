@@ -29,12 +29,12 @@ tests:
                 value: nodeId
 
     - label: "Send Key Command"
-      command: "sendKey"
+      command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 3
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0

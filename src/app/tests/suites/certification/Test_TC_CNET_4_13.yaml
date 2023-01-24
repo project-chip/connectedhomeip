@@ -125,7 +125,7 @@ tests:
 
     - label:
           "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
-          argument value as Userwifi_ssid2, Credentials argument value as
+          argument value as Userwifi_ssid2 Credentials argument value as
           Userwifi_Credentials and Breadcrumb argument value as 1"
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivate092010 1 0 --Breadcrumb 1
@@ -169,10 +169,10 @@ tests:
 
     - label:
           "TH reads  Networks  attribute from the  DUT and saves the  list
-          as  OriginalNetworkL  ist"
+          as  OriginalNetworkList"
       PICS: CNET.S.A0001
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)

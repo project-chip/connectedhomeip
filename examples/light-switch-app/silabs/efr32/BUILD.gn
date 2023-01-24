@@ -74,10 +74,16 @@ declare_args() {
 declare_args() {
   # Enables LCD Qr Code on supported devices
   show_qr_code = !disable_lcd
+
+  # Use default handler to negotiate subscription max interval
+  chip_config_use_icd_subscription_callbacks = enable_sleepy_device
 }
 
 # qr code cannot be true if lcd is disabled
 assert(!(disable_lcd && show_qr_code))
+
+# default read handler cannot be used without being an IC device (SED)
+assert(!chip_config_use_icd_subscription_callbacks || enable_sleepy_device)
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
@@ -250,6 +256,11 @@ efr32_executable("light_switch_app") {
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
     deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
+  }
+
+  # Default Read handler for SED
+  if (chip_config_use_icd_subscription_callbacks) {
+    deps += [ "${examples_plat_dir}:efr32-ICD-subscription-callback" ]
   }
 
   if (chip_enable_ota_requestor) {

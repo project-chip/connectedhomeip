@@ -25,6 +25,9 @@
 #include "glib.h"
 #include <stdio.h>
 #include <string.h>
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#include "spi_multiplex.h"
+#endif
 
 // Main Logo and App image
 #define SILICONLABS_X_POSITION ((glibContext.pDisplayGeometry->xSize - SILICONLABS_BITMAP_WIDTH) / 2)
@@ -105,14 +108,26 @@ void demoUIDisplayHeader(char * name)
     {
         GLIB_drawStringOnLine(&glibContext, name, 5, GLIB_ALIGN_CENTER, 0, 0, true);
     }
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_lcd_spi_transfer();
+#endif
     DMD_updateDisplay();
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    post_lcd_spi_transfer();
+#endif
 }
 
 void demoUIDisplayApp(bool on)
 {
     GLIB_drawBitmap(&glibContext, APP_X_POSITION, APP_Y_POSITION, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
                     (on ? OnStateBitMap : OffStateBitMap));
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_lcd_spi_transfer();
+#endif
     DMD_updateDisplay();
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    post_lcd_spi_transfer();
+#endif
 }
 
 void demoUIDisplayProtocol(demoUIProtocol protocol, bool isConnected)
@@ -123,7 +138,13 @@ void demoUIDisplayProtocol(demoUIProtocol protocol, bool isConnected)
                     (protocol == DEMO_UI_PROTOCOL1 ? PROT1_BITMAP_HEIGHT : PROT2_BITMAP_HEIGHT),
                     (protocol == DEMO_UI_PROTOCOL1 ? (isConnected ? PROT1_BITMAP_CONN : PROT1_BITMAP)
                                                    : (isConnected ? PROT2_BITMAP_CONN : PROT2_BITMAP)));
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_lcd_spi_transfer();
+#endif
     DMD_updateDisplay();
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    post_lcd_spi_transfer();
+#endif
 }
 
 void demoUIClearMainScreen(uint8_t * name)

@@ -31,11 +31,15 @@ pw_python_package("matter_yamltests") {
     "matter_yamltests/definitions.py",
     "matter_yamltests/fixes.py",
     "matter_yamltests/parser.py",
+    "matter_yamltests/pics_checker.py",
   ]
 
   python_deps = [ "${chip_root}/scripts/py_matter_idl:matter_idl" ]
 
-  tests = [ "test_spec_definitions.py" ]
+  tests = [
+    "test_spec_definitions.py",
+    "test_pics_checker.py",
+  ]
 
   # TODO: at a future time consider enabling all (* or missing) here to get
   #       pylint checking these files

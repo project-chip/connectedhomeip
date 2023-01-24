@@ -170,7 +170,7 @@ Commands::PlaybackResponse::Type AppMediaPlaybackManager::HandleMediaRequest(Med
 
 CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
-    Structs::PlaybackPosition::Type response;
+    Structs::PlaybackPositionStruct::Type response;
     response.updatedAt = 0;
     response.position  = Nullable<uint64_t>(0);
 

@@ -67,7 +67,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -75,8 +75,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -102,7 +100,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -110,8 +108,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR3 Commissions with DUT_CE"
       PICS: CADMIN.S
@@ -145,9 +141,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 2, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 2, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -208,8 +204,8 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -217,15 +213,13 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
       identity: "alpha"
       PICS: CADMIN.S.C01.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -259,9 +253,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 4, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 4, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list

@@ -107,7 +107,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->hardwareAddress = ByteSpan(ifp->MacAddress);
-    ifp->type            = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+    ifp->type            = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
 
     static_assert(sizeof(ifp->MacAddress) >= ConfigurationManager::kPrimaryMACAddressLength, "Invalid MacAddress buffer size");
     ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);

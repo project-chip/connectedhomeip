@@ -23,17 +23,16 @@ config CHIP_DEVICE_VENDOR_NAME
 	default "Nordic Semiconductor ASA"
 
 config CHIP_APP_LOG_LEVEL
-	int "Set logging level in application"
+	int "Logging level in application"
 	default LOG_DEFAULT_LEVEL
 	depends on LOG
 	help
-	  Sets the logging level in Matter application. 
-	  This config should be used only within application.
-	  To set the logging level for Matter stack use MATTER_LOG_LEVEL 
-	  config.
+	  Sets the logging level in the Matter application. Use this configuration
+	  option only within the application. To set the logging level for the
+	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
 
 config CHIP_NFC_COMMISSIONING
-	bool "Enable NFC commissioning support"
+	bool "Share onboarding payload in NFC tag"
 	default n
 	imply NFC_T2T_NRFXLIB
 	imply NFC_NDEF
@@ -42,7 +41,7 @@ config CHIP_NFC_COMMISSIONING
 	imply NFC_NDEF_URI_REC
 	imply NFC_NDEF_URI_MSG
 	help
-	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
+	  Enables sharing the onboarding payload in the NFC tag.
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
@@ -59,8 +58,8 @@ config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	default 1024
 	depends on CHIP_OTA_REQUESTOR
 	help
-	  Configures size of the buffer used by OTA Requestor when downloading and
-	  writing a new firmware image to flash.
+	  Configures the size of the buffer used by OTA Requestor when downloading
+	  and writing a new firmware image to flash.
 
 config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	bool "Auto-reboot when firmware update is applied"
@@ -68,9 +67,9 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	depends on CHIP_OTA_REQUESTOR
 	imply REBOOT
 	help
-	  When a user consents to apply a firmware update, and the update package is
-	  downloaded, reboot the device automatically to swap the old and the new
-	  firmware images.
+	  Reboots the device automatically after downloading a new firmware update
+	  to swap the old and the new firmware images. The reboot happens only when
+	  a user consents to apply the firmware update.
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_IMAGE_BUILD
@@ -87,54 +86,55 @@ config CHIP_DEBUG_SYMBOLS
 	bool "Generate debug symbols"
 	default y
 	help
-	  Build the application with debug symbols.
+	  Enables building the application with debug symbols.
 
 config CHIP_FACTORY_DATA
-	bool "Enable Factory Data support"
+	bool "Factory data provider"
 	select ZCBOR
 	select FPROTECT
 	help
-	  Enables support for reading factory data from flash memory partition.
-	  It requires factory_data partition to exist in the partition manager 
-	  configuration file pm_static.yml.
+	  Enables the default nRF Connect factory data provider implementation that
+	  supports reading the factory data encoded in the CBOR format from the
+	  flash memory partition. This option requires the factory_data partition in
+	  Partition Manager configuration file (pm_static.yml).
 
 config CHIP_FACTORY_DATA_CUSTOM_BACKEND
-	bool "Enable Factory Data custom backend"
+	bool "Custom factory data provider"
 	depends on !CHIP_FACTORY_DATA
 	help
-	  Enables user custom factory data implementation. It cannot be used
-	  with the CHIP_FACTORY_DATA that enabled default nRF Connect factory data
-	  implementation.
+	  Enables user's custom factory data provider implementation. This option
+	  cannot be used with the CHIP_FACTORY_DATA, which enables the default nRF
+	  Connect factory data provider implementation.
 
 config CHIP_FACTORY_DATA_BUILD
-	bool "Enable Factory Data build"
+	bool "Generate factory data contents"
 	default n
 	help
-	  Enables generation of factory data during the building.
-	  It requires factory_data partition to exist in the partition manager 
-	  configuration file pm_static.yml.
-	  As a result a new output file factory_data.hex will be created.
+	  Enables generation of the factory data contents during the building. This
+	  option requires the factory_data partition in Partition Manager
+	  configuration file (pm_static.yml). As a result, a new output file is
+	  created (factory_data.hex).
 
 config CHIP_FACTORY_DATA_VERSION
 	int
 	default 1
 	help
-	  The Factory data version contains a current version of a factory data 
-	  parameter set that the user cannot change. 
-	  After moving to the next version of the factory data set, change the default value. 
-	  This config is used to validate the version of a factory data set on a device-side 
-	  with the version of factory data saved in the Flash memory.
+	  Provides the version of the generated factory data parameter set. This is
+	  a hidden configuration option that the user cannot change. You can use
+	  this value in the factory data provider implementation to verify that the
+	  factory data saved in the flash memory has the expected version.
 
 if CHIP_FACTORY_DATA_BUILD
 
 # Factory data definitions
 config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
-	bool "Enable merging generated factory data with the build target .hex file"
+	bool "Merge generated factory data with merged.hex output build file"
 	default y
 	help
-	  Enables merging generated factory data with the build target merged.hex file.
-	  As a result, a new output file merged.hex will consist of all partitions including 
-	  factory data.
+	  Enables merging the generated factory data with the merged.hex output
+	  build file. As a result, the merged.hex build output file, which is used
+	  when flashing the firmware using the west tool, includes the factory data
+	  as well.
 
 # Select source of the certificates
 choice CHIP_FACTORY_DATA_CERT_SOURCE
@@ -144,52 +144,56 @@ choice CHIP_FACTORY_DATA_CERT_SOURCE
 	config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
 		bool "Use pre-generated development certificates"
 		help
-			Use pre-generated certificate files from the credentials/development/attestation/
-			directory that match the configured Product ID. This can be used for development
-			purpose.
+		  Uses pre-generated certificate files from the
+		  credentials/development/attestation/ directory that match the
+		  configured Product ID. This can be used for development purpose.
+
 	config CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED
 		bool "Auto-generate certificates"
 		help
-			Generate new certificates instead of using pre-generated ones.
-			The certificates are generated on every build.
+		  Generates new certificates instead of using pre-generated ones. The
+		  certificates are generated on every build.
+
 	config CHIP_FACTORY_DATA_CERT_SOURCE_USER
 		bool "Use user-provided certificate files"
 		help
-			Use user-provided certificate files.
-			The user needs to specify the absolute path to all necessary files.
+		  Uses user-provided certificate files. The user needs to specify the
+		  absolute paths to all necessary files.
+
 endchoice
 
 if CHIP_FACTORY_DATA_CERT_SOURCE_USER
 
 config CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT
-	string "Path to the DAC certificate *.der-file"
+	string "Path to the DAC certificate (DER format)"
 	help
-		Absolute path to the DAC certificate file in binary format.
+	  Provides the absolute path to the DAC certificate file in the DER format.
+
 config CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY
-	string "Path to the DAC private key *.der-file"
+	string "Path to the DAC private key (DER format)"
 	help
-		Absolute path to the DAC keysfile in binary format.
-		Note that both public and private keys must be present (will be extracted automatically).
+	  Provides the absolute path to the DAC keypair file in the DER format. Both
+	  public and private keys must be present (the private key will be extracted
+	  automatically).
+
 config CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT
-	string "Path to the PAI certificate *.der-file"
+	string "Path to the PAI certificate (DER format)"
 	help
-		Absolute path pointing to the PAI certificate in binary format.
+	  Provides the absolute path to the PAI certificate in the DER format.
 endif
 
-# Configs for SPAKE2 generation
+# Configs for SPAKE2+ generation
 config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
-	bool "Enable spake2 verifier generation"
+	bool "Generate SPAKE2+ verifier"
 	help
-	  Enables generation of spake2 verifier according to 
-	  given iteration counter, salt and passcode.
-	  To generate Spake2 verifier a spake2p executable must be available 
-	  from system variables environment.
+	  Enables the generation of the SPAKE2+ verifier for the configured SPAKE2+
+	  passcode, iteration count and salt.
 
 config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
-	bool "Enable generation of a new Rotating device id unique id"
+	bool "Generate Rotating device ID unique ID"
 	default y
 	help
-	  Enables generation of a new Rotating device id unique id.
+	  Enables the generation of a random Rotating device ID unique ID.
 
 endif #CHIP_FACTORY_DATA_BUILD
 
@@ -203,7 +207,7 @@ endif
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
 	help
-	  Disables some log levels for the specific log modules
-	  providing detailed information that are not used in most cases.
-	  You can find full configuration enabled by this option
-	  in the platform/nrfconnect/CHIPPlatformConfig.h file.
+	  Disables some log levels for specific Matter log modules that provide
+	  information that is too detailed to be used in most cases. You can find
+	  full configuration enabled by this option in the
+	  platform/nrfconnect/CHIPPlatformConfig.h file.

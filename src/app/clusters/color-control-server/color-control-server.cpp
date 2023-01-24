@@ -2270,7 +2270,7 @@ exit:
 bool ColorControlServer::moveToColorTempCommand(const app::ConcreteCommandPath & commandPath,
                                                 const Commands::MoveToColorTemperature::DecodableType & commandData)
 {
-    uint16_t colorTemperature = commandData.colorTemperature;
+    uint16_t colorTemperature = commandData.colorTemperatureMireds;
     uint16_t transitionTime   = commandData.transitionTime;
     uint8_t optionsMask       = commandData.optionsMask;
     uint8_t optionsOverride   = commandData.optionsOverride;

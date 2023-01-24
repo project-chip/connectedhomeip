@@ -476,13 +476,35 @@ private:
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
 
-    void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch a secure unicast message.
+     *
+     * @param[in] partialPacketHeader The partial PacketHeader of the message after processing with DecodeFixed.
+     * If the message decrypts successfully, this will be filled with a fully decoded PacketHeader.
+     * @param[in] peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void SecureUnicastMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
                                       System::PacketBufferHandle && msg);
 
-    void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch a secure group message.
+     *
+     * @param partialPacketHeader The partial PacketHeader of the message once processed with DecodeFixed.
+     * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void SecureGroupMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
 
-    void UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch an unsecured message.
+     *
+     * @param partialPacketHeader The partial PacketHeader of the message after processing with DecodeFixed.
+     * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void UnauthenticatedMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
                                         System::PacketBufferHandle && msg);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);

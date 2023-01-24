@@ -78,7 +78,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
 
         for (jint i = 0; i < length; i++)
         {
-            chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
+            chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type channelInfo;
             jobject channelObject = env->GetObjectArrayElement(channelInfoList, i);
             jclass channelClass   = env->GetObjectClass(channelObject);
 
@@ -131,7 +131,7 @@ exit:
 
 CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
 {
-    chip::app::Clusters::Channel::Structs::LineupInfo::Type lineupInfo;
+    chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type lineupInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -193,7 +193,7 @@ exit:
 
 CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEncoder)
 {
-    chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
+    chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type channelInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetCurrentChannel");

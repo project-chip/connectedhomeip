@@ -118,6 +118,13 @@
 #define MBEDTLS_HKDF_C
 #define MBEDTLS_PKCS5_C
 
+#define MBEDTLS_ENTROPY_HARDWARE_ALT
+
+#define MBEDTLS_SHA1_ALT
+#define MBEDTLS_SHA256_ALT
+#define MBEDTLS_AES_ALT
+#define MBEDTLS_ECP_ALT
+
 // Spans multiple lines to avoid being processed by unifdef
 #if defined(MBEDTLS_USER_CONFIG_FILE)
 #include MBEDTLS_USER_CONFIG_FILE

@@ -50,7 +50,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 200
               - name: "Direction"
                 value: 0
@@ -145,7 +145,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 50
               - name: "Direction"
                 value: 0

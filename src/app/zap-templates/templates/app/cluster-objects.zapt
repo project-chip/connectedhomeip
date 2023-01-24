@@ -105,7 +105,7 @@ public:
 
     using ResponseType =
     {{~#if responseName}}
-      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{responseName}}::DecodableType;
+      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::DecodableType;
     {{else}}
       DataModel::NullObjectType;
     {{/if}}

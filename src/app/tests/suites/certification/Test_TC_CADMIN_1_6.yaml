@@ -70,7 +70,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -130,7 +130,7 @@ tests:
           error: FAILURE
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -140,7 +140,7 @@ tests:
                 value: 180
 
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000
@@ -159,7 +159,7 @@ tests:
           error: FAILURE
 
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C02.Rsp
@@ -186,7 +186,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -197,7 +197,7 @@ tests:
 
     - label: "TH_CR1 opens another commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -233,7 +233,7 @@ tests:
     - label:
           "TH_CR1 tries to revoke the commissioning window on DUT_CE using
           RevokeCommissioning command"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000

@@ -51,7 +51,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -77,7 +77,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 0
@@ -163,7 +163,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -189,7 +189,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 135
               - name: "Direction"
                 value: 1
@@ -285,7 +285,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -311,7 +311,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 2
@@ -397,7 +397,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 0
@@ -423,7 +423,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 3

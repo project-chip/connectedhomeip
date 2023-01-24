@@ -22,6 +22,7 @@
 #import "MTRCluster.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCluster_Internal.h"
+#import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -1132,7 +1133,11 @@ exit:
 
             ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, MTRDataValueDictionaryDecodableType(commandFields),
                 (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue])));
-            ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
+
+            // We don't have a way to communicate a non-default invoke timeout
+            // here for now.
+            // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
+            ReturnErrorOnFailure(commandSender->SendCommandRequest(session, NullOptional));
 
             decoder.release();
             commandSender.release();

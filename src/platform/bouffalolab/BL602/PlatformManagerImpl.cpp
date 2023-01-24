@@ -77,6 +77,8 @@ static void WifiStaDisconect(void)
         return;
     }
 
+    ChipLogError(DeviceLayer, "WiFi station disconnect, reason %d.", reason);
+
     switch (reason)
     {
     case WLAN_FW_TX_ASSOC_FRAME_ALLOCATE_FAIILURE:
@@ -178,14 +180,22 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
     case CODE_WIFI_ON_MGMR_DONE: {
     }
     break;
+    case CODE_WIFI_ON_CONNECTED: {
+        ChipLogProgress(DeviceLayer, "WiFi station connected.");
+    }
+    break;
     case CODE_WIFI_ON_SCAN_DONE: {
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     break;
+    case CODE_WIFI_ON_CONNECTING: {
+        ChipLogProgress(DeviceLayer, "WiFi station starts connecting.");
+    }
+    break;
     case CODE_WIFI_ON_DISCONNECT: {
-        log_info("[APP] [EVT] disconnect %lld, Reason: %s\r\n", aos_now_ms(), wifi_mgmr_status_code_str(event->value));
+        ChipLogProgress(DeviceLayer, "WiFi station disconnect, reason %s.", wifi_mgmr_status_code_str(event->value));
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         WifiStaDisconect();
@@ -193,11 +203,12 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
     }
     break;
     case CODE_WIFI_CMD_RECONNECT: {
-        log_info("[APP] [EVT] Reconnect %lld\r\n", aos_now_ms());
+        ChipLogProgress(DeviceLayer, "WiFi station reconnect.");
     }
     break;
     case CODE_WIFI_ON_GOT_IP: {
-        log_info("[APP] [EVT] GOT IP %lld\r\n", aos_now_ms());
+
+        ChipLogProgress(DeviceLayer, "WiFi station gets IPv4 address.");
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         WifiStaConnected();
@@ -205,14 +216,15 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
     }
     break;
     case CODE_WIFI_ON_GOT_IP6: {
-        log_info("[APP] [EVT] GOT IP6 %lld\r\n", aos_now_ms());
+        ChipLogProgress(DeviceLayer, "WiFi station gets IPv6 address.");
+
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         ConnectivityMgrImpl().OnIPv6AddressAvailable();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     break;
     default: {
-        log_info("[APP] [EVT] Unknown code %u, %lld\r\n", event->code, aos_now_ms());
+        ChipLogProgress(DeviceLayer, "WiFi station gets unknow code %u.", event->code);
         /*nothing*/
     }
     }
@@ -234,7 +246,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     if (1 == stack_wifi_init)
     {
-        log_error("Wi-Fi already initialized!\r\n");
+        ChipLogError(DeviceLayer, "Wi-Fi already initialized!");
         return CHIP_NO_ERROR;
     }
 

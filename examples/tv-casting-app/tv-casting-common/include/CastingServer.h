@@ -36,7 +36,7 @@
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <functional>
-#include <tv-casting-app/zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
 constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
@@ -112,10 +112,10 @@ public:
      */
     CHIP_ERROR ContentLauncher_LaunchURL(
         TargetEndpointInfo * endpoint, const char * contentUrl, const char * contentDisplayStr,
-        chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+        chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type> brandingInformation,
         std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ContentLauncher_LaunchContent(TargetEndpointInfo * endpoint,
-                                             chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
+                                             chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type search,
                                              bool autoPlay, chip::Optional<chip::CharSpan> data,
                                              std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR
@@ -246,13 +246,13 @@ public:
      * @brief Application Launcher cluster
      */
     CHIP_ERROR ApplicationLauncher_LaunchApp(TargetEndpointInfo * endpoint,
-                                             chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                             chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                              chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_StopApp(TargetEndpointInfo * endpoint,
-                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_HideApp(TargetEndpointInfo * endpoint,
-                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback);
 
     CHIP_ERROR

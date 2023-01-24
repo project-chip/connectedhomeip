@@ -42,7 +42,7 @@ tests:
           "Using manufacturer provided means (i.e. NOT using Matter protocol),
           update the name of this bridged device"
       verification: |
-          Press b in bridge-app
+          Press b on bridge app
 
           b
           [1657013342.067936][16436:16443] CHIP:DL: Device[Light 1]: New Name="Light 1b"

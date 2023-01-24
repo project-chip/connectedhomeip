@@ -25,13 +25,14 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DoorLock;
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                            OperationErrorEnum & err)
 {
     return LockManager::Instance().Lock(endpointId, pinCode, err);
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
-                                              DlOperationError & err)
+                                              OperationErrorEnum & err)
 {
     return LockManager::Instance().Unlock(endpointId, pinCode, err);
 }
@@ -43,15 +44,15 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
 
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
                                   chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
-                                  DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
-                                  const DlCredential * credentials, size_t totalCredentials)
+                                  UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
+                                  const CredentialStruct * credentials, size_t totalCredentials)
 {
 
     return LockManager::Instance().SetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus, usertype,
                                            credentialRule, credentials, totalCredentials);
 }
 
-bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential)
 {
     return LockManager::Instance().GetCredential(endpointId, credentialIndex, credentialType, credential);
@@ -59,7 +60,7 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
 
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
                                         chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
-                                        DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+                                        CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
 {
     return LockManager::Instance().SetCredential(endpointId, credentialIndex, creator, modifier, credentialStatus, credentialType,
                                                  credentialData);
@@ -72,7 +73,7 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t w
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                          DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute)
 {
     return LockManager::Instance().SetSchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute,

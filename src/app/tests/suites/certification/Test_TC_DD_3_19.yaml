@@ -37,8 +37,8 @@ tests:
           "Place DUT into commissioning mode using the DUTs manufacturers means
           to be discovered by the TH Commissioner"
       verification: |
-          Verify on DUT Commissionee side:
-          $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3841
+          Verify on DUT (All-cluster-app):
+          ./chip-all-clusters-app --discriminator 3841
 
           [1651111142.369356][32024:32024] CHIP:DL: Device Configuration:
           [1651111142.369395][32024:32024] CHIP:DL:   Serial Number: TEST_SN
@@ -51,15 +51,17 @@ tests:
           [1651111142.369573][32024:32024] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1651111142.370760][32024:32024] CHIP:SVR: SetupQRCode: [MT:-24J0ALY01KA0648G00]
 
-          Verify on TH Commissioner side:
-          $ ./chip-tool discover commissionables
+          Verify on TH (Chip-tool):
+          For devices already on the network:
+           ./chip-tool discover commissionables
 
           [1651111150395] [95835:65674062] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651111150395] [95835:65674062] CHIP: [DIS]         Vendor ID: 65521
           [1651111150395] [95835:65674062] CHIP: [DIS]         Product ID: 32769
           [1651111150395] [95835:65674062] CHIP: [DIS]         Long Discriminator: 3841
           [1651111150395] [95835:65674062] CHIP: [DIS]         Pairing Hint: 33
-          [1651111150395] [95835:65674062] CHIP: [DIS]         Hostname: DCA6328D2B9F0000        [1651111150395] [95835:65674062] CHIP: [DIS]         Instance Name: B4B6B83476500D4A
+          [1651111150395] [95835:65674062] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
+          [1651111150395] [95835:65674062] CHIP: [DIS]         Instance Name: B4B6B83476500D4A
           [1651111150395] [95835:65674062] CHIP: [DIS]         IP Address #1: fe80::dea6:32ff:fe8d:2b9f
           [1651111150395] [95835:65674062] CHIP: [DIS]         IP Address #2: fe80::dea6:32ff:fe8d:2ba0
           [1651111150395] [95835:65674062] CHIP: [DIS]         IP Address #3: 192.168.1.2
@@ -67,6 +69,14 @@ tests:
           [1651111150395] [95835:65674062] CHIP: [DIS]         Commissioning Mode: 1
           [1651111150395] [95835:65674062] CHIP: [DIS]         Mrp Interval idle: 5000 ms
           [1651111150395] [95835:65674062] CHIP: [DIS]         Mrp Interval active: 300 ms
+
+
+          For devices not on the network (i.e. BLE discovery):
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          Observe the DUT advertising in a commissionable state
       disabled: true
 
     - label:
@@ -74,12 +84,12 @@ tests:
           for the Commissioner/Commissionee to complete the commissioning
           process over the DUT Commissionees method of device discovery"
       verification: |
-          Verify on DUT Commissionee side:
+          Verify on DUT (All-cluster-app):
           [1651111335.475159][32130:32130] CHIP:SVR: Commissioning completed successfully
           [1651111335.475204][32130:32130] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on TH Commissioner side:
-          $ ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
+          Verify on TH (Chip-tool):
+           ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111335378] [95843:65675989] CHIP: [CTL] Received CommissioningComplete response
           [1651111335378] [95843:65675989] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
@@ -93,7 +103,7 @@ tests:
           "Using TH Commissioner, unpair the DUT Commissionee from the Matter
           network."
       verification: |
-          TH Commissioner:
+          Verify on TH (Chip-tool):
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
@@ -109,17 +119,19 @@ tests:
           "Place DUT Commissionee back into commissioning mode using the DUT
           manufacturers means to be discovered by the TH Commissioner"
       verification: |
-          1. On RasPi DUT $ rm -rf /tmp/chip*
-          2. On RasPi DUT $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3841
+          1. On RasPi DUT  rm -rf /tmp/chip*
+          2. On RasPi DUT ./chip-all-clusters-app --discriminator 3841
 
-          Verify on TH Commissioner side:
-          $ ./chip-tool discover commissionables
+          Verify on TH (Chip-tool):
+          For devices already on the network:
+           ./chip-tool discover commissionables
           [1651111576350] [95850:65678872] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651111576350] [95850:65678872] CHIP: [DIS]         Vendor ID: 65521
           [1651111576350] [95850:65678872] CHIP: [DIS]         Product ID: 32769
           [1651111576350] [95850:65678872] CHIP: [DIS]         Long Discriminator: 3841
           [1651111576350] [95850:65678872] CHIP: [DIS]         Pairing Hint: 33
-          [1651111576350] [95850:65678872] CHIP: [DIS]         Hostname: DCA6328D2B9F0000        [1651111576350] [95850:65678872] CHIP: [DIS]         Instance Name: F17CF4C2DECCDA4B
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Instance Name: F17CF4C2DECCDA4B
           [1651111576350] [95850:65678872] CHIP: [DIS]         IP Address #1: fe80::dea6:32ff:fe8d:2ba0
           [1651111576350] [95850:65678872] CHIP: [DIS]         IP Address #2: fe80::dea6:32ff:fe8d:2b9f
           [1651111576350] [95850:65678872] CHIP: [DIS]         IP Address #3: 192.168.1.2
@@ -127,6 +139,14 @@ tests:
           [1651111576350] [95850:65678872] CHIP: [DIS]         Commissioning Mode: 1
           [1651111576350] [95850:65678872] CHIP: [DIS]         Mrp Interval idle: 5000 ms
           [1651111576350] [95850:65678872] CHIP: [DIS]         Mrp Interval active: 300 ms
+
+
+          For devices not on the network (i.e. BLE discovery):
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          Observe the DUT advertising in a commissionable state
       disabled: true
 
     - label:
@@ -134,17 +154,17 @@ tests:
           for the Commissioner/Commissionee to complete the commissioning
           process over the DUT Commissionees method of device discovery"
       verification: |
-          Verify on DUT Commissionee side:
+          Verify on DUT (All-cluster-app):
           [1651111614.006849][32259:32259] CHIP:SVR: Commissioning completed successfully
           [1651111614.006893][32259:32259] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on TH Commissioner side:
-          $ ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
+          Verify on TH (Chip-tool):
+           ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111613912] [95856:65679504] CHIP: [CTL] Received CommissioningComplete response
-          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651111613912] [95856:65679504] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651111613912] [95856:65679504] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1651111613912] [95856:65679504] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1651111613912] [95856:65679504] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1651111613912] [95856:65679504] CHIP: [TOO] Device commissioning completed with success
       disabled: true
