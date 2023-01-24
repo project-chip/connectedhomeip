@@ -67,6 +67,11 @@ A.D=1=
 
 
 class TestPICSChecker(unittest.TestCase):
+    def test_no_file(self):
+        pics_checker = PICSChecker(None)
+        self.assertIsInstance(pics_checker, PICSChecker)
+        self.assertFalse(pics_checker.check('A.A'))
+
     @patch('builtins.open', mock_open(read_data=empty_config))
     def test_empty_config(self):
         pics_checker = PICSChecker('')

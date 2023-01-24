@@ -44,39 +44,39 @@ tests:
       command: "launchApp"
       arguments:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data"
-              - name: "application"
-                value: { catalogVendorId: 123, applicationId: "applicationId" }
+              - name: "Application"
+                value: { CatalogVendorID: 123, ApplicationID: "applicationId" }
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Stop App Command"
       command: "stopApp"
       arguments:
           values:
-              - name: "application"
-                value: { catalogVendorId: 123, applicationId: "applicationId" }
+              - name: "Application"
+                value: { CatalogVendorID: 123, ApplicationID: "applicationId" }
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Hide App Command"
       command: "hideApp"
       arguments:
           values:
-              - name: "application"
-                value: { catalogVendorId: 123, applicationId: "applicationId" }
+              - name: "Application"
+                value: { CatalogVendorID: 123, ApplicationID: "applicationId" }
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data"
-              - name: "status"
+              - name: "Status"
                 value: 0

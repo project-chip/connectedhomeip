@@ -416,6 +416,7 @@ diffsyms
 dimmable
 dirname
 dirs
+disableNotifyUpdateApplied
 disambiguated
 discoverable
 DispatchEvent

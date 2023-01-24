@@ -242,13 +242,13 @@ tests:
                   {
                       FabricIndex: 1,
                       GroupId: 0x0103,
-                      endpoints: [1],
+                      Endpoints: [1],
                       GroupName: "Group #3",
                   },
                   {
                       FabricIndex: 1,
                       GroupId: 0x0104,
-                      endpoints: [1],
+                      Endpoints: [1],
                       GroupName: "Group #4",
                   },
               ]
@@ -320,13 +320,13 @@ tests:
                   {
                       FabricIndex: 1,
                       GroupId: 0x0103,
-                      endpoints: [1],
+                      Endpoints: [1],
                       GroupName: "Group #3",
                   },
                   {
                       FabricIndex: 1,
                       GroupId: 0x0104,
-                      endpoints: [1],
+                      Endpoints: [1],
                       GroupName: "Group #4",
                   },
               ]

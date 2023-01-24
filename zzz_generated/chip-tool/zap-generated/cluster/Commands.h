@@ -6097,7 +6097,7 @@ private:
 | Commands:                                                           |        |
 | * Play                                                              |   0x00 |
 | * Pause                                                             |   0x01 |
-| * StopPlayback                                                      |   0x02 |
+| * Stop                                                              |   0x02 |
 | * StartOver                                                         |   0x03 |
 | * Previous                                                          |   0x04 |
 | * Next                                                              |   0x05 |
@@ -6183,12 +6183,12 @@ private:
 };
 
 /*
- * Command StopPlayback
+ * Command Stop
  */
-class MediaPlaybackStopPlayback : public ClusterCommand
+class MediaPlaybackStop : public ClusterCommand
 {
 public:
-    MediaPlaybackStopPlayback(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop-playback", credsIssuerConfig)
+    MediaPlaybackStop(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -6208,7 +6208,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type mRequest;
+    chip::app::Clusters::MediaPlayback::Commands::Stop::Type mRequest;
 };
 
 /*
@@ -6895,7 +6895,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type>>
+        mComplex_Application;
 };
 
 /*
@@ -6927,7 +6928,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type>>
+        mComplex_Application;
 };
 
 /*
@@ -6959,7 +6961,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type>>
+        mComplex_Application;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -12256,7 +12259,7 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<ClusterCommand>(Id, credsIssuerConfig),        //
         make_unique<MediaPlaybackPlay>(credsIssuerConfig),         //
         make_unique<MediaPlaybackPause>(credsIssuerConfig),        //
-        make_unique<MediaPlaybackStopPlayback>(credsIssuerConfig), //
+        make_unique<MediaPlaybackStop>(credsIssuerConfig),         //
         make_unique<MediaPlaybackStartOver>(credsIssuerConfig),    //
         make_unique<MediaPlaybackPrevious>(credsIssuerConfig),     //
         make_unique<MediaPlaybackNext>(credsIssuerConfig),         //
@@ -12537,7 +12540,7 @@ void registerClusterApplicationLauncher(Commands & commands, CredentialIssuerCom
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type>>>(
+            chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type>>>(
             Id, "current-app", Attributes::CurrentApp::Id, credsIssuerConfig),                                                  //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "catalog-list", Attributes::CatalogList::Id, credsIssuerConfig),                    //

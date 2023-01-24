@@ -52,6 +52,9 @@ public:
         }
     }
 
+    // Specify whether to send notify update applied after successful update
+    void SetSendNotifyUpdateApplied(bool sendNotify) { mSendNotifyUpdateApplied = sendNotify; }
+
     // Restart the periodic query timer
     void RekickPeriodicQueryTimer(void);
 
@@ -116,6 +119,8 @@ protected:
     uint8_t mProviderRetryCount = 0;
     // Track query image retry count on invalid session error
     uint8_t mInvalidSessionRetryCount = 0;
+    // Track whether to send notify update applied after successful update
+    bool mSendNotifyUpdateApplied = true;
 };
 
 } // namespace DeviceLayer

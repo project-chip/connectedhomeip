@@ -1174,6 +1174,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
+ * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
+ * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
+ * This is a temporary workaround for interoperability with those erroneous early-SVE2 implementations.
+ * The cost of this compatibity mode is twice as many decryption steps per received group message.
+ *
+ * TODO(#24573): Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
+ */
+#ifndef CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
+#define CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2 1
+#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
+
+/**
  *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
  *
  *  @brief
@@ -1340,6 +1353,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
 #define CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC 1
 #endif // CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
+
 /**
  * @}
  */

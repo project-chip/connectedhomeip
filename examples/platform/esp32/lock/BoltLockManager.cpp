@@ -764,7 +764,6 @@ CHIP_ERROR BoltLockManager::InitLockState()
     // Initial lock state
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
     chip::EndpointId endpointId{ 1 };
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
     chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
 
     uint8_t numberOfCredentialsPerUser = 0;
@@ -815,8 +814,6 @@ CHIP_ERROR BoltLockManager::InitLockState()
             endpointId);
         numberOfHolidaySchedules = 10;
     }
-
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     CHIP_ERROR err = BoltLockMgr().Init(state,
                                         ParamBuilder()

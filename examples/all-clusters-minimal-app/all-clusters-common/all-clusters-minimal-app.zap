@@ -17811,7 +17811,7 @@
               "outgoing": 1
             },
             {
-              "name": "StopPlayback",
+              "name": "Stop",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -17965,7 +17965,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "PlaybackPosition",
+              "type": "PlaybackPositionStruct",
               "included": 0,
               "storageOption": "External",
               "singleton": 0,
@@ -18717,7 +18717,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "ApplicationEP",
+              "type": "ApplicationEPStruct",
               "included": 0,
               "storageOption": "External",
               "singleton": 0,

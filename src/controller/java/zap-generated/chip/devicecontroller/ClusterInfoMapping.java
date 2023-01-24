@@ -5747,12 +5747,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> data) {
+    public void onSuccess(Integer Status, Optional<String> Data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
-      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo DataResponseValue = new CommandResponseInfo("Data", "Optional<String>");
+      responseValues.put(DataResponseValue, Data);
       callback.onSuccess(responseValues);
     }
 
@@ -6331,12 +6331,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, byte[] data) {
+    public void onSuccess(Integer Status, Optional<byte[]> Data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "byte[]");
-      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo DataResponseValue = new CommandResponseInfo("Data", "Optional<byte[]>");
+      responseValues.put(DataResponseValue, Data);
       callback.onSuccess(responseValues);
     }
 
@@ -11377,19 +11377,17 @@ public class ClusterInfoMapping {
             () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
             mediaPlaybackpauseCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("pause", mediaPlaybackpauseInteractionInfo);
-    Map<String, CommandParameterInfo> mediaPlaybackstopPlaybackCommandParams =
+    Map<String, CommandParameterInfo> mediaPlaybackstopCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo mediaPlaybackstopPlaybackInteractionInfo =
+    InteractionInfo mediaPlaybackstopInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.MediaPlaybackCluster) cluster)
-                  .stopPlayback(
-                      (ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
+                  .stop((ChipClusters.MediaPlaybackCluster.PlaybackResponseCallback) callback);
             },
             () -> new DelegatedMediaPlaybackClusterPlaybackResponseCallback(),
-            mediaPlaybackstopPlaybackCommandParams);
-    mediaPlaybackClusterInteractionInfoMap.put(
-        "stopPlayback", mediaPlaybackstopPlaybackInteractionInfo);
+            mediaPlaybackstopCommandParams);
+    mediaPlaybackClusterInteractionInfoMap.put("stop", mediaPlaybackstopInteractionInfo);
     Map<String, CommandParameterInfo> mediaPlaybackstartOverCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo mediaPlaybackstartOverInteractionInfo =
@@ -11716,7 +11714,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ApplicationLauncherCluster) cluster)
                   .launchApp(
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
-                      (ChipStructs.ApplicationLauncherClusterApplication)
+                      (Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct>)
                           commandArguments.get("application"),
                       (Optional<byte[]>) commandArguments.get("data"));
             },
@@ -11732,7 +11730,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ApplicationLauncherCluster) cluster)
                   .stopApp(
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
-                      (ChipStructs.ApplicationLauncherClusterApplication)
+                      (Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct>)
                           commandArguments.get("application"));
             },
             () -> new DelegatedApplicationLauncherClusterLauncherResponseCallback(),
@@ -11747,7 +11745,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ApplicationLauncherCluster) cluster)
                   .hideApp(
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
-                      (ChipStructs.ApplicationLauncherClusterApplication)
+                      (Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct>)
                           commandArguments.get("application"));
             },
             () -> new DelegatedApplicationLauncherClusterLauncherResponseCallback(),

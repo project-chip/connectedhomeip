@@ -1338,10 +1338,10 @@ JNI_METHOD(jboolean, applicationLauncher_1launchApp)
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationLauncher_launchApp called");
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId      = static_cast<uint16_t>(catalogVendorId);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID      = static_cast<uint16_t>(catalogVendorId);
     const char * nativeApplicationId = env->GetStringUTFChars(applicationId, 0);
-    application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
+    application.applicationID        = CharSpan::fromCharString(nativeApplicationId);
     JniByteArray dataByteArray(env, data);
 
     TargetEndpointInfo endpoint;
@@ -1377,10 +1377,10 @@ JNI_METHOD(jboolean, applicationLauncher_1stopApp)
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationLauncher_stopApp called");
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId      = static_cast<uint16_t>(catalogVendorId);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID      = static_cast<uint16_t>(catalogVendorId);
     const char * nativeApplicationId = env->GetStringUTFChars(applicationId, 0);
-    application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
+    application.applicationID        = CharSpan::fromCharString(nativeApplicationId);
 
     TargetEndpointInfo endpoint;
     CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
@@ -1415,10 +1415,10 @@ JNI_METHOD(jboolean, applicationLauncher_1hideApp)
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationLauncher_hideApp called");
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId      = static_cast<uint16_t>(catalogVendorId);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID      = static_cast<uint16_t>(catalogVendorId);
     const char * nativeApplicationId = env->GetStringUTFChars(applicationId, 0);
-    application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
+    application.applicationID        = CharSpan::fromCharString(nativeApplicationId);
 
     TargetEndpointInfo endpoint;
     CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);

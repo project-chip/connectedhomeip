@@ -41,8 +41,9 @@ class PICSChecker():
     """Class to compute a PICS expression"""
 
     def __init__(self, pics_file: str):
-        self.__pics = None
+        self.__pics = {}
         self.__expression_index = 0
+
         if pics_file is not None:
             self.__pics = self.__parse(pics_file)
 
@@ -54,7 +55,6 @@ class PICSChecker():
         tokens = self.__tokenize(pics)
         if self.__pics is not None:
             return self.__evaluate_expression(tokens, self.__pics)
-        return True
 
     def __parse(self, pics_file: str):
         pics = {}
