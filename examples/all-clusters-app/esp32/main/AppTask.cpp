@@ -161,6 +161,13 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     }
 }
 
+CHIP_ERROR AppTask::LockInit()
+{
+    ReturnErrorOnFailure(BoltLockMgr().InitLockState());
+    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AppTask::Init()
 {
     /* Print chip information */
@@ -179,10 +186,7 @@ CHIP_ERROR AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
-
-    CHIP_ERROR err = BoltLockMgr().InitLockState();
-
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    VerifyOrReturnError(sFunctionTimer != NULL, CHIP_ERROR_NO_MEMORY, ESP_LOGE(TAG, "Failed to create function selection timer"));
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual
@@ -199,7 +203,7 @@ CHIP_ERROR AppTask::Init()
     InitDeviceDisplay();
 #endif
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
