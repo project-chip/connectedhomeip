@@ -59,6 +59,10 @@ protected:
     void _HandleServerShuttingDown();
     CHIP_ERROR _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg);
     CHIP_ERROR _ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg);
+    CHIP_ERROR _PostBackgroundEvent(const ChipDeviceEvent * event);
+    void _RunBackgroundEventLoop(void);
+    CHIP_ERROR _StartBackgroundEventLoopTask(void);
+    CHIP_ERROR _StopBackgroundEventLoopTask();
     void _DispatchEvent(const ChipDeviceEvent * event);
 
     // ===== Support methods that can be overridden by the implementation subclass.

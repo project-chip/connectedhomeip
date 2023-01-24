@@ -241,6 +241,33 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleBackgroundWork(AsyncW
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_PostBackgroundEvent(const ChipDeviceEvent * event)
+{
+    // Impl class must override to implement background event processing
+    return Impl()->PostEvent(event);
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl<ImplClass>::_RunBackgroundEventLoop(void)
+{
+    // Impl class must override to implement background event processing
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_StartBackgroundEventLoopTask(void)
+{
+    // Impl class must override to implement background event processing
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_StopBackgroundEventLoopTask(void)
+{
+    // Impl class must override to implement background event processing
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
 #if (CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0)
