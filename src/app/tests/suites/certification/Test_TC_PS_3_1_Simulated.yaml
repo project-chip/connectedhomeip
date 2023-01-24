@@ -14,6 +14,13 @@
 
 name: 62.3.1. [TC-PS-3.1] Attributes with client as DUT
 
+PICS:
+    - PS.C
+    - PS.C.AM-READ
+    - PS.C.AO-READ
+    - PS.C.AM-WRITE
+    - PS.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Power Source"

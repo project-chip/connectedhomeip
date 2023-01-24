@@ -7,6 +7,7 @@
         "Test_TC_ACL_2_3",
         "Test_TC_ACL_2_4",
         "Test_TC_ACL_2_7",
+        "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9"
     ],
     "AccessControlEnforcement": ["Test_TC_ACE_1_1"],

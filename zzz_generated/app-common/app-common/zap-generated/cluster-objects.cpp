@@ -26,6 +26,50 @@ namespace Clusters {
 namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
+namespace ApplicationStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCatalogVendorID)), catalogVendorID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kApplicationID)), applicationID));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kCatalogVendorID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, catalogVendorID));
+            break;
+        case to_underlying(Fields::kApplicationID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, applicationID));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ApplicationStruct
 namespace LabelStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -190,8 +234,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace Identify
 namespace Groups {
@@ -624,8 +667,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace Groups
 namespace Scenes {
@@ -1645,8 +1687,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace Scenes
 namespace OnOff {
@@ -1915,14 +1956,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace OnOff
 namespace OnOffSwitchConfiguration {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -1958,8 +1997,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace OnOffSwitchConfiguration
 namespace LevelControl {
@@ -2458,14 +2496,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace LevelControl
 namespace BinaryInputBasic {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2522,14 +2558,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace BinaryInputBasic
 namespace PulseWidthModulation {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2559,8 +2593,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace PulseWidthModulation
 namespace Descriptor {
@@ -2611,8 +2644,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace DeviceTypeStruct
 } // namespace Structs
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2654,8 +2686,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace Descriptor
 namespace Binding {
@@ -2731,8 +2762,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TargetStruct
 } // namespace Structs
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2765,8 +2795,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace Binding
 namespace AccessControl {
@@ -2964,8 +2993,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace AccessControlExtensionStruct
 } // namespace Structs
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -4501,8 +4529,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
@@ -4813,8 +4840,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace OtaSoftwareUpdateRequestor
 namespace LocalizationConfiguration {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -4850,14 +4876,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace LocalizationConfiguration
 namespace TimeFormatLocalization {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -4896,14 +4920,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace TimeFormatLocalization
 namespace UnitLocalization {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -4936,14 +4958,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace UnitLocalization
 namespace PowerSourceConfiguration {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -4976,8 +4996,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace PowerSourceConfiguration
 namespace PowerSource {
@@ -5116,8 +5135,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace WiredFaultChangeType
 } // namespace Structs
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -5707,8 +5725,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
@@ -6336,8 +6353,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace NetworkCommissioning
 namespace DiagnosticLogs {
@@ -6468,8 +6484,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace DiagnosticLogs
 namespace GeneralDiagnostics {
@@ -7954,8 +7969,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace EthernetNetworkDiagnostics
 namespace TimeSynchronization {
@@ -8164,14 +8178,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace TimeSynchronization
-namespace BridgedDeviceBasic {
+namespace BridgedDeviceBasicInformation {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -8389,11 +8401,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace ReachableChanged.
 } // namespace Events
 
-} // namespace BridgedDeviceBasic
+} // namespace BridgedDeviceBasicInformation
 namespace Switch {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -8873,13 +8884,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
 namespace Structs {
-namespace FabricDescriptor {
+namespace FabricDescriptorStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     return DoEncode(writer, tag, NullOptional);
@@ -8895,9 +8905,9 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRootPublicKey)), rootPublicKey));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorId)), vendorId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricId)), fabricId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNodeId)), nodeId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorID)), vendorID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricID)), fabricID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNodeID)), nodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLabel)), label));
     if (accessingFabricIndex.HasValue())
     {
@@ -8925,14 +8935,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kRootPublicKey):
             ReturnErrorOnFailure(DataModel::Decode(reader, rootPublicKey));
             break;
-        case to_underlying(Fields::kVendorId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
+        case to_underlying(Fields::kVendorID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
             break;
-        case to_underlying(Fields::kFabricId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricId));
+        case to_underlying(Fields::kFabricID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricID));
             break;
-        case to_underlying(Fields::kNodeId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, nodeId));
+        case to_underlying(Fields::kNodeID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nodeID));
             break;
         case to_underlying(Fields::kLabel):
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
@@ -8951,7 +8961,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace FabricDescriptor
+} // namespace FabricDescriptorStruct
 namespace NOCStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -9067,7 +9077,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttestationElements)), attestationElements));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSignature)), signature));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttestationSignature)), attestationSignature));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -9089,8 +9100,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kAttestationElements):
             ReturnErrorOnFailure(DataModel::Decode(reader, attestationElements));
             break;
-        case to_underlying(Fields::kSignature):
-            ReturnErrorOnFailure(DataModel::Decode(reader, signature));
+        case to_underlying(Fields::kAttestationSignature):
+            ReturnErrorOnFailure(DataModel::Decode(reader, attestationSignature));
             break;
         default:
             break;
@@ -9477,7 +9488,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRootCertificate)), rootCertificate));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRootCACertificate)), rootCACertificate));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -9496,8 +9507,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kRootCertificate):
-            ReturnErrorOnFailure(DataModel::Decode(reader, rootCertificate));
+        case to_underlying(Fields::kRootCACertificate):
+            ReturnErrorOnFailure(DataModel::Decode(reader, rootCACertificate));
             break;
         default:
             break;
@@ -9557,8 +9568,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace OperationalCredentials
 namespace GroupKeyManagement {
@@ -10025,16 +10035,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace GroupKeyManagement
 namespace FixedLabel {
-namespace Structs {
-} // namespace Structs
+namespace Structs {} // namespace Structs
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10067,16 +10074,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace FixedLabel
 namespace UserLabel {
-namespace Structs {
-} // namespace Structs
+namespace Structs {} // namespace Structs
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10109,14 +10113,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace UserLabel
 namespace ProxyConfiguration {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10146,14 +10148,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ProxyConfiguration
 namespace ProxyDiscovery {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10183,14 +10183,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ProxyDiscovery
 namespace ProxyValid {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10220,14 +10218,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ProxyValid
 namespace BooleanState {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10483,13 +10479,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ModeSelect
 namespace DoorLock {
 namespace Structs {
-namespace DlCredential {
+namespace CredentialStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -10532,7 +10527,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace DlCredential
+} // namespace CredentialStruct
 } // namespace Structs
 
 namespace Commands {
@@ -10541,7 +10536,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPinCode)), pinCode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPINCode)), PINCode));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10560,8 +10555,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kPinCode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, pinCode));
+        case to_underlying(Fields::kPINCode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
             break;
         default:
             break;
@@ -10578,7 +10573,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPinCode)), pinCode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPINCode)), PINCode));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10597,8 +10592,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kPinCode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, pinCode));
+        case to_underlying(Fields::kPINCode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
             break;
         default:
             break;
@@ -10616,7 +10611,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeout)), timeout));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPinCode)), pinCode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPINCode)), PINCode));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10638,8 +10633,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kTimeout):
             ReturnErrorOnFailure(DataModel::Decode(reader, timeout));
             break;
-        case to_underlying(Fields::kPinCode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, pinCode));
+        case to_underlying(Fields::kPINCode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
             break;
         default:
             break;
@@ -11227,7 +11222,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOperationType)), operationType));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserIndex)), userIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserName)), userName));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserUniqueId)), userUniqueId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserUniqueID)), userUniqueID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserStatus)), userStatus));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserType)), userType));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCredentialRule)), credentialRule));
@@ -11258,8 +11253,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kUserName):
             ReturnErrorOnFailure(DataModel::Decode(reader, userName));
             break;
-        case to_underlying(Fields::kUserUniqueId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueId));
+        case to_underlying(Fields::kUserUniqueID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueID));
             break;
         case to_underlying(Fields::kUserStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
@@ -11324,7 +11319,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserIndex)), userIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserName)), userName));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserUniqueId)), userUniqueId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserUniqueID)), userUniqueID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserStatus)), userStatus));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserType)), userType));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCredentialRule)), credentialRule));
@@ -11358,8 +11353,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kUserName):
             ReturnErrorOnFailure(DataModel::Decode(reader, userName));
             break;
-        case to_underlying(Fields::kUserUniqueId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueId));
+        case to_underlying(Fields::kUserUniqueID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueID));
             break;
         case to_underlying(Fields::kUserStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
@@ -12405,8 +12400,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace WindowCovering
 namespace BarrierControl {
@@ -12542,14 +12536,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace BarrierControl
 namespace PumpConfigurationAndControl {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -13660,14 +13652,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace Thermostat
 namespace FanControl {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -13730,14 +13720,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace FanControl
 namespace ThermostatUserInterfaceConfiguration {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -13776,8 +13764,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ThermostatUserInterfaceConfiguration
 namespace ColorControl {
@@ -14302,7 +14289,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperature)), colorTemperature));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMireds)), colorTemperatureMireds));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
@@ -14324,8 +14312,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kColorTemperature):
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperature));
+        case to_underlying(Fields::kColorTemperatureMireds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMireds));
             break;
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
@@ -14964,14 +14952,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ColorControl
 namespace BallastConfiguration {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -14993,8 +14979,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::MaxLevel::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, maxLevel));
         break;
-    case Attributes::IntrinsicBalanceFactor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, intrinsicBalanceFactor));
+    case Attributes::IntrinsicBallastFactor::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, intrinsicBallastFactor));
         break;
     case Attributes::BallastFactorAdjustment::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, ballastFactorAdjustment));
@@ -15043,14 +15029,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace BallastConfiguration
 namespace IlluminanceMeasurement {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -15095,14 +15079,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace IlluminanceMeasurement
 namespace TemperatureMeasurement {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -15144,14 +15126,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace TemperatureMeasurement
 namespace PressureMeasurement {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -15208,14 +15188,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace PressureMeasurement
 namespace FlowMeasurement {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -15257,14 +15235,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace FlowMeasurement
 namespace RelativeHumidityMeasurement {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -15306,14 +15282,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace RelativeHumidityMeasurement
 namespace OccupancySensing {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -15329,14 +15303,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::OccupancySensorTypeBitmap::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorTypeBitmap));
         break;
-    case Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, pirOccupiedToUnoccupiedDelay));
+    case Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIROccupiedToUnoccupiedDelay));
         break;
-    case Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, pirUnoccupiedToOccupiedDelay));
+    case Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedDelay));
         break;
-    case Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, pirUnoccupiedToOccupiedThreshold));
+    case Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedThreshold));
         break;
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicOccupiedToUnoccupiedDelay));
@@ -15379,14 +15353,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace OccupancySensing
 namespace WakeOnLan {
 
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -15419,13 +15391,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace WakeOnLan
 namespace Channel {
 namespace Structs {
-namespace ChannelInfo {
+namespace ChannelInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15480,8 +15451,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ChannelInfo
-namespace LineupInfo {
+} // namespace ChannelInfoStruct
+namespace LineupInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15532,7 +15503,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace LineupInfo
+} // namespace LineupInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -15731,13 +15702,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace Channel
 namespace TargetNavigator {
 namespace Structs {
-namespace TargetInfo {
+namespace TargetInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15780,7 +15750,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace TargetInfo
+} // namespace TargetInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -15902,13 +15872,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace TargetNavigator
 namespace MediaPlayback {
 namespace Structs {
-namespace PlaybackPosition {
+namespace PlaybackPositionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -15951,7 +15920,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace PlaybackPosition
+} // namespace PlaybackPositionStruct
 } // namespace Structs
 
 namespace Commands {
@@ -16021,7 +15990,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace Pause.
-namespace StopPlayback {
+namespace Stop {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -16053,7 +16022,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace StopPlayback.
+} // namespace Stop.
 namespace StartOver {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -16424,13 +16393,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace MediaPlayback
 namespace MediaInput {
 namespace Structs {
-namespace InputInfo {
+namespace InputInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -16481,7 +16449,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace InputInfo
+} // namespace InputInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -16665,8 +16633,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace MediaInput
 namespace LowPower {
@@ -16735,8 +16702,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace LowPower
 namespace KeypadInput {
@@ -16846,13 +16812,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace KeypadInput
 namespace ContentLauncher {
 namespace Structs {
-namespace Dimension {
+namespace DimensionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -16899,8 +16864,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Dimension
-namespace AdditionalInfo {
+} // namespace DimensionStruct
+namespace AdditionalInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -16943,8 +16908,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace AdditionalInfo
-namespace Parameter {
+} // namespace AdditionalInfoStruct
+namespace ParameterStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -16991,8 +16956,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Parameter
-namespace ContentSearch {
+} // namespace ParameterStruct
+namespace ContentSearchStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17031,13 +16996,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ContentSearch
-namespace StyleInformation {
+} // namespace ContentSearchStruct
+namespace StyleInformationStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kImageUrl)), imageUrl));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kImageURL)), imageURL));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColor)), color));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSize)), size));
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -17059,8 +17024,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kImageUrl):
-            ReturnErrorOnFailure(DataModel::Decode(reader, imageUrl));
+        case to_underlying(Fields::kImageURL):
+            ReturnErrorOnFailure(DataModel::Decode(reader, imageURL));
             break;
         case to_underlying(Fields::kColor):
             ReturnErrorOnFailure(DataModel::Decode(reader, color));
@@ -17079,8 +17044,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace StyleInformation
-namespace BrandingInformation {
+} // namespace StyleInformationStruct
+namespace BrandingInformationStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17139,7 +17104,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace BrandingInformation
+} // namespace BrandingInformationStruct
 } // namespace Structs
 
 namespace Commands {
@@ -17234,7 +17199,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace LaunchURL.
-namespace LaunchResponse {
+namespace LauncherResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17274,7 +17239,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LaunchResponse.
+} // namespace LauncherResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -17311,13 +17276,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ContentLauncher
 namespace AudioOutput {
 namespace Structs {
-namespace OutputInfo {
+namespace OutputInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17364,7 +17328,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace OutputInfo
+} // namespace OutputInfoStruct
 } // namespace Structs
 
 namespace Commands {
@@ -17482,57 +17446,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace Application {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCatalogVendorId)), catalogVendorId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kApplicationId)), applicationId));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCatalogVendorId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, catalogVendorId));
-            break;
-        case to_underlying(Fields::kApplicationId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, applicationId));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace Application
-namespace ApplicationEP {
+namespace ApplicationEPStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17575,7 +17494,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ApplicationEP
+} // namespace ApplicationEPStruct
 } // namespace Structs
 
 namespace Commands {
@@ -17771,60 +17690,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
-namespace Structs {
-namespace ApplicationBasicApplication {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCatalogVendorId)), catalogVendorId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kApplicationId)), applicationId));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
+namespace Structs {} // namespace Structs
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCatalogVendorId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, catalogVendorId));
-            break;
-        case to_underlying(Fields::kApplicationId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, applicationId));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace ApplicationBasicApplication
-} // namespace Structs
-
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -17878,8 +17750,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ApplicationBasic
 namespace AccountLogin {
@@ -18065,8 +17936,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace AccountLogin
 namespace ElectricalMeasurement {
@@ -18674,8 +18544,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ElectricalMeasurement
 namespace ClientMonitoring {
@@ -18901,8 +18770,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ClientMonitoring
 namespace UnitTesting {
@@ -21368,8 +21236,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace FaultInjection
 

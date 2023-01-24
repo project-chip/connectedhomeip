@@ -3,14 +3,16 @@ OUTPUT_ARCH( "riscv" )
 ENTRY( bl702_start )
 
 __EM_SIZE = DEFINED(ble_controller_init) ? 8K : 0K;
+__SHA_LINK_CFG_SIZE = DEFINED(mbedtls_sha256_init) ? 72 : 0;
 __CACHE_SIZE = DEFINED(__CACHE_SIZE) ? __CACHE_SIZE : 16K;
 __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
 
 MEMORY
 {
   flash  (rxai!w) : ORIGIN = 0x23000000, LENGTH = (2M)
-  tcm_ocram (wxa) : ORIGIN = 0x42010000 + __CACHE_SIZE, LENGTH = (64K - __CACHE_SIZE + 64K - __EM_SIZE - __stack_size)
-  sys_stack (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram), LENGTH = __stack_size
+  tcm_ocram (wxa) : ORIGIN = 0x42010000 + __CACHE_SIZE, LENGTH = (64K - __CACHE_SIZE + 64K - __EM_SIZE - __stack_size - __SHA_LINK_CFG_SIZE)
+  sha_ocram (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram), LENGTH = __SHA_LINK_CFG_SIZE
+  sys_stack (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram) + __SHA_LINK_CFG_SIZE, LENGTH = __stack_size
   hbnram    (wxa) : ORIGIN = 0x40010000, LENGTH = (4K)
   psram     (wxa) : ORIGIN = 0x26000000, LENGTH = (2M)
 }
@@ -143,11 +145,7 @@ SECTIONS
     *(.ble_rsvd_mem)
 
     KEEP(*AppTask.cpp.o(.bss.*appStack*))
-    KEEP(*main.cpp.o(.bss.*IdleTaskStack*))
     KEEP(*main.cpp.o(.bss.*TimerTaskStack*))
-    
-    /*KEEP(*MemMonitoring.cpp.o(.bss.*monitoringStack*))*/
-    /*KEEP(*out.uart.c.o(.bss.chipUart_var*))*/
     
   } >hbnram
 
@@ -328,6 +326,11 @@ SECTIONS
   PROVIDE( _heap3_start = .);
   PROVIDE( _heap3_size = ORIGIN(psram) + LENGTH(psram) - _heap3_start );
 
+  .sha_ocram (NOLOAD) :
+  {
+    *(.sha_ocram*)
+  } > sha_ocram
+  
   .stack (NOLOAD) :
   {
     PROVIDE ( _sp_base = . );

@@ -41,14 +41,14 @@ bool BoltLockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo 
     user = mUsers[userIndex - 1];
 
     ChipLogProgress(Zcl, "Getting lock user %u: %s", static_cast<unsigned>(userIndex),
-                    user.userStatus == DlUserStatus::kAvailable ? "available" : "occupied");
+                    user.userStatus == UserStatusEnum::kAvailable ? "available" : "occupied");
 
     return true;
 }
 
 bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName,
-                              uint32_t uniqueId, DlUserStatus userStatus, DlUserType userType, DlCredentialRule credentialRule,
-                              const DlCredential * credentials, size_t totalCredentials)
+                              uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType,
+                              CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
     // userIndex is guaranteed by the caller to be between 1 and CONFIG_LOCK_NUM_USERS
     UserData & userData = mUserData[userIndex - 1];
@@ -58,10 +58,10 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
     VerifyOrReturnError(totalCredentials <= CONFIG_LOCK_NUM_CREDENTIALS_PER_USER, false);
 
     Platform::CopyString(userData.mName, userName);
-    memcpy(userData.mCredentials, credentials, totalCredentials * sizeof(DlCredential));
+    memcpy(userData.mCredentials, credentials, totalCredentials * sizeof(CredentialStruct));
 
     user.userName           = CharSpan(userData.mName, userName.size());
-    user.credentials        = Span<const DlCredential>(userData.mCredentials, totalCredentials);
+    user.credentials        = Span<const CredentialStruct>(userData.mCredentials, totalCredentials);
     user.userUniqueId       = uniqueId;
     user.userStatus         = userStatus;
     user.userType           = userType;
@@ -72,12 +72,12 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
     user.lastModifiedBy     = modifier;
 
     ChipLogProgress(Zcl, "Setting lock user %u: %s", static_cast<unsigned>(userIndex),
-                    userStatus == DlUserStatus::kAvailable ? "available" : "occupied");
+                    userStatus == UserStatusEnum::kAvailable ? "available" : "occupied");
 
     return true;
 }
 
-bool BoltLockManager::GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
+bool BoltLockManager::GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                     EmberAfPluginDoorLockCredentialInfo & credential) const
 {
     VerifyOrReturnError(credentialIndex > 0 && credentialIndex <= CONFIG_LOCK_NUM_CREDENTIALS, false);
@@ -91,7 +91,7 @@ bool BoltLockManager::GetCredential(uint16_t credentialIndex, DlCredentialType c
 }
 
 bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
-                                    DlCredentialStatus credentialStatus, DlCredentialType credentialType, const ByteSpan & secret)
+                                    DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const ByteSpan & secret)
 {
     VerifyOrReturnError(credentialIndex > 0 && credentialIndex <= CONFIG_LOCK_NUM_CREDENTIALS, false);
     VerifyOrReturnError(secret.size() <= kMaxCredentialLength, false);
@@ -118,7 +118,7 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     return true;
 }
 
-bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, DlOperationError & err) const
+bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationErrorEnum & err) const
 {
     // Optionality of the PIN code is validated by the caller, so assume it is OK not to provide the PIN code.
     if (!pinCode.HasValue())
@@ -129,7 +129,7 @@ bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, DlOperatio
     // Check the PIN code
     for (const auto & credential : mCredentials)
     {
-        if (credential.status == DlCredentialStatus::kAvailable || credential.credentialType != DlCredentialType::kPin)
+        if (credential.status == DlCredentialStatus::kAvailable || credential.credentialType != CredentialTypeEnum::kPin)
         {
             continue;
         }
@@ -142,7 +142,7 @@ bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, DlOperatio
     }
 
     ChipLogDetail(Zcl, "Invalid lock PIN code provided");
-    err = DlOperationError::kInvalidCredential;
+    err = OperationErrorEnum::kInvalidCredential;
 
     return false;
 }

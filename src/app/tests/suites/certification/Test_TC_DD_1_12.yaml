@@ -36,7 +36,7 @@ tests:
     - label: "Scan the DUTs QR code using the TH."
       verification: |
           1. Run DUT. Example for DUT=all-clusters-app
-          $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
           ...
           [1657213978.633542][366513:366513] CHIP:DL: Device Configuration:
           [1657213978.633637][366513:366513] CHIP:DL:   Serial Number: (not set)
@@ -51,9 +51,9 @@ tests:
           [1657213978.634100][366513:366513] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
 
           2. Parse onboarding payload using TH=chip-tool
-          $ ./chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
+          ./chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
 
-          Verify in TH as commissioner side:
+          Verify in TH (CHIP-TOOL)
 
           [1657214153060] [29000:16610528] CHIP: [SPL] Parsing base38Representation: MT:-24J0AFN00KA0648G00
           [1657214153060] [29000:16610528] CHIP: [SPL] Version:       0
@@ -69,14 +69,17 @@ tests:
       verification: |
           1. Verify DUT is advertising in commissioning mode. On DUT, verify through commissioning
 
-          Verify in TH as commissioner side:
+          Verify in TH (CHIP-TOOL)
 
-          $  ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+
           ...
           [1657214364908] [29006:16612760] CHIP: [CTL] Starting commissioning discovery over DNS-SD
           [1657214364908] [29006:16612760] CHIP: [DL] Browsing for: _matterc._udp,_L3840
-          [1657214365080] [29006:16612761] CHIP: [DL] Mdns: OnBrowseAdd  name: E5EFE5FB9DC494B9, type: _matterc._udp., domain: local., interface: 7        [1657214365080] [29006:16612761] CHIP: [DL] Resolve type=_matterc._udp name=E5EFE5FB9DC494B9 interface=7
-          [1657214365080] [29006:16612761] CHIP: [DL] Mdns : OnNewInterface hostname:DCA6328D2B9F0000.local. fullname:E5EFE5FB9DC494B9._matterc._udp.local. interface: 7        [1657214365082] [29006:16612761] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fd54:23a1:c6de:4637:4c4:ee82:2a0f:b5e2
+          [1657214365080] [29006:16612761] CHIP: [DL] Mdns: OnBrowseAdd  name: E5EFE5FB9DC494B9, type: _matterc._udp., domain: local., interface: 7
+          [1657214365080] [29006:16612761] CHIP: [DL] Resolve type=_matterc._udp name=E5EFE5FB9DC494B9 interface=7
+          [1657214365080] [29006:16612761] CHIP: [DL] Mdns : OnNewInterface hostname:DCA6328D2B9F0000.local. fullname:E5EFE5FB9DC494B9._matterc._udp.local. interface: 7
+          [1657214365082] [29006:16612761] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fd54:23a1:c6de:4637:4c4:ee82:2a0f:b5e2
           [1657214365082] [29006:16612761] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fe80::1e81:3e0:3865:2d29
           [1657214365082] [29006:16612761] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.10
           [1657214365082] [29006:16612761] CHIP: [CTL] Discovered device to be commissioned over DNS-SD

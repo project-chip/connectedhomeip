@@ -139,7 +139,7 @@ tests:
       command: "SkipForward"
       arguments:
           values:
-              - name: "DeltaPositionMilliseconds"
+              - name: "deltaPositionMilliseconds"
                 value: 10000
       response:
           values:
@@ -170,7 +170,7 @@ tests:
       command: "SkipBackward"
       arguments:
           values:
-              - name: "DeltaPositionMilliseconds"
+              - name: "deltaPositionMilliseconds"
                 value: 10000
       response:
           values:

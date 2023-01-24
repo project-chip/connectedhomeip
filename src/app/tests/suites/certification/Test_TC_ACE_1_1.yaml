@@ -15,6 +15,9 @@
 
 name: 42.1.1. [TC-ACE-1.1] Privileges
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Access Control"
@@ -29,8 +32,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # NOTE: This won't work with the command line switch for commissioner node id
-    # TODO: get this working with the command line switch
     - label: "TP2 - Write ACL giving admin privilege on all EP0"
       command: "writeAttribute"
       attribute: "ACL"

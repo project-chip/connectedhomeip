@@ -18,7 +18,7 @@
      {{~/first~}}
     {{~/zcl_command_arguments~}}
   ): {{#if responseName~}}
-    {{responseName}}
+    {{asUpperCamelCase responseName}}
 {{~else~}}
     DefaultSuccess
 {{~/if~}}

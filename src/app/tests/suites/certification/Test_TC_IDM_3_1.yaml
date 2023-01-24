@@ -36,9 +36,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
-          sudo ./chip-tool levelcontrol write on-level 2 1 1
+           ./chip-tool levelcontrol write on-level 2 1 1
 
-          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
 
           [1655795552.551487][7331:7331] CHIP:EM: Handling via exchange: 41640r, Delegate: 0xaaaad9aed418
           [1655795552.551552][7331:7331] CHIP:IM: Received Write request
@@ -96,7 +96,7 @@ tests:
           [1657883782.723047][2796:2801] CHIP:EM: Sending Standalone Ack for MessageCounter:76592104 on exchange 56753i
 
 
-          sudo ./chip-tool levelcontrol read on-level 1 1
+           ./chip-tool levelcontrol read on-level 1 1
           verify on TH(reference app) receives the right write Request Message for the data sent in the above command
           [1657883808.062792][2457:2457] CHIP:IM: Received Read request
           [1657883808.062871][2457:2457] CHIP:DMG: ReadRequestMessage =
@@ -120,7 +120,7 @@ tests:
           If the DUT has to provision to verify the logs,, verify that TH all-clusters-app sent success response
           [1655795604.755214][6880:6885] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 737039636
           [1655795604.755363][6880:6885] CHIP:TOO:   on level: 2
-          [1655795604.755460][6880:6885] CHIP:EM: Sending Standalone Ack for MessageCounter:83198098 on exchange 53763i
+          [1655795604.755460][6880:6885] CHIP:EM: Sending Standalone Ack for MessageCounter:83198098 on exchange 53763iOn TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
       disabled: true
 
     - label:
@@ -138,9 +138,10 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-           ./chip-tool basic write local-config-disabled 1 1 0
+           ./chip-tool  basicinformation write local-config-disabled 1 1 0
 
-          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
 
           [1655795795.033946][7331:7331] CHIP:EM: Handling via exchange: 11668r, Delegate: 0xaaaad9aed418
           [1655795795.034011][7331:7331] CHIP:IM: Received Write request
@@ -202,7 +203,7 @@ tests:
           [1657883938.395940][2822:2827] CHIP:EM: Sending Standalone Ack for MessageCounter:157043526 on exchange 18989i
 
 
-           ./chip-tool basic read local-config-disabled 1 0
+           ./chip-tool  basicinformation read local-config-disabled 1 0
 
           verify on TH(reference app) receives the right write Request Message for the data sent in the above command
           [1657884119.522809][2748:2748] CHIP:IM: Received Read request
@@ -237,9 +238,10 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-           ./chip-tool basic write node-label node 1 0
+           ./chip-tool basicinformation write node-label node 1 0
 
-          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
 
           [1655796035.022296][7331:7331] CHIP:EM: Handling via exchange: 64908r, Delegate: 0xaaaad9aed418
           [1655796035.022365][7331:7331] CHIP:IM: Received Write request
@@ -334,7 +336,7 @@ tests:
 
           ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
 
-          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
 
           [1655796141.166846][7331:7331] CHIP:IM: Received Write request
           [1655796141.166889][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
@@ -481,7 +483,8 @@ tests:
 
            ./chip-tool any write-by-id 0x0204 0  1  1 1
 
-          verify on TH (reference app) receives the right write Request Message for the data sent in the above command
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
 
           [1655796297.607841][7331:7331] CHIP:EM: Handling via exchange: 37495r, Delegate: 0xaaaad9aed418
           [1655796297.607911][7331:7331] CHIP:IM: Received Write request
@@ -563,7 +566,8 @@ tests:
 
            ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
 
-          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
 
           [1655796429.696904][7331:7331] CHIP:IM: Received Write request
           [1655796429.696947][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
@@ -660,7 +664,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes)
           Here is an example command to verify the write functionality. User must choose an attribute which has large list of attribute data.
-           ./chip-tool basic write node-label node 1 0
+           ./chip-tool  basicinformation write node-label node 1 0
 
           If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
@@ -673,8 +677,7 @@ tests:
 
           ./chip-tool any write-by-id 0x0204 0  1  1 1
 
-
-          verify on TH(reference  app) receives the right write Request Message for the data sent in the above command
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
 
           [1655796724.510633][7331:7331] CHIP:EM: Handling via exchange: 51058r, Delegate: 0xaaaad9aed418
           [1655796724.510711][7331:7331] CHIP:IM: Received Write request

@@ -1137,5 +1137,52 @@
                              requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
                                 successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
                                 failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback;
+/*!
+ @brief Send a OnOff:On request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)onOff_on:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a OnOff:Off request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)onOff_off:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a OnOff:Toggle request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)onOff_toggle:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 @end
 #endif /* CastingServerBridge_h */

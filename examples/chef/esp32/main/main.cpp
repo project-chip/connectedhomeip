@@ -42,7 +42,6 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>

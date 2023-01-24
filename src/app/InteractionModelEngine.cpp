@@ -50,14 +50,16 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                                        CASESessionManager * apCASESessionMgr)
+                                        CASESessionManager * apCASESessionMgr,
+                                        SubscriptionResumptionStorage * subscriptionResumptionStorage)
 {
     VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mpExchangeMgr    = apExchangeMgr;
-    mpFabricTable    = apFabricTable;
-    mpCASESessionMgr = apCASESessionMgr;
+    mpExchangeMgr                   = apExchangeMgr;
+    mpFabricTable                   = apFabricTable;
+    mpCASESessionMgr                = apCASESessionMgr;
+    mpSubscriptionResumptionStorage = subscriptionResumptionStorage;
 
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
@@ -663,6 +665,8 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
         foundSubscription->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
         return Status::Success;
     }
+
+    ChipLogDetail(InteractionModel, "Received report with invalid subscriptionId %" PRIu32, subscriptionId);
 
     return Status::InvalidSubscription;
 }
@@ -1578,5 +1582,40 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
     // the fabric removal, though, so they will fail when they try to actually send their command response
     // and will close at that point.
 }
+
+CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
+
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    while (iterator->Next(subscriptionInfo))
+    {
+        auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedSize();
+        auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedSize();
+        if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
+        {
+            ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
+            iterator->Release();
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        ReadHandler * handler = mReadHandlers.CreateObject(*this);
+        if (handler == nullptr)
+        {
+            ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
+            iterator->Release();
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        handler->ResumeSubscription(*mpCASESessionMgr, subscriptionInfo);
+    }
+    iterator->Release();
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace app
 } // namespace chip

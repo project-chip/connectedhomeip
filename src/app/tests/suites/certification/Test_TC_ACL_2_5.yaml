@@ -43,11 +43,7 @@ tests:
 
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-          DUT
-          sudo ./chip-all-clusters-app --wifi
-
-          TH1
-          ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
+          DUT is commissioned on TH1 fabric
       disabled: true
 
     - label:

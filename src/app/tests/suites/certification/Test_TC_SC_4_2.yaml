@@ -38,6 +38,7 @@ tests:
           Run the  unknown key/value pair on second TH Terminal with the same discriminator as the one in the first teminal:
 
           avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=3840 CM=1  INVALID_TEST=40 SII=5000 SAI=300 PH=36 PI= VP=65521+3276 T=1
+          Established under name "DD200C20D25AE5F7"
       disabled: true
 
     - label: "DUT attempts to commission TH"
@@ -53,7 +54,8 @@ tests:
           [1661234861.805967][2599:2604] CHIP:DL: Avahi browse: all for now
           [1661234861.810750][2599:2604] CHIP:DL: Avahi resolve found
           [1661234861.810840][2599:2604] CHIP:DIS: Discovered node:
-          [1661234861.810861][2599:2604] CHIP:DIS:         Hostname: E45F010BF66D0000        [1661234861.810887][2599:2604] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0b:f66e
+          [1661234861.810861][2599:2604] CHIP:DIS:         Hostname: E45F010BF66D0000
+          [1661234861.810887][2599:2604] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0b:f66e
           [1661234861.810908][2599:2604] CHIP:DIS:         Port: 5540
           [1661234861.810928][2599:2604] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1661234861.810947][2599:2604] CHIP:DIS:         Mrp Interval active: 300 ms

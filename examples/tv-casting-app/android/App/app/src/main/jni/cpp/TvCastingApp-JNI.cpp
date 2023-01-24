@@ -330,7 +330,7 @@ exit:
 }
 
 CHIP_ERROR CreateParameter(JNIEnv * env, jobject jParameter,
-                           chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & parameter)
+                           chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type & parameter)
 {
     jclass jParameterClass = env->GetObjectClass(jParameter);
 
@@ -348,7 +348,8 @@ CHIP_ERROR CreateParameter(JNIEnv * env, jobject jParameter,
 }
 
 CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
-                               chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & search, ListFreer & listFreer)
+                               chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type & search,
+                               ListFreer & listFreer)
 {
     jclass jContentSearchClass;
     ReturnErrorOnFailure(
@@ -367,20 +368,21 @@ CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
     jmethodID jNextMid    = env->GetMethodID(env->GetObjectClass(jIterator), "next", "()Ljava/lang/Object;");
     jmethodID jHasNextMid = env->GetMethodID(env->GetObjectClass(jIterator), "hasNext", "()Z");
 
-    auto * parameterListHolder = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(parameterListSize);
+    auto * parameterListHolder =
+        new ListHolder<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(parameterListSize);
     listFreer.add(parameterListHolder);
     int parameterIndex = 0;
     while (env->CallBooleanMethod(jIterator, jHasNextMid))
     {
         jobject jParameter = env->CallObjectMethod(jIterator, jNextMid);
-        chip::app::Clusters::ContentLauncher::Structs::Parameter::Type parameter;
+        chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type parameter;
         ReturnErrorOnFailure(CreateParameter(env, jParameter, parameter));
         parameterListHolder->mList[parameterIndex].type           = parameter.type;
         parameterListHolder->mList[parameterIndex].value          = parameter.value;
         parameterListHolder->mList[parameterIndex].externalIDList = parameter.externalIDList;
         parameterIndex++;
     }
-    search.parameterList = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(
+    search.parameterList = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(
         parameterListHolder->mList, parameterListSize);
 
     return CHIP_NO_ERROR;
@@ -400,7 +402,7 @@ JNI_METHOD(jboolean, contentLauncher_1launchContent)
     chip::Optional<chip::CharSpan> data = MakeOptional(CharSpan::fromCharString(nativeData));
 
     ListFreer listFreer;
-    chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search;
+    chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type search;
     CHIP_ERROR err = CreateContentSearch(env, jSearch, search, listFreer);
 
     TargetEndpointInfo endpoint;
@@ -1336,10 +1338,10 @@ JNI_METHOD(jboolean, applicationLauncher_1launchApp)
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationLauncher_launchApp called");
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId      = static_cast<uint16_t>(catalogVendorId);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID      = static_cast<uint16_t>(catalogVendorId);
     const char * nativeApplicationId = env->GetStringUTFChars(applicationId, 0);
-    application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
+    application.applicationID        = CharSpan::fromCharString(nativeApplicationId);
     JniByteArray dataByteArray(env, data);
 
     TargetEndpointInfo endpoint;
@@ -1375,10 +1377,10 @@ JNI_METHOD(jboolean, applicationLauncher_1stopApp)
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationLauncher_stopApp called");
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId      = static_cast<uint16_t>(catalogVendorId);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID      = static_cast<uint16_t>(catalogVendorId);
     const char * nativeApplicationId = env->GetStringUTFChars(applicationId, 0);
-    application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
+    application.applicationID        = CharSpan::fromCharString(nativeApplicationId);
 
     TargetEndpointInfo endpoint;
     CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
@@ -1413,10 +1415,10 @@ JNI_METHOD(jboolean, applicationLauncher_1hideApp)
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationLauncher_hideApp called");
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId      = static_cast<uint16_t>(catalogVendorId);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID      = static_cast<uint16_t>(catalogVendorId);
     const char * nativeApplicationId = env->GetStringUTFChars(applicationId, 0);
-    application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
+    application.applicationID        = CharSpan::fromCharString(nativeApplicationId);
 
     TargetEndpointInfo endpoint;
     CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
