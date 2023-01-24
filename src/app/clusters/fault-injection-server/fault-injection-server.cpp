@@ -80,9 +80,8 @@ bool emberAfFaultInjectionClusterFailAtFaultCallback(CommandHandler * commandObj
 
     if (faultInjectionMgr != nullptr)
     {
-        ChipLogProgress(
-            Zcl, "FaultInjection: Configure a fault of type: %u and Id: %" PRIu32 " to be triggered deterministically",
-            static_cast<uint8_t>(commandData.type), commandData.id);
+        ChipLogProgress(Zcl, "FaultInjection: Configure a fault of type: %u and Id: %" PRIu32 " to be triggered deterministically",
+                        static_cast<uint8_t>(commandData.type), commandData.id);
         int32_t err = faultInjectionMgr->FailAtFault(commandData.id, commandData.numCallsToSkip, commandData.numCallsToFail,
                                                      commandData.takeMutex);
 
