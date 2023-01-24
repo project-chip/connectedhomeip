@@ -123,7 +123,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    if chip_tool is None:
+    if chip_tool is None and not run_yamltests_with_chip_repl:
+        # non yaml tests REQUIRE chip-tool. Yaml tests should not require chip-tool
         chip_tool = FindBinaryPath('chip-tool')
 
     # Figures out selected test that match the given name(s)
