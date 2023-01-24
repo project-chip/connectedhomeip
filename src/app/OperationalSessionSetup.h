@@ -45,31 +45,6 @@
 
 namespace chip {
 
-struct DeviceProxyInitParams
-{
-    SessionManager * sessionManager                                    = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
-    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
-    Messaging::ExchangeManager * exchangeMgr                           = nullptr;
-    FabricTable * fabricTable                                          = nullptr;
-    CASEClientPoolDelegate * clientPool                                = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
-
-    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
-
-    CHIP_ERROR Validate() const
-    {
-        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        // sessionResumptionStorage can be nullptr when resumption is disabled
-        ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-        return CHIP_NO_ERROR;
-    }
-};
-
 class OperationalSessionSetup;
 
 /**
@@ -140,7 +115,7 @@ private:
  * application code does incorrectly hold onto this information so do not follow those incorrect
  * implementations as an example.
  */
-typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
 /**
@@ -171,20 +146,20 @@ class DLL_EXPORT OperationalSessionSetup : public SessionDelegate,
 public:
     ~OperationalSessionSetup() override;
 
-    OperationalSessionSetup(DeviceProxyInitParams & params, ScopedNodeId peerId,
+    OperationalSessionSetup(const CASEClientInitParams & params, CASEClientPoolDelegate * clientPool, ScopedNodeId peerId,
                             OperationalSessionReleaseDelegate * releaseDelegate) :
         mSecureSession(*this)
     {
         mInitParams = params;
-        if (params.Validate() != CHIP_NO_ERROR || releaseDelegate == nullptr)
+        if (params.Validate() != CHIP_NO_ERROR || clientPool == nullptr || releaseDelegate == nullptr)
         {
             mState = State::Uninitialized;
             return;
         }
 
+        mClientPool      = clientPool;
         mSystemLayer     = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mPeerId          = peerId;
-        mFabricTable     = params.fabricTable;
         mReleaseDelegate = releaseDelegate;
         mState           = State::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
@@ -260,8 +235,8 @@ private:
         SecureConnected,  // CASE session established.
     };
 
-    DeviceProxyInitParams mInitParams;
-    FabricTable * mFabricTable = nullptr;
+    CASEClientInitParams mInitParams;
+    CASEClientPoolDelegate * mClientPool = nullptr;
     System::Layer * mSystemLayer;
 
     // mCASEClient is only non-null if we are in State::Connecting or just

@@ -70,6 +70,7 @@ class AndroidApp(Enum):
     CHIP_TEST = auto()
     TV_SERVER = auto()
     TV_CASTING_APP = auto()
+    JAVA_MATTER_CONTROLLER = auto()
 
     def AppName(self):
         if self == AndroidApp.CHIP_TOOL:
@@ -80,6 +81,8 @@ class AndroidApp(Enum):
             return "tv-server"
         elif self == AndroidApp.TV_CASTING_APP:
             return "tv-casting"
+        elif self == AndroidApp.JAVA_MATTER_CONTROLLER:
+            return "java-matter-controller"
         else:
             raise Exception("Unknown app type: %r" % self)
 
@@ -96,6 +99,8 @@ class AndroidApp(Enum):
             return "tv-app"
         elif self == AndroidApp.TV_CASTING_APP:
             return "tv-casting-app"
+        elif self == AndroidApp.JAVA_MATTER_CONTROLLER:
+            return "java-matter-controller"
         else:
             return None
 
@@ -165,13 +170,13 @@ class AndroidBuilder(Builder):
         # when using dry run.
         jnilibs_dir = os.path.join(
             self.root,
-            "src/android/",
+            "examples/android/",
             self.app.AppName(),
             "app/libs/jniLibs",
             self.board.AbiName(),
         )
         libs_dir = os.path.join(
-            self.root, "src/android/", self.app.AppName(), "app/libs"
+            self.root, "examples/android/", self.app.AppName(), "app/libs"
         )
         self._Execute(
             ["mkdir", "-p", jnilibs_dir], title="Prepare Native libs " + self.identifier
@@ -216,25 +221,11 @@ class AndroidBuilder(Builder):
                 ]
             )
 
-    def copyToExampleAndroid(self):
-        jnilibs_dir = os.path.join(
-            self.root,
-            "examples",
-            self.app.ExampleName(),
-            "android/App/app/libs/jniLibs",
-            self.board.AbiName(),
-        )
-        libs_dir = os.path.join(
-            self.root, "examples", self.app.ExampleName(), "android/App/app/libs"
-        )
+    def copyToExampleApp(self, jnilibs_dir, libs_dir, libs, jars):
         self._Execute(
             ["mkdir", "-p", jnilibs_dir], title="Prepare Native libs " + self.identifier
         )
 
-        if self.app.ExampleName() == "tv-casting-app":
-            libs = ["libc++_shared.so", "libTvCastingApp.so"]
-        else:
-            libs = ["libSetupPayloadParser.so", "libc++_shared.so", "libTvApp.so"]
         for libName in libs:
             self._Execute(
                 [
@@ -246,19 +237,6 @@ class AndroidBuilder(Builder):
                 ]
             )
 
-        if self.app.ExampleName() == "tv-casting-app":
-            jars = {
-                "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
-                "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
-                "TvCastingApp.jar": "TvCastingApp.jar",
-            }
-        else:
-            jars = {
-                "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
-                "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
-                "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
-                "TvApp.jar": "TvApp.jar",
-            }
         for jarName in jars.keys():
             self._Execute(
                 [
@@ -272,9 +250,9 @@ class AndroidBuilder(Builder):
         # App compilation
         self._Execute(
             [
-                "%s/src/android/%s/gradlew" % (self.root, self.app.AppName()),
+                "%s/examples/android/%s/gradlew" % (self.root, self.app.AppName()),
                 "-p",
-                "%s/src/android/%s" % (self.root, self.app.AppName()),
+                "%s/examples/android/%s" % (self.root, self.app.AppName()),
                 "-PmatterBuildSrcDir=%s" % self.output_dir,
                 "-PmatterSdkSourceBuild=false",
                 "-PbuildDir=%s" % self.output_dir,
@@ -316,10 +294,25 @@ class AndroidBuilder(Builder):
                 title="Building Example " + self.identifier,
             )
 
+    def createJavaExecutable(self, java_program):
+        self._Execute(
+            [
+                "chmod",
+                "+x",
+                "%s/bin/%s" % (self.output_dir, java_program),
+            ],
+            title="Make Java program executable",
+        )
+
     def generate(self):
         self._Execute(
             ["python3", "third_party/android_deps/set_up_android_deps.py"],
             title="Setting up Android deps through Gradle",
+        )
+
+        self._Execute(
+            ["third_party/java_deps/set_up_java_deps.sh"],
+            title="Setting up Java deps",
         )
 
         if not os.path.exists(self.output_dir):
@@ -356,7 +349,10 @@ class AndroidBuilder(Builder):
 
             exampleName = self.app.ExampleName()
             if exampleName is not None:
-                gn_gen += ["--root=%s/examples/%s/android/" % (self.root, exampleName)]
+                if exampleName == "java-matter-controller":
+                    gn_gen += ["--root=%s/examples/%s/" % (self.root, exampleName)]
+                else:
+                    gn_gen += ["--root=%s/examples/%s/android/" % (self.root, exampleName)]
 
             if self.board.IsIde():
                 gn_gen += [
@@ -387,15 +383,26 @@ class AndroidBuilder(Builder):
                     title="Accepting NDK licenses @ tools",
                 )
 
+            app_dir = os.path.join(self.root, "examples/", self.app.AppName())
+            if exampleName == "java-matter-controller":
+                self._Execute(
+                    [
+                        "cp",
+                        os.path.join(app_dir, "Manifest.txt"),
+                        self.output_dir,
+                    ],
+                    title="Copying Manifest.txt to " + self.output_dir,
+                )
+
     def _build(self):
         if self.board.IsIde():
             # App compilation IDE
             # TODO: Android Gradle with module and -PbuildDir= will caused issue, remove -PbuildDir=
             self._Execute(
                 [
-                    "%s/src/android/%s/gradlew" % (self.root, self.app.AppName()),
+                    "%s/examples/android/%s/gradlew" % (self.root, self.app.AppName()),
                     "-p",
-                    "%s/src/android/%s" % (self.root, self.app.AppName()),
+                    "%s/examples/android/%s" % (self.root, self.app.AppName()),
                     "-PmatterBuildSrcDir=%s" % self.output_dir,
                     "-PmatterSdkSourceBuild=true",
                     "-PmatterSourceBuildAbiFilters=%s" % self.board.AbiName(),
@@ -413,8 +420,78 @@ class AndroidBuilder(Builder):
             if exampleName is None:
                 self.copyToSrcAndroid()
                 self.gradlewBuildSrcAndroid()
-            else:
-                self.copyToExampleAndroid()
+            elif exampleName == "java-matter-controller":
+                jnilibs_dir = os.path.join(
+                    self.root,
+                    "examples/",
+                    self.app.ExampleName(),
+                    "app/libs/jniLibs",
+                    self.board.AbiName(),
+                )
+
+                libs_dir = os.path.join(
+                    self.root, "examples/", self.app.ExampleName(), "app/libs"
+                )
+
+                libs = [
+                    "libSetupPayloadParser.so",
+                    "libCHIPController.so",
+                    "libc++_shared.so",
+                ]
+
+                jars = {
+                    "CHIPController.jar": "third_party/connectedhomeip/src/controller/java/CHIPController.jar",
+                    "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
+                }
+
+                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
+                self.createJavaExecutable("java-matter-controller")
+            elif exampleName == "tv-casting-app":
+                jnilibs_dir = os.path.join(
+                    self.root,
+                    "examples/",
+                    self.app.ExampleName(),
+                    "android/App/app/libs/jniLibs",
+                    self.board.AbiName(),
+                )
+
+                libs_dir = os.path.join(
+                    self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
+                )
+
+                libs = ["libc++_shared.so", "libTvCastingApp.so"]
+
+                jars = {
+                    "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
+                    "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
+                    "TvCastingApp.jar": "TvCastingApp.jar",
+                }
+
+                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
+                self.gradlewBuildExampleAndroid()
+            elif exampleName == "tv-app":
+                jnilibs_dir = os.path.join(
+                    self.root,
+                    "examples/",
+                    self.app.ExampleName(),
+                    "android/App/app/libs/jniLibs",
+                    self.board.AbiName(),
+                )
+
+                libs_dir = os.path.join(
+                    self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
+                )
+
+                libs = ["libSetupPayloadParser.so", "libc++_shared.so", "libTvApp.so"]
+
+                jars = {
+                    "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
+                    "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
+                    "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
+                    "TvApp.jar": "TvApp.jar",
+                }
+
+                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
     def build_outputs(self):
@@ -423,7 +500,7 @@ class AndroidBuilder(Builder):
                 self.app.AppName()
                 + "-debug.apk": os.path.join(
                     self.root,
-                    "src/android",
+                    "examples/android",
                     self.app.AppName(),
                     "app/build/outputs/apk/debug/app-debug.apk",
                 )

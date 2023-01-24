@@ -17,7 +17,6 @@
 
 import logging
 import subprocess
-
 from typing import List
 
 from memdf.util.config import Config

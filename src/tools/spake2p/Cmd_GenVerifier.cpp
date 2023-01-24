@@ -30,6 +30,7 @@
 #include "spake2p.h"
 
 #include <errno.h>
+#include <stdio.h>
 
 #include <CHIPVersion.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -52,6 +53,7 @@ OptionDef gCmdOptionDefs[] =
 {
     { "count",           kArgumentRequired, 'c' },
     { "pin-code",        kArgumentRequired, 'p' },
+    { "pin-code-file",   kArgumentRequired, 'f' },
     { "iteration-count", kArgumentRequired, 'i' },
     { "salt-len",        kArgumentRequired, 'l' },
     { "salt",            kArgumentRequired, 's' },
@@ -84,6 +86,20 @@ const char * const gCmdOptionHelp =
     "          * 99999999\n"
     "          * 12345678\n"
     "          * 87654321\n"
+    "\n"
+    "   -f, --pin-code-file <file>\n"
+    "\n"
+    "       A file which contains all the PIN codes to generate verifiers.\n"
+    "       Each line in this file should be a valid PIN code in the decimal number format. If the row count\n"
+    "       of this file is less than the number of pin-code/verifier parameter sets to be generated, the\n"
+    "       first few verifier sets will be generated using the PIN codes in this file, and the next will\n"
+    "       use the random PIN codes.\n"
+    "       The following file is a example with 5 PIN codes:\n"
+    "       1234\n"
+    "       2345\n"
+    "       3456\n"
+    "       4567\n"
+    "       5678\n"
     "\n"
     "   -i, --iteration-count <int>\n"
     "\n"
@@ -143,6 +159,33 @@ uint8_t gSalt[BASE64_MAX_DECODED_LEN(BASE64_ENCODED_LEN(chip::kSpake2p_Max_PBKDF
 uint8_t gSaltDecodedLen   = 0;
 uint8_t gSaltLen          = 0;
 const char * gOutFileName = nullptr;
+FILE * gPinCodeFile       = nullptr;
+
+static uint32_t GetNextPinCode()
+{
+    if (!gPinCodeFile)
+    {
+        return chip::kSetupPINCodeUndefinedValue;
+    }
+    char * pinCodeStr = nullptr;
+    size_t readSize   = 8;
+    uint32_t pinCode  = chip::kSetupPINCodeUndefinedValue;
+    if (getline(&pinCodeStr, &readSize, gPinCodeFile) != -1)
+    {
+        if (readSize > 8)
+        {
+            pinCodeStr[8] = 0;
+        }
+        pinCode = static_cast<uint32_t>(atoi(pinCodeStr));
+        if (!chip::SetupPayload::IsValidSetupPIN(pinCode))
+        {
+            fprintf(stderr, "The line %s in PIN codes file is invalid, using a random PIN code.\n", pinCodeStr);
+            pinCode = chip::kSetupPINCodeUndefinedValue;
+        }
+        free(pinCodeStr);
+    }
+    return pinCode;
+}
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -157,15 +200,21 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
     case 'p':
         // Specifications sections 5.1.1.6 and 5.1.6.1
-        if (!ParseInt(arg, gPinCode) || (gPinCode > chip::kSetupPINCodeMaximumValue) ||
-            (gPinCode == chip::kSetupPINCodeUndefinedValue) || (gPinCode == 11111111) || (gPinCode == 22222222) ||
-            (gPinCode == 33333333) || (gPinCode == 44444444) || (gPinCode == 55555555) || (gPinCode == 66666666) ||
-            (gPinCode == 77777777) || (gPinCode == 88888888) || (gPinCode == 99999999) || (gPinCode == 12345678) ||
-            (gPinCode == 87654321))
+        if (!ParseInt(arg, gPinCode) || (!chip::SetupPayload::IsValidSetupPIN(gPinCode)))
         {
             PrintArgError("%s: Invalid value specified for pin-code parameter: %s\n", progName, arg);
             return false;
         }
+        break;
+
+    case 'f':
+        gPinCodeFile = fopen(arg, "r");
+        if (!gPinCodeFile)
+        {
+            PrintArgError("%s: Failed to open the PIN code file: %s\n", progName, arg);
+            return false;
+        }
+        gPinCode = GetNextPinCode();
         break;
 
     case 'i':
@@ -334,10 +383,15 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
-        // On the next iteration the PIN Code and Salt will be randomly generated.
-        gPinCode        = chip::kSetupPINCodeUndefinedValue;
+        // If the file with PIN codes is not provided, the PIN code on next iteration will be randomly generated.
+        gPinCode = GetNextPinCode();
+        // On the next iteration the Salt will be randomly generated.
         gSaltDecodedLen = 0;
     }
 
+    if (gPinCodeFile)
+    {
+        fclose(gPinCodeFile);
+    }
     return true;
 }

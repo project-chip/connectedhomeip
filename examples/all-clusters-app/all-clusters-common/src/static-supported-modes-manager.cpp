@@ -6,7 +6,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using SemanticTag          = Structs::SemanticTag::Type;
+using SemanticTag          = Structs::SemanticTagStruct::Type;
 template <typename T>
 using List               = app::DataModel::List<T>;
 using storage_value_type = const ModeOptionStructType;
@@ -39,7 +39,7 @@ const StaticSupportedModesManager::EndpointSpanPair
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-const SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
+SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
 {
     for (auto & endpointSpanPair : supportedOptionsByEndpoints)
     {

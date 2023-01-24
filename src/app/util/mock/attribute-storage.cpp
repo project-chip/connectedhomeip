@@ -41,7 +41,7 @@
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -96,7 +96,7 @@ uint8_t mockAttribute4[256]  = {
 
 } // namespace
 
-uint16_t emberAfEndpointCount(void)
+uint16_t emberAfEndpointCount()
 {
     return ArraySize(endpoints);
 }

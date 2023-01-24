@@ -74,7 +74,7 @@ tests:
               contains: [0]
 
     - label: "Read the optional command(TriggerEffect) in AcceptedCommandList"
-      PICS: I.C.C40.Tx
+      PICS: I.S.C40.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -84,7 +84,7 @@ tests:
 
     #Commenting out the step IdentifyQuery (0x01) is not supported by Matter 1.0.
     #- label: "Read the optional attribute(IdentifyQuery) in AcceptedCommandList"
-    #  PICS: I.C.C01.Tx
+    #  PICS: I.S.C01.Rsp
     #  command: "readAttribute"
     #  attribute: "AcceptedCommandList"
     #  response:

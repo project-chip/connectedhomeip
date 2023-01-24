@@ -103,9 +103,16 @@ public:
 
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
-        ReturnErrorOnFailure(mMessageSendError);
+        if (mNumMessagesToAllowBeforeError == 0)
+        {
+            ReturnErrorOnFailure(mMessageSendError);
+        }
         mSentMessageCount++;
         bool dropMessage = false;
+        if (mNumMessagesToAllowBeforeError > 0)
+        {
+            --mNumMessagesToAllowBeforeError;
+        }
         if (mNumMessagesToAllowBeforeDropping > 0)
         {
             --mNumMessagesToAllowBeforeDropping;
@@ -124,15 +131,13 @@ public:
             {
                 mDelegate->OnMessageDropped();
             }
-        }
-        else
-        {
-            System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-            mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
-            mSystemLayer->ScheduleWork(OnMessageReceived, this);
+
+            return CHIP_NO_ERROR;
         }
 
-        return CHIP_NO_ERROR;
+        System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
+        mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+        return mSystemLayer->ScheduleWork(OnMessageReceived, this);
     }
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override { return true; }
@@ -143,6 +148,7 @@ public:
         mDroppedMessageCount              = 0;
         mSentMessageCount                 = 0;
         mNumMessagesToAllowBeforeDropping = 0;
+        mNumMessagesToAllowBeforeError    = 0;
         mMessageSendError                 = CHIP_NO_ERROR;
     }
 
@@ -158,11 +164,11 @@ public:
 
     System::Layer * mSystemLayer = nullptr;
     std::queue<PendingMessageItem> mPendingMessageQueue;
-    Transport::PeerAddress mTxAddress;
     uint32_t mNumMessagesToDrop                = 0;
     uint32_t mDroppedMessageCount              = 0;
     uint32_t mSentMessageCount                 = 0;
     uint32_t mNumMessagesToAllowBeforeDropping = 0;
+    uint32_t mNumMessagesToAllowBeforeError    = 0;
     CHIP_ERROR mMessageSendError               = CHIP_NO_ERROR;
     LoopbackTransportDelegate * mDelegate      = nullptr;
 };

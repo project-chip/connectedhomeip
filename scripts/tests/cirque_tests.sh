@@ -105,7 +105,10 @@ function cirquetest_bootstrap() {
     set -ex
 
     cd "$REPO_DIR"/third_party/cirque/repo
+    pip3 uninstall -y setuptools
+    pip3 install setuptools==65.7.0
     pip3 install pycodestyle==2.5.0 wheel
+
     make NO_GRPC=1 install -j
 
     "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh

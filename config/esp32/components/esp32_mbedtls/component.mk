@@ -1,1 +1,0 @@
-COMPONENT_DEPENDS := chip

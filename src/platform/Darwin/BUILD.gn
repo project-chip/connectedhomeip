@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
@@ -24,6 +25,7 @@ config("darwin_config") {
     "CoreFoundation.framework",
     "CoreBluetooth.framework",
     "Foundation.framework",
+    "Network.framework",
   ]
 
   if (current_os == "mac") {
@@ -55,10 +57,11 @@ static_library("Darwin") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdContexts.cpp",
+    "DnssdHostNameRegistrar.cpp",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "InetPlatformConfig.h",
-    "Logging.cpp",
+    "LoggingImpl.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
     "NetworkCommissioningDriver.h",
@@ -79,7 +82,7 @@ static_library("Darwin") {
     ]
   }
 
-  if (chip_disable_platform_kvs == false) {
+  if (!chip_disable_platform_kvs) {
     sources += [
       "DeviceInstanceInfoProviderImpl.cpp",
       "DeviceInstanceInfoProviderImpl.h",
@@ -89,6 +92,7 @@ static_library("Darwin") {
   }
 
   deps = [
+    ":logging",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
   ]
@@ -120,4 +124,22 @@ static_library("Darwin") {
       "UUIDHelperImpl.mm",
     ]
   }
+}
+
+static_library("logging") {
+  sources = [
+    "Logging.h",
+    "Logging.mm",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core:chip_config_header",  # for lib/support/Span.h
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:logging_constants",
+    "${nlassert_root}:nlassert",  # for lib/support/Span.h
+  ]
+
+  configs += [ "${chip_root}/src:includes" ]
+  cflags = [ "-fobjc-arc" ]
+  frameworks = [ "Foundation.framework" ]
 }

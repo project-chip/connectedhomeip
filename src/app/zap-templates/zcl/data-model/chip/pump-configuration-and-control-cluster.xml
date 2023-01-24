@@ -21,7 +21,7 @@ limitations under the License.
     <domain>HVAC</domain>
     <description>An interface for configuring and controlling pumps.</description>
     <code>0x0200</code>
-    <define>PUMP_CONFIG_CONTROL_CLUSTER</define>
+    <define>PUMP_CONFIGURATION_AND_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
@@ -148,5 +148,16 @@ limitations under the License.
     <item name="ConstantTemperature" value="0x5"/>
     <item name="Automatic" value="0x7"/>
   </enum>
+
+  <bitmap name="PumpFeature" type="BITMAP32">
+    <cluster code="0x0200"/>
+    <field mask="0x01" name="ConstantPressure" />
+    <field mask="0x02" name="CompensatedPressure" />
+    <field mask="0x04" name="ConstantFlow"/>
+    <field mask="0x08" name="ConstantSpeed"/>
+    <field mask="0x10" name="ConstantTemperature"/>
+    <field mask="0x20" name="Automatic"/>
+    <field mask="0x40" name="Local"/>
+  </bitmap>
 
 </configurator>

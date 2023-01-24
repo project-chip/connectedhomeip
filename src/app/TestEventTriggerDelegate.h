@@ -44,7 +44,7 @@ public:
      *
      * @param[in] eventTrigger Event trigger to handle.
      *
-     * @return CHIP_ERROR_INVALID_ARGUMENT when eventTrigger is not a valid test event trigger.
+     * @return CHIP_NO_ERROR on success or another CHIP_ERROR on failure
      */
     virtual CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) = 0;
 };

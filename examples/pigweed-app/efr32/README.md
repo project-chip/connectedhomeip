@@ -1,4 +1,4 @@
-#CHIP EFR32 Pigweed Example Application
+# CHIP EFR32 Pigweed Example Application
 
 The EFR32 example demonstrates the usage of Pigweed module functionalities in an
 application.
@@ -21,9 +21,9 @@ following features are available:
 
 ---
 
--   [CHIP EFR32 Pigweed Example Application](#chip-EFR32-pigweed-example-application)
+-   [CHIP EFR32 Pigweed Example Application](#chip-efr32-pigweed-example-application)
     -   [Building the Example Application](#building-the-example-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
+        -   [Flashing the Application](#flashing-the-application)
     -   [Testing the Example Application](#testing-the-example-application)
 
 ---
@@ -66,6 +66,7 @@ following features are available:
     MG12 boards:
 
     -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4163A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm,
         868MHz@19dBm
     -   BRD4164A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm,
@@ -75,9 +76,18 @@ following features are available:
         915MHz@19dBm
     -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 
-    MG21 boards:
+    MG21 boards: Currently not supported due to RAM limitation.
 
     -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+    MG24 boards :
+
+    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 

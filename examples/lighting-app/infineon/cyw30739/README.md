@@ -59,6 +59,24 @@ dataset and CASE credentials are then provided.
     $ rm -rf out/
     ```
 
+## Building Options
+
+### DAC / DAC Key / PAI Certificate / Certificate Declaration
+
+Infineon CYW30739 examples use test certifications, keys, and CD by default. For
+a production build, manufacturers can provision certifications, keys, and CD by
+the following arguments:
+
+-   `matter_dac`, `matter_dac_key`, `matter_pai`, `matter_cd`
+
+    ```bash
+    $ ./scripts/examples/gn_build_example.sh examples/lighting-app/infineon/cyw30739 out/lighting-app \
+    'matter_dac="/path/to/dac.der"' \
+    'matter_dac_key="/path/to/dac_key.der"' \
+    'matter_pai="/path/to/pai.der"' \
+    'matter_cd="/path/to/cd.der"'
+    ```
+
 ## Flashing the Application
 
 ### Enter Recovery Mode

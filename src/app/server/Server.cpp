@@ -126,10 +126,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     chip::Platform::MemoryInit();
 
     // Initialize PersistentStorageDelegate-based storage
-    mDeviceStorage            = initParams.persistentStorageDelegate;
-    mSessionResumptionStorage = initParams.sessionResumptionStorage;
-    mOperationalKeystore      = initParams.operationalKeystore;
-    mOpCertStore              = initParams.opCertStore;
+    mDeviceStorage                 = initParams.persistentStorageDelegate;
+    mSessionResumptionStorage      = initParams.sessionResumptionStorage;
+    mSubscriptionResumptionStorage = initParams.subscriptionResumptionStorage;
+    mOperationalKeystore           = initParams.operationalKeystore;
+    mOpCertStore                   = initParams.opCertStore;
 
     mCertificateValidityPolicy = initParams.certificateValidityPolicy;
 
@@ -225,7 +226,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
-    err = sGlobalEventIdCounter.Init(mDeviceStorage, &DefaultStorageKeyAllocator::IMEventNumber,
+    err = sGlobalEventIdCounter.Init(mDeviceStorage, DefaultStorageKeyAllocator::IMEventNumber(),
                                      CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
     SuccessOrExit(err);
 
@@ -290,11 +291,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .certificateValidityPolicy = mCertificateValidityPolicy,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
-            .clientPool        = &mCASEClientPool,
             .groupDataProvider = mGroupsProvider,
             .mrpLocalConfig    = GetLocalMRPConfig(),
         },
-        .sessionSetupPool        = &mSessionSetupPool,
+        .clientPool            = &mCASEClientPool,
+        .sessionSetupPool      = &mSessionSetupPool,
     };
 
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
@@ -304,7 +305,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager,
+                                                                 mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -350,6 +352,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                 reinterpret_cast<intptr_t>(this));
         }
     }
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    ResumeSubscriptions();
+#endif
 
     PlatformMgr().HandleServerStarted();
 
@@ -430,6 +436,7 @@ void Server::Shutdown()
     mSessions.Shutdown();
     mTransports.Close();
     mAccessControl.Finish();
+    Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
@@ -473,5 +480,16 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+void Server::ResumeSubscriptions()
+{
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Error when trying to resume subscriptions : %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+#endif
 
 } // namespace chip

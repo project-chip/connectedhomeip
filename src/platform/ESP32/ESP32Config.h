@@ -74,9 +74,12 @@ public:
     static const Key kConfigKey_VendorName;
     static const Key kConfigKey_ProductId;
     static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_ProductLabel;
+    static const Key kConfigKey_ProductURL;
     static const Key kConfigKey_SupportedCalTypes;
     static const Key kConfigKey_SupportedLocaleSize;
     static const Key kConfigKey_RotatingDevIdUniqueId;
+    static const Key kConfigKey_LocationCapability;
 
     // CHIP Config keys
     static const Key kConfigKey_ServiceConfig;
@@ -88,6 +91,14 @@ public:
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_UniqueId;
+    static const Key kConfigKey_LockUser;
+    static const Key kConfigKey_Credential;
+    static const Key kConfigKey_LockUserName;
+    static const Key kConfigKey_CredentialData;
+    static const Key kConfigKey_UserCredentials;
+    static const Key kConfigKey_WeekDaySchedules;
+    static const Key kConfigKey_YearDaySchedules;
+    static const Key kConfigKey_HolidaySchedules;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;

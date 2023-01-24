@@ -50,7 +50,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 200
               - name: "Direction"
                 value: 0
@@ -101,8 +101,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 215
-              maxValue: 245
+              minValue: 195
+              maxValue: 254
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -118,8 +118,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 0
-              maxValue: 10
+              minValue: 4
+              maxValue: 6
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -134,7 +134,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 5
+          constraints:
+              minValue: 4
+              maxValue: 6
 
     - label:
           "TH sends MoveToHue command to DUT with Hue=50, Direction=0x00
@@ -143,7 +145,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 50
               - name: "Direction"
                 value: 0
@@ -211,7 +213,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 245
+              minValue: 208
               maxValue: 255
 
     - label: "Wait 5s"
@@ -227,13 +229,16 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 245
+          constraints:
+              minValue: 208
+              maxValue: 255
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 2
@@ -241,8 +246,9 @@ tests:
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 3

@@ -16,7 +16,7 @@
  *
  */
 
-#include "../../config/PersistentStorage.h"
+#include <controller/ExamplePersistentStorage.h>
 
 #include "StorageManagementCommand.h"
 

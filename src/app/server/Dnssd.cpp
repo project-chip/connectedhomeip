@@ -219,22 +219,6 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetProductId(chip::Optional<uint16_t>::Value(value));
     }
 
-    uint16_t discriminator = 0;
-    CHIP_ERROR error       = DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery,
-                     "Setup discriminator read error (%" CHIP_ERROR_FORMAT ")! Critical error, will not be commissionable.",
-                     error.Format());
-        return error;
-    }
-
-    // Override discriminator with temporary one if one is set
-    discriminator = mEphemeralDiscriminator.ValueOr(discriminator);
-
-    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((discriminator >> 8) & 0x0F))
-        .SetLongDiscriminator(discriminator);
-
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceTypeId(val32) == CHIP_NO_ERROR)
     {
@@ -248,52 +232,71 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
     }
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
-    ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
-    advertiseParameters.SetRotatingDeviceId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
-#endif
-
     advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
-    if (!HaveOperationalCredentials())
+    if (commissionableNode)
     {
-        if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
+        uint16_t discriminator = 0;
+        CHIP_ERROR error       = DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
+        if (error != CHIP_NO_ERROR)
         {
-            ChipLogDetail(Discovery, "DNS-SD Pairing Hint not set");
-        }
-        else
-        {
-            advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+            ChipLogError(Discovery,
+                         "Setup discriminator read error (%" CHIP_ERROR_FORMAT ")! Critical error, will not be commissionable.",
+                         error.Format());
+            return error;
         }
 
-        if (DeviceLayer::ConfigurationMgr().GetInitialPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(Discovery, "DNS-SD Pairing Instruction not set");
-        }
-        else
-        {
-            advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
-        }
-    }
-    else
-    {
-        if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingHint(value) != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(Discovery, "DNS-SD Pairing Hint not set");
-        }
-        else
-        {
-            advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
-        }
+        // Override discriminator with temporary one if one is set
+        discriminator = mEphemeralDiscriminator.ValueOr(discriminator);
 
-        if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+        advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((discriminator >> 8) & 0x0F))
+            .SetLongDiscriminator(discriminator);
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+        char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+        ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+        advertiseParameters.SetRotatingDeviceId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
+#endif
+
+        if (!HaveOperationalCredentials())
         {
-            ChipLogDetail(Discovery, "DNS-SD Pairing Instruction not set");
+            if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(Discovery, "DNS-SD Pairing Hint not set");
+            }
+            else
+            {
+                advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+            }
+
+            if (DeviceLayer::ConfigurationMgr().GetInitialPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(Discovery, "DNS-SD Pairing Instruction not set");
+            }
+            else
+            {
+                advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
+            }
         }
         else
         {
-            advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
+            if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingHint(value) != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(Discovery, "DNS-SD Pairing Hint not set");
+            }
+            else
+            {
+                advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+            }
+
+            if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(Discovery, "DNS-SD Pairing Instruction not set");
+            }
+            else
+            {
+                advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
+            }
         }
     }
 

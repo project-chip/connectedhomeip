@@ -76,7 +76,10 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
                 return;
             }
 
-            mRequestor->NotifyUpdateApplied();
+            if (mSendNotifyUpdateApplied)
+            {
+                mRequestor->NotifyUpdateApplied();
+            }
         });
     }
     else if ((mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle))
@@ -388,7 +391,7 @@ void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
     CancelDelayedAction(PeriodicQueryTimerHandler, this);
 }
 
-void DefaultOTARequestorDriver::RekickPeriodicQueryTimer(void)
+void DefaultOTARequestorDriver::RekickPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Rekicking the Periodic Query timer");
     StopPeriodicQueryTimer();

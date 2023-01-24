@@ -16,7 +16,6 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
@@ -125,13 +124,13 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
 }
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging::ExchangeManager & exchangeMgr,
-                                                                      SessionHandle & sessionHandle)
+                                                                      const SessionHandle & sessionHandle)
 {
     ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, mNodeId);
 
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
-    AdministratorCommissioningCluster cluster(exchangeMgr, sessionHandle, kAdministratorCommissioningClusterEndpoint);
+    ClusterBase cluster(exchangeMgr, sessionHandle, kAdministratorCommissioningClusterEndpoint);
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
@@ -141,7 +140,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
 
         AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout.count();
-        request.PAKEVerifier         = serializedVerifierSpan;
+        request.PAKEPasscodeVerifier = serializedVerifierSpan;
         request.discriminator        = mSetupPayload.discriminator.GetLongValue();
         request.iterations           = mPBKDFIterations;
         request.salt                 = mPBKDFSalt;
@@ -204,9 +203,6 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowSuccess(void * context,
     self->mNextStep = Step::kAcceptCommissioningStart;
     if (self->mCommissioningWindowCallback != nullptr)
     {
-        self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, CHIP_NO_ERROR,
-                                                  self->mSetupPayload);
-
         char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
 
         MutableCharSpan manualCode(payloadBuffer);
@@ -230,11 +226,18 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowSuccess(void * context,
         {
             ChipLogError(Controller, "Unable to generate QR code for setup payload: %" CHIP_ERROR_FORMAT, err.Format());
         }
+
+        self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, CHIP_NO_ERROR,
+                                                  self->mSetupPayload);
+        // Don't touch `self` anymore; it might have been destroyed by the
+        // callee.
     }
     else if (self->mBasicCommissioningWindowCallback != nullptr)
     {
         self->mBasicCommissioningWindowCallback->mCall(self->mBasicCommissioningWindowCallback->mContext, self->mNodeId,
                                                        CHIP_NO_ERROR);
+        // Don't touch `self` anymore; it might have been destroyed by the
+        // callee.
     }
 }
 
@@ -255,7 +258,7 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowFailure(void * context,
 }
 
 void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                                          SessionHandle & sessionHandle)
+                                                          const SessionHandle & sessionHandle)
 {
     auto * self = static_cast<CommissioningWindowOpener *>(context);
 
@@ -267,20 +270,18 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Messag
     switch (self->mNextStep)
     {
     case Step::kReadVID: {
-        constexpr EndpointId kBasicClusterEndpoint = 0;
-        BasicCluster cluster(exchangeMgr, sessionHandle, kBasicClusterEndpoint);
-        err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(context, OnVIDReadResponse,
-                                                                                          OnVIDPIDReadFailureResponse);
+        ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+        err = cluster.ReadAttribute<BasicInformation::Attributes::VendorID::TypeInfo>(context, OnVIDReadResponse,
+                                                                                      OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
         messageIfError = "Could not read VID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING
         break;
     }
     case Step::kReadPID: {
-        constexpr EndpointId kBasicClusterEndpoint = 0;
-        BasicCluster cluster(exchangeMgr, sessionHandle, kBasicClusterEndpoint);
-        err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
-                                                                                           OnVIDPIDReadFailureResponse);
+        ClusterBase cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+        err = cluster.ReadAttribute<BasicInformation::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
+                                                                                       OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
         messageIfError = "Could not read PID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING
@@ -323,7 +324,7 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceCon
                                                                        Seconds16 timeout)
 {
     // Not using Platform::New because we want to keep our constructor private.
-    auto * opener = new AutoCommissioningWindowOpener(controller);
+    auto * opener = new (std::nothrow) AutoCommissioningWindowOpener(controller);
     if (opener == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -345,7 +346,7 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceControll
                                                                   SetupPayload & payload, bool readVIDPIDAttributes)
 {
     // Not using Platform::New because we want to keep our constructor private.
-    auto * opener = new AutoCommissioningWindowOpener(controller);
+    auto * opener = new (std::nothrow) AutoCommissioningWindowOpener(controller);
     if (opener == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

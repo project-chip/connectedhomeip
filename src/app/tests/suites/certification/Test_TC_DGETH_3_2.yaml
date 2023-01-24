@@ -20,26 +20,26 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label: "Note"
       verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
     - label: "Commission TH to DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends ResetCounts to TH."
       PICS: DGETH.C.C00.Tx
       verification: |
-          Verify Command data recieved from running the below command is a success
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool ethernetnetworkdiagnostics reset-counts 1 1
+          ./chip-tool ethernetnetworkdiagnostics reset-counts 1 0
 
           Verify Command data recieved from running the below command is a success on TH(all-clusters-app) Log
 

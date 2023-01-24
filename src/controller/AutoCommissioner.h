@@ -18,6 +18,7 @@
 #pragma once
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
+#include <credentials/DeviceAttestationConstructor.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
@@ -35,8 +36,13 @@ public:
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
     CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
+    void StopCommissioning() { mStopCommissioning = true; };
 
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
+
+    ByteSpan GetAttestationElements() const { return ByteSpan(mAttestationElements, mAttestationElementsLen); }
+    ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
+    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
 protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
@@ -45,6 +51,9 @@ protected:
 
 private:
     DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
+
+    // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
+    void SetCASEFailsafeTimerIfNeeded();
     void ReleaseDAC();
     void ReleasePAI();
 
@@ -54,7 +63,7 @@ private:
     ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
 
-    CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject);
+    CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, IdentityProtectionKeySpan ipk, NodeId adminSubject);
     /**
      * The device argument to GetCommandTimeout is the device whose session will
      * be used for sending the relevant command.
@@ -62,6 +71,24 @@ private:
     Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+
+    // Helper function to determine whether next stage should be kWiFiNetworkSetup,
+    // kThreadNetworkSetup or kCleanup, depending whether network information has
+    // been provided that matches the thread/wifi endpoint of the target.
+    CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+
+    // Helper function to determine if a scan attempt should be made given the
+    // scan attempt commissioning params and the corresponding network endpoint of
+    // the target.
+    bool IsScanNeeded()
+    {
+        return ((mParams.GetAttemptWiFiNetworkScan().ValueOr(false) &&
+                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) ||
+                (mParams.GetAttemptThreadNetworkScan().ValueOr(false) &&
+                 mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId));
+    };
+
+    bool mStopCommissioning = false;
 
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
@@ -86,6 +113,11 @@ private:
     uint8_t mCSRNonce[kCSRNonceLength];
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
+
+    uint16_t mAttestationElementsLen = 0;
+    uint8_t mAttestationElements[Credentials::kMaxRspLen];
+    uint16_t mAttestationSignatureLen = 0;
+    uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
 };
 } // namespace Controller
 } // namespace chip

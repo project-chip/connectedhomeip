@@ -38,10 +38,10 @@
     const uint16_t panID = 0x28f4;
     MTRThreadOperationalDataset * dataset = [[MTRThreadOperationalDataset alloc]
         initWithNetworkName:@"TestNetwork"
-              extendedPANID:[NSData dataWithBytes:&extendedPANID length:MTRSizeThreadExtendedPanId]
+              extendedPANID:[NSData dataWithBytes:&extendedPANID length:MTRSizeThreadExtendedPANID]
                   masterKey:[NSData dataWithBytes:&masterKey length:MTRSizeThreadMasterKey]
                        PSKc:[NSData dataWithBytes:&PKSc length:MTRSizeThreadPSKc]
-                    channel:25
+              channelNumber:@(25)
                       panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
     XCTAssertNotNil(dataset);
     NSData * data = [dataset data];
@@ -54,7 +54,7 @@
     XCTAssertEqualObjects(reconstructed.masterKey, dataset.masterKey);
     XCTAssertEqualObjects(reconstructed.PSKc, dataset.PSKc);
     XCTAssertEqualObjects(reconstructed.extendedPANID, dataset.extendedPANID);
-    XCTAssertEqual(reconstructed.channel, dataset.channel);
+    XCTAssertEqualObjects(reconstructed.channelNumber, dataset.channelNumber);
 }
 
 - (void)testThreadOperationalDatasetInvalid
@@ -68,7 +68,7 @@
                                                    extendedPANID:[NSData dataWithBytes:&extendedPANID length:sizeof(extendedPANID)]
                                                        masterKey:[NSData dataWithBytes:&masterKey length:sizeof(masterKey)]
                                                             PSKc:[NSData dataWithBytes:&PKSc length:sizeof(PKSc)]
-                                                         channel:25
+                                                   channelNumber:@(25)
                                                            panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
 
     XCTAssertNil(dataset);

@@ -42,7 +42,7 @@ public:
     bool IsGroupBound();
 
     static void SwitchWorkerHandler(intptr_t);
-    static void OnInvokeCommandFailure(chip::DeviceProxy * aDevice, BindingData & aBindingData, CHIP_ERROR aError);
+    static void OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERROR aError);
 
     static BindingHandler & GetInstance()
     {

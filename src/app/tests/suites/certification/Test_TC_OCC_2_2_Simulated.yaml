@@ -1,0 +1,106 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 30.2.1. [TC-OCC-2.2] Attributes with server as DUT
+
+PICS:
+    - OCC.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Occupancy Sensing"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the device to be commissioned"
+      cluster: "DelayCommands"
+      command: "WaitForCommissioning"
+
+    - label: "DUT reads from the TH the (0x0000) Occupancy attribute"
+      PICS: OCC.C.A0000
+      wait: "readAttribute"
+      attribute: "Occupancy"
+
+    - label: "DUT reads from the TH the (0x0001) OccupancySensorType attribute"
+      PICS: OCC.C.A0001
+      wait: "readAttribute"
+      attribute: "OccupancySensorType"
+
+    - label: "DUT reads from the TH the (0x0002) OccupancySensorType attribute"
+      PICS: OCC.C.A0002
+      wait: "readAttribute"
+      attribute: "OccupancySensorTypeBitmap"
+
+    - label:
+          "DUT reads from the TH the (0x0010) PIROccupiedToUnoccupiedDelay
+          optional attribute"
+      PICS: OCC.C.A0010
+      wait: "readAttribute"
+      attribute: "PIROccupiedToUnoccupiedDelay"
+
+    - label:
+          "DUT reads from the TH the (0x0011) PIRUnoccupiedToOccupiedDelay
+          optional attribute"
+      PICS: OCC.C.A0011
+      wait: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedDelay"
+
+    - label:
+          "DUT reads from the TH the (0x0012) PIRUnoccupiedToOccupiedThreshold
+          optional attribute"
+      PICS: OCC.C.A0012
+      wait: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedThreshold"
+
+    - label:
+          "DUT reads from the TH the (0x0020)
+          UltrasonicOccupiedToUnoccupiedDelay optional attribute"
+      PICS: OCC.C.A0020
+      wait: "readAttribute"
+      attribute: "UltrasonicOccupiedToUnoccupiedDelay"
+
+    - label:
+          "DUT reads from the TH the (0x0021)
+          UltrasonicUnoccupiedToOccupiedDelay optional attribute"
+      PICS: OCC.C.A0021
+      wait: "readAttribute"
+      attribute: "UltrasonicUnoccupiedToOccupiedDelay"
+
+    - label:
+          "DUT reads from the TH the (0x0022)
+          UltrasonicUnoccupiedToOccupiedThreshold optional attribute"
+      PICS: OCC.C.A0022
+      wait: "readAttribute"
+      attribute: "UltrasonicUnoccupiedToOccupiedThreshold"
+
+    - label:
+          "DUT reads from the TH the (0x0030)
+          PhysicalContactOccupiedToUnoccupiedDelay optional attribute"
+      PICS: OCC.C.A0030
+      wait: "readAttribute"
+      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
+
+    - label:
+          "DUT reads from the TH the (0x0031)
+          PhysicalContactUnoccupiedToOccupiedDelay optional attribute"
+      PICS: OCC.C.A0031
+      wait: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
+
+    - label:
+          "DUT reads from the TH the (0x0032)
+          PhysicalContactUnoccupiedToOccupiedThreshold optional attribute"
+      PICS: OCC.C.A0032
+      wait: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"

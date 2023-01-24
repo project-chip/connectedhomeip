@@ -79,7 +79,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestSrv(void)
+int TestSrv()
 {
     nlTestSuite theSuite = { "Srv", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

@@ -64,8 +64,11 @@ void TestAddRemove(nlTestSuite * aSuite, void * aContext)
     CreateDefaultFullBindingTable(BindingTable::GetInstance());
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        pendingMap.AddPendingNotification(i, nullptr);
+        NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(i, nullptr) == CHIP_NO_ERROR);
     }
+    // Confirm adding in one more element fails
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(EMBER_BINDING_TABLE_SIZE, nullptr) == CHIP_ERROR_NO_MEMORY);
+
     auto iter = pendingMap.begin();
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
@@ -77,10 +80,10 @@ void TestAddRemove(nlTestSuite * aSuite, void * aContext)
     pendingMap.RemoveAllEntriesForNode(chip::ScopedNodeId());
     uint8_t expectedEntryIndecies[] = { 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
     iter                            = pendingMap.begin();
-    for (size_t i = 0; i < sizeof(expectedEntryIndecies); i++)
+    for (uint8_t ch : expectedEntryIndecies)
     {
         PendingNotificationEntry entry = *iter;
-        NL_TEST_ASSERT(aSuite, entry.mBindingEntryId == expectedEntryIndecies[i]);
+        NL_TEST_ASSERT(aSuite, entry.mBindingEntryId == ch);
         ++iter;
     }
     NL_TEST_ASSERT(aSuite, iter == pendingMap.end());
@@ -102,11 +105,11 @@ void TestLRUEntry(nlTestSuite * aSuite, void * aContext)
     PendingNotificationMap pendingMap;
     ClearBindingTable(BindingTable::GetInstance());
     CreateDefaultFullBindingTable(BindingTable::GetInstance());
-    pendingMap.AddPendingNotification(0, nullptr);
-    pendingMap.AddPendingNotification(1, nullptr);
-    pendingMap.AddPendingNotification(5, nullptr);
-    pendingMap.AddPendingNotification(7, nullptr);
-    pendingMap.AddPendingNotification(11, nullptr);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(0, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(1, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(5, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(7, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(11, nullptr) == CHIP_NO_ERROR);
 
     chip::ScopedNodeId node;
 

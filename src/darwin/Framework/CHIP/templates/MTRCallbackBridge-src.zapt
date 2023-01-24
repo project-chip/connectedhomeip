@@ -1,6 +1,6 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
-#import "MTRCallbackBridge_internal.h"
+#import "MTRCallbackBridge.h"
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
 
@@ -39,28 +39,34 @@
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_server_cluster_attributes}}
+{{#unless (wasRemoved (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#if isArray}}
-{{#>MTRCallbackBridge ns=parent.name                                }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge ns=parent.name                                }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}ListAttributeCallback{{/MTRCallbackBridge}}
 {{else}}
   {{#if_is_struct type}}
-  {{#>MTRCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}StructAttributeCallback{{/MTRCallbackBridge}}
+  {{#>MTRCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}StructAttributeCallback{{/MTRCallbackBridge}}
   {{/if_is_struct}}
   {{#if_is_strongly_typed_bitmap type}}
-  {{#>MTRCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}AttributeCallback{{/MTRCallbackBridge}}
+  {{#>MTRCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
   {{/if_is_strongly_typed_bitmap}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_cluster_responses}}
-{{#>MTRCallbackBridge partial-type="Command"                        }}{{asUpperCamelCase ../../name}}Cluster{{asUpperCamelCase ../name}}Callback{{/MTRCallbackBridge}}
+{{#unless (wasRemoved (asUpperCamelCase ../name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#>MTRCallbackBridge partial-type="Command"                        }}{{asUpperCamelCase ../../name preserveAcronyms=true}}Cluster{{asUpperCamelCase ../name preserveAcronyms=true}}Callback{{/MTRCallbackBridge}}
+{{/unless}}
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
-{{#>MTRCallbackBridge type=(asType label) isNullable=false ns=parent.name}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge type=(asType label) isNullable=true  ns=parent.name}}Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/MTRCallbackBridge}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) enum=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#>MTRCallbackBridge type=(asType label) isNullable=false ns=parent.name}}{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type=(asType label) isNullable=true  ns=parent.name}}Nullable{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
+{{/unless}}
 {{/zcl_enums}}
 {{/zcl_clusters}}

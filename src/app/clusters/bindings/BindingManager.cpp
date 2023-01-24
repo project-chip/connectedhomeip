@@ -83,13 +83,19 @@ CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
     }
     else
     {
-        for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
+        // In case the application does not want the BindingManager to establish a CASE session
+        // to the available bindings, it can be disabled by setting mEstablishConnectionOnInit
+        // to false.
+        if (params.mEstablishConnectionOnInit)
         {
-            if (entry.type == EMBER_UNICAST_BINDING)
+            for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
             {
-                // The CASE connection can also fail if the unicast peer is offline.
-                // There is recovery mechanism to retry connection on-demand so ignore error.
-                (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+                if (entry.type == EMBER_UNICAST_BINDING)
+                {
+                    // The CASE connection can also fail if the unicast peer is offline.
+                    // There is recovery mechanism to retry connection on-demand so ignore error.
+                    (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+                }
             }
         }
     }
@@ -101,12 +107,12 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
     VerifyOrReturnError(mInitParams.mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mLastSessionEstablishmentError = CHIP_NO_ERROR;
-    mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    auto * connectionCallback      = Platform::New<ConnectionCallback>(*this);
+    mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
+                                                            connectionCallback->GetOnDeviceConnectionFailure());
     if (mLastSessionEstablishmentError == CHIP_ERROR_NO_MEMORY)
     {
         // Release the least recently used entry
-        // TODO: Some reference counting mechanism shall be added the CASESessionManager
-        // so that other session clients don't get accidentally closed.
         ScopedNodeId peerToRemove;
         if (mPendingNotificationMap.FindLRUConnectPeer(peerToRemove) == CHIP_NO_ERROR)
         {
@@ -114,19 +120,16 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
 
             // Now retry
             mLastSessionEstablishmentError = CHIP_NO_ERROR;
-            mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+            // At this point connectionCallback is null since it deletes itself when the callback is called.
+            connectionCallback = Platform::New<ConnectionCallback>(*this);
+            mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
+                                                                    connectionCallback->GetOnDeviceConnectionFailure());
         }
     }
     return mLastSessionEstablishmentError;
 }
 
-void BindingManager::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
-{
-    BindingManager * manager = static_cast<BindingManager *>(context);
-    manager->HandleDeviceConnected(exchangeMgr, sessionHandle);
-}
-
-void BindingManager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+void BindingManager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     FabricIndex fabricToRemove = kUndefinedFabricIndex;
     NodeId nodeToRemove        = kUndefinedNodeId;
@@ -149,17 +152,15 @@ void BindingManager::HandleDeviceConnected(Messaging::ExchangeManager & exchange
     mPendingNotificationMap.RemoveAllEntriesForNode(ScopedNodeId(nodeToRemove, fabricToRemove));
 }
 
-void BindingManager::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
-{
-    BindingManager * manager = static_cast<BindingManager *>(context);
-    manager->HandleDeviceConnectionFailure(peerId, error);
-}
-
 void BindingManager::HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     // Simply release the entry, the connection will be re-established as needed.
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     mLastSessionEstablishmentError = error;
+    // We don't release the entry when connection fails, because inside
+    // BindingManager::EstablishConnection we may try again the connection.
+    // TODO(#22173): The logic in there doesn't actually make any sense with how
+    // mPendingNotificationMap and CASESessionManager are implemented today.
 }
 
 void BindingManager::FabricRemoved(FabricIndex fabricIndex)
@@ -174,7 +175,7 @@ void BindingManager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
+    VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
 
     CHIP_ERROR error      = CHIP_NO_ERROR;
     auto * bindingContext = mPendingNotificationMap.NewPendingNotificationContext(context);
@@ -188,9 +189,10 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
         {
             if (iter->type == EMBER_UNICAST_BINDING)
             {
-                mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                error = mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                SuccessOrExit(error);
                 error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
-                SuccessOrExit(error == CHIP_NO_ERROR);
+                SuccessOrExit(error);
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)
             {

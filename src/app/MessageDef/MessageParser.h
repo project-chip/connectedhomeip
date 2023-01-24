@@ -30,9 +30,9 @@ class MessageParser : public StructParser
 public:
     CHIP_ERROR Init(TLV::TLVReader & aReader);
     CHIP_ERROR ExitContainer();
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     CHIP_ERROR CheckInteractionModelRevision(TLV::TLVReader & aReader) const;
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
     CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };

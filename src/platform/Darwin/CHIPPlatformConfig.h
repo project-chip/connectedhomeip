@@ -59,10 +59,9 @@
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
-// TODO - Fine tune MRP default parameters for Darwin platform
-#define CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL (15000)
-#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
-
 #ifndef CHIP_CONFIG_KVS_PATH
 #define CHIP_CONFIG_KVS_PATH "/tmp/chip_kvs"
 #endif // CHIP_CONFIG_KVS_PATH
+
+// Enable subscription persistence and resumption for CI
+#define CHIP_CONFIG_PERSIST_SUBSCRIPTIONS 1

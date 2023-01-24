@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -46,10 +46,10 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "   -o, --out\n"
+    "   -o, --out <file/stdout>\n"
     "\n"
     "       The output printed certificate file name. If not specified\n"
-    "       or if specified - then output is written to stdout.\n"
+    "       or if specified '-' then output is written to stdout.\n"
     "\n"
     ;
 
@@ -63,15 +63,15 @@ OptionSet gCmdOptions =
 
 HelpOptions gHelpOptions(
     CMD_NAME,
-    "Usage: " CMD_NAME " [<options...>] <cert-file>\n",
+    "Usage: " CMD_NAME " [<options...>] <file/str>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
-    "Print a CHIP certificate.\n"
+    "Print a CHIP operational certificate.\n"
     "\n"
     "ARGUMENTS\n"
     "\n"
-    "  <cert-file>\n"
+    "  <file/str>\n"
     "\n"
-    "       A file containing a CHIP certificate.\n"
+    "       File or string containing a CHIP certificate.\n"
     "\n"
 );
 
@@ -83,8 +83,8 @@ OptionSet *gCmdOptionSets[] =
 };
 // clang-format on
 
-const char * gInFileName  = nullptr;
-const char * gOutFileName = "-";
+const char * gInFileNameOrStr = nullptr;
+const char * gOutFileName     = "-";
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -115,7 +115,7 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
         return false;
     }
 
-    gInFileName = argv[0];
+    gInFileNameOrStr = argv[0];
 
     return true;
 }
@@ -263,11 +263,8 @@ bool PrintCert(const char * fileName, X509 * cert)
     fprintf(file, "Extensions:\n");
 
     indent += 4;
-    if (certData->mCertFlags.Has(CertFlags::kIsCA))
-    {
-        Indent(file, indent);
-        fprintf(file, "Is CA            : true\n");
-    }
+    Indent(file, indent);
+    fprintf(file, "Is CA            : %s\n", certData->mCertFlags.Has(CertFlags::kIsCA) ? "true" : "false");
 
     if (certData->mCertFlags.Has(CertFlags::kPathLenConstraintPresent))
     {
@@ -374,7 +371,7 @@ exit:
 bool Cmd_PrintCert(int argc, char * argv[])
 {
     bool res = true;
-    std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
 
     if (argc == 1)
     {
@@ -385,7 +382,7 @@ bool Cmd_PrintCert(int argc, char * argv[])
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets, HandleNonOptionArgs);
     VerifyTrueOrExit(res);
 
-    res = ReadCert(gInFileName, cert.get());
+    res = ReadCert(gInFileNameOrStr, cert);
     VerifyTrueOrExit(res);
 
     res = PrintCert(gOutFileName, cert.get());

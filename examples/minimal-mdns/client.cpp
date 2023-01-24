@@ -22,6 +22,8 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
+#include <lib/dnssd/MinimalMdnsServer.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
@@ -30,7 +32,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include "AllInterfaceListener.h"
 #include "PacketReporter.h"
 
 using namespace chip;
@@ -39,7 +40,6 @@ namespace {
 
 struct Options
 {
-    bool enableIpV4           = false;
     bool unicastAnswers       = true;
     uint32_t runtimeMs        = 500;
     uint16_t querySendPort    = 5353;
@@ -53,9 +53,8 @@ constexpr size_t kMdnsMaxPacketSize = 1'024;
 
 using namespace chip::ArgParser;
 
-constexpr uint16_t kOptionEnableIpV4 = '4';
-constexpr uint16_t kOptionQuery      = 'q';
-constexpr uint16_t kOptionType       = 't';
+constexpr uint16_t kOptionQuery = 'q';
+constexpr uint16_t kOptionType  = 't';
 
 // non-ascii options have no short option version
 constexpr uint16_t kOptionListenPort       = 0x100;
@@ -67,10 +66,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 {
     switch (aIdentifier)
     {
-    case kOptionEnableIpV4:
-        gOptions.enableIpV4 = true;
-        return true;
-
     case kOptionListenPort:
         if (!ParseInt(aValue, gOptions.listenPort))
         {
@@ -145,7 +140,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 OptionDef cmdLineOptionsDef[] = {
     { "listen-port", kArgumentRequired, kOptionListenPort },
-    { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
     { "query", kArgumentRequired, kOptionQuery },
     { "type", kArgumentRequired, kOptionType },
     { "query-port", kArgumentRequired, kOptionQueryPort },
@@ -157,9 +151,6 @@ OptionDef cmdLineOptionsDef[] = {
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
                              "  --listen-port <number>\n"
                              "        The port number to listen on\n"
-                             "  -4\n"
-                             "  --enable-ip-v4\n"
-                             "        enable listening on IPv4\n"
                              "  -q\n"
                              "  --query\n"
                              "        The query to send\n"
@@ -324,13 +315,16 @@ int main(int argc, char ** args)
     ReportDelegate reporter;
     CHIP_ERROR err;
 
+    // This forces the global MDNS instance to be loaded in, effectively setting
+    // built in policies for addresses.
+    (void) chip::Dnssd::GlobalMinimalMdnsServer::Instance();
+
     gMdnsServer.SetDelegate(&reporter);
 
     {
+        auto endpoints = mdns::Minimal::GetAddressPolicy()->GetListenEndpoints();
 
-        MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
-
-        err = gMdnsServer.Listen(chip::DeviceLayer::UDPEndPointManager(), &allInterfaces, gOptions.listenPort);
+        err = gMdnsServer.Listen(chip::DeviceLayer::UDPEndPointManager(), endpoints.get(), gOptions.listenPort);
         if (err != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));

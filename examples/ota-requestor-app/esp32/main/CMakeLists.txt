@@ -16,6 +16,8 @@
 #
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
@@ -26,7 +28,6 @@ set(PRIV_INCLUDE_DIRS_LIST
 
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/ota-requestor-app/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
@@ -34,7 +35,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/access-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/administrator-commissioning-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic-information"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/descriptor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
@@ -57,8 +58,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-requestor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
-		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
@@ -86,6 +86,10 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST}
                        PRIV_REQUIRES ${PRIV_REQUIRES_LIST})
 
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+chip_app_component_codegen("${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.matter")
+chip_app_component_zapgen("${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap")
+
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
@@ -94,7 +98,6 @@ target_compile_options(${COMPONENT_LIB} PUBLIC
 
 if (CONFIG_ENABLE_PW_RPC)
 
-get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
@@ -172,6 +175,8 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   pw_hdlc
   pw_log
   pw_rpc.server
+  pw_sys_io
+  pw_trace
   pw_trace_tokenized
   pw_trace_tokenized.trace_buffer
   pw_trace_tokenized.rpc_service

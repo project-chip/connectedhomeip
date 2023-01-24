@@ -44,17 +44,17 @@ function show_help() {
     echo "Example: $SCRIPT_NAME --tizen-sdk-path ~/tizen-sdk --tizen-version 6.0 --install-dependencies"
     echo
     echo "Options:"
-    echo "  --help                     Display this information"
+    echo "  -h, --help                 Display this information"
     echo "  --tizen-sdk-path           Set directory where Tizen will be installed. Default is $TIZEN_SDK_ROOT"
     echo "  --tizen-sdk-data-path      Set directory where Tizen have data. Default is $TIZEN_SDK_DATA_PATH"
     echo "  --install-dependencies     This options install all dependencies."
     echo "  --tizen-version            Select Tizen version. Default is $TIZEN_VERSION"
-    echo "  --override-secret-tool     Without password manager circumvents the requirement of having functional D-Bus Secrets service"
+    echo "  --override-secret-tool     Circumvent the requirement of having functional D-Bus Secrets service."
     echo
     echo "Note:"
     echo "The script should run fully with ubuntu. For other distributions you may have to manually"
     echo "install all needed dependencies. Use the script specifying --tizen-sdk-path with or"
-    echo "without --tizen-version. The script will only install the tizen platform for Matter."
+    echo "without --tizen-version. The script will only install Tizen platform for Matter."
 }
 
 # ------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ function error() {
 # ------------------------------------------------------------------------------
 # Info print function
 function info() {
-    echo "$COLOR_GREEN$1$COLOR_NONE"
+    echo "$COLOR_GREEN[INFO]: $1$COLOR_NONE"
 }
 
 # ------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ function warning() {
 # ------------------------------------------------------------------------------
 # Show dependencies
 function show_dependencies() {
-    warning "Need dependencies for use this script installation SDK: cpio  wget unzip unrpm"
+    warning "Need dependencies for use this script installation SDK: cpio unrpm unzip wget"
     warning "Need dependencies for Tizen SDK: JAVA JRE >=8.0"
 }
 
@@ -135,9 +135,10 @@ function install_tizen_sdk() {
 
     TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core"
 
-    # Get tizen studio CLI
-    info "Get tizen studio CLI [...]"
     cd "$TMP_DIR" || return
+
+    # Get Tizen Studio CLI
+    info "Downloading Tizen Studio CLI..."
 
     # Download
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
@@ -150,7 +151,7 @@ function install_tizen_sdk() {
     download "$URL" "${PKG_ARR[@]}"
 
     # Get toolchain
-    info "Get toolchain"
+    info "Downloading Tizen toolchain..."
 
     # Download
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
@@ -159,11 +160,11 @@ function install_tizen_sdk() {
         "sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
-    # Get tizen sysroot
-    info "Get tizen sysroot"
+    # Get Tizen sysroot
+    info "Downloading Tizen sysroot..."
 
     # Base sysroot
-    # Different versions of tizen have different rootstrap versions
+    # Different versions of Tizen have different rootstrap versions
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     PKG_ARR=(
         "mobile-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
@@ -224,7 +225,7 @@ function install_tizen_sdk() {
     download "$URL" "${PKG_ARR[@]}"
 
     # Install all
-    info "Installation Tizen SDK [...]"
+    info "Installing Tizen SDK..."
 
     unzip -o '*.zip'
     cp -rf data/* "$TIZEN_SDK_ROOT"
@@ -234,12 +235,12 @@ function install_tizen_sdk() {
 
     # Install secret tool or not
     if ("$SECRET_TOOL"); then
-        info "Override secret tool"
+        info "Overriding secret tool..."
         cp "$SCRIPT_DIR/secret-tool.py" "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
         chmod 0755 "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
     fi
 
-    # Configure tizen cli
+    # Configure Tizen CLI
     echo "TIZEN_SDK_INSTALLED_PATH=$TIZEN_SDK_ROOT" >"$TIZEN_SDK_ROOT/sdk.info"
     echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
     ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
@@ -251,9 +252,12 @@ function install_tizen_sdk() {
     ln -sf ../../lib/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib/libcap.so"
     ln -sf openssl1.1.pc "$TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc"
 
+    info "Done."
+    echo
+
     # Information on necessary environment variables
-    warning "You must add the appropriate environment variables before proceeding with matter."
-    echo "$COLOR_YELLOW"
+    warning "Before proceeding with Matter export environment variables as follows:"
+    echo -n "$COLOR_YELLOW"
     echo "export TIZEN_VESRSION=\"$TIZEN_VERSION\""
     echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
     echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2\""
@@ -264,7 +268,7 @@ function install_tizen_sdk() {
 
 while (($#)); do
     case $1 in
-        --help)
+        -h | --help)
             show_help
             exit 0
             ;;
@@ -308,20 +312,19 @@ if [ "$INSTALL_DEPENDENCIES" = true ]; then
         show_dependencies
         exit 1
     fi
-else
-    show_dependencies
 fi
 
 # ------------------------------------------------------------------------------
-# Checking dependencies needed to install the tizen platform
-for PKG in 'cpio' 'unzip' 'wget' 'unrpm'; do
+# Checking dependencies needed to install Tizen platform
+info "Checking required tools: cpio, java, unrpm, unzip, wget"
+for PKG in 'cpio' 'java' 'unrpm' 'unzip' 'wget'; do
     if ! command -v "$PKG" &>/dev/null; then
-        warning "Not found $PKG"
+        error "Required tool not found: $PKG"
         dep_lost=1
     fi
 done
 if [[ $dep_lost ]]; then
-    error "You need install dependencies before [HINT]: On Ubuntu-like distro run: sudo apt install ${DEPENDENCIES[@]}"
+    echo "[HINT]: sudo apt-get install ${DEPENDENCIES[*]}"
     exit 1
 fi
 

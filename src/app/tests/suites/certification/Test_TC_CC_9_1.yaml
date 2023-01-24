@@ -51,15 +51,15 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C40.Rsp
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 16384
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait for 1000ms"
@@ -77,19 +77,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -107,19 +107,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 2
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT"
@@ -136,19 +136,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 4
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 30
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopTime attribute from DUT"
@@ -165,19 +165,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 8
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 160
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopStartEnhancedHue attribute from DUT"
@@ -195,19 +195,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 1
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -232,7 +232,9 @@ tests:
               - name: "ms"
                 value: 30000
 
-    - label: "Read ColorLoopStartEnhancedHue attribute from DUT"
+    - label:
+          "Saving value for comparison in step 8d read ColorLoopStartEnhancedHue
+          attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4005 && CC.S.C44.Rsp
@@ -274,19 +276,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -296,7 +298,9 @@ tests:
       response:
           value: 0
 
-    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+    - label:
+          "Saving value for comparison in step 6c read
+          ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4006 && CC.S.C44.Rsp
@@ -318,19 +322,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 2
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 1
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT"
@@ -348,19 +352,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 1
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -385,7 +389,9 @@ tests:
               - name: "ms"
                 value: 30000
 
-    - label: "Read ColorLoopStartEnhancedHue attribute from DUT"
+    - label:
+          "Saving value for comparision in step 8d read
+          ColorLoopStartEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4005 && CC.S.C44.Rsp
@@ -427,19 +433,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -449,7 +455,9 @@ tests:
       response:
           value: 0
 
-    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
+    - label:
+          "Saving value for comparision in step 9c read
+          ColorLoopStoredEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4006 && CC.S.C44.Rsp
@@ -470,15 +478,15 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C40.Rsp
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 16384
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 1000ms"
@@ -504,19 +512,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 2
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT"
@@ -534,19 +542,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 2
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -571,7 +579,9 @@ tests:
               - name: "ms"
                 value: 30000
 
-    - label: "Read ColorLoopStartEnhancedHue attribute from DUT"
+    - label:
+          "Saving value for comparision in step 12d read
+          ColorLoopStartEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4005 && CC.S.C44.Rsp
@@ -613,19 +623,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -635,7 +645,9 @@ tests:
       response:
           value: 0
 
-    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+    - label:
+          "Saving value for comparision in step 13c read
+          ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4006 && CC.S.C44.Rsp
@@ -657,19 +669,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 2
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 1
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT"
@@ -687,19 +699,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 2
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -724,7 +736,9 @@ tests:
               - name: "ms"
                 value: 30000
 
-    - label: "Read ColorLoopStartEnhancedHue attribute from DUT"
+    - label:
+          "Saving value for comparision in step 15d read
+          ColorLoopStartEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4005 && CC.S.C44.Rsp
@@ -766,19 +780,19 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.C44.Rsp
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
-              - name: "startHue"
+              - name: "StartHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -788,7 +802,9 @@ tests:
       response:
           value: 0
 
-    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+    - label:
+          "Saving value for comparision in step 16b read
+          ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4006 && CC.S.C44.Rsp

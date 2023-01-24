@@ -50,9 +50,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 33000
-              - name: "colorY"
+              - name: "ColorY"
                 value: 20000
               - name: "TransitionTime"
                 value: 0
@@ -70,15 +70,15 @@ tests:
                 value: 100
 
     - label:
-          "TH sends StepColor command to DUT, with StepX = -2000, StepY = -6000,
-          TransitionTime = 200 (20s)"
+          "TH sends StepColor command to DUT, with StepX = -20000, StepY =
+          -6000, TransitionTime = 200 (20s)"
       command: "StepColor"
       PICS: CC.S.F03 && CC.S.C09.Rsp
       arguments:
           values:
-              - name: "stepX"
+              - name: "StepX"
                 value: -20000
-              - name: "stepY"
+              - name: "StepY"
                 value: -6000
               - name: "TransitionTime"
                 value: 200
@@ -127,8 +127,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 13000
-              maxValue: 14000
+              minValue: 11050
+              maxValue: 14950
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -136,8 +136,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 14000
-              maxValue: 15000
+              minValue: 11900
+              maxValue: 16100
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -152,29 +152,35 @@ tests:
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
       attribute: "CurrentX"
       response:
-          value: 13000
+          constraints:
+              minValue: 11050
+              maxValue: 14950
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
       attribute: "CurrentY"
       response:
-          value: 14000
+          constraints:
+              minValue: 11900
+              maxValue: 16100
 
     - label: "TH reads ColorMode attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0008
+      PICS: CC.S.F03 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 1
           constraints:
               minValue: 0
               maxValue: 2
 
     - label: "TH reads EnhancedColorMode attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A4001
+      PICS: CC.S.F03 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 1
           constraints:
               minValue: 0
               maxValue: 3

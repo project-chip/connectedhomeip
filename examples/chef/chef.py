@@ -18,17 +18,16 @@ import hashlib
 import json
 import optparse
 import os
+import re
 import shutil
 import sys
 import tarfile
 import textwrap
 from typing import Any, Dict, Sequence
 
-import yaml
-import re
-
 import constants
 import stateful_shell
+import yaml
 from sample_app_util import zap_file_parser
 
 TermColors = constants.TermColors
@@ -38,7 +37,8 @@ shell = stateful_shell.StatefulShell()
 _CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 _REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
-_DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
+_DEVICE_LIST = [file[:-4]
+                for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 
@@ -64,6 +64,7 @@ def load_config() -> None:
     config["nrfconnect"] = dict()
     config["esp32"] = dict()
     config["silabs-thread"] = dict()
+    config["ameba"] = dict()
     configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
         configStream = open(configFile, 'r')
@@ -81,7 +82,11 @@ def load_config() -> None:
         config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
-        config["silabs-thread"]["EFR32_BOARD"] = None
+        config["silabs-thread"]["SILABS_BOARD"] = None
+        config["ameba"]["AMEBA_SDK"] = None
+        config["ameba"]["MATTER_SDK"] = None
+        config["ameba"]["MODEL"] = 'D'
+        config["ameba"]["TTY"] = None
 
         flush_print(yaml.dump(config))
         yaml.dump(config, configStream)
@@ -250,7 +255,8 @@ def main() -> int:
     #
 
     if sys.platform == "win32":
-        flush_print('Windows is currently not supported. Use Linux or MacOS platforms')
+        flush_print(
+            'Windows is currently not supported. Use Linux or MacOS platforms')
         exit(1)
 
     #
@@ -267,6 +273,7 @@ def main() -> int:
             esp32
             linux
             silabs-thread
+            ameba
 
         Device Types:
             {deviceTypes}
@@ -291,8 +298,6 @@ def main() -> int:
                       action="store_true", dest="do_interact")
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
-    parser.add_option("", "--bootstrap_zap", help="installs zap dependencies",
-                      action="store_true", dest="do_bootstrap_zap")
     parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
                       action="store_true", dest="do_run_zap")
     parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model",
@@ -304,7 +309,8 @@ def main() -> int:
                       action='store',
                       dest="build_target",
                       help="specifies target platform. Default is esp32. See info below for currently supported target platforms",
-                      choices=['nrfconnect', 'esp32', 'linux', 'silabs-thread'],
+                      choices=['nrfconnect', 'esp32',
+                               'linux', 'silabs-thread', 'ameba'],
                       metavar="TARGET",
                       default="esp32")
     parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c",
@@ -336,8 +342,8 @@ def main() -> int:
     parser.add_option(
         "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
     parser.add_option(
-        "", "--ipv6only", help="Compile build which only supports ipv6. Linux only.",
-        action="store_true")
+        "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
+        action="store_true", default=False)
     parser.add_option(
         "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
 
@@ -346,38 +352,18 @@ def main() -> int:
     splash()
 
     #
-    # ZAP bootstrapping
-    #
-
-    if options.do_bootstrap_zap:
-        if sys.platform == "linux" or sys.platform == "linux2":
-            flush_print("Installing ZAP OS package dependencies")
-            install_deps_cmd = """\
-            sudo apt-get install nodejs node-yargs npm
-            libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
-            libjpeg9-dev libgif-dev node-typescript"""
-            shell.run_cmd(unwrap_cmd(install_deps_cmd))
-        if sys.platform == "darwin":
-            flush_print("Installation of ZAP OS packages not supported on MacOS")
-        if sys.platform == "win32":
-            flush_print(
-                "Installation of ZAP OS packages not supported on Windows")
-
-        flush_print("Running NPM to install ZAP Node.JS dependencies")
-        shell.run_cmd(
-            f"cd {_REPO_BASE_PATH}/third_party/zap/repo/ && npm install")
-
-    #
     # CI
     #
 
     if options.ci:
         for device_name in cicd_config["ci_allow_list"]:
             if device_name not in _DEVICE_LIST:
-                flush_print(f"{device_name} in CICD config but not {_DEVICE_FOLDER}!")
+                flush_print(
+                    f"{device_name} in CICD config but not {_DEVICE_FOLDER}!")
                 exit(1)
             if options.build_target == "nrfconnect":
-                shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
+                shell.run_cmd(
+                    "export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
             command = f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
@@ -413,7 +399,8 @@ def main() -> int:
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
                     shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-                    shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
+                    shell.run_cmd(
+                        "export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
                     try:
                         shell.run_cmd(command)
                     except RuntimeError as build_fail_error:
@@ -432,7 +419,8 @@ def main() -> int:
                         continue
                     os.makedirs(archive_prefix, exist_ok=True)
                     archive_full_name = archive_prefix + archive_name + archive_suffix
-                    flush_print(f"Adding build output to archive {archive_full_name}")
+                    flush_print(
+                        f"Adding build output to archive {archive_full_name}")
                     if os.path.exists(archive_full_name):
                         os.remove(archive_full_name)
                     with tarfile.open(archive_full_name, "w:gz") as tar:
@@ -461,25 +449,41 @@ def main() -> int:
     flush_print("Setting up environment...")
     if options.build_target == "esp32":
         if config['esp32']['IDF_PATH'] is None:
-            flush_print('Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
+            flush_print(
+                'Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
             exit(1)
         plat_folder = os.path.normpath(f"{_CHEF_SCRIPT_PATH}/esp32")
         shell.run_cmd(f'source {config["esp32"]["IDF_PATH"]}/export.sh')
     elif options.build_target == "nrfconnect":
         if config['nrfconnect']['ZEPHYR_BASE'] is None:
-            flush_print('Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
+            flush_print(
+                'Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
             exit(1)
         plat_folder = os.path.normpath(f"{_CHEF_SCRIPT_PATH}/nrfconnect")
-        shell.run_cmd(f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+        shell.run_cmd(
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
         shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
     elif options.build_target == "linux":
         pass
     elif options.build_target == "silabs-thread":
         flush_print('Path to gecko sdk is configured within Matter.')
-        if 'EFR32_BOARD' not in config['silabs-thread'] or config['silabs-thread']['EFR32_BOARD'] is None:
-            flush_print('EFR32_BOARD was not configured. Make sure silabs-thread.EFR32_BOARD is set on your config.yaml file')
+        if 'SILABS_BOARD' not in config['silabs-thread'] or config['silabs-thread']['SILABS_BOARD'] is None:
+            flush_print(
+                'SILABS_BOARD was not configured. Make sure silabs-thread.SILABS_BOARD is set on your config.yaml file')
             exit(1)
-        efr32_board = config['silabs-thread']['EFR32_BOARD']
+        silabs_board = config['silabs-thread']['SILABS_BOARD']
+    elif options.build_target == "ameba":
+        if config['ameba']['AMEBA_SDK'] is None:
+            flush_print(
+                'Path for Ameba SDK was not found. Make sure AMEBA_SDK is set on your config.yaml file')
+            exit(1)
+        if config['ameba']['MATTER_SDK'] is None:
+            flush_print(
+                'Path for Matter SDK was not found. Make sure MATTER_SDK is set on your config.yaml file')
+            exit(1)
+        if (config['ameba']['MODEL'] != 'D' and config['ameba']['MODEL'] != 'Z2'):
+            flush_print("Ameba Model is not recognized, please input D or Z2")
+            exit(1)
     else:
         flush_print(f"Target {options.build_target} not supported")
 
@@ -500,6 +504,18 @@ def main() -> int:
             flush_print("Silabs-thread toolchain not supported. Skipping")
         elif options.build_target == "linux":
             flush_print("Linux toolchain update not supported. Skipping")
+        elif options.build_target == "Ameba":
+            flush_print("Ameba toolchain update not supported. Skipping")
+
+    #
+    # Clean environment
+    #
+    if options.do_clean:
+        if options.build_target == "esp32":
+            shell.run_cmd(f"rm -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
+            shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build")
+            shell.run_cmd("idf.py fullclean")
 
     #
     # Cluster customization
@@ -521,6 +537,27 @@ def main() -> int:
         shell.run_cmd(f"touch {gen_dir}/af-gen-event.h")
 
     #
+    # Setup environment
+    #
+    if options.do_rpc:
+        flush_print("RPC PW enabled")
+        if options.build_target == "esp32":
+            shell.run_cmd(
+                f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
+            shell.run_cmd(
+                f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp {_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+        else:
+            flush_print(f"RPC PW on {options.build_target} not supported")
+
+    else:
+        flush_print("RPC PW disabled")
+        if (options.build_target == "esp32"):
+            shell.run_cmd(
+                f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
+            shell.run_cmd(
+                f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp {_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+
+    #
     # Menuconfig
     #
 
@@ -532,9 +569,12 @@ def main() -> int:
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
             shell.run_cmd("west build -t menuconfig")
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
-            flush_print("Menuconfig not available on Silabs-thread target. Skipping")
+            flush_print(
+                "Menuconfig not available on Silabs-thread target. Skipping")
         elif options.build_target == "linux":
             flush_print("Menuconfig not available on Linux target. Skipping")
+        elif options.build_target == "Ameba":
+            flush_print("Menuconfig not available on Ameba target. Skipping")
 
     #
     # Build
@@ -550,7 +590,8 @@ def main() -> int:
                 if match_texts:
                     branch = match_texts[0]
                     break
-            commit_id = shell.run_cmd("git rev-parse HEAD", return_cmd_output=True).replace("\n", "")
+            commit_id = shell.run_cmd(
+                "git rev-parse HEAD", return_cmd_output=True).replace("\n", "")
             sw_ver_string = f"""{branch}:{commit_id}"""
             # 64 bytes space could only contain 63 bytes string + 1 byte EOS.
             if len(sw_ver_string) >= 64:
@@ -575,25 +616,12 @@ def main() -> int:
             shutil.rmtree(gen_dir, ignore_errors=True)
             shutil.copytree(zzz_dir, gen_dir)
         flush_print("Building...")
-        if options.do_rpc:
-            flush_print("RPC PW enabled")
-            if options.build_target == "esp32":
-                shell.run_cmd(
-                    f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
-            else:
-                flush_print(f"RPC PW on {options.build_target} not supported")
-
-        else:
-            flush_print("RPC PW disabled")
-            if (options.build_target == "esp32"):
-                shell.run_cmd(
-                    f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
 
         flush_print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
-        if (options.build_target == "esp32") or (options.build_target == "nrfconnect"):
+        if (options.build_target == "esp32") or (options.build_target == "nrfconnect") or (options.build_target == "ameba"):
             with open("project_include.cmake", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         set(CONFIG_DEVICE_VENDOR_ID {options.vid})
@@ -604,11 +632,12 @@ def main() -> int:
 
         if options.build_target == "esp32":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
-            if options.do_clean:
-                shell.run_cmd(f"rm -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
-                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
-                shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build")
-                shell.run_cmd("idf.py fullclean")
+            if options.enable_ipv4:
+                shell.run_cmd(
+                    f"sed -i 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+            else:
+                shell.run_cmd(
+                    f"sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
             shell.run_cmd(
@@ -629,13 +658,16 @@ def main() -> int:
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
             efr32_cmd_args = []
-            efr32_cmd_args.append(f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
+            efr32_cmd_args.append(
+                f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
             efr32_cmd_args.append('./')
             efr32_cmd_args.append(f'out/{options.sample_device_type_name}')
-            efr32_cmd_args.append(f'{efr32_board}')
-            efr32_cmd_args.append(f'\'sample_name=\"{options.sample_device_type_name}\"\'')
+            efr32_cmd_args.append(f'{silabs_board}')
+            efr32_cmd_args.append(
+                f'\'sample_name=\"{options.sample_device_type_name}\"\'')
             if sw_ver_string:
-                efr32_cmd_args.append(f'\'chip_device_config_device_software_version_string=\"{sw_ver_string}\"\'')
+                efr32_cmd_args.append(
+                    f'\'chip_device_config_device_software_version_string=\"{sw_ver_string}\"\'')
             efr32_cmd_args.append('enable_openthread_cli=true')
             if options.do_rpc:
                 efr32_cmd_args.append('chip_build_libshell=false')
@@ -644,6 +676,33 @@ def main() -> int:
                 efr32_cmd_args.append('chip_build_libshell=true')
             shell.run_cmd(" ".join(efr32_cmd_args))
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+
+        elif options.build_target == "ameba":
+            if config['ameba']['MODEL'] == 'D':
+                shell.run_cmd(
+                    f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE")
+                if options.do_clean:
+                    shell.run_cmd(f"rm -rf out")
+                shell.run_cmd(
+                    f"./build.sh {config['ameba']['MATTER_SDK']} ninja {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out chef-app")
+                shell.run_cmd("ninja -C out")
+            elif config['ameba']['MODEL'] == 'Z2':
+                shell.run_cmd(
+                    f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
+                shell.run_cmd("rm -f project_include.mk")
+                with open(f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk", "w") as f:
+                    f.write(textwrap.dedent(f"""\
+                        SAMPLE_NAME = {options.sample_device_type_name}
+                        CHEF_FLAGS =
+                        CHEF_FLAGS += -DCONFIG_DEVICE_VENDOR_ID={options.vid}
+                        CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
+                        CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
+                        """
+                                            ))
+                if options.do_clean:
+                    shell.run_cmd("make clean")
+                shell.run_cmd("make chef")
+                shell.run_cmd("make is")
 
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
@@ -673,7 +732,8 @@ def main() -> int:
                     linux_args.append('target_cpu="arm64"')
                     linux_args.append('is_clang=true')
                     linux_args.append('chip_crypto="mbedtls"')
-                    linux_args.append(f'sysroot="{shell.env["SYSROOT_AARCH64"]}"')
+                    linux_args.append(
+                        f'sysroot="{shell.env["SYSROOT_AARCH64"]}"')
 
                 elif options.cpu_type == "arm":
                     if "SYSROOT_ARMHF" not in shell.env:
@@ -686,14 +746,18 @@ def main() -> int:
                     linux_args.append('target_cpu="arm"')
                     linux_args.append('is_clang=true')
                     linux_args.append('chip_crypto="mbedtls"')
-                    linux_args.append(f'sysroot="{shell.env["SYSROOT_ARMHF"]}"')
+                    linux_args.append(
+                        f'sysroot="{shell.env["SYSROOT_ARMHF"]}"')
 
             if options.cpu_type == "x64":
                 uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
                 if "x64" not in uname_resp and "x86_64" not in uname_resp:
-                    flush_print(f"Unable to cross compile for x64 on {uname_resp}")
+                    flush_print(
+                        f"Unable to cross compile for x64 on {uname_resp}")
                     exit(1)
-            if options.ipv6only:
+            if options.enable_ipv4:
+                linux_args.append("chip_inet_config_enable_ipv4=true")
+            else:
                 linux_args.append("chip_inet_config_enable_ipv4=false")
 
             if sw_ver_string:
@@ -723,7 +787,8 @@ def main() -> int:
         flush_print("Flashing target")
         if options.build_target == "esp32":
             if config['esp32']['TTY'] is None:
-                flush_print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                flush_print(
+                    'The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.do_erase:
@@ -738,9 +803,23 @@ def main() -> int:
                 shell.run_cmd("west flash")
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
-            shell.run_cmd(f"python3 out/{options.sample_device_type_name}/{efr32_board}/chip-efr32-chef-example.flash.py")
+            shell.run_cmd(
+                f"python3 out/{options.sample_device_type_name}/{silabs_board}/chip-efr32-chef-example.flash.py")
 
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+        elif (options.build_target == "ameba"):
+            if config['ameba']['MODEL'] == 'D':
+                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
+                shell.run_cmd(
+                    f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux")
+                shell.run_cmd(
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out", raise_on_returncode=False)
+            else:
+                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
+                shell.run_cmd(
+                    f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux")
+                shell.run_cmd(
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin", raise_on_returncode=False)
 
     #
     # Terminal interaction
@@ -750,13 +829,15 @@ def main() -> int:
         flush_print("Starting terminal...")
         if options.build_target == "esp32":
             if config['esp32']['TTY'] is None:
-                flush_print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                flush_print(
+                    'The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             shell.run_cmd(f"idf.py -p {config['esp32']['TTY']} monitor")
         elif options.build_target == "nrfconnect":
             if config['nrfconnect']['TTY'] is None:
-                flush_print('The path for the serial enumeration for nordic is not set. Make sure nrfconnect.TTY is set on your config.yaml file')
+                flush_print(
+                    'The path for the serial enumeration for nordic is not set. Make sure nrfconnect.TTY is set on your config.yaml file')
                 exit(1)
             shell.run_cmd("killall screen")
             shell.run_cmd(f"screen {config['nrfconnect']['TTY']} 115200")
@@ -767,12 +848,23 @@ def main() -> int:
                 exit(1)
 
             shell.run_cmd("killall screen")
-            shell.run_cmd(f"screen {config['silabs-thread']['TTY']} 115200 8-N-1")
+            shell.run_cmd(
+                f"screen {config['silabs-thread']['TTY']} 115200 8-N-1")
         elif options.build_target == "linux":
             flush_print(
                 f"{_CHEF_SCRIPT_PATH}/linux/out/{options.sample_device_type_name}")
             shell.run_cmd(
                 f"{_CHEF_SCRIPT_PATH}/linux/out/{options.sample_device_type_name}")
+        elif options.build_target == "ameba":
+            if config['ameba']['TTY'] is None:
+                flush_print(
+                    'The path for the serial enumeration for ameba is not set. Make sure ameba.TTY is set on your config.yaml file')
+                exit(1)
+            if config['ameba']['MODEL'] == 'D':
+                shell.run_cmd("killall screen")
+                shell.run_cmd(f"screen {config['ameba']['TTY']} 115200")
+            else:
+                flush_print("Ameba Z2 image has not been flashed yet")
 
     #
     # RPC Console
@@ -783,17 +875,19 @@ def main() -> int:
                 f"python3 -m chip_rpc.console --device {config['esp32']['TTY']}")
         elif (options.build_target == "silabs-thread"):
             if (sys.platform == "linux") or (sys.platform == "linux2"):
-                if(config['silabs-thread']['TTY'] is None):
+                if (config['silabs-thread']['TTY'] is None):
                     flush_print(
                         'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
                     exit(1)
-                shell.run_cmd(f"python3 -m chip_rpc.console --device {config['silabs-thread']['TTY']} -b 115200")
+                shell.run_cmd(
+                    f"python3 -m chip_rpc.console --device {config['silabs-thread']['TTY']} -b 115200")
             elif sys.platform == "darwin":
-                if(config['silabs-thread']['CU'] is None):
+                if (config['silabs-thread']['CU'] is None):
                     flush_print(
                         'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.CU is set on your config.yaml file')
                     exit(1)
-                shell.run_cmd(f"python3 -m chip_rpc.console --device {config['silabs-thread']['CU']} -b 115200")
+                shell.run_cmd(
+                    f"python3 -m chip_rpc.console --device {config['silabs-thread']['CU']} -b 115200")
 
     flush_print("Done")
     return 0

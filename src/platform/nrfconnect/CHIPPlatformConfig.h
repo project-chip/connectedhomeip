@@ -23,6 +23,10 @@
 
 #pragma once
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 // ==================== General Platform Adaptations ====================
 
 #define CHIP_CONFIG_ABORT() abort()
@@ -34,9 +38,11 @@
 
 // ==================== Security Adaptations ====================
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(psa_hash_operation_t)
+#elif defined(CONFIG_CC3XX_BACKEND)
 // Size of the statically allocated context for SHA256 operations in CryptoPAL
 // determined empirically.
-#ifdef CONFIG_CC3XX_BACKEND
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE 244
 #else
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE 208
@@ -62,4 +68,30 @@
 
 #ifndef CHIP_CONFIG_MAX_FABRICS
 #define CHIP_CONFIG_MAX_FABRICS 5
+#endif
+
+#if CONFIG_CHIP_LOG_SIZE_OPTIMIZATION
+// Disable some of the too detailed log modules to save flash
+#define CHIP_CONFIG_LOG_MODULE_ExchangeManager_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_Crypto_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_Crypto_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_BDX_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_BDX_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_EventLogging_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_EventLogging_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_SetupPayload_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_SetupPayload_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_CASESessionManager_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_CASESessionManager_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_DataManagement_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_FabricProvisioning_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_chipSystemLayer_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_chipSystemLayer_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_Zcl_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_SecureChannel_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_Ble_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_AppServer_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_Support_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_Support_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_DeviceLayer_DETAIL 0
 #endif

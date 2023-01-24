@@ -32,7 +32,7 @@
 
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
@@ -571,7 +571,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestASN1(void)
+int TestASN1()
 {
     nlTestSuite theSuite = { "Support-ASN1", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

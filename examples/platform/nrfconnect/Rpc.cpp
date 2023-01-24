@@ -26,7 +26,7 @@
 
 #include <zephyr/kernel.h>
 
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 #include "pigweed/rpc_services/Attributes.h"
@@ -109,7 +109,8 @@ class NrfButton final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        GetAppTask().ButtonEventHandler(request.pushed << request.idx /* button_state */, 1 << request.idx /* has_changed */);
+        AppTask::Instance().ButtonEventHandler(request.pushed << request.idx /* button_state */,
+                                               1 << request.idx /* has_changed */);
         return pw::OkStatus();
     }
 };

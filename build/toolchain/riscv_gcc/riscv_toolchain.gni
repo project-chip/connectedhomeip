@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/bl602_sdk.gni")
 import("//build_overrides/build.gni")
 
 import("${build_root}/toolchain/gcc_toolchain.gni")
 
 template("riscv_toolchain") {
   gcc_toolchain(target_name) {
-    _tool_name_root = "${root_build_dir}/../../third_party/bouffalolab/bl602_sdk/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-"
+    _tool_name_root = "riscv64-unknown-elf-"
+
     ar = _tool_name_root + "ar"
     cc = _tool_name_root + "gcc"
     cxx = _tool_name_root + "g++"

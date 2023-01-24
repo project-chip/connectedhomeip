@@ -62,7 +62,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Read(const ConcreteReadAttribut
 {
     switch (aPath.mAttributeId)
     {
-    case Attributes::DefaultOtaProviders::Id:
+    case Attributes::DefaultOTAProviders::Id:
         return ReadDefaultOtaProviders(aEncoder);
     default:
         break;
@@ -75,7 +75,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write(const ConcreteDataAttribu
 {
     switch (aPath.mAttributeId)
     {
-    case Attributes::DefaultOtaProviders::Id: {
+    case Attributes::DefaultOTAProviders::Id: {
         return WriteDefaultOtaProviders(aPath, aDecoder);
     }
     default:
@@ -258,9 +258,9 @@ void OtaRequestorServerOnDownloadError(uint32_t softwareVersion, uint64_t bytesD
 // -----------------------------------------------------------------------------
 // Callbacks implementation
 
-bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
+bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
+    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData)
 {
     auto & metadataForNode = commandData.metadataForNode;
 
@@ -287,7 +287,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(void)
+void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

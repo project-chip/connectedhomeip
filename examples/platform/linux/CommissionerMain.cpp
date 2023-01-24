@@ -30,7 +30,10 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <credentials/DeviceAttestationConstructor.h>
+#include <credentials/DeviceAttestationVendorReserved.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -110,6 +113,8 @@ class MyCommissionerCallback : public CommissionerCallback
     }
 };
 
+AutoCommissioner gAutoCommissioner;
+
 DeviceCommissioner gCommissioner;
 CommissionerDiscoveryController gCommissionerDiscoveryController;
 MyCommissionerCallback gCommissionerCallback;
@@ -117,9 +122,8 @@ MyServerStorageDelegate gServerStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
-AutoCommissioner gAutoCommissioner;
 
-CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
+CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, FabricId fabricId)
 {
     Controller::FactoryInitParams factoryParams;
     Controller::SetupParams params;
@@ -140,6 +144,10 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     params.controllerVendorId = static_cast<VendorId>(vendorId);
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
+    if (fabricId != kUndefinedFabricId)
+    {
+        gOpCredsIssuer.SetFabricIdForNextNOCRequest(fabricId);
+    }
 
     // No need to explicitly set the UDC port since we will use default
     ChipLogProgress(Support, " ----- UDC listening on port %d", udcListenPort);
@@ -163,7 +171,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
     Crypto::P256Keypair ephemeralKey;
-    ReturnErrorOnFailure(ephemeralKey.Initialize());
+    ReturnErrorOnFailure(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA));
 
     ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
                                                                         ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
@@ -174,6 +182,11 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     params.controllerNOC      = nocSpan;
 
     params.defaultCommissioner = &gAutoCommissioner;
+
+    // assign prefered feature settings
+    CommissioningParameters commissioningParams = gAutoCommissioner.GetCommissioningParameters();
+    commissioningParams.SetCheckForMatchingFabric(true);
+    gAutoCommissioner.SetCommissioningParameters(commissioningParams);
 
     auto & factory = Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
@@ -201,8 +214,9 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     // advertise operational since we are an admin
     app::DnssdServer::Instance().AdvertiseOperational();
 
-    ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=0x%x",
-                    ChipLogValueX64(gCommissioner.GetNodeId()), static_cast<unsigned>(fabricIndex));
+    ChipLogProgress(Support,
+                    "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabric.fabricId=0x" ChipLogFormatX64 " fabricIndex=0x%x",
+                    ChipLogValueX64(gCommissioner.GetNodeId()), ChipLogValueX64(fabricId), static_cast<unsigned>(fabricIndex));
 
     return CHIP_NO_ERROR;
 }
@@ -231,10 +245,14 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
+    void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
+
+    void OnReadCommissioningInfo(const ReadCommissioningInfo & info) override;
+
 private:
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
-                                    chip::SessionHandle & sessionHandle);
+                                    const chip::SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
@@ -292,7 +310,8 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         ChipLogProgress(AppServer, "Device commissioning completed with success - getting OperationalDeviceProxy");
 
-        gCommissioner.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+        gCommissioner.GetConnectedDevice(gAutoCommissioner.GetCommissioningParameters().GetRemoteNodeId().ValueOr(nodeId),
+                                         &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 #else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         ChipLogProgress(AppServer, "Device commissioning completed with success");
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -310,9 +329,36 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     }
 }
 
+void PairingCommand::OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error)
+{
+    ChipLogProgress(AppServer, "OnCommissioningStatusUpdate - stageCompleted='%s' error='%s'", StageToString(stageCompleted),
+                    ErrorStr(error));
+
+    // if we have successfully finished attestation AND this device already has a NodeId on our fabric
+    // then stop commissioning and attempt to connect to it.
+    if (stageCompleted == CommissioningStage::kAttestationVerification && error == CHIP_NO_ERROR &&
+        gAutoCommissioner.GetCommissioningParameters().GetRemoteNodeId().HasValue())
+    {
+        gAutoCommissioner.StopCommissioning();
+    }
+}
+
+void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
+{
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
+                    info.basic.productId);
+
+    if (info.nodeId != kUndefinedNodeId)
+    {
+        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(info.nodeId));
+        // wait until attestation verification before cancelling so we can validate vid/pid
+    }
+}
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-void PairingCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+void PairingCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                         const SessionHandle & sessionHandle)
 {
     ChipLogProgress(Controller, "OnDeviceConnectedFn");
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();

@@ -19,7 +19,6 @@ import("${chip_root}/build/chip/tools.gni")
 
 static_library("minimal-mdns-example-common") {
   sources = [
-    "AllInterfaceListener.h",
     "PacketReporter.cpp",
     "PacketReporter.h",
   ]

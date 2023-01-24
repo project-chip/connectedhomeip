@@ -35,6 +35,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/BuildTime.h>
 #include <platform/CommissionableDataProvider.h>
@@ -182,7 +183,10 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pSal
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
 
     ReturnErrorOnFailure(err);
-    size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
+
+    VerifyOrReturnError(chip::CanCastTo<uint32_t>(saltB64Len), CHIP_ERROR_INTERNAL);
+
+    size_t saltLen = chip::Base64Decode32(saltB64, static_cast<uint32_t>(saltB64Len), reinterpret_cast<uint8_t *>(saltB64));
 
     ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), saltB64, saltLen);
@@ -216,7 +220,11 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVer
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
 
     ReturnErrorOnFailure(err);
-    verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
+
+    VerifyOrReturnError(chip::CanCastTo<uint32_t>(verifierB64Len), CHIP_ERROR_INTERNAL);
+    verifierLen =
+        chip::Base64Decode32(verifierB64, static_cast<uint32_t>(verifierB64Len), reinterpret_cast<uint8_t *>(verifierB64));
+
     ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(verifierBuf.data(), verifierB64, verifierLen);
     verifierBuf.reduce_size(verifierLen);
@@ -415,7 +423,22 @@ void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint8_t & location)
 {
-    return GetLocationCapability(location);
+    uint32_t value;
+    if (CHIP_NO_ERROR != ReadConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, value))
+    {
+        ReturnErrorOnFailure(GetLocationCapability(location));
+
+        if (CHIP_NO_ERROR != StoreRegulatoryLocation(location))
+        {
+            ChipLogError(DeviceLayer, "Failed to store RegulatoryLocation");
+        }
+    }
+    else
+    {
+        location = static_cast<uint8_t>(value);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>
@@ -474,24 +497,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReason(uint32_t 
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPartNumber(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductURL(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductLabel(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf, size_t bufSize)
 {
     CHIP_ERROR err;
@@ -536,8 +541,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::IncrementLifetimeCounte
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan)
 {
-    ReturnErrorCodeIf(uniqueIdSpan.size() != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(mRotatingDeviceIdUniqueId, uniqueIdSpan.data(), kRotatingDeviceIDUniqueIDLength);
+    ReturnErrorCodeIf(uniqueIdSpan.size() < kMinRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(uniqueIdSpan.size() > CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(mRotatingDeviceIdUniqueId, uniqueIdSpan.data(), uniqueIdSpan.size());
+    mRotatingDeviceIdUniqueIdLength = uniqueIdSpan.size();
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+{
+    ReturnErrorCodeIf(mRotatingDeviceIdUniqueIdLength > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(uniqueIdSpan.data(), mRotatingDeviceIdUniqueId, mRotatingDeviceIdUniqueIdLength);
+    uniqueIdSpan.reduce_size(mRotatingDeviceIdUniqueIdLength);
     return CHIP_NO_ERROR;
 }
 

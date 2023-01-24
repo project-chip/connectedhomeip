@@ -53,7 +53,8 @@ CHIP_ERROR ModelCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+void ModelCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                       const SessionHandle & sessionHandle)
 {
     ChipLogProgress(chipTool, "ModelCommand::OnDeviceConnectedFn");
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);

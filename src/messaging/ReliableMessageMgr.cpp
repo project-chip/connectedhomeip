@@ -21,6 +21,7 @@
  *
  */
 
+#include <errno.h>
 #include <inttypes.h>
 
 #include <messaging/ReliableMessageMgr.h>
@@ -203,7 +204,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     return CHIP_NO_ERROR;
 }
 
-System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount)
+System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount,
+                                                        bool computeMaxPossible)
 {
     // See section "4.11.8. Parameters and Constants" for the parameters below:
     // MRP_BACKOFF_JITTER = 0.25
@@ -246,7 +248,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     System::Clock::Timestamp mrpBackoffTime = baseInterval * backoffNum / backoffDenom;
 
     // 3. Calculate `mrpBackoffTime *= (1.0 + random(0,1) * MRP_BACKOFF_JITTER)`
-    uint32_t jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU8();
+    uint32_t jitter = MRP_BACKOFF_JITTER_BASE + (computeMaxPossible ? UINT8_MAX : Crypto::GetRandU8());
     mrpBackoffTime  = mrpBackoffTime * jitter / MRP_BACKOFF_JITTER_BASE;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
@@ -259,6 +261,10 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     {
         mrpBackoffTime += System::Clock::Timestamp(sedIntervals.ActiveIntervalMS);
     }
+#endif
+
+#ifdef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+    mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
 #endif
 
     return mrpBackoffTime;
@@ -311,20 +317,25 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     auto * sessionManager = entry->ec->GetExchangeMgr()->GetSessionManager();
     CHIP_ERROR err        = sessionManager->SendPreparedMessage(entry->ec->GetSessionHandle(), entry->retainedBuf);
+    err                   = MapSendError(err, entry->ec->GetExchangeId(), entry->ec->IsInitiator());
 
     if (err == CHIP_NO_ERROR)
     {
+#if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange
         // context with mExchangeMgr==nullptr is used.
         if (exchangeMgr)
         {
             // After the first failure notify session manager to refresh device data
-            if (entry->sendCount == 1 && mSessionUpdateDelegate != nullptr)
+            if (entry->sendCount == 1 && mSessionUpdateDelegate != nullptr && entry->ec->GetSessionHandle()->IsSecureSession() &&
+                entry->ec->GetSessionHandle()->AsSecureSession()->IsCASESession())
             {
+                ChipLogDetail(ExchangeManager, "Notify session manager to update peer address");
                 mSessionUpdateDelegate->UpdatePeerAddress(entry->ec->GetSessionHandle()->GetPeer());
             }
         }
+#endif // CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
     }
     else
     {
@@ -412,6 +423,34 @@ void ReliableMessageMgr::StopTimer()
 void ReliableMessageMgr::RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate)
 {
     mSessionUpdateDelegate = sessionUpdateDelegate;
+}
+
+CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeId, bool isInitiator)
+{
+    if (
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        error == System::MapErrorLwIP(ERR_MEM)
+#else
+        error == CHIP_ERROR_POSIX(ENOBUFS)
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    )
+    {
+        // sendmsg on BSD-based systems never blocks, no matter how the
+        // socket is configured, and will return ENOBUFS in situation in
+        // which Linux, for example, blocks.
+        //
+        // This is typically a transient situation, so we pretend like this
+        // packet drop happened somewhere on the network instead of inside
+        // sendmsg and will just resend it in the normal MRP way later.
+        //
+        // Similarly, on LwIP an ERR_MEM on send indicates a likely
+        // temporary lack of TX buffers.
+        ChipLogError(ExchangeManager, "Ignoring transient send error: %" CHIP_ERROR_FORMAT " on exchange " ChipLogFormatExchangeId,
+                     error.Format(), ChipLogValueExchangeId(exchangeId, isInitiator));
+        error = CHIP_NO_ERROR;
+    }
+
+    return error;
 }
 
 #if CHIP_CONFIG_TEST

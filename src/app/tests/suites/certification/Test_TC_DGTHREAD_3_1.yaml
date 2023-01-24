@@ -20,18 +20,18 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label: "Note"
       verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
     - label: "Commission DUT to TH"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads Channel attribute value from TH"
@@ -507,9 +507,9 @@ tests:
     - label: "DUT reads ChannelPage0Mask attribute value from TH"
       PICS: DGTHREAD.C.A003c
       verification: |
-          ./chip-tool threadnetworkdiagnostics read channel-mask 54 0
+          ./chip-tool threadnetworkdiagnostics read channel-page0mask 54 0
 
-          Verify "ChannelMask response" on the TH(All-cluster-app) Log:
+          Verify "channel-page0mask" on the TH(All-cluster-app) Log:
 
           I: 2464057 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367840 to 0x0000000000000000c
           I: 2464071 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:147354356 on exchar

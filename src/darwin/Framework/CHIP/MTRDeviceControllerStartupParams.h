@@ -16,6 +16,9 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRCertificates.h>
+#import <Matter/MTROperationalCertificateIssuer.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRKeypair;
@@ -25,10 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Keypair used to sign operational certificates.  This is the root CA keypair
  * if not using an intermediate CA, the intermediate CA's keypair otherwise.
  *
- * Allowed to be nil if this controller will not be issuing operational
- * certificates.  In that case, the MTRDeviceControllerStartupParams object
- * must be initialized using initWithOperationalKeypair (to provide the
- * operational credentials for the controller itself).
+ * Allowed to be nil if this controller will not be issuing internally-generated
+ * operational certificates.  In that case, the MTRDeviceControllerStartupParams
+ * object must be initialized using
+ * initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:
+ * (to provide the operational credentials for t2he controller itself).
  */
 @property (nonatomic, copy, readonly, nullable) id<MTRKeypair> nocSigner;
 /**
@@ -42,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   key of the nocSigner keypair, since in this case we are not using an
  *   intermediate certificate.
  */
-@property (nonatomic, assign, readonly) uint64_t fabricId;
+@property (nonatomic, copy, readonly) NSNumber * fabricID MTR_NEWLY_AVAILABLE;
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
  * a controller was started on this fabric if a new IPK has been distributed to
@@ -65,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * Will override existing value if not nil. Otherwise existing value will be
  *   used.
  */
-@property (nonatomic, copy, nullable) NSNumber * vendorId;
+@property (nonatomic, copy, nullable) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
 
 /**
  * Node id for this controller.
@@ -75,29 +79,27 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If not nil, must be a valid Matter operational node id.
  *
- * If operationalCertificate is nil, nodeId and operationalKeypair are used to
+ * If operationalCertificate is nil, nodeID and operationalKeypair are used to
  * determine an operational certificate, as follows:
  *
  * * When creating a new fabric:
  *
- * ** nodeId is allowed to be nil to indicate that a random node id should be
+ * ** nodeID is allowed to be nil to indicate that a random node id should be
  *    generated.
  *
  * * When using an existing fabric:
  *
- * ** nodeId is allowed to be nil to indicate that the existing operational node
+ * ** nodeID is allowed to be nil to indicate that the existing operational node
  *    id should be used.  The existing operational keys will also be used,
  *    unless operationalKeypair is provided.
  *
- * ** If nodeId is not nil, a new operational certificate will be generated for
+ * ** If nodeID is not nil, a new operational certificate will be generated for
  *    the provided node id (even if that matches the existing node id), using
  *    either the operationalKeypair if that is provided or a new randomly
  *    generated operational key.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * nodeId;
-
-// TODO: Add something here for CATs?
+@property (nonatomic, copy, nullable) NSNumber * nodeID MTR_NEWLY_AVAILABLE;
 
 /**
  * Root certificate, in X.509 DER form, to use.
@@ -114,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * May be nil if nocSigner is not nil and an intermediate CA is not being
  *   used.  In that case the nocSigner keypair, which is the keypair for the
  *   root certificate, will be used to generate and sign a root certificate,
- *   with a random issuer id.  In this case, the fabricId will be included in
+ *   with a random issuer id.  In this case, the fabricID will be included in
  *   the root certificate's subject DN.
  *
  * When using an existing fabric:
@@ -130,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   2) The subject DN must match the subject DN of the existing root
  *      certificate.
  */
-@property (nonatomic, copy, nullable) NSData * rootCertificate;
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes rootCertificate;
 
 /**
  * Intermediate certificate, in X.509 DER form, to use.
@@ -162,7 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
  *     allows switching from using an intermediate CA to not using one.
  *
  */
-@property (nonatomic, copy, nullable) NSData * intermediateCertificate;
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes intermediateCertificate;
 
 /**
  * Operational certificate, in X.509 DER form, to use.
@@ -171,9 +173,9 @@ NS_ASSUME_NONNULL_BEGIN
  * operationalKeypair must not be nil.
  *
  * If nil, an operational certificate will be determined as described in the
- * documentation for nodeId.
+ * documentation for nodeID.
  */
-@property (nonatomic, copy, readonly, nullable) NSData * operationalCertificate;
+@property (nonatomic, copy, readonly, nullable) MTRCertificateDERBytes operationalCertificate;
 
 /**
  * Operational keypair to use.  If operationalCertificate is not nil, the public
@@ -182,9 +184,23 @@ NS_ASSUME_NONNULL_BEGIN
  * If not nil, and if operationalCertificate is nil, a new operational
  * certificate will be generated for the given operationalKeypair.  The node id
  * will for that certificated will be determined as described in the
- * documentation for nodeId.
+ * documentation for nodeID.
  */
 @property (nonatomic, strong, nullable) id<MTRKeypair> operationalKeypair;
+
+/**
+ * The certificate issuer delegate to use for issuing operational certificates
+ * when commmissioning devices.  Allowed to be nil if this controller either
+ * does not issue operational certificates at all or internally generates the
+ * certificates to be issued.  In the latter case, nocSigner must not be nil.
+ */
+@property (nonatomic, strong, nullable) id<MTROperationalCertificateIssuer> operationalCertificateIssuer MTR_NEWLY_AVAILABLE;
+
+/**
+ * The dispatch queue on which operationalCertificateIssuer should be called.
+ * Allowed to be nil if and only if operationalCertificateIssuer is nil.
+ */
+@property (nonatomic, strong, nullable) dispatch_queue_t operationalCertificateIssuerQueue MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -192,18 +208,18 @@ NS_ASSUME_NONNULL_BEGIN
  * Prepare to initialize a controller given a keypair to use for signing
  * operational certificates.
  *
- * fabricId must be set to a valid (i.e. nonzero) value.
+ * fabricID must be set to a valid (i.e. nonzero) value.
  *
  * ipk must be 16 bytes in length
  */
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk;
+- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner MTR_NEWLY_AVAILABLE;
 
 /**
  * Prepare to initialize a controller with a complete operational certificate
  * chain.  This initialization method should be used when none of the
  * certificate-signing private keys are available locally.
  *
- * The fabric id and node if to use will be derived from the provided
+ * The fabric id and node id to use will be derived from the provided
  * operationalCertificate.
  *
  * intermediateCertificate may be nil if operationalCertificate is signed by
@@ -211,11 +227,30 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * ipk must be 16 bytes in length.
  */
+- (instancetype)initWithIPK:(NSData *)ipk
+         operationalKeypair:(id<MTRKeypair>)operationalKeypair
+     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate MTR_NEWLY_AVAILABLE;
+
+@end
+
+@interface MTRDeviceControllerStartupParams (Deprecated)
+
+@property (nonatomic, assign, readonly) uint64_t fabricId MTR_NEWLY_DEPRECATED("Please use fabricID");
+@property (nonatomic, copy, nullable) NSNumber * vendorId MTR_NEWLY_DEPRECATED("Please use vendorID");
+@property (nonatomic, copy, nullable) NSNumber * nodeId MTR_NEWLY_DEPRECATED("Please use nodeID");
+
+- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner
+                              fabricId:(uint64_t)fabricId
+                                   ipk:(NSData *)ipk MTR_NEWLY_DEPRECATED("Please use initWithIPK:fabricID:nocSigner:");
 - (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(NSData *)operationalCertificate
-                   intermediateCertificate:(nullable NSData *)intermediateCertificate
-                           rootCertificate:(NSData *)rootCertificate
-                                       ipk:(NSData *)ipk;
+                    operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+                   intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+                           rootCertificate:(MTRCertificateDERBytes)rootCertificate
+                                       ipk:(NSData *)ipk
+    MTR_NEWLY_DEPRECATED(
+        "Please use initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:");
 
 @end
 

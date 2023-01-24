@@ -44,7 +44,9 @@ CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchan
                                              SecureChannel::kProtocolCodeCloseSession);
 
     size_t reportSize = statusReport.Size();
-    Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(reportSize), reportSize);
+    auto packetBuffer = MessagePacketBuffer::New(reportSize);
+    VerifyOrReturnError(!packetBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(packetBuffer), reportSize);
     statusReport.WriteToBuffer(bbuf);
 
     System::PacketBufferHandle msg = bbuf.Finalize();
@@ -69,7 +71,7 @@ CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchan
 }
 
 void CloseSessionCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                              SessionHandle & sessionHandle)
+                                              const SessionHandle & sessionHandle)
 {
     auto * command = reinterpret_cast<CloseSessionCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));

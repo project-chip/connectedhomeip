@@ -16,6 +16,7 @@
  */
 #include <lib/dnssd/IncrementalResolve.h>
 
+#include <lib/dnssd/IPAddressSorter.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
@@ -31,7 +32,7 @@ using namespace mdns::Minimal::Logging;
 
 namespace {
 
-const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
+ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
 {
     return ByteSpan(range.Start(), range.Size());
 }
@@ -261,6 +262,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
             return CHIP_NO_ERROR;
         }
 
+#if INET_CONFIG_ENABLE_IPV4
         Inet::IPAddress addr;
         if (!ParseARecord(data.GetData(), &addr))
         {
@@ -268,6 +270,13 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
         }
 
         return OnIpAddress(interface, addr);
+#else
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+        ChipLogProgress(Discovery, "Ignoring A record: IPv4 not supported");
+#endif
+        // skipping IPv4 addresses
+        return CHIP_NO_ERROR;
+#endif
     }
     case QType::AAAA: {
         if (data.GetName() != mTargetHostName.Get())
@@ -343,6 +352,8 @@ CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const I
 CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 {
     VerifyOrReturnError(IsActiveCommissionParse(), CHIP_ERROR_INCORRECT_STATE);
+
+    IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
     outputData.resolutionData = mCommonResolutionData;
     outputData.commissionData = mSpecificResolutionData.Get<CommissionNodeData>();

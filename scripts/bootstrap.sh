@@ -30,9 +30,14 @@ _bootstrap_or_activate() {
         _CONFIG_FILE="$PW_CONFIG_FILE"
     fi
 
-    if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
-        [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
+    if [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
+        # Make sure our submodule remotes are correct for this revision.
+        git submodule sync --recursive
         git submodule update --init
+    elif [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ]; then
+        # In this case, only update already checked out submodules.
+        git submodule sync --recursive
+        git submodule update
     fi
 
     PW_BRANDING_BANNER="$_CHIP_ROOT/scripts/matter_banner.txt"
@@ -55,11 +60,25 @@ _bootstrap_or_activate() {
 
     local _PW_BANNER_FUNC="_chip_bootstrap_banner"
 
+    # Force the Pigweed environment directory to be '.environment'
+    if [ -z "$PW_ENVIRONMENT_ROOT" ]; then
+        export PW_ENVIRONMENT_ROOT="$PW_PROJECT_ROOT/.environment"
+    fi
+
     export _PW_ACTUAL_ENVIRONMENT_ROOT="$(pw_get_env_root)"
     local _SETUP_SH="$_PW_ACTUAL_ENVIRONMENT_ROOT/activate.sh"
 
     export PW_DOCTOR_SKIP_CIPD_CHECKS=1
     export PATH # https://bugs.chromium.org/p/pigweed/issues/detail?id=281
+
+    if test -n "$GITHUB_ACTION"; then
+        mkdir -p "$_PW_ACTUAL_ENVIRONMENT_ROOT"
+        tee <<EOF >"${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip.conf"
+[global]
+cache-dir = ${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip-cache
+EOF
+        export PIP_CONFIG_FILE="$_PW_ACTUAL_ENVIRONMENT_ROOT/pip.conf"
+    fi
 
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
         [ ! -f "$_SETUP_SH" ] ||

@@ -1,3 +1,9 @@
+# Deprecation notice
+
+chip-device-ctrl is no longer maintained and should not be used.
+
+Matter-repl is the current python controller implementation.
+
 # Working with Python CHIP Controller
 
 The Python CHIP Controller is a tool that allows to commission a Matter device
@@ -9,15 +15,13 @@ into the network and to communicate with it using the Zigbee Cluster Library
 
 <hr>
 
--   [Source files](#source)
--   [Building Android CHIPTool](#building)
--   [Running the tool](#running)
--   [Using Python CHIP Controller for Matter accessory testing](#using)
--   [List of commands](#commands)
+-   [Source files](#source-files)
+-   [Building Android CHIPTool](#building-and-installing)
+-   [Running the tool](#running-the-tool)
+-   [Using Python CHIP Controller for Matter accessory testing](#using-python-chip-controller-for-matter-accessory-testing)
+-   [List of commands](#list-of-commands)
 
 <hr>
-
-<a name="source"></a>
 
 ## Source files
 
@@ -28,8 +32,6 @@ The tool uses the generic CHIP Device Controller library, available in the
 `src/controller` directory.
 
 <hr>
-
-<a name="building"></a>
 
 ## Building and installing
 
@@ -88,8 +90,6 @@ To build and run the Python CHIP controller:
 
 <hr>
 
-<a name="running"></a>
-
 ## Running the tool
 
 1. Activate the Python virtual environment:
@@ -112,8 +112,6 @@ To build and run the Python CHIP controller:
     ```
 
 <hr>
-
-<a name="using"></a>
 
 ## Using Python CHIP Controller for Matter accessory testing
 
@@ -281,28 +279,27 @@ chip-device-ctrl > zcl LevelControl MoveToLevel 1234 1 0 level=50
 
 ### Step 7: Read basic information out of the accessory.
 
-Every Matter accessory device supports a Basic Cluster, which maintains
-collection of attributes that a controller can obtain from a device, such as the
-vendor name, the product name, or software version. Use `zclread` command to
-read those values from the device:
+Every Matter accessory device supports a Basic Information Cluster, which
+maintains collection of attributes that a controller can obtain from a device,
+such as the vendor name, the product name, or software version. Use `zclread`
+command to read those values from the device:
 
 ```
-chip-device-ctrl > zclread Basic VendorName 1234 1 0
-chip-device-ctrl > zclread Basic ProductName 1234 1 0
-chip-device-ctrl > zclread Basic SoftwareVersion 1234 1 0
+chip-device-ctrl > zclread BasicInformation VendorName 1234 1 0
+chip-device-ctrl > zclread BasicInformation ProductName 1234 1 0
+chip-device-ctrl > zclread BasicInformation SoftwareVersion 1234 1 0
 ```
 
 **REPL Command:**
-`await devCtrl.ReadAttribute(1234, [(1, Clusters.Basic.Attributes.VendorName)])`
+`await devCtrl.ReadAttribute(1234, [(1, Clusters.BasicInformation.Attributes.VendorName)])`
 
-> Use the `zcl ? Basic` command to list all available commands for Basic
-> Cluster.
+> Use the `zcl ? BasicInformation` command to list all available commands for
+> Basic Information Cluster.
 >
-> In REPL, you can type `Clusters.Basic.Attributes.` and then use the TAB key.
+> In REPL, you can type `Clusters.BasicInformation.Attributes.` and then use the
+> TAB key.
 
 <hr>
-
-<a name="commands"></a>
 
 ## List of commands
 
@@ -518,9 +515,9 @@ ApplicationBasic
 ApplicationLauncher
 AudioOutput
 BarrierControl
-Basic
+BasicInformation
 Binding
-BridgedDeviceBasic
+BridgedDeviceBasicInformation
 ColorControl
 ContentLaunch
 Descriptor
@@ -561,10 +558,11 @@ Type `Clusters.` and hit TAB
 
 ### `zcl ? <Cluster>`
 
-List available commands in cluster. For example, for _Basic_ cluster:
+List available commands in cluster. For example, for _Basic Information_
+cluster:
 
 ```
-chip-device-ctrl > zcl ? Basic
+chip-device-ctrl > zcl ? BasicInformation
 DataModelRevision
 VendorName
 VendorID
@@ -594,7 +592,7 @@ Type `Clusters.(cluster name).Commands.` and hit TAB
 Read the value of ZCL attribute. For example:
 
 ```
-chip-device-ctrl > zclread Basic VendorName 1234 1 0
+chip-device-ctrl > zclread BasicInformation VendorName 1234 1 0
 ```
 
 **REPL Commands**
@@ -602,7 +600,7 @@ chip-device-ctrl > zclread Basic VendorName 1234 1 0
 ```python
 # devCtrl.ReadAttribute(<nodeid>, [(<endpoint id>, Clusters.<cluster>.Attributes.<attribute>)])
 # e.g.
-await devCtrl.ReadAttribute(1234, [(1, Clusters.Basic.Attributes.VendorName)])
+await devCtrl.ReadAttribute(1234, [(1, Clusters.BasicInformation.Attributes.VendorName)])
 ```
 
 ### `zclwrite <cluster> <attribute> <nodeid> <endpoint> <groupid> <value>`
@@ -624,10 +622,10 @@ ZCL cluster commands.
 ```python
 # devCtrl.WriteAttribute(<nodeid>, [(<endpointid>, Clusters.<cluster>.Attributes.<attribute>(value=<attribute value>))])
 # e.g.
-await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.Int8u(value=1))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.Boolean(value=True))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.OctetString(value=b'123123\x00'))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.CharString(value='233233'))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.Int8u(value=1))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.Boolean(value=True))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.OctetString(value=b'123123\x00'))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.CharString(value='233233'))])
 ```
 
 ### `zclsubscribe <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval>`

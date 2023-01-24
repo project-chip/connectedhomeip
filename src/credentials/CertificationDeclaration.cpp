@@ -30,7 +30,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
@@ -182,6 +182,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
         err = reader.Next();
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
+    VerifyOrReturnError(reader.GetTag() != TLV::ContextTag(kTag_DACOriginProductId), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     if (err != CHIP_END_OF_TLV && reader.GetTag() == ContextTag(kTag_AuthorizedPAAList))
     {
@@ -277,6 +278,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
         err = reader.Next();
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
+    VerifyOrReturnError(reader.GetTag() != TLV::ContextTag(kTag_DACOriginProductId), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     if (err != CHIP_END_OF_TLV && reader.GetTag() == ContextTag(kTag_AuthorizedPAAList))
     {
@@ -473,7 +475,7 @@ CHIP_ERROR EncodeSignerInfo(const ByteSpan & signerKeyId, const P256ECDSASignatu
 
             uint8_t asn1SignatureBuf[kMax_ECDSA_Signature_Length_Der];
             MutableByteSpan asn1Signature(asn1SignatureBuf);
-            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, ByteSpan(signature, signature.Length()), asn1Signature));
+            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, signature.Span(), asn1Signature));
 
             // signature OCTET STRING
             ReturnErrorOnFailure(writer.PutOctetString(asn1Signature.data(), static_cast<uint16_t>(asn1Signature.size())));
@@ -537,7 +539,7 @@ CHIP_ERROR DecodeSignerInfo(ASN1Reader & reader, ByteSpan & signerKeyId, P256ECD
             // signature OCTET STRING
             ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_OctetString);
 
-            MutableByteSpan signatureSpan(signature, signature.Capacity());
+            MutableByteSpan signatureSpan(signature.Bytes(), signature.Capacity());
             ReturnErrorOnFailure(
                 EcdsaAsn1SignatureToRaw(kP256_FE_Length, ByteSpan(reader.GetValue(), reader.GetValueLen()), signatureSpan));
             ReturnErrorOnFailure(signature.SetLength(signatureSpan.size()));

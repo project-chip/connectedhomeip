@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include "lib/core/CHIPTLV.h"
-#include "lib/core/CHIPTLVTags.h"
-#include "lib/core/CHIPTLVTypes.h"
+#include "lib/core/TLV.h"
+#include "lib/core/TLVTags.h"
+#include "lib/core/TLVTypes.h"
 #include "protocols/interaction_model/Constants.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
@@ -65,9 +65,9 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
     // To avoid that, a single contiguous buffer is the best likely approach for now.
     //
     uint32_t totalBufSize = 0;
-    for (size_t i = 0; i < mBufferedList.size(); i++)
+    for (const auto & packetBuffer : mBufferedList)
     {
-        totalBufSize += mBufferedList[i]->TotalLength();
+        totalBufSize += packetBuffer->TotalLength();
     }
 
     //
@@ -117,6 +117,7 @@ CHIP_ERROR BufferedReadCallback::BufferListItem(TLV::TLVReader & reader)
     // we can improve this.
     //
     handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     writer.Init(std::move(handle), false);
 

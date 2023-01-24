@@ -21,10 +21,10 @@
 #include <system/SystemError.h>
 
 extern "C" {
-#include <init.h>
-#include <sys/math_extras.h>
-#include <sys/mutex.h>
-#include <sys/sys_heap.h>
+#include <zephyr/init.h>
+#include <zephyr/sys/math_extras.h>
+#include <zephyr/sys/mutex.h>
+#include <zephyr/sys/sys_heap.h>
 }
 
 #include <cstdint>
@@ -131,7 +131,7 @@ CHIP_ERROR GetStats(Stats & stats)
     LockGuard lockGuard;
     ReturnErrorOnFailure(lockGuard.Error());
 
-    sys_heap_runtime_stats sysHeapStats;
+    sys_memory_stats sysHeapStats;
     ReturnErrorOnFailure(System::MapErrorZephyr(sys_heap_runtime_stats_get(&sHeap, &sysHeapStats)));
 
     stats.free    = sysHeapStats.free_bytes;

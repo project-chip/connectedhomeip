@@ -17,11 +17,11 @@
  */
 
 #include <assert.h>
-#include <device.h>
-#include <drivers/gpio.h>
-#include <kernel.h>
-#include <logging/log.h>
-#include <zephyr.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
 
 LOG_MODULE_REGISTER(ButtonManager);
 
@@ -29,14 +29,15 @@ LOG_MODULE_REGISTER(ButtonManager);
 
 ButtonManager ButtonManager::sInstance;
 
-void Button::Configure(const struct device * port, gpio_pin_t outPin, gpio_pin_t inPin, void (*callback)(void))
+void Button::Configure(const struct device * port, gpio_pin_t outPin, gpio_pin_t inPin, bool intBothLevel, void (*callback)(void))
 {
     __ASSERT(device_is_ready(port), "%s is not ready\n", port->name);
 
-    mPort     = port;
-    mOutPin   = outPin;
-    mInPin    = inPin;
-    mCallback = callback;
+    mPort         = port;
+    mOutPin       = outPin;
+    mInPin        = inPin;
+    mIntBothLevel = intBothLevel;
+    mCallback     = callback;
 }
 
 int Button::Init(void)
@@ -46,14 +47,14 @@ int Button::Init(void)
     ret = gpio_pin_configure(mPort, mOutPin, GPIO_OUTPUT_ACTIVE);
     if (ret < 0)
     {
-        LOG_ERR("Configure out pin - fail. Status %d", ret);
+        LOG_ERR("Config out pin err: %d", ret);
         return ret;
     }
 
     ret = gpio_pin_configure(mPort, mInPin, GPIO_INPUT | GPIO_PULL_DOWN);
     if (ret < 0)
     {
-        LOG_ERR("Configure in pin - fail. Status %d", ret);
+        LOG_ERR("Config in pin err: %d", ret);
         return ret;
     }
 
@@ -68,7 +69,7 @@ int Button::Deinit(void)
     ret = gpio_pin_configure(mPort, mOutPin, GPIO_INPUT | GPIO_PULL_DOWN);
     if (ret < 0)
     {
-        LOG_ERR("Reconfigure out pin - fail. Status %d", ret);
+        LOG_ERR("Reconfig out pin err: %d", ret);
         return ret;
     }
 
@@ -91,19 +92,15 @@ void Button::Poll(Button * previous)
     ret = gpio_pin_get(mPort, mInPin);
     assert(ret >= 0);
 
-    if (ret == STATE_HIGH && mPreviousState != STATE_HIGH)
+    if ((mIntBothLevel && ret != mPreviousState) || (!mIntBothLevel && ret == STATE_HIGH && ret != mPreviousState))
     {
-        mPreviousState = STATE_HIGH;
-
         if (mCallback != NULL)
         {
             mCallback();
         }
     }
-    else if (ret == STATE_LOW)
-    {
-        mPreviousState = STATE_LOW;
-    }
+
+    mPreviousState = ret;
 
     k_msleep(10);
 }

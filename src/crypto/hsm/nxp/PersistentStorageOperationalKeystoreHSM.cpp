@@ -114,7 +114,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::NewOpKeypairForFabric(Fabric
     // Key id is created as slotid + start offset of ops key id
     mPendingKeypair->SetKeyId(FABRIC_SE05X_KEYID_START + slotId);
 
-    err = mPendingKeypair->Initialize();
+    err = mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NO_MEMORY);
 
     mPendingFabricIndex = fabricIndex;

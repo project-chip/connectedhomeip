@@ -27,15 +27,15 @@ using chip::EndpointId;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using ContentLauncherDelegate     = chip::app::Clusters::ContentLauncher::Delegate;
-using LaunchResponseType          = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
-using ParameterType               = chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType;
-using BrandingInformationType     = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type;
+using LaunchResponseType          = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
+using ParameterType               = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
+using BrandingInformationType     = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 class AppContentLauncherManager : public ContentLauncherDelegate
 {
 public:
-    AppContentLauncherManager(ContentAppAttributeDelegate attributeDelegate, std::list<std::string> acceptHeaderList,
+    AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate, std::list<std::string> acceptHeaderList,
                               uint32_t supportedStreamingProtocols);
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
@@ -60,5 +60,5 @@ private:
     // TODO: set this based upon meta data from app
     uint32_t mDynamicEndpointFeatureMap = 3;
 
-    ContentAppAttributeDelegate mAttributeDelegate;
+    ContentAppAttributeDelegate * mAttributeDelegate;
 };

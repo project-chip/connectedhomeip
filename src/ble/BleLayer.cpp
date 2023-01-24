@@ -203,9 +203,11 @@ CHIP_ERROR BleTransportCapabilitiesRequestMessage::Decode(const PacketBufferHand
     VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), BLE_ERROR_INVALID_MESSAGE);
     VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), BLE_ERROR_INVALID_MESSAGE);
 
-    for (size_t i = 0; i < kCapabilitiesRequestSupportedVersionsLength; i++)
+    static_assert(kCapabilitiesRequestSupportedVersionsLength == sizeof(msg.mSupportedProtocolVersions),
+                  "Expected capability sizes and storage must match");
+    for (unsigned char & version : msg.mSupportedProtocolVersions)
     {
-        msg.mSupportedProtocolVersions[i] = chip::Encoding::Read8(p);
+        version = chip::Encoding::Read8(p);
     }
 
     msg.mMtu        = chip::Encoding::LittleEndian::Read16(p);
@@ -733,7 +735,7 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
         shift_width ^= 4;
 
         uint8_t version = reqMsg.mSupportedProtocolVersions[(i / 2)];
-        version         = (version >> shift_width) & 0x0F; // Grab just the nibble we want.
+        version         = static_cast<uint8_t>((version >> shift_width) & 0x0F); // Grab just the nibble we want.
 
         if ((version >= CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION) &&
             (version <= CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION) && (version > retVersion))

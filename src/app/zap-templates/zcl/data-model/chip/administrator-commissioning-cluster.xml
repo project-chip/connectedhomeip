@@ -24,7 +24,7 @@ limitations under the License.
      <item name="WindowNotOpen" value="0x04"/>
   </enum>
 
-  <enum name="CommissioningWindowStatus" type="ENUM8">
+  <enum name="CommissioningWindowStatusEnum" type="ENUM8">
     <cluster code="0x003c"/>
      <item name="WindowNotOpen" value="0x00"/>
      <item name="EnhancedWindowOpen" value="0x01"/>
@@ -32,20 +32,20 @@ limitations under the License.
   </enum>
 
   <cluster>
-    <name>AdministratorCommissioning</name>
+    <name>Administrator Commissioning</name>
     <domain>General</domain>
     <code>0x003c</code>
     <define>ADMINISTRATOR_COMMISSIONING_CLUSTER</define>
     <description>Commands to trigger a Node to allow a new Administrator to commission it.</description>
 
-    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatus" writable="false" optional="false">WindowStatus</attribute>
+    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum" writable="false" optional="false">WindowStatus</attribute>
     <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" isNullable="true" optional="false">AdminFabricIndex</attribute>
     <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="INT16U" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
 
     <command source="client" code="0x00" name="OpenCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>
       <arg name="CommissioningTimeout" type="INT16U"/>
-      <arg name="PAKEVerifier" type="OCTET_STRING"/>
+      <arg name="PAKEPasscodeVerifier" type="OCTET_STRING"/>
       <arg name="Discriminator" type="INT16U"/>
       <arg name="Iterations" type="INT32U"/>
       <arg name="Salt" type="OCTET_STRING"/>

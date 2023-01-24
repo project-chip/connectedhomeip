@@ -236,14 +236,11 @@ extern void OTAIdleActivities(void);
 
 void vApplicationIdleHook(void)
 {
-    // Data queued by PDM will be written to external flash
-    // when PDM_vIdleTask is called. Interrupts are disabled
-    // to ensure there is no context switch during the actual
-    // writing, thus avoiding race conditions.
-    OSA_InterruptDisable();
+    vTaskSuspendAll();
     PDM_vIdleTask(PDM_MAX_WRITES_INFINITE);
-    OSA_InterruptEnable();
+    xTaskResumeAll();
 
     OTAIdleActivities();
+
     BOARD_ActionOnIdle();
 }

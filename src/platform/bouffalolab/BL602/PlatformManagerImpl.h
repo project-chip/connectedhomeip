@@ -24,19 +24,11 @@
 
 #pragma once
 
+#include <aos/yloop.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 namespace chip {
 namespace DeviceLayer {
-
-typedef struct
-{
-    uint32_t time;
-    uint16_t type;
-    uint16_t code;
-    unsigned long value;
-    unsigned long extra;
-} input_event_t;
 
 /**
  * Concrete implementation of the PlatformManager singleton object for the BL602 platform.
@@ -53,14 +45,15 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
     friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 #endif
 
+protected:
+    void _RunEventLoop(void);
+
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
-    /* none so far */
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
-
     CHIP_ERROR _InitChipStack(void);
     void _Shutdown();
 
@@ -76,6 +69,8 @@ private:
     static PlatformManagerImpl sInstance;
 
     using Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::PostEventFromISR;
+
+    void PlatformInit(void);
 };
 
 /**
@@ -98,6 +93,12 @@ inline PlatformManager & PlatformMgr(void)
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
     return PlatformManagerImpl::sInstance;
+}
+
+inline void PlatformManagerImpl::_RunEventLoop(void)
+{
+    PlatformInit();
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
 }
 
 } // namespace DeviceLayer

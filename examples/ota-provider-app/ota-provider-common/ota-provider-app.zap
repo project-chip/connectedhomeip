@@ -1,5 +1,5 @@
 {
-  "featureLevel": 77,
+  "featureLevel": 89,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -83,7 +83,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "identify time",
+              "name": "IdentifyTime",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -235,7 +235,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -737,6 +737,202 @@
           ]
         },
         {
+          "name": "Descriptor",
+          "code": 29,
+          "mfgCode": null,
+          "define": "DESCRIPTOR_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Descriptor",
+          "code": 29,
+          "mfgCode": null,
+          "define": "DESCRIPTOR_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "attributes": [
+            {
+              "name": "DeviceTypeList",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ServerList",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClientList",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "PartsList",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Access Control",
           "code": 31,
           "mfgCode": null,
@@ -901,10 +1097,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -927,10 +1123,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -1292,7 +1488,7 @@
           "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_PROVIDER_CLUSTER",
+          "define": "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -1344,7 +1540,7 @@
           "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_PROVIDER_CLUSTER",
+          "define": "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [
@@ -1404,7 +1600,7 @@
           "name": "OTA Software Update Requestor",
           "code": 42,
           "mfgCode": null,
-          "define": "OTA_REQUESTOR_CLUSTER",
+          "define": "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -1430,7 +1626,7 @@
           "name": "OTA Software Update Requestor",
           "code": 42,
           "mfgCode": null,
-          "define": "OTA_REQUESTOR_CLUSTER",
+          "define": "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -2279,11 +2475,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BootReasons",
+              "name": "BootReason",
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BootReasonEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2393,7 +2589,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -2427,7 +2623,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -2439,7 +2635,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "CommissioningWindowStatusEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2981,7 +3177,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3047,7 +3243,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3281,7 +3477,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "DlDoorState",
+              "type": "DoorStateEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -3361,7 +3557,7 @@
               "code": 37,
               "mfgCode": null,
               "side": "server",
-              "type": "DlOperatingMode",
+              "type": "OperatingModeEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -3929,7 +4125,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ColorTemperature",
+              "name": "ColorTemperatureMireds",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -4638,7 +4834,7 @@
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
-          "define": "TEMP_MEASUREMENT_CLUSTER",
+          "define": "TEMPERATURE_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -4664,7 +4860,7 @@
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
-          "define": "TEMP_MEASUREMENT_CLUSTER",
+          "define": "TEMPERATURE_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [

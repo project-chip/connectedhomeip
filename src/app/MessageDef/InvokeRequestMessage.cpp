@@ -25,11 +25,10 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR InvokeRequestMessage::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int tagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("InvokeRequestMessage =");
@@ -48,43 +47,33 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kSuppressResponse):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
 #if CHIP_DETAIL_LOGGING
-            {
-                bool suppressResponse;
-                ReturnErrorOnFailure(reader.Get(suppressResponse));
-                PRETTY_PRINT("\tsuppressResponse = %s, ", suppressResponse ? "true" : "false");
-            }
+        {
+            bool suppressResponse;
+            ReturnErrorOnFailure(reader.Get(suppressResponse));
+            PRETTY_PRINT("\tsuppressResponse = %s, ", suppressResponse ? "true" : "false");
+        }
 #endif // CHIP_DETAIL_LOGGING
-            break;
+        break;
 
         case to_underlying(Tag::kTimedRequest):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kTimedRequest))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kTimedRequest));
 #if CHIP_DETAIL_LOGGING
-            {
-                bool timedRequest;
-                ReturnErrorOnFailure(reader.Get(timedRequest));
-                PRETTY_PRINT("\ttimedRequest = %s, ", timedRequest ? "true" : "false");
-            }
+        {
+            bool timedRequest;
+            ReturnErrorOnFailure(reader.Get(timedRequest));
+            PRETTY_PRINT("\ttimedRequest = %s, ", timedRequest ? "true" : "false");
+        }
 #endif // CHIP_DETAIL_LOGGING
-            break;
-        case to_underlying(Tag::kInvokeRequests):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kInvokeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kInvokeRequests));
-            {
-                InvokeRequests::Parser invokeRequests;
-                ReturnErrorOnFailure(invokeRequests.Init(reader));
+        break;
+        case to_underlying(Tag::kInvokeRequests): {
+            InvokeRequests::Parser invokeRequests;
+            ReturnErrorOnFailure(invokeRequests.Init(reader));
 
-                PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(invokeRequests.CheckSchemaValidity());
-                PRETTY_PRINT_DECDEPTH();
-            }
-            break;
+            PRETTY_PRINT_INCDEPTH();
+            ReturnErrorOnFailure(invokeRequests.PrettyPrint());
+            PRETTY_PRINT_DECDEPTH();
+        }
+        break;
         case kInteractionModelRevisionTag:
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
@@ -99,15 +88,13 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int requiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kTimedRequest)) |
-            (1 << to_underlying(Tag::kInvokeRequests));
-        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE;
+        err = CHIP_NO_ERROR;
     }
 
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR InvokeRequestMessage::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
 {

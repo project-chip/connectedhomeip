@@ -82,9 +82,6 @@ labelPRBasedOnFilePath:
     ble:
         - src/ble/*
 
-    android:
-        - src/android/*
-
     app:
         - src/app/*
 

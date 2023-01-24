@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include <app_preference.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <cstddef>
+
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace DeviceLayer {

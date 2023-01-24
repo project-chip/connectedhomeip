@@ -19,6 +19,7 @@
 #pragma once
 
 #include <commands/common/CredentialIssuerCommands.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -37,7 +38,9 @@ public:
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-        setupParams.deviceAttestationVerifier = chip::Credentials::GetDefaultDACVerifier(trustStore);
+        mDacVerifier                          = chip::Credentials::GetDefaultDACVerifier(trustStore);
+        setupParams.deviceAttestationVerifier = mDacVerifier;
+        mDacVerifier->EnableCdTestKeySupport(mAllowTestCdSigningKey);
 
         return CHIP_NO_ERROR;
     }
@@ -49,6 +52,20 @@ public:
         return mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, keypair.Pubkey(), rcac, icac, noc);
     }
 
+    CHIP_ERROR AddAdditionalCDVerifyingCerts(const std::vector<std::vector<uint8_t>> & additionalCdCerts) override
+    {
+        VerifyOrReturnError(mDacVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        for (const auto & cert : additionalCdCerts)
+        {
+            auto cdTrustStore = mDacVerifier->GetCertificationDeclarationTrustStore();
+            VerifyOrReturnError(cdTrustStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            ReturnErrorOnFailure(cdTrustStore->AddTrustedKey(chip::ByteSpan(cert.data(), cert.size())));
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
     void SetCredentialIssuerOption(CredentialIssuerOptions option, bool isEnabled) override
     {
         switch (option)
@@ -57,6 +74,13 @@ public:
             mUsesMaxSizedCerts = isEnabled;
             mOpCredsIssuer.SetMaximallyLargeCertsUsed(mUsesMaxSizedCerts);
             break;
+        case CredentialIssuerOptions::kAllowTestCdSigningKey:
+            mAllowTestCdSigningKey = isEnabled;
+            if (mDacVerifier != nullptr)
+            {
+                mDacVerifier->EnableCdTestKeySupport(isEnabled);
+            }
+
         default:
             break;
         }
@@ -68,6 +92,8 @@ public:
         {
         case CredentialIssuerOptions::kMaximizeCertificateSizes:
             return mUsesMaxSizedCerts;
+        case CredentialIssuerOptions::kAllowTestCdSigningKey:
+            return mAllowTestCdSigningKey;
         default:
             return false;
         }
@@ -75,7 +101,10 @@ public:
 
 protected:
     bool mUsesMaxSizedCerts = false;
+    // Starts true for legacy purposes
+    bool mAllowTestCdSigningKey = true;
 
 private:
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+    chip::Credentials::DeviceAttestationVerifier * mDacVerifier;
 };

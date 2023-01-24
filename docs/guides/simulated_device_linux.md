@@ -2,7 +2,7 @@
 
 This document contains instructions on how to build, run, and interact with a
 simulated device. All virtual accessories live in
-[examples/placeholder/linux/apps](../../examples/placeholder/linux/apps).
+[examples/placeholder/linux/apps](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps).
 
 Each accessory needs to be hosted into a subfolder. It will be the name of the
 application. For example `app1` will create a binary named `chip-app1`.
@@ -86,17 +86,14 @@ Now that the building the app and starting it is complete, you will be able to
 interact with it using chip-tool
 
 1. Follow the instruction to build chip-tool in the
-   [chip-tool readme](../../examples/chip-tool).
+   [chip-tool readme](../../examples/chip-tool/README.md).
 
-2. Run this command to initiate the pairing.
+2. Run this command to commission.
     ```
-    ./out/debug/standalone/chip-tool pairing ethernet 0x654321 20202021 3842 [IP ADDRESS of App] 5542
+    ./out/debug/standalone/chip-tool pairing code 0x654321 MT:-24J0AFN00KA0648G00
     ```
-3. Run this command to complete the commissioning.
-    ```
-    ./out/debug/standalone/chip-tool generalcommissioning commissioning-complete 0x654321 0
-    ```
-4. Most tests will start at this point and now an send cluster commands with
+    or whatever is listed on the "SetupQRCode:" line in the log output.
+3. Most tests will start at this point and now an send cluster commands with
    chip-tool as follow.
 
     ```
@@ -105,7 +102,8 @@ interact with it using chip-tool
     ./out/debug/standalone/chip-tool onoff write on-time 1 0x654321 1
     ```
 
-    See [chip-tool readme](../../examples/chip-tool) for additional commands.
+    See [chip-tool readme](../../examples/chip-tool/README.md) for additional
+    commands.
 
 ## Adding simulated Tests via YAML
 

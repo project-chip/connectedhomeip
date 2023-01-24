@@ -21,20 +21,38 @@
  *          for Tizen platform.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+/**
+ * Note: ThreadStackManager requires ConnectivityManager to be defined
+ *       beforehand, otherwise we will face circular dependency between them. */
+#include <platform/ConnectivityManager.h>
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
+/**
+ * Note: Use public include for ThreadStackManager which includes our local
+ *       platform/<PLATFORM>/ThreadStackManagerImpl.h after defining interface
+ *       class. */
 #include <platform/ThreadStackManager.h>
-#include <platform/Tizen/NetworkCommissioningDriver.h>
 
-#include "ThreadStackManagerImpl.h"
+#include <endian.h>
+
+#include <cstring>
+
+#include <thread.h>
+
+#include <app/AttributeAccessInterface.h>
+#include <inet/IPAddress.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/dnssd/Constants.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/NetworkCommissioning.h>
+#include <platform/PlatformManager.h>
 
-using namespace ::chip::DeviceLayer::Internal;
-using namespace chip::DeviceLayer::NetworkCommissioning;
+#include <platform/Tizen/ThreadStackManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -426,9 +444,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
     int threadErr;
 
     threadErr = thread_get_extended_address(mThreadInstance, &extAddr);
-    VerifyOrReturnError(
-        threadErr == THREAD_ERROR_NONE,
-        (ChipLogError(DeviceLayer, "thread_get_extended_address() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_get_extended_address() failed. ret: %d", threadErr));
 
     extAddr = htobe64(extAddr);
     memcpy(buf, &extAddr, sizeof(extAddr));
@@ -454,7 +471,7 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     ChipLogError(DeviceLayer, "Not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -489,12 +506,12 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
 
 ThreadStackManager & ThreadStackMgr()
 {
-    return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
+    return DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
 ThreadStackManagerImpl & ThreadStackMgrImpl()
 {
-    return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
+    return DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -574,8 +591,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetupSrpHost(const char * aHostName)
 
     /* Get external ip address */
     threadErr = thread_get_ipaddr(mThreadInstance, _ThreadIpAddressCb, THREAD_IPADDR_TYPE_MLEID, nullptr);
-    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE,
-                        (ChipLogError(DeviceLayer, "thread_get_ipaddr() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_get_ipaddr() failed. ret: %d", threadErr));
 
     return CHIP_NO_ERROR;
 }
@@ -583,6 +600,17 @@ CHIP_ERROR ThreadStackManagerImpl::_SetupSrpHost(const char * aHostName)
 CHIP_ERROR ThreadStackManagerImpl::_ClearSrpHost(const char * aHostName)
 {
     ChipLogError(DeviceLayer, "Not implemented");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback,
+                                               void * aContext)
+{
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 

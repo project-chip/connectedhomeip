@@ -31,8 +31,10 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/SafeInt.h>
 #include <platform/android/AndroidConfig.h>
 
 namespace chip {
@@ -239,7 +241,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize
     chip::JniUtfString utfValue(env, (jstring) javaValue);
     outLen = strlen(utfValue.c_str());
 
-    strncpy(buf, utfValue.c_str(), bufSize);
+    Platform::CopyString(buf, bufSize, utfValue.c_str());
 
     return CHIP_NO_ERROR;
 }
@@ -371,13 +373,14 @@ CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, siz
     chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueBinMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::CanCastTo<uint32_t>(dataLen), CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString space(env, key.Namespace);
     UtfString name(env, key.Name);
-    ByteArray jval(env, reinterpret_cast<const jbyte *>(data), dataLen);
+    ByteArray jval(env, reinterpret_cast<const jbyte *>(data), static_cast<uint32_t>(dataLen));
 
     env->CallVoidMethod(gAndroidConfigObject, gWriteConfigValueBinMethod, space.jniValue(), name.jniValue(), jval.jniValue());
     if (env->ExceptionCheck())

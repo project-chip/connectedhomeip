@@ -39,6 +39,11 @@ public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
+    CHIP_ERROR IncreaseBootCount(void);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
+
 private:
     // ===== Members that implement the ConfigurationManager public interface.
 

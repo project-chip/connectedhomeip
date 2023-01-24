@@ -20,10 +20,15 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+      disabled: true
+
     - label: "DUT sends NavigateTarget command to TH"
       PICS: TGTNAV.C.C00.Tx
       verification: |

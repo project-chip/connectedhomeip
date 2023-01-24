@@ -50,15 +50,25 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Read the global attribute: FeatureMap"
-      PICS: MEDIAPLAYBACK.S.AS || MEDIAPLAYBACK.S.VS
+    - label:
+          "Given MEDIAPLAYBACK.S.AS ensure featuremap has the correct bit set"
+      PICS: MEDIAPLAYBACK.S.AS
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 1
-              maxValue: 3
+              hasMasksSet: [0x1]
+
+    - label:
+          "Given MEDIAPLAYBACK.S.VS ensure featuremap has the correct bit set"
+      PICS: MEDIAPLAYBACK.S.VS
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

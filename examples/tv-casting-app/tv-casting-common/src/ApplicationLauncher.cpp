@@ -21,27 +21,27 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-CHIP_ERROR LaunchAppCommand::Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+CHIP_ERROR LaunchAppCommand::Invoke(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                     chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback)
 {
     ApplicationLauncher::Commands::LaunchApp::Type request;
-    request.application = application;
-    request.data        = data;
+    request.application.SetValue(application);
+    request.data = data;
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 
-CHIP_ERROR StopAppCommand::Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+CHIP_ERROR StopAppCommand::Invoke(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                   std::function<void(CHIP_ERROR)> responseCallback)
 {
     ApplicationLauncher::Commands::StopApp::Type request;
-    request.application = application;
+    request.application.SetValue(application);
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 
-CHIP_ERROR HideAppCommand::Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+CHIP_ERROR HideAppCommand::Invoke(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                   std::function<void(CHIP_ERROR)> responseCallback)
 {
     ApplicationLauncher::Commands::HideApp::Type request;
-    request.application = application;
+    request.application.SetValue(application);
     return MediaCommandBase::Invoke(request, responseCallback);
 }

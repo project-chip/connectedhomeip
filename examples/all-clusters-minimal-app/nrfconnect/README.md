@@ -23,7 +23,7 @@ device works as a Thread Minimal End Device.
     -   [Bluetooth LE advertising](#bluetooth-le-advertising)
     -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
 -   [Requirements](#requirements)
-    -   [Supported devices](#supported_devices)
+    -   [Supported devices](#supported-devices)
 -   [Device UI](#device-ui)
 -   [Setting up the environment](#setting-up-the-environment)
     -   [Using Docker container for setup](#using-docker-container-for-setup)
@@ -31,19 +31,17 @@ device works as a Thread Minimal End Device.
 -   [Building](#building)
     -   [Removing build artifacts](#removing-build-artifacts)
     -   [Building with release configuration](#building-with-release-configuration)
-    -   [Building with low-power configuration](#building-with-low-power-configuration)
     -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
 -   [Configuring the example](#configuring-the-example)
     -   [Example build types](#example-build-types)
 -   [Flashing and debugging](#flashing-and-debugging)
-    -   [Flashing on the development kits](#nrfdks_flashing)
-    -   [Flashing on the nRF52840 Dongle](#nrf52840dongle_flashing)
+    -   [Flashing on the development kits](#flashing-on-the-development-kits)
+    -   [Flashing on the nRF52840 Dongle](#flashing-on-the-nrf52840-dongle)
 -   [Testing the example](#testing-the-example)
-    -   [Testing using CHIPTool](#testing-using-chiptool)
+    -   [Testing using Linux CHIPTool](#testing-using-linux-chiptool)
+    -   [Testing using Android CHIPTool](#testing-using-android-chiptool)
 
 <hr>
-
-<a name="overview"></a>
 
 ## Overview
 
@@ -54,11 +52,17 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
-The Matter device that runs the all clusters application is controlled by the
-Matter controller device over the Thread protocol. By default, the Matter device
-has Thread disabled, and it should be paired with Matter controller and get
-configuration from it. Some actions required before establishing full
-communication are described below.
+By default, the Matter accessory device has IPv6 networking disabled. You must
+pair it with the Matter controller over Bluetooth® LE to get the configuration
+from the controller to use the device within a Thread or Wi-Fi network. You have
+to make the device discoverable manually (for security reasons). See
+[Bluetooth LE advertising](#bluetooth-le-advertising) to learn how to do this.
+The controller must get the commissioning information from the Matter accessory
+device and provision the device into the network.
+
+You can test this application remotely over the Thread or the Wi-Fi protocol,
+which in either case requires more devices, including a Matter controller that
+you can configure either on a PC or a mobile device.
 
 ### Bluetooth LE advertising
 
@@ -85,15 +89,11 @@ with other Thread devices in the network.
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements
 
 The application requires a specific revision of the nRF Connect SDK to work
 correctly. See [Setting up the environment](#setting-up-the-environment) for
 more information.
-
-<a name="supported_devices"></a>
 
 ### Supported devices
 
@@ -106,8 +106,6 @@ The example supports building and running on the following devices:
 | [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-Dongle) | `nrf52840dongle_nrf52840`  | <details><summary>nRF52840 Dongle</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_Dongle-medium.jpg" alt="nRF52840 Dongle"/></details> |
 
 <hr>
-
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -136,8 +134,8 @@ following states are possible:
     Bluetooth LE.
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full Thread network or service
-    connectivity.
+    provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+    network, or the related services.
 
 -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
     network and service connectivity.
@@ -172,7 +170,7 @@ image that has the tools pre-installed.
 If you are a macOS user, you won't be able to use the Docker container to flash
 the application onto a Nordic development kit due to
 [certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
-Use the [native shell](#using-native-shell) for building instead.
+Use the [native shell](#using-native-shell-for-setup) for building instead.
 
 ### Using Docker container for setup
 
@@ -255,8 +253,6 @@ Now you can proceed with the [Building](#building) instruction.
 
 <hr>
 
-<a name="building"></a>
-
 ## Building
 
 Complete the following steps, regardless of the method used for setting up the
@@ -336,8 +332,6 @@ example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 
 <hr>
 
-<a name="configuring"></a>
-
 ## Configuring the example
 
 The Zephyr ecosystem is based on Kconfig files and the settings can be modified
@@ -388,14 +382,10 @@ page.
 
 <hr>
 
-<a name="flashing"></a>
-
 ## Flashing and debugging
 
 The flashing and debugging procedure is different for the development kits and
 the nRF52840 Dongle.
-
-<a name="nrfdks_flashing"></a>
 
 ### Flashing on the development kits
 
@@ -412,8 +402,6 @@ directory:
 
         $ west debug
 
-<a name="nrf52840dongle_flashing"></a>
-
 ### Flashing on the nRF52840 Dongle
 
 Visit
@@ -427,10 +415,16 @@ to read more about flashing on the nRF52840 Dongle.
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
 
-### Testing using CHIPTool
+### Testing using Linux CHIPTool
+
+Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to see
+how to use [CHIP Tool for Linux or mac OS](../../chip-tool/README.md) to
+commission and control the application within a Matter-enabled Thread network.
+
+### Testing using Android CHIPTool
 
 Read the
 [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
-to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for
+to see how to use [CHIPTool](../../../examples/android/CHIPTool/README.md) for
 Android smartphones to commission and control the application within a
 Matter-enabled Thread network.

@@ -61,13 +61,13 @@ class ExchangeContext;
  *        on the exchange, then the exchange remains with you, and it's your responsibility to either send a message on it,
  *        or Close/Abort if you no longer wish to have the exchange around.
  *
- *     6. If you get a call to OnExchangeClosing, you should give up your reference to the exchange
- *        by 'nulling' out your reference to the exchange. The exchange will be automatically closed by the ExchangeMgr.
+ *     6. If you get a call to OnExchangeClosing, you should null out your reference to the exchange UNLESS you still
+ *        hold ownership of the exchange (i.e due to a prior call to WillSendMessage). In that case, you should call Abort/Close
+ *        whenever you're done with using the exchange. Those calls can be made synchronously within the OnExchangeClosing
+ *        callback.
  *
- *     6. If you get a call to OnResponseTimeout, you should give up your reference to the exchange
- *        by 'nulling' out your reference to the exchange UNLESS you intend to do further work on the exchange. If so,
- *        rules 2, 3 and 5 apply. Otherwise, the exchange will be automatically closed by the ExchangeMgr. Note that
- *        if the cause of the call is the release of the underlying session, attempts to send a message will result in failure.
+ *     7. If you get a call to OnResponseTimeout, you should null out your reference to the exchange since the exchange layer
+ *        owns the exchange and will handle releasing the ref later. A call to OnExchangeClosing will follow after.
  *
  */
 class DLL_EXPORT ExchangeDelegate

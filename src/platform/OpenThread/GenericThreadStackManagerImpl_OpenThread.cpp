@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -453,7 +453,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
         // If Thread scanning was done before commissioning, turn off the IPv6 interface.
         if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
         {
-            otIp6SetEnabled(mOTInst, false);
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                Impl()->LockThreadStack();
+                otIp6SetEnabled(mOTInst, false);
+                Impl()->UnlockThreadStack();
+            });
         }
 
         if (mpScanCallback != nullptr)
@@ -1134,7 +1138,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
             constexpr uint16_t kFrameErrorRate100Percent   = 0xffff;
             constexpr uint16_t kMessageErrorRate100Percent = 0xffff;
@@ -1148,8 +1152,24 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 app::DataModel::Nullable<int8_t> averageRssi;
                 app::DataModel::Nullable<int8_t> lastRssi;
 
-                averageRssi.SetNonNull(neighInfo.mAverageRssi);
-                lastRssi.SetNonNull(neighInfo.mLastRssi);
+                if (neighInfo.mAverageRssi == OT_RADIO_RSSI_INVALID)
+                {
+                    averageRssi.SetNull();
+                }
+                else
+                {
+                    // Thread average calculation already restrict mAverageRssi to be between -128 and 0
+                    averageRssi.SetNonNull(neighInfo.mAverageRssi);
+                }
+
+                if (neighInfo.mLastRssi == OT_RADIO_RSSI_INVALID)
+                {
+                    lastRssi.SetNull();
+                }
+                else
+                {
+                    lastRssi.SetNonNull(((neighInfo.mLastRssi > 0) ? 0 : neighInfo.mLastRssi));
+                }
 
                 neighborTable.averageRssi      = averageRssi;
                 neighborTable.lastRssi         = lastRssi;
@@ -1176,7 +1196,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
             otRouterInfo routerInfo;
 
@@ -1816,9 +1836,10 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mIntervalsMode = intervalType;
 
     Impl()->LockThreadStack();
+
+    mIntervalsMode = intervalType;
 
 // For Thread devices, the intervals are defined as:
 // * poll period for SED devices that poll the parent for data
@@ -1829,33 +1850,39 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
 #else
     uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
-
+    otError otErr = OT_ERROR_NONE;
     if (interval.count() != curIntervalMS)
     {
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
         // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
-        otError otErr = otLinkCslSetPeriod(mOTInst, interval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
+        otErr         = otLinkCslSetPeriod(mOTInst, interval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
+        curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
 #else
-        otError otErr = otLinkSetPollPeriod(mOTInst, interval.count());
+        otErr         = otLinkSetPollPeriod(mOTInst, interval.count());
+        curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
         err = MapOpenThreadError(otErr);
     }
 
     Impl()->UnlockThreadStack();
 
-    if (interval.count() != curIntervalMS)
+    if (otErr != OT_ERROR_NONE)
     {
-        ChipLogProgress(DeviceLayer, "OpenThread SED interval set to %" PRId32 "ms", interval.count());
+        ChipLogError(DeviceLayer, "Failed to set SED interval to %" PRId32 "ms. Defaulting to %" PRId32 "ms", interval.count(),
+                     curIntervalMS);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "OpenThread SED interval is %" PRId32 "ms", curIntervalMS);
     }
 
     return err;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ConnectivityManager::SEDIntervalMode mode;
 
     if (onOff)
     {
@@ -1867,12 +1894,59 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiv
             mActiveModeConsumers--;
     }
 
+    if (!onOff && delayIdle && CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD.count() != 0)
+    {
+        // StartTimer will cancel a timer if the same callback & context is used.
+        // This will have the effect of canceling the previous one (if any) and starting
+        // a new timer of the same duration. This effectively prolongs the active threshold
+        // without consuming additional resources.
+        err = DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD, RequestSEDModeUpdate, this);
+        if (CHIP_NO_ERROR == err)
+        {
+            if (!mDelayIdleTimerRunning)
+            {
+                mDelayIdleTimerRunning = true;
+                mActiveModeConsumers++;
+            }
+            return err;
+        }
+
+        ChipLogError(DeviceLayer, "Failed to postpone Idle Mode with error %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return SEDUpdateMode();
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDUpdateMode()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ConnectivityManager::SEDIntervalMode mode;
+
     mode = mActiveModeConsumers > 0 ? ConnectivityManager::SEDIntervalMode::Active : ConnectivityManager::SEDIntervalMode::Idle;
 
     if (mIntervalsMode != mode)
         err = SetSEDIntervalMode(mode);
 
     return err;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeUpdate(chip::System::Layer * apSystemLayer,
+                                                                               void * apAppState)
+{
+    if (apAppState != nullptr)
+    {
+        GenericThreadStackManagerImpl_OpenThread * obj = static_cast<GenericThreadStackManagerImpl_OpenThread *>(apAppState);
+        if (obj->mActiveModeConsumers > 0)
+        {
+            obj->mActiveModeConsumers--;
+        }
+
+        obj->mDelayIdleTimerRunning = false;
+
+        obj->SEDUpdateMode();
+    }
 }
 #endif
 
@@ -2423,9 +2497,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(mdnsService.mHostName, serviceInfo.mHostNameBuffer, substringSize);
-    // Append string terminating character.
-    mdnsService.mHostName[substringSize] = '\0';
+    Platform::CopyString(mdnsService.mHostName, serviceInfo.mHostNameBuffer);
 
     if (strchr(serviceType, '.') == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -2436,9 +2508,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(mdnsService.mType, serviceType, substringSize);
-    // Append string terminating character.
-    mdnsService.mType[substringSize] = '\0';
+    Platform::CopyString(mdnsService.mType, serviceType);
 
     // Extract from the <type>.<protocol>.<domain-name>. the <protocol> part.
     const char * protocolSubstringStart = serviceType + substringSize + 1;
@@ -2451,9 +2521,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(protocol, protocolSubstringStart, substringSize);
-    // Append string terminating character.
-    protocol[substringSize] = '\0';
+    Platform::CopyString(protocol, protocolSubstringStart);
 
     if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {
@@ -2518,7 +2586,7 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchBrowseEmpty(intptr_t context)
 {
     auto * dnsResult = reinterpret_cast<DnsResult *>(context);
-    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, nullptr, 0, dnsResult->error);
+    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, nullptr, 0, true, dnsResult->error);
     Platform::Delete<DnsResult>(dnsResult);
 }
 
@@ -2526,7 +2594,7 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchBrowse(intptr_t context)
 {
     auto * dnsResult = reinterpret_cast<DnsResult *>(context);
-    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, &dnsResult->mMdnsService, 1, dnsResult->error);
+    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, &dnsResult->mMdnsService, 1, false, dnsResult->error);
     Platform::Delete<DnsResult>(dnsResult);
 }
 
@@ -2543,8 +2611,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
     otDnsServiceInfo serviceInfo;
-    uint16_t index          = 0;
-    bool wasAnythingBrowsed = false;
+    uint16_t index = 0;
 
     if (ThreadStackMgrImpl().mDnsBrowseCallback == nullptr)
     {
@@ -2570,18 +2637,16 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
 
         VerifyOrExit(error == CHIP_NO_ERROR, );
 
-        DnsResult * dnsResult = Platform::New<DnsResult>(aContext, MapOpenThreadError(aError));
+        DnsResult * dnsResult = Platform::New<DnsResult>(aContext, CHIP_NO_ERROR);
         error = FromOtDnsResponseToMdnsData(serviceInfo, type, dnsResult->mMdnsService, dnsResult->mServiceTxtEntry);
         if (CHIP_NO_ERROR == error)
         {
-            // Invoke callback for every service one by one instead of for the whole list due to large memory size needed to
-            // allocate on
-            // stack.
+            // Invoke callback for every service one by one instead of for the whole
+            // list due to large memory size needed to allocate on stack.
             static_assert(ArraySize(dnsResult->mMdnsService.mName) >= ArraySize(serviceName),
                           "The target buffer must be big enough");
             Platform::CopyString(dnsResult->mMdnsService.mName, serviceName);
             DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(dnsResult));
-            wasAnythingBrowsed = true;
         }
         else
         {
@@ -2591,13 +2656,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     }
 
 exit:
-
-    // In case no service was found invoke callback to notify about failure. In other case it was already called before.
-    if (!wasAnythingBrowsed)
-    {
-        DnsResult * dnsResult = Platform::New<DnsResult>(aContext, MapOpenThreadError(aError));
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(dnsResult));
-    }
+    // Invoke callback to notify about end-of-browse or failure
+    DnsResult * dnsResult = Platform::New<DnsResult>(aContext, error);
+    DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(dnsResult));
 }
 
 template <class ImplClass>

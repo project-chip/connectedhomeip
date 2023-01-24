@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
@@ -75,9 +74,9 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 VerifyOrDie(err == CHIP_NO_ERROR);
                 timeMs = *reinterpret_cast<decltype(timeMs) *>(buf.get());
 
-                response.status    = chip::app::Clusters::DiagnosticLogs::LogsStatus::kSuccess;
-                response.content   = chip::ByteSpan(buf.get() + sizeof(timeMs), logSize - sizeof(timeMs));
-                response.timeStamp = timeMs;
+                response.status       = chip::app::Clusters::DiagnosticLogs::LogsStatus::kSuccess;
+                response.logContent   = chip::ByteSpan(buf.get() + sizeof(timeMs), logSize - sizeof(timeMs));
+                response.UTCTimeStamp = timeMs;
                 handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;

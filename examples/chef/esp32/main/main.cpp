@@ -41,9 +41,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
@@ -209,7 +207,7 @@ extern "C" void app_main(void)
     xTaskCreate(&chip_shell_task, "chip_shell", 8192, NULL, 5, NULL);
 #endif /* CONFIG_ENABLE_CHIP_SHELL */
 
-    while (1)
+    while (true)
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }

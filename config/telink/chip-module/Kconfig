@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2021 Project CHIP Authors
+#   Copyright (c) 2022 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,8 +16,117 @@
 
 rsource "../../zephyr/Kconfig"
 
-config TELINK_BLE_LIB
-	bool "Include third party Telink BLE SDK"
+# See config/zephyr/Kconfig for full definition
+config CHIP_DEVICE_VENDOR_NAME
+	default "Telink semiconductor"
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_REQUESTOR
+	bool
+	default y
+	imply BOOTLOADER_MCUBOOT
+	imply IMG_MANAGER
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+	int "OTA Requestor image buffer size"
+	default 256
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Configures size of the buffer used by OTA Requestor when downloading and
+	  writing a new firmware image to flash.
+
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	bool "Auto-reboot when firmware update is applied"
+	default y
+	depends on CHIP_OTA_REQUESTOR
+	imply REBOOT
+	help
+	  When a user consents to apply a firmware update, and the update package is
+	  downloaded, reboot the device automatically to swap the old and the new
+	  firmware images.
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_IMAGE_BUILD
+	bool
+	default y if CHIP_OTA_REQUESTOR
+
+config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+	bool "Include default device information provider build"
+	default y
+
+config CHIP_FACTORY_DATA
+	bool "Enable Factory Data support"
+	select ZCBOR
+	help
+	  Enables support for reading factory data from flash memory partition.
+	  It requires factory_data partition to exist.
+
+config CHIP_FACTORY_DATA_CUSTOM_BACKEND
+	bool "Enable Factory Data custom backend"
+	depends on !CHIP_FACTORY_DATA
+	help
+	  Enables user custom factory data implementation. It cannot be used
+	  with the CHIP_FACTORY_DATA that enabled default Telink factory data
+	  implementation.
+
+config CHIP_FACTORY_DATA_BUILD
+	bool "Enable Factory Data build"
 	default n
 	help
-	  Include third party Telink BLE SDK
+	  Enables generation of factory data during the building.
+	  It requires factory_data partition to exist.
+	  As a result a new output file factory_data.bin will be created.
+
+config CHIP_FACTORY_DATA_VERSION
+	int
+	default 1
+	help
+	  The Factory data version contains a current version of a factory data 
+	  parameter set that the user cannot change. 
+	  After moving to the next version of the factory data set, change the default value. 
+	  This config is used to validate the version of a factory data set on a device-side 
+	  with the version of factory data saved in the Flash memory.
+
+if CHIP_FACTORY_DATA_BUILD
+
+# Factory data definitions
+config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
+	bool "Enable merging generated factory data with the build target .bin file"
+	default y
+	help
+	  Enables merging generated factory data with the build target zephyr.bin file.
+	  As a result, output file zephyr.bin will consist of all partitions including 
+	  factory data.
+
+# Use default certificates without generating or providing them
+config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+	bool "Use default certificates located in Matter repository"
+	default y
+	help
+	  Pre-generated certificates can be used for development purpose.
+	  This config includes default pre-generated certificates 
+	  which are located in credentials/development/attestation/ directory 
+	  instead of generating new ones.
+	  If this config is set to `n` new certificates will be generated.
+
+# Configs for SPAKE2 generation
+config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
+	bool "Enable spake2 verifier generation"
+	help
+	  Enables generation of spake2 verifier according to 
+	  given iteration counter, salt and passcode.
+	  To generate Spake2 verifier a spake2p executable must be available 
+	  from system variables environment.
+
+config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
+	bool "Enable generation of a new Rotating device id unique id"
+	default y
+	help
+	  Enables generation of a new Rotating device id unique id.
+
+endif #CHIP_FACTORY_DATA_BUILD
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_FACTORY_RESET_ERASE_NVS
+	bool
+	default y

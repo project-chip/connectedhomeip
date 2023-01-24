@@ -55,7 +55,7 @@ tests:
           constraints:
               type: bitmap8
               minValue: 0
-              maxValue: 63
+              maxValue: 127
 
     ### Attribute[ 10]: OperationalStatus  ==========================
     - label: "1c: read the RO mandatory attribute default: OperationalStatus"
@@ -66,7 +66,7 @@ tests:
           constraints:
               type: bitmap8
               minValue: 0
-              maxValue: 63
+              maxValue: 127
 
     ### Attribute[ 13]: EndProductType ==============================
     - label: "1d: read the RO mandatory attribute default: EndProductType"

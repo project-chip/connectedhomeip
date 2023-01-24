@@ -266,6 +266,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_BUSY,
     CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB,
     CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB,
+    CHIP_ERROR_HANDLER_NOT_SET,
 };
 // clang-format on
 
@@ -306,7 +307,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestCHIPErrorStr(void)
+int TestCHIPErrorStr()
 {
     // clang-format off
     nlTestSuite theSuite =

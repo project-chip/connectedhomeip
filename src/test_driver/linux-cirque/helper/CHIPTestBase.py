@@ -20,14 +20,14 @@ import json
 import logging
 import os
 import re
-from typing import Union, List
-
-import requests
 import sys
 import time
 import traceback
 from enum import IntEnum
+from typing import List, Union
 from urllib.parse import urljoin
+
+import requests
 
 
 class TestResult(IntEnum):
@@ -140,7 +140,7 @@ class CHIPVirtualHome:
         for device_id in devices:
             # Wait for otbr-agent and CHIP server start
             self.assertTrue(self.wait_for_device_output(
-                device_id, "Border router agent started.", 10))
+                device_id, "Thread Border Router started on AIL", 10))
             self.assertTrue(self.wait_for_device_output(
                 device_id, "CHIP:SVR: Server Listening...", 15))
             # Clear default Thread network commissioning data

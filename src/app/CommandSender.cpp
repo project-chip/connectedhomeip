@@ -213,8 +213,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     reader.Init(std::move(payload));
     ReturnErrorOnFailure(invokeResponseMessage.Init(reader));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(invokeResponseMessage.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    invokeResponseMessage.PrettyPrint();
 #endif
 
     ReturnErrorOnFailure(invokeResponseMessage.GetSuppressResponse(&suppressResponse));

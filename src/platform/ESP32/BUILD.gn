@@ -23,7 +23,12 @@ declare_args() {
   # DeviceAttestationCredentialsProvider and DeviceInstanceInforProvider
   chip_use_factory_data_provider = false
   chip_use_device_info_provider = false
+  chip_config_software_version_number = 0
 }
+
+defines = [
+  "CHIP_CONFIG_SOFTWARE_VERSION_NUMBER=${chip_config_software_version_number}",
+]
 
 static_library("ESP32") {
   sources = [
@@ -35,8 +40,7 @@ static_library("ESP32") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
+    "ConnectivityManagerImpl_Ethernet.cpp",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "ESP32Config.cpp",
@@ -78,6 +82,10 @@ static_library("ESP32") {
       "ConnectivityManagerImpl_WiFi.cpp",
       "NetworkCommissioningDriver.cpp",
       "NetworkCommissioningDriver.h",
+      "route_hook/ESP32RouteHook.c",
+      "route_hook/ESP32RouteHook.h",
+      "route_hook/ESP32RouteTable.c",
+      "route_hook/ESP32RouteTable.h",
     ]
     if (chip_mdns == "platform") {
       sources += [

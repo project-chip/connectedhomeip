@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <app-common/zap-generated/cluster-enums.h>
+
+#include "platform/internal/CHIPDeviceLayerInternal.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -27,7 +28,7 @@ namespace Internal {
 class ConnectivityUtils
 {
 public:
-    static app::Clusters::GeneralDiagnostics::InterfaceType GetInterfaceConnectionType(const char * ifname);
+    static app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
 };
 
 } // namespace Internal

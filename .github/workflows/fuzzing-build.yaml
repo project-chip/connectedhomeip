@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     build_linux_fuzzing:
         name: Build on Linux
@@ -31,12 +34,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.91
+            image: connectedhomeip/chip-build:0.6.34
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -54,7 +57,7 @@ jobs:
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -71,7 +74,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}
               with:
                   name: objdir-linux
@@ -85,8 +88,14 @@ jobs:
         runs-on: macos-latest
         if: github.actor != 'restyled-io[bot]'
 
+        env:
+            # NOTE: Generally kept in sync within the repo using
+            #       scripts/tools/zap/version_update.py
+            ZAP_VERSION: v2023.01.19-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
+
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -108,11 +117,21 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+            - name: Install zap
+              run: |
+                 sudo mkdir -p $ZAP_INSTALL_PATH
+                 sudo chown `whoami` $ZAP_INSTALL_PATH
+                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
+                      --output $ZAP_INSTALL_PATH/zap-mac.zip
+                 cd $ZAP_INSTALL_PATH
+                 unzip zap-mac.zip zap-cli
+                 rm zap-mac.zip
+                 ./zap-cli --version
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -129,7 +148,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}
               with:
                   name: crash-darwin

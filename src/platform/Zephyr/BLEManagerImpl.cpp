@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <platform/Zephyr/BLEManagerImpl.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -36,11 +37,11 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#include <bluetooth/addr.h>
-#include <bluetooth/gatt.h>
-#include <random/rand32.h>
-#include <sys/byteorder.h>
-#include <sys/util.h>
+#include <zephyr/bluetooth/addr.h>
+#include <zephyr/bluetooth/gatt.h>
+#include <zephyr/random/rand32.h>
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/util.h>
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -73,7 +74,7 @@ _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerIm
 
 // clang-format off
 
-struct bt_gatt_attr sChipoBleAttributes[] = {
+static bt_gatt_attr sChipoBleAttributes[] = {
     BT_GATT_PRIMARY_SERVICE(&UUID16_CHIPoBLEService.uuid),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
                                BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
@@ -92,7 +93,7 @@ struct bt_gatt_attr sChipoBleAttributes[] = {
 #endif
 };
 
-struct bt_gatt_service sChipoBleService = BT_GATT_SERVICE(sChipoBleAttributes);
+static bt_gatt_service sChipoBleService = BT_GATT_SERVICE(sChipoBleAttributes);
 
 // clang-format on
 
@@ -234,8 +235,7 @@ struct BLEManagerImpl::ServiceData
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    int err                       = 0;
-    const bool isAdvertisingRerun = mFlags.Has(Flags::kAdvertising);
+    int err = 0;
 
     // At first run always select fast advertising, on the next attempt slow down interval.
     const uint32_t intervalMin = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
@@ -344,9 +344,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
@@ -378,21 +375,13 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
-    size_t len = bufSize - 1;
-
-    strncpy(buf, bt_get_name(), len);
-    buf[len] = 0;
+    Platform::CopyString(buf, bufSize, bt_get_name());
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
     ChipLogDetail(DeviceLayer, "Device name set to: %s", deviceName);
     return MapErrorZephyr(bt_set_name(deviceName));
 }
@@ -626,14 +615,14 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
@@ -670,22 +659,22 @@ exit:
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                       PacketBufferHandle pBuf)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                      PacketBufferHandle pBuf)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
                                       const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
@@ -771,7 +760,7 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
     return sizeof(value);
 }
 
-void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, IndicationAttrType, uint8_t err)
+void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, bt_gatt_indicate_params *, uint8_t err)
 {
     ChipDeviceEvent event;
 

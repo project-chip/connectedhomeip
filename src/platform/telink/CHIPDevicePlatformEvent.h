@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,76 +24,4 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceEvent.h>
-
-#include <bluetooth/bluetooth.h>
-
-namespace chip {
-namespace DeviceLayer {
-
-namespace DeviceEventType {
-
-/**
- * Enumerates Telink platform-specific event types that are visible to the application.
- */
-enum PublicPlatformSpecificEventTypes
-{
-    /* None currently defined */
-};
-
-/**
- * Enumerates Telink platform-specific event types that are internal to the chip Device Layer.
- */
-enum InternalPlatformSpecificEventTypes
-{
-    kPlatformTelinkEvent = kRange_InternalPlatformSpecific,
-    kPlatformTelinkBleConnected,
-    kPlatformTelinkBleDisconnected,
-    kPlatformTelinkBleDisconnectRequest,
-    kPlatformTelinkBleCCCWrite,
-    kPlatformTelinkBleRXWrite,
-    kPlatformTelinkBleTXComplete,
-    kPlatformTelinkBleOutOfBuffersEvent,
-};
-
-} // namespace DeviceEventType
-
-struct BleConnEventType
-{
-    uint16_t connHandle;
-    uint8_t HciResult;
-};
-
-struct BleCCCWriteEventType
-{
-    uint16_t connHandle;
-    uint16_t Value;
-};
-
-struct BleRXWriteEventType
-{
-    uint16_t connHandle;
-    ::chip::System::PacketBuffer * Data;
-};
-
-struct BleTXCompleteEventType
-{
-    uint16_t connHandle;
-};
-
-/**
- * Represents platform-specific event information for Zephyr platforms.
- */
-struct ChipDevicePlatformEvent final
-{
-    union
-    {
-        BleConnEventType BleConnEvent;
-        BleCCCWriteEventType BleCCCWriteEvent;
-        BleRXWriteEventType BleRXWriteEvent;
-        BleTXCompleteEventType BleTXCompleteEvent;
-    };
-};
-
-} // namespace DeviceLayer
-} // namespace chip
+#include <platform/Zephyr/CHIPDevicePlatformEvent.h>

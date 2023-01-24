@@ -549,11 +549,11 @@ bool AccessControl::IsValid(const Entry & entry)
     const char * log = "unexpected error";
     IgnoreUnusedVariable(log); // logging may be disabled
 
-    AuthMode authMode;
-    FabricIndex fabricIndex;
-    Privilege privilege;
-    size_t subjectCount = 0;
-    size_t targetCount  = 0;
+    AuthMode authMode       = AuthMode::kNone;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    Privilege privilege     = static_cast<Privilege>(0);
+    size_t subjectCount     = 0;
+    size_t targetCount      = 0;
 
     SuccessOrExit(entry.GetAuthMode(authMode));
     SuccessOrExit(entry.GetFabricIndex(fabricIndex));
@@ -630,6 +630,11 @@ void SetAccessControl(AccessControl & accessControl)
 {
     ChipLogProgress(DataManagement, "AccessControl: setting");
     globalAccessControl = &accessControl;
+}
+
+void ResetAccessControlToDefault()
+{
+    globalAccessControl = &defaultAccessControl;
 }
 
 } // namespace Access

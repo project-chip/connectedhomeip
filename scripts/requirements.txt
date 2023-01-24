@@ -8,12 +8,26 @@ virtualenv
 # mbed-os
 -r requirements.mbed.txt
 
+# bouffalolab
+-r requirements.bouffalolab.txt
+
+# openiotsdk
+-r requirements.openiotsdk.txt
+
+# Infineon
+-r requirements.infineon.txt
+
+# TI
+-r requirements.ti.txt
+
+# Telink
+-r requirements.telink.txt
+
 # cirque tests
 requests>=2.24.0
 
 # device controller wheel package
-wheel
-dbus-python; sys_platform == 'linux'
+wheel; sys_platform == 'linux'
 pgi; sys_platform == 'linux'
 pyobjc-core; sys_platform == 'darwin'
 pyobjc-framework-cocoa; sys_platform == 'darwin'
@@ -40,7 +54,10 @@ appnope
 appdirs
 coloredlogs
 watchdog
-protobuf
+mypy==0.971
+mypy-protobuf==3.2.0
+protobuf==3.20.1
+types-protobuf==3.19.22
 
 # scripts/tools/memory
 anytree
@@ -52,8 +69,9 @@ tabulate
 # scripts/build
 click
 
-# scripts/idl
+# scripts/py_matter_idl/matter_idl
 lark
+# scripts/py_matter_idl/matter_idl and scripts/py_matter_yamtests/matter_yamltests
 stringcase
 
 cryptography

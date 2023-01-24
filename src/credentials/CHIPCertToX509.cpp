@@ -36,7 +36,7 @@
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/SafeInt.h>
@@ -73,6 +73,12 @@ static CHIP_ERROR DecodeConvertValidity(TLVReader & reader, ASN1Writer & writer,
         ReturnErrorOnFailure(reader.Get(certData.mNotAfterTime));
         ReturnErrorOnFailure(ChipEpochToASN1Time(certData.mNotAfterTime, asn1Time));
         ASN1_ENCODE_TIME(asn1Time);
+
+        // Perform this check if NotAfter value is different from Never-Expire value.
+        if (certData.mNotAfterTime != kNullCertTime)
+        {
+            VerifyOrReturnError(certData.mNotBeforeTime < certData.mNotAfterTime, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+        }
     }
     ASN1_END_SEQUENCE;
 

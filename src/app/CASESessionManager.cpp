@@ -41,7 +41,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     {
         ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
 
-        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, mConfig.clientPool, peerId, this);
 
         if (session == nullptr)
         {
@@ -83,12 +83,18 @@ void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
     {
         ChipLogDetail(CASESessionManager, "UpdatePeerAddress: No existing OperationalSessionSetup instance found");
 
-        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, mConfig.clientPool, peerId, this);
         if (session == nullptr)
         {
             ChipLogDetail(CASESessionManager, "UpdatePeerAddress: Failed to allocate OperationalSessionSetup instance");
             return;
         }
+    }
+    else
+    {
+        ChipLogDetail(CASESessionManager,
+                      "UpdatePeerAddress: Found existing OperationalSessionSetup instance for peerId[" ChipLogFormatX64 "]",
+                      ChipLogValueX64(peerId.GetNodeId()));
     }
 
     session->PerformAddressUpdate();

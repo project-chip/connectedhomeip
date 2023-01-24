@@ -20,12 +20,13 @@ the esp32 application.
 
 ## Supported target chips
 
-All the CHIP demo application is intended to work on: the
+All the Matter demo application is intended to work on: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
 the
 [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
 the [M5Stack](http://m5stack.com), the
 [ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html),
+[ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/en/latest/hw-reference/get-started-ethernet-kit.html)
 and the ESP32S3.
 
 All the applications support variants of ESP32, ESP32C3, ESP32S3 chips.
@@ -50,7 +51,7 @@ functionality can still work fine.
     $ source export.sh
     ```
 
--   CHIP
+-   Matter
 
     Before running any other build command, the scripts/activate.sh environment
     setup script should be sourced at the top level. This script set up a Python
@@ -78,10 +79,10 @@ functionality can still work fine.
     $ cd examples/<app-name>/esp32
     ```
 
--   Set the chip target to build
+-   Set the Matter target to build
 
     ```
-    $ idf.py set-target (CHIP)
+    $ idf.py set-target (Matter)
     ```
 
     All the example applications supports target chips: esp32, esp32s3, esp32c3
@@ -153,7 +154,7 @@ Below apps can be used for commissioning the application running on ESP32:
 -   [Python Based Device Controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
 -   [Standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 -   [iOS chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin/CHIPTool)
--   [Android chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
+-   [Android chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/examples/android/CHIPTool)
 
 ### Building Standalone chip-tool
 
@@ -189,6 +190,16 @@ $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
     ```
      $ ./out/debug/chip-tool pairing ble-thread 12345 hex:<operational-dataset> 20202021 3840
     ```
+
+#### Commissioning the Ethernet device (ESP32-Ethernet-Kit)
+
+```
+$ out/debug/chip-tool pairing ethernet 12345 20202021 3840 device-remote-ip 5540
+```
+
+Note: In order to commission an ethernet device, from all-clusters-app enable
+these config options: select `ESP32-Ethernet-Kit` under `Demo->Device Type` and
+select `On-Network` rendezvous mode under `Demo->Rendezvous Mode`
 
 #### Commissioning Parameters
 

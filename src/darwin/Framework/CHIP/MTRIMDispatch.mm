@@ -28,14 +28,15 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/GlobalAttributes.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
 #include <app/data-model/Decode.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <protocols/interaction_model/Constants.h>
 
 /**
@@ -66,11 +67,29 @@ namespace app {
 
     namespace {
 
-        Status DetermineAttributeStatus(const ConcreteAttributePath & aPath, bool aIsWrite)
+        bool IsSupportedGlobalAttribute(AttributeId aAttribute)
         {
             // We don't have any non-global attributes.
             using namespace Globals::Attributes;
 
+            for (auto & attr : GlobalAttributesNotInMetadata) {
+                if (attr == aAttribute) {
+                    return true;
+                }
+            }
+
+            switch (aAttribute) {
+            case FeatureMap::Id:
+                FALLTHROUGH;
+            case ClusterRevision::Id:
+                return true;
+            }
+
+            return false;
+        }
+
+        Status DetermineAttributeStatus(const ConcreteAttributePath & aPath, bool aIsWrite)
+        {
             // TODO: Consider making this configurable for applications that are not
             // trying to be an OTA provider, though in practice it just affects which
             // error is returned.
@@ -85,30 +104,13 @@ namespace app {
                 return Status::UnsupportedCluster;
             }
 
-            switch (aPath.mAttributeId) {
-            case AttributeList::Id:
-                FALLTHROUGH;
-            case AcceptedCommandList::Id:
-                FALLTHROUGH;
-            case GeneratedCommandList::Id:
-                FALLTHROUGH;
-                // When EventList is supported, include it here.
-#if 0
-    case EventList::Id:
-        FALLTHROUGH;
-#endif
-            case FeatureMap::Id:
-                FALLTHROUGH;
-            case ClusterRevision::Id:
-                // No permissions for this for read, and none of these are writable for
-                // write.  The writable-or-not check happens before the ACL check.
-                return aIsWrite ? Status::UnsupportedWrite : Status::UnsupportedAccess;
-            default:
-                // No other attributes.
-                break;
+            if (!IsSupportedGlobalAttribute(aPath.mAttributeId)) {
+                return Status::UnsupportedAttribute;
             }
 
-            return Status::UnsupportedAttribute;
+            // No permissions for this for read, and none of these are writable for
+            // write.  The writable-or-not check happens before the ACL check.
+            return aIsWrite ? Status::UnsupportedWrite : Status::UnsupportedAccess;
         }
 
     } // anonymous namespace
@@ -119,6 +121,11 @@ namespace app {
     {
         Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ false);
         return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(status));
+    }
+
+    bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+    {
+        return DetermineAttributeStatus(aPath, /* aIsWrite = */ false) == Status::UnsupportedAccess;
     }
 
     Status ServerClusterCommandExists(const ConcreteCommandPath & aPath)

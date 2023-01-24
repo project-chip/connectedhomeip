@@ -16,8 +16,6 @@ name: 7.2.1. [TC-TMP-2.1] Attributes with server as DUT
 
 PICS:
     - TMP.S
-    - TMP.S.Am
-    - TMP.S.Ao
 
 config:
     nodeId: 0x12344321
@@ -32,16 +30,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Read the mandatory attribute: MeasuredValue"
-      PICS: TMP.S.A0000
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: int16s
-              minValue: -27315
-              maxValue: 32767
 
     - label: "Read the mandatory attribute: MinMeasuredValue"
       PICS: TMP.S.A0001
@@ -61,6 +49,16 @@ tests:
           constraints:
               type: int16s
               minValue: -27314
+              maxValue: 32767
+
+    - label: "Read the mandatory attribute: MeasuredValue"
+      PICS: TMP.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16s
+              minValue: -27315
               maxValue: 32767
 
     - label: "Read the optional attribute: Tolerance"

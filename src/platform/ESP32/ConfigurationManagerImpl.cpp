@@ -31,6 +31,7 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#include "esp_ota_ops.h"
 #include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -184,6 +185,41 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
     return WriteConfigValue(ESP32Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    memset(buf, 0, bufSize);
+    const esp_app_desc_t * appDescription = esp_ota_get_app_description();
+    ReturnErrorCodeIf(bufSize < sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(sizeof(appDescription->version) > ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_INTERNAL);
+    strcpy(buf, appDescription->version);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
+{
+    softwareVer = CHIP_CONFIG_SOFTWARE_VERSION_NUMBER;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+#if CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
+    uint32_t value = 0;
+    CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+#else
+    location = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+    return CHIP_NO_ERROR;
+#endif
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -314,6 +350,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
+    }
+
+    // Erase all values in the chip-counters NVS namespace.
+    err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipCounters);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ClearNamespace(ChipCounters) failed: %s", chip::ErrorStr(err));
     }
 
     // Restore WiFi persistent settings to default values.

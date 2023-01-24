@@ -1,5 +1,5 @@
 {
-  "featureLevel": 77,
+  "featureLevel": 89,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -83,7 +83,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "identify time",
+              "name": "IdentifyTime",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -235,7 +235,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -883,10 +883,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -909,10 +909,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -2045,7 +2045,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "DlDoorState",
+              "type": "DoorStateEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2125,7 +2125,7 @@
               "code": 37,
               "mfgCode": null,
               "side": "server",
-              "type": "DlOperatingMode",
+              "type": "OperatingModeEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2693,7 +2693,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ColorTemperature",
+              "name": "ColorTemperatureMireds",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -3402,7 +3402,7 @@
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
-          "define": "TEMP_MEASUREMENT_CLUSTER",
+          "define": "TEMPERATURE_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -3428,7 +3428,7 @@
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
-          "define": "TEMP_MEASUREMENT_CLUSTER",
+          "define": "TEMPERATURE_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [

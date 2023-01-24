@@ -15,44 +15,14 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/****************************************************************************
- * @file
- * @brief Routines for the Groups Server plugin, the
- *server implementation of the Groups cluster.
- *******************************************************************************
- ******************************************************************************/
-
-// *******************************************************************
-// * groups-server.c
-// *
-// *
-// * Copyright 2010 by Ember Corporation. All rights reserved.              *80*
-// *******************************************************************
 #include "groups-server.h"
 
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <credentials/GroupDataProvider.h>
@@ -90,17 +60,16 @@ static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
 
     auto it    = provider->IterateGroupKeys(fabricIndex);
     bool found = false;
-    while (it->Next(entry) && !found)
+    while (!found && it->Next(entry))
     {
-        found = (entry.group_id == groupId);
+        if (entry.group_id == groupId)
+        {
+            GroupDataProvider::KeySet keys;
+            found = (CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys));
+        }
     }
     it->Release();
 
-    if (found)
-    {
-        GroupDataProvider::KeySet keys;
-        found = (CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys));
-    }
     return found;
 }
 
@@ -157,7 +126,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
     EmberAfStatus status = Attributes::NameSupport::Set(endpointId, kNameSuppportFlagGroupNamesSupported);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogDetail(Zcl, "ERR: writing name support %x", status);
+        ChipLogDetail(Zcl, "ERR: writing NameSupport %x", status);
     }
 
     status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupClusterFeature::kGroupNames));
@@ -173,8 +142,8 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::AddGroupResponse::Type response;
 
-    response.groupId = commandData.groupId;
-    response.status  = GroupAdd(fabricIndex, commandPath.mEndpointId, commandData.groupId, commandData.groupName);
+    response.groupID = commandData.groupID;
+    response.status  = GroupAdd(fabricIndex, commandPath.mEndpointId, commandData.groupID, commandData.groupName);
     commandObj->AddResponse(commandPath, response);
     return true;
 }
@@ -183,14 +152,14 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
                                            const Commands::ViewGroup::DecodableType & commandData)
 {
     auto fabricIndex             = commandObj->GetAccessingFabricIndex();
-    auto groupId                 = commandData.groupId;
+    auto groupId                 = commandData.groupID;
     GroupDataProvider * provider = GetGroupDataProvider();
     GroupDataProvider::GroupInfo info;
     Groups::Commands::ViewGroupResponse::Type response;
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
 
-    VerifyOrExit(IsFabricGroupId(groupId), status = EMBER_ZCL_STATUS_INVALID_VALUE);
+    VerifyOrExit(IsFabricGroupId(groupId), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     VerifyOrExit(nullptr != provider, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(provider->HasEndpoint(fabricIndex, groupId, commandPath.mEndpointId), status = EMBER_ZCL_STATUS_NOT_FOUND);
 
@@ -200,7 +169,7 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
     response.groupName = CharSpan(info.name, strnlen(info.name, GroupDataProvider::GroupInfo::kGroupNameMax));
     status             = EMBER_ZCL_STATUS_SUCCESS;
 exit:
-    response.groupId = groupId;
+    response.groupID = groupId;
     response.status  = status;
     commandObj->AddResponse(commandPath, response);
     return true;
@@ -241,7 +210,6 @@ struct GroupMembershipResponse
             {
                 GroupDataProvider::GroupEndpoint mapping;
                 size_t requestedCount = 0;
-                size_t matchCount     = 0;
                 ReturnErrorOnFailure(mCommandData.groupList.ComputeSize(&requestedCount));
 
                 if (0 == requestedCount)
@@ -253,7 +221,6 @@ struct GroupMembershipResponse
                         if (mapping.endpoint_id == mEndpoint)
                         {
                             ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
-                            matchCount++;
                             ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
                         }
                     }
@@ -268,7 +235,6 @@ struct GroupMembershipResponse
                             if (mapping.endpoint_id == mEndpoint && mapping.group_id == iter.GetValue())
                             {
                                 ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
-                                matchCount++;
                                 ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
                                 break;
                             }
@@ -322,10 +288,10 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
 
 #ifdef EMBER_AF_PLUGIN_SCENES
     // If a group is, removed the scenes associated with that group SHOULD be removed.
-    emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, commandData.groupId);
+    emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, commandData.groupID);
 #endif
-    response.groupId = commandData.groupId;
-    response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupId);
+    response.groupID = commandData.groupID;
+    response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 
     commandObj->AddResponse(commandPath, response);
     return true;
@@ -375,7 +341,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
                                                        const Commands::AddGroupIfIdentifying::DecodableType & commandData)
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto groupId     = commandData.groupId;
+    auto groupId     = commandData.groupID;
     auto groupName   = commandData.groupName;
     auto endpointId  = commandPath.mEndpointId;
 

@@ -37,6 +37,8 @@ config("openthread_k32w0_config") {
   defines = [
     "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
     "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
+    "PDM_SAVE_IDLE=1",
+    "K32W0_RADIO_NUM_OF_RX_BUFS=16",
   ]
 }
 

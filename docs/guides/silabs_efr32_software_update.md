@@ -14,21 +14,18 @@ all of the EFR32 example applications.
 -   On a Linux or Darwin platform build the chip-tool and the ota-provider-app
     as follows:
 
-           ```
            scripts/examples/gn_build_example.sh examples/chip-tool out/
            scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
-           ```
 
 -   Build or download the Gecko Bootloader binary. Follow the instructions in
     "UG266: Silicon Labs Gecko Bootloader User’s Guide". For the bootloader
     using the external flash select the "external SPI" bootloader type
     configured with a single slot of at least 1000 KB. For the bootloader using
     the internal flash see the Internal Storage Bootloader section below.
-    Pre-built binaries for some configurations should be available in
+    Pre-built binaries for some configurations are available at the following
+    location, see README.md for details
 
-           ```
            third_party/silabs/matter_support/matter/efr32/bootloader_binaries
-           ```
 
 -   Using the commander tool upload the bootloader to the device running the
     application.
@@ -36,47 +33,35 @@ all of the EFR32 example applications.
 -   Create a bootable image file (using the Lighting application image as an
     example):
 
-           ```
            commander gbl create chip-efr32-lighting-example.gbl --app chip-efr32-lighting-example.s37
-           ```
 
 -   Create the Matter OTA file from the bootable image file:
 
-           ```
            ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
-           ```
 
 -   In a terminal start the Provider app passing to it the path to the Matter
     OTA file created in the previous step:
 
-           ```
            rm -r /tmp/chip_*
            ./out/debug/chip-ota-provider-app -f chip-efr32-lighting-example.ota
-           ```
 
 -   In a separate terminal run the chip-tool commands to provision the Provider:
 
-           ```
            ./out/chip-tool pairing onnetwork 1 20202021
            ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
-           ```
 
 -   If the application device had been previously commissioned hold Button 0 for
     six seconds to factory-reset the device.
 
 -   In the chip-tool terminal enter:
 
-           ```
            ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
-           ```
 
 where operationalDataset is obtained from the OpenThread Border Router.
 
 -   Once the commissioning process completes enter:
 
-           ```
            ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
-           ```
 
 -   The application device will connect to the Provider and start the image
     download. Once the image is downloaded the device will reboot into the
@@ -91,9 +76,7 @@ that both images are built with a reduced feature set such as disabled logging
 and Matter shell. The following set of compile flags leaves out all the optional
 features and results in the minimal image size:
 
-           ```
            chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false is_debug=false show_qr_code=false chip_build_libshell=false enable_openthread_cli=false chip_openthread_ftd=true
-           ```
 
 Using LZMA compression when building the .gbl file ( passing `--compress lzma`
 parameter to the `commander gbl create` command) further reduces the downloaded

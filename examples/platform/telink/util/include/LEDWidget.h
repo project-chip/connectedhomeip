@@ -18,26 +18,33 @@
 #pragma once
 
 #include <cstdint>
-#include <drivers/gpio.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/zephyr.h>
 
 class LEDWidget
 {
 public:
+    typedef void (*LEDWidgetStateUpdateHandler)(LEDWidget * ledWidget);
+
     static void InitGpio(const device * port);
+    static void SetStateUpdateCallback(LEDWidgetStateUpdateHandler stateUpdateCb);
     const static struct device * mPort;
     void Init(gpio_pin_t gpioNum);
     void Set(bool state);
     void Invert(void);
     void Blink(uint32_t changeRateMS);
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
-    void Animate();
+    void UpdateState();
 
 private:
-    int64_t mLastChangeTimeMS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
     gpio_pin_t mGPIONum;
     bool mState;
+    k_timer mLedTimer;
+
+    static void LedStateTimerHandler(k_timer * timer);
 
     void DoSet(bool state);
+    void ScheduleStateChange();
 };

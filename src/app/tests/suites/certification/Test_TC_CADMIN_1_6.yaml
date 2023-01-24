@@ -70,7 +70,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -78,6 +78,34 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+
+    #Check for DNS-SD advertisement CM is not possible in YAML
+    - label: "Verify that the DNS-SD advertisement shows CM=1"
+      verification: |
+          On TH_CR1 send the below command
+
+          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          +   eth0 IPv6 05EB1D3652D2F544                              _matterc._udp        local
+          +   eth0 IPv6 7869CD25CBF12D42                              _matterc._udp        local
+          =   eth0 IPv6 7869CD25CBF12D42                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["PI=" "PH=33" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          =   eth0 IPv6 05EB1D3652D2F544                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for PIXIT.CADMIN.CwDuration + 10"
       cluster: "DelayCommands"
@@ -102,7 +130,7 @@ tests:
           error: FAILURE
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -112,7 +140,7 @@ tests:
                 value: 180
 
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000
@@ -131,7 +159,7 @@ tests:
           error: FAILURE
 
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C02.Rsp
@@ -140,7 +168,7 @@ tests:
 
     - label: "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
@@ -149,7 +177,7 @@ tests:
 
     - label: "TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
@@ -158,7 +186,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -169,7 +197,7 @@ tests:
 
     - label: "TH_CR1 opens another commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -179,8 +207,9 @@ tests:
                 value: 180
       response:
           error: FAILURE
+          clusterError: 2
 
-    - label: "Commission from beta"
+    - label: "TH_CR2 starts a commissioning process on DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -191,7 +220,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "TH_CR2 starts a commissioning process on DUT_CE"
+    - label: "DUT_CE is commissioned by TH_CR2"
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -204,12 +233,13 @@ tests:
     - label:
           "TH_CR1 tries to revoke the commissioning window on DUT_CE using
           RevokeCommissioning command"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000
       response:
           error: FAILURE
+          clusterError: 4
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"

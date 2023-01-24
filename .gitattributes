@@ -7,3 +7,5 @@ src/controller/python/chip/clusters/CHIPClusters.py linguist-generated
 src/controller/python/chip/clusters/Objects.py linguist-generated
 # Let bat file use CRLF linebreak
 **/*.bat eol=crlf
+# Mark Matter operational certificate/key files as binary
+**/*.chip binary

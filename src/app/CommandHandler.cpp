@@ -32,8 +32,8 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
-#include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLVData.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/LockTracker.h>
 #include <protocols/secure_channel/Constants.h>
@@ -104,8 +104,8 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
     VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    VerifyOrReturnError(invokeRequestMessage.CheckSchemaValidity() == CHIP_NO_ERROR, Status::InvalidAction);
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    invokeRequestMessage.PrettyPrint();
 #endif
 
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);

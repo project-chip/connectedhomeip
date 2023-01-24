@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -86,19 +86,25 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
-                           Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                           Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     if (type == nullptr || callback == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     char serviceType[Dnssd::kDnssdFullTypeAndProtocolMaxSize + 1]; // +1 for null-terminator
-    snprintf(serviceType, sizeof(serviceType), "%s.%s", type, GetProtocolString(protocol));
+    snprintf(serviceType, sizeof(serviceType), "%s.%s", StringOrNullMarker(type), GetProtocolString(protocol));
 
+    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
     return ThreadStackMgr().DnsBrowse(serviceType, callback, context);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
@@ -114,6 +120,12 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId inter
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+}
+
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Dnssd

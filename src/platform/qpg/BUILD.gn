@@ -36,10 +36,10 @@ static_library("qpg") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "FactoryDataProvider.cpp",
+    "FactoryDataProvider.h",
     "InetPlatformConfig.h",
     "Logging.cpp",
     "OTAImageProcessorImpl.cpp",
@@ -51,6 +51,8 @@ static_library("qpg") {
   ]
 
   deps = []
+
+  public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 

@@ -44,7 +44,7 @@ public:
             mStrings[i] = strdup(data[i]);
         }
 
-        mSerializedQNameBuffer = new uint8_t[neededSize];
+        mSerializedQNameBuffer = new (std::nothrow) uint8_t[neededSize];
         VerifyOrDie(mSerializedQNameBuffer != nullptr);
 
         chip::Encoding::BigEndian::BufferWriter writer(mSerializedQNameBuffer, neededSize);

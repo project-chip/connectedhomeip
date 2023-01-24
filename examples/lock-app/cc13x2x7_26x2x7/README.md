@@ -19,14 +19,13 @@ Instruments CC13XX_26XX family of Wireless MCUs.
         -   [Provisioning](#provisioning)
             -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
             -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
-        -   [Matter Remote Commands](#matter-remote-commands)
     -   [TI Support](#ti-support)
 
 ---
 
 ## Introduction
 
-![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
+![CC1352R1_LAUNCHXL](../../pump-app/cc13x2x7_26x2x7/doc/images/cc1352r1_launchxl.jpg)
 
 The CC13XX_26XX lock example application provides a working demonstration of a
 connected door lock device. This uses the open-source Matter implementation and
@@ -50,9 +49,9 @@ lock and unlock of the door lock. The left button (`BTN-1`) is used to request
 locking. The right button (`BTN-2`) is used to request unlocking.
 
 Long presses (greater than 1000ms) of the user buttons are used for controlling
-BLE advertisements. The left button (`BTN-1`) is used to disable advertisements
-if they are enabled. The Right button (`BTN-2`) is used to enable
-advertisements.
+BLE advertisements and resets. The left button (`BTN-1`) is used to perform a
+factory reset of the device. The Right button (`BTN-2`) is used to disable BLE
+advertisements (if enabled) or enable advertisements (if disabled).
 
 ## Building
 

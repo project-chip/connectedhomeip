@@ -40,10 +40,11 @@ JNI_METHOD(void, GetConnectedDeviceCallbackJni, deleteCallback)(JNIEnv * env, jo
 }
 
 JNI_METHOD(jlong, ReportCallbackJni, newCallback)
-(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava)
+(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava,
+ jobject resubscriptionAttemptCallbackJava)
 {
-    ReportCallback * reportCallback =
-        chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava, reportCallbackJava);
+    ReportCallback * reportCallback = chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava,
+                                                                          reportCallbackJava, resubscriptionAttemptCallbackJava);
     return reinterpret_cast<jlong>(reportCallback);
 }
 

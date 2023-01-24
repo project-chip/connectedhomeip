@@ -654,6 +654,11 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
     return &stub;
 }
 
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler *)
 {

@@ -18,16 +18,18 @@
 {{> clusters_header}}
 
 {{#chip_client_clusters includeAll=true}}
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 {{> cluster_header}}
 
 {{#chip_cluster_commands}}
+{{#unless (wasRemoved (asUpperCamelCase clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 /*
  * Command {{asUpperCamelCase name}}
  */
 class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterCommand
 {
 public:
-    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
+    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{cleanse_label_as_kebab_case name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#chip_cluster_command_arguments}}
         {{#if_chip_complex}}
@@ -35,7 +37,7 @@ public:
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         ClusterCommand::AddArguments();
@@ -46,8 +48,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %u", endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        MTRBaseCluster{{asUpperCamelCase clusterName}} * cluster = [[MTRBaseCluster{{asUpperCamelCase clusterName}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        __auto_type * params = [[MTR{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase name}}Params alloc] init];
+        __auto_type * cluster = [[MTRBaseCluster{{asUpperCamelCase clusterName preserveAcronyms=true}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTR{{asUpperCamelCase clusterName preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         {{#chip_cluster_command_arguments}}
         {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asLowerCamelCase label)) cluster=parent.clusterName type=type depth=0}}
@@ -56,9 +58,9 @@ public:
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--)
         {
-            [cluster {{asLowerCamelCase name}}WithParams:params completionHandler:
+            [cluster {{asLowerCamelCase name}}WithParams:params completion:
             {{#if hasSpecificResponse}}
-                ^(MTR{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
+                ^(MTR{{asUpperCamelCase clusterName preserveAcronyms=true}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
                     NSLog(@"Values: %@", values);
             {{else}}
                 ^(NSError * _Nullable error) {
@@ -87,10 +89,13 @@ private:
     {{/chip_cluster_command_arguments}}
 };
 
+{{/unless}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#*inline "cluster"}}Cluster{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 
 /*
  * Attribute {{asUpperCamelCase name}}
@@ -98,7 +103,7 @@ private:
 class Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ReadAttribute
 {
 public:
-    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ReadAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}")
+    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ReadAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}")
     {
     }
 
@@ -111,21 +116,23 @@ public:
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReadAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        MTRBaseCluster{{asUpperCamelCase parent.name}} * cluster = [[MTRBaseCluster{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        __auto_type * cluster = [[MTRBase{{>cluster}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
         {{#if_is_fabric_scoped_struct type}}
-        MTRReadParams * params = [[MTRReadParams alloc] init];
-        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        __auto_type * params = [[MTRReadParams alloc] init];
+        if (mFabricFiltered.HasValue()) {
+          params.filterByFabric = mFabricFiltered.Value();
+        }
         {{/if_is_fabric_scoped_struct}}
-        [cluster readAttribute{{asUpperCamelCase name}}With
+        [cluster read{{>attribute}}With
         {{~#if_is_fabric_scoped_struct type~}}
-        Params:params completionHandler:
+        Params:params completion:
         {{~else~}}
-        CompletionHandler:
+        Completion:
         {{~/if_is_fabric_scoped_struct~}}
         ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
-        NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
+        NSLog(@"{{asUpperCamelCase parent.name preserveAcronyms=true}}.{{asUpperCamelCase name preserveAcronyms=true}} response %@", [value description]);
         if (error != nil) {
-          LogNSError("{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} read Error", error);
+          LogNSError("{{asUpperCamelCase parent.name preserveAcronyms=true}} {{asUpperCamelCase name preserveAcronyms=true}} read Error", error);
         }
         SetCommandExitStatus(error);
          }];
@@ -140,15 +147,15 @@ public:
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public WriteAttribute
 {
 public:
-    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): WriteAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
+    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): WriteAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
+        AddArgument("attr-name", "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}");
         {{#if_chip_complex}}
         AddArgument("attr-value", &mComplex);
         {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
-        AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
+        AddArgument("attr-value", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mValue);
         {{/if_chip_complex}}
         WriteAttribute::AddArguments();
     }
@@ -161,8 +168,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) WriteAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        MTRBaseCluster{{asUpperCamelCase parent.name}} * cluster = [[MTRBaseCluster{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        MTRWriteParams * params = [[MTRWriteParams alloc] init];
+        __auto_type * cluster = [[MTRBase{{>cluster}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRWriteParams alloc] init];
         params.timedWriteTimeout = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
         {{#if_chip_complex}}
@@ -176,9 +183,9 @@ public:
         {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue];
         {{/if_chip_complex}}
 
-        [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value params:params completionHandler:^(NSError * _Nullable error) {
+        [cluster write{{>attribute}}WithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
-              LogNSError("{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} write Error", error);
+              LogNSError("{{asUpperCamelCase parent.name preserveAcronyms=true}} {{asUpperCamelCase name preserveAcronyms=true}} write Error", error);
             }
             SetCommandExitStatus(error);
             }];
@@ -203,7 +210,7 @@ private:
 class SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public SubscribeAttribute
 {
 public:
-    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): SubscribeAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}")
+    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): SubscribeAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}")
     {
     }
 
@@ -215,16 +222,21 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        MTRBaseCluster{{asUpperCamelCase parent.name}} * cluster = [[MTRBaseCluster{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
-        params.keepPreviousSubscriptions = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
-        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
-        [cluster subscribe{{>attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                 params:params
+        __auto_type * cluster = [[MTRBase{{>cluster}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+          params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+          params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+          params.resubscribeIfLost = mAutoResubscribe.Value();
+        }
+        [cluster subscribe{{>attribute}}WithParams:params
                                 subscriptionEstablished:^(){ mSubscriptionEstablished=YES; }
                                 reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
-        NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
+        NSLog(@"{{asUpperCamelCase parent.name preserveAcronyms=true}}.{{asUpperCamelCase name preserveAcronyms=true}} response %@", [value description]);
         SetCommandExitStatus(error);
          }];
 
@@ -233,13 +245,16 @@ public:
 };
 
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
+{{/unless}}
 {{/chip_client_clusters}}
 
 /*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
 {{#chip_client_clusters includeAll=true}}
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 void registerCluster{{asUpperCamelCase name}}(Commands & commands)
 {
     using namespace chip::app::Clusters::{{asUpperCamelCase name}};
@@ -249,30 +264,39 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ClusterCommand>(Id), //
         {{#chip_cluster_commands}}
+        {{#unless (wasRemoved (asUpperCamelCase clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/chip_cluster_commands}}
         {{#chip_server_cluster_attributes}}
         {{#first}}
          make_unique<ReadAttribute>(Id), //
         {{/first}}
+        {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{#first}}
         make_unique<WriteAttribute>(Id), //
         {{/first}}
+        {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         {{#if isWritableAttribute}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
+        {{/unless}}
         {{#first}}
         make_unique<SubscribeAttribute>(Id), //
         {{/first}}
+        {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         {{#if isReportableAttribute}}
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
+        {{/unless}}
         {{/chip_server_cluster_attributes}}
     };
 
     commands.Register(clusterName, clusterCommands);
 }
+{{/unless}}
 {{/chip_client_clusters}}
 
 void registerClusterAny(Commands & commands)
@@ -294,6 +318,8 @@ void registerClusters(Commands & commands)
 {
     registerClusterAny(commands);
 {{#chip_client_clusters includeAll=true}}
+    {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
     registerCluster{{asUpperCamelCase name}}(commands);
+    {{/unless}}
 {{/chip_client_clusters}}
 }

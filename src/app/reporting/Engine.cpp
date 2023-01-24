@@ -838,14 +838,6 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
     }
     ReturnErrorOnFailure(InsertPathIntoDirtySet(aAttributePath));
 
-    // Schedule work to run asynchronously on the CHIP thread. The scheduled
-    // work won't execute until the current execution context has
-    // completed. This ensures that we can 'gather up' multiple attribute
-    // changes that have occurred in the same execution context without
-    // requiring any explicit 'start' or 'end' change calls into the engine to
-    // book-end the change.
-    ScheduleRun();
-
     return CHIP_NO_ERROR;
 }
 
@@ -856,6 +848,10 @@ CHIP_ERROR Engine::SendReport(ReadHandler * apReadHandler, System::PacketBufferH
     // We can only have 1 report in flight for any given read - increment and break out.
     mNumReportsInFlight++;
     err = apReadHandler->SendReportData(std::move(aPayload), aHasMoreChunks);
+    if (err != CHIP_NO_ERROR)
+    {
+        --mNumReportsInFlight;
+    }
     return err;
 }
 
@@ -938,7 +934,7 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
 
     if (isUrgentEvent)
     {
-        ChipLogDetail(DataManagement, "urgent event would be sent after min interval");
+        ChipLogDetail(DataManagement, "Urgent event will be sent once reporting is not blocked by the min interval");
         return CHIP_NO_ERROR;
     }
 
@@ -972,3 +968,10 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
 
 void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
 void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+
+// TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
+// instead of being in ember-compatibility-functions.  It does not depend on any
+// app-specific generated bits.
+void __attribute__((weak))
+MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+{}

@@ -31,11 +31,10 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR EventFilterIB::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int tagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventFilterIB =");
@@ -54,29 +53,23 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kNode):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kNode))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kNode));
 #if CHIP_DETAIL_LOGGING
-            {
-                NodeId node;
-                ReturnErrorOnFailure(reader.Get(node));
-                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
-            }
+        {
+            NodeId node;
+            ReturnErrorOnFailure(reader.Get(node));
+            PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+        }
 #endif // CHIP_DETAIL_LOGGING
-            break;
+        break;
         case to_underlying(Tag::kEventMin):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventMin))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kEventMin));
 #if CHIP_DETAIL_LOGGING
-            {
-                uint64_t eventMin;
-                ReturnErrorOnFailure(reader.Get(eventMin));
-                PRETTY_PRINT("\tEventMin = 0x%" PRIx64 ",", eventMin);
-            }
+        {
+            uint64_t eventMin;
+            ReturnErrorOnFailure(reader.Get(eventMin));
+            PRETTY_PRINT("\tEventMin = 0x%" PRIx64 ",", eventMin);
+        }
 #endif // CHIP_DETAIL_LOGGING
-            break;
+        break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
             break;
@@ -88,14 +81,13 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int requiredFields = (1 << to_underlying(Tag::kEventMin));
-        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_EVENT_FILTER_IB;
+        err = CHIP_NO_ERROR;
     }
 
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR EventFilterIB::Parser::GetNode(NodeId * const apNode) const
 {

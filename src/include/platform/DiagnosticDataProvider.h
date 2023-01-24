@@ -33,7 +33,7 @@ namespace DeviceLayer {
 
 // Maximum length of vendor defined name or prefix of the software thread that is
 // static for the duration of the thread.
-static constexpr size_t kMaxThreadNameLength = 32;
+static constexpr size_t kMaxThreadNameLength = 8;
 
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
 constexpr size_t kMaxHardwareAddrSize = 8;
@@ -43,15 +43,15 @@ constexpr size_t kMaxIPv6AddrSize  = 16;
 constexpr size_t kMaxIPv4AddrCount = 4;
 constexpr size_t kMaxIPv6AddrCount = 8;
 
-using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonType;
+using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonEnum;
 
-struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
+struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type
 {
     char NameBuf[kMaxThreadNameLength + 1];
     ThreadMetrics * Next; /* Pointer to the next structure.  */
 };
 
-struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
+struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type
 {
     char Name[Inet::InterfaceId::kMaxIfNameLength];
     uint8_t MacAddress[kMaxHardwareAddrSize];
@@ -142,7 +142,7 @@ public:
     /**
      * Ethernet network diagnostics methods
      */
-    virtual CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate);
+    virtual CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
     virtual CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
     virtual CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect);
     virtual CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset);
@@ -278,7 +278,7 @@ inline CHIP_ERROR DiagnosticDataProvider::GetNetworkInterfaces(NetworkInterface 
 
 inline void DiagnosticDataProvider::ReleaseNetworkInterfaces(NetworkInterface * netifp) {}
 
-inline CHIP_ERROR DiagnosticDataProvider::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate)
+inline CHIP_ERROR DiagnosticDataProvider::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

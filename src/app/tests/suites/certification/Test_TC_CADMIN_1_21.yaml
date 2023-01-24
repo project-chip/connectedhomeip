@@ -58,7 +58,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -66,8 +66,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 900
-              - name: "discriminator"
-                value: discriminator
 
     - label: "Wait for commissioning Window to 901 seconds"
       cluster: "DelayCommands"
@@ -79,7 +77,7 @@ tests:
 
     - label:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -87,7 +85,7 @@ tests:
           value: 0
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000
@@ -95,14 +93,12 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 901
-              - name: "discriminator"
-                value: discriminator
       response:
           error: INVALID_COMMAND
 
     - label:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000

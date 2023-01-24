@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/address_resolve/AddressResolve.h>
+#include <lib/dnssd/IPAddressSorter.h>
 #include <lib/dnssd/Resolver.h>
 #include <system/TimeSource.h>
 #include <transport/raw/PeerAddress.h>
@@ -25,11 +26,42 @@ namespace chip {
 namespace AddressResolve {
 namespace Impl {
 
+constexpr uint8_t kNodeLookupResultsLen = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
+
 enum class NodeLookupResult
 {
     kKeepSearching, // keep the current search active
     kLookupError,   // final status: error
     kLookupSuccess, // final status: success
+};
+
+struct NodeLookupResults
+{
+    ResolveResult results[kNodeLookupResultsLen] = {};
+    uint8_t count                                = 0; // number of valid ResolveResult
+    uint8_t consumed                             = 0; // number of already read ResolveResult
+
+    bool UpdateResults(const ResolveResult & result, Dnssd::IPAddressSorter::IpScore score);
+
+    bool HasValidResult() const { return count > consumed; }
+
+    ResolveResult ConsumeResult()
+    {
+        VerifyOrDie(HasValidResult());
+        return results[consumed++];
+    }
+
+#if CHIP_DETAIL_LOGGING
+    void LogDetail() const
+    {
+        for (unsigned i = 0; i < count; i++)
+        {
+            char addr_string[Transport::PeerAddress::kMaxToStringSize];
+            results[i].address.ToString(addr_string);
+            ChipLogDetail(Discovery, "\t#%d: %s", i + 1, addr_string);
+        }
+    }
+#endif // CHIP_DETAIL_LOGGING
 };
 
 /// Action to take when some resolve data
@@ -91,7 +123,7 @@ private:
 /// An implementation of a node lookup handle
 ///
 /// Keeps track of time requests as well as the current
-/// "best" IP address found.
+/// "best" IPs addresses found.
 class NodeLookupHandle : public NodeLookupHandleBase
 {
 public:
@@ -115,15 +147,20 @@ public:
     /// any active searches)
     NodeLookupAction NextAction(System::Clock::Timestamp now);
 
+    /// Does the node have any valid lookup result?
+    bool HasLookupResult() const { return mResults.HasValidResult(); }
+
+    /// Return the next valid lookup result.
+    ResolveResult TakeLookupResult() { return mResults.ConsumeResult(); }
+
     /// Return when the next timer (min or max lookup time) is required to
     /// be triggered for this lookup handle
     System::Clock::Timeout NextEventTimeout(System::Clock::Timestamp now);
 
 private:
-    System::Clock::Timestamp mRequestStartTime;
+    NodeLookupResults mResults;
     NodeLookupRequest mRequest; // active request to process
-    AddressResolve::ResolveResult mBestResult;
-    unsigned mBestAddressScore = 0;
+    System::Clock::Timestamp mRequestStartTime;
 };
 
 class Resolver : public ::chip::AddressResolve::Resolver, public Dnssd::OperationalResolveDelegate
@@ -135,6 +172,7 @@ public:
 
     CHIP_ERROR Init(System::Layer * systemLayer) override;
     CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) override;
+    CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) override;
     CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) override;
     void Shutdown() override;
 
@@ -145,6 +183,7 @@ public:
 
 private:
     static void OnResolveTimer(System::Layer * layer, void * context) { static_cast<Resolver *>(context)->HandleTimer(); }
+    static void OnTryNextResult(System::Layer * layer, void * context);
 
     /// Timer on lookup node events: min and max search times.
     void HandleTimer();

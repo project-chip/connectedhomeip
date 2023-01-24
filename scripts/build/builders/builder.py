@@ -17,27 +17,37 @@ import os
 import shutil
 import tarfile
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass
+class BuilderOptions:
+    # Enable flashbundle generation stage
+    enable_flashbundle: bool = False
+
+    # Allow to wrap default build command
+    pw_command_launcher: str = None
+
+    # Locations where files are pre-generated
+    pregen_dir: str = None
 
 
 class Builder(ABC):
     """Generic builder base class for CHIP.
 
-    Provides ability to boostrap and copy output artifacts and subclasses can use
-    a generic shell runner.
+    Provides ability to bootstrap and copy output artifacts and subclasses can
+    use a generic shell runner.
 
     """
 
     def __init__(self, root, runner):
         self.root = os.path.abspath(root)
         self._runner = runner
-        self._enable_flashbundle = False
 
         # Set post-init once actual build target is known
         self.identifier = None
         self.output_dir = None
-
-    def enable_flashbundle(self, enable_flashbundle: bool):
-        self._enable_flashbundle = enable_flashbundle
+        self.options = BuilderOptions()
 
     @abstractmethod
     def generate(self):
@@ -81,13 +91,13 @@ class Builder(ABC):
 
     def outputs(self):
         artifacts = self.build_outputs()
-        if self._enable_flashbundle:
+        if self.options.enable_flashbundle:
             artifacts.update(self.flashbundle())
         return artifacts
 
     def build(self):
         self._build()
-        if self._enable_flashbundle:
+        if self.options.enable_flashbundle:
             self._generate_flashbundle()
 
     def _Execute(self, cmdarray, title=None):

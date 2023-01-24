@@ -43,7 +43,7 @@ uint32_t heapSize = TOTAL_ICALL_HEAP_SIZE;
 // ================================================================================
 extern "C" void vApplicationStackOverflowHook(void)
 {
-    while (1)
+    while (true)
     {
         ;
     }
@@ -60,7 +60,7 @@ void TestTask(void * pvParameter)
 
     chip::DeviceLayer::Internal::CC13X2_26X2Config().Init();
 
-    while (1)
+    while (true)
     {
         PLAT_LOG("Running Tests:");
         chip::RunKvsTest();
@@ -83,6 +83,6 @@ int main(void)
     vTaskStartScheduler();
 
     // Should never get here.
-    while (1)
+    while (true)
         ;
 }

@@ -128,6 +128,7 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
             return CHIP_NO_ERROR;
         }
         System::PacketBufferHandle handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(handle), false);
@@ -531,5 +532,14 @@ exit:
     return err;
 }
 
+CHIP_ERROR ClusterStateCache::GetLastReportDataPath(ConcreteClusterPath & aPath)
+{
+    if (mLastReportDataPath.IsValidConcreteClusterPath())
+    {
+        aPath = mLastReportDataPath;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INCORRECT_STATE;
+}
 } // namespace app
 } // namespace chip

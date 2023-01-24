@@ -80,6 +80,11 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     } else if (errorCode == CHIP_ERROR_BUFFER_TOO_SMALL) {
         code = MTRErrorCodeBufferTooSmall;
         [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A buffer is too small.", nil) }];
+    } else if (errorCode == CHIP_ERROR_FABRIC_EXISTS) {
+        code = MTRErrorCodeFabricExists;
+        [userInfo addEntriesFromDictionary:@{
+            NSLocalizedDescriptionKey : NSLocalizedString(@"The device is already a member of this fabric.", nil)
+        }];
     } else {
         code = MTRErrorCodeGeneralError;
         [userInfo addEntriesFromDictionary:@{

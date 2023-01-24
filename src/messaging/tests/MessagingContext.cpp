@@ -95,6 +95,11 @@ void MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
     existing.mTransport->SetSessionManager(&existing.GetSecureSessionManager());
 }
 
+using namespace System::Clock::Literals;
+
+constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveIdleRetransTimeout;
+constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveActiveRetransTimeout;
+
 void MessagingContext::SetMRPMode(MRPMode mode)
 {
     if (mode == MRPMode::kDefault)
@@ -103,17 +108,37 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
         mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
         mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        ClearLocalMRPConfigOverride();
+#else
+        //
+        // A test is calling this function assuming the overrides above are going to work
+        // when in fact, they won't because the compile flag is not set correctly.
+        //
+        VerifyOrDie(false);
+#endif
     }
     else
     {
-        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
-        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
-        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
-        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        OverrideLocalMRPConfig(MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout);
+#else
+        //
+        // A test is calling this function assuming the overrides above are going to work
+        // when in fact, they won't because the compile flag is not set correctly.
+        //
+        VerifyOrDie(false);
+#endif
+
+        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
     }
 }
 
@@ -227,14 +252,14 @@ Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(M
         delegate);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate, bool isInitiator)
 {
-    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate);
+    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate, isInitiator);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator)
 {
-    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
+    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate, isInitiator);
 }
 
 void MessageCapturer::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
