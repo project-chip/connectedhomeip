@@ -31,7 +31,7 @@ tests:
 
     # NOTE: This won't work with the command line switch for commissioner node id
     # TODO: get this working with the command line switch
-    - label: "Write ACL giving admin privilege on all EP0"
+    - label: "TP2 - Write ACL giving admin privilege on all EP0"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -40,14 +40,14 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets:
                           [{ Cluster: null, Endpoint: 0, DeviceType: null }],
                   },
               ]
 
     - label:
-          "Read the NOC attribute (Node operational credentials - requires
+          "TP3 - Read the NOC attribute (Node operational credentials - requires
           administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
@@ -57,7 +57,7 @@ tests:
               minLength: 1
               maxLength: 1
 
-    - label: "Write the location attribute (Basic - requires administer)"
+    - label: "TP4 - Write the location attribute (Basic - requires administer)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "Location"
@@ -65,7 +65,7 @@ tests:
           value: "XX"
 
     - label:
-          "Send the UpdateFabricLabel command (Node operational credentials -
+          "TP5 - Send the UpdateFabricLabel command (Node operational credentials -
           requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
@@ -74,14 +74,14 @@ tests:
               - name: "Label"
                 value: "TestFabric"
 
-    - label: "Write NodeLabel attribute (Basic - requires manage)"
+    - label: "TP6 - Write NodeLabel attribute (Basic - requires manage)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       arguments:
           value: "TestNode"
 
-    - label: "Send TestEventTrigger (General Diagnostics - requires manage)"
+    - label: "TP7 - Send TestEventTrigger (General Diagnostics - requires manage)"
       cluster: "General Diagnostics"
       command: "TestEventTrigger"
       arguments:
@@ -93,13 +93,13 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Tead the VendorID attribute (Basic - requires view)"
+    - label: "TP8 - Tead the VendorID attribute (Basic - requires view)"
       cluster: "Basic Information"
       command: "readAttribute"
       attribute: "VendorID"
 
     # MANAGE
-    - label: "Write ACL giving admin privilege ACL, manage for rest of EP0"
+    - label: "TP9 - Write ACL giving admin privilege ACL, manage for rest of EP0"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -108,7 +108,7 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets:
                           [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
                   },
@@ -116,14 +116,14 @@ tests:
                       FabricIndex: 1,
                       Privilege: 4, # manage
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets:
                           [{ Cluster: null, Endpoint: 0, DeviceType: null }],
                   },
               ]
 
     - label:
-          "Read the NOC attribute (Node operational credentials - requires
+          "TP10 - Read the NOC attribute (Node operational credentials - requires
           administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
@@ -131,7 +131,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write the location attribute (Basic - requires administer)"
+    - label: "TP11 - Write the location attribute (Basic - requires administer)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "Location"
@@ -141,7 +141,7 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "Send the UpdateFabricLabel command (Node operational credentials -
+          "TP12 - Send the UpdateFabricLabel command (Node operational credentials -
           requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
@@ -152,14 +152,14 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write NodeLabel attribute (Basic - requires manage)"
+    - label: "TP13(6) - Write NodeLabel attribute (Basic - requires manage)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       arguments:
           value: "TestNode"
 
-    - label: "Send TestEventTrigger (General Diagnostics - requires manage)"
+    - label: "TP13(7) - Send TestEventTrigger (General Diagnostics - requires manage)"
       cluster: "General Diagnostics"
       command: "TestEventTrigger"
       arguments:
@@ -171,13 +171,13 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Tead the VendorID attribute (Basic - requires view)"
+    - label: "TP13(8) - Tead the VendorID attribute (Basic - requires view)"
       cluster: "Basic Information"
       command: "readAttribute"
       attribute: "VendorID"
 
     # OPERATE
-    - label: "Write ACL giving admin privilege ACL, operate for rest of EP0"
+    - label: "TP14 - Write ACL giving admin privilege ACL, operate for rest of EP0"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -186,7 +186,7 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets:
                           [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
                   },
@@ -194,14 +194,14 @@ tests:
                       FabricIndex: 1,
                       Privilege: 3, # operate
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets:
                           [{ Cluster: null, Endpoint: 0, DeviceType: null }],
                   },
               ]
 
     - label:
-          "Read the NOC attribute (Node operational credentials - requires
+          "TP15(10) - Read the NOC attribute (Node operational credentials - requires
           administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
@@ -209,7 +209,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write the location attribute (Basic - requires administer)"
+    - label: "TP15(11) - Write the location attribute (Basic - requires administer)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "Location"
@@ -219,7 +219,7 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "Send the UpdateFabricLabel command (Node operational credentials -
+          "TP15(12) - Send the UpdateFabricLabel command (Node operational credentials -
           requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
@@ -230,7 +230,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write NodeLabel attribute (Basic - requires manage)"
+    - label: "TP16 - Write NodeLabel attribute (Basic - requires manage)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
@@ -239,7 +239,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Send TestEventTrigger (General Diagnostics - requires manage)"
+    - label: "TP17 - Send TestEventTrigger (General Diagnostics - requires manage)"
       cluster: "General Diagnostics"
       command: "TestEventTrigger"
       arguments:
@@ -251,13 +251,13 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Tead the VendorID attribute (Basic - requires view)"
+    - label: "TP18(8) - Tead the VendorID attribute (Basic - requires view)"
       cluster: "Basic Information"
       command: "readAttribute"
       attribute: "VendorID"
 
     # VIEW
-    - label: "Write ACL giving admin privilege ACL, operate for rest of EP0"
+    - label: "TP19 - Write ACL giving admin privilege ACL, operate for rest of EP0"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -266,7 +266,7 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets:
                           [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
                   },
@@ -274,14 +274,14 @@ tests:
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets:
                           [{ Cluster: null, Endpoint: 0, DeviceType: null }],
                   },
               ]
 
     - label:
-          "Read the NOC attribute (Node operational credentials - requires
+          "TP20(10) - Read the NOC attribute (Node operational credentials - requires
           administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
@@ -289,7 +289,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write the location attribute (Basic - requires administer)"
+    - label: "TP20(11) - Write the location attribute (Basic - requires administer)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "Location"
@@ -299,7 +299,7 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "Send the UpdateFabricLabel command (Node operational credentials -
+          "TP20(12) - Send the UpdateFabricLabel command (Node operational credentials -
           requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
@@ -310,7 +310,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write NodeLabel attribute (Basic - requires manage)"
+    - label: "TP21(16) - Write NodeLabel attribute (Basic - requires manage)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
@@ -319,7 +319,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Send TestEventTrigger (General Diagnostics - requires manage)"
+    - label: "TP21(17) - Send TestEventTrigger (General Diagnostics - requires manage)"
       cluster: "General Diagnostics"
       command: "TestEventTrigger"
       arguments:
@@ -331,13 +331,13 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Tead the VendorID attribute (Basic - requires view)"
+    - label: "TP22(8) - Tead the VendorID attribute (Basic - requires view)"
       cluster: "Basic Information"
       command: "readAttribute"
       attribute: "VendorID"
 
     # NO PRIVILEGE
-    - label: "Write ACL giving admin privilege ACL, operate for rest of EP0"
+    - label: "TP23 - Write ACL giving only admin privilege ACL cluster"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -346,14 +346,14 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets:
                           [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
                   },
               ]
 
     - label:
-          "Read the NOC attribute (Node operational credentials - requires
+          "TP24(10) - Read the NOC attribute (Node operational credentials - requires
           administer)"
       cluster: "Operational Credentials"
       command: "readAttribute"
@@ -361,7 +361,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write the location attribute (Basic - requires administer)"
+    - label: TP24(11) - Write the location attribute (Basic - requires administer)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "Location"
@@ -371,7 +371,7 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "Send the UpdateFabricLabel command (Node operational credentials -
+          "TP24(12) - Send the UpdateFabricLabel command (Node operational credentials -
           requires administer)"
       cluster: "Operational Credentials"
       command: "UpdateFabricLabel"
@@ -382,7 +382,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write NodeLabel attribute (Basic - requires manage)"
+    - label: "TP25(16) - Write NodeLabel attribute (Basic - requires manage)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
@@ -391,7 +391,7 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Send TestEventTrigger (General Diagnostics - requires manage)"
+    - label: "TP25(17) - Send TestEventTrigger (General Diagnostics - requires manage)"
       cluster: "General Diagnostics"
       command: "TestEventTrigger"
       arguments:
@@ -403,14 +403,14 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Tead the VendorID attribute (Basic - requires view)"
+    - label: "TP26 - Tead the VendorID attribute (Basic - requires view)"
       cluster: "Basic Information"
       command: "readAttribute"
       attribute: "VendorID"
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Write ACL to restore full access"
+    - label: "TP27 - Write ACL to restore full access"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -419,7 +419,7 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeId],
                       Targets: null,
                   },
               ]
