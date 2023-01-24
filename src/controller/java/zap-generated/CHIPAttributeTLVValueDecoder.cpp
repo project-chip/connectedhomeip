@@ -16518,35 +16518,34 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jobject value_catalogVendorId;
-            std::string value_catalogVendorIdClassName     = "java/lang/Integer";
-            std::string value_catalogVendorIdCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(value_catalogVendorIdClassName.c_str(),
-                                                                           value_catalogVendorIdCtorSignature.c_str(),
-                                                                           cppValue.catalogVendorId, value_catalogVendorId);
-            jobject value_applicationId;
-            value_applicationId =
-                env->NewStringUTF(std::string(cppValue.applicationId.data(), cppValue.applicationId.size()).c_str());
+            jobject value_catalogVendorID;
+            std::string value_catalogVendorIDClassName     = "java/lang/Integer";
+            std::string value_catalogVendorIDCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(value_catalogVendorIDClassName.c_str(),
+                                                                           value_catalogVendorIDCtorSignature.c_str(),
+                                                                           cppValue.catalogVendorID, value_catalogVendorID);
+            jobject value_applicationID;
+            value_applicationID =
+                env->NewStringUTF(std::string(cppValue.applicationID.data(), cppValue.applicationID.size()).c_str());
 
-            jclass applicationBasicApplicationStructClass_0;
+            jclass applicationStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$ApplicationBasicClusterApplicationBasicApplication",
-                applicationBasicApplicationStructClass_0);
+                env, "chip/devicecontroller/ChipStructs$ApplicationBasicClusterApplicationStruct", applicationStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$ApplicationBasicClusterApplicationBasicApplication");
+                ChipLogError(Zcl, "Could not find class ChipStructs$ApplicationBasicClusterApplicationStruct");
                 return nullptr;
             }
-            jmethodID applicationBasicApplicationStructCtor_0 =
-                env->GetMethodID(applicationBasicApplicationStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-            if (applicationBasicApplicationStructCtor_0 == nullptr)
+            jmethodID applicationStructStructCtor_0 =
+                env->GetMethodID(applicationStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+            if (applicationStructStructCtor_0 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$ApplicationBasicClusterApplicationBasicApplication constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$ApplicationBasicClusterApplicationStruct constructor");
                 return nullptr;
             }
 
-            value = env->NewObject(applicationBasicApplicationStructClass_0, applicationBasicApplicationStructCtor_0,
-                                   value_catalogVendorId, value_applicationId);
+            value = env->NewObject(applicationStructStructClass_0, applicationStructStructCtor_0, value_catalogVendorID,
+                                   value_applicationID);
             return value;
         }
         case Attributes::Status::Id: {

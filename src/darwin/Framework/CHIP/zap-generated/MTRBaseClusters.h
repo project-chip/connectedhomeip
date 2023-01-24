@@ -13381,18 +13381,17 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                          completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeApplicationWithCompletion:(void (^)(MTRApplicationBasicClusterApplicationBasicApplication * _Nullable value,
+- (void)readAttributeApplicationWithCompletion:(void (^)(MTRApplicationBasicClusterApplicationStruct * _Nullable value,
                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeApplicationWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(MTRApplicationBasicClusterApplicationBasicApplication * _Nullable value,
+                                  reportHandler:(void (^)(MTRApplicationBasicClusterApplicationStruct * _Nullable value,
                                                     NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeApplicationWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
-                                           completion:
-                                               (void (^)(MTRApplicationBasicClusterApplicationBasicApplication * _Nullable value,
-                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+                                           completion:(void (^)(MTRApplicationBasicClusterApplicationStruct * _Nullable value,
+                                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;

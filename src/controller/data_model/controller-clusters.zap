@@ -13635,7 +13635,7 @@
               "reportableChange": 0
             },
             {
-              "name": "IntrinsicBalanceFactor",
+              "name": "IntrinsicBallastFactor",
               "code": 20,
               "mfgCode": null,
               "side": "server",
@@ -17161,7 +17161,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "ApplicationBasicApplication",
+              "type": "ApplicationStruct",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

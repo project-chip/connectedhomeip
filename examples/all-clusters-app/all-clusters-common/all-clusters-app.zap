@@ -16819,7 +16819,7 @@
               "reportableChange": 0
             },
             {
-              "name": "IntrinsicBalanceFactor",
+              "name": "IntrinsicBallastFactor",
               "code": 20,
               "mfgCode": null,
               "side": "server",

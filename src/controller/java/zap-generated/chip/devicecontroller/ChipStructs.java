@@ -1806,25 +1806,24 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationBasicClusterApplicationBasicApplication {
-    public Integer catalogVendorId;
-    public String applicationId;
+  public static class ApplicationBasicClusterApplicationStruct {
+    public Integer catalogVendorID;
+    public String applicationID;
 
-    public ApplicationBasicClusterApplicationBasicApplication(
-        Integer catalogVendorId, String applicationId) {
-      this.catalogVendorId = catalogVendorId;
-      this.applicationId = applicationId;
+    public ApplicationBasicClusterApplicationStruct(Integer catalogVendorID, String applicationID) {
+      this.catalogVendorID = catalogVendorID;
+      this.applicationID = applicationID;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationBasicClusterApplicationBasicApplication {\n");
-      output.append("\tcatalogVendorId: ");
-      output.append(catalogVendorId);
+      output.append("ApplicationBasicClusterApplicationStruct {\n");
+      output.append("\tcatalogVendorID: ");
+      output.append(catalogVendorID);
       output.append("\n");
-      output.append("\tapplicationId: ");
-      output.append(applicationId);
+      output.append("\tapplicationID: ");
+      output.append(applicationID);
       output.append("\n");
       output.append("}\n");
       return output.toString();

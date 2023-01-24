@@ -14294,11 +14294,11 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRApplicationBasicClusterApplicationBasicApplication * _Nonnull value;
-            value = [MTRApplicationBasicClusterApplicationBasicApplication new];
-            value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
-            value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
-                                                           length:cppValue.applicationId.size()
+            MTRApplicationBasicClusterApplicationStruct * _Nonnull value;
+            value = [MTRApplicationBasicClusterApplicationStruct new];
+            value.catalogVendorID = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorID];
+            value.applicationID = [[NSString alloc] initWithBytes:cppValue.applicationID.data()
+                                                           length:cppValue.applicationID.size()
                                                          encoding:NSUTF8StringEncoding];
             return value;
         }

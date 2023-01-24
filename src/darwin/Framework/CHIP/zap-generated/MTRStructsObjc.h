@@ -937,10 +937,17 @@ MTR_NEWLY_DEPRECATED("Please use MTRApplicationLauncherClusterApplicationEPStruc
 @interface MTRApplicationLauncherClusterApplicationEP : MTRApplicationLauncherClusterApplicationEPStruct
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRApplicationBasicClusterApplicationStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull catalogVendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull catalogVendorId MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull applicationID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull applicationId MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRApplicationBasicClusterApplicationBasicApplication : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull catalogVendorId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSString * _Nonnull applicationId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRApplicationBasicClusterApplicationStruct")
+@interface MTRApplicationBasicClusterApplicationBasicApplication : MTRApplicationBasicClusterApplicationStruct
 @end
 
 MTR_NEWLY_AVAILABLE
