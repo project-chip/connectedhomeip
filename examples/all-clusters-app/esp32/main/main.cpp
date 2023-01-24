@@ -119,7 +119,7 @@ static void InitServer(intptr_t context)
     CHIP_ERROR err = GetAppTask().LockInit();
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Failed to initialize app task lock, err:%" CHIP_FORMAT_ERROR, err.Format());
+        ESP_LOGE(TAG, "Failed to initialize app task lock, err:%" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CONFIG_DEVICE_TYPE_M5STACK
