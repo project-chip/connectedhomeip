@@ -166,9 +166,10 @@ class ApplicationPaths:
     tv_app: typing.List[str]
     bridge_app: typing.List[str]
     chip_repl_yaml_tester_cmd: typing.List[str]
+    chip_tool_with_python_cmd: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app, self.bridge_app, self.chip_repl_yaml_tester_cmd]
+        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app, self.bridge_app, self.chip_repl_yaml_tester_cmd, self.chip_tool_with_python_cmd]
 
 
 @dataclass
@@ -225,7 +226,8 @@ class TestTag(Enum):
 
 class TestRunTime(Enum):
     CHIP_TOOL_BUILTIN = auto()  # run via chip-tool built-in test commands
-    PYTHON_YAML = auto()       # use the python yaml test runner
+    CHIP_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
+    CHIP_REPL_PYTHON = auto()       # use the python yaml test runner
 
 
 @dataclass
@@ -274,7 +276,7 @@ class TestDefinition:
 
             for path in paths.items():
                 # Do not add chip-tool or chip-repl-yaml-tester-cmd to the register
-                if path == paths.chip_tool or path == paths.chip_repl_yaml_tester_cmd:
+                if path == paths.chip_tool or path == paths.chip_repl_yaml_tester_cmd or path == paths.chip_tool_with_python_cmd:
                     continue
 
                 # For the app indicated by self.target, give it the 'default' key to add to the register
@@ -291,7 +293,7 @@ class TestDefinition:
                 # so it will be commissionable again.
                 app.factoryReset()
 
-            tool_cmd = paths.chip_tool
+            tool_cmd = paths.chip_tool if test_runtime != TestRunTime.CHIP_TOOL_PYTHON else paths.chip_tool_with_python_cmd
 
             files_to_unlink = [
                 '/tmp/chip_tool_config.ini',
@@ -309,11 +311,14 @@ class TestDefinition:
             app.start()
             pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, app.setupCode]
             test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
+            if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                pairing_cmd += ['--server_path'] + [paths.chip_tool[-1]]
+                test_cmd += ['--server_path'] + [paths.chip_tool[-1]]
 
             if dry_run:
                 logging.info(" ".join(pairing_cmd))
                 logging.info(" ".join(test_cmd))
-            elif test_runtime == TestRunTime.PYTHON_YAML:
+            elif test_runtime == TestRunTime.CHIP_REPL_PYTHON:
                 chip_repl_yaml_tester_cmd = paths.chip_repl_yaml_tester_cmd
                 python_cmd = chip_repl_yaml_tester_cmd + \
                     ['--setup-code', app.setupCode] + ['--yaml-path', self.run_name] + ["--pics-file", pics_file]
