@@ -218,8 +218,8 @@ void GenericPlatformManagerImpl<ImplClass>::_HandleServerShuttingDown()
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
-    ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct, .CallWorkFunct{ .WorkFunct = workFunct, .Arg = arg } };
-
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct };
+    event.CallWorkFunct = { .WorkFunct = workFunct, .Arg = arg };
     CHIP_ERROR err = Impl()->PostEvent(&event);
     if (err != CHIP_NO_ERROR)
     {
@@ -231,7 +231,8 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct w
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
-    ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct, .CallWorkFunct{ .WorkFunct = workFunct, .Arg = arg } };
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct };
+    event.CallWorkFunct = { .WorkFunct = workFunct, .Arg = arg };
     auto err = Impl()->PostBackgroundEvent(&event);
     if (err != CHIP_NO_ERROR)
     {
