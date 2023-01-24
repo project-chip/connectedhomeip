@@ -48,11 +48,11 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     mNextTimerDurationTicks = 0;
     // TODO: This nulling out of mEventLoopTask should happen when we shut down
     // the task, not here!
-    mEventLoopTask           = NULL;
+    mEventLoopTask = NULL;
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
     mBackgroundEventLoopTask = NULL;
 #endif
-    mChipTimerActive         = false;
+    mChipTimerActive = false;
 
     // We support calling Shutdown followed by InitChipStack, because some tests
     // do that.  To keep things simple for existing consumers, we keep not
@@ -101,8 +101,8 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     if (mBackgroundEventQueue == NULL)
     {
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
-        mBackgroundEventQueue = xQueueCreateStatic(CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent), mBackgroundQueueBuffer,
-                                                   &mBackgroundQueueStruct);
+        mBackgroundEventQueue = xQueueCreateStatic(CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent),
+                                                   mBackgroundQueueBuffer, &mBackgroundQueueStruct);
 #else
         mBackgroundEventQueue = xQueueCreate(CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent));
 #endif
@@ -283,7 +283,6 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * ar
     // Or somehow get our caller to do it once this thread is joined?
 }
 
-
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostBackgroundEvent(const ChipDeviceEvent * event)
 {
@@ -340,11 +339,13 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartBackgroundEvent
 {
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
-    mBackgroundEventLoopTask = xTaskCreateStatic(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME, ArraySize(mBackgroundEventLoopStack), this,
-                                                 CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, mBackgroundEventLoopStack, &mBackgroundEventLoopTaskStruct);
+    mBackgroundEventLoopTask =
+        xTaskCreateStatic(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME, ArraySize(mBackgroundEventLoopStack), this,
+                          CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, mBackgroundEventLoopStack, &mBackgroundEventLoopTaskStruct);
 #else
-    xTaskCreate(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME, CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE / sizeof(StackType_t),
-                this, CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, &mBackgroundEventLoopTask);
+    xTaskCreate(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME,
+                CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE / sizeof(StackType_t), this, CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY,
+                &mBackgroundEventLoopTask);
 #endif
     return (mBackgroundEventLoopTask != NULL) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 #else
@@ -360,7 +361,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopBackgroundEventL
     bool oldShouldRunBackgroundEventLoop = true;
     if (mShouldRunBackgroundEventLoop.compare_exchange_strong(oldShouldRunBackgroundEventLoop /* expected */, false /* desired */))
     {
-        ChipDeviceEvent noop {.Type = DeviceEventType::kNoOp };
+        ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
         xQueueSendToBack(mBackgroundEventQueue, &noop, 0);
     }
     return CHIP_NO_ERROR;
@@ -391,7 +392,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(Syste
     // to the event queue.
     if (xTaskGetCurrentTaskHandle() != mEventLoopTask)
     {
-        ChipDeviceEvent noop {.Type = DeviceEventType::kNoOp };
+        ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
         ReturnErrorOnFailure(Impl()->PostEvent(&noop));
     }
 

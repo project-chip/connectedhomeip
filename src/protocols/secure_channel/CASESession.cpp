@@ -1064,7 +1064,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
         CompressedFabricId unused;
         FabricId responderFabricId;
         SuccessOrExit(err = SetEffectiveTime());
-        SuccessOrExit(err = mFabricsTable->VerifyCredentials(mFabricIndex, responderNOC, responderICAC, mValidContext, unused, responderFabricId, responderNodeId, responderPublicKey));
+        SuccessOrExit(err = mFabricsTable->VerifyCredentials(mFabricIndex, responderNOC, responderICAC, mValidContext, unused,
+                                                             responderFabricId, responderNodeId, responderPublicKey));
         VerifyOrExit(fabricId == responderFabricId, err = CHIP_ERROR_INVALID_CASE_PARAMETER);
         // Verify that responderNodeId (from responderNOC) matches one that was included
         // in the computation of the Destination Identifier when generating Sigma1.
@@ -1324,7 +1325,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
         // It happens that there's only one pairing session (in CASEServer)
         // so it will still be available for use. Use a sequence number to
         // coordinate.
-        work.session = this;
+        work.session  = this;
         work.sequence = mSequence;
 
         {
@@ -1363,8 +1364,8 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             SuccessOrExit(err);
 
             HKDF_sha_crypto mHKDF;
-            err = mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR3Info,
-                                    kKDFInfoLength, sr3k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+            err = mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(),
+                                    kKDFSR3Info, kKDFInfoLength, sr3k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
             SuccessOrExit(err);
         }
 
@@ -1394,15 +1395,16 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
         // Step 4 - Construct Sigma3 TBS Data
         work.msg_r3_signed_len = TLV::EstimateStructOverhead(sizeof(uint16_t), work.initiatorNOC.size(), work.initiatorICAC.size(),
-                                                            kP256_PublicKey_Length, kP256_PublicKey_Length);
+                                                             kP256_PublicKey_Length, kP256_PublicKey_Length);
 
         VerifyOrExit(work.msg_R3_Signed.Alloc(work.msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
         SuccessOrExit(err = ConstructTBSData(work.initiatorNOC, work.initiatorICAC, ByteSpan(mRemotePubKey, mRemotePubKey.Length()),
-                                            ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()), work.msg_R3_Signed.Get(),
-                                            work.msg_r3_signed_len));
+                                             ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
+                                             work.msg_R3_Signed.Get(), work.msg_r3_signed_len));
 
-        VerifyOrExit(TLV::TagNumFromTag(decryptedDataTlvReader.GetTag()) == kTag_TBEData_Signature, err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::TagNumFromTag(decryptedDataTlvReader.GetTag()) == kTag_TBEData_Signature,
+                     err = CHIP_ERROR_INVALID_TLV_TAG);
         VerifyOrExit(work.tbsData3Signature.Capacity() >= decryptedDataTlvReader.GetLength(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
         work.tbsData3Signature.SetLength(decryptedDataTlvReader.GetLength());
         SuccessOrExit(err = decryptedDataTlvReader.GetBytes(work.tbsData3Signature.Bytes(), work.tbsData3Signature.Length()));
@@ -1438,9 +1440,9 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             }
         }
 
-        SuccessOrExit(err = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(
-            [](intptr_t arg) { HandleSigma3b(*reinterpret_cast<Sigma3Work*>(arg)); },
-            reinterpret_cast<intptr_t>(&work)));
+        SuccessOrExit(
+            err = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(
+                [](intptr_t arg) { HandleSigma3b(*reinterpret_cast<Sigma3Work *>(arg)); }, reinterpret_cast<intptr_t>(&work)));
         workPtr = nullptr; // scheduling succeeded, so don't delete
         mExchangeCtxt->WillSendMessage();
         mState = State::kBackgroundPending;
@@ -1467,7 +1469,8 @@ void CASESession::HandleSigma3b(Sigma3Work & work)
     CompressedFabricId unused;
     FabricId initiatorFabricId;
     P256PublicKey initiatorPublicKey;
-    SuccessOrExit(err = FabricTable::VerifyCredentials(work.initiatorNOC, work.initiatorICAC, work.fabricRCAC, work.validContext, unused, initiatorFabricId, work.initiatorNodeId, initiatorPublicKey));
+    SuccessOrExit(err = FabricTable::VerifyCredentials(work.initiatorNOC, work.initiatorICAC, work.fabricRCAC, work.validContext,
+                                                       unused, initiatorFabricId, work.initiatorNodeId, initiatorPublicKey));
     VerifyOrExit(work.fabricId == initiatorFabricId, err = CHIP_ERROR_INVALID_CASE_PARAMETER);
 
     // TODO - Validate message signature prior to validating the received operational credentials.
@@ -1480,11 +1483,12 @@ void CASESession::HandleSigma3b(Sigma3Work & work)
     {
         P256PublicKeyHSM initiatorPublicKeyHSM;
         memcpy(Uint8::to_uchar(initiatorPublicKeyHSM), initiatorPublicKey.Bytes(), initiatorPublicKey.Length());
-        SuccessOrExit(
-            err = initiatorPublicKeyHSM.ECDSA_validate_msg_signature(work.msg_R3_Signed.Get(), work.msg_r3_signed_len, work.tbsData3Signature));
+        SuccessOrExit(err = initiatorPublicKeyHSM.ECDSA_validate_msg_signature(work.msg_R3_Signed.Get(), work.msg_r3_signed_len,
+                                                                               work.tbsData3Signature));
     }
 #else
-    SuccessOrExit(err = initiatorPublicKey.ECDSA_validate_msg_signature(work.msg_R3_Signed.Get(), work.msg_r3_signed_len, work.tbsData3Signature));
+    SuccessOrExit(err = initiatorPublicKey.ECDSA_validate_msg_signature(work.msg_R3_Signed.Get(), work.msg_r3_signed_len,
+                                                                        work.tbsData3Signature));
 #endif
 
 exit:
@@ -1492,7 +1496,7 @@ exit:
 
     auto err2 = DeviceLayer::PlatformMgr().ScheduleWork(
         [](intptr_t arg) {
-            auto & work2 = *reinterpret_cast<Sigma3Work*>(arg);
+            auto & work2 = *reinterpret_cast<Sigma3Work *>(arg);
             work2.session->HandleSigma3c(work2);
         },
         reinterpret_cast<intptr_t>(&work));
@@ -1505,7 +1509,7 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigma3c(Sigma3Work & work)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
     bool ignoreFailure = true;
 
     // Special case: if for whatever reason not in expected state or sequence,

@@ -115,7 +115,7 @@
  * The size (in bytes) of the background task stack.
  */
 #ifndef CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE
-#define CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE (6*1024)
+#define CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE (6 * 1024)
 #endif
 
 /**
