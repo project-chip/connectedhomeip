@@ -264,7 +264,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
-            if context.skip_manual and test.is_manual:
+            if context.obj.skip_manual and test.is_manual:
                 continue
 
             test_start = time.monotonic()
