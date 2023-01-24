@@ -163,7 +163,6 @@ def _hardcoded_python_yaml_tests():
         "TestClusterComplexTypes.yaml",
         "TestGroupsCluster.yaml",
         "TestOperationalCredentialsCluster.yaml",
-        "Test_TC_APPLAUNCHER_3_7.yaml",
         "Test_TC_AUDIOOUTPUT_7_1.yaml",
         "Test_TC_BOOL_2_1.yaml",
         "Test_TC_DGWIFI_2_1.yaml",
