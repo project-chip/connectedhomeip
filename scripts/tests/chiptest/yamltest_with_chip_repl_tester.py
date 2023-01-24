@@ -14,8 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import functools
-import glob
 import os
 import tempfile
 import traceback
@@ -32,26 +30,13 @@ import chip.native
 import click
 from chip.ChipStack import *
 from chip.yaml.runner import ReplTestRunner
-from matter_yamltests.definitions import ParseSource, SpecDefinitions
+from matter_yamltests.definitions import SpecDefinitionsFromPath
 from matter_yamltests.parser import TestParser
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 _CLUSTER_XML_DIRECTORY_PATH = os.path.abspath(
     os.path.join(_DEFAULT_CHIP_ROOT, "src/app/zap-templates/zcl/data-model/"))
-
-
-def _sort_with_global_attribute_first(a, b):
-    if a.endswith('global-attributes.xml'):
-        return -1
-    elif b.endswith('global-attributes.xml'):
-        return 1
-    elif a > b:
-        return 1
-    elif a == b:
-        return 0
-    elif a < b:
-        return -1
 
 
 @click.command()
@@ -91,10 +76,7 @@ def main(setup_code, yaml_path, node_id):
 
         try:
             # Creating Cluster definition.
-            cluster_xml_filenames = glob.glob(_CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml', recursive=False)
-            cluster_xml_filenames.sort(key=functools.cmp_to_key(_sort_with_global_attribute_first))
-            sources = [ParseSource(source=name) for name in cluster_xml_filenames]
-            clusters_definitions = SpecDefinitions(sources)
+            clusters_definitions = SpecDefinitionsFromPath(_CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml')
 
             # Parsing YAML test and setting up chip-repl yamltests runner.
             yaml = TestParser(yaml_path, None, clusters_definitions)
