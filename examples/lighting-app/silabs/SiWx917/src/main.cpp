@@ -84,7 +84,7 @@ int main(void)
     appError(CHIP_ERROR_INTERNAL);
 }
 
-void sl_button_on_change(uint8_t btn,uint8_t btnAction)
+void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
     AppTask::GetAppTask().ButtonEventHandler(btn, btnAction);
 }

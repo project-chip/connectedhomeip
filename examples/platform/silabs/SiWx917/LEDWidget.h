@@ -40,6 +40,6 @@ private:
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
     int mLed;
-    //created a temporary mLedStatus since Led status is not updating from the platform API(RSI_EGPIO_GetPin)
+    // created a temporary mLedStatus since Led status is not updating from the platform API(RSI_EGPIO_GetPin)
     bool mLedStatus;
 };
