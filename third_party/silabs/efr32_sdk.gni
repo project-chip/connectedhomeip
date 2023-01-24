@@ -30,7 +30,6 @@ declare_args() {
   enable_openthread_cli = true
 
   kvs_max_entries = 75
-  use_external_flash = true
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -39,31 +38,13 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
-  # Enable Buttons by default
-  use_wstk_buttons = true
-
-  # Enable LEDs by default
-  use_wstk_leds = true
-
   sleep_time_ms = 3300000  # 55 mins sleep
-}
 
-# Explorer Kit and MGM240L do not have external flash
-if (silabs_board == "BRD2703A" || silabs_board == "BRD4318A" ||
-    silabs_board == "BRD4319A") {
-  use_external_flash = false
-}
+  # Enable Sleepy end device
+  enable_sleepy_device = false
 
-# Board does not support LEDs and Buttons at the same time
-if (silabs_board == "BRD4317A" || silabs_board == "BRD4316A" ||
-    silabs_board == "BRD4319A" || silabs_board == "BRD4318A") {
-  use_wstk_leds = false
-}
-
-# Board does not support buttons
-if (silabs_board == "BRD2704A") {
-  use_wstk_buttons = false
-  use_external_flash = false
+  # OTA timeout in seconds
+  OTA_periodic_query_timeout = 86400
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -110,7 +91,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/CMSIS/Core/Include",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Include",
       "${efr32_sdk_root}/platform/common/inc",
-      "${efr32_sdk_root}/platform/driver/button/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/inc",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/config",
@@ -249,15 +229,13 @@ template("efr32_sdk") {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
-    if (defined(invoker.enable_sleepy_device)) {
-      if (invoker.enable_sleepy_device) {
-        defines += [
-          "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
-          "SL_CATALOG_POWER_MANAGER_PRESENT",
-          "SL_CATALOG_SLEEPTIMER_PRESENT",
-          "SL_SLEEP_TIME_MS=${sleep_time_ms}",
-        ]
-      }
+    if (enable_sleepy_device) {
+      defines += [
+        "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
+        "SL_CATALOG_POWER_MANAGER_PRESENT",
+        "SL_CATALOG_SLEEPTIMER_PRESENT",
+        "SL_SLEEP_TIME_MS=${sleep_time_ms}",
+      ]
     }
 
     if (chip_build_libshell) {  # matter shell
@@ -276,12 +254,10 @@ template("efr32_sdk") {
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) ||
-        (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
-        (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
-        (defined(invoker.use_external_flash) && use_external_flash)) {
+        show_qr_code || disable_lcd || use_external_flash) {
       defines += [ "CONFIG_ENABLE_UART" ]
 
-      if (defined(invoker.use_external_flash) && use_external_flash) {
+      if (use_external_flash) {
         defines += [ "CONFIG_USE_EXTERNAL_FLASH" ]
 
         _include_dirs += [ "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart" ]
@@ -667,10 +643,8 @@ template("efr32_sdk") {
       ]
     }
 
-    if (defined(invoker.enable_sleepy_device)) {
-      if (invoker.enable_sleepy_device) {
-        sources += [ "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c" ]
-      }
+    if (enable_sleepy_device) {
+      sources += [ "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c" ]
     }
 
     if (defined(enable_fem)) {
@@ -683,9 +657,7 @@ template("efr32_sdk") {
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) ||
-        (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
-        (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
-        (defined(invoker.use_external_flash) && use_external_flash)) {
+        show_qr_code || !disable_lcd || use_external_flash) {
       sources += [
         "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
@@ -695,13 +667,12 @@ template("efr32_sdk") {
         "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_uartdrv_init.c",
       ]
 
-      if (defined(invoker.use_external_flash) && use_external_flash) {
+      if (use_external_flash) {
         sources += [ "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c" ]
       }
     }
 
-    if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
-        (defined(invoker.disable_lcd) && !invoker.disable_lcd)) {
+    if (show_qr_code || !disable_lcd) {
       sources += [
         "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd.c",
         "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",
