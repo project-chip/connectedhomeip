@@ -16949,7 +16949,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "ApplicationEP",
+              "type": "ApplicationEPStruct",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

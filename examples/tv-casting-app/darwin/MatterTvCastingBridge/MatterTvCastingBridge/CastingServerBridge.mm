@@ -1493,9 +1493,9 @@
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_launchApp"];
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId = catalogVendorId;
-    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID = catalogVendorId;
+    application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
     dispatch_async(_chipWorkQueue, ^{
         TargetEndpointInfo endpoint;
@@ -1525,9 +1525,9 @@
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_stopApp"];
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId = catalogVendorId;
-    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID = catalogVendorId;
+    application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
     dispatch_async(_chipWorkQueue, ^{
         TargetEndpointInfo endpoint;
@@ -1556,9 +1556,9 @@
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_hideApp"];
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId = catalogVendorId;
-    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID = catalogVendorId;
+    application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
     dispatch_async(_chipWorkQueue, ^{
         TargetEndpointInfo endpoint;

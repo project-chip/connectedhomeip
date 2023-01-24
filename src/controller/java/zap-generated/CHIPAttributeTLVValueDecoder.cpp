@@ -16274,35 +16274,36 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             else
             {
                 jobject value_application;
-                jobject value_application_catalogVendorId;
-                std::string value_application_catalogVendorIdClassName     = "java/lang/Integer";
-                std::string value_application_catalogVendorIdCtorSignature = "(I)V";
+                jobject value_application_catalogVendorID;
+                std::string value_application_catalogVendorIDClassName     = "java/lang/Integer";
+                std::string value_application_catalogVendorIDCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                    value_application_catalogVendorIdClassName.c_str(), value_application_catalogVendorIdCtorSignature.c_str(),
-                    cppValue.Value().application.catalogVendorId, value_application_catalogVendorId);
-                jobject value_application_applicationId;
-                value_application_applicationId = env->NewStringUTF(std::string(cppValue.Value().application.applicationId.data(),
-                                                                                cppValue.Value().application.applicationId.size())
+                    value_application_catalogVendorIDClassName.c_str(), value_application_catalogVendorIDCtorSignature.c_str(),
+                    cppValue.Value().application.catalogVendorID, value_application_catalogVendorID);
+                jobject value_application_applicationID;
+                value_application_applicationID = env->NewStringUTF(std::string(cppValue.Value().application.applicationID.data(),
+                                                                                cppValue.Value().application.applicationID.size())
                                                                         .c_str());
 
-                jclass applicationStructClass_2;
+                jclass applicationStructStructClass_2;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ApplicationLauncherClusterApplication", applicationStructClass_2);
+                    env, "chip/devicecontroller/ChipStructs$ApplicationLauncherClusterApplicationStruct",
+                    applicationStructStructClass_2);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ApplicationLauncherClusterApplication");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ApplicationLauncherClusterApplicationStruct");
                     return nullptr;
                 }
-                jmethodID applicationStructCtor_2 =
-                    env->GetMethodID(applicationStructClass_2, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-                if (applicationStructCtor_2 == nullptr)
+                jmethodID applicationStructStructCtor_2 =
+                    env->GetMethodID(applicationStructStructClass_2, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+                if (applicationStructStructCtor_2 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ApplicationLauncherClusterApplication constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ApplicationLauncherClusterApplicationStruct constructor");
                     return nullptr;
                 }
 
-                value_application = env->NewObject(applicationStructClass_2, applicationStructCtor_2,
-                                                   value_application_catalogVendorId, value_application_applicationId);
+                value_application = env->NewObject(applicationStructStructClass_2, applicationStructStructCtor_2,
+                                                   value_application_catalogVendorID, value_application_applicationID);
                 jobject value_endpoint;
                 if (!cppValue.Value().endpoint.HasValue())
                 {
@@ -16319,24 +16320,26 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     chip::JniReferences::GetInstance().CreateOptional(value_endpointInsideOptional, value_endpoint);
                 }
 
-                jclass applicationEPStructClass_1;
+                jclass applicationEPStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ApplicationLauncherClusterApplicationEP", applicationEPStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$ApplicationLauncherClusterApplicationEPStruct",
+                    applicationEPStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ApplicationLauncherClusterApplicationEP");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ApplicationLauncherClusterApplicationEPStruct");
                     return nullptr;
                 }
-                jmethodID applicationEPStructCtor_1 = env->GetMethodID(
-                    applicationEPStructClass_1, "<init>",
-                    "(Lchip/devicecontroller/ChipStructs$ApplicationLauncherClusterApplication;Ljava/util/Optional;)V");
-                if (applicationEPStructCtor_1 == nullptr)
+                jmethodID applicationEPStructStructCtor_1 = env->GetMethodID(
+                    applicationEPStructStructClass_1, "<init>",
+                    "(Lchip/devicecontroller/ChipStructs$ApplicationLauncherClusterApplicationStruct;Ljava/util/Optional;)V");
+                if (applicationEPStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ApplicationLauncherClusterApplicationEP constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ApplicationLauncherClusterApplicationEPStruct constructor");
                     return nullptr;
                 }
 
-                value = env->NewObject(applicationEPStructClass_1, applicationEPStructCtor_1, value_application, value_endpoint);
+                value = env->NewObject(applicationEPStructStructClass_1, applicationEPStructStructCtor_1, value_application,
+                                       value_endpoint);
             }
             return value;
         }

@@ -22706,18 +22706,18 @@ struct TypeInfo
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace Application {
+namespace ApplicationStruct {
 enum class Fields
 {
-    kCatalogVendorId = 0,
-    kApplicationId   = 1,
+    kCatalogVendorID = 0,
+    kApplicationID   = 1,
 };
 
 struct Type
 {
 public:
-    uint16_t catalogVendorId = static_cast<uint16_t>(0);
-    chip::CharSpan applicationId;
+    uint16_t catalogVendorID = static_cast<uint16_t>(0);
+    chip::CharSpan applicationID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -22728,8 +22728,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Application
-namespace ApplicationEP {
+} // namespace ApplicationStruct
+namespace ApplicationEPStruct {
 enum class Fields
 {
     kApplication = 0,
@@ -22739,7 +22739,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::Application::Type application;
+    Structs::ApplicationStruct::Type application;
     Optional<chip::EndpointId> endpoint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22751,7 +22751,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationEP
+} // namespace ApplicationEPStruct
 } // namespace Structs
 
 namespace Commands {
@@ -22794,7 +22794,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Optional<Structs::ApplicationStruct::Type> application;
     Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -22810,7 +22810,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Optional<Structs::ApplicationStruct::DecodableType> application;
     Optional<chip::ByteSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -22828,7 +22828,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Optional<Structs::ApplicationStruct::Type> application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -22843,7 +22843,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Optional<Structs::ApplicationStruct::DecodableType> application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopApp
@@ -22860,7 +22860,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Optional<Structs::ApplicationStruct::Type> application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -22875,7 +22875,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Optional<Structs::ApplicationStruct::DecodableType> application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideApp
@@ -22894,7 +22894,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
-    chip::ByteSpan data;
+    Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -22910,7 +22910,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
-    chip::ByteSpan data;
+    Optional<chip::ByteSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse
@@ -22933,11 +22933,11 @@ struct TypeInfo
 namespace CurrentApp {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type>;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &;
+        chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentApp::Id; }

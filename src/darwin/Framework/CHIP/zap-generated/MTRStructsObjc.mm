@@ -3696,43 +3696,66 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRAudioOutputClusterOutputInfo : MTRAudioOutputClusterOutputInfoStruct
 @end
 
-@implementation MTRApplicationLauncherClusterApplication
+@implementation MTRApplicationLauncherClusterApplicationStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _catalogVendorId = @(0);
+        _catalogVendorID = @(0);
 
-        _applicationId = @"";
+        _applicationID = @"";
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRApplicationLauncherClusterApplication alloc] init];
+    auto other = [[MTRApplicationLauncherClusterApplicationStruct alloc] init];
 
-    other.catalogVendorId = self.catalogVendorId;
-    other.applicationId = self.applicationId;
+    other.catalogVendorID = self.catalogVendorID;
+    other.applicationID = self.applicationID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorId:%@; applicationId:%@; >",
-                                             NSStringFromClass([self class]), _catalogVendorId, _applicationId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorID:%@; applicationID:%@; >",
+                                             NSStringFromClass([self class]), _catalogVendorID, _applicationID];
     return descriptionString;
+}
+
+- (void)setCatalogVendorId:(NSNumber * _Nonnull)catalogVendorId
+{
+    self.catalogVendorID = catalogVendorId;
+}
+
+- (NSNumber * _Nonnull)catalogVendorId
+{
+    return self.catalogVendorID;
+}
+
+- (void)setApplicationId:(NSString * _Nonnull)applicationId
+{
+    self.applicationID = applicationId;
+}
+
+- (NSString * _Nonnull)applicationId
+{
+    return self.applicationID;
 }
 
 @end
 
-@implementation MTRApplicationLauncherClusterApplicationEP
+@implementation MTRApplicationLauncherClusterApplication : MTRApplicationLauncherClusterApplicationStruct
+@end
+
+@implementation MTRApplicationLauncherClusterApplicationEPStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _application = [MTRApplicationLauncherClusterApplication new];
+        _application = [MTRApplicationLauncherClusterApplicationStruct new];
 
         _endpoint = nil;
     }
@@ -3741,7 +3764,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRApplicationLauncherClusterApplicationEP alloc] init];
+    auto other = [[MTRApplicationLauncherClusterApplicationEPStruct alloc] init];
 
     other.application = self.application;
     other.endpoint = self.endpoint;
@@ -3756,6 +3779,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRApplicationLauncherClusterApplicationEP : MTRApplicationLauncherClusterApplicationEPStruct
 @end
 
 @implementation MTRApplicationBasicClusterApplicationBasicApplication

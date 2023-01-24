@@ -2050,18 +2050,18 @@ server cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  struct ApplicationEP {
-    Application application = 0;
+  struct ApplicationEPStruct {
+    ApplicationStruct application = 0;
     optional endpoint_no endpoint = 1;
   }
 
-  struct Application {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
+  struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
   }
 
   readonly attribute INT16U catalogList[] = 0;
-  attribute nullable ApplicationEP currentApp = 1;
+  attribute nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2069,21 +2069,21 @@ server cluster ApplicationLauncher = 1292 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
     optional OCTET_STRING data = 1;
   }
 
   request struct StopAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   request struct HideAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   response struct LauncherResponse = 3 {
     ApplicationLauncherStatusEnum status = 0;
-    OCTET_STRING data = 1;
+    optional OCTET_STRING data = 1;
   }
 
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;

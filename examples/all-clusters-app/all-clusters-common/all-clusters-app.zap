@@ -19181,7 +19181,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "ApplicationEP",
+              "type": "ApplicationEPStruct",
               "included": 0,
               "storageOption": "External",
               "singleton": 0,

@@ -1046,7 +1046,7 @@ typedef void (*ApplicationLauncherCatalogListListAttributeCallback)(void * conte
                                                                     const chip::app::DataModel::DecodableList<uint16_t> & data);
 typedef void (*ApplicationLauncherCurrentAppStructAttributeCallback)(
     void *,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &);
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> &);
 typedef void (*ApplicationLauncherGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ApplicationLauncherAcceptedCommandListListAttributeCallback)(
@@ -9755,10 +9755,9 @@ public:
                                                                   MTRActionBlock action) :
         MTRCallbackBridge<ApplicationLauncherCurrentAppStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<
+                                chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> & value);
 };
 
 class MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge

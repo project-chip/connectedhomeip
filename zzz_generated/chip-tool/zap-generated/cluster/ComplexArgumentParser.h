@@ -39,19 +39,19 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & request);
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & request);
+static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs::AttributeValuePair::Type & request,
                         Json::Value & value);
 
