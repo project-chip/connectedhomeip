@@ -202,8 +202,8 @@ void emAfPluginScenesServerPrintInfo()
 bool emberAfScenesClusterAddSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::AddScene::DecodableType & commandData)
 {
-    auto & groupId            = commandData.groupId;
-    auto & sceneId            = commandData.sceneId;
+    auto & groupId            = commandData.groupID;
+    auto & sceneId            = commandData.sceneID;
     auto & transitionTime     = commandData.transitionTime;
     auto & sceneName          = commandData.sceneName;
     auto & extensionFieldSets = commandData.extensionFieldSets;
@@ -215,8 +215,8 @@ bool emberAfScenesClusterAddSceneCallback(app::CommandHandler * commandObj, cons
 bool emberAfScenesClusterViewSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                            const Commands::ViewScene::DecodableType & commandData)
 {
-    auto & groupId = commandData.groupId;
-    auto & sceneId = commandData.sceneId;
+    auto & groupId = commandData.groupID;
+    auto & sceneId = commandData.sceneID;
 
     return emberAfPluginScenesServerParseViewScene(commandObj, emberAfCurrentCommand(), groupId, sceneId);
 }
@@ -225,8 +225,8 @@ bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, c
                                              const Commands::RemoveScene::DecodableType & commandData)
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto & groupId   = commandData.groupId;
-    auto & sceneId   = commandData.sceneId;
+    auto & groupId   = commandData.groupID;
+    auto & sceneId   = commandData.sceneID;
 
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -283,7 +283,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandOb
                                                  const Commands::RemoveAllScenes::DecodableType & commandData)
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto & groupId   = commandData.groupId;
+    auto & groupId   = commandData.groupID;
 
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_COMMAND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -334,8 +334,8 @@ bool emberAfScenesClusterStoreSceneCallback(app::CommandHandler * commandObj, co
                                             const Commands::StoreScene::DecodableType & commandData)
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto & groupId   = commandData.groupId;
-    auto & sceneId   = commandData.sceneId;
+    auto & groupId   = commandData.groupID;
+    auto & sceneId   = commandData.sceneID;
 
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -369,8 +369,8 @@ bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, c
                                              const Commands::RecallScene::DecodableType & commandData)
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto & groupId   = commandData.groupId;
-    auto & sceneId   = commandData.sceneId;
+    auto & groupId   = commandData.groupID;
+    auto & sceneId   = commandData.sceneID;
 
     // NOTE: TransitionTime field in the RecallScene command is currently
     // ignored. Per Zigbee Alliance ZCL 7 (07-5123-07):
@@ -407,7 +407,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * comman
                                                     const Commands::GetSceneMembership::DecodableType & commandData)
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto & groupId   = commandData.groupId;
+    auto & groupId   = commandData.groupID;
 
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -822,7 +822,7 @@ bool emberAfPluginScenesServerParseAddScene(
     {
         auto & fieldSet = fieldSetIter.GetValue();
 
-        ClusterId clusterId = fieldSet.clusterId;
+        ClusterId clusterId = fieldSet.clusterID;
 
         // TODO: We need to encode scene field sets in TLV.
         // https://github.com/project-chip/connectedhomeip/issues/10334
