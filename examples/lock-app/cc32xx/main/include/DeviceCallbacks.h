@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +15,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file DeviceCallbacks.h
- *
- * Implementations for the DeviceManager callbacks for this application
- *
- **/
-
-#ifndef DEVICE_LOCK_CALLBACKS_H
-#define DEVICE_LOCK_CALLBACKS_H
+#pragma once
 
 #include <CHIPDeviceManager.h>
-#include <CommonDeviceCallbacks.h>
+#include <platform/CHIPDeviceLayer.h>
 
-class AppDeviceCallbacks : public CommonDeviceCallbacks
+class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t type, uint16_t size, uint8_t * value);
-
-private:
-    void OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
-    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
+    void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 };
 
-#endif // DEVICE_LOCK_CALLBACKS_H
+class DeviceCallbacksDelegate
+{
+public:
+    static DeviceCallbacksDelegate & Instance()
+    {
+        static DeviceCallbacksDelegate instance;
+        return instance;
+    }
+    DeviceCallbacksDelegate * mDelegate = nullptr;
+    void SetAppDelegate(DeviceCallbacksDelegate * delegate) { mDelegate = delegate; }
+    DeviceCallbacksDelegate * GetAppDelegate() { return mDelegate; }
+};

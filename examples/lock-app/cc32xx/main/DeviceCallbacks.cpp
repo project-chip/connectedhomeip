@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,32 +16,32 @@
  *    limitations under the License.
  */
 
-/**
- * @file DeviceCallbacks.cpp
- *
- * Implements all the callbacks to the application from the CHIP Stack
- *
- **/
-
 #include "DeviceCallbacks.h"
-#include "AppConfig.h"
-#include "BoltLockManager.h"
+#include <app/server/Dnssd.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+using namespace chip;
+using namespace chip::DeviceLayer;
+using namespace chip::System;
 
-using namespace ::chip;
-using namespace ::chip::Inet;
-using namespace ::chip::System;
-using namespace ::chip::DeviceLayer;
+DeviceCallbacksDelegate * appDelegate = nullptr;
+extern "C" void cc32xxLog(const char * aFormat, ...);
 
-void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                                     uint8_t type, uint16_t size, uint8_t * value)
+void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    ;
+    switch (event->Type)
+    {
+    case DeviceEventType::kInterfaceIpAddressChanged:
+        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
+            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
+        {
+            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
+            // will not trigger a 'internet connectivity change' as there is no internet
+            // connectivity. MDNS still wants to refresh its listening interfaces to include the
+            // newly selected address.
+            cc32xxLog("DeviceEventCallback:Start DNS Server");
+            chip::app::DnssdServer::Instance().StartServer();
+        }
+    }
 }
 
-void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    ;
-}
+
