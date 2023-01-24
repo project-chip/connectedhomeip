@@ -18,6 +18,7 @@ import functools
 import glob
 import os
 import tempfile
+import traceback
 
 # isort: off
 
@@ -88,28 +89,32 @@ def main(setup_code, yaml_path, node_id):
         dev_ctrl = ca_list[0].adminList[0].NewController()
         dev_ctrl.CommissionWithCode(setup_code, node_id)
 
-        # Creating Cluster definition.
-        cluster_xml_filenames = glob.glob(_CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml', recursive=False)
-        cluster_xml_filenames.sort(key=functools.cmp_to_key(_sort_with_global_attribute_first))
-        sources = [ParseSource(source=name) for name in cluster_xml_filenames]
-        clusters_definitions = SpecDefinitions(sources)
+        try:
+            # Creating Cluster definition.
+            cluster_xml_filenames = glob.glob(_CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml', recursive=False)
+            cluster_xml_filenames.sort(key=functools.cmp_to_key(_sort_with_global_attribute_first))
+            sources = [ParseSource(source=name) for name in cluster_xml_filenames]
+            clusters_definitions = SpecDefinitions(sources)
 
-        # Parsing YAML test and setting up chip-repl yamltests runner.
-        yaml = TestParser(yaml_path, None, clusters_definitions)
-        runner = ReplTestRunner(clusters_definitions, certificate_authority_manager, dev_ctrl)
+            # Parsing YAML test and setting up chip-repl yamltests runner.
+            yaml = TestParser(yaml_path, None, clusters_definitions)
+            runner = ReplTestRunner(clusters_definitions, certificate_authority_manager, dev_ctrl)
 
-        # Executing and validating test
-        for test_step in yaml.tests:
-            test_action = runner.encode(test_step)
-            # TODO if test_action is None we should see if it is a pseudo cluster.
-            if test_action is not None:
-                response = runner.execute(test_action)
-                decoded_response = runner.decode(response)
-                post_processing_result = test_step.post_process_response(decoded_response)
-                if not post_processing_result.is_success():
-                    exit(-2)
-            else:
-                exit(-2)
+            # Executing and validating test
+            for test_step in yaml.tests:
+                test_action = runner.encode(test_step)
+                # TODO if test_action is None we should see if it is a pseudo cluster.
+                if test_action is not None:
+                    response = runner.execute(test_action)
+                    decoded_response = runner.decode(response)
+                    post_processing_result = test_step.post_process_response(decoded_response)
+                    if not post_processing_result.is_success():
+                        raise Exception(f'Test step failed {test_step.label}')
+                else:
+                    raise Exception(f'Failed to encode test step {test_step.label}')
+        except Exception:
+            print(traceback.format_exc())
+            exit(-2)
 
         runner.shutdown()
         # Tearing down chip stack. If not done in the correct order test will fail.

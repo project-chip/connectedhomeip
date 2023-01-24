@@ -400,6 +400,8 @@ class TestStep:
         self.response = copy.deepcopy(test.response_with_placeholders)
         self._update_placeholder_values(self.arguments)
         self._update_placeholder_values(self.response)
+        self._test.node_id = self._config_variable_substitution(
+            self._test.node_id)
         test.update_arguments(self.arguments)
         test.update_response(self.response)
 
