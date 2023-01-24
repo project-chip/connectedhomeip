@@ -123,7 +123,7 @@ tests:
           values:
               - name: Status
                 value: 0
-              - name: GroupId
+              - name: GroupID
                 value: 0x0103
               - name: GroupName
                 value: "Test Group"
@@ -139,7 +139,7 @@ tests:
           values:
               - name: Status
                 value: 0
-              - name: GroupId
+              - name: GroupID
                 value: 0x0103
               - name: GroupName
                 value: ""
