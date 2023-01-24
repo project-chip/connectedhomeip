@@ -206,7 +206,7 @@ public:
     /**
      * Generally this function has the same semantics as ScheduleWork
      * except it applies to background processing.
-     * 
+     *
      * Delegates to PostBackgroundEvent (which will delegate to PostEvent if
      * CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING is not true).
      */
@@ -215,12 +215,12 @@ public:
     /**
      * Generally this function has the same semantics as PostEvent
      * except it applies to background processing.
-     * 
+     *
      * If CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING is not true, will delegate
      * to PostEvent.
-     * 
+     *
      * Only accepts events of type kCallWorkFunct or kNoOp.
-     * 
+     *
      * Returns CHIP_ERROR_INVALID_ARGUMENT if the event type is not acceptable.
      * Returns CHIP_ERROR_NO_MEMORY if resources are exhausted.
      */
