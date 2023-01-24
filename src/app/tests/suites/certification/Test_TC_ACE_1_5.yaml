@@ -40,7 +40,7 @@ tests:
           saveAs: th1FabricIndex
 
     - label: "Open Commissioning Window from alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
