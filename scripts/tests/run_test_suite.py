@@ -60,6 +60,7 @@ class RunContext:
     in_unshare: bool
     chip_tool: str
     dry_run: bool
+    skip_manual: bool
 
 
 @click.group(chain=True)
@@ -128,8 +129,10 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     # Figures out selected test that match the given name(s)
     all_tests = [test for test in chiptest.AllTests(chip_tool, run_yamltests_with_chip_repl)]
 
+    tests = all_tests
+
     # Default to only non-manual tests unless explicit targets are specified.
-    tests = list(filter(lambda test: not test.is_manual, all_tests))
+    skip_manual = 'all' in target
     if 'all' not in target:
         tests = []
         for name in target:
@@ -159,7 +162,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
-                             chip_tool=chip_tool, dry_run=dry_run)
+                             chip_tool=chip_tool, dry_run=dry_run,
+                             skip_manual=skip_manual)
 
 
 @main.command(
@@ -167,7 +171,10 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 @click.pass_context
 def cmd_list(context):
     for test in context.obj.tests:
-        print(test.name)
+        if test.is_manual:
+            print("%s (MANUAL TEST)" % test.name)
+        else:
+            print(test.name)
 
 
 @main.command(
@@ -257,6 +264,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
+            if context.skip_manual and test.is_manual:
+                continue
+
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
@@ -264,11 +274,11 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
                 test.Run(runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run)
                 test_end = time.monotonic()
-                logging.info('%-20s - Completed in %0.2f seconds' %
+                logging.info('%-30s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
             except Exception:
                 test_end = time.monotonic()
-                logging.exception('%s - FAILED in %0.2f seconds' %
+                logging.exception('%-30s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
                 apps_register.uninit()
                 sys.exit(2)
