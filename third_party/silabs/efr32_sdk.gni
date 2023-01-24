@@ -39,21 +39,31 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
+  # Enable Buttons by default
+  use_wstk_buttons = true
+
+  # Enable LEDs by default
+  use_wstk_leds = true
+
   sleep_time_ms = 3300000  # 55 mins sleep
 }
 
 # Explorer Kit and MGM240L do not have external flash
-if (silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
+if (silabs_board == "BRD2703A" || silabs_board == "BRD4318A" ||
+    silabs_board == "BRD4319A") {
   use_external_flash = false
 }
 
-# Enable LEDs by default
-use_wstk_leds = true
-
 # Board does not support LEDs and Buttons at the same time
 if (silabs_board == "BRD4317A" || silabs_board == "BRD4316A" ||
-    silabs_board == "BRD4319A") {
+    silabs_board == "BRD4319A" || silabs_board == "BRD4318A") {
   use_wstk_leds = false
+}
+
+# Board does not support buttons
+if (silabs_board == "BRD2704A") {
+  use_wstk_buttons = false
+  use_external_flash = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -195,7 +205,7 @@ template("efr32_sdk") {
       "MBEDTLS_THREADING_C=1",
       "MBEDTLS_THREADING_ALT=1",
       "SL_THREADING_ALT=1",
-      "SL_COMPONENT_CATALOG_PRESENT",
+      "SL_COMPONENT_CATALOG_PRESENT=1",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
 
@@ -213,12 +223,25 @@ template("efr32_sdk") {
       defines += [ "SL_SYSTEM_VIEW=1" ]
     }
 
+    if (silabs_board == "BRD2704A" || silabs_board == "BRD4318A") {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/",
+        "${efr32_sdk_root}/platform/driver/debug/inc/",
+        "${efr32_sdk_root}/hardware/driver/configuration_over_swo/inc/",
+      ]
+    }
+
     defines += board_defines
 
     if (use_wstk_leds) {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/leddrv/inc" ]
 
       defines += [ "ENABLE_WSTK_LEDS" ]
+    }
+
+    if (use_wstk_buttons) {
+      _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
     if (defined(invoker.enable_sleepy_device)) {
@@ -344,14 +367,27 @@ template("efr32_sdk") {
         "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+        "${efr32_sdk_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
       ]
 
       if (silabs_mcu == "MGM240PB32VNA") {
         libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
+        defines += [
+          "SL_RAIL_LIB_MULTIPROTOCOL_SUPPORT=1",
+          "RADIO_CONFIG_DMP_SUPPORT=1",
+        ]
       } else if (silabs_mcu == "MGM240PB22VNA") {
         libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a" ]
       } else if (silabs_mcu == "MGM240L022RNF") {
         libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240l022rnf_gcc.a" ]
+      } else if (silabs_mcu == "MGM240SD22VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a" ]
+        defines += [
+          "SL_RAIL_LIB_MULTIPROTOCOL_SUPPORT=1",
+          "RADIO_CONFIG_DMP_SUPPORT=1",
+          "SLI_RADIOAES_REQUIRES_MASKING=1",
+          "SL_RAIL_UTIL_PA_CONFIG_HEADER=<sl_rail_util_pa_config.h>",
+        ]
       }
 
       defines += [
@@ -420,8 +456,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
-      "${efr32_sdk_root}/platform/driver/button/src/sl_button.c",
-      "${efr32_sdk_root}/platform/driver/button/src/sl_simple_button.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
@@ -485,7 +519,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
-      "${efr32_sdk_root}/platform/service/system/src/sl_system_process_action.c",
       "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_def.c",
       "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_manager.c",
       "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_manufacturing.c",
@@ -590,8 +623,15 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_board_default_init.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_device_init_clocks.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_event_handler.c",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_simple_button_instances.c",
     ]
+
+    if (use_wstk_buttons) {
+      sources += [
+        "${efr32_sdk_root}/platform/driver/button/src/sl_button.c",
+        "${efr32_sdk_root}/platform/driver/button/src/sl_simple_button.c",
+        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_simple_button_instances.c",
+      ]
+    }
 
     if (use_system_view) {
       sources += [
@@ -814,8 +854,18 @@ template("efr32_sdk") {
     }
 
     if (silabs_board == "BRD4186A" || silabs_board == "BRD4186C" ||
-        silabs_board == "BRD4187A" || silabs_board == "BRD4187C") {
+        silabs_board == "BRD4187A" || silabs_board == "BRD4187C" ||
+        silabs_board == "BRD2704A") {
       sources += [ "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c" ]
+    }
+
+    if (silabs_board == "BRD2704A" || silabs_board == "BRD4318A") {
+      sources += [
+        "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
+        "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
+      ]
     }
 
     public_deps = [
