@@ -54,6 +54,21 @@ source_response = '''<?xml version="1.0"?>
   </configurator>
 '''
 
+source_response_with_nullable = '''<?xml version="1.0"?>
+  <configurator>
+    <cluster>
+      <name>Test</name>
+      <code>0x1234</code>
+
+      <command source="server" code="0x0" name="TestCommandResponse">
+          <arg name="arg1" type="int8u"/>
+          <arg name="arg2" type="int8u" isNullable="true"/>
+      </command>
+
+    </cluster>
+  </configurator>
+'''
+
 source_attribute = '''<?xml version="1.0"?>
   <configurator>
     <global>
@@ -183,6 +198,24 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsNone(definitions.get_response_name(0x1234, 0x1))
         self.assertEqual(definitions.get_response_name(
             0x1234, 0x0), 'TestCommandResponse')
+
+    def test_response_name_with_nullable(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_response_with_nullable), name='source_response_with_nullable')])
+        cluster_name = 'Test'
+        response_name = 'TestCommandResponse'
+
+        self.assertEqual(definitions.get_cluster_name(0x1234), cluster_name)
+        self.assertEqual(definitions.get_response_name(
+            0x1234, 0x0), response_name)
+
+        response = definitions.get_response_by_name(
+            cluster_name, response_name)
+        for field in response.fields:
+            if field.name == 'arg1':
+                self.assertFalse(definitions.is_nullable(field))
+            else:
+                self.assertTrue(definitions.is_nullable(field))
 
     def test_attribute_name(self):
         definitions = SpecDefinitions(

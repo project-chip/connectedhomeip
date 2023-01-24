@@ -146,6 +146,11 @@ class SpecDefinitions:
             return bool(target.qualities & StructQuality.FABRIC_SCOPED)
         return False
 
+    def is_nullable(self, target) -> bool:
+        if hasattr(target, 'qualities'):
+            return bool(target.qualities & FieldQuality.NULLABLE)
+        return False
+
     def __get_by_name(self, cluster_name: str, target_name: str, target_type: _ItemType):
         if not cluster_name or not target_name:
             return None
