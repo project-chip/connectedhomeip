@@ -102,6 +102,8 @@ using namespace chip;
     _intermediateCertificate = params.intermediateCertificate;
     _operationalCertificate = params.operationalCertificate;
     _operationalKeypair = params.operationalKeypair;
+    _operationalCertificateIssuer = params.operationalCertificateIssuer;
+    _operationalCertificateIssuerQueue = params.operationalCertificateIssuerQueue;
 
     return self;
 }
