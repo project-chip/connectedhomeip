@@ -14,7 +14,7 @@
 #    limitations under the License.
 
 import copy
-from enum import Enum
+from enum import Enum, auto
 
 import yaml
 
@@ -50,6 +50,7 @@ _TEST_SECTION = [
     'maxInterval',
     'timedInteractionTimeoutMs',
     'busyWaitMs',
+    'wait',
 ]
 
 _TEST_ARGUMENTS_SECTION = [
@@ -91,11 +92,12 @@ class PostProcessCheckStatus(Enum):
 
 class PostProcessCheckType(Enum):
     '''Indicates the post processing check step type.'''
-    IM_STATUS = 'IMStatus',
-    CLUSTER_STATUS = 'ClusterStatus',
-    RESPONSE_VALIDATION = 'Response',
-    CONSTRAINT_VALIDATION = 'Constraints',
-    SAVE_AS_VARIABLE = 'SaveAs'
+    IM_STATUS = auto()
+    CLUSTER_STATUS = auto()
+    RESPONSE_VALIDATION = auto()
+    CONSTRAINT_VALIDATION = auto()
+    SAVE_AS_VARIABLE = auto()
+    WAIT_VALIDATION = auto()
 
 
 class PostProcessCheck:
@@ -213,9 +215,10 @@ class _TestStepWithPlaceholders:
         self.timed_interaction_timeout_ms = _value_or_none(
             test, 'timedInteractionTimeoutMs')
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
+        self.wait_for = _value_or_none(test, 'wait')
 
-        self.is_attribute = self.command in _ATTRIBUTE_COMMANDS
-        self.is_event = self.command in _EVENT_COMMANDS
+        self.is_attribute = self.command in _ATTRIBUTE_COMMANDS or self.wait_for in _ATTRIBUTE_COMMANDS
+        self.is_event = self.command in _EVENT_COMMANDS or self.wait_for in _EVENT_COMMANDS
 
         self.arguments_with_placeholders = _value_or_none(test, 'arguments')
         self.response_with_placeholders = _value_or_none(test, 'response')
@@ -472,8 +475,16 @@ class TestStep:
     def busy_wait_ms(self):
         return self._test.busy_wait_ms
 
+    @property
+    def wait_for(self):
+        return self._test.wait_for
+
     def post_process_response(self, response: dict):
         result = PostProcessResponseResult()
+
+        if self.wait_for is not None:
+            self._response_cluster_wait_validation(response, result)
+            return result
 
         if self._skip_post_processing(response, result):
             return result
@@ -486,6 +497,52 @@ class TestStep:
             self._maybe_save_as(response, result)
 
         return result
+
+    def _response_cluster_wait_validation(self, response, result):
+        """Check if the response concrete path matches the configuration of the test step
+           and validate that the response type (e.g readAttribute/writeAttribute/...) matches
+           the expectation from the test step."""
+        check_type = PostProcessCheckType.WAIT_VALIDATION
+        error_success = 'The test expectation "{wait_for}" for "{cluster}.{wait_type}" on endpoint {endpoint} is true'
+        error_failure = 'The test expectation "{expected} == {received}" is false'
+
+        if self.is_attribute:
+            expected_wait_type = self.attribute
+            received_wait_type = response.get('attribute')
+        elif self.is_event:
+            expected_wait_type = self.event
+            received_wait_type = response.get('event')
+        else:
+            expected_wait_type = self.command
+            received_wait_type = response.get('command')
+
+        expected_values = [
+            self.wait_for,
+            self.endpoint,
+            # TODO The name in tests does not always use spaces
+            self.cluster.replace(' ', ''),
+            expected_wait_type
+        ]
+
+        received_values = [
+            response.get('wait_for'),
+            response.get('endpoint'),
+            response.get('cluster'),
+            received_wait_type
+        ]
+
+        success = True
+        for expected_value in expected_values:
+            received_value = received_values.pop(0)
+
+            if expected_value != received_value:
+                result.error(check_type, error_failure.format(
+                    expected=expected_value, received=received_value))
+                success = False
+
+        if success:
+            result.success(check_type, error_success.format(
+                wait_for=self.wait_for, cluster=self.cluster, wait_type=expected_wait_type, endpoint=self.endpoint))
 
     def _skip_post_processing(self, response: dict, result) -> bool:
         '''Should we skip perform post processing.

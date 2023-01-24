@@ -4847,15 +4847,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+- (void)stopWithParams:(MTRMediaPlaybackClusterStopParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
@@ -5206,17 +5206,17 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -8328,14 +8328,14 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                    NSError * _Nullable error))completionHandler
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-            MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithParams:expectedValues:expectedValueInterval:completion:");
+            MTR_NEWLY_DEPRECATED("Please use stopWithParams:expectedValues:expectedValueInterval:completion:");
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-            MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithExpectedValues:expectedValueInterval:completion:");
+            MTR_NEWLY_DEPRECATED("Please use stopWithExpectedValues:expectedValueInterval:completion:");
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
@@ -8580,7 +8580,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                   queue:(dispatch_queue_t)queue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                             MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -8588,7 +8588,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
             MTR_NEWLY_DEPRECATED("Please use launchAppWithParams:expectedValues:expectedValueInterval:completion:");
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -8596,7 +8596,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
     NS_SWIFT_UNAVAILABLE("Unavailable to avoid ambiguity in trailing closure or async calls")
         API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
             MTR_NEWLY_DEPRECATED("Please use stopAppWithParams:expectedValues:expectedValueInterval:completion:");
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,

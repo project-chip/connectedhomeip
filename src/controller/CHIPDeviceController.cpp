@@ -1248,14 +1248,14 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     // The placeholder IPK is not satisfactory, but is there to fill the NocChain struct on error. It will still fail.
     const uint8_t placeHolderIpk[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    if (!ipk.HasValue())
+    if (status == CHIP_NO_ERROR && !ipk.HasValue())
     {
         ChipLogError(Controller, "Did not have an IPK from the OperationalCredentialsIssuer! Cannot commission.");
         status = CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
-    if (commissioner->mState != State::Initialized)
+    if (status == CHIP_NO_ERROR && commissioner->mState != State::Initialized)
     {
         status = CHIP_ERROR_INCORRECT_STATE;
     }

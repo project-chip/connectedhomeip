@@ -5698,8 +5698,8 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRMediaPlaybackClusterStopPlaybackParams : NSObject <NSCopying>
+MTR_NEWLY_AVAILABLE
+@interface MTRMediaPlaybackClusterStopParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5724,6 +5724,11 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRMediaPlaybackClusterStopParams")
+@interface MTRMediaPlaybackClusterStopPlaybackParams : MTRMediaPlaybackClusterStopParams
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6344,8 +6349,8 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRApplicationLauncherClusterLaunchAppParams : NSObject <NSCopying>
 
-@property (nonatomic, copy)
-    MTRApplicationLauncherClusterApplication * _Nonnull application API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) MTRApplicationLauncherClusterApplicationStruct * _Nullable application API_AVAILABLE(
+    ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 @property (nonatomic, copy) NSData * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
@@ -6377,8 +6382,8 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRApplicationLauncherClusterStopAppParams : NSObject <NSCopying>
 
-@property (nonatomic, copy)
-    MTRApplicationLauncherClusterApplication * _Nonnull application API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) MTRApplicationLauncherClusterApplicationStruct * _Nullable application API_AVAILABLE(
+    ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6408,8 +6413,8 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRApplicationLauncherClusterHideAppParams : NSObject <NSCopying>
 
-@property (nonatomic, copy)
-    MTRApplicationLauncherClusterApplication * _Nonnull application API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) MTRApplicationLauncherClusterApplicationStruct * _Nullable application API_AVAILABLE(
+    ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6441,7 +6446,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSData * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

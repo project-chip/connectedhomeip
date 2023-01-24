@@ -49,15 +49,15 @@ tests:
           values:
               - name: "data"
                 value: "Hello World"
-              - name: "application"
+              - name: "Application"
                 value:
                     {
-                        catalogVendorId: catalogVendorId,
-                        applicationId: applicationId,
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
                     }
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label:

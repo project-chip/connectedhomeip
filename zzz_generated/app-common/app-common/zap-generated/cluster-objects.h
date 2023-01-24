@@ -43,6 +43,29 @@ namespace Clusters {
 namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
+namespace ApplicationStruct {
+enum class Fields
+{
+    kCatalogVendorID = 0,
+    kApplicationID   = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t catalogVendorID = static_cast<uint16_t>(0);
+    chip::CharSpan applicationID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ApplicationStruct
 namespace LabelStruct {
 enum class Fields
 {
@@ -21055,7 +21078,7 @@ struct TypeInfo
 } // namespace TargetNavigator
 namespace MediaPlayback {
 namespace Structs {
-namespace PlaybackPosition {
+namespace PlaybackPositionStruct {
 enum class Fields
 {
     kUpdatedAt = 0,
@@ -21077,7 +21100,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace PlaybackPosition
+} // namespace PlaybackPositionStruct
 } // namespace Structs
 
 namespace Commands {
@@ -21093,10 +21116,10 @@ struct Type;
 struct DecodableType;
 } // namespace Pause
 
-namespace StopPlayback {
+namespace Stop {
 struct Type;
 struct DecodableType;
-} // namespace StopPlayback
+} // namespace Stop
 
 namespace StartOver {
 struct Type;
@@ -21202,7 +21225,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Pause
-namespace StopPlayback {
+namespace Stop {
 enum class Fields
 {
 };
@@ -21211,7 +21234,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::StopPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21224,12 +21247,12 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::StopPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace StopPlayback
+}; // namespace Stop
 namespace StartOver {
 enum class Fields
 {
@@ -21544,11 +21567,11 @@ struct TypeInfo
 namespace SampledPosition {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type>;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType>;
+        chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampledPosition::Id; }
@@ -22706,30 +22729,8 @@ struct TypeInfo
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace Application {
-enum class Fields
-{
-    kCatalogVendorId = 0,
-    kApplicationId   = 1,
-};
-
-struct Type
-{
-public:
-    uint16_t catalogVendorId = static_cast<uint16_t>(0);
-    chip::CharSpan applicationId;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace Application
-namespace ApplicationEP {
+namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
+namespace ApplicationEPStruct {
 enum class Fields
 {
     kApplication = 0,
@@ -22739,7 +22740,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::Application::Type application;
+    Structs::ApplicationStruct::Type application;
     Optional<chip::EndpointId> endpoint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22751,7 +22752,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationEP
+} // namespace ApplicationEPStruct
 } // namespace Structs
 
 namespace Commands {
@@ -22794,7 +22795,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Optional<Structs::ApplicationStruct::Type> application;
     Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -22810,7 +22811,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Optional<Structs::ApplicationStruct::DecodableType> application;
     Optional<chip::ByteSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -22828,7 +22829,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Optional<Structs::ApplicationStruct::Type> application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -22843,7 +22844,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Optional<Structs::ApplicationStruct::DecodableType> application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopApp
@@ -22860,7 +22861,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Optional<Structs::ApplicationStruct::Type> application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -22875,7 +22876,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Optional<Structs::ApplicationStruct::DecodableType> application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideApp
@@ -22894,7 +22895,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
-    chip::ByteSpan data;
+    Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -22910,7 +22911,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
-    chip::ByteSpan data;
+    Optional<chip::ByteSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse
@@ -22933,11 +22934,11 @@ struct TypeInfo
 namespace CurrentApp {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type>;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &;
+        chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentApp::Id; }
@@ -22996,29 +22997,7 @@ struct TypeInfo
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
 namespace Structs {
-namespace ApplicationBasicApplication {
-enum class Fields
-{
-    kCatalogVendorId = 0,
-    kApplicationId   = 1,
-};
-
-struct Type
-{
-public:
-    uint16_t catalogVendorId = static_cast<uint16_t>(0);
-    chip::CharSpan applicationId;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ApplicationBasicApplication
+namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
 } // namespace Structs
 
 namespace Attributes {
@@ -23076,9 +23055,9 @@ struct TypeInfo
 namespace Application {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type;
-    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &;
+    using Type             = chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::Type;
+    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Application::Id; }

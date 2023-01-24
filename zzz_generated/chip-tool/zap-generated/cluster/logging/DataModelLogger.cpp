@@ -21,8 +21,6 @@
 
 using namespace chip::app::Clusters;
 
-DataModelLoggerJSONDelegate * DataModelLogger::mJSONDelegate = nullptr;
-
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType & value)
@@ -178,57 +176,9 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ApplicationLauncher::Structs::Application::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("CatalogVendorId", indent + 1, value.catalogVendorId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CatalogVendorId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ApplicationId", indent + 1, value.applicationId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApplicationId'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("CatalogVendorId", indent + 1, value.catalogVendorId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CatalogVendorId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ApplicationId", indent + 1, value.applicationId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApplicationId'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value)
+                          const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -244,6 +194,30 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CatalogVendorID", indent + 1, value.catalogVendorID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CatalogVendorID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ApplicationID", indent + 1, value.applicationID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApplicationID'");
             return err;
         }
     }
@@ -1681,8 +1655,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -8638,7 +8613,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Duration", 1, value);
         }
         case MediaPlayback::Attributes::SampledPosition::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SampledPosition", 1, value);
         }
@@ -8879,7 +8855,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("CatalogList", 1, value);
         }
         case ApplicationLauncher::Attributes::CurrentApp::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentApp", 1, value);
         }
@@ -8935,7 +8912,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ProductID", 1, value);
         }
         case ApplicationBasic::Attributes::Application::Id: {
-            chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType value;
+            chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Application", 1, value);
         }

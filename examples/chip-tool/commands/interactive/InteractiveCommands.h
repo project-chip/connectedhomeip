@@ -53,7 +53,7 @@ public:
     CHIP_ERROR RunCommand() override;
 };
 
-class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate, public DataModelLoggerJSONDelegate
+class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate, public RemoteDataModelLoggerDelegate
 {
 public:
     InteractiveServerCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
@@ -68,7 +68,7 @@ public:
     /////////// WebSocketServerDelegate Interface /////////
     bool OnWebSocketMessageReceived(char * msg) override;
 
-    /////////// DataModelLoggerJSONDelegate interface /////////
+    /////////// RemoteDataModelLoggerDelegate interface /////////
     CHIP_ERROR LogJSON(const char * json) override;
 
 private:

@@ -5976,7 +5976,7 @@ class ChipClusters:
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "StopPlayback",
+                    "commandName": "Stop",
                     "args": {
                     },
                 },
@@ -6420,8 +6420,8 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LaunchApp",
                     "args": {
-                        "catalogVendorId": "int",
-                        "applicationId": "str",
+                        "catalogVendorID": "int",
+                        "applicationID": "str",
                         "data": "bytes",
                     },
                 },
@@ -6429,16 +6429,16 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "StopApp",
                     "args": {
-                        "catalogVendorId": "int",
-                        "applicationId": "str",
+                        "catalogVendorID": "int",
+                        "applicationID": "str",
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
                     "commandName": "HideApp",
                     "args": {
-                        "catalogVendorId": "int",
-                        "applicationId": "str",
+                        "catalogVendorID": "int",
+                        "applicationID": "str",
                     },
                 },
             },

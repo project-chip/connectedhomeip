@@ -4832,6 +4832,8 @@
               - StayAwakeRequest
           ContentLauncher:
               - LauncherResponse
+          MediaPlayback:
+              - Stop
       command fields:
           UnitTesting:
               TestSpecificResponse:
@@ -5066,6 +5068,8 @@
               - FabricDescriptorStruct
           DoorLock:
               - CredentialStruct
+          MediaPlayback:
+              - PlaybackPositionStruct
           TargetNavigator:
               - TargetInfoStruct
           MediaInput:
@@ -5082,6 +5086,11 @@
               - ContentSearchStruct
               - StyleInformationStruct
               - BrandingInformationStruct
+          ApplicationLauncher:
+              - ApplicationStruct
+              - ApplicationEPStruct
+          ApplicationBasic:
+              - ApplicationStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5197,6 +5206,10 @@
               CredentialStruct:
                   - credentialType
                   - credentialIndex
+          MediaPlayback:
+              PlaybackPositionStruct:
+                  - updatedAt
+                  - position
           TargetNavigator:
               TargetInfoStruct:
                   - identifier
@@ -5252,6 +5265,25 @@
                   - progressBar
                   - splash
                   - waterMark
+          ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorID
+                  - applicationID
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - catalogVendorId
+                  - applicationId
+              ApplicationEPStruct:
+                  - application
+                  - endpoint
+          ApplicationBasic:
+              ApplicationStruct:
+                  - catalogVendorID
+                  - applicationID
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - catalogVendorId
+                  - applicationId
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5697,6 +5729,8 @@
       commands:
           ContentLauncher:
               - LaunchResponse
+          MediaPlayback:
+              - StopPlayback
       command fields:
           Groups:
               AddGroup:
@@ -5764,6 +5798,8 @@
               - FabricDescriptor
           DoorLock:
               - DlCredential
+          MediaPlayback:
+              - PlaybackPosition
           TargetNavigator:
               - TargetInfo
           MediaInput:
@@ -5780,6 +5816,11 @@
               - ContentSearch
               - StyleInformation
               - BrandingInformation
+          ApplicationLauncher:
+              - Application
+              - ApplicationEP
+          ApplicationBasic:
+              - ApplicationBasicApplication
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5792,6 +5833,14 @@
           ContentLauncher:
               StyleInformationStruct:
                   - imageUrl
+          ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorId
+                  - applicationId
+          ApplicationBasic:
+              ApplicationStruct:
+                  - catalogVendorId
+                  - applicationId
       event fields:
           Switch:
               MultiPressComplete:
@@ -5992,6 +6041,8 @@
               AnnounceOTAProvider: AnnounceOtaProvider
           ContentLauncher:
               LauncherResponse: LaunchResponse
+          MediaPlayback:
+              Stop: StopPlayback
       command fields:
           OTASoftwareUpdateProvider:
               QueryImage:
@@ -6053,6 +6104,8 @@
               FabricDescriptorStruct: FabricDescriptor
           DoorLock:
               CredentialStruct: DlCredential
+          MediaPlayback:
+              PlaybackPositionStruct: PlaybackPosition
           TargetNavigator:
               TargetInfoStruct: TargetInfo
           MediaInput:
@@ -6069,6 +6122,11 @@
               ContentSearchStruct: ContentSearch
               StyleInformationStruct: StyleInformation
               BrandingInformationStruct: BrandingInformation
+          ApplicationLauncher:
+              ApplicationStruct: Application
+              ApplicationEPStruct: ApplicationEP
+          ApplicationBasic:
+              ApplicationStruct: ApplicationBasicApplication
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -6081,6 +6139,14 @@
           ContentLauncher:
               StyleInformationStruct:
                   imageURL: imageUrl
+          ApplicationLauncher:
+              ApplicationStruct:
+                  catalogVendorID: catalogVendorId
+                  applicationID: applicationId
+          ApplicationBasic:
+              ApplicationStruct:
+                  catalogVendorID: catalogVendorId
+                  applicationID: applicationId
       event fields:
           Switch:
               MultiPressComplete:

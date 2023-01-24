@@ -197,7 +197,7 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
     // is dumped to stdout while the user is typing a command.
     chip::Logging::SetLogRedirectCallback(InteractiveServerLoggingCallback);
 
-    DataModelLogger::SetJSONDelegate(this);
+    RemoteDataModelLogger::SetDelegate(this);
     ReturnErrorOnFailure(mWebSocketServer.Run(mPort, this));
 
     gInteractiveServerResult.Reset();

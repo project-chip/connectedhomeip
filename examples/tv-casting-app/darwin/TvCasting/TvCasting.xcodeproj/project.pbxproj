@@ -26,6 +26,8 @@
 		3CCB8748286A5D0F00771BAD /* CommissioningViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */; };
 		3CCB8749286A5D0F00771BAD /* ContentLauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA19434285BA780004768D5 /* ContentLauncherView.swift */; };
 		3CCB874A286A5D0F00771BAD /* ContentLauncherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */; };
+		EAF14299296D561900E17793 /* CertTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF14298296D561900E17793 /* CertTestView.swift */; };
+		EAF1429B296D57DF00E17793 /* CertTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF1429A296D57DF00E17793 /* CertTestViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -64,6 +66,8 @@
 		3CC0E9002841DD3500EC6A18 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3CC0E90C2841DECC00EC6A18 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3CCB872A28690A5D00771BAD /* MatterTvCastingBridge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MatterTvCastingBridge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAF14298296D561900E17793 /* CertTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertTestView.swift; sourceTree = "<group>"; };
+		EAF1429A296D57DF00E17793 /* CertTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertTestViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +113,8 @@
 			children = (
 				3CC0E8FD2841DD3500EC6A18 /* Assets.xcassets */,
 				3C75075E284C1DF800D7DB3A /* TvCasting.entitlements */,
+				EAF14298296D561900E17793 /* CertTestView.swift */,
+				EAF1429A296D57DF00E17793 /* CertTestViewModel.swift */,
 				3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */,
 				3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */,
 				3C81C75228F8C79E001CB9D1 /* StartFromCacheView.swift */,
@@ -226,11 +232,13 @@
 				3CCB8746286A5D0F00771BAD /* CommissionerDiscoveryViewModel.swift in Sources */,
 				3C81C75928F8E42D001CB9D1 /* ConnectionViewModel.swift in Sources */,
 				3CA1CA7A28E281080023ED44 /* ClusterSelectorView.swift in Sources */,
+				EAF14299296D561900E17793 /* CertTestView.swift in Sources */,
 				3CCB8747286A5D0F00771BAD /* CommissioningView.swift in Sources */,
 				3CCB8748286A5D0F00771BAD /* CommissioningViewModel.swift in Sources */,
 				3CA1CA7E28E284950023ED44 /* MediaPlaybackViewModel.swift in Sources */,
 				3CCB8749286A5D0F00771BAD /* ContentLauncherView.swift in Sources */,
 				3CCB874A286A5D0F00771BAD /* ContentLauncherViewModel.swift in Sources */,
+				EAF1429B296D57DF00E17793 /* CertTestViewModel.swift in Sources */,
 				3C81C75728F8E418001CB9D1 /* ConnectionView.swift in Sources */,
 				3CC0E8FC2841DD3400EC6A18 /* ContentView.swift in Sources */,
 				3CA1CA7C28E282150023ED44 /* MediaPlaybackView.swift in Sources */,
@@ -371,7 +379,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TvCasting/Preview Content\"";
-				DEVELOPMENT_TEAM = R7NUZ7N74U;
+				DEVELOPMENT_TEAM = KCRB72LX9T;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -441,7 +449,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TvCasting/Preview Content\"";
-				DEVELOPMENT_TEAM = R7NUZ7N74U;
+				DEVELOPMENT_TEAM = KCRB72LX9T;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

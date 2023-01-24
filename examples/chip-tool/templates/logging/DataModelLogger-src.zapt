@@ -4,8 +4,6 @@
 
 using namespace chip::app::Clusters;
 
-DataModelLoggerJSONDelegate * DataModelLogger::mJSONDelegate = nullptr;
-
 {{#structs_with_clusters groupByStructName=1}}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const chip::app::Clusters::{{#unless (is_number_greater_than structClusterCount 1)}}{{as_camel_cased clusterName false}}{{else}}detail{{/unless}}::Structs::{{name}}::DecodableType & value)
 {

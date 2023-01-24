@@ -22752,25 +22752,22 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completion
-{
-    [self stopPlaybackWithParams:nil
-                  expectedValues:expectedValues
-           expectedValueInterval:expectedValueIntervalMs
-                      completion:completion];
-}
-- (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+- (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID];
+    [self stopWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)stopWithParams:(MTRMediaPlaybackClusterStopParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:
+                   (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStopID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -22798,7 +22795,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 Optional<uint16_t> timedInvokeTimeoutMs;
                 Optional<Timeout> invokeTimeout;
                 ListFreer listFreer;
-                MediaPlayback::Commands::StopPlayback::Type request;
+                MediaPlayback::Commands::Stop::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -23586,13 +23583,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
 {
-    [self stopPlaybackWithParams:params
-                  expectedValues:expectedDataValueDictionaries
-           expectedValueInterval:expectedValueIntervalMs
-                      completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
-                          // Cast is safe because subclass does not add any selectors.
-                          completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
-                      }];
+    [self stopWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                   }];
 }
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -25187,7 +25184,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return self;
 }
 
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -25236,11 +25233,16 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-                request.application.applicationId = [self asCharSpan:params.application.applicationId];
-                if (params.data != nil) {
-                    auto & definedValue_0 = request.data.Emplace();
-                    definedValue_0 = [self asByteSpan:params.data];
+                if (params != nil) {
+                    if (params.application != nil) {
+                        auto & definedValue_0 = request.application.Emplace();
+                        definedValue_0.catalogVendorID = params.application.catalogVendorID.unsignedShortValue;
+                        definedValue_0.applicationID = [self asCharSpan:params.application.applicationID];
+                    }
+                    if (params.data != nil) {
+                        auto & definedValue_0 = request.data.Emplace();
+                        definedValue_0 = [self asByteSpan:params.data];
+                    }
                 }
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
@@ -25262,7 +25264,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -25311,8 +25313,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-                request.application.applicationId = [self asCharSpan:params.application.applicationId];
+                if (params != nil) {
+                    if (params.application != nil) {
+                        auto & definedValue_0 = request.application.Emplace();
+                        definedValue_0.catalogVendorID = params.application.catalogVendorID.unsignedShortValue;
+                        definedValue_0.applicationID = [self asCharSpan:params.application.applicationID];
+                    }
+                }
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -25333,7 +25340,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -25382,8 +25389,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-                request.application.applicationId = [self asCharSpan:params.application.applicationId];
+                if (params != nil) {
+                    if (params.application != nil) {
+                        auto & definedValue_0 = request.application.Emplace();
+                        definedValue_0.catalogVendorID = params.application.catalogVendorID.unsignedShortValue;
+                        definedValue_0.applicationID = [self asCharSpan:params.application.applicationID];
+                    }
+                }
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -25488,7 +25500,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -25502,7 +25514,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                        completionHandler(static_cast<MTRApplicationLauncherClusterLauncherResponseParams *>(data), error);
                    }];
 }
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -25516,7 +25528,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                        completionHandler(static_cast<MTRApplicationLauncherClusterLauncherResponseParams *>(data), error);
                    }];
 }
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,

@@ -42,11 +42,11 @@ tests:
       command: "HideApp"
       arguments:
           values:
-              - name: "application"
+              - name: "Application"
                 value:
                     {
-                        catalogVendorId: catalogVendorId,
-                        applicationId: applicationId,
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
                     }
 
     #Expected status attribute response ACTIVE_HIDDEN or STOPPED 'OR' condition is not supported in YAML

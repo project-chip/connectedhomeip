@@ -30,14 +30,14 @@ tests:
 
     - label: "Read maxGroupsPerFabric"
       command: "readAttribute"
-      attribute: "maxGroupsPerFabric"
+      attribute: "MaxGroupsPerFabric"
       response:
           constraints:
               minValue: 4
 
     - label: "Read maxGroupKeysPerFabric"
       command: "readAttribute"
-      attribute: "maxGroupKeysPerFabric"
+      attribute: "MaxGroupKeysPerFabric"
       response:
           constraints:
               minValue: 3
