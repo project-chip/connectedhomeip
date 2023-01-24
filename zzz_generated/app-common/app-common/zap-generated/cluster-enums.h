@@ -1950,25 +1950,18 @@ enum class PumpStatus : uint16_t
 
 namespace Thermostat {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SetpointAdjustMode
 enum class SetpointAdjustMode : uint8_t
 {
-    kHeatSetpoint         = 0x00,
-    kCoolSetpoint         = 0x01,
-    kHeatAndCoolSetpoints = 0x02,
+    kHeat = 0x00,
+    kCool = 0x01,
+    kBoth = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SetpointAdjustMode                                                               = EmberAfSetpointAdjustMode;
-static SetpointAdjustMode __attribute__((unused)) kSetpointAdjustModekUnknownEnumValue = static_cast<SetpointAdjustMode>(3);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for ThermostatControlSequence
 enum class ThermostatControlSequence : uint8_t
@@ -2002,13 +1995,15 @@ enum class ThermostatRunningMode : uint8_t
 // Enum for ThermostatSystemMode
 enum class ThermostatSystemMode : uint8_t
 {
-    kOff              = 0x00,
-    kAuto             = 0x01,
-    kCool             = 0x03,
-    kHeat             = 0x04,
-    kEmergencyHeating = 0x05,
-    kPrecooling       = 0x06,
-    kFanOnly          = 0x07,
+    kOff           = 0x00,
+    kAuto          = 0x01,
+    kCool          = 0x03,
+    kHeat          = 0x04,
+    kEmergencyHeat = 0x05,
+    kPrecooling    = 0x06,
+    kFanOnly       = 0x07,
+    kDry           = 0x08,
+    kSleep         = 0x09,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -2019,32 +2014,32 @@ enum class ThermostatSystemMode : uint8_t
 // Bitmap for DayOfWeek
 enum class DayOfWeek : uint8_t
 {
-    kSunday         = 0x1,
-    kMonday         = 0x2,
-    kTuesday        = 0x4,
-    kWednesday      = 0x8,
-    kThursday       = 0x10,
-    kFriday         = 0x20,
-    kSaturday       = 0x40,
-    kAwayOrVacation = 0x80,
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+    kAway      = 0x80,
 };
 
 // Bitmap for ModeForSequence
 enum class ModeForSequence : uint8_t
 {
-    kHeatSetpointFieldPresent = 0x1,
-    kCoolSetpointFieldPresent = 0x2,
+    kHeatSetpointPresent = 0x1,
+    kCoolSetpointPresent = 0x2,
 };
 
 // Bitmap for ThermostatFeature
 enum class ThermostatFeature : uint32_t
 {
-    kHeating   = 0x1,
-    kCooling   = 0x2,
-    kOccupancy = 0x4,
-    kSchedule  = 0x8,
-    kSetback   = 0x10,
-    kAutomode  = 0x20,
+    kHeating               = 0x1,
+    kCooling               = 0x2,
+    kOccupancy             = 0x4,
+    kScheduleConfiguration = 0x8,
+    kSetback               = 0x10,
+    kAutoMode              = 0x20,
 };
 } // namespace Thermostat
 
