@@ -268,6 +268,11 @@ void ContentAppFactoryImpl::setContentAppAttributeDelegate(ContentAppAttributeDe
     mAttributeDelegate = attributeDelegate;
 }
 
+void ContentAppFactoryImpl::setContentAppCommandDelegate(ContentAppCommandDelegate * commandDelegate)
+{
+    mCommandDelegate = commandDelegate;
+}
+
 CHIP_ERROR ContentAppFactoryImpl::LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp)
 {
     std::string appId               = BuildAppId(vendorId);
@@ -331,9 +336,9 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
                                                 uint16_t productId, const char * szApplicationVersion, jobject manager)
 {
     DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
-    ContentAppImpl * app         = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion,
-                                              "20202021", mAttributeDelegate);
-    EndpointId epId              = ContentAppPlatform::GetInstance().AddContentApp(
+    ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
+                                              mAttributeDelegate, mCommandDelegate);
+    EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType));
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
@@ -348,9 +353,9 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
                                                 EndpointId desiredEndpointId)
 {
     DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
-    ContentAppImpl * app         = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion,
-                                              "20202021", mAttributeDelegate);
-    EndpointId epId              = ContentAppPlatform::GetInstance().AddContentApp(
+    ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
+                                              mAttributeDelegate, mCommandDelegate);
+    EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
@@ -442,6 +447,7 @@ CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
     gFactory.setContentAppAttributeDelegate(new ContentAppAttributeDelegate(contentAppEndpointManager));
+    gFactory.setContentAppCommandDelegate(new ContentAppCommandDelegate(contentAppEndpointManager));
 
     ChipLogProgress(AppServer, "Starting registration of command handler delegates");
     for (size_t i = 0; i < ArraySize(contentAppClusters); i++)
