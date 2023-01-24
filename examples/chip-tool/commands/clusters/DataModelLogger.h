@@ -26,23 +26,8 @@
 #include <app/EventHeader.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/data-model/DecodableList.h>
+#include <commands/common/RemoteDataModelLogger.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/jsontlv/TlvJson.h>
-
-constexpr const char * kClusterIdKey      = "clusterId";
-constexpr const char * kEndpointIdKey     = "endpointId";
-constexpr const char * kAttributeIdKey    = "attributeId";
-constexpr const char * kEventIdKey        = "eventId";
-constexpr const char * kCommandIdKey      = "commandId";
-constexpr const char * kErrorIdKey        = "error";
-constexpr const char * kClusterErrorIdKey = "clusterError";
-
-class DataModelLoggerJSONDelegate
-{
-public:
-    CHIP_ERROR virtual LogJSON(const char *) = 0;
-    virtual ~DataModelLoggerJSONDelegate(){};
-};
 
 class DataModelLogger
 {
@@ -51,119 +36,7 @@ public:
     static CHIP_ERROR LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data);
     static CHIP_ERROR LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
 
-    static CHIP_ERROR LogAttributeAsJSON(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
-    {
-        VerifyOrReturnError(mJSONDelegate != nullptr, CHIP_NO_ERROR);
-
-        Json::Value value;
-        value[kClusterIdKey]   = path.mClusterId;
-        value[kEndpointIdKey]  = path.mEndpointId;
-        value[kAttributeIdKey] = path.mAttributeId;
-
-        chip::TLV::TLVReader reader;
-        reader.Init(*data);
-        ReturnErrorOnFailure(chip::TlvToJson(reader, value));
-
-        auto valueStr = chip::JsonToString(value);
-        return mJSONDelegate->LogJSON(valueStr.c_str());
-    }
-
-    static CHIP_ERROR LogErrorAsJSON(const chip::app::ConcreteDataAttributePath & path, const chip::app::StatusIB & status)
-    {
-        VerifyOrReturnError(mJSONDelegate != nullptr, CHIP_NO_ERROR);
-
-        Json::Value value;
-        value[kClusterIdKey]   = path.mClusterId;
-        value[kEndpointIdKey]  = path.mEndpointId;
-        value[kAttributeIdKey] = path.mAttributeId;
-
-        return LogError(value, status);
-    }
-
-    static CHIP_ERROR LogCommandAsJSON(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
-    {
-        VerifyOrReturnError(mJSONDelegate != nullptr, CHIP_NO_ERROR);
-
-        Json::Value value;
-        value[kClusterIdKey]  = path.mClusterId;
-        value[kEndpointIdKey] = path.mEndpointId;
-        value[kCommandIdKey]  = path.mCommandId;
-
-        chip::TLV::TLVReader reader;
-        reader.Init(*data);
-        ReturnErrorOnFailure(chip::TlvToJson(reader, value));
-
-        auto valueStr = chip::JsonToString(value);
-        return mJSONDelegate->LogJSON(valueStr.c_str());
-    }
-
-    static CHIP_ERROR LogErrorAsJSON(const chip::app::ConcreteCommandPath & path, const chip::app::StatusIB & status)
-    {
-        VerifyOrReturnError(mJSONDelegate != nullptr, CHIP_NO_ERROR);
-
-        Json::Value value;
-        value[kClusterIdKey]  = path.mClusterId;
-        value[kEndpointIdKey] = path.mEndpointId;
-        value[kCommandIdKey]  = path.mCommandId;
-
-        return LogError(value, status);
-    }
-
-    static CHIP_ERROR LogEventAsJSON(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
-    {
-        VerifyOrReturnError(mJSONDelegate != nullptr, CHIP_NO_ERROR);
-
-        Json::Value value;
-        value[kClusterIdKey]  = header.mPath.mClusterId;
-        value[kEndpointIdKey] = header.mPath.mEndpointId;
-        value[kEventIdKey]    = header.mPath.mEventId;
-
-        chip::TLV::TLVReader reader;
-        reader.Init(*data);
-        ReturnErrorOnFailure(chip::TlvToJson(reader, value));
-
-        auto valueStr = chip::JsonToString(value);
-        return mJSONDelegate->LogJSON(valueStr.c_str());
-    }
-
-    static CHIP_ERROR LogErrorAsJSON(const chip::app::EventHeader & header, const chip::app::StatusIB & status)
-    {
-        VerifyOrReturnError(mJSONDelegate != nullptr, CHIP_NO_ERROR);
-
-        Json::Value value;
-        value[kClusterIdKey]  = header.mPath.mClusterId;
-        value[kEndpointIdKey] = header.mPath.mEndpointId;
-        value[kEventIdKey]    = header.mPath.mEventId;
-
-        return LogError(value, status);
-    }
-
-    static CHIP_ERROR LogErrorAsJSON(const CHIP_ERROR & error)
-    {
-        Json::Value value;
-        chip::app::StatusIB status;
-        status.InitFromChipError(error);
-        return LogError(value, status);
-    }
-
-    static void SetJSONDelegate(DataModelLoggerJSONDelegate * delegate) { mJSONDelegate = delegate; }
-
 private:
-    static CHIP_ERROR LogError(Json::Value & value, const chip::app::StatusIB & status)
-    {
-        if (status.mClusterStatus.HasValue())
-        {
-            auto statusValue          = status.mClusterStatus.Value();
-            value[kClusterErrorIdKey] = statusValue;
-        }
-
-        auto statusName    = chip::Protocols::InteractionModel::StatusName(status.mStatus);
-        value[kErrorIdKey] = statusName;
-
-        auto valueStr = chip::JsonToString(value);
-        return mJSONDelegate->LogJSON(valueStr.c_str());
-    }
-
     static CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
     {
         DataModelLogger::LogString(label, indent, value ? "TRUE" : "FALSE");
@@ -323,5 +196,4 @@ private:
     }
 
     static size_t ComputePrefixSize(const std::string label, size_t indent) { return ComputePrefix(label, indent).size(); }
-    static DataModelLoggerJSONDelegate * mJSONDelegate;
 };
