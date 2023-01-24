@@ -21,13 +21,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterAttributeValuePair : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable attributeId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSNumber * _Nullable attributeID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable attributeId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use attributeID");
 @property (nonatomic, copy) NSArray * _Nonnull attributeValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterExtensionFieldSet : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull clusterId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSNumber * _Nonnull clusterID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull clusterId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use clusterID");
 @property (nonatomic, copy) NSArray * _Nonnull attributeValueList API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 

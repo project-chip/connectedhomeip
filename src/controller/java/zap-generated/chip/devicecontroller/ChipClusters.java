@@ -602,16 +602,16 @@ public class ChipClusters {
 
     public void addScene(
         AddSceneResponseCallback callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         Integer transitionTime,
         String sceneName,
         ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets) {
       addScene(
           chipClusterPtr,
           callback,
-          groupId,
-          sceneId,
+          groupID,
+          sceneID,
           transitionTime,
           sceneName,
           extensionFieldSets,
@@ -620,8 +620,8 @@ public class ChipClusters {
 
     public void addScene(
         AddSceneResponseCallback callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         Integer transitionTime,
         String sceneName,
         ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets,
@@ -629,91 +629,91 @@ public class ChipClusters {
       addScene(
           chipClusterPtr,
           callback,
-          groupId,
-          sceneId,
+          groupID,
+          sceneID,
           transitionTime,
           sceneName,
           extensionFieldSets,
           timedInvokeTimeoutMs);
     }
 
-    public void viewScene(ViewSceneResponseCallback callback, Integer groupId, Integer sceneId) {
-      viewScene(chipClusterPtr, callback, groupId, sceneId, null);
+    public void viewScene(ViewSceneResponseCallback callback, Integer groupID, Integer sceneID) {
+      viewScene(chipClusterPtr, callback, groupID, sceneID, null);
     }
 
     public void viewScene(
         ViewSceneResponseCallback callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         int timedInvokeTimeoutMs) {
-      viewScene(chipClusterPtr, callback, groupId, sceneId, timedInvokeTimeoutMs);
+      viewScene(chipClusterPtr, callback, groupID, sceneID, timedInvokeTimeoutMs);
     }
 
     public void removeScene(
-        RemoveSceneResponseCallback callback, Integer groupId, Integer sceneId) {
-      removeScene(chipClusterPtr, callback, groupId, sceneId, null);
+        RemoveSceneResponseCallback callback, Integer groupID, Integer sceneID) {
+      removeScene(chipClusterPtr, callback, groupID, sceneID, null);
     }
 
     public void removeScene(
         RemoveSceneResponseCallback callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         int timedInvokeTimeoutMs) {
-      removeScene(chipClusterPtr, callback, groupId, sceneId, timedInvokeTimeoutMs);
+      removeScene(chipClusterPtr, callback, groupID, sceneID, timedInvokeTimeoutMs);
     }
 
-    public void removeAllScenes(RemoveAllScenesResponseCallback callback, Integer groupId) {
-      removeAllScenes(chipClusterPtr, callback, groupId, null);
+    public void removeAllScenes(RemoveAllScenesResponseCallback callback, Integer groupID) {
+      removeAllScenes(chipClusterPtr, callback, groupID, null);
     }
 
     public void removeAllScenes(
-        RemoveAllScenesResponseCallback callback, Integer groupId, int timedInvokeTimeoutMs) {
-      removeAllScenes(chipClusterPtr, callback, groupId, timedInvokeTimeoutMs);
+        RemoveAllScenesResponseCallback callback, Integer groupID, int timedInvokeTimeoutMs) {
+      removeAllScenes(chipClusterPtr, callback, groupID, timedInvokeTimeoutMs);
     }
 
-    public void storeScene(StoreSceneResponseCallback callback, Integer groupId, Integer sceneId) {
-      storeScene(chipClusterPtr, callback, groupId, sceneId, null);
+    public void storeScene(StoreSceneResponseCallback callback, Integer groupID, Integer sceneID) {
+      storeScene(chipClusterPtr, callback, groupID, sceneID, null);
     }
 
     public void storeScene(
         StoreSceneResponseCallback callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         int timedInvokeTimeoutMs) {
-      storeScene(chipClusterPtr, callback, groupId, sceneId, timedInvokeTimeoutMs);
+      storeScene(chipClusterPtr, callback, groupID, sceneID, timedInvokeTimeoutMs);
     }
 
     public void recallScene(
         DefaultClusterCallback callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         @Nullable Optional<Integer> transitionTime) {
-      recallScene(chipClusterPtr, callback, groupId, sceneId, transitionTime, null);
+      recallScene(chipClusterPtr, callback, groupID, sceneID, transitionTime, null);
     }
 
     public void recallScene(
         DefaultClusterCallback callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         @Nullable Optional<Integer> transitionTime,
         int timedInvokeTimeoutMs) {
-      recallScene(chipClusterPtr, callback, groupId, sceneId, transitionTime, timedInvokeTimeoutMs);
+      recallScene(chipClusterPtr, callback, groupID, sceneID, transitionTime, timedInvokeTimeoutMs);
     }
 
-    public void getSceneMembership(GetSceneMembershipResponseCallback callback, Integer groupId) {
-      getSceneMembership(chipClusterPtr, callback, groupId, null);
+    public void getSceneMembership(GetSceneMembershipResponseCallback callback, Integer groupID) {
+      getSceneMembership(chipClusterPtr, callback, groupID, null);
     }
 
     public void getSceneMembership(
-        GetSceneMembershipResponseCallback callback, Integer groupId, int timedInvokeTimeoutMs) {
-      getSceneMembership(chipClusterPtr, callback, groupId, timedInvokeTimeoutMs);
+        GetSceneMembershipResponseCallback callback, Integer groupID, int timedInvokeTimeoutMs) {
+      getSceneMembership(chipClusterPtr, callback, groupID, timedInvokeTimeoutMs);
     }
 
     private native void addScene(
         long chipClusterPtr,
         AddSceneResponseCallback Callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         Integer transitionTime,
         String sceneName,
         ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets,
@@ -722,46 +722,46 @@ public class ChipClusters {
     private native void viewScene(
         long chipClusterPtr,
         ViewSceneResponseCallback Callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeScene(
         long chipClusterPtr,
         RemoveSceneResponseCallback Callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeAllScenes(
         long chipClusterPtr,
         RemoveAllScenesResponseCallback Callback,
-        Integer groupId,
+        Integer groupID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void storeScene(
         long chipClusterPtr,
         StoreSceneResponseCallback Callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void recallScene(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer groupId,
-        Integer sceneId,
+        Integer groupID,
+        Integer sceneID,
         @Nullable Optional<Integer> transitionTime,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void getSceneMembership(
         long chipClusterPtr,
         GetSceneMembershipResponseCallback Callback,
-        Integer groupId,
+        Integer groupID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface AddSceneResponseCallback {
-      void onSuccess(Integer status, Integer groupId, Integer sceneId);
+      void onSuccess(Integer status, Integer groupID, Integer sceneID);
 
       void onError(Exception error);
     }
@@ -769,8 +769,8 @@ public class ChipClusters {
     public interface ViewSceneResponseCallback {
       void onSuccess(
           Integer status,
-          Integer groupId,
-          Integer sceneId,
+          Integer groupID,
+          Integer sceneID,
           Optional<Integer> transitionTime,
           Optional<String> sceneName,
           Optional<ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>> extensionFieldSets);
@@ -779,19 +779,19 @@ public class ChipClusters {
     }
 
     public interface RemoveSceneResponseCallback {
-      void onSuccess(Integer status, Integer groupId, Integer sceneId);
+      void onSuccess(Integer status, Integer groupID, Integer sceneID);
 
       void onError(Exception error);
     }
 
     public interface RemoveAllScenesResponseCallback {
-      void onSuccess(Integer status, Integer groupId);
+      void onSuccess(Integer status, Integer groupID);
 
       void onError(Exception error);
     }
 
     public interface StoreSceneResponseCallback {
-      void onSuccess(Integer status, Integer groupId, Integer sceneId);
+      void onSuccess(Integer status, Integer groupID, Integer sceneID);
 
       void onError(Exception error);
     }
@@ -800,7 +800,7 @@ public class ChipClusters {
       void onSuccess(
           Integer status,
           @Nullable Integer capacity,
-          Integer groupId,
+          Integer groupID,
           Optional<ArrayList<Integer>> sceneList);
 
       void onError(Exception error);
