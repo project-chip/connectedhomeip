@@ -39,6 +39,7 @@ public:
     void PostEvent(const AppEvent * event);
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
     static void ButtonPressedAction(AppEvent * aEvent);
+    CHIP_ERROR LockInit();
 
 private:
     CHIP_ERROR Init();
