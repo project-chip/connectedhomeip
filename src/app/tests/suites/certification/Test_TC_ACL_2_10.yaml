@@ -187,7 +187,7 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Factory Reset the DUT and enter 'y' after success"
+                value: "Reboot the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
 
@@ -288,7 +288,7 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Factory Reset the DUT and enter 'y' after success"
+                value: "Enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
 
@@ -347,6 +347,6 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Factory Reset the DUT and enter 'y' after success"
+                value: "Enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
