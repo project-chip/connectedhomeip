@@ -42,7 +42,7 @@ CHIP_ERROR AmebaUtils::StartWiFi(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Ensure that the WiFi layer is started.
-    wifi_on(RTW_MODE_STA);
+    matter_wifi_on(RTW_MODE_STA);
     return err;
 }
 
@@ -61,7 +61,7 @@ bool AmebaUtils::IsStationProvisioned(void)
 CHIP_ERROR AmebaUtils::IsStationConnected(bool & connected)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    connected      = (wifi_is_connected_to_ap() == RTW_SUCCESS) ? 1 : 0;
+    connected      = (matter_wifi_is_connected_to_ap() == RTW_SUCCESS) ? 1 : 0;
     return err;
 }
 
@@ -69,7 +69,7 @@ CHIP_ERROR AmebaUtils::EnableStationMode(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Ensure that station mode is enabled in the WiFi layer.
-    wifi_set_mode(RTW_MODE_STA);
+    matter_wifi_set_mode(RTW_MODE_STA);
     return err;
 }
 
@@ -121,8 +121,8 @@ CHIP_ERROR AmebaUtils::ClearWiFiConfig()
 CHIP_ERROR AmebaUtils::WiFiDisconnect(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogProgress(DeviceLayer, "wifi_disconnect");
-    err = (wifi_disconnect() == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    ChipLogProgress(DeviceLayer, "matter_wifi_disconnect");
+    err = (matter_wifi_disconnect() == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
     return err;
 }
 
@@ -133,8 +133,8 @@ CHIP_ERROR AmebaUtils::WiFiConnect(void)
     memset(config, 0, sizeof(rtw_wifi_config_t));
     GetWiFiConfig(config);
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) config->ssid);
-    int ameba_err = wifi_connect((char *) config->ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) config->password,
-                                 strlen((const char *) config->ssid), strlen((const char *) config->password), 0, NULL);
+    int ameba_err = matter_wifi_connect((char *) config->ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) config->password,
+                                        strlen((const char *) config->ssid), strlen((const char *) config->password), 0, NULL);
 
     vPortFree(config);
     err = (ameba_err == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;

@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _attributeId = nil;
+        _attributeID = nil;
 
         _attributeValue = [NSArray array];
     }
@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterAttributeValuePair alloc] init];
 
-    other.attributeId = self.attributeId;
+    other.attributeID = self.attributeID;
     other.attributeValue = self.attributeValue;
 
     return other;
@@ -43,9 +43,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; attributeValue:%@; >",
-                                             NSStringFromClass([self class]), _attributeId, _attributeValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; attributeValue:%@; >",
+                                             NSStringFromClass([self class]), _attributeID, _attributeValue];
     return descriptionString;
+}
+
+- (void)setAttributeId:(NSNumber * _Nullable)attributeId
+{
+    self.attributeID = attributeId;
+}
+
+- (NSNumber * _Nullable)attributeId
+{
+    return self.attributeID;
 }
 
 @end
@@ -55,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _clusterId = @(0);
+        _clusterID = @(0);
 
         _attributeValueList = [NSArray array];
     }
@@ -66,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterExtensionFieldSet alloc] init];
 
-    other.clusterId = self.clusterId;
+    other.clusterID = self.clusterID;
     other.attributeValueList = self.attributeValueList;
 
     return other;
@@ -74,9 +84,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clusterId:%@; attributeValueList:%@; >",
-                                             NSStringFromClass([self class]), _clusterId, _attributeValueList];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clusterID:%@; attributeValueList:%@; >",
+                                             NSStringFromClass([self class]), _clusterID, _attributeValueList];
     return descriptionString;
+}
+
+- (void)setClusterId:(NSNumber * _Nonnull)clusterId
+{
+    self.clusterID = clusterId;
+}
+
+- (NSNumber * _Nonnull)clusterId
+{
+    return self.clusterID;
 }
 
 @end

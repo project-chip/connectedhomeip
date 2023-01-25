@@ -28,6 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRCertificates : NSObject
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 /**
  * Create a root (self-signed) X.509 DER encoded certificate that has the
  * right fields to be a valid Matter root certificate.

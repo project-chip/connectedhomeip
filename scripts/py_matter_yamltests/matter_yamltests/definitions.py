@@ -14,6 +14,8 @@
 #    limitations under the License.
 
 import enum
+import functools
+import glob
 from typing import List
 
 from matter_idl.matter_idl_types import *
@@ -228,3 +230,22 @@ class SpecDefinitions:
             if name.lower() == target_name.lower():
                 raise KeyError(
                     f'Unknown target {target_name}. Did you mean {name} ?')
+
+
+def SpecDefinitionsFromPath(path: str):
+    def sort_with_global_attribute_first(a, b):
+        if a.endswith('global-attributes.xml'):
+            return -1
+        elif b.endswith('global-attributes.xml'):
+            return 1
+        elif a > b:
+            return 1
+        elif a == b:
+            return 0
+        elif a < b:
+            return -1
+
+    filenames = glob.glob(path, recursive=False)
+    filenames.sort(key=functools.cmp_to_key(sort_with_global_attribute_first))
+    sources = [ParseSource(source=name) for name in filenames]
+    return SpecDefinitions(sources)

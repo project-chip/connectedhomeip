@@ -31,7 +31,8 @@ def _AllYamlTests():
     yaml_test_suite_path = Path(_YAML_TEST_SUITE_PATH)
 
     if not yaml_test_suite_path.exists():
-        raise FileNotFoundError(f"Expected directory {_YAML_TEST_SUITE_PATH} to exist")
+        raise FileNotFoundError(
+            f"Expected directory {_YAML_TEST_SUITE_PATH} to exist")
 
     for path in yaml_test_suite_path.rglob("*.yaml"):
         if not path.is_file():
@@ -197,7 +198,8 @@ def _hardcoded_python_yaml_tests():
         )
 
     if found_supported_tests != currently_supported_yaml_tests:
-        raise Exception("Did not find YAMLs for all supported tests: %r" % (currently_supported_yaml_tests - found_supported_tests))
+        raise Exception("Did not find YAMLs for all supported tests: %r" % (
+            currently_supported_yaml_tests - found_supported_tests))
 
 
 def AllTests(chip_tool: str, run_yamltests_with_chip_repl: bool):
