@@ -24,10 +24,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Exposes Matter-specific information from an operational X.509 certificate.
  *
- * Note: This class does not support parsing certifactes related to Device Attestation.
+ * Note: This class does not support parsing certificates related to Device Attestation.
  */
+NS_SWIFT_SENDABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRCertificateInfo : NSObject <NSCopying>
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -47,8 +50,10 @@ NS_ASSUME_NONNULL_BEGIN
  * Represents the Matter-specific components of an X.509 Distinguished Name.
  */
 NS_SWIFT_SENDABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRDistinguishedNameInfo : NSObject <NSCopying>
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**

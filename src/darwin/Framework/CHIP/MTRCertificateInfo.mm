@@ -73,7 +73,7 @@ MTR_DIRECT_MEMBERS
 
 - (id)copyWithZone:(nullable NSZone *)zone
 {
-    return self;
+    return self; // immutable, no need to copy
 }
 
 - (BOOL)isEqual:(id)object
@@ -165,7 +165,7 @@ MTR_DIRECT_MEMBERS
 
 - (id)copyWithZone:(nullable NSZone *)zone
 {
-    return self;
+    return self; // immutable, no need to copy
 }
 
 - (BOOL)isEqual:(id)object

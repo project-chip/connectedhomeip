@@ -35,7 +35,7 @@ AsNumber(chip::Optional<T> optional)
 
 inline NSDate * ChipEpochSecondsAsDate(uint32_t chipEpochSeconds)
 {
-    return [NSDate dateWithTimeIntervalSince1970:(chip::kChipEpochSecondsSinceUnixEpoch + chipEpochSeconds)];
+    return [NSDate dateWithTimeIntervalSince1970:(chip::kChipEpochSecondsSinceUnixEpoch + (NSTimeInterval) chipEpochSeconds)];
 }
 
 NS_ASSUME_NONNULL_END
