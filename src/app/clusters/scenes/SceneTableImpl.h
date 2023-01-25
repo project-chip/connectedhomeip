@@ -40,21 +40,24 @@ public:
 
     ~DefaultSceneTableImpl() override {}
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage);
-    void Finish();
+    CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
+    void Finish() override;
 
     //
     // Scene Data
     //
 
     // By id
-    CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry);
+    CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry) override;
     CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id,
-                                  SceneTableEntry & entry);
-    CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id);
+                                  SceneTableEntry & entry) override;
+    CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id) override;
 
     // Iterators
     SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) override;
+
+    // Fabrics
+    CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
 
 protected:
     class SceneEntryIteratorImpl : public SceneEntryIterator
@@ -76,8 +79,6 @@ protected:
 
     chip::PersistentStorageDelegate * mStorage = nullptr;
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
-
-    const uint8_t mMaxScenePerFabric = kMaxScenePerFabric;
 }; // class DefaultSceneTableImpl
 
 /**
@@ -96,7 +97,7 @@ DefaultSceneTableImpl * GetSceneTable();
  *
  * The `provider` can be set to nullptr if the owner is done with it fully.
  *
- * @param[in] provider pointer to the Scene Table global isntance to use
+ * @param[in] provider pointer to the Scene Table global instance to use
  */
 void SetSceneTable(DefaultSceneTableImpl * provider);
 } // namespace scenes
