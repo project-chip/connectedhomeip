@@ -20,6 +20,10 @@
 #include "LightSwitchMgr.h"
 #include "BindingHandler.h"
 
+#if defined(ENABLE_CHIP_SHELL)
+#include "ShellCommands.h"
+#endif // defined(ENABLE_CHIP_SHELL)
+
 #include "AppConfig.h"
 #include "AppEvent.h"
 
@@ -56,6 +60,10 @@ CHIP_ERROR LightSwitchMgr::Init(EndpointId lightSwitchEndpoint, chip::EndpointId
         SILABS_LOG("InitBindingHandler() failed!");
         appError(error);
     }
+
+#if defined(ENABLE_CHIP_SHELL)
+    LightSwtichCommands::RegisterSwitchCommands();
+#endif // defined(ENABLE_CHIP_SHELL)
 
     return error;
 }

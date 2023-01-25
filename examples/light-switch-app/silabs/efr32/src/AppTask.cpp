@@ -40,10 +40,6 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#if defined(ENABLE_CHIP_SHELL)
-#include "ShellCommands.h"
-#endif // defined(ENABLE_CHIP_SHELL)
-
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -177,10 +173,6 @@ CHIP_ERROR AppTask::Init()
         SILABS_LOG("LightSwitchMgr Init failed!");
         appError(err);
     }
-
-#if defined(ENABLE_CHIP_SHELL)
-    LightSwtichCommands::RegisterSwitchCommands();
-#endif // defined(ENABLE_CHIP_SHELL)
 
     return err;
 }
