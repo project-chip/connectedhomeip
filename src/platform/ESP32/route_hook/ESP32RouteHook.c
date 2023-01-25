@@ -105,10 +105,10 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
                 route.prefix           = prefix;
                 route.preference       = preference;
                 route.lifetime_seconds = lwip_ntohl(rio_header.route_lifetime);
-                ESP_LOGI(TAG, "prefix %s lifetime %u\n", ip6addr_ntoa(&prefix), route.lifetime_seconds);
+                ESP_LOGI(TAG, "prefix %s lifetime %" PRIu32, ip6addr_ntoa(&prefix), route.lifetime_seconds);
                 if (esp_route_table_add_route_entry(&route) == NULL)
                 {
-                    ESP_LOGI(TAG, "Failed to add route table entry\n");
+                    ESP_LOGI(TAG, "Failed to add route table entry");
                 }
             }
         }

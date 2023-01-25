@@ -99,11 +99,13 @@ extern "C" void otPlatFree(void * aPtr)
 {
     CHIPPlatformMemoryFree(aPtr);
 }
-
+#ifndef SL_COMPONENT_CATALOG_PRESENT
 extern "C" __WEAK void sl_openthread_init(void)
 {
+#error "This shouldn't compile"
     // Place holder for enabling Silabs specific features available only through Simplicity Studio
 }
+#endif
 
 /**
  * @brief Openthread UART implementation for the CLI is conflicting

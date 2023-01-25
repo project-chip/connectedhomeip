@@ -47,8 +47,9 @@ using namespace chip::app::Clusters;
 void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                                                      uint8_t type, uint16_t size, uint8_t * value)
 {
-    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
-             endpointId, attributeId);
+    ESP_LOGI(TAG,
+             "PostAttributeChangeCallback - Cluster ID: '0x%04" PRIx32 "', EndPoint ID: '0x%02x', Attribute ID: '0x%04" PRIx32 "'",
+             clusterId, endpointId, attributeId);
 
     switch (clusterId)
     {
@@ -67,7 +68,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 #endif
 
     default:
-        ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
+        ESP_LOGI(TAG, "Unhandled cluster ID: %" PRIu32, clusterId);
         break;
     }
 
@@ -76,7 +77,8 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 
 void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == OnOff::Attributes::OnOff::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == OnOff::Attributes::OnOff::Id,
+                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     AppLED.Set(*value);
@@ -88,7 +90,7 @@ exit:
 void AppDeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == LevelControl::Attributes::CurrentLevel::Id,
-                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     AppLED.SetBrightness(*value);
@@ -105,7 +107,7 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
 
     VerifyOrExit(attributeId == ColorControl::Attributes::CurrentHue::Id ||
                      attributeId == ColorControl::Attributes::CurrentSaturation::Id,
-                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04x", attributeId));
+                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     if (attributeId == ColorControl::Attributes::CurrentHue::Id)
