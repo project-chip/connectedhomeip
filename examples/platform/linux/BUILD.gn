@@ -19,6 +19,7 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
+import("${chip_root}/src/lib/trusty.gni")
 
 if (current_os != "nuttx") {
   import("//build_overrides/jsoncpp.gni")
@@ -96,6 +97,13 @@ source_set("app-main") {
     "testing/CustomCSRResponseOperationalKeyStore.h",
   ]
 
+  if (chip_with_trusty_os == 1) {
+    sources += [
+      "DeviceAttestationCreds.cpp",
+      "DeviceAttestationCreds.h",
+    ]
+  }
+
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
@@ -120,6 +128,16 @@ source_set("app-main") {
 
   if (current_os != "nuttx") {
     public_deps += [ jsoncpp_root ]
+  }
+
+  if (chip_with_trusty_os == 1) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
+
+  if (chip_with_trusty_os == 1) {
+    defines += [ "CHIP_ATTESTATION_TRUSTY_OS=1" ]
+  } else {
+    defines += [ "CHIP_ATTESTATION_TRUSTY_OS=0" ]
   }
 
   if (chip_enable_pw_rpc) {
