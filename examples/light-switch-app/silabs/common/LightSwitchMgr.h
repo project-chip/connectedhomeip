@@ -26,12 +26,11 @@
 class LightSwitchMgr
 {
 public:
-
     enum class LightSwitchAction : uint8_t
     {
         Toggle, // Triggers an toggle command
-        On, // Triggers an On command
-        Off // Trigger an Off command
+        On,     // Triggers an On command
+        Off     // Trigger an Off command
     };
 
     struct GenericSwitchEventData
@@ -47,19 +46,13 @@ public:
 
     void TriggerLightSwitchAction(LightSwitchAction action, bool isGroupCommand = false);
 
-    static LightSwitchMgr & GetInstance()
-    {
-        return sSwitch;
-    }
-
-
+    static LightSwitchMgr & GetInstance() { return sSwitch; }
 
 private:
     static LightSwitchMgr sSwitch;
 
     static void GenericSwitchWorkerFunction(intptr_t context);
 
-
-    chip::EndpointId mLightSwitchEndpoint = chip::kInvalidEndpointId;
-    chip::EndpointId mGenericSwitchEndpoint = chip::kInvalidEndpointId; 
+    chip::EndpointId mLightSwitchEndpoint   = chip::kInvalidEndpointId;
+    chip::EndpointId mGenericSwitchEndpoint = chip::kInvalidEndpointId;
 };

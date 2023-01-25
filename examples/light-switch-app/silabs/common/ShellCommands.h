@@ -23,8 +23,8 @@
 
 namespace LightSwtichCommands {
 
-    void RegisterSwitchCommands();
-    
+void RegisterSwitchCommands();
+
 } // namespace LightSwtichCommands
 
 #endif // defined(ENABLE_CHIP_SHELL)
