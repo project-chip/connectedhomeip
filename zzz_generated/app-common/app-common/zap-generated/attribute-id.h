@@ -468,7 +468,7 @@
 #define ZCL_CURRENT_POSITION_ATTRIBUTE_ID (0x0001)
 #define ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID (0x0002)
 
-// Attribute ids for cluster: AdministratorCommissioning
+// Attribute ids for cluster: Administrator Commissioning
 
 // Client attributes
 

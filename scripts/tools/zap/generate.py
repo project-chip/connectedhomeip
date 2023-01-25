@@ -16,6 +16,7 @@
 #
 
 import argparse
+import fcntl
 import json
 import os
 import subprocess
@@ -65,8 +66,11 @@ def checkDirExists(path):
         exit(1)
 
 
-def getFilePath(name):
-    fullpath = os.path.join(CHIP_ROOT_DIR, name)
+def getFilePath(name, prefix_chip_root_dir=True):
+    if prefix_chip_root_dir:
+        fullpath = os.path.join(CHIP_ROOT_DIR, name)
+    else:
+        fullpath = name
     checkFileExists(fullpath)
     return fullpath
 
@@ -80,6 +84,7 @@ def getDirPath(name):
 def detectZclFile(zapFile):
     print(f"Searching for zcl file from {zapFile}")
 
+    prefix_chip_root_dir = True
     path = 'src/app/zap-templates/zcl/zcl.json'
 
     data = json.load(open(zapFile))
@@ -87,14 +92,17 @@ def detectZclFile(zapFile):
         if package["type"] != "zcl-properties":
             continue
 
+        prefix_chip_root_dir = (package["pathRelativity"] != "resolveEnvVars")
         # found the right path, try to figure out the actual path
         if package["pathRelativity"] == "relativeToZap":
             path = os.path.abspath(os.path.join(
                 os.path.dirname(zapFile), package["path"]))
+        elif package["pathRelativity"] == "resolveEnvVars":
+            path = os.path.expandvars(package["path"])
         else:
             path = package["path"]
 
-    return getFilePath(path)
+    return getFilePath(path, prefix_chip_root_dir)
 
 
 def runArgumentsParser() -> CmdLineArgs:
@@ -148,7 +156,13 @@ def runArgumentsParser() -> CmdLineArgs:
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
-    return CmdLineArgs(zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap)
+    return CmdLineArgs(
+        zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
+        parallel=args.parallel,
+        prettify_output=args.prettify_output,
+        version_check=args.version_check,
+        lock_file=args.lock_file,
+    )
 
 
 def extractGeneratedIdl(output_dir, zap_config_path):
@@ -276,7 +290,7 @@ class LockFileSerializer:
             return
 
         fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
-        close(self.lock_file)
+        self.lock_file.close()
         self.lock_file = None
 
 

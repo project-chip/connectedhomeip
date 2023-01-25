@@ -30,7 +30,7 @@ tests:
       PICS: LCFG.S.A0001
       verification: |
           ./chip-tool localizationconfiguration read supported-locales 1 0
-          On TH(chip-tool) verify that the entry values in the SupportedLocales attribute are not repeated
+          Verify that the entry values in the SupportedLocales attribute are not repeated and the maximum number of elements is 32 and also  that the  maximum length is of 35bytes on TH(chip-tool) log:
 
           [1661759583.481746][104665:104670] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001 DataVersion: 3207653748
           [1661759583.482016][104665:104670] CHIP:TOO:   SupportedLocales: 8 entries
@@ -47,8 +47,8 @@ tests:
 
     - label: "TH writes xx-XX to SupportedLocales attribute"
       verification: |
-          ./chip-tool any write-by-id 0x002B 1 '"xx-XX"' 1 0
-          On TH(chip-tool) verify that DUT responds as UNSUPPORTED_WRITE
+          ./chip-tool any write-by-id 0x002B 1 ""xx-XX"" 1 0
+           Verify that DUT responds as UNSUPPORTED_WRITE on TH(chip-tool) log:
 
           [1653996674.832226][7281:7286] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1653996674.832300][7281:7286] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
@@ -58,7 +58,8 @@ tests:
     - label: "TH reads SupportedLocales attribute"
       verification: |
           ./chip-tool localizationconfiguration read supported-locales 1 0
-          On TH(chip-tool) verify that the entries same as step 1
+          Verify that the  SupportedLocales atrribute entries are same as step 1  on TH(chip-tool) log:
+
           [1645772065.848431][3762:3767] CHIP:TOO:   SupportedLocales: 8 entries
           [1645772065.850249][3762:3767] CHIP:TOO:     [1]: en-US
           [1645772065.850298][3762:3767] CHIP:TOO:     [2]: de-DE
@@ -75,7 +76,8 @@ tests:
       PICS: LCFG.S.A0000
       verification: |
           ./chip-tool localizationconfiguration read active-locale 1 0
-          On TH(chip-tool) verify  that the ActiveLocale Attribute value is present in the SupportedLocales attribute list
+          Verify  that the ActiveLocale Attribute value is Language Tag as defined by BCP47 and is  present in the SupportedLocales attribute list and also the value is of maximum length of 35 bytes and if the value of ActiveLocale is not one among supportedLocales value then  default value is assigned by the Vendor on TH(chip-tool)log:
+
           [1661759849.744419][104758:104763] CHIP:DMG: }
           [1661759849.744488][104758:104763] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0000 DataVersion: 3207653748
           [1661759849.744509][104758:104763] CHIP:TOO:   ActiveLocale: en-US
@@ -87,7 +89,7 @@ tests:
           ActiveLocale Attribute."
       verification: |
           ./chip-tool localizationconfiguration write active-locale fw-GB 1 0
-          On TH(chip-tool) verify that DUT responds as CONSTRAINT_ERROR
+          Verify that DUT responds as CONSTRAINT_ERROR On TH(chip-tool) log:
 
           [[1651130076.882814][174458:174463] CHIP:DMG: WriteResponseMessage =
           [1651130076.882819][174458:174463] CHIP:DMG: {
@@ -123,7 +125,7 @@ tests:
           ActiveLocale Attribute"
       verification: |
           ./chip-tool localizationconfiguration write active-locale fr-FR 1 0
-          On TH(chip-tool) verify that DUT responds as SUCCESS
+          Verify that DUT responds as SUCCESS on TH(chip-tool) log:
 
           [1661759978.806730][104802:104807] CHIP:DMG: WriteResponseMessage =
           [1661759978.806741][104802:104807] CHIP:DMG: {
@@ -156,7 +158,7 @@ tests:
     - label: "TH Reads ActiveLocale"
       verification: |
           ./chip-tool localizationconfiguration read active-locale 1 0
-          On TH(chip-tool) Verify that the value of the ActiveLocale attribute is changed
+           Verify that the value of the ActiveLocale attribute is changed to SupportedLocale on TH(chip-tool) log:
           [1661760013.634782][104820:104825] CHIP:DMG: }
           [1661760013.634848][104820:104825] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0000 DataVersion: 3207653749
           [1661760013.634861][104820:104825] CHIP:TOO:   ActiveLocale: fr-FR

@@ -17,10 +17,12 @@
 
 #include "ias-zone-client.h"
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::IasZone::Commands;
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -282,7 +284,7 @@ bool emberAfIasZoneClusterZoneEnrollRequestCallback(app::CommandHandler * comman
         setServerZoneId(serverIndex, zoneId);
     }
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
-                              ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID, "uu", responseCode, zoneId);
+                              ZoneEnrollResponse::Id, "uu", responseCode, zoneId);
     // Need to send this command with our source EUI because the server will
     // check our EUI64 against his CIE Address to see if we're his CIE.
     emberAfGetCommandApsFrame()->options |= EMBER_APS_OPTION_SOURCE_EUI64;

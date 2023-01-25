@@ -40,9 +40,9 @@ tests:
           "Commissioner has regulatory and fabric information available and has
           accurate date, time and timezone"
       verification: |
-          sudo ./chip-all-clusters-app --wifi --discriminator 3841
+          ./chip-all-clusters-app --wifi --discriminator 3841
 
-          Verify in TH as commissionee side:
+          Verify in TH (ALL-CLUSTER-APP)
 
           [1653471956.966855][10713:10713] CHIP:SPT: PASE PBKDF iterations set to 1000
           [1653471956.966887][10713:10713] CHIP:SPT: LinuxCommissionableDataProvider didn"t get a PASE salt, generating one.
@@ -68,7 +68,7 @@ tests:
 
 
           ./chip-tool pairing code 1 MT:-24J0CEK01KA0648G00
-          Verify in DUT as commissioner side:
+          Verify in DUT(CHIP-TOOL)
 
           [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
           [1657226543861] [30621:16744161] CHIP: [IN] New secure session activated for device <FFFFFFFB00000000, 0>, LSID:47293 PSID:201!
@@ -86,7 +86,14 @@ tests:
           (DNS-SD)"
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          Verify in DUT as commissioner side:
+          Verify in TH (ALL-CLUSTER-APP)
+          ./chip-all-clusters-app
+          ...
+          [1657226543.948995][369114:369114] CHIP:IN: SecureSession[0xaaaab60788e0]: Activated - Type:1 LSID:201
+          [1657226543.949023][369114:369114] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:201 PSID:47293!
+          [1657226543.949048][369114:369114] CHIP:SVR: Commissioning completed session establishment step
+
+          Verify in DUT(CHIP-TOOL)
           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
           ...
           [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
@@ -96,14 +103,6 @@ tests:
           [1657226543861] [30621:16744161] CHIP: [TOO] Pairing Success
           [1657226543861] [30621:16744161] CHIP: [TOO] PASE establishment successful
           [1657226543861] [30621:16744161] CHIP: [CTL] Commissioning stage next step: "SecurePairing" -> "ReadCommissioningInfo"
-
-
-          Verify in TH as commissionee side:
-          $ ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          [1657226543.948995][369114:369114] CHIP:IN: SecureSession[0xaaaab60788e0]: Activated - Type:1 LSID:201
-          [1657226543.949023][369114:369114] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:201 PSID:47293!
-          [1657226543.949048][369114:369114] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
 
     - label:
@@ -112,7 +111,7 @@ tests:
       verification: |
           Verify that the responder receives the PBKDFParamRequest message
 
-          Verify in DUT as commissioner side:
+          Verify in TH (ALL-CLUSTER-APP)
           CHIP:SC: Received PBKDF param request
           CHIP:SC: Peer assigned session ID 18450
           CHIP:SC: Found MRP parameters in the message
@@ -121,32 +120,14 @@ tests:
           CHIP:IN: Prepared unauthenticated message 0xaaaaad340560 to 0x0000000000000000 (0)  of type 0x21 and protocolId (0, 0) on exchange 63762r with MessageCounter:1341084110.
           CHIP:IN: Sending unauthenticated msg 0xaaaaad340560 with MessageCounter:1341084110 to 0x0000000000000000 at monotonic time: 0000000000FBA380 msec
           CHIP:SC: Sent PBKDF param response
-
-          Verify in TH as commissionee side:
-          Sent PBKDF param request
-          [1653471961.364996][30157:30162] CHIP:CTL: Setting wifi credentials from parameters
-          [1653471961.365051][30157:30162] CHIP:CTL: Setting attestation nonce to random value
-          [1653471961.365166][30157:30162] CHIP:CTL: Setting CSR nonce to random value
-          [1653471961.365285][30157:30162] CHIP:CTL: Commission called for node ID 0x0000000000000001
-          [1653471961.365797][30157:30163] CHIP:DL: TRACE: Bluez mainloop starting Thread
-          [1653471961.366157][30157:30160] CHIP:DL: TRACE: Bus acquired for name C-75cd
-          [1653471961.382240][30157:30162] CHIP:DL: PlatformBlueZInit init success
-          [1653471961.393893][30157:30160] CHIP:BLE: BLE removing known devices.
-          [1653471961.397319][30157:30160] CHIP:BLE: BLE initiating scan.
-          [1653471961.415415][30157:30160] CHIP:BLE: Device 21:2D:EF:B9:9D:46 does not look like a CHIP device.
       disabled: true
 
     - label:
           "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
           (the autonomously Fail-safe timer length set by Commissionee)"
       verification: |
-          Verify in TH as commissionee side:
-          CHIP:DL: NVS set: chip-config/fail-safe-armed = true
-
-          Verify in DUT as commissioner side:
-
-          : Performing next commissioning step "ArmFailSafe"
-          [1653471968.064493][30157:30162] CHIP:CTL: Arming failsafe (60 seconds)
+          Verify in TH (ALL-CLUSTER-APP)
+          [1661796620.258906][17861:17861] CHIP:FS: GeneralCommissioning: Received ArmFailSafe (60s)
       disabled: true
 
     - label:
@@ -154,8 +135,8 @@ tests:
           Commissionee."
       PICS: MCORE.COM.WIRELESS
       verification: |
-          Verify in TH as commissionee side
-          NVS set: chip-config/regulatory-location = 0 (0x0)
+          Verify in TH (ALL-CLUSTER-APP)
+           NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true
 
     - label:
@@ -164,21 +145,22 @@ tests:
       verification: |
           1. Verify the following on DUT after commissioning
 
-          Verify in TH as commissionee side:
-          [1646909537.102263][3145:3150] CHIP:CTL: Received Attestation Information from the device
-          [1646909537.102418][3145:3150] CHIP:CTL: Verifying attestation
-          [1646909537.115081][3145:3150] CHIP:CTL: Successfully validated "Attestation Information" command received from the device.
-
-          Verify in DUT as commissioner side
-          CHIP:ZCL: OpCreds: commissioner has requested a CSR
-          CHIP:ZCL: OpCreds: NewCertificateSigningRequest returned ../../third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1114: Success
+          Verify in TH (ALL-CLUSTER-APP)
+          [1661746360.259922][132620:132620] CHIP:ZCL: OpCreds: Received a CSRRequest command
+          [1661746360.259946][132620:132620] CHIP:ZCL: OpCreds: Finding fabric with fabricIndex 0x0
+          [1661746360.259971][132620:132620] CHIP:EM: Sending Standalone Ack for MessageCounter:123253174 on exchange 23504r
+          [1661746360.260030][132620:132620] CHIP:IN: Prepared secure message 0xffffe25a60c8 to 0xFFFFFFFB00000000 (0)  of type 0x10 and protocolId (0, 0) on exchange 23504r with MessageCounter:155549628.
+          [1661746360.260066][132620:132620] CHIP:IN: Sending encrypted msg 0xffffe25a60c8 with MessageCounter:155549628 to 0xFFFFFFFB00000000 (0) at monotonic time: 000000000F107443 msec
+          [1661746360.260187][132620:132620] CHIP:EM: Flushed pending ack for MessageCounter:123253174 on exchange 23504r
+          [1661746360.261186][132620:132620] CHIP:ZCL: OpCreds: AllocatePendingOperationalKey succeeded
+          [1661746360.261515][132620:132620] CHIP:ZCL: OpCreds: CSRRequest successful.
       disabled: true
 
     - label:
           "Commissioner configures operational credentials on DUT if not
           previously installed"
       verification: |
-          Verify in TH as commissionee side:
+          Verify in TH (ALL-CLUSTER-APP)
 
           OpCreds: Received an AddTrustedRootCertificate command
       disabled: true
@@ -187,85 +169,37 @@ tests:
           "Commissioner configures itself as administrator in ACL on TH if
           needed"
       verification: |
-          Verify in DUT as commissioner side after commissioning:
+          Verify in TH (ALL-CLUSTER-APP)
 
-          CHIP:CTL: Commissioning stage next step: "SendTrustedRootCert" -> "SendNOC"
-          [1653471969.812357][30157:30162] CHIP:CTL: Performing next commissioning step "SendNOC"
-          [1653471969.812478][30157:30162] CHIP:DMG: ICR moving to [AddingComm]
-          [1653471969.812559][30157:30162] CHIP:DMG: ICR moving to [AddedComma]
-          [1653471969.812778][30157:30162] CHIP:IN: Prepared secure message 0xffffa4ce0998 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 24000i with MessageCounter:211813.
-          [1653471969.812871][30157:30162] CHIP:IN: Sending encrypted msg 0xffffa4ce0998 with MessageCounter:211813 to 0xFFFFFFFB00000000 (0) at monotonic time: 00000000010D077D msec
-          [1653471969.813068][30157:30162] CHIP:DMG: ICR moving to [CommandSen]
-          [1653471969.813137][30157:30162] CHIP:CTL: Sent operational certificate to the device
-          [1653471969.813237][30157:30162] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1653471969.952613][30157:30162] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
-          [1653471970.050705][30157:30162] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
-          [1653471970.148491][30157:30162] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
-          [1653471970.344099][30157:30160] CHIP:DL: Indication received, conn = 0xffff9c04df70
-          [1653471970.344351][30157:30162] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
-          [1653471970.344611][30157:30162] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:1000769 on exchange 24000i
-          [1653471970.344688][30157:30162] CHIP:EM: Found matching exchange: 24000i, Delegate: 0xffff9c06f0a0
-          [1653471970.344771][30157:30162] CHIP:DMG: ICR moving to [ResponseRe]
-          [1653471970.344870][30157:30162] CHIP:DMG: InvokeResponseMessage =
-          [1653471970.345060][30157:30162] CHIP:DMG: {
-          [1653471970.345124][30157:30162] CHIP:DMG:         suppressResponse = false,
-          [1653471970.345198][30157:30162] CHIP:DMG:         InvokeResponseIBs =
-          [1653471970.345276][30157:30162] CHIP:DMG:         [
-          [1653471970.345338][30157:30162] CHIP:DMG:                 InvokeResponseIB =
-          [1653471970.345422][30157:30162] CHIP:DMG:                 {
-          [1653471970.345501][30157:30162] CHIP:DMG:                         CommandDataIB =
-          [1653471970.345586][30157:30162] CHIP:DMG:                         {
-          [1653471970.345666][30157:30162] CHIP:DMG:                                 CommandPathIB =
-          [1653471970.345748][30157:30162] CHIP:DMG:                                 {
-          [1653471970.345835][30157:30162] CHIP:DMG:                                         EndpointId = 0x0,
-          [1653471970.345924][30157:30162] CHIP:DMG:                                         ClusterId = 0x3e,
-          [1653471970.346017][30157:30162] CHIP:DMG:                                         CommandId = 0x8,
-          [1653471970.346105][30157:30162] CHIP:DMG:                                 },
-          [1653471970.346198][30157:30162] CHIP:DMG:
-          [1653471970.346280][30157:30162] CHIP:DMG:                                 CommandData =
-          [1653471970.346361][30157:30162] CHIP:DMG:                                 {
-          [1653471970.346452][30157:30162] CHIP:DMG:                                         0x0 = 0,
-          [1653471970.346539][30157:30162] CHIP:DMG:                                         0x1 = 1,
-          [1653471970.346628][30157:30162] CHIP:DMG:                                 },
-          [1653471970.346702][30157:30162] CHIP:DMG:                         },
-          [1653471970.346767][30157:30162] CHIP:DMG:
-          [1653471970.346889][30157:30162] CHIP:DMG:                 },
-          [1653471970.346954][30157:30162] CHIP:DMG:
-          [1653471970.346999][30157:30162] CHIP:DMG:         ],
-          [1653471970.347056][30157:30162] CHIP:DMG:
-          [1653471970.347101][30157:30162] CHIP:DMG:         InteractionModelRevision = 1
-          [1653471970.347144][30157:30162] CHIP:DMG: },
-          [1653471970.347251][30157:30162] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1653471970.347339][30157:30162] CHIP:CTL: Device returned status 0 on receiving the NOC
-          [1653471970.347381][30157:30162] CHIP:CTL: Operational credentials provisioned on device 0xffff90000b60
-          [1653471970.347439][30157:30162] CHIP:TOO: Secure Pairing Success
-          [1653471970.347485][30157:30162] CHIP:CTL: Successfully finished commissioning step "SendNOC"
-
-          Verify in TH as commissionee side:
-
-           OpCreds: Received an AddNOC command
+          [1661746360.321195][132620:132620] CHIP:ZCL: OpCreds: Received an AddNOC command
+          [1661746360.321224][132620:132620] CHIP:EM: Sending Standalone Ack for MessageCounter:123253178 on exchange 23506r
+          [1661746360.321300][132620:132620] CHIP:IN: Prepared secure message 0xffffe25a60d8 to 0xFFFFFFFB00000000 (0)  of type 0x10 and protocolId (0, 0) on exchange 23506r with MessageCounter:155549632.
+          [1661746360.321343][132620:132620] CHIP:IN: Sending encrypted msg 0xffffe25a60d8 with MessageCounter:155549632 to 0xFFFFFFFB00000000 (0) at monotonic time: 000000000F107480 msec
+          [1661746360.321478][132620:132620] CHIP:EM: Flushed pending ack for MessageCounter:123253178 on exchange 23506r
+          [1661746360.321713][132620:132620] CHIP:FP: Validating NOC chain
+          [1661746360.322745][132620:132620] CHIP:FP: NOC chain validation successful
       disabled: true
 
     - label:
           "Commissioner configures operational network on TH if TH both supports
           and requires"
       verification: |
-          Verifiy on TH as commissionee side:
+          Verify in TH (ALL-CLUSTER-APP)
           [1660151567834] [99153:10411339] CHIP: [CTL] Received certificate signing request from the device
-          [1660151567834] [99153:10411339] CHIP: [CTL] Successfully finished commissioning step 'SendOpCertSigningRequest'
+          [1660151567834] [99153:10411339] CHIP: [CTL] Successfully finished commissioning step "SendOpCertSigningRequest"
       disabled: true
 
     - label:
           "Commissioner instructs Commissionee to connect to operational network
           if not already connected"
       verification: |
-          Verifiy on TH as commissionee side:
+          Verify in TH (ALL-CLUSTER-APP)
           [1660152735.835717][648909:648909] CHIP:ZCL: OpCreds: successfully created fabric index 0x1 via AddNOC
       disabled: true
 
     - label: "Commissioner starts discovery of TH using Operational Discovery"
       verification: |
-          Verifiy on TH as commissionee side:
+          Verify in TH (ALL-CLUSTER-APP)
           [1660152735.835315][648909:648909] CHIP:DIS: Broadcasting mDns reply for query from fe80::808c:7ff:fefd:3b1
           [1660152735.835522][648909:648909] CHIP:DIS: mDNS service published: _matter._tcp
           [1660152735.835565][648909:648909] CHIP:DMG: Endpoint 0, Cluster 0x0000_003E update version to 553aae1
@@ -275,9 +209,9 @@ tests:
     - label:
           "Commissioner opens a CASE session with TH over operational network"
       verification: |
-          Verify in TH as commissionee side:
+          Verify in TH (ALL-CLUSTER-APP)
 
-          CASE Server enabling CASE session setups
+           CASE Server enabling CASE session setups
           [1653471957.713139][10713:10713] CHIP:SVR: Joining Multicast groups
           [1653471957.713654][10713:10713] CHIP:ZCL: Emitting StartUp event
           [1653471957.714762][10713:10713] CHIP:EVL: LogEvent event number: 0x0000000000000000 priority: 2, endpoint id:  0x0 cluster id: 0x0000_0028 event id: 0x0 Sys timestamp: 0x000000000059AC88
@@ -286,7 +220,7 @@ tests:
 
     - label: "Commissioner sends CommissioningComplete command"
       verification: |
-          Verifiy on TH as commissionee side:
+          Verify in TH (ALL-CLUSTER-APP)
           [1660154248.898113][7143:7143] CHIP:SVR: Commissioning completed successfully
       disabled: true
 
@@ -294,8 +228,8 @@ tests:
           "Commissioning channel between the Commissioner and Commissionee is
           terminated."
       verification: |
-          Verify on TH as commissionee side:
+          Verify in TH (ALL-CLUSTER-APP)
           [1660154249.008047][7143:7143] CHIP:IN: Expiring all PASE sessions
           [1660154249.008069][7143:7143] CHIP:IN: SecureSession[0xaaab09155000]: MarkForEviction Type:1 LSID:5786
-          [1660154249.008090][7143:7143] CHIP:SC: SecureSession[0xaaab09155000]: Moving from state 'kActive' --> 'kPendingEviction'
+          [1660154249.008090][7143:7143] CHIP:SC: SecureSession[0xaaab09155000]: Moving from state "kActive" --> "kPendingEviction"
       disabled: true

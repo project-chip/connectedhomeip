@@ -70,7 +70,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -139,7 +139,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -179,7 +179,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -200,7 +200,7 @@ tests:
           set in step 5, TH_CR1 opens a 2nd commissioning window on DUT_CE using
           a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -249,7 +249,7 @@ tests:
           "TH_CR1 re-opens a commissioning window on DUT_CE using a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -285,7 +285,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       identity: "gamma"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -324,7 +324,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
       PICS: CADMIN.S.C01.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -338,7 +338,7 @@ tests:
           a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       identity: "beta"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:

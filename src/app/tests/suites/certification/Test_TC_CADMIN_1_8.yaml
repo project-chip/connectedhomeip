@@ -52,7 +52,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1 0 --timedInteractionTimeoutMs 1000
 
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
@@ -130,7 +130,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          /chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
 
 
           Verify the Commissioning window is closed in TH_CE(all-clusters-app) Log
@@ -162,7 +162,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          /chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
 
 
           Verify the Commissioning window is closed in TH_CE(all-clusters-app) Log
@@ -181,7 +181,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool basic write node-label te5new 1 0
+          ./chip-tool  basicinformation write node-label te5new 1 0
 
           Verify Write request on TH_CE(all-clusters-app) Log
 
@@ -206,7 +206,7 @@ tests:
           [1660894021.902912][2871:2871] CHIP:DMG:                         Data = "te5new" (6 chars),
           [1660894021.902985][2871:2871] CHIP:DMG:                 },
 
-          ./chip-tool basic read node-label 1 0
+          ./chip-tool  basicinformation read node-label 1 0
 
           Verify read request on TH_CE(all-clusters-app) Log
 

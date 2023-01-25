@@ -44,12 +44,18 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef ENABLE_WSTK_LEDS
-#define SYSTEM_STATE_LED &sl_led_led0
+#if SL_STATUS_LED
 #define LIGHT_LED &sl_led_led1
+#else
+#define LIGHT_LED &sl_led_led0
+#endif
 #endif // ENABLE_WSTK_LEDS
+
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -225,11 +231,13 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
         actor  = aEvent->LightEvent.Actor;
     }
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
         action = (LightMgr().IsLightOn()) ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
         actor  = AppEvent::kEventType_Button;
     }
+#endif
     else
     {
         err = APP_ERROR_UNHANDLED_EVENT;
@@ -245,7 +253,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         }
     }
 }
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
 {
     if (buttonHandle == NULL)
@@ -269,6 +277,8 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
     }
 }
 
+#endif
+
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     // Action initiated, update the light led
@@ -282,11 +292,12 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(lightOn);
 #endif
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     if (aActor == AppEvent::kEventType_Button)
     {
         sAppTask.mSyncClusterToButtonAction = true;
     }
+#endif
 }
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction)
@@ -300,12 +311,13 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     {
         SILABS_LOG("Light OFF")
     }
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     if (sAppTask.mSyncClusterToButtonAction)
     {
         chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
+#endif
 }
 
 void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)

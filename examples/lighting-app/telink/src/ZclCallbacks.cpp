@@ -17,7 +17,8 @@
  */
 
 #include "AppTask.h"
-#include "LightingManager.h"
+#include "ColorFormat.h"
+#include "PWMDevice.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -32,26 +33,86 @@ using namespace chip::app::Clusters::OnOff;
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
+    static HsvColor_t hsv;
+    static XyColor_t xy;
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
         ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
-                                     AppEvent::kEventType_Lighting, size, value);
+        GetAppTask().SetInitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
+                                       static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
-
-        if (LightingMgr().IsTurnedOn())
+        if (GetAppTask().GetPWMDevice().IsTurnedOn())
         {
-            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
+            ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
+            GetAppTask().SetInitiateAction(PWMDevice::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
         }
         else
         {
             ChipLogDetail(Zcl, "LED is off. Try to use move-to-level-with-on-off instead of move-to-level");
+        }
+    }
+    else if (clusterId == ColorControl::Id)
+    {
+        /* Ignore several attributes that are currently not processed */
+        if ((attributeId == ColorControl::Attributes::RemainingTime::Id) ||
+            (attributeId == ColorControl::Attributes::EnhancedColorMode::Id) ||
+            (attributeId == ColorControl::Attributes::ColorMode::Id))
+        {
+            return;
+        }
+
+        /* XY color space */
+        if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
+        {
+            if (attributeId == ColorControl::Attributes::CurrentX::Id)
+            {
+                xy.x = *reinterpret_cast<uint16_t *>(value);
+            }
+            else if (attributeId == ColorControl::Attributes::CurrentY::Id)
+            {
+                xy.y = *reinterpret_cast<uint16_t *>(value);
+            }
+
+            ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
+            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+                                           (uint8_t *) &xy);
+        }
+        /* HSV color space */
+        else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
+                 attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
+                 attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+        {
+            if (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+            {
+                hsv.h = (uint8_t)(((*reinterpret_cast<uint16_t *>(value)) & 0xFF00) >> 8);
+                hsv.s = (uint8_t)((*reinterpret_cast<uint16_t *>(value)) & 0xFF);
+            }
+            else if (attributeId == ColorControl::Attributes::CurrentHue::Id)
+            {
+                hsv.h = *value;
+            }
+            else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
+            {
+                hsv.s = *value;
+            }
+            ChipLogProgress(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
+            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+                                           (uint8_t *) &hsv);
+        }
+        /* Temperature Mireds color space */
+        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
+        {
+            ChipLogProgress(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
+            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "Ignore ColorControl attribute (%u) that is not currently processed!", attributeId);
         }
     }
 }
@@ -75,7 +136,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
         // Set actual state to stored before reboot
-        LightingMgr().Set(storedValue);
+        GetAppTask().GetPWMDevice().Set(storedValue);
     }
 
     GetAppTask().UpdateClusterState();

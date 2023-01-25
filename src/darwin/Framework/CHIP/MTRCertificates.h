@@ -20,14 +20,16 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NSData * MTRCertificateDERBytes;
-typedef NSData * MTRCertificateTLVBytes;
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRKeypair;
 
 @interface MTRCertificates : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 /**
  * Create a root (self-signed) X.509 DER encoded certificate that has the
@@ -128,8 +130,8 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (NSData * _Nullable)createCertificateSigningRequest:(id<MTRKeypair>)keypair
-                                                error:(NSError * __autoreleasing _Nullable * _Nullable)error;
++ (MTRCSRDERBytes _Nullable)createCertificateSigningRequest:(id<MTRKeypair>)keypair
+                                                      error:(NSError * __autoreleasing _Nullable * _Nullable)error;
 
 /**
  * Convert the given X.509v3 DER encoded certificate to the Matter certificate
@@ -150,6 +152,15 @@ NS_ASSUME_NONNULL_BEGIN
  * represented in the X.509v3 DER format).
  */
 + (MTRCertificateDERBytes _Nullable)convertMatterCertificate:(MTRCertificateTLVBytes)matterCertificate MTR_NEWLY_AVAILABLE;
+
+/**
+ * Extract the public key from the given PKCS#10 certificate signing request.
+ * This is the public key that a certificate issued in response to the request
+ * would need to have.
+ */
++ (NSData * _Nullable)extractPublicKeyFromCertificateSigningRequest:(MTRCSRDERBytes)certificateSigningRequest
+                                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    MTR_NEWLY_AVAILABLE;
 
 @end
 

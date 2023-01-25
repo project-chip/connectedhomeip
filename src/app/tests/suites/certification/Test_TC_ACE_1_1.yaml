@@ -15,6 +15,9 @@
 
 name: 42.1.1. [TC-ACE-1.1] Privileges - REMOVED
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
@@ -28,21 +31,15 @@ tests:
 
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-          DUT side:
-           sudo ./chip-all-clusters-app
+          DUT is commissioned on TH1 fabric
 
-          TH side:
-          ./chip-tool pairing ethernet 1 20202021 chiip5 matter123 3840  fe80::e65f:1ff:fe0f:2753  5540
-
-          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
       disabled: true
 
     - label:
           "TH writes the ACL attribute with a list of AccessControlEntryStruct
           entries containing 1 elements, granting itself administer privileges
-          on all of Endpoint 1: 1. struct Privilege field: Administer (5)
-          AuthMode field: CASE (2) Subjects field: [N1] Targets field:
-          [{Endpoint: 0}]"
+          on all of Endpoint 1: struct Privilege field: Administer (5) AuthMode
+          field: CASE (2) Subjects field: [N1] Targets field: [{Endpoint: 0}]"
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]" 1 0
           On TH(Chiptool),Verify ACL attribute with a list of AccessControlEntryStruct entries containing 1 element.
@@ -123,9 +120,9 @@ tests:
 
     - label:
           "TH writes the Location attribute in the Basic Information cluster
-          with XX (requires administer privilege)"
+          with 'XX' (requires administerprivilege)"
       verification: |
-          ./chip-tool basic write location xx 1 0
+          ./chip-tool basicinformation write location xx 1 0
           On TH(Chiptool),Verify Successfully Location attribute in the Basic Information cluster
            with "XX" (requires administer privilege)
           1660287985.294180][3436:3441] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -160,7 +157,7 @@ tests:
 
     - label:
           "TH sends the UpdateFabricLabel command to the Node Operational
-          Credentials cluster with the Label field set to TestFabric (requires
+          Credentials cluster with the Label field set to 'TestFabric'(requires
           administer privilege)"
       verification: |
           ./chip-tool operationalcredentials   update-fabric-label  Testfabric 1 0
@@ -190,9 +187,9 @@ tests:
 
     - label:
           "TH writes the NodeLabel attribute in the Basic Information cluster
-          with the string TestNode (requires manage privilege)"
+          with the string 'TestNode' (requires manage privilege)"
       verification: |
-          ./chip-tool basic write node-label TestNode  1 0
+          ./chip-tool basicinformation write node-label TestNode  1 0
           On TH(Chiptool),Verify Successfully NodeLabel attribute in the Basic Information cluster with the
            string "TestNode" (requires manage privilege)
           [1660288214.881228][3458:3463] CHIP:DMG: WriteResponseMessage =
@@ -275,7 +272,7 @@ tests:
           "TH reads the VendorID attribute from the Basic Information cluster
           (requires view privilege)"
       verification: |
-          ./chip-tool basic read vendor-id 1 0
+          ./chip-tool basicinformation read vendor-id 1 0
           On TH(Chiptool),Verify  VendorID attribute from the Basic Information cluster
           288412.817686][3478:3483] CHIP:DMG: {
           [1660288412.817723][3478:3483] CHIP:DMG:         AttributeReportIBs =
@@ -312,9 +309,9 @@ tests:
           "TH writes the ACL attribute with a list of AccessControlEntryStruct
           entries containing 2 elements, giving itself administer privilege only
           on the Access Control cluster and manage privilege on everything else
-          on EP0. 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          on EP0. struct Privilege field: Administer (5) AuthMode field: CASE
           (2) Subjects field: [N1] Targets field: [{Cluster: 0x001F, Endpoint:
-          0}] 2.struct Privilege field: Manage (4) AuthMode field: CASE (2)
+          0}] struct Privilege field: Manage (4) AuthMode field: CASE (2)
           Subjects field: [N1] Targets field: [{Endpoint: 0}]"
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 4, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]" 1 0
@@ -426,9 +423,9 @@ tests:
 
     - label:
           "TH writes the Location attribute in the Basic Information cluster
-          with XX (requires administer privilege)"
+          with 'XX' (requires administer privilege)"
       verification: |
-          ./chip-tool basic write location xx 1 0
+          ./chip-tool basicinformation write location xx 1 0
           On TH(Chiptool),Verify Successfully Location attribute in the Basic Information cluster
            with "XX" (requires administer privilege)
           [1660288749.400037][3516:3521] CHIP:DMG: WriteResponseMessage =
@@ -464,7 +461,7 @@ tests:
 
     - label:
           "TH sends the UpdateFabricLabel command to the operational credentials
-          cluster with the Label field set to TestFabric (requires administer
+          cluster with the Label field set to 'TestFabric' (requires administer
           privilege)"
       verification: |
           ./chip-tool operationalcredentials   update-fabric-label  Testfabric 1 0
@@ -508,7 +505,7 @@ tests:
           "Repeat steps 6 to 8 to confirm that TH still has access associated
           with manage and view privileges"
       verification: |
-          Step 6: ./chip-tool basic write node-label TestNode  1 0
+          Step 6: ./chip-tool basicinformation write node-label TestNode  1 0
 
           On TH(Chiptool),Verify TH still  has manage and view permissions by repeating Steps 6 to 8
 
@@ -572,7 +569,7 @@ tests:
           [1660289262.562511][3553:3560] CHIP:DMG:
           [1660289262.562535][3553:3560] CHIP:DMG:         InteractionModelRevision = 1
           [1660289262.562569][3553:3560] CHIP:DMG: },
-          STEP 8:./chip-tool basic read vendor-id 1 0
+          STEP 8:./chip-tool basicinformation read vendor-id 1 0
           1660289390.248196][3566:3571] CHIP:DMG: ReportDataMessage =
           [1660289390.248239][3566:3571] CHIP:DMG: {
           [1660289390.248273][3566:3571] CHIP:DMG:         AttributeReportIBs =
@@ -609,9 +606,9 @@ tests:
           "TH writes the ACL attribute with a list of AccessControlEntryStruct
           entries containing 2 elements, giving itself administer privilege only
           on the Access Control cluster and operate privilege on everything else
-          on EP0. 1. struct Privilege field: Administer (5) AuthMode field: CASE
+          on EP0. struct Privilege field: Administer (5) AuthMode field: CASE
           (2) Subjects field: [N1] Targets field: [{Cluster: 0x001F, Endpoint:
-          0}] 2. struct Privilege field: Operate (3) AuthMode field: CASE (2)
+          0}] struct Privilege field: Operate (3) AuthMode field: CASE (2)
           Subjects field: [N1] Targets field: [{Endpoint: 0}]"
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 3, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]" 1 0
@@ -723,7 +720,7 @@ tests:
           [1660289669.016863][3588:3588] CHIP:CTL: Shutting down the commissioner
           [1660289669.017002][3588:3588] CHIP:CTL: Shutting down the controller
           [1660289669.017037][3588:3588] CHIP:CTL: Shutting down the commissioner
-          Step 11:./chip-tool basic write location xx 1 0
+          Step 11:./chip-tool basicinformation write location xx 1 0
 
           1660289760.000896][3597:3602] CHIP:DMG: WriteResponseMessage =
           [1660289760.000939][3597:3602] CHIP:DMG: {
@@ -788,9 +785,9 @@ tests:
 
     - label:
           "TH writes the NodeLabel attribute in the Basic Information cluster
-          with the string TestNode (requires manage privilege)"
+          with the string 'TestNode' (requires manage privilege)"
       verification: |
-          ./chip-tool basic write node-label TestNode 1 0
+          ./chip-tool basicinformation write node-label TestNode 1 0
 
           On TH(Chiptool),Verify  NodeLabel attribute in the Basic Information cluster with the string "TestNode" (requires manage privilege) Returns UNSUPPORTED_ACCESS (0x7e)
           [1660290058.857328][3622:3627] CHIP:DMG: {
@@ -864,7 +861,7 @@ tests:
 
     - label: "Repeat step 8 to confirm that the TH still has view privileges"
       verification: |
-          ./chip-tool basic read vendor-id 1 0
+          ./chip-tool basicinformation read vendor-id 1 0
 
                On TH(Chiptool),Verify TH  still has view privilege by repeating step 8
           [1660290302.767326][3645:3650] CHIP:DMG:         AttributeReportIBs =
@@ -900,9 +897,9 @@ tests:
           "TH1 writes the ACL attribute with a list of AccessControlEntryStruct
           entries containing 2 elements, giving itself administer privilege only
           on the Access Control cluster and view privilege on everything else on
-          EP0. 1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          EP0. struct Privilege field: Administer (5) AuthMode field: CASE (2)
           Subjects field: [N1] Targets field: [{Cluster: 0x001F, Endpoint: 0}]
-          2.struct Privilege field: View (1) AuthMode field: CASE (2) Subjects
+          struct Privilege field: View (1) AuthMode field: CASE (2) Subjects
           field: [N1] Targets field: [{Endpoint: 0}]"
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 1, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]" 1 0
@@ -1001,7 +998,7 @@ tests:
           [1660290793.814027][3679:3684] CHIP:IN: Prepared secure message 0xffff95ed5a58 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 53264i with MessageCounter:163518118.
           [1660290793.814076][3679:3684] CHIP:IN: Sending encrypted msg 0xffff95ed5a58 with MessageCounter:163518118 to 0x000000
           STEP 11 :
-          ./chip-tool basic write location xx 1 0
+          ./chip-tool basicinformation write location xx 1 0
           1660290881.760017][3688:3693] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1660290881.760081][3688:3693] CHIP:DMG: WriteResponseMessage =
           [1660290881.760115][3688:3693] CHIP:DMG: {
@@ -1070,7 +1067,7 @@ tests:
       verification: |
           On TH(Chiptool),Verify it still does not have manage privileges by repeating steps 16 ,17
           STEP 16:
-          ./chip-tool basic write node-label TestNode 1 0
+          ./chip-tool basicinformation write node-label TestNode 1 0
 
           [1660291097.342481][3711:3716] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1660291097.342536][3711:3716] CHIP:DMG: WriteResponseMessage =
@@ -1136,7 +1133,7 @@ tests:
 
     - label: "Repeat step 8 to confirm that the TH still has view privileges"
       verification: |
-          ./chip-tool basic read vendor-id 1 0
+          ./chip-tool basicinformation read vendor-id 1 0
           On TH(Chiptool),Verify  VendorID attribute from the Basic Information cluster
           [1660306412.895825][2832:2837] CHIP:DMG: ReportDataMessage =
           [1660306412.895851][2832:2837] CHIP:DMG: {
@@ -1180,9 +1177,9 @@ tests:
     - label:
           "TH writes the ACL attribute with a list of AccessControlEntryStruct
           entries containing a single element, granting Administer privilege on
-          only the Access Control cluster and no other access. 1.struct
-          Privilege field: Administer (5) AuthMode field: CASE (2) Subjects
-          field: [N1] Targets field: [{Cluster: 0x001F, Endpoint: 0}]"
+          only the Access Control cluster and no other access. struct Privilege
+          field: Administer (5) AuthMode field: CASE (2) Subjects field: [N1]
+          Targets field: [{Cluster: 0x001F, Endpoint: 0}]"
       verification: |
           On TH(Chiptool)1,Verify ACL attribute with a list of AccessControlEntryStruct entries containing 1 element.
 
@@ -1264,7 +1261,7 @@ tests:
           [1660291809.031749][3773:3779] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
 
 
-          Step 11.  ./chip-tool basic write location xx 1 0
+          Step 11.  ./chip-tool basicinformation write location xx 1 0
 
           660291846.616184][3780:3785] CHIP:DMG: WriteResponseMessage =
           [1660291846.616222][3780:3785] CHIP:DMG: {
@@ -1332,7 +1329,7 @@ tests:
           privileges"
       verification: |
           On TH(Chiptool),Verify it  still does not have manage privileges by repeating steps 16,17
-          Step 16)./chip-tool basic write node-label TestNode 1 0
+          Step 16)./chip-tool basicinformation write node-label TestNode 1 0
 
           1660292038.309440][3801:3806] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1660292038.309498][3801:3806] CHIP:DMG: WriteResponseMessage =
@@ -1439,7 +1436,7 @@ tests:
       verification: |
           On TH(Chiptool),Verify VendorID attribute from the Basic Information cluster (requires view privilege) Returns  UNSUPPORTED_ACCESS (0x7e)
 
-           ./chip-tool basic  read  vendor-id 1 0
+           ./chip-tool basicinformation  read  vendor-id 1 0
 
            :3827] CHIP:DMG:         [
           [1660292225.412956][3822:3827] CHIP:DMG:                 AttributeReportIB =

@@ -43,7 +43,7 @@ TizenEthernetDriver::EthernetNetworkIterator::EthernetNetworkIterator(TizenEther
     for (const auto * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
         if (DeviceLayer::Internal::ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) ==
-            app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
+            app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET)
         {
             mInterfaces.push_back(ifa->ifa_name);
             if (mInterfaces.size() == mDriver->GetMaxNetworks())

@@ -201,7 +201,7 @@ public class ClusterInfoMapping {
   }
   {{#chip_client_clusters}}
   {{#chip_cluster_responses}}
-      public static class Delegated{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
+      public static class Delegated{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -327,7 +327,7 @@ public class ClusterInfoMapping {
            {{#if mustUseTimedInvoke}}, 10000{{/if}}
            );
          },
-         () -> new Delegated{{asUpperCamelCase responseName}}Callback(),
+         () -> new Delegated{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase responseName}}Callback(),
            {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams
        );
      {{else}}

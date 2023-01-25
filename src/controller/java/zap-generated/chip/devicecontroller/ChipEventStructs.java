@@ -925,7 +925,7 @@ public class ChipEventStructs {
     public @Nullable Integer userIndex;
     public @Nullable Integer fabricIndex;
     public @Nullable Long sourceNode;
-    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials;
+    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterCredentialStruct>> credentials;
 
     public DoorLockClusterLockOperationEvent(
         Integer lockOperationType,
@@ -933,7 +933,7 @@ public class ChipEventStructs {
         @Nullable Integer userIndex,
         @Nullable Integer fabricIndex,
         @Nullable Long sourceNode,
-        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials) {
+        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterCredentialStruct>> credentials) {
       this.lockOperationType = lockOperationType;
       this.operationSource = operationSource;
       this.userIndex = userIndex;
@@ -976,7 +976,7 @@ public class ChipEventStructs {
     public @Nullable Integer userIndex;
     public @Nullable Integer fabricIndex;
     public @Nullable Long sourceNode;
-    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials;
+    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterCredentialStruct>> credentials;
 
     public DoorLockClusterLockOperationErrorEvent(
         Integer lockOperationType,
@@ -985,7 +985,7 @@ public class ChipEventStructs {
         @Nullable Integer userIndex,
         @Nullable Integer fabricIndex,
         @Nullable Long sourceNode,
-        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials) {
+        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterCredentialStruct>> credentials) {
       this.lockOperationType = lockOperationType;
       this.operationSource = operationSource;
       this.operationError = operationError;

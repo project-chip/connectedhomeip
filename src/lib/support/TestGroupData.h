@@ -44,8 +44,10 @@ inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip
 {
     static const chip::GroupId kGroup1   = 0x0101;
     static const chip::GroupId kGroup2   = 0x0102;
+    static const chip::GroupId kGroup3   = 0x0103;
     static const chip::KeysetId kKeySet1 = 0x01a1;
     static const chip::KeysetId kKeySet2 = 0x01a2;
+    static const chip::KeysetId kKeySet3 = 0x01a3;
 
     // Groups
 
@@ -56,6 +58,10 @@ inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip
     const chip::Credentials::GroupDataProvider::GroupInfo group2(kGroup2, "Group #2");
     ReturnErrorOnFailure(provider->SetGroupInfo(fabric_index, group2));
     ReturnErrorOnFailure(provider->AddEndpoint(fabric_index, group2.group_id, 0));
+
+    const chip::Credentials::GroupDataProvider::GroupInfo group3(kGroup3, "Group #3");
+    ReturnErrorOnFailure(provider->SetGroupInfo(fabric_index, group3));
+    ReturnErrorOnFailure(provider->AddEndpoint(fabric_index, group3.group_id, 0));
 
     // Key Sets
 
@@ -81,8 +87,20 @@ inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip
     err = provider->SetKeySet(fabric_index, compressed_fabric_id, keyset2);
     ReturnErrorOnFailure(err);
 
+    chip::Credentials::GroupDataProvider::KeySet keyset3(kKeySet3,
+                                                         chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst, 3);
+    const chip::Credentials::GroupDataProvider::EpochKey epoch_keys3[] = {
+        { 2220000, { 0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf } },
+        { 2220001, { 0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf } },
+        { 2220002, { 0xd2, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf } },
+    };
+    memcpy(keyset3.epoch_keys, epoch_keys3, sizeof(epoch_keys3));
+    err = provider->SetKeySet(fabric_index, compressed_fabric_id, keyset3);
+    ReturnErrorOnFailure(err);
+
     provider->SetGroupKeyAt(fabric_index, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
     provider->SetGroupKeyAt(fabric_index, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2));
+    provider->SetGroupKeyAt(fabric_index, 2, chip::Credentials::GroupDataProvider::GroupKey(kGroup3, kKeySet3));
 
     return CHIP_NO_ERROR;
 }

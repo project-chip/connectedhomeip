@@ -60,7 +60,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -87,7 +87,7 @@ tests:
 
     - label:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000
@@ -95,7 +95,7 @@ tests:
           value: 0
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
@@ -116,7 +116,7 @@ tests:
 
     - label:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
       PICS: CADMIN.S.A0000

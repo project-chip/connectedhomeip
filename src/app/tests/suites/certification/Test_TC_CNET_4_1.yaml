@@ -41,7 +41,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 1 0
 
-          Verify "server list" on the TH(Chip-tool) Log:
+          Verify "server list has value: 49" on the TH(Chip-tool) Log:
 
           [1654250292.680821][5262:5267] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 812190876
           [1654250292.681079][5262:5267] CHIP:TOO:   server list: 26 entries
@@ -184,6 +184,17 @@ tests:
           "[1653474059.383553][27286:27291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 1912591449
           [1653474059.383618][27286:27291] CHIP:TOO:   LastNetworkID: 47524C50726976617465
           [1653474059.383723][27286:27291] CHIP:EM: Sending Standalone Ack for MessageCounter:6975079 on exchange 34674i"
+
+          ./chip-tool networkcommissioning read networks 1 0
+
+          Verify "lastnetworkID is present in the NetworkID in the entries of Network" on the TH(Chip-tool) Log:
+
+          [1654250379.881780][5309:5314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3741733376
+          [1654250379.881974][5309:5314] CHIP:TOO:   Networks: 1 entries
+          [1654250379.882123][5309:5314] CHIP:TOO:     [1]: {
+          [1654250379.882196][5309:5314] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1654250379.882257][5309:5314] CHIP:TOO:       Connected: TRUE
+          [1654250379.882312][5309:5314] CHIP:TOO:      }
       disabled: true
 
     - label: "TH reads the LastConnectErrorValue attribute from the DUT"

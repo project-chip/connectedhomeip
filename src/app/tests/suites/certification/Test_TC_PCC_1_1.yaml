@@ -35,17 +35,85 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 3
+          value: 4
           constraints:
               type: int16u
 
     - label: "TH reads the FeatureMap attribute from the DUT"
+      PICS:
+          " !PCC.S.F00 && !PCC.S.F01 && !PCC.S.F02 && !PCC.S.F03 && !PCC.S.F04
+          && !PCC.S.F05 && !PCC.S.F06 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
           constraints:
               type: bitmap32
+
+    - label:
+          "Given PCC.S.F00(PRSCONST) ensure featuremap has the correct bit set"
+      PICS: PCC.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Given PCC.S.F01(PRSCOMP) ensure featuremap has the correct bit set"
+      PICS: PCC.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Given PCC.S.F02(FLW) ensure featuremap has the correct bit set"
+      PICS: PCC.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label: "Given PCC.S.F03(SPD) ensure featuremap has the correct bit set"
+      PICS: PCC.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label: "Given PCC.S.F04(TEMP) ensure featuremap has the correct bit set"
+      PICS: PCC.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
+
+    - label: "Given PCC.S.F05(AUTO) ensure featuremap has the correct bit set"
+      PICS: PCC.S.F05
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20]
+
+    - label: "Given PCC.S.F06(LOCAL) ensure featuremap has the correct bit set"
+      PICS: PCC.S.F06
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x40]
 
     - label: "TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"

@@ -32,16 +32,16 @@ tests:
 
     - label: "Precondition"
       verification: |
-          To Provision the DUT using  ethernet
+          Execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
           ./chip-all-clusters-app
 
           *Provision the device using chip tool on first controller(RC1)
-          *./chip-tool pairing ethernet node-id  setup-pin-code  discriminator  device-remote-ip  device-remote-port(5540)
+          ./chip-tool pairing onnetwork 1 20202021
           on first controller open a commissioning window using below command (In RC1)
           ./chip-tool pairing open-commissioning-window 1 1 400 2000 3840 (Save the manualcode for 2nd  Provision)
 
           *Provision the device using chip tool on 2nd  controller(RC2)
-          * ./chip-tool pairing code 2 mannualcode –commissioner name beta
+          * ./chip-tool pairing code 2 mannualcode --commissioner-name beta
       disabled: true
 
     - label:
@@ -345,7 +345,7 @@ tests:
           [1657780904.261840][2741:2746] CHIP:TOO: VendorId: 65521
           [1657780904.261865][2741:2746] CHIP:TOO: FabricId: 2
           [1657780904.261889][2741:2746] CHIP:TOO: NodeId: 1
-          [1657780904.261913][2741:2746] CHIP:TOO: Label:
+          [1657780904.261913][2741:2746] CHIP:TOO: Label: 1
           [1657780904.261937][2741:2746] CHIP:TOO: FabricIndex: 1
           [1657780904.261960][2741:2746] CHIP:TOO: }
           [1657780904.261994][2741:2746] CHIP:TOO: [2]: {
@@ -353,7 +353,7 @@ tests:
           [1657780904.262049][2741:2746] CHIP:TOO: VendorId: 65521
           [1657780904.262073][2741:2746] CHIP:TOO: FabricId: 3
           [1657780904.262096][2741:2746] CHIP:TOO: NodeId: 2
-          [1657780904.262119][2741:2746] CHIP:TOO: Label: 1
+          [1657780904.262119][2741:2746] CHIP:TOO: Label:
           [1657780904.262141][2741:2746] CHIP:TOO: FabricIndex: 2
           [1657780904.262164][2741:2746] CHIP:TOO: }
           [1657780904.262252][2741:2746] CHIP:EM: Sending Standalone Ack for MessageCounter:203207506 on exchange 27504i
@@ -553,7 +553,7 @@ tests:
           [1660742282.280940][9069:9074] CHIP:DMG: MoveToState ReadClient[0xffff7000ce70]: Moving to [AwaitingSu]
 
 
-          ON RC2 Verify that the DUT sends a response remains same as in sub-step #2
+          ON RC2 Verify that the DUT sends a response remains same as in sub-step #2 and receives Report Data Message with empty EventReports
           [1660742276.568516][17561:17566] CHIP:DMG: }
           [1660742276.568676][17561:17566] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
           [1660742276.568688][17561:17566] CHIP:TOO:   Event number: 2
