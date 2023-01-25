@@ -72,6 +72,11 @@ def _SetupSourceZap(install_directory: str, zap_version: str):
 
 
 def _SetupReleaseZap(install_directory: str, zap_version: str):
+    """
+    Downloads the given [zap_version] into "[install_directory]/zap-[zap_version]/".
+
+    Will download the given release from github releases.
+    """
 
     if sys.platform == 'linux':
         zap_platform = 'linux'
