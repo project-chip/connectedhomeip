@@ -55,6 +55,7 @@ USAGE_FILES_DEPENDING_ON_ZAP_VERSION = [
     '.github/workflows/fuzzing-build.yaml',
     '.github/workflows/tests.yaml',
     'integrations/docker/images/chip-cert-bins/Dockerfile',
+    'scripts/zap.json',
 ]
 
 # Note that chip-cert-bits is assumed USAGE on purpose (it compiles code)
