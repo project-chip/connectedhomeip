@@ -54,9 +54,7 @@ def _GetDefaultExtractRoot():
     if 'PW_ENVIRONMENT_ROOT' in os.environ:
         return os.environ['PW_ENVIRONMENT_ROOT']
     else:
-        # Before bootstrap, this will pick a temporary directory. Probably
-        # not ideal, but it likely just works
-        return '/tmp/'
+        return ".zap"
 
 
 def _LogPipeLines(pipe, prefix):
@@ -196,6 +194,10 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
             format='%(asctime)s %(name)s %(levelname)-7s %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
+
+    if extract_root == ".zap":
+        # Place .zap in the project root
+        extract_root = os.path.join(sdk_root, extract_root)
 
     if not zap_version:
         zap_version = _GetZapVersionToUse(sdk_root)
