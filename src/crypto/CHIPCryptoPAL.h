@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright 2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -587,6 +588,10 @@ public:
 
     /** Release resources associated with this key pair */
     void Clear();
+
+#if CHIP_CRYPTO_TRUSTY_OS
+    uint64_t p256_handler = 0;
+#endif
 
 protected:
     P256PublicKey mPublicKey;
