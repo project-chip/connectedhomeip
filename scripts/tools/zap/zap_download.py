@@ -49,13 +49,6 @@ class DownloadType(enum.Enum):
     RELEASE = enum.auto()  # asking for a zip file release download
     SOURCE = enum.auto()  # asking for a source download (will work on arm64 for example)
 
-# Downloads zap into the current environment
-# Arguments:
-#    - $1 - zap version to download
-#    - $2 - type of download:
-#         "release" - attempts to download the release version (a zip file)
-#         "devel" - checks out the corresponding tag and does "npm ci"
-
 
 def _GetDefaultExtractRoot():
     if 'PW_ENVIRONMENT_ROOT' in os.environ:
