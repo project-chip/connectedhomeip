@@ -68,7 +68,15 @@ CHIP_ERROR CastingServer::SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteS
     // if this class's client provided a RotatingDeviceIdUniqueId, use that
     if (rotatingDeviceIdUniqueIdOptional.HasValue())
     {
-        ChipLogProgress(AppServer, "Setting rotatingDeviceIdUniqueId received from client app");
+        char hexRotatingDeviceIdUniqueId[2 * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH];
+        Encoding::BytesToUppercaseHexString(rotatingDeviceIdUniqueIdOptional.Value().data(),
+                                            rotatingDeviceIdUniqueIdOptional.Value().size(), hexRotatingDeviceIdUniqueId,
+                                            2 * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH);
+        ChipLogProgress(
+            AppServer,
+            "Setting unique ID (for generating rotating device ID) received from client app (hex): %s with byte size: %zu",
+            hexRotatingDeviceIdUniqueId, rotatingDeviceIdUniqueIdOptional.Value().size());
+
         return chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdOptional.Value());
     }
 #ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID

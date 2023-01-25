@@ -251,6 +251,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
     ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+    ChipLogProgress(Discovery, "Advertising rotating device ID (hex): 0x%s", rotatingDeviceIdHexBuffer);
     advertiseParameters.SetRotatingDeviceId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
@@ -423,6 +424,12 @@ CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[
     ReturnErrorOnFailure(
         chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
     additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+
+    char hexRotatingDeviceIdUniqueId[2 * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH];
+    Encoding::BytesToUppercaseHexString(rotatingDeviceIdUniqueIdSpan.data(), rotatingDeviceIdUniqueIdSpan.size(),
+                                        hexRotatingDeviceIdUniqueId, 2 * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH);
+    ChipLogProgress(Discovery, "Generating rotating device ID based on unique ID (hex): %s with byte size: %zu",
+                    hexRotatingDeviceIdUniqueId, rotatingDeviceIdUniqueIdSpan.size());
 
     return AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
         additionalDataPayloadParams, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize, rotatingDeviceIdValueOutputSize);

@@ -232,6 +232,14 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     else
     {
         SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+
+        ChipLogProgress(
+            NotSpecified,
+            "emberAfGeneralCommissioningClusterCommissioningCompleteCallback: SessionType: %hhu, SecureSessionType: %hhu, "
+            "commandObj.FabricIndex: %d, failSafe.fabricIndex: %d",
+            handle->GetSessionType(), handle->AsSecureSession()->GetSecureSessionType(), commandObj->GetAccessingFabricIndex(),
+            failSafe.GetFabricIndex());
+
         // If not a CASE session, or the fabric does not match the fail-safe,
         // error out.
         if (handle->GetSessionType() != Session::SessionType::kSecure ||
