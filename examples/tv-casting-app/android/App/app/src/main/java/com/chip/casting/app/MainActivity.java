@@ -27,7 +27,11 @@ public class MainActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    initJni();
+    boolean ret = initJni();
+    if (!ret) {
+      Log.e(TAG, "Failed to initialize Matter TV casting library");
+      return;
+    }
 
     Fragment fragment = CommissionerDiscoveryFragment.newInstance(tvCastingApp);
     getSupportFragmentManager()
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity
    * AndroidChipPlatform to prepare platform, then start ChipAppServer, then call init on
    * TvCastingApp
    */
-  private void initJni() {
+  private boolean initJni() {
     tvCastingApp = new TvCastingApp();
 
     Context applicationContext = this.getApplicationContext();
@@ -84,7 +88,7 @@ public class MainActivity extends AppCompatActivity
     appParameters.setDacProvider(new DACProviderStub());
     appParameters.setSetupPasscode(GlobalCastingConstants.SetupPasscode);
     appParameters.setDiscriminator(GlobalCastingConstants.Discriminator);
-    tvCastingApp.initApp(applicationContext, appParameters);
+    return tvCastingApp.initApp(applicationContext, appParameters);
   }
 
   private void showFragment(Fragment fragment, boolean showOnBack) {

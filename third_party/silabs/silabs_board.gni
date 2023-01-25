@@ -93,8 +93,14 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4319A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240L022RNF"
+} else if (silabs_board == "BRD2704A") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240PB32VNA"
+} else if (silabs_board == "BRD4318A") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240SD22VNA"
 } else {
   print(
-      "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A)")
+      "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A, BRD2704A)")
   assert(false, "The board ${silabs_board} is unsupported")
 }
