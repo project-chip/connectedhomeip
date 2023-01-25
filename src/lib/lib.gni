@@ -29,4 +29,7 @@ declare_args() {
 
   # Set to true to enable device-specific attestation credentials
   chip_build_platform_attestation_credentials_provider = false
+
+  # Set to true to enable Trusty OS
+  chip_with_trusty_os = false
 }
