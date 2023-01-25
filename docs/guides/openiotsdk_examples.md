@@ -11,6 +11,7 @@ The list of currently supported Matter examples:
 shell
 lock-app
 tv-app
+all-clusters-app
 ```
 
 You can use these examples as a reference for creating your own applications.
