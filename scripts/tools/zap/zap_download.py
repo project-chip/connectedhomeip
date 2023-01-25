@@ -15,18 +15,17 @@
 # limitations under the License.
 
 import enum
+import io
 import logging
 import os
 import re
-import requests
-import zipfile
-import io
-import sys
 import shlex
-
+import sys
+import zipfile
 from typing import Optional
 
 import click
+import requests
 
 try:
     import coloredlogs
@@ -64,11 +63,13 @@ def _GetDefaultExtractRoot():
         # not ideal, but it likely just works
         return '/tmp/'
 
+
 def _SetupSourceZap(install_directory: str, zap_version: str):
     # TODO:
     #   - git checkout
     #   - npm ci
     raise Exception("NOT YET IMPLEMENTED")
+
 
 def _SetupReleaseZap(install_directory: str, zap_version: str):
 
@@ -78,7 +79,6 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
         zap_platform = 'mac'
     else:
         raise Exception('Unknown platform - do not know what zip file to download.')
-
 
     url = f"https://github.com/project-chip/zap/releases/download/{zap_version}/zap-{zap_platform}.zip"
 
