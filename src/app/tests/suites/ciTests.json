@@ -8,7 +8,8 @@
         "Test_TC_ACL_2_4",
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
-        "Test_TC_ACL_2_9"
+        "Test_TC_ACL_2_9",
+        "Test_TC_ACL_2_10"
     ],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
