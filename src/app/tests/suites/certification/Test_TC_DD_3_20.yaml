@@ -42,8 +42,8 @@ tests:
           "Place TH into commissioning mode using the TH manufacturers means to
           be discovered by the DUT Commissioner"
       verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3840
-          Verify on TH Commissionee side:
+          ./chip-all-clusters-app --discriminator 3840
+          Verify on TH (All-cluster-app):
 
           [1651109580.413197][31207:31207] CHIP:DL: Device Configuration:
           [1651109580.413259][31207:31207] CHIP:DL:   Serial Number: TEST_SN
@@ -70,12 +70,12 @@ tests:
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
-          Verify on TH Commissionee side:
+          Verify on TH (All-cluster-app):
           [1651109784.452770][31207:31207] CHIP:SVR: Commissioning completed successfully
           [1651109784.452813][31207:31207] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on DUT Commissioner side:
-          $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+          Verify on DUT (Chip-tool):
+           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651109784376] [95553:65657838] CHIP: [CTL] Received CommissioningComplete response
           [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
@@ -90,7 +90,7 @@ tests:
           network."
       verification: |
           ./chip-tool operationalcredentials remove-fabric 1 1 0
-          Verify on DUT Commissioner side:
+          Verify on DUT (Chip-tool):
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
@@ -107,8 +107,8 @@ tests:
       verification: |
           1. Place the TH into commissioning mode by launching the app again
 
-          $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3840
-          Verify on TH Commissionee side:
+          ./chip-all-clusters-app --discriminator 3840
+          Verify on TH (All-cluster-app):
 
           [1651110721.112368][31791:31791] CHIP:DL: Device Configuration:
           [1651110721.112448][31791:31791] CHIP:DL:   Serial Number: TEST_SN
@@ -135,12 +135,12 @@ tests:
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
-          Verify on TH Commissionee side:
+          Verify on TH (All-cluster-app):
           [1651110724.759825][31791:31791] CHIP:SVR: Commissioning completed successfully
           [1651110724.759869][31791:31791] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on DUT Commissioner side:
-          $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+          Verify on DUT (Chip-tool):
+           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651110724689] [95810:65669790] CHIP: [CTL] Received CommissioningComplete response
           [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step "SendComplete"

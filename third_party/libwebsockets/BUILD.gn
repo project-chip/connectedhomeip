@@ -22,6 +22,7 @@ config("libwebsockets_config") {
     "-Wno-shadow",
     "-Wno-unreachable-code",
     "-Wno-format-nonliteral",
+    "-Wno-implicit-fallthrough",
   ]
 
   defines = []

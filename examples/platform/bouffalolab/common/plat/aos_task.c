@@ -6,17 +6,18 @@
  * web site:    https://www.bouffalolab.com/
  */
 
+#ifdef SYS_AOS_LOOP_ENABLE
+
 #include <FreeRTOS.h>
 #include <timers.h>
 
-#ifdef SYS_AOS_LOOP_ENABLE
 #include <vfs.h>
 
 #include <aos/kernel.h>
 #include <aos/yloop.h>
 #include <event_device.h>
 
-#include <AppConfig.h>
+#include <plat.h>
 
 static void aos_loop_proc(void * pvParameters)
 {

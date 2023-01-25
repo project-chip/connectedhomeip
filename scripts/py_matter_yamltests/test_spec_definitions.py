@@ -14,10 +14,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from matter_yamltests.definitions import *
-
-import unittest
 import io
+import unittest
+
+from matter_yamltests.definitions import *
 
 source_cluster = '''<?xml version="1.0"?>
   <configurator>
@@ -48,6 +48,21 @@ source_response = '''<?xml version="1.0"?>
 
       <command source="server" code="0x0" name="TestCommandResponse">
           <arg name="arg1" type="int8u"/>
+      </command>
+
+    </cluster>
+  </configurator>
+'''
+
+source_response_with_nullable = '''<?xml version="1.0"?>
+  <configurator>
+    <cluster>
+      <name>Test</name>
+      <code>0x1234</code>
+
+      <command source="server" code="0x0" name="TestCommandResponse">
+          <arg name="arg1" type="int8u"/>
+          <arg name="arg2" type="int8u" isNullable="true"/>
       </command>
 
     </cluster>
@@ -184,6 +199,24 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertEqual(definitions.get_response_name(
             0x1234, 0x0), 'TestCommandResponse')
 
+    def test_response_name_with_nullable(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_response_with_nullable), name='source_response_with_nullable')])
+        cluster_name = 'Test'
+        response_name = 'TestCommandResponse'
+
+        self.assertEqual(definitions.get_cluster_name(0x1234), cluster_name)
+        self.assertEqual(definitions.get_response_name(
+            0x1234, 0x0), response_name)
+
+        response = definitions.get_response_by_name(
+            cluster_name, response_name)
+        for field in response.fields:
+            if field.name == 'arg1':
+                self.assertFalse(definitions.is_nullable(field))
+            else:
+                self.assertTrue(definitions.is_nullable(field))
+
     def test_attribute_name(self):
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_attribute), name='source_attribute')])
@@ -215,8 +248,8 @@ class TestSpecDefinitions(unittest.TestCase):
             'Test', 'TestCommand'), Command)
         self.assertIsNone(
             definitions.get_command_by_name('test', 'TestCommand'))
-        self.assertIsInstance(definitions.get_command_by_name(
-            'Test', 'testcommand'), Command)
+        self.assertRaises(KeyError, definitions.get_command_by_name,
+                          'Test', 'testcommand')
 
     def test_get_response_by_name(self):
         definitions = SpecDefinitions(
@@ -231,8 +264,8 @@ class TestSpecDefinitions(unittest.TestCase):
             'Test', 'TestCommandResponse'), Struct)
         self.assertIsNone(definitions.get_response_by_name(
             'test', 'TestCommandResponse'))
-        self.assertIsInstance(definitions.get_response_by_name(
-            'Test', 'testcommandresponse'), Struct)
+        self.assertRaises(KeyError, definitions.get_response_by_name,
+                          'Test', 'testcommandresponse')
 
     def test_get_attribute_by_name(self):
         definitions = SpecDefinitions(
@@ -251,10 +284,10 @@ class TestSpecDefinitions(unittest.TestCase):
             'test', 'TestAttribute'))
         self.assertIsNone(definitions.get_attribute_by_name(
             'test', 'TestGlobalAttribute'))
-        self.assertIsInstance(definitions.get_attribute_by_name(
-            'Test', 'testattribute'), Attribute)
-        self.assertIsInstance(definitions.get_attribute_by_name(
-            'Test', 'testglobalattribute'), Attribute)
+        self.assertRaises(KeyError, definitions.get_attribute_by_name,
+                          'Test', 'testattribute')
+        self.assertRaises(KeyError, definitions.get_attribute_by_name,
+                          'Test', 'testglobalattribute')
 
     def test_get_event_by_name(self):
         definitions = SpecDefinitions(
@@ -266,8 +299,8 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(
             definitions.get_event_by_name('Test', 'TestEvent'), Event)
         self.assertIsNone(definitions.get_event_by_name('test', 'TestEvent'))
-        self.assertIsInstance(
-            definitions.get_event_by_name('Test', 'testevent'), Event)
+        self.assertRaises(
+            KeyError, definitions.get_event_by_name, 'Test', 'testevent')
 
     def test_get_bitmap_by_name(self):
         definitions = SpecDefinitions(
@@ -279,8 +312,8 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(definitions.get_bitmap_by_name(
             'Test', 'TestBitmap'), Bitmap)
         self.assertIsNone(definitions.get_bitmap_by_name('test', 'TestBitmap'))
-        self.assertIsInstance(definitions.get_bitmap_by_name(
-            'Test', 'testbitmap'), Bitmap)
+        self.assertRaises(KeyError, definitions.get_bitmap_by_name,
+                          'Test', 'testbitmap')
 
     def test_get_enum_by_name(self):
         definitions = SpecDefinitions(
@@ -292,8 +325,8 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(
             definitions.get_enum_by_name('Test', 'TestEnum'), Enum)
         self.assertIsNone(definitions.get_enum_by_name('test', 'TestEnum'))
-        self.assertIsInstance(
-            definitions.get_enum_by_name('Test', 'testenum'), Enum)
+        self.assertRaises(
+            KeyError, definitions.get_enum_by_name, 'Test', 'testenum')
 
     def test_get_struct_by_name(self):
         definitions = SpecDefinitions(
@@ -305,8 +338,8 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(definitions.get_struct_by_name(
             'Test', 'TestStruct'), Struct)
         self.assertIsNone(definitions.get_struct_by_name('test', 'TestStruct'))
-        self.assertIsInstance(definitions.get_struct_by_name(
-            'Test', 'teststruct'), Struct)
+        self.assertRaises(
+            KeyError, definitions.get_struct_by_name, 'Test', 'teststruct')
 
     def test_get_type_by_name(self):
         definitions = SpecDefinitions(

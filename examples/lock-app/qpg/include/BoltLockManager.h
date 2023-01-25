@@ -55,7 +55,7 @@ public:
     struct UserData
     {
         char mName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
-        DlCredential mCredentials[CONFIG_LOCK_NUM_CREDENTIALS_PER_USER];
+        CredentialStruct mCredentials[CONFIG_LOCK_NUM_CREDENTIALS_PER_USER];
     };
 
     struct CredentialData
@@ -75,15 +75,15 @@ public:
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
     bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
-                 uint32_t uniqueId, DlUserStatus userStatus, DlUserType userType, DlCredentialRule credentialRule,
-                 const DlCredential * credentials, size_t totalCredentials);
+                 uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType, CredentialRuleEnum credentialRule,
+                 const CredentialStruct * credentials, size_t totalCredentials);
 
-    bool GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
+    bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
     bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                       DlCredentialStatus credentialStatus, DlCredentialType credentialType, const chip::ByteSpan & secret);
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const chip::ByteSpan & secret);
 
-    bool ValidatePIN(const Optional<chip::ByteSpan> & pinCode, DlOperationError & err) const;
+    bool ValidatePIN(const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err) const;
 
 private:
     friend BoltLockManager & BoltLockMgr(void);

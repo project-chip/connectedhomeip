@@ -46,9 +46,9 @@ tests:
       command: "RenameInput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: 1
-              - name: "name"
+              - name: "Name"
                 value: "A1"
 
     # Issue 13029

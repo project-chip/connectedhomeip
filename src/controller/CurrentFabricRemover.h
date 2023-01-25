@@ -70,10 +70,10 @@ private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
     Step mNextStep           = Step::kAcceptRemoveFabricStart;
 
-    CHIP_ERROR ReadCurrentFabricIndex(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
-    CHIP_ERROR SendRemoveFabricIndex(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR ReadCurrentFabricIndex(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    CHIP_ERROR SendRemoveFabricIndex(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
-    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     static void OnSuccessReadCurrentFabricIndex(void * context, FabricIndex fabricIndex);

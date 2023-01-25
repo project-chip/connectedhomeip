@@ -5,11 +5,8 @@
         "Test_TC_BOOL_3_1_Simulated",
         "Test_TC_DESC_2_2_Simulated",
         "Test_TC_DGETH_3_1_Simulated",
-        "Test_TC_DGETH_3_2_Simulated",
         "Test_TC_DGSW_3_1_Simulated",
-        "Test_TC_DGSW_3_2_Simulated",
         "Test_TC_DGWIFI_3_1_Simulated",
-        "Test_TC_DGWIFI_3_2_Simulated",
         "Test_TC_FLW_3_1_Simulated",
         "Test_TC_G_3_1_Simulated",
         "Test_TC_I_3_1_Simulated",
@@ -24,7 +21,8 @@
         "Test_TC_LUNIT_2_1_Simulated",
         "Test_TC_OCC_2_2_Simulated",
         "Test_TC_OCC_2_4_Simulated",
-        "Test_TC_ULABEL_3_1_Simulated"
+        "Test_TC_ULABEL_3_1_Simulated",
+        "Test_TC_FLABEL_3_1_Simulated"
     ],
     "collection": ["Test"]
 }

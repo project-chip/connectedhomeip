@@ -188,11 +188,11 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "AddScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                         "transitionTime": "int",
                         "sceneName": "str",
-                        "clusterId": "int",
+                        "clusterID": "int",
                         "attributeValueList": "",
                     },
                 },
@@ -200,39 +200,39 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "ViewScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
                     "commandName": "RemoveScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                     },
                 },
             0x00000003: {
                     "commandId": 0x00000003,
                     "commandName": "RemoveAllScenes",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             0x00000004: {
                     "commandId": 0x00000004,
                     "commandName": "StoreScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                     },
                 },
             0x00000005: {
                     "commandId": 0x00000005,
                     "commandName": "RecallScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                         "transitionTime": "int",
                     },
                 },
@@ -240,7 +240,7 @@ class ChipClusters:
                     "commandId": 0x00000006,
                     "commandName": "GetSceneMembership",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             },
@@ -2826,8 +2826,8 @@ class ChipClusters:
                 },
             },
     }
-    _BRIDGED_DEVICE_BASIC_CLUSTER_INFO = {
-            "clusterName": "BridgedDeviceBasic",
+    _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO = {
+            "clusterName": "BridgedDeviceBasicInformation",
             "clusterId": 0x00000039,
             "commands": {
             },
@@ -3154,7 +3154,7 @@ class ChipClusters:
                     "commandId": 0x0000000B,
                     "commandName": "AddTrustedRootCertificate",
                     "args": {
-                        "rootCertificate": "bytes",
+                        "rootCACertificate": "bytes",
                     },
                 },
             },
@@ -3543,14 +3543,14 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LockDoor",
                     "args": {
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x00000001: {
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x00000003: {
@@ -3558,7 +3558,7 @@ class ChipClusters:
                     "commandName": "UnlockWithTimeout",
                     "args": {
                         "timeout": "int",
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x0000000B: {
@@ -3647,7 +3647,7 @@ class ChipClusters:
                         "operationType": "int",
                         "userIndex": "int",
                         "userName": "str",
-                        "userUniqueId": "int",
+                        "userUniqueID": "int",
                         "userStatus": "int",
                         "userType": "int",
                         "credentialRule": "int",
@@ -4814,7 +4814,7 @@ class ChipClusters:
                     "commandId": 0x0000000A,
                     "commandName": "MoveToColorTemperature",
                     "args": {
-                        "colorTemperature": "int",
+                        "colorTemperatureMireds": "int",
                         "transitionTime": "int",
                         "optionsMask": "int",
                         "optionsOverride": "int",
@@ -5307,7 +5307,7 @@ class ChipClusters:
                     "writable": True,
                 },
                 0x00000014: {
-                    "attributeName": "IntrinsicBalanceFactor",
+                    "attributeName": "IntrinsicBallastFactor",
                     "attributeId": 0x00000014,
                     "type": "int",
                     "reportable": True,
@@ -5976,7 +5976,7 @@ class ChipClusters:
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "StopPlayback",
+                    "commandName": "Stop",
                     "args": {
                     },
                 },
@@ -6420,8 +6420,8 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LaunchApp",
                     "args": {
-                        "catalogVendorId": "int",
-                        "applicationId": "str",
+                        "catalogVendorID": "int",
+                        "applicationID": "str",
                         "data": "bytes",
                     },
                 },
@@ -6429,16 +6429,16 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "StopApp",
                     "args": {
-                        "catalogVendorId": "int",
-                        "applicationId": "str",
+                        "catalogVendorID": "int",
+                        "applicationID": "str",
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
                     "commandName": "HideApp",
                     "args": {
-                        "catalogVendorId": "int",
-                        "applicationId": "str",
+                        "catalogVendorID": "int",
+                        "applicationID": "str",
                     },
                 },
             },
@@ -7609,7 +7609,7 @@ class ChipClusters:
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000037: _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
-    0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+    0x00000039: _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
     0x0000003B: _SWITCH_CLUSTER_INFO,
     0x0000003C: _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
     0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
@@ -7678,7 +7678,7 @@ class ChipClusters:
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "EthernetNetworkDiagnostics": _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
-        "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+        "BridgedDeviceBasicInformation": _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         "Switch": _SWITCH_CLUSTER_INFO,
         "AdministratorCommissioning": _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,

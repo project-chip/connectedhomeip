@@ -50,9 +50,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 33000
-              - name: "colorY"
+              - name: "ColorY"
                 value: 20000
               - name: "TransitionTime"
                 value: 0
@@ -76,9 +76,9 @@ tests:
       PICS: CC.S.F03 && CC.S.C09.Rsp
       arguments:
           values:
-              - name: "stepX"
+              - name: "StepX"
                 value: -20000
-              - name: "stepY"
+              - name: "StepY"
                 value: -6000
               - name: "TransitionTime"
                 value: 200

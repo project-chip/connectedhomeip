@@ -133,10 +133,7 @@ stack captured in the following Figure:
 
 4) **Action Framing:** Once an action is constructed using the Interaction
    Model, it is serialized into a prescribed packed binary format to encode for
-   network transmission. Security: An encoded action frame is then processed by
-   the Security Layer: the message is encrypted and appended with a message
-   authentication code. These actions ensure the data remain confidential and
-   authentic between sender and receiver of the message.
+   network transmission.
 
 5. **Security:** An encoded action frame is then sent down to the Security Layer
    to encrypt and sign the payload to ensure that data is secured and

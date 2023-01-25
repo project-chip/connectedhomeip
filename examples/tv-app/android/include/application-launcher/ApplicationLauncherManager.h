@@ -25,7 +25,7 @@ using chip::ByteSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using ApplicationLauncherDelegate = chip::app::Clusters::ApplicationLauncher::Delegate;
-using ApplicationType             = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type;
+using ApplicationType             = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type;
 using LauncherResponseType        = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
 class ApplicationLauncherManager : public ApplicationLauncherDelegate

@@ -14,6 +14,13 @@
 
 name: 10.3.1. [TC-RH-3.1] Attributes with Client as DUT
 
+PICS:
+    - RH.C
+    - RH.C.AM-READ
+    - RH.C.AO-READ
+    - RH.C.AM-WRITE
+    - RH.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Relative Humidity Measurement"
@@ -26,16 +33,16 @@ tests:
 
     - label: "Read attribute MeasuredValue"
       wait: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
 
     - label: "Read attribute MinMeasuredValue"
       wait: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
 
     - label: "Read attribute MaxMeasuredValue"
       wait: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
 
     - label: "Read attribute Tolerance"
       wait: "readAttribute"
-      attribute: "tolerance"
+      attribute: "Tolerance"

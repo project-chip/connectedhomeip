@@ -1836,9 +1836,10 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mIntervalsMode = intervalType;
 
     Impl()->LockThreadStack();
+
+    mIntervalsMode = intervalType;
 
 // For Thread devices, the intervals are defined as:
 // * poll period for SED devices that poll the parent for data
@@ -1879,10 +1880,9 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ConnectivityManager::SEDIntervalMode mode;
 
     if (onOff)
     {
@@ -1894,12 +1894,59 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiv
             mActiveModeConsumers--;
     }
 
+    if (!onOff && delayIdle && CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD.count() != 0)
+    {
+        // StartTimer will cancel a timer if the same callback & context is used.
+        // This will have the effect of canceling the previous one (if any) and starting
+        // a new timer of the same duration. This effectively prolongs the active threshold
+        // without consuming additional resources.
+        err = DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD, RequestSEDModeUpdate, this);
+        if (CHIP_NO_ERROR == err)
+        {
+            if (!mDelayIdleTimerRunning)
+            {
+                mDelayIdleTimerRunning = true;
+                mActiveModeConsumers++;
+            }
+            return err;
+        }
+
+        ChipLogError(DeviceLayer, "Failed to postpone Idle Mode with error %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return SEDUpdateMode();
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDUpdateMode()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ConnectivityManager::SEDIntervalMode mode;
+
     mode = mActiveModeConsumers > 0 ? ConnectivityManager::SEDIntervalMode::Active : ConnectivityManager::SEDIntervalMode::Idle;
 
     if (mIntervalsMode != mode)
         err = SetSEDIntervalMode(mode);
 
     return err;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeUpdate(chip::System::Layer * apSystemLayer,
+                                                                               void * apAppState)
+{
+    if (apAppState != nullptr)
+    {
+        GenericThreadStackManagerImpl_OpenThread * obj = static_cast<GenericThreadStackManagerImpl_OpenThread *>(apAppState);
+        if (obj->mActiveModeConsumers > 0)
+        {
+            obj->mActiveModeConsumers--;
+        }
+
+        obj->mDelayIdleTimerRunning = false;
+
+        obj->SEDUpdateMode();
+    }
 }
 #endif
 

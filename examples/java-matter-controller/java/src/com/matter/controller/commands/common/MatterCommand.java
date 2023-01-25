@@ -22,6 +22,7 @@ import chip.devicecontroller.ChipDeviceController;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 public abstract class MatterCommand extends Command {
   private final ChipDeviceController mChipDeviceController;
@@ -30,9 +31,10 @@ public abstract class MatterCommand extends Command {
   private final StringBuffer mPaaTrustStorePath = new StringBuffer();
   private final StringBuffer mCDTrustStorePath = new StringBuffer();
   private final AtomicLong mCommissionerNodeId = new AtomicLong();
-  private final AtomicBoolean mUseMaxSizedCerts = new AtomicBoolean();;
-  private final AtomicBoolean mOnlyAllowTrustedCdKeys = new AtomicBoolean();;
-  private Optional<String> mTestResult = Optional.empty();
+  private final AtomicBoolean mUseMaxSizedCerts = new AtomicBoolean();
+  private final AtomicBoolean mOnlyAllowTrustedCdKeys = new AtomicBoolean();
+  private FutureResult mFutureResult = new FutureResult();
+  private static Logger logger = Logger.getLogger(MatterCommand.class.getName());
 
   public MatterCommand(
       ChipDeviceController controller, String commandName, CredentialsIssuer credIssuerCmds) {
@@ -100,39 +102,16 @@ public abstract class MatterCommand extends Command {
 
   protected abstract void runCommand();
 
-  public void setTestResult(String result) {
-    mTestResult = Optional.of(result);
+  public void setSuccess() {
+    mFutureResult.setRealResult(RealResult.Success());
   }
 
-  public void expectSuccess(long timeout) {
-    expectResult("Success", timeout);
+  public void setFailure(String error) {
+    mFutureResult.setRealResult(RealResult.Error(error));
   }
 
-  private void expectResult(String expectedResult, long timeout) {
-    long start = System.currentTimeMillis();
-    while (!mTestResult.isPresent())
-      try {
-        if (System.currentTimeMillis() > (start + timeout)) {
-          throw new RuntimeException("timeout!");
-        }
-        Thread.sleep(100);
-      } catch (InterruptedException ex) {
-      }
-
-    if (!mTestResult.isPresent()) {
-      throw new RuntimeException("received empty test result");
-    }
-
-    if (!mTestResult.get().equals(expectedResult)) {
-      if (!expectedResult.equals("Success")) {
-        System.out.format(
-            "%s command failed:%n    Expected: %s%n    Got: %s%n",
-            getName(), expectedResult, mTestResult);
-        throw new RuntimeException(getName());
-      } else {
-        System.out.format("%s command failed: %s%n", getName(), mTestResult.get());
-      }
-    }
-    mTestResult = Optional.empty();
+  public void waitCompleteMs(long timeoutMs) {
+    mFutureResult.setTimeoutMs(timeoutMs);
+    mFutureResult.waitResult();
   }
 }

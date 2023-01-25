@@ -178,7 +178,12 @@ RUN set -x \
 
 # Install a known ZAP release
 # Only keep the cli version, since `zap` is 143MB and not usable (UI)
-ENV ZAP_VERSION=v2023.01.09-nightly
+#
+# NOTE: zap version occurs in several files (CI and docker)
+#       for a uniform update, a separate update script exists:
+#
+#       scripts/tools/zap/version_update.py
+ENV ZAP_VERSION=v2023.01.19-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
     && cd /opt/zap-${ZAP_VERSION} \

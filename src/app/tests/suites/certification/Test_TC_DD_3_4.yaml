@@ -42,7 +42,7 @@ tests:
 
           chip-tv-app is used as TH
 
-          ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
+           ./chip-tv-app
 
           Verify in tv-app side
 
@@ -60,13 +60,14 @@ tests:
 
           In certification QA we are using chip-tv-casting-app as a reference app, In case of certification testing, DUT (app) vendor to provide instructions on how to scan for commissioners
 
-          connectedhomeip/examples/tv-casting-app/linux/out/tv-casting-app$ sudo ./chip-tv-casting-app
+           ./chip-tv-casting-app
 
           Verify for the commissioner advertisements from the TH in tv-casting-app side
 
           [1660758661.643392][2867:2867] CHIP:SVR: Discovered Commissioner #0
           [1660758661.643469][2867:2867] CHIP:DIS: Discovered node:
-          [1660758661.643506][2867:2867] CHIP:DIS:         Hostname: E45F010F3BAF0000        [1660758661.643561][2867:2867] CHIP:DIS:         IP Address #1: fe80::9052:32ff:fe00:92c4
+          [1660758661.643506][2867:2867] CHIP:DIS:         Hostname: E45F010F3BAF0000
+          [1660758661.643561][2867:2867] CHIP:DIS:         IP Address #1: fe80::9052:32ff:fe00:92c4
           [1660758661.643606][2867:2867] CHIP:DIS:         Port: 5540
           [1660758661.643648][2867:2867] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1660758661.643691][2867:2867] CHIP:DIS:         Mrp Interval active: 300 ms
@@ -81,7 +82,8 @@ tests:
           [1660758661.644212][2867:2867] CHIP:DIS:         Commissioning Mode: 0
           [1660758661.644256][2867:2867] CHIP:SVR: Discovered Commissioner #1
           [1660758661.644294][2867:2867] CHIP:DIS: Discovered node:
-          [1660758661.644329][2867:2867] CHIP:DIS:         Hostname: E45F010F27530000        [1660758661.644378][2867:2867] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2753
+          [1660758661.644329][2867:2867] CHIP:DIS:         Hostname: E45F010F27530000
+          [1660758661.644378][2867:2867] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2753
           [1660758661.644426][2867:2867] CHIP:DIS:         IP Address #2: fe80::e65f:1ff:fe0f:2753
           [1660758661.644468][2867:2867] CHIP:DIS:         Port: 5640
           [1660758661.644510][2867:2867] CHIP:DIS:         Mrp Interval idle: 5000 ms
@@ -98,7 +100,8 @@ tests:
           [1660758661.644968][2867:2867] CHIP:DIS:         Commissioning Mode: 1
           [1660758661.645010][2867:2867] CHIP:SVR: Discovered Commissioner #2
           [1660758661.645046][2867:2867] CHIP:DIS: Discovered node:
-          [1660758661.645082][2867:2867] CHIP:DIS:         Hostname: E45F010F27530000        [1660758661.645128][2867:2867] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2753
+          [1660758661.645082][2867:2867] CHIP:DIS:         Hostname: E45F010F27530000
+          [1660758661.645128][2867:2867] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2753
           [1660758661.645174][2867:2867] CHIP:DIS:         IP Address #2: fe80::e65f:1ff:fe0f:2753
           [1660758661.645217][2867:2867] CHIP:DIS:         Port: 5650
           [1660758661.645258][2867:2867] CHIP:DIS:         Mrp Interval idle: 5000 ms
@@ -132,7 +135,7 @@ tests:
 
 
           Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side
-          > cast request 0 [1653179218011] [47890:1899175] CHIP: [DL] request [1653179218011] [47890:1899175] CHIP: [SVR] ------- PrepareForCommissioning [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...
+          > cast request 1 [1653179218011] [47890:1899175] CHIP: [DL] request [1653179218011] [47890:1899175] CHIP: [SVR] ------- PrepareForCommissioning [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...
       disabled: true
 
     - label: "DUT starts the commissioning procedure with TH"
