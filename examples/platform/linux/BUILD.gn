@@ -96,6 +96,13 @@ source_set("app-main") {
     "testing/CustomCSRResponseOperationalKeyStore.h",
   ]
 
+  if (chip_with_trusty_os) {
+    sources += [
+      "DeviceAttestationCreds.cpp",
+      "DeviceAttestationCreds.h",
+    ]
+  }
+
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
@@ -120,6 +127,16 @@ source_set("app-main") {
 
   if (current_os != "nuttx") {
     public_deps += [ jsoncpp_root ]
+  }
+
+  if (chip_with_trusty_os) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
+
+  if (chip_with_trusty_os) {
+    defines += [ "CHIP_ATTESTATION_TRUSTY_OS=1" ]
+  } else {
+    defines += [ "CHIP_ATTESTATION_TRUSTY_OS=0" ]
   }
 
   if (chip_enable_pw_rpc) {
