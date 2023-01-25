@@ -142,8 +142,9 @@ public:
             commissioner->PerformCommissioningStep(proxy, stage, params, this, 0, GetCommandTimeout(proxy, stage));
             return CHIP_NO_ERROR;
         }
-        else if (mPrematureCompleteAfter != chip::Controller::CommissioningStage::kError &&
-                 report.stageCompleted == chip::Controller::CommissioningStage::kSendComplete)
+
+        if (mPrematureCompleteAfter != chip::Controller::CommissioningStage::kError &&
+            report.stageCompleted == chip::Controller::CommissioningStage::kSendComplete)
         {
             if (report.Is<chip::Controller::CommissioningErrorInfo>())
             {
@@ -155,6 +156,7 @@ public:
                 mCompletionError = err;
             }
         }
+
         return chip::Controller::AutoCommissioner::CommissioningStepFinished(err, report);
     }
     // This will cause the COMMISSIONER to fail after the given stage. Setting this to kSecurePairing will cause the
