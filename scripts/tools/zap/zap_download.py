@@ -20,11 +20,10 @@ import logging
 import os
 import re
 import shlex
+import shutil
+import subprocess
 import sys
 import zipfile
-import subprocess
-import shutil
-
 from typing import Optional
 
 import click
@@ -65,6 +64,7 @@ def _GetDefaultExtractRoot():
         # Before bootstrap, this will pick a temporary directory. Probably
         # not ideal, but it likely just works
         return '/tmp/'
+
 
 def _LogPipeLines(pipe, prefix):
     l = logging.getLogger().getChild(prefix)
@@ -211,7 +211,6 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
     logging.debug('User requested to download a %s zap version %s into %s', zap, zap_version, extract_root)
 
     install_directory = os.path.join(extract_root, f"zap-{zap_version}")
-
 
     if zap == DownloadType.SOURCE:
         install_directory = install_directory + "-src"
