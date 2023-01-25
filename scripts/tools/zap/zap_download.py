@@ -16,6 +16,8 @@
 
 import logging
 import os
+import re
+from typing import Optional
 
 import click
 
@@ -54,6 +56,38 @@ def _GetDefaultExtractRoot():
         # not ideal, but it likely just works
         return '/tmp/'
 
+def _GetZapVersionToUse(project_root):
+    """
+    Heuristic to figure out what zap version should be used.
+
+    Looks at the given project root and tries to figure out the zap tag/version.
+    """
+
+    # We have several locations for zap versioning:
+    #  - CI is likely the most reliable as long as we use the "latest build"
+    #  - zap_execution.py is what is currently used, but it is a minimum version
+    #
+    # Based on the above, we assume CI is using the latest build (will not be
+    # out of sync more than a few days) and even if it is not, zap is often
+    # backwards compatible (new features added, but codegen should not change
+    # that often for fixed inputs)
+    #
+    # This heuristic may be bad at times, however then you can also override the
+    # version in command line parameters
+
+    match_re = re.compile(r'.*ENV\s+ZAP_VERSION=([^# ]*)')
+
+    docker_path = os.path.join(project_root, "integrations/docker/images/chip-build/Dockerfile")
+
+    with open(docker_path, 'rt') as f:
+        for l in f.readlines():
+            m = match_re.match(l)
+            if not m:
+                continue
+            return m.group(1)
+
+    raise Exception(f"Failed to determine version from {docker_path}")
+
 
 @click.command()
 @click.option(
@@ -64,7 +98,7 @@ def _GetDefaultExtractRoot():
     help='Determines the verbosity of script output')
 @click.option(
     '--sdk-root',
-    default=os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')),
+    default=os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..')),
     show_default=True,
     help='Path to the SDK root (where zap versioning exists).')
 @click.option(
@@ -72,8 +106,11 @@ def _GetDefaultExtractRoot():
     default=_GetDefaultExtractRoot(),
     show_default=True,
     help='Directory where too unpack/checkout zap')
-@click.argument('output_dir')
-def main(log_level, sdk_root, extract_dir):
+@click.option(
+    '--zap-version',
+    default=None,
+    help='Force to checkout this zap version instead of trying to auto-detect')
+def main(log_level: str, sdk_root: str, extract_root: str, zap_version=Optional[str]):
     if _has_coloredlogs:
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
@@ -83,6 +120,10 @@ def main(log_level, sdk_root, extract_dir):
             format='%(asctime)s %(levelname)-7s %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
+
+    if not zap_version:
+        zap_version = _GetZapVersionToUse(sdk_root)
+        logging.info('Found required zap version to be: %s' % zap_version)
 
     # TODO: implement
     pass
