@@ -20,10 +20,10 @@ import sys
 
 import click
 import coloredlogs
-
-import build
 from builders.builder import BuilderOptions
 from runner import PrintOnlyRunner, ShellRunner
+
+import build
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
