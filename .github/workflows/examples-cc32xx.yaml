@@ -68,7 +68,8 @@ jobs:
               timeout-minutes: 60
               run: |
                   scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py --target-glob cc32xx* build \
+                      ./scripts/build/build_examples.py  \
+                      --target cc32xx-lock build \
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Get lock app size stats
