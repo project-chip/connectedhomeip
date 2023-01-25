@@ -22,6 +22,9 @@ import re
 import shlex
 import sys
 import zipfile
+import subprocess
+import shutil
+
 from typing import Optional
 
 import click
@@ -63,12 +66,43 @@ def _GetDefaultExtractRoot():
         # not ideal, but it likely just works
         return '/tmp/'
 
+def _LogPipeLines(pipe, prefix):
+    l = logging.getLogger().getChild(prefix)
+    for line in iter(pipe.readline, b''):
+        line = line.strip().decode('utf-8', errors="ignore")
+        l.info('%s' % line)
+
+
+def _ExecuteProcess(cmd, cwd):
+    logging.info('Executing %r in %s' % (cmd, cwd))
+
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=cwd)
+
+    with process.stdout:
+        _LogPipeLines(process.stdout, cmd[0])
+
+    exitcode = process.wait()
+    if exitcode != 0:
+        raise Exception("Error executing process: %d" % exitcode)
+
 
 def _SetupSourceZap(install_directory: str, zap_version: str):
-    # TODO:
-    #   - git checkout
-    #   - npm ci
-    raise Exception("NOT YET IMPLEMENTED")
+    if os.path.exists(install_directory):
+        logging.warning("Completely re-creating %s", install_directory)
+        shutil.rmtree(install_directory)
+
+    os.makedirs(install_directory, exist_ok=True)
+
+    _ExecuteProcess(
+        f"git clone --depth 1 --branch {zap_version} https://github.com/project-chip/zap.git .".split(),
+        install_directory
+    )
+
+    _ExecuteProcess(f"npm ci".split(), install_directory)
 
 
 def _SetupReleaseZap(install_directory: str, zap_version: str):
@@ -162,11 +196,11 @@ def _GetZapVersionToUse(project_root):
     help='What type of zap download to perform')
 def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional[str], zap: DownloadType):
     if _has_coloredlogs:
-        coloredlogs.install(level=log_level, fmt='%(asctime)s %(levelname)-7s %(message)s')
+        coloredlogs.install(level=log_level, fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
     else:
         logging.basicConfig(
             level=log_level,
-            format='%(asctime)s %(levelname)-7s %(message)s',
+            format='%(asctime)s %(name)s %(levelname)-7s %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
@@ -177,6 +211,8 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
     logging.debug('User requested to download a %s zap version %s into %s', zap, zap_version, extract_root)
 
     install_directory = os.path.join(extract_root, f"zap-{zap_version}")
+
+
     if zap == DownloadType.SOURCE:
         install_directory = install_directory + "-src"
         _SetupSourceZap(install_directory, zap_version)
