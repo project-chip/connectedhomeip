@@ -1688,8 +1688,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                    if (eventID) {
                        container.eventPathParams->mEventId = static_cast<chip::EventId>([eventID unsignedLongValue]);
                    }
-                   if (params.isUrgentEvent) {
-                       container.eventPathParams->mIsUrgentEvent = params.isUrgentEvent;
+                   if (params.reportEventsUrgently) {
+                       container.eventPathParams->mIsUrgentEvent = params.reportEventsUrgently;
                    }
 
                    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
@@ -1972,9 +1972,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return
-        [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u", (uint16_t) self.endpoint.unsignedShortValue,
-                  (uint32_t) self.cluster.unsignedLongValue, (uint32_t) _event.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u",
+                     (uint16_t) self.endpoint.unsignedShortValue, (uint32_t) self.cluster.unsignedLongValue,
+                     (uint32_t) _event.unsignedLongValue];
 }
 
 + (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID

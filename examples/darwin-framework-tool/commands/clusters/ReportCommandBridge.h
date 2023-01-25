@@ -188,10 +188,14 @@ public:
         AddCommonArguments();
     }
 
-    SubscribeEvent(chip::ClusterId clusterId)
+    SubscribeEvent(chip::ClusterId clusterId, bool isClusterAny = false)
         : ModelCommand("subscribe-event-by-id")
         , mClusterId(clusterId)
     {
+        if ( isClusterAny == true )
+        {
+            AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
+        }
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         AddArgument("is-urgent", 0, 1, &mIsUrgent);
@@ -215,19 +219,19 @@ public:
 
         MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
         if (mEventNumber.HasValue()) {
-            params.eventMin = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
+            params.minimumEventNumber = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
         }
         if (mKeepSubscriptions.HasValue()) {
             params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
         }
         if (mIsUrgent.HasValue()) {
-            params.isUrgentEvent = mIsUrgent.Value();
+            params.reportEventsUrgently = mIsUrgent.Value();
         }
         if (mAutoResubscribe.HasValue()) {
             params.resubscribeIfLost = mAutoResubscribe.Value();
         }
 
-        if (mClusterId != chip::kInvalidClusterId) {
+        if (strcmp(GetName(), "subscribe-event-by-id") == 0) {
             [device subscribeToEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
                 clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
                 eventID:[NSNumber numberWithUnsignedInteger:mEventId]
@@ -291,7 +295,7 @@ protected:
     bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
 
 private:
-    chip::ClusterId mClusterId = chip::kInvalidClusterId;
+    chip::ClusterId mClusterId;
     chip::EventId mEventId;
 };
 
@@ -325,7 +329,7 @@ public:
             params.filterByFabric = mFabricFiltered.Value();
         }
         if (mEventNumber.HasValue()) {
-            params.eventMin = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
+            params.minimumEventNumber = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
         }
 
         [device readEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]

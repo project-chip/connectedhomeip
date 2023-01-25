@@ -315,6 +315,7 @@ void registerClusterAny(Commands & commands)
         make_unique<WriteAttribute>(),  //
         make_unique<SubscribeAttribute>(), //
         make_unique<ReadEvent>(),     //
+        make_unique<SubscribeEvent>(chip::kInvalidClusterId, true), //
         make_unique<SubscribeEvent>(),     //
     };
 

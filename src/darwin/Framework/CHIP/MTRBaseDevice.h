@@ -322,7 +322,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  * (e.g. nil eventID means "read all the events from the endpoint(s) and
  * cluster(s) that match endpointID/clusterID").
  *
- * If all of endpointID, clusterID, eventID are non-nil, a single
+ * If all of endpointID, clusterID, eventID are non-nil, all the matching instances of a single
  * event will be read.
  *
  * If all of endpointID, clusterID, eventID are nil, all events on the
