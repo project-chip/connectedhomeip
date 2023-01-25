@@ -65,21 +65,40 @@ public class TvCastingApp {
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
-    chipPlatform.updateCommissionableDataProviderData(
-        appParameters.getSpake2pVerifierBase64(),
-        appParameters.getSpake2pSaltBase64(),
-        appParameters.getSpake2pIterationCount(),
-        appParameters.getSetupPasscode(),
-        appParameters.getDiscriminator());
+    boolean ret =
+        chipPlatform.updateCommissionableDataProviderData(
+            appParameters.getSpake2pVerifierBase64(),
+            appParameters.getSpake2pSaltBase64(),
+            appParameters.getSpake2pIterationCount(),
+            appParameters.getSetupPasscode(),
+            appParameters.getDiscriminator());
+    if (!ret) {
+      Log.e(
+          TAG,
+          "TvCastingApp.initApp failed to updateCommissionableDataProviderData on chipPlatform");
+      return ret;
+    }
+
+    ret = preInitJni(appParameters);
+    if (!ret) {
+      Log.e(TAG, "TvCastingApp.initApp failed in preInitJni");
+      return ret;
+    }
 
     chipAppServer = new ChipAppServer();
-    chipAppServer.startApp();
+    ret = chipAppServer.startApp();
+    if (!ret) {
+      Log.e(TAG, "TvCastingApp.initApp failed in start chipAppServer");
+      return ret;
+    }
 
     setDACProvider(appParameters.getDacProvider());
     return initJni(appParameters);
   }
 
   private native void setDACProvider(DACProvider provider);
+
+  private native boolean preInitJni(AppParameters appParameters);
 
   private native boolean initJni(AppParameters appParameters);
 

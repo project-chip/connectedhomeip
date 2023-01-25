@@ -36,35 +36,21 @@ CastingServer * CastingServer::GetInstance()
     return castingServer_;
 }
 
+CHIP_ERROR CastingServer::PreInit(AppParams * appParams)
+{
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    return SetRotatingDeviceIdUniqueId(appParams != nullptr ? appParams->GetRotatingDeviceIdUniqueId() : chip::NullOptional);
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
+}
+
 CHIP_ERROR CastingServer::Init(AppParams * AppParams)
 {
     if (mInited)
     {
         return CHIP_NO_ERROR;
     }
-
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    // if this class's client provided a RotatingDeviceIdUniqueId, use that
-    if (AppParams != nullptr && AppParams->GetRotatingDeviceIdUniqueId().HasValue())
-    {
-        ByteSpan rotatingDeviceIdUniqueId(AppParams->GetRotatingDeviceIdUniqueId().Value());
-        chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueId);
-    }
-#ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
-    else
-    {
-        // otherwise, generate and set a random uniqueId for generating rotatingId
-        uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
-        for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
-        {
-            rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
-        }
-
-        // ByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
-        chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(ByteSpan(rotatingDeviceIdUniqueId));
-    }
-#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
-#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
 
     // Initialize binding handlers
     ReturnErrorOnFailure(InitBindingHandlers());
@@ -73,6 +59,33 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
     mInited = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CastingServer::SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteSpan> rotatingDeviceIdUniqueIdOptional)
+{
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // if this class's client provided a RotatingDeviceIdUniqueId, use that
+    if (rotatingDeviceIdUniqueIdOptional.HasValue())
+    {
+        ChipLogProgress(AppServer, "Setting rotatingDeviceIdUniqueId received from client app");
+        return chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdOptional.Value());
+    }
+#ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+    else
+    {
+        // otherwise, generate and set a random uniqueId for generating rotatingId
+        ChipLogProgress(AppServer, "Setting random rotatingDeviceIdUniqueId");
+        uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+        for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
+        {
+            rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
+        }
+
+        return chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(ByteSpan(rotatingDeviceIdUniqueId));
+    }
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
     return CHIP_NO_ERROR;
 }
 
@@ -289,16 +302,17 @@ CHIP_ERROR CastingServer::VerifyOrEstablishConnection(TargetVideoPlayerInfo & ta
     mOnConnectionFailureClientCallback = onConnectionFailure;
     mOnNewOrUpdatedEndpoint            = onNewOrUpdatedEndpoint;
 
+    chip::OperationalDeviceProxy * prevDeviceProxy =
+        CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo.GetOperationalDeviceProxy();
+    if (prevDeviceProxy != nullptr)
+    {
+        ChipLogProgress(AppServer, "CastingServer::VerifyOrEstablishConnection Disconnecting previous deviceProxy");
+        prevDeviceProxy->Disconnect();
+    }
+
     return targetVideoPlayerInfo.FindOrEstablishCASESession(
         [](TargetVideoPlayerInfo * videoPlayer) {
             ChipLogProgress(AppServer, "CastingServer::OnConnectionSuccess lambda called");
-            chip::OperationalDeviceProxy * prevDeviceProxy =
-                CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-            if (prevDeviceProxy != nullptr)
-            {
-                ChipLogProgress(AppServer, "CastingServer::OnConnectionSuccess lambda Disconnecting deviceProxy");
-                prevDeviceProxy->Disconnect();
-            }
             CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo = *videoPlayer;
             CastingServer::GetInstance()->mOnConnectionSuccessClientCallback(videoPlayer);
         },
