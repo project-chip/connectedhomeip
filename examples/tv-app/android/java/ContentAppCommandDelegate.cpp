@@ -82,10 +82,9 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
             FormatResponseData(handlerContext, "{\"value\":{}}");
             return;
         }
-        const char * respStr = env->GetStringUTFChars(resp, 0);
-        ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr);
-        FormatResponseData(handlerContext, respStr);
-        env->ReleaseStringUTFChars(resp, respStr);
+        JniUtfString respStr(env, resp);
+        ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr.c_str());
+        FormatResponseData(handlerContext, respStr.c_str());
         env->DeleteLocalRef(resp);
     }
     else
@@ -115,15 +114,15 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
         }
         else
         {
-            const char * respStr = env->GetStringUTFChars(resp, 0);
-            ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr);
+            JniUtfString respStr(env, resp);
+            ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr.c_str());
 
             Json::Reader reader;
-            if (!reader.parse(respStr, value))
+            if (!reader.parse(respStr.c_str(), value))
             {
+                env->DeleteLocalRef(resp);
                 return Protocols::InteractionModel::Status::Failure;
             }
-            env->ReleaseStringUTFChars(resp, respStr);
         }
         env->DeleteLocalRef(resp);
 
