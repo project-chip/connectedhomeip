@@ -79,6 +79,22 @@ source_set("ota-requestor-test-srcs") {
   ]
 }
 
+source_set("scenes-table-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/scenes/ExtensionFieldsSets.cpp",
+    "${chip_root}/src/app/clusters/scenes/ExtensionFieldsSets.h",
+    "${chip_root}/src/app/clusters/scenes/SceneTable.h",
+    "${chip_root}/src/app/clusters/scenes/SceneTableImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes/SceneTableImpl.h",
+    "${chip_root}/src/app/clusters/scenes/scenes-tokens.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -105,6 +121,7 @@ chip_test_suite("tests") {
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
+    "TestSceneTable.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTimedHandler.cpp",
@@ -140,6 +157,7 @@ chip_test_suite("tests") {
     ":binding-test-srcs",
     ":client-monitoring-test-srcs",
     ":ota-requestor-test-srcs",
+    ":scenes-table-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",

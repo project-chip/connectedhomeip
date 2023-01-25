@@ -16,7 +16,6 @@
  */
 
 #include <app/clusters/scenes/SceneTableImpl.h>
-#include <lib/support/CommonPersistentData.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
 
@@ -399,6 +398,32 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index
     ReturnErrorOnFailure(fabric.Save(mStorage));
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
+{
+    FabricSceneData fabric(fabric_index);
+
+    CHIP_ERROR err = fabric.Load(mStorage);
+    VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+
+    // Remove scene entries
+    SceneTableData scene(fabric_index, fabric.first_scene);
+    size_t scene_count = 0;
+
+    while (scene_count < fabric.scene_count)
+    {
+        if (CHIP_NO_ERROR != scene.Load(mStorage))
+        {
+            break;
+        }
+        RemoveSceneTableEntry(fabric_index, scene.storageId);
+        scene.storageId = scene.next;
+        scene_count++;
+    }
+
+    // Remove fabric
+    return fabric.Delete(mStorage);
 }
 
 DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntry(FabricIndex fabric_index)

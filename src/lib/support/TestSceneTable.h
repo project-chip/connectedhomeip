@@ -25,10 +25,10 @@ namespace chip {
 namespace SceneTesting {
 
 using FabricIndex     = chip::FabricIndex;
-using SceneTableEntry = chip::scenes::SceneTableImpl::SceneTableEntry;
-using SceneTableImpl  = chip::scenes::SceneTableImpl;
-using SceneStorageId  = chip::scenes::SceneTableImpl::SceneStorageId;
-using SceneData       = chip::scenes::SceneTableImpl::SceneData;
+using SceneTableEntry = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
+using SceneTableImpl  = chip::scenes::DefaultSceneTableImpl;
+using SceneStorageId  = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
+using SceneData       = chip::scenes::DefaultSceneTableImpl::SceneData;
 
 CHIP_ERROR scene_store_test(SceneTableImpl * provider, FabricIndex fabric_index, SceneTableEntry & entry)
 {
@@ -98,6 +98,7 @@ CHIP_ERROR scene_remove_test(SceneTableImpl * provider, FabricIndex fabric_index
 
     // Iterator should return false here
     VerifyOrReturnError(iterator->Next(temp) == false, CHIP_ERROR_INVALID_ACCESS_TOKEN);
+    iterator->Release();
 
     return err;
 }

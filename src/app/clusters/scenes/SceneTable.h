@@ -20,6 +20,7 @@
 #include <app/clusters/scenes/ExtensionFieldsSets.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
+#include <lib/support/CommonPersistentData.h>
 
 namespace chip {
 namespace scenes {
@@ -111,13 +112,12 @@ public:
         ExtensionFieldsSets extentsionFieldsSets;
         TransitionTime100ms transitionTime100 = 0;
 
-        SceneData() = default;
-        SceneData(const char * sceneName, SceneTransitionTime time = 0, TransitionTime100ms time100ms = 0) :
+        SceneData(const char * sceneName = nullptr, SceneTransitionTime time = 0, TransitionTime100ms time100ms = 0) :
             sceneTransitionTime(time), transitionTime100(time100ms)
         {
             SetName(sceneName);
         }
-        SceneData(const char * sceneName, ExtensionFieldsSets fields, SceneTransitionTime time = 0,
+        SceneData(ExtensionFieldsSets fields, const char * sceneName = nullptr, SceneTransitionTime time = 0,
                   TransitionTime100ms time100ms = 0) :
             sceneTransitionTime(time),
             transitionTime100(time100ms)
@@ -136,8 +136,13 @@ public:
             TLV::TLVType container;
             ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
 
-            size_t name_size = strnlen(this->name, kSceneNameMax);
-            ReturnErrorOnFailure(writer.PutString(TagSceneName(), this->name, static_cast<uint32_t>(name_size)));
+            // assumes a 0 size means the name wasn't used so it doesn't get stored
+            if (this->name[0] != 0)
+            {
+                size_t name_size = strnlen(this->name, kSceneNameMax);
+                ReturnErrorOnFailure(writer.PutString(TagSceneName(), this->name, static_cast<uint32_t>(name_size)));
+            }
+
             ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime(), static_cast<uint16_t>(this->sceneTransitionTime)));
             ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime100(), static_cast<uint8_t>(this->transitionTime100)));
             ReturnErrorOnFailure(this->extentsionFieldsSets.Serialize(writer));
@@ -150,10 +155,20 @@ public:
             ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(1)));
             ReturnErrorOnFailure(reader.EnterContainer(container));
 
-            ReturnErrorOnFailure(reader.Next(TagSceneName()));
-            ReturnErrorOnFailure(reader.GetString(this->name, sizeof(this->name)));
-            size_t name_size      = strnlen(this->name, kSceneNameMax); // TODO : verify use of strnlen is ok
-            this->name[name_size] = 0;                                  // Putting a null terminator
+            ReturnErrorOnFailure(reader.Next());
+            TLV::Tag currTag = reader.GetTag();
+            VerifyOrReturnError(TagSceneName() == currTag || TagSceneTransitionTime() == currTag, CHIP_ERROR_WRONG_TLV_TYPE);
+
+            // If there was no error, a name is expected from the storage, if there was an unexpectec TLV element,
+            if (currTag == TagSceneName())
+            {
+                size_t name_size = reader.GetLength();
+                VerifyOrReturnError(name_size <= (kSceneNameMax - 1), CHIP_ERROR_BUFFER_TOO_SMALL);
+                ReturnErrorOnFailure(reader.GetString(this->name, name_size));
+                this->name[name_size] = 0;
+            }
+
+            // Putting a null terminator
             ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime()));
             ReturnErrorOnFailure(reader.Get(this->sceneTransitionTime));
             ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime100()));
@@ -212,7 +227,10 @@ public:
         SceneTableEntry(SceneStorageId id) : storageId(id) {}
         SceneTableEntry(const SceneStorageId id, const SceneData data) : storageId(id), storageData(data) {}
 
-        bool operator==(const SceneTableEntry & other) { return (this->storageId == other.storageId); }
+        bool operator==(const SceneTableEntry & other)
+        {
+            return (this->storageId == other.storageId && this->storageData == other.storageData);
+        }
 
         void operator=(const SceneTableEntry & other)
         {
@@ -229,8 +247,8 @@ public:
     SceneTable(const SceneTable &)             = delete;
     SceneTable & operator=(const SceneTable &) = delete;
 
-    virtual CHIP_ERROR Init() = 0;
-    virtual void Finish()     = 0;
+    virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;
+    virtual void Finish()                                        = 0;
 
     // Data
     virtual CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)                    = 0;
@@ -241,6 +259,12 @@ public:
     using SceneEntryIterator = CommonIterator<SceneTableEntry>;
 
     virtual SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) = 0;
+
+    // Fabrics
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
+
+protected:
+    const uint8_t mMaxScenePerFabric = kMaxScenePerFabric;
 };
 
 } // namespace scenes
