@@ -64,9 +64,6 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
-// Enable subscription persistence and resumption for CI
-#define CHIP_CONFIG_PERSIST_SUBSCRIPTIONS 1
-
 // ==================== Security Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_KVS_PATH

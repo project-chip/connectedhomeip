@@ -25,9 +25,6 @@
 
 #include <app/SubscriptionResumptionStorage.h>
 
-// TODO: move the conditional compilation into BUILD.gn config options
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-
 #include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Pool.h>
@@ -141,5 +138,3 @@ protected:
 };
 } // namespace app
 } // namespace chip
-
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
