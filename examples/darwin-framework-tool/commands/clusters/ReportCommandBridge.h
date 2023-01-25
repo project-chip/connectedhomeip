@@ -192,8 +192,7 @@ public:
         : ModelCommand("subscribe-event-by-id")
         , mClusterId(clusterId)
     {
-        if ( isClusterAny == true )
-        {
+        if (isClusterAny == true) {
             AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         }
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
