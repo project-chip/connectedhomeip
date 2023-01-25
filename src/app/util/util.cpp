@@ -16,8 +16,8 @@
  */
 
 #include "app/util/common.h"
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af-event.h>
@@ -84,8 +84,7 @@ bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, app::Clusters::Identify::Id, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
-                                                      (uint8_t *) &identifyTime, sizeof(identifyTime));
+    EmberAfStatus status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
     return (status == EMBER_ZCL_STATUS_SUCCESS && 0 < identifyTime);
 #else
     return false;

@@ -16,12 +16,14 @@
  */
 
 #include "ias-zone-client.h"
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::IasZone;
 using namespace chip::app::Clusters::IasZone::Commands;
 
 //-----------------------------------------------------------------------------
@@ -344,9 +346,11 @@ static EmberStatus sendCommand(EmberNodeId destAddress)
 
 static void setCieAddress(EmberNodeId destAddress)
 {
+#error "This needs to be fixed to handle 4-byte attribute ids"
+
     uint8_t writeAttributes[] = {
-        EMBER_LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
-        EMBER_HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(Attributes::IasCieAddress::Id),
+        EMBER_HIGH_BYTE(Attributes::IasCieAddress::Id),
         ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE,
         0,
         0,
@@ -430,12 +434,14 @@ void emberAfPluginIasZoneClientZdoMessageReceivedCallback(EmberNodeId emberNodeI
 
 void readIasZoneServerAttributes(EmberNodeId nodeId)
 {
+#error "This needs to be fixed to handle 4-byte attribute ids"
+
     uint8_t iasZoneAttributeIds[] = {
-        EMBER_LOW_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),  EMBER_HIGH_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(Attributes::ZoneState::Id),  EMBER_HIGH_BYTE(Attributes::ZoneState::Id),
 
-        EMBER_LOW_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),   EMBER_HIGH_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(Attributes::ZoneType::Id),   EMBER_HIGH_BYTE(Attributes::ZoneType::Id),
 
-        EMBER_LOW_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID), EMBER_HIGH_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(Attributes::ZoneStatus::Id), EMBER_HIGH_BYTE(Attributes::ZoneStatus::Id),
     };
     emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
@@ -447,9 +453,11 @@ void readIasZoneServerAttributes(EmberNodeId nodeId)
 
 void readIasZoneServerCieAddress(EmberNodeId nodeId)
 {
+#error "This needs to be fixed to handle 4-byte attribute ids"
+
     uint8_t iasZoneAttributeIds[] = {
-        EMBER_LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
-        EMBER_HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(Attributes::IasCieAddress::Id),
+        EMBER_HIGH_BYTE(Attributes::IasCieAddress::Id),
     };
     emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
@@ -495,7 +503,7 @@ void emberAfPluginIasZoneClientReadAttributesResponseCallback(ClusterId clusterI
                 i++; // skip the type of the attribute.  We already know what it should be.
                 switch (attributeId)
                 {
-                case ZCL_ZONE_STATUS_ATTRIBUTE_ID:
+                case Attributes::ZoneStatus::Id:
                     if ((i + 2) > bufLen)
                     {
                         // Too short, dump the message.
@@ -505,7 +513,7 @@ void emberAfPluginIasZoneClientReadAttributesResponseCallback(ClusterId clusterI
                     setServerZoneStatus(currentIndex, zoneStatus);
                     i += 2;
                     break;
-                case ZCL_ZONE_TYPE_ATTRIBUTE_ID:
+                case Attributes::ZoneType::Id:
                     if ((i + 2) > bufLen)
                     {
                         // Too short, dump the message.
@@ -515,7 +523,7 @@ void emberAfPluginIasZoneClientReadAttributesResponseCallback(ClusterId clusterI
                     setServerZoneType(currentIndex, zoneType);
                     i += 2;
                     break;
-                case ZCL_ZONE_STATE_ATTRIBUTE_ID:
+                case Attributes::ZoneState::Id:
                     if ((i + 1) > bufLen)
                     {
                         // Too short, dump the message
@@ -525,7 +533,7 @@ void emberAfPluginIasZoneClientReadAttributesResponseCallback(ClusterId clusterI
                     setServerZoneState(currentIndex, zoneState);
                     i++;
                     break;
-                case ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID: {
+                case Attributes::IasCieAddress::Id: {
                     uint8_t myIeee[EUI64_SIZE];
                     emberAfGetEui64(myIeee);
                     if ((i + 8) > bufLen)

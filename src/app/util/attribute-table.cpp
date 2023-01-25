@@ -212,8 +212,9 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 
 // writes an attribute (identified by clusterID and attrID to the given value.
 // this returns:
-// - EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isnt supported by the device (the
-//           device is not found in the attribute table)
+// - EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT: if endpoint isn't supported by the device.
+// - EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER: if cluster isn't supported on the endpoint.
+// - EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isn't supported in the cluster.
 // - EMBER_ZCL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
 //           stored in the attribute table
 // - EMBER_ZCL_STATUS_UNSUPPORTED_WRITE: if the attribute isnt writable
@@ -236,13 +237,13 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
-    record.endpoint    = endpoint;
-    record.clusterId   = cluster;
-    record.attributeId = attributeID;
-    emAfReadOrWriteAttribute(&record, &metadata,
-                             nullptr, // buffer
-                             0,       // buffer size
-                             false);  // write?
+    record.endpoint      = endpoint;
+    record.clusterId     = cluster;
+    record.attributeId   = attributeID;
+    EmberAfStatus status = emAfReadOrWriteAttribute(&record, &metadata,
+                                                    nullptr, // buffer
+                                                    0,       // buffer size
+                                                    false);  // write?
 
     // if we dont support that attribute
     if (metadata == nullptr)
@@ -250,7 +251,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         emberAfAttributesPrintln("%pep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported",
                                  "WRITE ERR: ", endpoint, ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
         emberAfAttributesFlush();
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        return status;
     }
 
     // if the data type specified by the caller is incorrect
@@ -329,8 +330,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 
         // Pre-write attribute callback specific
         // to the cluster that the attribute lives in.
-        EmberAfStatus status =
-            emAfClusterPreAttributeChangedCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+        status = emAfClusterPreAttributeChangedCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
 
         // Ignore the following write operation and return success
         if (status == EMBER_ZCL_STATUS_WRITE_IGNORED)

@@ -116,7 +116,7 @@ jobs:
               uses: gaurav-nelson/github-action-markdown-link-check@v1
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for incorrect error use in VerifyOrExit
               if: always()
@@ -124,7 +124,7 @@ jobs:
                   git grep -n "VerifyOrExit(.*, [A-Za-z]*_ERROR" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of PRI*8, which are not supported on some libcs.
               if: always()
@@ -132,7 +132,7 @@ jobs:
                   git grep -n "PRI.8" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
                   
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of PRI*16, which are not supported on some libcs.
               if: always()
@@ -140,7 +140,7 @@ jobs:
                   git grep -n "PRI.16" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
                   
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of %zu, which are not supported on some libcs.
               if: always()
@@ -167,7 +167,7 @@ jobs:
                   scripts/tools/check_test_pics.py src/app/tests/suites/certification/ci-pics-values src/app/tests/suites/certification/PICS.yaml
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of 0x%u and the like, which lead to misleading output.
               if: always()
@@ -175,9 +175,17 @@ jobs:
                   git grep -n '0x%[0-9l.-]*[^0-9lxX".-]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of '"0x" PRIu*' and the like, which lead to misleading output.
               if: always()
               run: |
                   git grep -n '0x%[0-9-]*" *PRI[^xX]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of legacy non-namespaced attribute ids.
+              if: always()
+              run: |
+                  git grep -n '_ATTRIBUTE_ID' -- src ':(exclude)src/app/zap-templates/templates/app/attribute-id.zapt' && exit 1 || exit 0
