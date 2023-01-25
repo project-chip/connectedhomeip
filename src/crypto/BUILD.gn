@@ -1,4 +1,5 @@
 # Copyright (c) 2020 Project CHIP Authors
+# Copyright 2025 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +20,8 @@ import("//build_overrides/nlassert.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("crypto.gni")
+
+import("${chip_root}/src/lib/trusty.gni")
 
 if (chip_crypto == "") {
   if (current_os == "android" || current_os == "freertos" ||
@@ -74,6 +77,12 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
     "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
   ]
+
+  if (chip_with_trusty_os == 1) {
+    defines += [ "CHIP_CRYPTO_TRUSTY_OS=1" ]
+  } else {
+    defines += [ "CHIP_CRYPTO_TRUSTY_OS=0" ]
+  }
 }
 
 source_set("public_headers") {
@@ -92,6 +101,10 @@ source_set("public_headers") {
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]
+
+  if (chip_with_trusty_os == 1) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
 }
 
 if (chip_crypto == "openssl") {
