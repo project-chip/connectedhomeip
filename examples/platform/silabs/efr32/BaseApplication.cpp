@@ -25,7 +25,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
 #include "LEDWidget.h"
 #include "sl_simple_led_instances.h"
 #endif // ENABLE_WSTK_LEDS
@@ -74,11 +74,12 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
 
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
 #define SYSTEM_STATE_LED &sl_led_led0
 #endif // ENABLE_WSTK_LEDS
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #define APP_FUNCTION_BUTTON &sl_button_btn0
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -95,7 +96,7 @@ TimerHandle_t sLightTimer;
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
@@ -211,7 +212,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     SILABS_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
 #endif // ENABLE_WSTK_LEDS
@@ -272,7 +273,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 
         mFunction = kFunction_FactoryReset;
 
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
@@ -333,7 +334,7 @@ void BaseApplication::LightEventHandler()
     {
         if ((gIdentifyptr != nullptr) && (gIdentifyptr->mActive))
         {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
             sStatusLED.Blink(250, 250);
 #endif // ENABLE_WSTK_LEDS
         }
@@ -341,19 +342,19 @@ void BaseApplication::LightEventHandler()
         {
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
             {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
                 sStatusLED.Blink(50, 50);
 #endif // ENABLE_WSTK_LEDS
             }
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
             {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
                 sStatusLED.Blink(1000, 1000);
 #endif // ENABLE_WSTK_LEDS
             }
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
             {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
                 sStatusLED.Blink(300, 700);
 #endif // ENABLE_WSTK_LEDS
             }
@@ -363,37 +364,37 @@ void BaseApplication::LightEventHandler()
         {
             if (sIsAttached)
             {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
                 sStatusLED.Set(true);
 #endif // ENABLE_WSTK_LEDS
             }
             else
             {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
                 sStatusLED.Blink(950, 50);
 #endif
             }
         }
         else if (sHaveBLEConnections)
         {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
             sStatusLED.Blink(100, 100);
 #endif // ENABLE_WSTK_LEDS
         }
         else
         {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
             sStatusLED.Blink(50, 950);
 #endif // ENABLE_WSTK_LEDS
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
     }
 
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
     sStatusLED.Animate();
 #endif // ENABLE_WSTK_LEDS
 }
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
 {
     // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
@@ -440,7 +441,10 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                     SILABS_LOG("Failed to open the Basic Commissioning Window");
                 }
             }
-            else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
+            else
+            {
+                SILABS_LOG("Network is already provisioned, Ble advertissement not enabled");
+            }
         }
         else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
         {
@@ -457,7 +461,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
         }
     }
 }
-
+#endif
 void BaseApplication::CancelFunctionTimer()
 {
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
@@ -500,7 +504,7 @@ void BaseApplication::StartStatusLEDTimer()
 
 void BaseApplication::StopStatusLEDTimer()
 {
-#ifdef ENABLE_WSTK_LEDS
+#if defined(ENABLE_WSTK_LEDS) && SL_STATUS_LED
     sStatusLED.Set(false);
 #endif // ENABLE_WSTK_LEDS
 
