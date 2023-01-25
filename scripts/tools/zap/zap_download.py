@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import logging
+import os
+
+import click
+
+try:
+    import coloredlogs
+    _has_coloredlogs = True
+except:
+    _has_coloredlogs = False
+
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'fatal': logging.FATAL,
+}
+
+# TODO:
+#  - figure out "current zap version to use"
+#  - select what to download
+
+# Downloads zap into the current environment
+# Arguments:
+#    - $1 - zap version to download
+#    - $2 - type of download:
+#         "release" - attempts to download the release version (a zip file)
+#         "devel" - checks out the corresponding tag and does "npm ci"
+
+def _GetDefaultExtractRoot():
+    if 'PW_ENVIRONMENT_ROOT' in os.environ:
+        return os.environ['PW_ENVIRONMENT_ROOT']
+    else:
+        # Before bootstrap, this will pick a temporary directory. Probably
+        # not ideal, but it likely just works
+        return '/tmp/'
+
+@click.command()
+@click.option(
+    '--log-level',
+    default='INFO',
+    show_default=True,
+    type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+    help='Determines the verbosity of script output')
+@click.option(
+    '--sdk-root',
+    default=os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')),
+    show_default=True,
+    help='Path to the SDK root (where zap versioning exists).')
+@click.option(
+    '--extract-root',
+    default=_GetDefaultExtractRoot(),
+    show_default=True,
+    help='Directory where too unpack/checkout zap')
+@click.argument('output_dir')
+def main(log_level, sdk_root, extract_dir):
+    if _has_coloredlogs:
+        coloredlogs.install(level=__LOG_LEVELS__[
+                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+    else:
+        logging.basicConfig(
+            level=__LOG_LEVELS__[log_level],
+            format='%(asctime)s %(levelname)-7s %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+
+    # TODO: implement
+    pass
+
+
+if __name__ == '__main__':
+    main()
