@@ -59,6 +59,18 @@ def ValidateRepoPath(context, parameter, value):
     return value
 
 
+def ValidateTargetNames(context, parameter, values):
+    """
+    Validates that the given target name is valid.
+    """
+    for value in values:
+        if not any(target.StringIntoTargetParts(value.lower())
+                   for target in build.targets.BUILD_TARGETS):
+            raise click.BadParameter(
+                "'%s' is not a valid target name." % value)
+    return values
+
+
 @click.group(chain=True)
 @click.option(
     '--log-level',
@@ -69,6 +81,7 @@ def ValidateRepoPath(context, parameter, value):
     '--target',
     default=[],
     multiple=True,
+    callback=ValidateTargetNames,
     help='Build target(s)'
 )
 @click.option(
