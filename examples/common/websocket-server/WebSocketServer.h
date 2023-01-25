@@ -22,7 +22,6 @@
 
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPMem.h>
-#include <libwebsockets.h>
 
 class WebSocketServer
 {

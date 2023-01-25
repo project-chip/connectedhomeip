@@ -22,7 +22,7 @@
 #include "../common/CHIPCommand.h"
 #include "../common/Commands.h"
 
-#include "WebSocketServer.h"
+#include <websocket-server/WebSocketServer.h>
 
 class Commands;
 
