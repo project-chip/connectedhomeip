@@ -45,6 +45,7 @@ __LOG_LEVELS__ = {
 #         "release" - attempts to download the release version (a zip file)
 #         "devel" - checks out the corresponding tag and does "npm ci"
 
+
 def _GetDefaultExtractRoot():
     if 'PW_ENVIRONMENT_ROOT' in os.environ:
         return os.environ['PW_ENVIRONMENT_ROOT']
@@ -52,6 +53,7 @@ def _GetDefaultExtractRoot():
         # Before bootstrap, this will pick a temporary directory. Probably
         # not ideal, but it likely just works
         return '/tmp/'
+
 
 @click.command()
 @click.option(
