@@ -22,9 +22,14 @@ import("${efr32_sdk_build_root}/silabs_board.gni")
 
 declare_args() {
   enable_heap_monitoring = false
+
+  # OTA timeout in seconds
+  OTA_periodic_query_timeout = 86400
 }
 
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
+
+import("${silabs_common_plat_dir}/efr32/args.gni")
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -124,8 +129,8 @@ config("ICD-subscription-callback-config") {
 
 source_set("efr32-ICD-subscription-callback") {
   sources = [
-    "../ICDSubscriptionCallback.cpp",
-    "../ICDSubscriptionCallback.h",
+    "${silabs_common_plat_dir}/ICDSubscriptionCallback.cpp",
+    "${silabs_common_plat_dir}/ICDSubscriptionCallback.h",
   ]
 
   public_deps = [ "${chip_root}/src/app:app" ]
@@ -133,16 +138,13 @@ source_set("efr32-ICD-subscription-callback") {
   public_configs = [ ":ICD-subscription-callback-config" ]
 }
 
-config("silabs-common-config") {
-  defines = []
+config("efr32-common-config") {
+  defines = [ "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}" ]
 
   if (!disable_lcd) {
     include_dirs = [ "display" ]
 
-    defines += [
-      "DISPLAY_ENABLED",
-      "IS_DEMO_LIGHT=1",  #TODO <- by example
-    ]
+    defines += [ "DISPLAY_ENABLED" ]
   }
 
   if (show_qr_code) {
@@ -158,19 +160,22 @@ config("silabs-common-config") {
   }
 }
 
-source_set("silabs-common") {
+source_set("efr32-common") {
   deps = []
   public_deps = []
 
   include_dirs = [ "." ]
 
   sources = [
-    "../heap_4_silabs.c",
-    "BaseApplication.cpp",
+    "${silabs_common_plat_dir}/heap_4_silabs.c",
     "efr32_utils.cpp",
     "init_efrPlatform.cpp",
     "matter_config.cpp",
   ]
+
+  if (use_base_app) {
+    sources += [ "BaseApplication.cpp" ]
+  }
 
   if (use_wstk_leds) {
     sources += [ "LEDWidget.cpp" ]
@@ -196,7 +201,7 @@ source_set("silabs-common") {
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "../MemMonitoring.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
   }
 
   # OpenThread Settings
@@ -218,15 +223,15 @@ source_set("silabs-common") {
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
-    deps += [ ":efr32-factory-data-provider" ]
+    public_deps += [ ":efr32-factory-data-provider" ]
   }
 
-  public_configs = [ ":silabs-common-config" ]
+  public_configs = [ ":efr32-common-config" ]
 
   public_deps += [
-    "${chip_root}/examples/lighting-app/lighting-common",  #TODO <- by example
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    app_data_model,
   ]
 }

@@ -35,6 +35,8 @@ efr32_project_dir = "${chip_root}/examples/lighting-app/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
+import("${examples_plat_dir}/args.gni")
+
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
@@ -132,11 +134,6 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
-  defines += [
-    "BOARD_ID=${silabs_board}",
-    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
-  ]
-
   if (chip_enable_pw_rpc) {
     defines += [
       "HAL_VCOM_ENABLE=1",
@@ -190,11 +187,13 @@ efr32_executable("lighting_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/lighting-app/lighting-common",
-    "${examples_plat_dir}:silabs-common",
+    "${examples_plat_dir}:efr32-common",
+    app_data_model,
   ]
 
-  #public_deps = []
+  if (!disable_lcd) {
+    defines += [ "IS_DEMO_LIGHT=1" ]
+  }
 
   # WiFi Settings
   if (chip_enable_wifi) {

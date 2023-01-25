@@ -29,18 +29,11 @@ efr32_project_dir = "${project_dir}/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
+import("${examples_plat_dir}/args.gni")
+
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-
-  # Monitor & log memory usage at runtime.
-  enable_heap_monitoring = false
-
-  # Enable Sleepy end device
-  enable_sleepy_device = false
-
-  # OTA timeout in seconds
-  OTA_periodic_query_timeout = 86400
 
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   use_wf200 = false
@@ -48,9 +41,6 @@ declare_args() {
   use_rs911x_sockets = false
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
-
-  # Disable LCD on supported devices
-  disable_lcd = false
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
@@ -65,14 +55,6 @@ declare_args() {
   chip_default_wifi_psk = ""
 }
 
-declare_args() {
-  # Enables LCD Qr Code on supported devices
-  show_qr_code = !disable_lcd
-}
-
-# qr code cannot be true if lcd is disabled
-assert(!(disable_lcd && show_qr_code))
-
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
 assert(!(use_rs911x && chip_enable_openthread))
@@ -81,13 +63,6 @@ if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
   import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
-}
-
-# ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
-if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
-    silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
-  show_qr_code = false
-  disable_lcd = true
 }
 
 defines = []
@@ -153,11 +128,6 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
-  defines += [
-    "BOARD_ID=${silabs_board}",
-    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
-  ]
-
   # WiFi Settings
   if (chip_enable_wifi) {
     if (use_rs911x) {
@@ -196,45 +166,21 @@ efr32_executable("window_app") {
   defines = []
 
   sources = [
-    "${examples_common_plat_dir}/heap_4_silabs.c",
-    "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/matter_config.cpp",
     "${project_dir}/common/src/WindowApp.cpp",
     "${project_dir}/common/src/ZclCallbacks.cpp",
     "src/WindowAppImpl.cpp",
     "src/main.cpp",
   ]
 
-  if (use_wstk_leds) {
-    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
-  }
-
-  if (chip_build_libshell || enable_openthread_cli || use_wf200 || use_rs911x) {
-    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  if (!disable_lcd) {
+    sources += [ "src/LcdPainter.cpp" ]
   }
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/examples/window-app/common:window-common",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
+    "${examples_plat_dir}:efr32-common",
+    app_data_model,
   ]
-
-  # OpenThread Settings
-  if (chip_enable_openthread) {
-    deps += [
-      "${chip_root}/third_party/openthread:openthread",
-      "${chip_root}/third_party/openthread:openthread-platform",
-      "${examples_plat_dir}:efr-matter-shell",
-    ]
-  }
-
-  if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
-    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
-  }
 
   # WiFi Settings
   if (chip_enable_wifi) {
@@ -274,27 +220,6 @@ efr32_executable("window_app") {
     }
   }
 
-  if (!disable_lcd) {
-    sources += [
-      "${examples_plat_dir}/display/demo-ui.c",
-      "${examples_plat_dir}/display/lcd.cpp",
-      "src/LcdPainter.cpp",
-    ]
-    include_dirs += [ "${examples_plat_dir}/display" ]
-    defines += [ "DISPLAY_ENABLED" ]
-
-    if (show_qr_code) {
-      deps += [ "${chip_root}/examples/common/QRCode" ]
-      defines += [ "QR_CODE_ENABLED" ]
-    }
-  }
-
-  if (enable_heap_monitoring) {
-    defines += [ "HEAP_MONITORING" ]
-
-    sources += [ "${examples_common_plat_dir}/MemMonitoring.cpp" ]
-  }
-
   ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
@@ -314,16 +239,6 @@ efr32_executable("window_app") {
       "-Wl,--defsym",
       "-Wl,SILABS_WIFI=1",
     ]
-  }
-
-  # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
-  }
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
   }
 }
 

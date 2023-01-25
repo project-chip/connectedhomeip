@@ -35,20 +35,13 @@ assert(current_os == "freertos")
 
 chef_project_dir = "${chip_root}/examples/chef"
 efr32_project_dir = "${chef_project_dir}/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+app_data_model = "${efr32_project_dir}:chef-comon"
 
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-
-  # Monitor & log memory usage at runtime.
-  enable_heap_monitoring = false
-
-  # Enable Sleepy end device
-  enable_sleepy_device = false
-
-  # OTA timeout in seconds
-  OTA_periodic_query_timeout = 86400
 
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   use_wf200 = false
@@ -57,19 +50,8 @@ declare_args() {
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
 
-  # Disable LCD on supported devices
-  disable_lcd = false
-
   sample_name = ""
 }
-
-declare_args() {
-  # Enables LCD Qr Code on supported devices
-  show_qr_code = !disable_lcd
-}
-
-# qr code cannot be true if lcd is disabled
-assert(!(disable_lcd && show_qr_code))
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
@@ -85,13 +67,6 @@ chip_data_model("chef-common") {
 
   zap_pregenerated_dir = "${chef_project_dir}/out/${sample_name}/zap-generated/"
   is_server = true
-}
-
-# ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
-if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
-    silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
-  show_qr_code = false
-  disable_lcd = true
 }
 
 # WiFi settings
@@ -123,15 +98,11 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/EFR32",
+    "${chip_root}/src/platform/silabs/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
-  ]
-
-  defines = [
-    "BOARD_ID=${silabs_board}",
-    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
+    "${examples_common_plat_dir}",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -170,51 +141,22 @@ efr32_sdk("sdk") {
 
 efr32_executable("chef_app") {
   output_name = "chip-efr32-chef-example.out"
+  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   include_dirs = [ "include" ]
   defines = []
 
   sources = [
-    "${examples_plat_dir}/BaseApplication.cpp",
-    "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/heap_4_silabs.c",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
 
-  if (use_wstk_leds) {
-    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
-  }
-
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
-      use_wf200 || use_rs911x) {
-    sources += [ "${examples_plat_dir}/uart.cpp" ]
-  }
-
   deps = [
     ":chef-common",
     ":sdk",
-    "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
+    "${examples_plat_dir}:efr32-common",
   ]
-
-  # OpenThread Settings
-  if (chip_enable_openthread) {
-    deps += [
-      "${chip_root}/third_party/openthread:openthread",
-      "${chip_root}/third_party/openthread:openthread-platform",
-      "${examples_plat_dir}:efr-matter-shell",
-    ]
-  }
-
-  if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
-    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
-  }
 
   # WiFi Settings
   if (chip_enable_wifi) {
@@ -245,19 +187,6 @@ efr32_executable("chef_app") {
     }
   }
 
-  if (!disable_lcd) {
-    sources += [
-      "${examples_plat_dir}/display/demo-ui.c",
-      "${examples_plat_dir}/display/lcd.cpp",
-    ]
-    include_dirs += [ "${examples_plat_dir}/display" ]
-    defines += [ "DISPLAY_ENABLED" ]
-    if (show_qr_code) {
-      defines += [ "QR_CODE_ENABLED" ]
-      deps += [ "${chip_root}/examples/common/QRCode" ]
-    }
-  }
-
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",
@@ -274,8 +203,8 @@ efr32_executable("chef_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_plat_dir}/PigweedLogger.cpp",
-      "${examples_plat_dir}/Rpc.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
     ]
 
     deps += [
@@ -303,11 +232,6 @@ efr32_executable("chef_app") {
     ]
   }
 
-  if (enable_heap_monitoring) {
-    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
-    defines += [ "HEAP_MONITORING" ]
-  }
-
   ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
@@ -327,16 +251,6 @@ efr32_executable("chef_app") {
       "-Wl,--defsym",
       "-Wl,SILABS_WIFI=1",
     ]
-  }
-
-  # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
-  }
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
   }
 
   output_dir = root_out_dir

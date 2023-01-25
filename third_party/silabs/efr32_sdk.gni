@@ -42,9 +42,6 @@ declare_args() {
 
   # Enable Sleepy end device
   enable_sleepy_device = false
-
-  # OTA timeout in seconds
-  OTA_periodic_query_timeout = 86400
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")

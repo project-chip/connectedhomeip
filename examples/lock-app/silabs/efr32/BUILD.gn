@@ -35,18 +35,11 @@ efr32_project_dir = "${chip_root}/examples/lock-app/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
+import("${examples_plat_dir}/args.gni")
+
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-
-  # Monitor & log memory usage at runtime.
-  enable_heap_monitoring = false
-
-  # Enable Sleepy end device
-  enable_sleepy_device = false
-
-  # OTA timeout in seconds
-  OTA_periodic_query_timeout = 86400
 
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   use_wf200 = false
@@ -54,9 +47,6 @@ declare_args() {
   use_rs911x_sockets = false
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
-
-  # Disable LCD on supported devices
-  disable_lcd = false
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
@@ -71,14 +61,6 @@ declare_args() {
   chip_default_wifi_psk = ""
 }
 
-declare_args() {
-  # Enables LCD Qr Code on supported devices
-  show_qr_code = !disable_lcd
-}
-
-# qr code cannot be true if lcd is disabled
-assert(!(disable_lcd && show_qr_code))
-
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
 assert(!(use_rs911x && chip_enable_openthread))
@@ -87,13 +69,6 @@ if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
   import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
-}
-
-# ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
-if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
-    silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
-  show_qr_code = false
-  disable_lcd = true
 }
 
 defines = []
@@ -159,11 +134,6 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
-  defines += [
-    "BOARD_ID=${silabs_board}",
-    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
-  ]
-
   if (chip_enable_pw_rpc) {
     defines += [
       "HAL_VCOM_ENABLE=1",
@@ -204,53 +174,20 @@ efr32_executable("lock_app") {
   defines = []
 
   sources = [
-    "${examples_common_plat_dir}/heap_4_silabs.c",
-    "${examples_plat_dir}/BaseApplication.cpp",
-    "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
     "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
 
-  if (use_wstk_leds) {
-    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
-  }
-
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
-      use_wf200 || use_rs911x) {
-    sources += [ "${examples_plat_dir}/uart.cpp" ]
-  }
-
-  if (chip_build_libshell) {
-    sources += [ "src/EventHandlerLibShell.cpp" ]
-  }
-
   deps = [
     ":sdk",
-    "${chip_root}/examples/lock-app/lock-common",
-    "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${examples_plat_dir}:efr-matter-shell",
+    "${examples_plat_dir}:efr32-common",
+    app_data_model,
   ]
 
-  # OpenThread Settings
-  if (chip_enable_openthread) {
-    deps += [
-      "${chip_root}/third_party/openthread:openthread",
-      "${chip_root}/third_party/openthread:openthread-platform",
-      "${examples_plat_dir}:efr-matter-shell",
-    ]
-  }
-
-  if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
-    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+  if (!disable_lcd) {
+    defines += [ "IS_DEMO_LOCK=1" ]
   }
 
   # WiFi Settings
@@ -291,22 +228,6 @@ efr32_executable("lock_app") {
     }
   }
 
-  if (!disable_lcd) {
-    sources += [
-      "${examples_plat_dir}/display/demo-ui.c",
-      "${examples_plat_dir}/display/lcd.cpp",
-    ]
-    include_dirs += [ "${examples_plat_dir}/display" ]
-    defines += [
-      "DISPLAY_ENABLED",
-      "IS_DEMO_LOCK=1",
-    ]
-    if (show_qr_code) {
-      defines += [ "QR_CODE_ENABLED" ]
-      deps += [ "${chip_root}/examples/common/QRCode" ]
-    }
-  }
-
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",
@@ -317,6 +238,7 @@ efr32_executable("lock_app") {
       "PW_RPC_LOCKING_SERVICE=1",
       "PW_RPC_OTCLI_SERVICE=1",
       "PW_RPC_THREAD_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
     ]
 
     sources += [
@@ -329,6 +251,9 @@ efr32_executable("lock_app") {
     deps += [
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
@@ -346,11 +271,6 @@ efr32_executable("lock_app") {
       "${chip_root}/examples/common",
       "${chip_root}/examples/common/pigweed/efr32",
     ]
-  }
-
-  if (enable_heap_monitoring) {
-    sources += [ "${examples_common_plat_dir}/MemMonitoring.cpp" ]
-    defines += [ "HEAP_MONITORING" ]
   }
 
   ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
@@ -374,18 +294,9 @@ efr32_executable("lock_app") {
     ]
   }
 
-  # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
-  }
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
-  }
-
   output_dir = root_out_dir
 }
+
 group("efr32") {
   deps = [ ":lock_app" ]
 }
