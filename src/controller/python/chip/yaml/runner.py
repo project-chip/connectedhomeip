@@ -27,10 +27,16 @@ import chip.yaml.format_converter as Converter
 import stringcase
 from chip import ChipDeviceCtrl
 from chip.clusters.Attribute import AttributeStatus, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
+from chip.exceptions import ChipStackError
 from chip.yaml.errors import ParsingError, UnexpectedParsingError
+from matter_yamltests.pseudo_clusters.clusters.delay_commands import DelayCommands
+from matter_yamltests.pseudo_clusters.clusters.log_commands import LogCommands
+from matter_yamltests.pseudo_clusters.clusters.system_commands import SystemCommands
+from matter_yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters
 
 from .data_model_lookup import *
 
+_PSEUDO_CLUSTERS = PseudoClusters([DelayCommands(), LogCommands(), SystemCommands()])
 logger = logging.getLogger('YamlParser')
 
 
@@ -94,6 +100,18 @@ class BaseAction(ABC):
     @abstractmethod
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
         pass
+
+
+class DefaultPseudoCluster(BaseAction):
+    def __init__(self, test_step):
+        super().__init__(test_step)
+        self._test_step = test_step
+        if not _PSEUDO_CLUSTERS.supports(test_step):
+            raise ParsingError(f'Default cluster {test_step.cluster} {test_step.command}, not supported')
+
+    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+        resp = asyncio.run(_PSEUDO_CLUSTERS.execute(self._test_step))
+        return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
 
 
 class InvokeAction(BaseAction):
@@ -213,6 +231,13 @@ class ReadAttributeAction(BaseAction):
                                                           fabricFiltered=self._fabric_filtered))
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
+        except ChipStackError as error:
+            _CHIP_TIMEOUT_ERROR = 50
+            if error.err == _CHIP_TIMEOUT_ERROR:
+                return _ActionResult(status=_ActionStatus.ERROR, response=error)
+            # For now it is unsure if all ChipStackError are supposed to be intentional.
+            # As a result we simply re-raise the error.
+            raise error
 
         return self.parse_raw_response(raw_resp)
 
@@ -254,7 +279,9 @@ class WaitForCommissioneeAction(BaseAction):
         args = test_step.arguments['values']
         request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
 
-        self._expire_existing_session = request_data_as_dict.get('expireExistingSession', False)
+        # Only if expire existing session is explicitly false do we want to supress expiring
+        # the session.
+        self._expire_existing_session = request_data_as_dict.get('expireExistingSession', True)
         if 'timeout' in request_data_as_dict:
             # Timeout is provided in seconds we need to conver to milliseconds.
             self._timeout_ms = request_data_as_dict['timeout'] * 1000
@@ -579,6 +606,12 @@ class ReplTestRunner:
         except ParsingError:
             return None
 
+    def _default_pseudo_cluster(self, test_step):
+        try:
+            return DefaultPseudoCluster(test_step)
+        except ParsingError:
+            return None
+
     def encode(self, request) -> BaseAction:
         action = None
         cluster = request.cluster.replace(' ', '').replace('/', '')
@@ -606,6 +639,10 @@ class ReplTestRunner:
             action = self._invoke_action_factory(request, cluster)
 
         if action is None:
+            # Now we try to create a default pseudo cluster.
+            action = self._default_pseudo_cluster(request)
+
+        if action is None:
             logger.warn(f"Failed to parse {request.label}")
         return action
 
@@ -626,6 +663,10 @@ class ReplTestRunner:
 
         if isinstance(response, chip.interaction_model.Status):
             decoded_response['error'] = stringcase.snakecase(response.name).upper()
+            return decoded_response
+
+        if isinstance(response, ChipStackError):
+            decoded_response['error'] = 'FAILURE'
             return decoded_response
 
         cluster_name = self._test_spec_definition.get_cluster_name(response.cluster_id)
