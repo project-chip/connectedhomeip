@@ -403,11 +403,17 @@ def Buildcc13x2x7_26x2x7Target():
 
     return target
 
-def cc32xxTargets():
-    target = Target('cc32xx', cc32xxBuilder)
-
-    yield target.Extend('lock', app=cc32xxApp.LOCK)
+def Buildcc32xxTarget():
+    target = BuildTarget('cc32xx', cc32xxBuilder)
     
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lock', app=cc32xxApp.LOCK),
+       
+    ])
+
+    return target
+
 def BuildCyw30739Target():
     target = BuildTarget('cyw30739', Cyw30739Builder)
     # board
@@ -498,31 +504,6 @@ def BuildBouffalolabTarget():
 def BuildIMXTarget():
     target = BuildTarget('imx', IMXBuilder)
 
-<<<<<<< HEAD
-    yield target.Extend('all-clusters-app', app=MW320App.ALL_CLUSTERS)
-
-
-ALL = []
-
-target_generators = [
-    HostTargets(),
-    Esp32Targets(),
-    Efr32Targets(),
-    NrfTargets(),
-    AndroidTargets(),
-    MbedTargets(),
-    InfineonTargets(),
-    AmebaTargets(),
-    K32WTargets(),
-    cc13x2x7_26x2x7Targets(),
-    cc32xxTargets(),
-    Cyw30739Targets(),
-    QorvoTargets(),
-    TizenTargets(),
-    Bl602Targets(),
-    IMXTargets(),
-    MW320Targets(),
-=======
     target.AppendFixedTargets([
         TargetPart('chip-tool', app=IMXApp.CHIP_TOOL),
         TargetPart('lighting-app', app=IMXApp.LIGHT),
@@ -582,6 +563,7 @@ BUILD_TARGETS = [
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
     Buildcc13x2x7_26x2x7Target(),
+    Buildcc32xxTarget(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),
@@ -600,5 +582,4 @@ BUILD_TARGETS = [
     BuildTizenTarget(),
     BuildTelinkTarget(),
     BuildOpenIotSdkTargets(),
->>>>>>> 29d777f39dfe3c97cd8b010a7b827b1805cc9a47
 ]
