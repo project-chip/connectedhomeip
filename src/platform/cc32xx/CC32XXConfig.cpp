@@ -27,6 +27,7 @@
 
 #include <CC32XXConfig.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <ti/drivers/net/wifi/simplelink.h>
 

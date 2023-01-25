@@ -21,7 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/ids/ClusterIds.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
