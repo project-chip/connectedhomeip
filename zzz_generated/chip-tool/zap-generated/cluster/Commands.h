@@ -433,8 +433,8 @@ public:
     ScenesAddScene(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-scene", credsIssuerConfig), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("SceneName", &mRequest.sceneName);
         AddArgument("ExtensionFieldSets", &mComplex_ExtensionFieldSets);
@@ -469,8 +469,8 @@ class ScenesViewScene : public ClusterCommand
 public:
     ScenesViewScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("view-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         ClusterCommand::AddArguments();
     }
 
@@ -500,8 +500,8 @@ class ScenesRemoveScene : public ClusterCommand
 public:
     ScenesRemoveScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         ClusterCommand::AddArguments();
     }
 
@@ -531,7 +531,7 @@ class ScenesRemoveAllScenes : public ClusterCommand
 public:
     ScenesRemoveAllScenes(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-all-scenes", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -561,8 +561,8 @@ class ScenesStoreScene : public ClusterCommand
 public:
     ScenesStoreScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("store-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         ClusterCommand::AddArguments();
     }
 
@@ -592,8 +592,8 @@ class ScenesRecallScene : public ClusterCommand
 public:
     ScenesRecallScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("recall-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         ClusterCommand::AddArguments();
     }
@@ -625,7 +625,7 @@ public:
     ScenesGetSceneMembership(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("get-scene-membership", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -656,8 +656,8 @@ public:
     ScenesEnhancedAddScene(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("enhanced-add-scene", credsIssuerConfig), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("SceneName", &mRequest.sceneName);
         AddArgument("ExtensionFieldSets", &mComplex_ExtensionFieldSets);
@@ -692,8 +692,8 @@ class ScenesEnhancedViewScene : public ClusterCommand
 public:
     ScenesEnhancedViewScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("enhanced-view-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         ClusterCommand::AddArguments();
     }
 
@@ -724,10 +724,10 @@ public:
     ScenesCopyScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("copy-scene", credsIssuerConfig)
     {
         AddArgument("Mode", 0, UINT8_MAX, &mRequest.mode);
-        AddArgument("GroupIdFrom", 0, UINT16_MAX, &mRequest.groupIdFrom);
-        AddArgument("SceneIdFrom", 0, UINT8_MAX, &mRequest.sceneIdFrom);
-        AddArgument("GroupIdTo", 0, UINT16_MAX, &mRequest.groupIdTo);
-        AddArgument("SceneIdTo", 0, UINT8_MAX, &mRequest.sceneIdTo);
+        AddArgument("GroupIdentifierFrom", 0, UINT16_MAX, &mRequest.groupIdentifierFrom);
+        AddArgument("SceneIdentifierFrom", 0, UINT8_MAX, &mRequest.sceneIdentifierFrom);
+        AddArgument("GroupIdentifierTo", 0, UINT16_MAX, &mRequest.groupIdentifierTo);
+        AddArgument("SceneIdentifierTo", 0, UINT8_MAX, &mRequest.sceneIdentifierTo);
         ClusterCommand::AddArguments();
     }
 
@@ -5766,7 +5766,7 @@ private:
 | * BallastStatus                                                     | 0x0002 |
 | * MinLevel                                                          | 0x0010 |
 | * MaxLevel                                                          | 0x0011 |
-| * IntrinsicBalanceFactor                                            | 0x0014 |
+| * IntrinsicBallastFactor                                            | 0x0014 |
 | * BallastFactorAdjustment                                           | 0x0015 |
 | * LampQuantity                                                      | 0x0020 |
 | * LampType                                                          | 0x0030 |
@@ -6097,7 +6097,7 @@ private:
 | Commands:                                                           |        |
 | * Play                                                              |   0x00 |
 | * Pause                                                             |   0x01 |
-| * StopPlayback                                                      |   0x02 |
+| * Stop                                                              |   0x02 |
 | * StartOver                                                         |   0x03 |
 | * Previous                                                          |   0x04 |
 | * Next                                                              |   0x05 |
@@ -6183,12 +6183,12 @@ private:
 };
 
 /*
- * Command StopPlayback
+ * Command Stop
  */
-class MediaPlaybackStopPlayback : public ClusterCommand
+class MediaPlaybackStop : public ClusterCommand
 {
 public:
-    MediaPlaybackStopPlayback(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop-playback", credsIssuerConfig)
+    MediaPlaybackStop(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -6208,7 +6208,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type mRequest;
+    chip::app::Clusters::MediaPlayback::Commands::Stop::Type mRequest;
 };
 
 /*
@@ -6895,7 +6895,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type>>
+        mComplex_Application;
 };
 
 /*
@@ -6927,7 +6928,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type>>
+        mComplex_Application;
 };
 
 /*
@@ -6959,7 +6961,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type>>
+        mComplex_Application;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -11725,7 +11728,7 @@ void registerClusterBallastConfiguration(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "ballast-status", Attributes::BallastStatus::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "min-level", Attributes::MinLevel::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "max-level", Attributes::MaxLevel::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "intrinsic-balance-factor", Attributes::IntrinsicBalanceFactor::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "intrinsic-ballast-factor", Attributes::IntrinsicBallastFactor::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "ballast-factor-adjustment", Attributes::BallastFactorAdjustment::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "lamp-quantity", Attributes::LampQuantity::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "lamp-type", Attributes::LampType::Id, credsIssuerConfig),                                //
@@ -11743,7 +11746,7 @@ void registerClusterBallastConfiguration(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<uint8_t>>(Id, "min-level", 0, UINT8_MAX, Attributes::MinLevel::Id, credsIssuerConfig),        //
         make_unique<WriteAttribute<uint8_t>>(Id, "max-level", 0, UINT8_MAX, Attributes::MaxLevel::Id, credsIssuerConfig),        //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
-            Id, "intrinsic-balance-factor", 0, UINT8_MAX, Attributes::IntrinsicBalanceFactor::Id, credsIssuerConfig), //
+            Id, "intrinsic-ballast-factor", 0, UINT8_MAX, Attributes::IntrinsicBallastFactor::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
             Id, "ballast-factor-adjustment", 0, UINT8_MAX, Attributes::BallastFactorAdjustment::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "lamp-type", Attributes::LampType::Id, credsIssuerConfig),      //
@@ -11763,7 +11766,7 @@ void registerClusterBallastConfiguration(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeAttribute>(Id, "ballast-status", Attributes::BallastStatus::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "min-level", Attributes::MinLevel::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "max-level", Attributes::MaxLevel::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeAttribute>(Id, "intrinsic-balance-factor", Attributes::IntrinsicBalanceFactor::Id,
+        make_unique<SubscribeAttribute>(Id, "intrinsic-ballast-factor", Attributes::IntrinsicBallastFactor::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "ballast-factor-adjustment", Attributes::BallastFactorAdjustment::Id,
                                         credsIssuerConfig),                                                            //
@@ -12256,7 +12259,7 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<ClusterCommand>(Id, credsIssuerConfig),        //
         make_unique<MediaPlaybackPlay>(credsIssuerConfig),         //
         make_unique<MediaPlaybackPause>(credsIssuerConfig),        //
-        make_unique<MediaPlaybackStopPlayback>(credsIssuerConfig), //
+        make_unique<MediaPlaybackStop>(credsIssuerConfig),         //
         make_unique<MediaPlaybackStartOver>(credsIssuerConfig),    //
         make_unique<MediaPlaybackPrevious>(credsIssuerConfig),     //
         make_unique<MediaPlaybackNext>(credsIssuerConfig),         //
@@ -12537,7 +12540,7 @@ void registerClusterApplicationLauncher(Commands & commands, CredentialIssuerCom
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type>>>(
+            chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type>>>(
             Id, "current-app", Attributes::CurrentApp::Id, credsIssuerConfig),                                                  //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "catalog-list", Attributes::CatalogList::Id, credsIssuerConfig),                    //

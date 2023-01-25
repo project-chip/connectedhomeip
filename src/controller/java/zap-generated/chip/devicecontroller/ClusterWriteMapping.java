@@ -1408,24 +1408,24 @@ public class ClusterWriteMapping {
             writeBallastConfigurationMaxLevelCommandParams);
     writeBallastConfigurationInteractionInfo.put(
         "writeMaxLevelAttribute", writeBallastConfigurationMaxLevelAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeBallastConfigurationIntrinsicBalanceFactorCommandParams =
+    Map<String, CommandParameterInfo> writeBallastConfigurationIntrinsicBallastFactorCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo ballastConfigurationintrinsicBalanceFactorCommandParameterInfo =
+    CommandParameterInfo ballastConfigurationintrinsicBallastFactorCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class, Integer.class);
-    writeBallastConfigurationIntrinsicBalanceFactorCommandParams.put(
-        "value", ballastConfigurationintrinsicBalanceFactorCommandParameterInfo);
-    InteractionInfo writeBallastConfigurationIntrinsicBalanceFactorAttributeInteractionInfo =
+    writeBallastConfigurationIntrinsicBallastFactorCommandParams.put(
+        "value", ballastConfigurationintrinsicBallastFactorCommandParameterInfo);
+    InteractionInfo writeBallastConfigurationIntrinsicBallastFactorAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BallastConfigurationCluster) cluster)
-                  .writeIntrinsicBalanceFactorAttribute(
+                  .writeIntrinsicBallastFactorAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBallastConfigurationIntrinsicBalanceFactorCommandParams);
+            writeBallastConfigurationIntrinsicBallastFactorCommandParams);
     writeBallastConfigurationInteractionInfo.put(
-        "writeIntrinsicBalanceFactorAttribute",
-        writeBallastConfigurationIntrinsicBalanceFactorAttributeInteractionInfo);
+        "writeIntrinsicBallastFactorAttribute",
+        writeBallastConfigurationIntrinsicBallastFactorAttributeInteractionInfo);
     Map<String, CommandParameterInfo>
         writeBallastConfigurationBallastFactorAdjustmentCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();

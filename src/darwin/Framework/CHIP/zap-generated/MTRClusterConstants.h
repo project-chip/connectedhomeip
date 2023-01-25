@@ -3734,7 +3734,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID")
     = 0x00000011,
     MTRClusterBallastConfigurationAttributeIntrinsicBalanceFactorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID")
     = 0x00000014,
     MTRClusterBallastConfigurationAttributeBallastFactorAdjustmentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID")
@@ -3782,7 +3782,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastStatusID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeMinLevelID MTR_NEWLY_AVAILABLE = 0x00000010,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID MTR_NEWLY_AVAILABLE = 0x00000011,
-    MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID MTR_NEWLY_AVAILABLE = 0x00000014,
+    MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID MTR_NEWLY_AVAILABLE = 0x00000014,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID MTR_NEWLY_AVAILABLE = 0x00000015,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeLampQuantityID MTR_NEWLY_AVAILABLE = 0x00000020,
     MTRAttributeIDTypeClusterBallastConfigurationAttributeLampTypeID MTR_NEWLY_AVAILABLE = 0x00000030,
@@ -6402,7 +6402,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandPauseID")
     = 0x00000001,
     MTRClusterMediaPlaybackCommandStopPlaybackID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandStopID")
     = 0x00000002,
     MTRClusterMediaPlaybackCommandStartOverID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID")
@@ -6435,7 +6435,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster MediaPlayback commands
     MTRCommandIDTypeClusterMediaPlaybackCommandPlayID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterMediaPlaybackCommandPauseID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterMediaPlaybackCommandStopID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRCommandIDTypeClusterMediaPlaybackCommandNextID MTR_NEWLY_AVAILABLE = 0x00000005,

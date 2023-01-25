@@ -8038,20 +8038,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback
-    : public chip::Callback::Callback<CHIPBallastConfigurationClusterIntrinsicBalanceFactorAttributeCallbackType>
+class CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterIntrinsicBallastFactorAttributeCallbackType>
 {
 public:
-    CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback();
+    ~CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback();
 
-    static void maybeDestroy(CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback * callback)
+    static void maybeDestroy(CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback>(callback);
         }
     }
 
@@ -8059,7 +8059,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

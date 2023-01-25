@@ -1393,8 +1393,8 @@ typedef void (*CHIPBallastConfigurationClusterMinLevelAttributeCallbackType)(
     void *, chip::app::Clusters::BallastConfiguration::Attributes::MinLevel::TypeInfo::DecodableArgType);
 typedef void (*CHIPBallastConfigurationClusterMaxLevelAttributeCallbackType)(
     void *, chip::app::Clusters::BallastConfiguration::Attributes::MaxLevel::TypeInfo::DecodableArgType);
-typedef void (*CHIPBallastConfigurationClusterIntrinsicBalanceFactorAttributeCallbackType)(
-    void *, chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBalanceFactor::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterIntrinsicBallastFactorAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBallastFactor::TypeInfo::DecodableArgType);
 typedef void (*CHIPBallastConfigurationClusterBallastFactorAdjustmentAttributeCallbackType)(
     void *, chip::app::Clusters::BallastConfiguration::Attributes::BallastFactorAdjustment::TypeInfo::DecodableArgType);
 typedef void (*CHIPBallastConfigurationClusterLampQuantityAttributeCallbackType)(

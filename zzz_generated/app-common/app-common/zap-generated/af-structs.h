@@ -30,13 +30,6 @@
 
 #include "enums.h"
 
-// Struct for ApplicationBasicApplication
-typedef struct _ApplicationBasicApplication
-{
-    uint16_t catalogVendorId;
-    chip::CharSpan applicationId;
-} ApplicationBasicApplication;
-
 // Struct for CredentialStruct
 typedef struct _CredentialStruct
 {

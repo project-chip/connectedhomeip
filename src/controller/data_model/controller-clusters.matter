@@ -6,6 +6,11 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
+struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
+}
+
 client cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -114,17 +119,21 @@ client cluster Groups = 4 {
 }
 
 client cluster Scenes = 5 {
+  bitmap SceneFeatures : BITMAP32 {
+    kSceneNames = 0x1;
+  }
+
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
   }
 
   struct ExtensionFieldSet {
-    cluster_id clusterId = 0;
+    cluster_id clusterID = 0;
     AttributeValuePair attributeValueList[] = 1;
   }
 
   struct AttributeValuePair {
-    optional attrib_id attributeId = 0;
+    optional attrib_id attributeID = 0;
     int8u attributeValue[] = 1;
   }
 
@@ -140,52 +149,52 @@ client cluster Scenes = 5 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
     INT16U transitionTime = 2;
     CHAR_STRING sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
 
   request struct ViewSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RemoveSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RemoveAllScenesRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct StoreSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RecallSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
     optional nullable INT16U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
     optional CHAR_STRING sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
@@ -193,25 +202,25 @@ client cluster Scenes = 5 {
 
   response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
     nullable INT8U capacity = 1;
-    group_id groupId = 2;
+    group_id groupID = 2;
     optional INT8U sceneList[] = 3;
   }
 
@@ -252,10 +261,6 @@ client cluster OnOff = 6 {
 
   bitmap OnOffFeature : BITMAP32 {
     kLighting = 0x1;
-  }
-
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -2916,9 +2921,9 @@ client cluster PumpConfigurationAndControl = 512 {
 
 client cluster Thermostat = 513 {
   enum SetpointAdjustMode : ENUM8 {
-    kHeatSetpoint = 0;
-    kCoolSetpoint = 1;
-    kHeatAndCoolSetpoints = 2;
+    kHeat = 0;
+    kCool = 1;
+    kBoth = 2;
   }
 
   enum ThermostatControlSequence : ENUM8 {
@@ -2941,9 +2946,11 @@ client cluster Thermostat = 513 {
     kAuto = 1;
     kCool = 3;
     kHeat = 4;
-    kEmergencyHeating = 5;
+    kEmergencyHeat = 5;
     kPrecooling = 6;
     kFanOnly = 7;
+    kDry = 8;
+    kSleep = 9;
   }
 
   bitmap DayOfWeek : BITMAP8 {
@@ -2954,21 +2961,21 @@ client cluster Thermostat = 513 {
     kThursday = 0x10;
     kFriday = 0x20;
     kSaturday = 0x40;
-    kAwayOrVacation = 0x80;
+    kAway = 0x80;
   }
 
   bitmap ModeForSequence : BITMAP8 {
-    kHeatSetpointFieldPresent = 0x1;
-    kCoolSetpointFieldPresent = 0x2;
+    kHeatSetpointPresent = 0x1;
+    kCoolSetpointPresent = 0x2;
   }
 
   bitmap ThermostatFeature : BITMAP32 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
-    kSchedule = 0x8;
+    kScheduleConfiguration = 0x8;
     kSetback = 0x10;
-    kAutomode = 0x20;
+    kAutoMode = 0x20;
   }
 
   struct ThermostatScheduleTransition {
@@ -3403,7 +3410,7 @@ client cluster BallastConfiguration = 769 {
   readonly attribute bitmap8 ballastStatus = 2;
   attribute int8u minLevel = 16;
   attribute int8u maxLevel = 17;
-  attribute nullable int8u intrinsicBalanceFactor = 20;
+  attribute nullable int8u intrinsicBallastFactor = 20;
   attribute nullable int8u ballastFactorAdjustment = 21;
   readonly attribute int8u lampQuantity = 32;
   attribute char_string<16> lampType = 48;
@@ -3628,15 +3635,15 @@ client cluster MediaPlayback = 1286 {
     kVariableSpeed = 0x2;
   }
 
-  struct PlaybackPosition {
-    int64u updatedAt = 0;
+  struct PlaybackPositionStruct {
+    epoch_us updatedAt = 0;
     nullable int64u position = 1;
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
   readonly attribute nullable epoch_us startTime = 1;
   readonly attribute nullable int64u duration = 2;
-  readonly attribute nullable PlaybackPosition sampledPosition = 3;
+  readonly attribute nullable PlaybackPositionStruct sampledPosition = 3;
   readonly attribute single playbackSpeed = 4;
   readonly attribute nullable int64u seekRangeEnd = 5;
   readonly attribute nullable int64u seekRangeStart = 6;
@@ -3665,7 +3672,7 @@ client cluster MediaPlayback = 1286 {
 
   command Play(): PlaybackResponse = 0;
   command Pause(): PlaybackResponse = 1;
-  command StopPlayback(): PlaybackResponse = 2;
+  command Stop(): PlaybackResponse = 2;
   command StartOver(): PlaybackResponse = 3;
   command Previous(): PlaybackResponse = 4;
   command Next(): PlaybackResponse = 5;
@@ -4011,18 +4018,13 @@ client cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  struct ApplicationEP {
-    Application application = 0;
+  struct ApplicationEPStruct {
+    ApplicationStruct application = 0;
     optional endpoint_no endpoint = 1;
   }
 
-  struct Application {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
-  }
-
   readonly attribute INT16U catalogList[] = 0;
-  attribute nullable ApplicationEP currentApp = 1;
+  attribute nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4030,21 +4032,21 @@ client cluster ApplicationLauncher = 1292 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
     optional OCTET_STRING data = 1;
   }
 
   request struct StopAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   request struct HideAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   response struct LauncherResponse = 3 {
     ApplicationLauncherStatusEnum status = 0;
-    OCTET_STRING data = 1;
+    optional OCTET_STRING data = 1;
   }
 
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
@@ -4060,16 +4062,11 @@ client cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  struct ApplicationBasicApplication {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
-  }
-
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
-  readonly attribute ApplicationBasicApplication application = 4;
+  readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;

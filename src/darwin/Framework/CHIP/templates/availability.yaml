@@ -4054,7 +4054,6 @@
           OnOff:
               - OnOffControl
               - OnOffFeature
-              - SceneFeatures
           LevelControl:
               - LevelControlFeature
           Actions:
@@ -4142,8 +4141,6 @@
                   - AcceptOnlyWhenOn
               OnOffFeature:
                   - Lighting
-              SceneFeatures:
-                  - SceneNames
           LevelControl:
               LevelControlFeature:
                   - OnOff
@@ -4600,6 +4597,8 @@
               - DeviceTypeList
           AccessControl:
               - ACL
+          BallastConfiguration:
+              - IntrinsicBallastFactor
           OccupancySensing:
               - PIROccupiedToUnoccupiedDelay
               - PIRUnoccupiedToOccupiedDelay
@@ -4830,6 +4829,8 @@
               - StayAwakeRequest
           ContentLauncher:
               - LauncherResponse
+          MediaPlayback:
+              - Stop
       command fields:
           UnitTesting:
               TestSpecificResponse:
@@ -5036,6 +5037,62 @@
               LauncherResponse:
                   - status
                   - data
+          Scenes:
+              AddScene:
+                  - groupID
+                  - sceneID
+              ViewScene:
+                  - groupID
+                  - sceneID
+              RemoveScene:
+                  - groupID
+                  - sceneID
+              RemoveAllScenes:
+                  - groupID
+              StoreScene:
+                  - groupID
+                  - sceneID
+              RecallScene:
+                  - groupID
+                  - sceneID
+              GetSceneMembership:
+                  - groupID
+              EnhancedAddScene:
+                  - groupID
+                  - sceneID
+              EnhancedViewScene:
+                  - groupID
+                  - sceneID
+              CopyScene:
+                  - groupIdentifierFrom
+                  - sceneIdentifierFrom
+                  - groupIdentifierTo
+                  - sceneIdentifierTo
+              AddSceneResponse:
+                  - groupID
+                  - sceneID
+              ViewSceneResponse:
+                  - groupID
+                  - sceneID
+              RemoveSceneResponse:
+                  - groupID
+                  - sceneID
+              RemoveAllScenesResponse:
+                  - groupID
+              StoreSceneResponse:
+                  - groupID
+                  - sceneID
+              GetSceneMembershipResponse:
+                  - groupID
+              EnhancedAddSceneResponse:
+                  - groupID
+                  - sceneID
+              EnhancedViewSceneResponse:
+                  - groupID
+                  - sceneID
+              CopySceneResponse:
+                  - groupIdentifierFrom
+                  - sceneIdentifierFrom
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5064,6 +5121,8 @@
               - FabricDescriptorStruct
           DoorLock:
               - CredentialStruct
+          MediaPlayback:
+              - PlaybackPositionStruct
           TargetNavigator:
               - TargetInfoStruct
           MediaInput:
@@ -5080,6 +5139,11 @@
               - ContentSearchStruct
               - StyleInformationStruct
               - BrandingInformationStruct
+          ApplicationLauncher:
+              - ApplicationStruct
+              - ApplicationEPStruct
+          ApplicationBasic:
+              - ApplicationStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5195,6 +5259,10 @@
               CredentialStruct:
                   - credentialType
                   - credentialIndex
+          MediaPlayback:
+              PlaybackPositionStruct:
+                  - updatedAt
+                  - position
           TargetNavigator:
               TargetInfoStruct:
                   - identifier
@@ -5250,6 +5318,30 @@
                   - progressBar
                   - splash
                   - waterMark
+          ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorID
+                  - applicationID
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - catalogVendorId
+                  - applicationId
+              ApplicationEPStruct:
+                  - application
+                  - endpoint
+          ApplicationBasic:
+              ApplicationStruct:
+                  - catalogVendorID
+                  - applicationID
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - catalogVendorId
+                  - applicationId
+          Scenes:
+              AttributeValuePair:
+                  - attributeID
+              ExtensionFieldSet:
+                  - clusterID
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5588,6 +5680,15 @@
                   - Percentage
               ParameterEnum:
                   - Video
+          Thermostat:
+              ThermostatSystemMode:
+                  - EmergencyHeat
+                  - Dry
+                  - Sleep
+              SetpointAdjustMode:
+                  - Heat
+                  - Cool
+                  - Both
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5601,6 +5702,8 @@
               - DaysMaskMap
           PumpConfigurationAndControl:
               - PumpFeature
+          Scenes:
+              - SceneFeatures
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5666,6 +5769,18 @@
                   - ConstantTemperature
                   - Automatic
                   - Local
+          Thermostat:
+              ThermostatFeature:
+                  - ScheduleConfiguration
+                  - AutoMode
+              DayOfWeek:
+                  - Away
+              ModeForSequence:
+                  - HeatSetpointPresent
+                  - CoolSetpointPresent
+          Scenes:
+              SceneFeatures:
+                  - SceneNames
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5678,6 +5793,8 @@
               - DeviceList
           AccessControl:
               - Acl
+          BallastConfiguration:
+              - IntrinsicBalanceFactor
           OccupancySensing:
               - PirOccupiedToUnoccupiedDelay
               - PirUnoccupiedToOccupiedDelay
@@ -5693,6 +5810,8 @@
       commands:
           ContentLauncher:
               - LaunchResponse
+          MediaPlayback:
+              - StopPlayback
       command fields:
           Groups:
               AddGroup:
@@ -5740,6 +5859,62 @@
               AnnounceOTAProvider:
                   - providerNodeId
                   - vendorId
+          Scenes:
+              AddScene:
+                  - groupId
+                  - sceneId
+              ViewScene:
+                  - groupId
+                  - sceneId
+              RemoveScene:
+                  - groupId
+                  - sceneId
+              RemoveAllScenes:
+                  - groupId
+              StoreScene:
+                  - groupId
+                  - sceneId
+              RecallScene:
+                  - groupId
+                  - sceneId
+              GetSceneMembership:
+                  - groupId
+              EnhancedAddScene:
+                  - groupId
+                  - sceneId
+              EnhancedViewScene:
+                  - groupId
+                  - sceneId
+              CopyScene:
+                  - groupIdFrom
+                  - sceneIdFrom
+                  - groupIdTo
+                  - sceneIdTo
+              AddSceneResponse:
+                  - groupId
+                  - sceneId
+              ViewSceneResponse:
+                  - groupId
+                  - sceneId
+              RemoveSceneResponse:
+                  - groupId
+                  - sceneId
+              RemoveAllScenesResponse:
+                  - groupId
+              StoreSceneResponse:
+                  - groupId
+                  - sceneId
+              GetSceneMembershipResponse:
+                  - groupId
+              EnhancedAddSceneResponse:
+                  - groupId
+                  - sceneId
+              EnhancedViewSceneResponse:
+                  - groupId
+                  - sceneId
+              CopySceneResponse:
+                  - groupIdFrom
+                  - sceneIdFrom
       structs:
           Descriptor:
               - DeviceType
@@ -5760,6 +5935,8 @@
               - FabricDescriptor
           DoorLock:
               - DlCredential
+          MediaPlayback:
+              - PlaybackPosition
           TargetNavigator:
               - TargetInfo
           MediaInput:
@@ -5776,6 +5953,11 @@
               - ContentSearch
               - StyleInformation
               - BrandingInformation
+          ApplicationLauncher:
+              - Application
+              - ApplicationEP
+          ApplicationBasic:
+              - ApplicationBasicApplication
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5788,6 +5970,19 @@
           ContentLauncher:
               StyleInformationStruct:
                   - imageUrl
+          ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorId
+                  - applicationId
+          ApplicationBasic:
+              ApplicationStruct:
+                  - catalogVendorId
+                  - applicationId
+          Scenes:
+              AttributeValuePair:
+                  - attributeId
+              ExtensionFieldSet:
+                  - clusterId
       event fields:
           Switch:
               MultiPressComplete:
@@ -5872,6 +6067,13 @@
               MetricTypeEnum:
                   - PIXELS
                   - PERCENTAGE
+          Thermostat:
+              ThermostatSystemMode:
+                  - EmergencyHeating
+              SetpointAdjustMode:
+                  - HeatSetpoint
+                  - CoolSetpoint
+                  - HeatAndCoolSetpoints
       bitmaps:
           DoorLock:
               - DlDaysMaskMap
@@ -5894,6 +6096,15 @@
                   - UsersManagement
                   - Notifications
                   - YearDaySchedules
+          Thermostat:
+              ThermostatFeature:
+                  - Schedule
+                  - Automode
+              DayOfWeek:
+                  - AwayOrVacation
+              ModeForSequence:
+                  - HeatSetpointFieldPresent
+                  - CoolSetpointFieldPresent
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5967,6 +6178,8 @@
               DeviceTypeList: DeviceList
           AccessControl:
               ACL: Acl
+          BallastConfiguration:
+              IntrinsicBallastFactor: IntrinsicBalanceFactor
           OccupancySensing:
               PIROccupiedToUnoccupiedDelay: PirOccupiedToUnoccupiedDelay
               PIRUnoccupiedToOccupiedDelay: PirUnoccupiedToOccupiedDelay
@@ -5986,6 +6199,8 @@
               AnnounceOTAProvider: AnnounceOtaProvider
           ContentLauncher:
               LauncherResponse: LaunchResponse
+          MediaPlayback:
+              Stop: StopPlayback
       command fields:
           OTASoftwareUpdateProvider:
               QueryImage:
@@ -6033,6 +6248,62 @@
           ColorControl:
               MoveToColorTemperature:
                   colorTemperatureMireds: colorTemperature
+          Scenes:
+              AddScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              ViewScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveAllScenes:
+                  groupID: groupId
+              StoreScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RecallScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              GetSceneMembership:
+                  groupID: groupId
+              EnhancedAddScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              EnhancedViewScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              CopyScene:
+                  groupIdentifierFrom: groupIdFrom
+                  sceneIdentifierFrom: sceneIdFrom
+                  groupIdentifierTo: groupIdTo
+                  sceneIdentifierTo: sceneIdTo
+              AddSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              ViewSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveAllScenesResponse:
+                  groupID: groupId
+              StoreSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              GetSceneMembershipResponse:
+                  groupID: groupId
+              EnhancedAddSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              EnhancedViewSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              CopySceneResponse:
+                  groupIdentifierFrom: groupIdFrom
+                  sceneIdentifierFrom: sceneIdFrom
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
@@ -6047,6 +6318,8 @@
               FabricDescriptorStruct: FabricDescriptor
           DoorLock:
               CredentialStruct: DlCredential
+          MediaPlayback:
+              PlaybackPositionStruct: PlaybackPosition
           TargetNavigator:
               TargetInfoStruct: TargetInfo
           MediaInput:
@@ -6063,6 +6336,11 @@
               ContentSearchStruct: ContentSearch
               StyleInformationStruct: StyleInformation
               BrandingInformationStruct: BrandingInformation
+          ApplicationLauncher:
+              ApplicationStruct: Application
+              ApplicationEPStruct: ApplicationEP
+          ApplicationBasic:
+              ApplicationStruct: ApplicationBasicApplication
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -6075,6 +6353,19 @@
           ContentLauncher:
               StyleInformationStruct:
                   imageURL: imageUrl
+          ApplicationLauncher:
+              ApplicationStruct:
+                  catalogVendorID: catalogVendorId
+                  applicationID: applicationId
+          ApplicationBasic:
+              ApplicationStruct:
+                  catalogVendorID: catalogVendorId
+                  applicationID: applicationId
+          Scenes:
+              AttributeValuePair:
+                  attributeID: attributeId
+              ExtensionFieldSet:
+                  clusterID: clusterId
       event fields:
           Switch:
               MultiPressComplete:
@@ -6172,6 +6463,13 @@
               MetricTypeEnum:
                   Pixels: PIXELS
                   Percentage: PERCENTAGE
+          Thermostat:
+              ThermostatSystemMode:
+                  EmergencyHeat: EmergencyHeating
+              SetpointAdjustMode:
+                  Heat: HeatSetpoint
+                  Cool: CoolSetpoint
+                  Both: HeatAndCoolSetpoints
       bitmaps:
           DoorLock:
               DaysMaskMap: DlDaysMaskMap
@@ -6194,3 +6492,12 @@
                   User: UsersManagement
                   Notification: Notifications
                   YearDayAccessSchedules: YearDaySchedules
+          Thermostat:
+              ThermostatFeature:
+                  ScheduleConfiguration: Schedule
+                  AutoMode: Automode
+              DayOfWeek:
+                  Away: AwayOrVacation
+              ModeForSequence:
+                  HeatSetpointPresent: HeatSetpointFieldPresent
+                  CoolSetpointPresent: CoolSetpointFieldPresent

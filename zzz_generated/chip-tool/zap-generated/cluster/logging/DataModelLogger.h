@@ -29,12 +29,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ApplicationLauncher::Structs::Application::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value);
+                           const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value);
+                           const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -106,7 +103,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value);
+                           const chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

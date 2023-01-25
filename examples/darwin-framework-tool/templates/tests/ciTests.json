@@ -27,6 +27,7 @@
         "Test_TC_TSTAT_2_2",
         "Test_TC_ACL_2_4",
         "Test_TC_ACL_2_7",
+        "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9"
     ]
 }

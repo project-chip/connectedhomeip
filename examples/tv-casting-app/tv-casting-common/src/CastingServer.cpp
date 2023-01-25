@@ -778,7 +778,7 @@ CHIP_ERROR CastingServer::MediaPlayback_SubscribeToSeekRangeStart(
  */
 CHIP_ERROR
 CastingServer::ApplicationLauncher_LaunchApp(TargetEndpointInfo * endpoint,
-                                             chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                             chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                              chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mLaunchAppCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
@@ -787,7 +787,7 @@ CastingServer::ApplicationLauncher_LaunchApp(TargetEndpointInfo * endpoint,
 
 CHIP_ERROR
 CastingServer::ApplicationLauncher_StopApp(TargetEndpointInfo * endpoint,
-                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mStopAppCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
@@ -796,7 +796,7 @@ CastingServer::ApplicationLauncher_StopApp(TargetEndpointInfo * endpoint,
 
 CHIP_ERROR
 CastingServer::ApplicationLauncher_HideApp(TargetEndpointInfo * endpoint,
-                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mHideAppCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));

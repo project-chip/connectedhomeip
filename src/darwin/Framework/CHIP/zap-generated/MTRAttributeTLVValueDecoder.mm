@@ -11325,8 +11325,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
-        case Attributes::IntrinsicBalanceFactor::Id: {
-            using TypeInfo = Attributes::IntrinsicBalanceFactor::TypeInfo;
+        case Attributes::IntrinsicBallastFactor::Id: {
+            using TypeInfo = Attributes::IntrinsicBallastFactor::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -13248,11 +13248,11 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRMediaPlaybackClusterPlaybackPosition * _Nullable value;
+            MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [MTRMediaPlaybackClusterPlaybackPosition new];
+                value = [MTRMediaPlaybackClusterPlaybackPositionStruct new];
                 value.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.Value().updatedAt];
                 if (cppValue.Value().position.IsNull()) {
                     value.position = nil;
@@ -14116,15 +14116,15 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRApplicationLauncherClusterApplicationEP * _Nullable value;
+            MTRApplicationLauncherClusterApplicationEPStruct * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [MTRApplicationLauncherClusterApplicationEP new];
-                value.application = [MTRApplicationLauncherClusterApplication new];
-                value.application.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.Value().application.catalogVendorId];
-                value.application.applicationId = [[NSString alloc] initWithBytes:cppValue.Value().application.applicationId.data()
-                                                                           length:cppValue.Value().application.applicationId.size()
+                value = [MTRApplicationLauncherClusterApplicationEPStruct new];
+                value.application = [MTRApplicationLauncherClusterApplicationStruct new];
+                value.application.catalogVendorID = [NSNumber numberWithUnsignedShort:cppValue.Value().application.catalogVendorID];
+                value.application.applicationID = [[NSString alloc] initWithBytes:cppValue.Value().application.applicationID.data()
+                                                                           length:cppValue.Value().application.applicationID.size()
                                                                          encoding:NSUTF8StringEncoding];
                 if (cppValue.Value().endpoint.HasValue()) {
                     value.endpoint = [NSNumber numberWithUnsignedShort:cppValue.Value().endpoint.Value()];
@@ -14294,11 +14294,11 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRApplicationBasicClusterApplicationBasicApplication * _Nonnull value;
-            value = [MTRApplicationBasicClusterApplicationBasicApplication new];
-            value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
-            value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
-                                                           length:cppValue.applicationId.size()
+            MTRApplicationBasicClusterApplicationStruct * _Nonnull value;
+            value = [MTRApplicationBasicClusterApplicationStruct new];
+            value.catalogVendorID = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorID];
+            value.applicationID = [[NSString alloc] initWithBytes:cppValue.applicationID.data()
+                                                           length:cppValue.applicationID.size()
                                                          encoding:NSUTF8StringEncoding];
             return value;
         }
