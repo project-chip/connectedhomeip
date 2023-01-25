@@ -588,6 +588,10 @@ public:
     /** Release resources associated with this key pair */
     void Clear();
 
+#if CHIP_CRYPTO_TRUSTY_OS
+    uint64_t p256_handler = 0;
+#endif
+
 protected:
     P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
