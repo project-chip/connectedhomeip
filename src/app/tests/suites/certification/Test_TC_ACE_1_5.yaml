@@ -80,17 +80,14 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: th1FabricIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets:
-                          [
-                              { Cluster: 0x001f, Endpoint: 0, DeviceType: null }
-                          ]
+                          [{ Cluster: 0x001f, Endpoint: 0, DeviceType: null }],
                   },
                   {
                       FabricIndex: th1FabricIndex,
@@ -98,28 +95,23 @@ tests:
                       AuthMode: 2, # case
                       Subjects: null,
                       Targets:
-                          [
-                              { Cluster: 0x001d, Endpoint: 0, DeviceType: null }
-                          ]
+                          [{ Cluster: 0x001d, Endpoint: 0, DeviceType: null }],
                   },
-                ]
+              ]
 
     - label: "TH2 writes ACL giving view privilge for basic cluster"
       identity: beta
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: th2FabricIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets:
-                          [
-                              { Cluster: 0x001f, Endpoint: 0, DeviceType: null }
-                          ]
+                          [{ Cluster: 0x001f, Endpoint: 0, DeviceType: null }],
                   },
                   {
                       FabricIndex: th2FabricIndex,
@@ -127,11 +119,9 @@ tests:
                       AuthMode: 2, # case
                       Subjects: null,
                       Targets:
-                          [
-                              { Cluster: 0x0028, Endpoint: 0, DeviceType: null }
-                          ]
+                          [{ Cluster: 0x0028, Endpoint: 0, DeviceType: null }],
                   },
-                ]
+              ]
 
     - label: "TH1 reads descriptor cluster - expect SUCCESS"
       command: "readAttribute"
@@ -143,7 +133,7 @@ tests:
       cluster: "Basic Information"
       attribute: "VendorID"
       response:
-        error: UNSUPPORTED_ACCESS
+          error: UNSUPPORTED_ACCESS
 
     - label: "TH2 reads descriptor cluster - expect UNSUPPORTED_ACCESS"
       identity: "beta"
@@ -151,7 +141,7 @@ tests:
       cluster: "Descriptor"
       attribute: "DeviceTypeList"
       response:
-        error: UNSUPPORTED_ACCESS
+          error: UNSUPPORTED_ACCESS
 
     - label: "TH2 reads basic cluster - expect SUCCESS"
       identity: "beta"
@@ -163,16 +153,15 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-                [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
-                      Targets: null
-                  }
-                ]
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+              ]
 
     - label: "TH1 sends RemoveFabric command for TH2"
       cluster: "Operational Credentials"
