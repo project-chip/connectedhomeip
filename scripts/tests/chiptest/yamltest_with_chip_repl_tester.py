@@ -52,7 +52,11 @@ _CLUSTER_XML_DIRECTORY_PATH = os.path.abspath(
     '--node-id',
     default=0x12344321,
     help='Node ID to use when commissioning device')
-def main(setup_code, yaml_path, node_id):
+@click.option(
+    '--pics-file',
+    default=None,
+    help='Optional PICS file')
+def main(setup_code, yaml_path, node_id, pics_file):
     # Setting up python environment for running YAML CI tests using python parser.
     with tempfile.NamedTemporaryFile() as chip_stack_storage:
         chip.native.Init()
@@ -79,21 +83,23 @@ def main(setup_code, yaml_path, node_id):
             clusters_definitions = SpecDefinitionsFromPath(_CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml')
 
             # Parsing YAML test and setting up chip-repl yamltests runner.
-            yaml = TestParser(yaml_path, None, clusters_definitions)
+            yaml = TestParser(yaml_path, pics_file, clusters_definitions)
             runner = ReplTestRunner(clusters_definitions, certificate_authority_manager, dev_ctrl)
 
             # Executing and validating test
             for test_step in yaml.tests:
                 test_action = runner.encode(test_step)
                 # TODO if test_action is None we should see if it is a pseudo cluster.
-                if test_action is not None:
-                    response = runner.execute(test_action)
-                    decoded_response = runner.decode(response)
-                    post_processing_result = test_step.post_process_response(decoded_response)
-                    if not post_processing_result.is_success():
-                        raise Exception(f'Test step failed {test_step.label}')
-                else:
+                if test_action is None:
                     raise Exception(f'Failed to encode test step {test_step.label}')
+                if not test_action.pics_enabled:
+                    continue
+
+                response = runner.execute(test_action)
+                decoded_response = runner.decode(response)
+                post_processing_result = test_step.post_process_response(decoded_response)
+                if not post_processing_result.is_success():
+                    raise Exception(f'Test step failed {test_step.label}')
         except Exception:
             print(traceback.format_exc())
             exit(-2)
