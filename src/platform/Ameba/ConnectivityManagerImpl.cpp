@@ -849,13 +849,13 @@ void ConnectivityManagerImpl::RtkWiFiScanCompletedHandler(void)
 
 void ConnectivityManagerImpl::DHCPProcessThread(void * param)
 {
-    LwIP_DHCP(0, DHCP_START);
+    matter_lwip_dhcp(0, DHCP_START);
     PlatformMgr().LockChipStack();
     sInstance.OnStationIPv4AddressAvailable();
     PlatformMgr().UnlockChipStack();
 #if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
-    LwIP_DHCP6(0, DHCP6_START);
+    matter_lwip_dhcp(0, DHCP6_START);
     PlatformMgr().LockChipStack();
     sInstance.OnIPv6AddressAvailable();
     PlatformMgr().UnlockChipStack();
