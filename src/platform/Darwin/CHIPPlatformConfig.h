@@ -62,4 +62,3 @@
 #ifndef CHIP_CONFIG_KVS_PATH
 #define CHIP_CONFIG_KVS_PATH "/tmp/chip_kvs"
 #endif // CHIP_CONFIG_KVS_PATH
-
