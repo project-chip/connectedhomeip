@@ -67,7 +67,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
 )
 
-set(PRIV_REQUIRES_LIST chip QRCode bt led_strip app_update openthread driver nvs_flash)
+set(PRIV_REQUIRES_LIST chip QRCode bt led_strip app_update openthread driver nvs_flash spi_flash)
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build

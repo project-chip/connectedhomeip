@@ -71,19 +71,22 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     {
         ChipLogError(DeviceLayer,
                      "CONFIG_NVS_ENCRYPTION is enabled, but no partition with subtype nvs_keys found in the partition table.");
-        SuccessOrExit(MapConfigError(esp_err));
+        err = MapConfigError(esp_err);
+        SuccessOrExit(err);
     }
 
     esp_err = nvs_flash_read_security_cfg(key_part, &cfg);
     if (esp_err == ESP_ERR_NVS_KEYS_NOT_INITIALIZED)
     {
         ChipLogError(DeviceLayer, "NVS key partition empty");
-        SuccessOrExit(MapConfigError(esp_err));
+        err = MapConfigError(esp_err);
+        SuccessOrExit(err);
     }
     else if (esp_err != ESP_OK)
     {
         ChipLogError(DeviceLayer, "Failed to read NVS security cfg, err:0x%02x", esp_err);
-        SuccessOrExit(MapConfigError(esp_err));
+        err = MapConfigError(esp_err);
+        SuccessOrExit(err);
     }
 
     // Securely initialize the nvs partitions,
@@ -93,7 +96,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize NVS partition %s err:0x%02x",
                      CHIP_DEVICE_CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION, esp_err);
-        SuccessOrExit(MapConfigError(esp_err));
+        err = MapConfigError(esp_err);
+        SuccessOrExit(err);
     }
 
     esp_err = nvs_flash_secure_init_partition(CHIP_DEVICE_CONFIG_CHIP_CONFIG_NAMESPACE_PARTITION, &cfg);
@@ -101,7 +105,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize NVS partition %s err:0x%02x",
                      CHIP_DEVICE_CONFIG_CHIP_CONFIG_NAMESPACE_PARTITION, esp_err);
-        SuccessOrExit(MapConfigError(esp_err));
+        err = MapConfigError(esp_err);
+        SuccessOrExit(err);
     }
 
     esp_err = nvs_flash_secure_init_partition(CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION, &cfg);
@@ -109,19 +114,23 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize NVS partition %s err:0x%02x",
                      CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION, esp_err);
-        SuccessOrExit(MapConfigError(esp_err));
+        err = MapConfigError(esp_err);
+        SuccessOrExit(err);
     }
 #else
     // Initialize the nvs partitions,
     // nvs_flash_init_partition() will initialize the partition only if it is not already initialized.
-    esp_err_t esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION);
-    SuccessOrExit(MapConfigError(esp_err));
-    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_CONFIG_NAMESPACE_PARTITION);
-    SuccessOrExit(MapConfigError(esp_err));
-    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION);
-    SuccessOrExit(MapConfigError(esp_err));
-    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION);
-    SuccessOrExit(MapConfigError(esp_err));
+    err = MapConfigError(nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION));
+    SuccessOrExit(err);
+
+    err = MapConfigError(nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_CONFIG_NAMESPACE_PARTITION));
+    SuccessOrExit(err);
+
+    err = MapConfigError(nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION));
+    SuccessOrExit(err);
+
+    err = MapConfigError(nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION));
+    SuccessOrExit(err);
 #endif
 
     // Force initialization of NVS namespaces if they doesn't already exist.
@@ -188,7 +197,14 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
     memset(buf, 0, bufSize);
-    const esp_app_desc_t * appDescription = esp_ota_get_app_description();
+    const esp_app_desc_t * appDescription = NULL;
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    appDescription = esp_app_get_description();
+#else
+    appDescription = esp_ota_get_app_description();
+#endif
+
     ReturnErrorCodeIf(bufSize < sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(sizeof(appDescription->version) > ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_INTERNAL);
     strcpy(buf, appDescription->version);
@@ -215,7 +231,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 
     return err;
 #else
-    location = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+    location       = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
     return CHIP_NO_ERROR;
 #endif
 }
