@@ -9,11 +9,11 @@ Chef uses the shell app a starting point, but processes the data model defined
 on ZAP files during build time. This procedure is handled by its unified build
 script: `chef.py`.
 
-When processing ZAP files as part of the build process, Chef places the
-auto-generated zap artifacts under its `out` temporary folder. Chef uses
+ZAP files are automatically processed as part of the build process. Chef uses
 artifacts from `zzz_generated` for CI/CD.
 
-All device types available (.zap files) are found inside the `devices` folder.
+All device types available (.zap/.matter files) are found inside the `devices`
+folder.
 
 ## Building your first sample
 
@@ -48,10 +48,10 @@ All device types available (.zap files) are found inside the `devices` folder.
 ```
 
 4. Run `$ chef.py -u` to update zap and the toolchain (on selected platforms).
-5. Run `$ chef.py -gzbf -t <platform> -d lighting`. This command will run the
-   ZAP GUI opening the `devices/lighting.zap` file and will allow editing. It
-   will then generate the zap artifacts, place them on the `zap-generated`
-   folder, run a build and flash the binary in your target.
+5. Run `$ chef.py -gbf -t <platform> -d lighting`. This command will run the ZAP
+   GUI opening the `devices/lighting.zap` file and will allow editing. It will
+   then generate the data model artifacts, build and flash the binary in your
+   target.
 6. Run `chef.py -h` to see all available commands.
 
 ## Creating a new device type in your device library
