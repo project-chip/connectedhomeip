@@ -16,6 +16,127 @@ limitations under the License.
 -->
 <configurator>
   <domain name="HVAC"/>
+
+  <bitmap name="ThermostatOccupancy" type="BITMAP8">
+    <cluster code="0x0201"/>
+    <field name="Occupied" mask="0x1"/>
+  </bitmap>
+
+  <bitmap name="ThermostatRemoteSensing" type="BITMAP8">
+    <cluster code="0x0201"/>
+    <field name="LocalTemperature" mask="0x1"/>
+    <field name="OutdoorTemperature" mask="0x2"/>
+    <field name="Occupancy" mask="0x4"/>
+  </bitmap>
+
+  <enum name="ThermostatControlSequence" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="CoolingOnly" value="0x0"/>
+    <item name="CoolingWithReheat" value="0x1"/>
+    <item name="HeatingOnly" value="0x2"/>
+    <item name="HeatingWithReheat" value="0x3"/>
+    <item name="CoolingAndHeating" value="0x4"/>
+    <item name="CoolingAndHeatingWithReheat" value="0x5"/>
+  </enum>
+
+  <enum name="ThermostatSystemMode" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="Off" value="0x0"/>
+    <item name="Auto" value="0x1"/>
+    <item name="Cool" value="0x3"/>
+    <item name="Heat" value="0x4"/>
+    <item name="EmergencyHeat" value="0x5"/>
+    <item name="Precooling" value="0x6"/>
+    <item name="FanOnly" value="0x7"/>
+    <item name="Dry" value="0x8"/>
+    <item name="Sleep" value="0x9"/>
+  </enum>
+
+  <bitmap name="ThermostatAlarmMask" type="BITMAP8">
+    <cluster code="0x0201"/>
+    <field name="InitializationFailure" mask="0x1"/>
+    <field name="HardwareFailure" mask="0x2"/>
+    <field name="SelfCalibrationFailure" mask="0x4"/>
+  </bitmap>
+
+  <enum name="ThermostatRunningMode" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="Off" value="0x00"/>
+    <item name="Cool" value="0x03"/>
+    <item name="Heat" value="0x04"/>
+  </enum>
+
+  <enum name="StartOfWeek" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="Sunday" value="0x00"/>
+    <item name="Monday" value="0x01"/>
+    <item name="Tuesday" value="0x02"/>
+    <item name="Wednesday" value="0x03"/>
+    <item name="Thursday" value="0x04"/>
+    <item name="Friday" value="0x05"/>
+    <item name="Saturday" value="0x06"/>
+  </enum>
+
+  <enum name="TemperatureSetpointHold" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="SetpointHoldOff" value="0x00"/>
+    <item name="SetpointHoldOn" value="0x01"/>
+  </enum>
+
+  <bitmap name="ThermostatRunningState" type="BITMAP16">
+    <cluster code="0x0201"/>
+    <field name="Heat" mask="0x0001"/>
+    <field name="Cool" mask="0x0002"/>
+    <field name="Fan" mask="0x0004"/>
+    <field name="HeatStage2" mask="0x0008"/>
+    <field name="CoolStage2" mask="0x0010"/>
+    <field name="FanStage2" mask="0x0020"/>
+    <field name="FanStage3" mask="0x0040"/>
+  </bitmap>
+
+  <bitmap name="ThermostatFeature" type="BITMAP32">
+    <cluster code="0x0201"/>
+    <field name="Heating" mask="0x1"/>
+    <field name="Cooling" mask="0x2"/>
+    <field name="Occupancy" mask="0x4"/>
+    <field name="ScheduleConfiguration" mask="0x8"/>
+    <field name="Setback" mask="0x10"/>
+    <field name="AutoMode" mask="0x20"/>
+  </bitmap>
+
+  <bitmap name="DayOfWeek" type="BITMAP8">
+    <cluster code="0x0201"/>
+    <field name="Sunday" mask="0x01"/>
+    <field name="Monday" mask="0x02"/>
+    <field name="Tuesday" mask="0x04"/>
+    <field name="Wednesday" mask="0x08"/>
+    <field name="Thursday" mask="0x10"/>
+    <field name="Friday" mask="0x20"/>
+    <field name="Saturday" mask="0x40"/>
+    <field name="Away" mask="0x80"/>
+  </bitmap>
+
+  <bitmap name="ModeForSequence" type="BITMAP8">
+    <cluster code="0x0201"/>
+    <field name="HeatSetpointPresent" mask="0x01"/>
+    <field name="CoolSetpointPresent" mask="0x02"/>
+  </bitmap>
+
+  <struct name="ThermostatScheduleTransition">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="TransitionTime" type="INT16U"/>
+    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
+    <item fieldId="1" name="HeatSetpoint" type="INT16S" isNullable="true"/>
+    <item fieldId="2" name="CoolSetpoint" type="INT16S" isNullable="true"/>
+  </struct>
+
+  <enum name="SetpointAdjustMode" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="Heat" value="0x0"/>
+    <item name="Cool" value="0x1"/>
+    <item name="Both" value="0x2"/>
+  </enum>
+
   <cluster>
     <name>Thermostat</name>
 	<domain>HVAC</domain>
@@ -27,7 +148,7 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="5"/>
     <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="INT16S" min="0x954D" max="0x7FFF" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>
     <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="INT16S" min="0x954D" max="0x7FFF" writable="false" optional="true" isNullable="true">OutdoorTemperature</attribute>
-    <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" default="0x01" optional="true">Occupancy</attribute>
+    <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="ThermostatOccupancy" min="0x00" max="0x01" writable="false" default="0x01" optional="true">Occupancy</attribute>
     <!-- OCCUPANCY -->
     <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="false" default="700" optional="true">AbsMinHeatSetpointLimit</attribute>
     <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="false" default="3000" optional="true">AbsMaxHeatSetpointLimit</attribute>
@@ -74,7 +195,7 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x001A" define="REMOTE_SENSING" type="BITMAP8" min="0x00" max="0x07" writable="true" default="0x00" optional="true">
+    <attribute side="server" code="0x001A" define="REMOTE_SENSING" type="ThermostatRemoteSensing" min="0x00" max="0x07" writable="true" default="0x00" optional="true">
       <description>RemoteSensing</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
@@ -84,16 +205,16 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="ENUM8" min="0x00" max="0x07" writable="true" default="0x01" optional="false">
+    <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="ThermostatSystemMode" min="0x00" max="0x07" writable="true" default="0x01" optional="false">
       <description>SystemMode</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x001E" define="THERMOSTAT_RUNNING_MODE" type="ENUM8" min="0x00" max="0x04" writable="false" optional="true">ThermostatRunningMode</attribute>
-    <attribute side="server" code="0x0020" define="START_OF_WEEK" type="ENUM8" min="0x00" max="0x06" writable="false" optional="true">StartOfWeek</attribute>
+    <attribute side="server" code="0x001E" define="THERMOSTAT_RUNNING_MODE" type="ThermostatRunningMode" min="0x00" max="0x04" writable="false" optional="true">ThermostatRunningMode</attribute>
+    <attribute side="server" code="0x0020" define="START_OF_WEEK" type="StartOfWeek" min="0x00" max="0x06" writable="false" optional="true">StartOfWeek</attribute>
     <attribute side="server" code="0x0021" define="NUMBER_OF_WEEKLY_TRANSITIONS" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">NumberOfWeeklyTransitions</attribute>
     <attribute side="server" code="0x0022" define="NUMBER_OF_DAILY_TRANSITIONS" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">NumberOfDailyTransitions</attribute>
-    <attribute side="server" code="0x0023" define="TEMPERATURE_SETPOINT_HOLD" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="true">
+    <attribute side="server" code="0x0023" define="TEMPERATURE_SETPOINT_HOLD" type="TemperateSetpointHold" min="0x00" max="0x01" writable="true" default="0x00" optional="true">
       <description>TemperatureSetpointHold</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
@@ -108,7 +229,7 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="BITMAP16" writable="false" optional="true">ThermostatRunningState</attribute>
+    <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="ThermostatRunningState" writable="false" optional="true">ThermostatRunningState</attribute>
     <attribute side="server" code="0x0030" define="SETPOINT_CHANGE_SOURCE" type="ENUM8" writable="false" optional="true">SetpointChangeSource</attribute>
     <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="INT16S" writable="false" default="0x8000" optional="true" isNullable="true">SetpointChangeAmount</attribute>
     <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" writable="false" optional="true">SetpointChangeSourceTimestamp</attribute>
@@ -207,23 +328,4 @@ limitations under the License.
       <arg name="Transitions" type="ThermostatScheduleTransition" array="true"/>
     </command>
   </cluster>
-
-  <bitmap name="ThermostatFeature" type="BITMAP32">
-    <cluster code="0x0201"/>
-    <field name="Heating" mask="0x1"/>
-    <field name="Cooling" mask="0x2"/>
-    <field name="Occupancy" mask="0x4"/>
-    <field name="ScheduleConfiguration" mask="0x8"/>
-    <field name="Setback" mask="0x10"/>
-    <field name="AutoMode" mask="0x20"/>
-  </bitmap>
-
-  <struct name="ThermostatScheduleTransition">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="TransitionTime" type="INT16U"/>
-    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
-    <item fieldId="1" name="HeatSetpoint" type="INT16S" isNullable="true"/>
-    <item fieldId="2" name="CoolSetpoint" type="INT16S" isNullable="true"/>
-  </struct>
-
 </configurator>

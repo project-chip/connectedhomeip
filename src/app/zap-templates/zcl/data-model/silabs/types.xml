@@ -43,19 +43,6 @@ limitations under the License.
     <field name="MasterZoneDst" mask="0x4"/>
     <field name="Superseding" mask="0x8"/>
   </bitmap>
-  <bitmap name="ThermostatOccupancy" type="BITMAP8">
-    <field name="occupied" mask="0x1"/>
-  </bitmap>
-  <bitmap name="ThermostatSensing" type="BITMAP8">
-    <field name="localTempSensedRemotely" mask="0x1"/>
-    <field name="outdoorTempSensedRemotely" mask="0x2"/>
-    <field name="occupancySensedRemotely" mask="0x4"/>
-  </bitmap>
-  <bitmap name="ThermostatAlarmMask" type="BITMAP8">
-    <field name="initializationFailure" mask="0x1"/>
-    <field name="hardwareFailure" mask="0x2"/>
-    <field name="selfcalibrationFailure" mask="0x4"/>
-  </bitmap>
   <bitmap name="BallastStatus" type="BITMAP8">
     <field name="NonOperational" mask="0x1"/>
     <field name="LampNotInSocket" mask="0x2"/>
@@ -141,33 +128,6 @@ limitations under the License.
     <cluster code="0x0008"/>
     <item name="Up" value="0x0"/>
     <item name="Down" value="0x1"/>
-  </enum>
-  <enum name="ThermostatControlSequence" type="ENUM8">
-    <cluster code="0x0201"/>
-    <item name="CoolingOnly" value="0x0"/>
-    <item name="CoolingWithReheat" value="0x1"/>
-    <item name="HeatingOnly" value="0x2"/>
-    <item name="HeatingWithReheat" value="0x3"/>
-    <item name="CoolingAndHeating" value="0x4"/>
-    <item name="CoolingAndHeatingWithReheat" value="0x5"/>
-  </enum>
-  <enum name="ThermostatSystemMode" type="ENUM8">
-    <cluster code="0x0201"/>
-    <item name="Off" value="0x0"/>
-    <item name="Auto" value="0x1"/>
-    <item name="Cool" value="0x3"/>
-    <item name="Heat" value="0x4"/>
-    <item name="EmergencyHeat" value="0x5"/>
-    <item name="Precooling" value="0x6"/>
-    <item name="FanOnly" value="0x7"/>
-    <item name="Dry" value="0x8"/>
-    <item name="Sleep" value="0x9"/>
-  </enum>
-  <enum name="SetpointAdjustMode" type="ENUM8">
-    <cluster code="0x0201"/>
-    <item name="Heat" value="0x0"/>
-    <item name="Cool" value="0x1"/>
-    <item name="Both" value="0x2"/>
   </enum>
   <enum name="FanMode" type="ENUM8">
     <item name="off" value="0x0"/>
@@ -547,50 +507,6 @@ limitations under the License.
     <item name="IdAdded" value="0x05"/>
     <item name="IdDeleted" value="0x06"/>
   </enum>
-  <enum name="ThermostatRunningMode" type="ENUM8">
-    <cluster code="0x0201"/>
-    <item name="Off" value="0x00"/>
-    <item name="Cool" value="0x03"/>
-    <item name="Heat" value="0x04"/>
-  </enum>
-  <enum name="StartOfWeek" type="ENUM8">
-    <item name="Sunday" value="0x00"/>
-    <item name="Monday" value="0x01"/>
-    <item name="Tuesday" value="0x02"/>
-    <item name="Wednesday" value="0x03"/>
-    <item name="Thursday" value="0x04"/>
-    <item name="Friday" value="0x05"/>
-    <item name="Saturday" value="0x06"/>
-  </enum>
-  <enum name="TemperatureSetpointHold" type="ENUM8">
-    <item name="SetpointHoldOff" value="0x00"/>
-    <item name="SetpointHoldOn" value="0x01"/>
-  </enum>
-  <bitmap name="ThermostatRunningState" type="BITMAP16">
-    <field name="HeatStateOn" mask="0x0001"/>
-    <field name="CoolStateOn" mask="0x0002"/>
-    <field name="FanStateOn" mask="0x0004"/>
-    <field name="HeatSecondStageStateOn" mask="0x0008"/>
-    <field name="CoolSecondStageStateOn" mask="0x0010"/>
-    <field name="FanSecondStageStateOn" mask="0x0020"/>
-    <field name="FanThirdStageStateOn" mask="0x0040"/>
-  </bitmap>
-  <bitmap name="DayOfWeek" type="BITMAP8">
-    <cluster code="0x0201"/>
-    <field name="Sunday" mask="0x01"/>
-    <field name="Monday" mask="0x02"/>
-    <field name="Tuesday" mask="0x04"/>
-    <field name="Wednesday" mask="0x08"/>
-    <field name="Thursday" mask="0x10"/>
-    <field name="Friday" mask="0x20"/>
-    <field name="Saturday" mask="0x40"/>
-    <field name="Away" mask="0x80"/>
-  </bitmap>
-  <bitmap name="ModeForSequence" type="BITMAP8">
-    <cluster code="0x0201"/>
-    <field name="HeatSetpointPresent" mask="0x01"/>
-    <field name="CoolSetpointPresent" mask="0x02"/>
-  </bitmap>
   <enum name="ProductTypeId" type="ENUM16">
     <item name="WhiteGoods" value="0x0000"/>
     <item name="Dishwasher" value="0x5601"/>
