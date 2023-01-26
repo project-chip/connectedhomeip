@@ -52,13 +52,13 @@ tests and prints the result which is the number of tests that failed.
 
 The required environment is the same as for the Matter examples. For information
 on how to set it up see
-[Open IoT SDK examples environment](../examples/openiotsdk_examples.md#environment-setup).
+[Open IoT SDK examples environment](./openiotsdk_examples.md#environment-setup).
 
 ## Configuration
 
 The configuration options are the same as for the Matter examples. For
 information on how to configure unit-tests applications see
-[Open IoT SDK examples configuration](../examples/openiotsdk_examples.md#configuration).
+[Open IoT SDK examples configuration](./openiotsdk_examples.md#configuration).
 
 ## Building
 
@@ -171,7 +171,7 @@ ${MATTER_ROOT}/scripts/examples/openiotsdk_example.sh -C test unit-tests <unit t
 Before debugging ensure the following:
 
 1. The debug environment is correctly setup:
-   [debugging setup](../examples/openiotsdk_examples.md#debugging-setup).
+   [debugging setup](./openiotsdk_examples.md#debugging-setup).
 
 2. The unit tests are compiled with debug symbols enabled:
 

@@ -430,8 +430,8 @@
             "name": "Debug Open IoT SDK example application",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}/examples/${input:openiotsdkApp}/openiotsdk",
-            "executable": "./build/chip-openiotsdk-${input:openiotsdkApp}-example.elf",
+            "cwd": "${workspaceRoot}/examples/${input:openiotsdkExample}/openiotsdk",
+            "executable": "./build/chip-openiotsdk-${input:openiotsdkExample}-example.elf",
             "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
             "servertype": "external",
             "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
@@ -439,7 +439,7 @@
                 "-enable-pretty-printing",
                 "add-symbol-file ./build/bl2.elf 0x10000000",
                 "add-symbol-file ./build/tfm_s.elf 0x38000400",
-                "add-symbol-file ./build/chip-openiotsdk-${input:openiotsdkApp}-example_ns.elf 0x28060400",
+                "add-symbol-file ./build/chip-openiotsdk-${input:openiotsdkExample}-example_ns.elf 0x28060400",
                 "break main_ns.cpp:main"
             ],
             "runToEntryPoint": "main",
@@ -522,11 +522,13 @@
             "default": "CY8CPROTO_062_4343W"
         },
         {
-            "type": "pickString",
-            "id": "openiotsdkApp",
-            "description": "What Open IoT SDK example do you want to use?",
-            "options": ["shell", "lock-app"],
-            "default": "shell"
+            "type": "command",
+            "id": "openiotsdkExample",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "cat examples/platform/openiotsdk/supported_examples.txt",
+                "description": "What Open IoT SDK example application do you want to use?"
+            }
         },
         {
             "type": "promptString",

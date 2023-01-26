@@ -47,12 +47,10 @@ KVS_STORAGE_FILE=""
 declare -A tdb_storage_param=([instance]=sram [memspace]=0 [address]=0x0 [size]=0x100000)
 declare -A ps_storage_param=([instance]=qspi_sram [memspace]=0 [address]=0x660000 [size]=0x12000)
 
-readarray -t TEST_NAMES <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/test_components.txt
-
-declare -a SUPPORTED_APP_NAMES
-SUPPORTED_APP_NAMES+=("shell")
-SUPPORTED_APP_NAMES+=("lock-app")
+readarray -t SUPPORTED_APP_NAMES <"$CHIP_ROOT"/examples/platform/openiotsdk/supported_examples.txt
 SUPPORTED_APP_NAMES+=("unit-tests")
+
+readarray -t TEST_NAMES <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/test_components.txt
 
 function show_usage() {
     cat <<EOF
