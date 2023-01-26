@@ -26,69 +26,6 @@ limitations under the License.
     <older spec="ha-1.2-05-3520-29" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
     <older spec="ha-1.1-05-3520-27" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
   </domain>
-  <global>
-    <command code="0x00" name="ReadAttributes" source="either">
-      <description>
-        Command description for ReadAttributes
-      </description>
-      <arg name="attributeIds" type="ATTRIB_ID" array="true"/>
-    </command>
-    <command code="0x01" name="ReadAttributesResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for ReadAttributesResponse
-      </description>
-      <arg name="readAttributeStatusRecords" type="ReadAttributeStatusRecord" array="true"/>
-    </command>
-    <command code="0x02" name="WriteAttributes" source="either">
-      <description>
-        Command description for WriteAttributes
-      </description>
-      <arg name="writeAttributeRecords" type="WriteAttributeRecord" array="true"/>
-    </command>
-    <command code="0x03" name="WriteAttributesUndivided" source="either">
-      <description>
-        Command description for WriteAttributesUndivided
-      </description>
-      <arg name="writeAttributeRecords" type="WriteAttributeRecord" array="true"/>
-    </command>
-    <command code="0x04" name="WriteAttributesResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for WriteAttributesResponse
-      </description>
-      <arg name="writeAttributeStatusRecords" type="WriteAttributeStatusRecord" array="true"/>
-    </command>
-    <command code="0x05" name="WriteAttributesNoResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for WriteAttributesNoResponse
-      </description>
-      <arg name="writeAttributeRecords" type="WriteAttributeRecord" array="true"/>
-    </command>
-    <command code="0x0B" name="DefaultResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for DefaultResponse
-      </description>
-      <arg name="commandId" type="INT8U"/>
-      <arg name="status" type="Status"/>
-    </command>
-    <command code="0x0E" name="ReadAttributesStructured" source="either">
-      <description>
-        Command description for ReadAttributesStructured
-      </description>
-      <arg name="readStructuredAttributeRecords" type="ReadStructuredAttributeRecord" array="true"/>
-    </command>
-    <command code="0x0F" name="WriteAttributesStructured" source="either">
-      <description>
-        Command description for WriteAttributesStructured
-      </description>
-      <arg name="writeStructuredAttributeRecords" type="WriteStructuredAttributeRecord" array="true"/>
-    </command>
-    <command code="0x10" name="WriteAttributesStructuredResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for WriteAttributesStructuredResponse
-      </description>
-      <arg name="writeStructuredAttributeStatusRecords" type="WriteStructuredAttributeStatusRecord" array="true"/>
-    </command>
-  </global>
   <cluster>
     <name>Groups</name>
     <domain>General</domain>
