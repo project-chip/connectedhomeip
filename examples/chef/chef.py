@@ -298,8 +298,6 @@ def main() -> int:
                       action="store_true", dest="do_interact")
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
-    parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
-                      action="store_true", dest="do_run_zap")
     parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model",
                       action="store_true", dest="do_run_gui")
     parser.add_option("-d", "--device", dest="sample_device_type_name",
@@ -521,29 +519,11 @@ def main() -> int:
     # Cluster customization
     #
 
-    if options.do_run_gui or options.do_run_zap:
-        zap_binary_found = shell.run_cmd(
-            f"if [[ -x $(which zap) ]]; then echo \"zap found\"; else echo \"\"; fi", return_cmd_output=True)
-        zap_dev_path_found = os.getenv("ZAP_INSTALL_PATH")
-        if (zap_binary_found != "zap found\n" and (zap_dev_path_found == None or zap_dev_path_found == "")):
-            flush_print(
-                "zap not found. See README for instructions")
-            return 1
-
     if options.do_run_gui:
         flush_print("Starting ZAP GUI editor")
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/devices")
         shell.run_cmd(
             f"{_REPO_BASE_PATH}/scripts/tools/zap/run_zaptool.sh {options.sample_device_type_name}.zap")
-
-    if options.do_run_zap:
-        flush_print("Running ZAP script to generate artifacts")
-        shell.run_cmd(f"rm -rf {gen_dir}")
-        shell.run_cmd(f"mkdir -p {gen_dir}")
-        shell.run_cmd(
-            f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py {_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
-        # af-gen-event.h is not generated
-        shell.run_cmd(f"touch {gen_dir}/af-gen-event.h")
 
     #
     # Setup environment
