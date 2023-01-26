@@ -315,6 +315,47 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
     API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
+/**
+ * Reads events from the device.
+ *
+ * Nil values for endpointID, clusterID, eventID indicate wildcards
+ * (e.g. nil eventID means "read all the events from the endpoint(s) and
+ * cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, eventID are non-nil, all the matching instances of a single
+ * event will be read.
+ *
+ * If all of endpointID, clusterID, eventID are nil, all events on the
+ * device will be read.
+ */
+
+- (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
+                       clusterID:(NSNumber * _Nullable)clusterID
+                         eventID:(NSNumber * _Nullable)eventID
+                          params:(MTRReadParams * _Nullable)params
+                           queue:(dispatch_queue_t)queue
+                      completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+
+/**
+ * Subscribes to the specified events on the device.
+ *
+ * Nil values for endpointID, clusterID, eventID indicate wildcards
+ * (e.g. nil eventID means "subscribe to all the events from the
+ * endpoint(s) and cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, eventID are non-nil, a single event
+ * will be subscribed to.
+ *
+ * If all of endpointID, clusterID, eventID are nil, all events on the
+ * device will be subscribed to.
+ */
+- (void)subscribeToEventsWithEndpointID:(NSNumber * _Nullable)endpointID
+                              clusterID:(NSNumber * _Nullable)clusterID
+                                eventID:(NSNumber * _Nullable)eventID
+                                 params:(MTRSubscribeParams * _Nullable)params
+                                  queue:(dispatch_queue_t)queue
+                          reportHandler:(MTRDeviceResponseHandler)reportHandler
+                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished MTR_NEWLY_AVAILABLE;
 @end
 
 /**
