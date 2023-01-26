@@ -203,7 +203,8 @@ void emAfPluginScenesServerPrintInfo()
 
             if (!entry.targetPositionLiftPercent100thsValue.IsNull() && !entry.targetPositionTiltPercent100thsValue.IsNull())
             {
-                emberAfCorePrint(" Window target percent100ths Lift %5u, Tilt %5u", entry.targetPositionLiftPercent100thsValue.Value(),
+                emberAfCorePrint(" Window target percent100ths Lift %5u, Tilt %5u",
+                                 entry.targetPositionLiftPercent100thsValue.Value(),
                                  entry.targetPositionTiltPercent100thsValue.Value());
             }
             else if (!entry.targetPositionLiftPercent100thsValue.IsNull())
