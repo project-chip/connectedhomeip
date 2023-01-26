@@ -26,10 +26,10 @@ import chip.clusters as Clusters
 import chip.FabricAdmin
 from chip import ChipDeviceCtrl
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
+from chip.interaction_model import InteractionModelError
 from chip.utils import CommissioningBuildingBlocks
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-from chip.interaction_model import InteractionModelError
 
 
 class TC_CGEN_2_4(MatterBaseTest):
