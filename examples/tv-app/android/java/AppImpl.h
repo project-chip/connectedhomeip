@@ -42,6 +42,7 @@
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
 #include "ContentAppAttributeDelegate.h"
+#include "ContentAppCommandDelegate.h"
 #include "KeypadInputManager.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
@@ -77,6 +78,7 @@ using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 using SupportedStreamingProtocol  = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
+using ContentAppCommandDelegate   = chip::AppPlatform::ContentAppCommandDelegate;
 
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
@@ -87,17 +89,23 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, const char * setupPIN, ContentAppAttributeDelegate * attributeDelegate) :
+                   const char * szApplicationVersion, const char * setupPIN, ContentAppAttributeDelegate * attributeDelegate,
+                   ContentAppCommandDelegate * commandDelegate) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
-                                                                  to_underlying(SupportedStreamingProtocol::kDash) |
-                                                                      to_underlying(SupportedStreamingProtocol::kHls)),
+        mAccountLoginDelegate(commandDelegate, setupPIN),
+        mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
+                                 to_underlying(SupportedStreamingProtocol::kDash) |
+                                     to_underlying(SupportedStreamingProtocol::kHls)),
         mMediaPlaybackDelegate(attributeDelegate),
         mTargetNavigatorDelegate(attributeDelegate, { "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
-    AccountLoginDelegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
+    AccountLoginDelegate * GetAccountLoginDelegate() override
+    {
+        mAccountLoginDelegate.SetEndpointId(GetEndpointId());
+        return &mAccountLoginDelegate;
+    };
     ApplicationBasicDelegate * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
     ApplicationLauncherDelegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
     ChannelDelegate * GetChannelDelegate() override { return &mChannelDelegate; };
@@ -174,12 +182,14 @@ public:
 
     void setContentAppAttributeDelegate(ContentAppAttributeDelegate * attributeDelegate);
 
+    void setContentAppCommandDelegate(ContentAppCommandDelegate * commandDelegate);
+
 protected:
     std::vector<ContentAppImpl *> mContentApps{
-        new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", nullptr),
-        new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021", nullptr),
-        new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr),
-        new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr)
+        new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", nullptr, nullptr),
+        new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021", nullptr, nullptr),
+        new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr, nullptr),
+        new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr, nullptr)
     };
     std::vector<DataVersion *> mDataVersions{};
 
@@ -187,6 +197,7 @@ protected:
 
 private:
     ContentAppAttributeDelegate * mAttributeDelegate;
+    ContentAppCommandDelegate * mCommandDelegate;
 };
 
 } // namespace AppPlatform
