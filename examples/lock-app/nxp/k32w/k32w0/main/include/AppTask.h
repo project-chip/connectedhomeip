@@ -23,7 +23,15 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+
+#include "CHIPProjectConfig.h"
+
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
 #include "K32W0FactoryDataProvider.h"
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+#include "CustomFactoryDataProvider.h"
+#endif
+#endif
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -32,6 +40,15 @@
 
 class AppTask
 {
+public:
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+    using FactoryDataProvider = chip::DeviceLayer::CustomFactoryDataProvider;
+#else
+    using FactoryDataProvider = chip::DeviceLayer::K32W0FactoryDataProvider;
+#endif
+#endif
+
 public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
@@ -70,6 +87,7 @@ private:
     static void UpdateClusterStateInternal(intptr_t arg);
     static void ThreadStart();
     static void InitServer(intptr_t arg);
+    static void PrintOnboardingInfo();
     void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t

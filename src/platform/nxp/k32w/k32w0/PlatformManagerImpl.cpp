@@ -30,6 +30,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/nxp/k32w/k32w0/DiagnosticDataProviderImpl.h>
+#include <platform/nxp/k32w/k32w0/KeyValueStoreManagerImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
@@ -47,6 +48,9 @@
 #include "TimersManager.h"
 #include "fsl_sha.h"
 #include "k32w0-chip-mbedtls-config.h"
+#include "SecLib.h"
+#include "PDM.h"
+#include "board.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -90,6 +94,10 @@ CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
     /* Used for OT initializations */
     otSysInit(1, argv);
 
+#if gAdcUsed_d
+    BOARD_ADCWakeupInit();
+#endif
+
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     /* Low Power Init */
     InitLowPower();
@@ -124,14 +132,42 @@ int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 }
 #endif
 
+#if CHIP_DEVICE_LAYER_ENABLE_PDM_LOGS
+static void PDM_SystemCallback(uint32_t number, PDM_eSystemEventCode code)
+{
+    uint8_t capacity  = PDM_u8GetSegmentCapacity();
+    uint8_t occupancy = PDM_u8GetSegmentOccupancy();
+    ChipLogProgress(DeviceLayer, "[PDM]Event (number, code): (%lu, %d)", number, code);
+    ChipLogProgress(DeviceLayer, "[PDM]Capacity: %hhu", capacity);
+    ChipLogProgress(DeviceLayer, "[PDM]Occupancy: %hhu", occupancy);
+}
+#endif
+
+static CHIP_ERROR MapPdmInitStatusToChipError(int status)
+{
+    return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatform, status);
+}
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     uint32_t chipType;
     CHIP_ERROR err = CHIP_NO_ERROR;
+    int status;
+
+    /* Initialise the Persistent Data Manager */
+    status = PDM_Init();
+    SuccessOrExit(err = MapPdmInitStatusToChipError(status));
+#if CHIP_DEVICE_LAYER_ENABLE_PDM_LOGS
+    PDM_vRegisterSystemCallback(PDM_SystemCallback);
+#endif
 
     // Initialize the configuration system.
     err = Internal::K32WConfig::Init();
     SuccessOrExit(err);
+
+    err = PersistedStorage::KeyValueStoreManagerImpl::Init();
+    SuccessOrExit(err);
+
 
     chipType = Chip_GetType();
     if ((chipType != CHIP_K32W061) && (chipType != CHIP_K32W041) && (chipType != CHIP_K32W041A) && (chipType != CHIP_K32W041AM))
