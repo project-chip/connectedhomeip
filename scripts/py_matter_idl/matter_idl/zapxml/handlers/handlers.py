@@ -579,6 +579,12 @@ class GlobalHandler(BaseHandler):
                 return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
 
             return GlobalAttributeHandler(self.context, AttrsToAttribute(attrs))
+        elif name.lower() == 'command':
+            # NOTE: global commands are NOT a thing in matter currently.
+            #       they occur in silabs/general.xml and are Read/WriteAttribute
+            #       and similar
+            LOGGER.info("Ignoring global command: %s" % attrs['name'])
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
 
