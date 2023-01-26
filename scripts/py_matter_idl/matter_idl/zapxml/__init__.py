@@ -50,6 +50,8 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         if self._include_meta_data:
             self._idl.parse_file_name = filename
 
+        self._context.file_name = filename
+
     def Finish(self) -> Idl:
         self._context.PostProcess(self._idl)
         return self._idl
