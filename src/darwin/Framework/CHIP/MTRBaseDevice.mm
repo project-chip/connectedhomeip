@@ -337,7 +337,7 @@ public:
                                       // Wildcard endpoint, cluster, attribute, event.
                                       auto attributePath = std::make_unique<AttributePathParams>();
                                       auto eventPath = std::make_unique<EventPathParams>();
-                                      // We want to get event reports at the minInterval, not the maxInterval.
+                                      eventPath->mIsUrgentEvent = params.reportEventsUrgently;
                                       ReadPrepareParams readParams(session.Value());
                                       [params toReadPrepareParams:readParams];
                                       readParams.mpAttributePathParamsList = attributePath.get();
