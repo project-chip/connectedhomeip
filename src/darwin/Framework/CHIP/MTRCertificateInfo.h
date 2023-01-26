@@ -79,7 +79,7 @@ MTR_NEWLY_AVAILABLE
 /**
  * The set of CASE Authenticated Tags contained in the DN.
  */
-@property (readonly) NSSet<NSNumber *> * tags;
+@property (readonly) NSSet<NSNumber *> * caseAuthenticatedTags;
 
 @end
 

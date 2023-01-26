@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
                                             operationalPublicKey:(SecKeyRef)operationalPublicKey
                                                         fabricID:(NSNumber *)fabricID
                                                           nodeID:(NSNumber *)nodeID
-                                           caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                           caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
     MTR_NEWLY_AVAILABLE;
 
@@ -158,9 +158,8 @@ NS_ASSUME_NONNULL_BEGIN
  * This is the public key that a certificate issued in response to the request
  * would need to have.
  */
-+ (NSData * _Nullable)extractPublicKeyFromCertificateSigningRequest:(MTRCSRDERBytes)certificateSigningRequest
-                                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_AVAILABLE;
++ (NSData * _Nullable)publicKeyFromCSR:(MTRCSRDERBytes)csr
+                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error MTR_NEWLY_AVAILABLE;
 
 @end
 

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRAttestationInfo.h>
 #import <Matter/MTRCSRInfo.h>
 #import <Matter/MTRCertificates.h>
+#import <Matter/MTRDeviceAttestationInfo.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,30 +27,37 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * A representation of the operational certificate chain for a node.
- *
- * A nil intermediateCertificate means there is no intermediate.
- *
- * adminSubject is passed to the device as part of the AddNOC command.  A nil
- * adminSubject means the node id of the relevant MTRDeviceController will be
- * used.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTROperationalCertificateInfo : NSObject
-@property (nonatomic, copy) MTRCertificateDERBytes operationalCertificate;
-@property (nonatomic, copy, nullable) MTRCertificateDERBytes intermediateCertificate;
-@property (nonatomic, copy) MTRCertificateDERBytes rootCertificate;
-@property (nonatomic, copy, nullable) NSNumber * adminSubject;
+@interface MTROperationalCertificateChain : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 - (instancetype)initWithOperationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                        intermediateCertificate:(nullable MTRCertificateDERBytes)intermediateCertificate
                                rootCertificate:(MTRCertificateDERBytes)rootCertificate
                                   adminSubject:(nullable NSNumber *)adminSubject;
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+@property (nonatomic, copy) MTRCertificateDERBytes operationalCertificate;
+
+/**
+ * A nil intermediateCertificate means there is no intermediate.
+ */
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes intermediateCertificate;
+
+@property (nonatomic, copy) MTRCertificateDERBytes rootCertificate;
+
+/**
+ * adminSubject is passed to the device as part of the AddNOC command.  A nil
+ * adminSubject means the node id of the relevant MTRDeviceController will be
+ * used.
+ */
+@property (nonatomic, copy, nullable) NSNumber * adminSubject;
+
 @end
 
-typedef void (^MTROperationalCertificateIssuedHandler)(MTROperationalCertificateInfo * _Nullable info, NSError * _Nullable error);
+typedef void (^MTROperationalCertificateIssuedHandler)(MTROperationalCertificateChain * _Nullable info, NSError * _Nullable error);
 
 MTR_NEWLY_AVAILABLE
 @protocol MTROperationalCertificateIssuer
@@ -64,14 +71,14 @@ MTR_NEWLY_AVAILABLE
  * Commissioning will pause when
  * issueOperationalCertificateForRequest:attestationInfo:completion: is called,
  * and resume when the completion is invoked with a non-nil
- * MTROperationalCertificateInfo.  When the completion is invoked with an error,
+ * MTROperationalCertificateChain.  When the completion is invoked with an error,
  * commissioning will fail.
  *
  * This will be called on the dispatch queue passed as
  * operationalCertificateIssuerQueue in the MTRDeviceControllerFactoryParams.
  */
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
-                              attestationInfo:(MTRAttestationInfo *)attestationInfo
+                              attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
                                    controller:(MTRDeviceController *)controller
                                    completion:(MTROperationalCertificateIssuedHandler)completion;
 

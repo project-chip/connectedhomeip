@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -51,11 +51,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Only one of the following delegate callbacks should be implemented.
  *
- * If -deviceAttestationFailedForController:device:error: is implemented, then it will be called when device
- * attestation fails, and the client can decide to continue or stop the commissioning.
+ * If -deviceAttestationFailedForController:opaqueDeviceHandle:error: is implemented, then it will
+ * be called when device attestation fails, and the client can decide to continue or stop the
+ * commissioning.
  *
- * If -deviceAttestationCompletedForController:device:attestationDeviceInfo:error: is implemented, then it
- * will always be called when device attestation completes.
+ * If -deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error: is
+ * implemented, then it will always be called when device attestation completes.
  */
 
 /**
@@ -66,36 +67,39 @@ NS_ASSUME_NONNULL_BEGIN
  * This allows the delegate to stop commissioning after examining the device info (DAC, PAI, CD).
  *
  * @param controller Controller corresponding to the commissioning process
- * @param device Handle of device being commissioned
+ * @param opaqueDeviceHandle Handle of device being commissioned
  * @param attestationDeviceInfo Attestation information for the device
  * @param error NSError representing the error code on attestation failure. Nil if success.
  */
 - (void)deviceAttestationCompletedForController:(MTRDeviceController *)controller
-                                         device:(void *)device
+                             opaqueDeviceHandle:(void *)opaqueDeviceHandle
                           attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
                                           error:(NSError * _Nullable)error MTR_NEWLY_AVAILABLE;
 
 /**
- * Notify the delegate when device attestation fails
+ * Notify the delegate when device attestation fails.  If this callback is implemented,
+ * continueCommissioningDevice on MTRDeviceController is expected to be called if commisioning
+ * should continue.
  *
  * @param controller Controller corresponding to the commissioning process
- * @param device Handle of device being commissioned
+ * @param opaqueDeviceHandle Handle of device being commissioned
  * @param error NSError representing the error code for the failure
  */
 - (void)deviceAttestationFailedForController:(MTRDeviceController *)controller
-                                      device:(void *)device
+                          opaqueDeviceHandle:(void *)opaqueDeviceHandle
                                        error:(NSError * _Nonnull)error MTR_NEWLY_AVAILABLE;
 
 - (void)deviceAttestation:(MTRDeviceController *)controller
        completedForDevice:(void *)device
     attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
                     error:(NSError * _Nullable)error
-    MTR_NEWLY_DEPRECATED("Please implement deviceAttestationCompletedForController:device:attestationDeviceInfo:error:");
+    MTR_NEWLY_DEPRECATED(
+        "Please implement deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:");
 
 - (void)deviceAttestation:(MTRDeviceController *)controller
           failedForDevice:(void *)device
                     error:(NSError * _Nonnull)error
-    MTR_NEWLY_DEPRECATED("Please implement deviceAttestationFailedForController:device:error:");
+    MTR_NEWLY_DEPRECATED("Please implement deviceAttestationFailedForController:opaqueDeviceHandle:error:");
 
 @end
 

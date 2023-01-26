@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,41 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
  * MTRCommissioningParameters.
  */
 @interface MTRThreadOperationalDataset : NSObject
-
-/**
- * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
- */
-extern size_t const MTRSizeThreadNetworkName;
-extern size_t const MTRSizeThreadExtendedPanId MTR_NEWLY_DEPRECATED("Please use MTRSizeThreadExtendedPANID");
-extern size_t const MTRSizeThreadExtendedPANID MTR_NEWLY_AVAILABLE;
-extern size_t const MTRSizeThreadMasterKey;
-extern size_t const MTRSizeThreadPSKc;
-extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
-
-/**
- * The Thread Network name
- */
-@property (nonatomic, copy, readonly) NSString * networkName;
-/**
- * The Thread Network extendended PAN ID
- */
-@property (nonatomic, copy, readonly) NSData * extendedPANID;
-/**
- * The 16 byte Master Key
- */
-@property (nonatomic, copy, readonly) NSData * masterKey;
-/**
- * The Thread PSKc
- */
-@property (nonatomic, copy, readonly) NSData * PSKc;
-/**
- * The Thread network channel.  Always an unsigned 16-bit integer.
- */
-@property (nonatomic, copy, readonly) NSNumber * channelNumber MTR_NEWLY_AVAILABLE;
-/**
- * A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
- */
-@property (nonatomic, copy, readonly) NSData * panID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -92,6 +57,46 @@ extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
  * This initializer will return nil if the input data cannot be parsed correctly
  */
 - (instancetype _Nullable)initWithData:(NSData *)data;
+
+/**
+ * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
+ */
+extern size_t const MTRSizeThreadNetworkName;
+extern size_t const MTRSizeThreadExtendedPanId MTR_NEWLY_DEPRECATED("Please use MTRSizeThreadExtendedPANID");
+extern size_t const MTRSizeThreadExtendedPANID MTR_NEWLY_AVAILABLE;
+extern size_t const MTRSizeThreadMasterKey;
+extern size_t const MTRSizeThreadPSKc;
+extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
+
+/**
+ * The Thread Network name
+ */
+@property (nonatomic, copy, readonly) NSString * networkName;
+
+/**
+ * The Thread Network extendended PAN ID
+ */
+@property (nonatomic, copy, readonly) NSData * extendedPANID;
+
+/**
+ * The 16 byte Master Key
+ */
+@property (nonatomic, copy, readonly) NSData * masterKey;
+
+/**
+ * The Thread PSKc
+ */
+@property (nonatomic, copy, readonly) NSData * PSKc;
+
+/**
+ * The Thread network channel.  Always an unsigned 16-bit integer.
+ */
+@property (nonatomic, copy, readonly) NSNumber * channelNumber MTR_NEWLY_AVAILABLE;
+
+/**
+ * A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
+ */
+@property (nonatomic, copy, readonly) NSData * panID;
 
 /**
  * Get the underlying data that represents the Thread Active Operational Dataset

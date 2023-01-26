@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,6 +32,12 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @protocol MTRDeviceControllerDelegate;
 
 @interface MTRDeviceController : NSObject
+
+/**
+ * Controllers are created via the MTRDeviceControllerFactory object.
+ */
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 /**
  * If true, the controller has not been shut down yet.
@@ -85,7 +91,14 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
-- (BOOL)continueCommissioningDevice:(void *)device
+/**
+ * After MTRDeviceAttestationDelegate's
+ * deviceAttestationFailedForController:opaqueDeviceHandle:error: or
+ * deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:
+ * is called, continueCommissioningDevice:ignoreAttestationFailure:error: should
+ * be called to continue commissioning the device.
+ */
+- (BOOL)continueCommissioningDevice:(void *)opaqueDeviceHandle
            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
                               error:(NSError * __autoreleasing *)error;
 
@@ -103,20 +116,15 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 /**
- * Prepare the controller for setting up a commissioning session.
+ * Optionally pre-warm the controller for setting up a commissioning session.
+ * This may be called before setupCommissioningSessionWithPayload if it's known
+ * that a commissioning attempt will soon take place but the commissioning
+ * payload is not known yet.
  *
- * This method is intended to be used when it is known that a setting up a commissioning session
- * will happen soon.
- * For example it may ask different subsystems to look for useful informations onto the network
- * ahead of commissioning that may then be re-used during commissioning.
+ * For example this may do a BLE scan in advance so results are ready earlier
+ * once the discriminator is known.
  */
-- (BOOL)prepareCommissioningSession:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
-
-/**
- * Controllers are created via the MTRDeviceControllerFactory object.
- */
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+- (void)preWarmCommissioningSession MTR_NEWLY_AVAILABLE;
 
 /**
  * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered

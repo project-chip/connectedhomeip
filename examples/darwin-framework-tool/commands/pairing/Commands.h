@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2022-2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
 
 #include "OpenCommissioningWindowCommand.h"
 #include "PairingCommandBridge.h"
-#include "PrepareCommissioningCommand.h"
+#include "PreWarmCommissioningCommand.h"
 
 class PairCode : public PairingCommandBridge
 {
@@ -72,7 +72,7 @@ void registerCommandsPairing(Commands & commands)
         make_unique<PairBleThread>(),
         make_unique<Unpair>(),
         make_unique<OpenCommissioningWindowCommand>(),
-        make_unique<PrepareCommissioningCommand>(),
+        make_unique<PreWarmCommissioningCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

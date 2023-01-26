@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -377,15 +377,12 @@ MTR_NEWLY_AVAILABLE
  * A path indicating a specific attribute on a device (i.e. without any
  * wildcards).
  */
-@interface MTRAttributePath : MTRClusterPath <NSCopying>
+@interface MTRAttributePath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * attribute;
 
 + (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
                                   clusterID:(NSNumber *)clusterID
                                 attributeID:(NSNumber *)attributeID MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 @end
 
 /**
@@ -393,30 +390,24 @@ MTR_NEWLY_AVAILABLE
  * (i.e. without any wildcards).  There can be multiple instances of actual
  * events for a given event path.
  */
-@interface MTREventPath : MTRClusterPath <NSCopying>
+@interface MTREventPath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * event;
 
 + (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
                               clusterID:(NSNumber *)clusterID
                                 eventID:(NSNumber *)eventID MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 @end
 
 /**
  * A path indicating a specific command on a device (i.e. without any
  * wildcards).
  */
-@interface MTRCommandPath : MTRClusterPath <NSCopying>
+@interface MTRCommandPath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * command;
 
 + (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
                                 clusterID:(NSNumber *)clusterID
                                 commandID:(NSNumber *)commandID MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 @end
 
 @interface MTRAttributeReport : NSObject

@@ -40,7 +40,7 @@ MTR_NEWLY_AVAILABLE
  * controllers.  It is used to store persistent information for the fabrics the
  * controllers ends up interacting with.
  */
-@property (nonatomic, strong, readonly) id<MTRStorage> storage MTR_NEWLY_AVAILABLE;
+@property (nonatomic, strong, readonly) id<MTRStorage> storage;
 
 /*
  * OTA Provider delegate to be called when an OTA Requestor is requesting a software update.
@@ -59,6 +59,7 @@ MTR_NEWLY_AVAILABLE
  * Defaults to nil.
  */
 @property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
+
 /*
  * The Certification Declaration certificates whose public keys correspond to
  * private keys that are trusted to sign certification declarations.  Defaults
@@ -68,22 +69,34 @@ MTR_NEWLY_AVAILABLE
  * well-known certification declaration signing keys.
  */
 @property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
+
 /*
  * The network port to bind to.  If not specified, an ephemeral port will be
  * used.
  */
 @property (nonatomic, copy, nullable) NSNumber * port;
+
 /*
  * Whether to run a server capable of accepting incoming CASE
  * connections.  Defaults to NO.
  */
-@property (nonatomic, assign) BOOL shouldStartServer MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign) BOOL shouldStartServer;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStorage:(id<MTRStorage>)storage;
 @end
 
+MTR_NEWLY_AVAILABLE
 @interface MTRDeviceControllerFactory : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Return the single MTRDeviceControllerFactory we support existing.  It starts off
+ * in a "not started" state.
+ */
++ (instancetype)sharedInstance;
 
 /**
  * If true, the factory is in a state where it can create controllers:
@@ -91,12 +104,6 @@ MTR_NEWLY_AVAILABLE
  * since then.
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
-
-/**
- * Return the single MTRDeviceControllerFactory we support existing.  It starts off
- * in a "not started" state.
- */
-+ (instancetype)sharedInstance;
 
 /**
  * Start the controller factory. Repeated calls to startControllerFactory
@@ -141,9 +148,6 @@ MTR_NEWLY_AVAILABLE
  */
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

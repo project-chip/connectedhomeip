@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,13 +48,21 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  * initialized from.
  */
 @interface MTROptionalQRCodeInfo : NSObject
+
 @property (nonatomic, assign) MTROptionalQRCodeInfoType type MTR_NEWLY_AVAILABLE;
-// The numeric value of the TLV tag for this information item.
+
+/**
+ * The numeric value of the TLV tag for this information item.
+ */
 @property (nonatomic, copy) NSNumber * tag;
-// Exactly one of integerValue and stringValue will be non-nil, depending on the
-// the value of "infoType".
+
+/**
+ * Exactly one of integerValue and stringValue will be non-nil, depending on the
+ * the value of "type".
+ */
 @property (nonatomic, copy, nullable) NSNumber * integerValue;
 @property (nonatomic, copy, nullable) NSString * stringValue;
+
 @end
 
 /**
@@ -69,6 +77,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, copy) NSNumber * vendorID;
 @property (nonatomic, copy) NSNumber * productID;
 @property (nonatomic, assign) MTRCommissioningFlow commissioningFlow;
+
 /**
  * The value of discoveryCapabilities is made up of the various
  * MTRDiscoveryCapabilities flags.  If the discovery capabilities are not known,
@@ -76,6 +85,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  */
 @property (nonatomic, assign) MTRDiscoveryCapabilities discoveryCapabilities MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * discriminator;
+
 /**
  * If hasShortDiscriminator is true, the discriminator value contains just the
  * high 4 bits of the full discriminator.  For example, if

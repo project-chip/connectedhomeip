@@ -24,6 +24,39 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTRKeypair;
 
 @interface MTRDeviceControllerStartupParams : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Prepare to initialize a controller given a keypair to use for signing
+ * operational certificates.
+ *
+ * fabricID must be set to a valid (i.e. nonzero) value.
+ *
+ * ipk must be 16 bytes in length
+ */
+- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner MTR_NEWLY_AVAILABLE;
+
+/**
+ * Prepare to initialize a controller with a complete operational certificate
+ * chain.  This initialization method should be used when none of the
+ * certificate-signing private keys are available locally.
+ *
+ * The fabric id and node id to use will be derived from the provided
+ * operationalCertificate.
+ *
+ * intermediateCertificate may be nil if operationalCertificate is signed by
+ * rootCertificate.
+ *
+ * ipk must be 16 bytes in length.
+ */
+- (instancetype)initWithIPK:(NSData *)ipk
+         operationalKeypair:(id<MTRKeypair>)operationalKeypair
+     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate MTR_NEWLY_AVAILABLE;
+
 /**
  * Keypair used to sign operational certificates.  This is the root CA keypair
  * if not using an intermediate CA, the intermediate CA's keypair otherwise.
@@ -35,6 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
  * (to provide the operational credentials for t2he controller itself).
  */
 @property (nonatomic, copy, readonly, nullable) id<MTRKeypair> nocSigner;
+
 /**
  * Fabric id for the controller.  Must be set to a nonzero value.  This is
  * scoped by the root public key, which is determined as follows:
@@ -47,6 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   intermediate certificate.
  */
 @property (nonatomic, copy, readonly) NSNumber * fabricID MTR_NEWLY_AVAILABLE;
+
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
  * a controller was started on this fabric if a new IPK has been distributed to
@@ -201,37 +236,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Allowed to be nil if and only if operationalCertificateIssuer is nil.
  */
 @property (nonatomic, strong, nullable) dispatch_queue_t operationalCertificateIssuerQueue MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-
-/**
- * Prepare to initialize a controller given a keypair to use for signing
- * operational certificates.
- *
- * fabricID must be set to a valid (i.e. nonzero) value.
- *
- * ipk must be 16 bytes in length
- */
-- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner MTR_NEWLY_AVAILABLE;
-
-/**
- * Prepare to initialize a controller with a complete operational certificate
- * chain.  This initialization method should be used when none of the
- * certificate-signing private keys are available locally.
- *
- * The fabric id and node id to use will be derived from the provided
- * operationalCertificate.
- *
- * intermediateCertificate may be nil if operationalCertificate is signed by
- * rootCertificate.
- *
- * ipk must be 16 bytes in length.
- */
-- (instancetype)initWithIPK:(NSData *)ipk
-         operationalKeypair:(id<MTRKeypair>)operationalKeypair
-     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
-    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
-            rootCertificate:(MTRCertificateDERBytes)rootCertificate MTR_NEWLY_AVAILABLE;
 
 @end
 

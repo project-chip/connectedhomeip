@@ -231,7 +231,7 @@ public:
           params.filterByFabric = mFabricFiltered.Value();
         }
         if (mAutoResubscribe.HasValue()) {
-          params.resubscribeIfLost = mAutoResubscribe.Value();
+          params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
         [cluster subscribe{{>attribute}}WithParams:params
                                 subscriptionEstablished:^(){ mSubscriptionEstablished=YES; }

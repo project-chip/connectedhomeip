@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,16 +32,19 @@ MTR_NEWLY_AVAILABLE
  * DER-encoded certificate signing request.
  */
 @property (nonatomic, copy, readonly) MTRCSRDERBytes csr;
+
 /**
- * The nonce provided in the original CSRRequest command hat led to this CSR
+ * The nonce provided in the original CSRRequest command that led to this CSR
  * being created.
  */
 @property (nonatomic, copy, readonly) NSData * csrNonce;
+
 /**
  * TLV-encoded nocsr-elements structure.  This includes the "csr" and "csrNonce"
  * fields, and can include additional vendor-specific information.
  */
 @property (nonatomic, copy, readonly) MTRTLVBytes csrElementsTLV;
+
 /**
  * A signature, using the device attestation private key of the device that
  * created the CSR, over the concatenation of csrElementsTLV and the attestation

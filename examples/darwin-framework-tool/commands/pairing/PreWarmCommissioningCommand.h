@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2022-2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,10 @@
 
 #import "MTRError_Utils.h"
 
-class PrepareCommissioningCommand : public CHIPCommandBridge {
+class PreWarmCommissioningCommand : public CHIPCommandBridge {
 public:
-    PrepareCommissioningCommand()
-        : CHIPCommandBridge("prepare-commissioning")
+    PreWarmCommissioningCommand()
+        : CHIPCommandBridge("pre-warm-commissioning")
     {
     }
 
@@ -35,12 +35,7 @@ protected:
     CHIP_ERROR RunCommand() override
     {
         auto * controller = CurrentCommissioner();
-        NSError * error;
-        if (![controller prepareCommissioningSession:&error]) {
-            auto err = MTRErrorToCHIPErrorCode(error);
-            SetCommandExitStatus(err);
-            return err;
-        }
+        [controller preWarmCommissioningSession];
 
         // In interactive mode, we don't want to block the UI until the end of `GetWaitDuration`. So returns early.
         if (IsInteractive()) {

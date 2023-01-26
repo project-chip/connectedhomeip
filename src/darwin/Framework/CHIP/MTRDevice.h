@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -169,15 +169,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 @protocol MTRDeviceDelegate <NSObject>
 @required
 /**
- * device:stateChanged:
- *
  * @param state The current state of the device
  */
 - (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state;
 
 /**
- * device:receivedAttributeReport:
- *
  * Notifies delegate of attribute reports from the MTRDevice
  *
  * @param attributeReport  An array of response-value objects as described in MTRDeviceResponseHandler
@@ -185,8 +181,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 
 /**
- * subscriptionReceivedEventReport:
- *
  * Notifies delegate of event reports from the MTRDevice
  *
  * @param eventReport  An array of response-value objects as described in MTRDeviceResponseHandler
@@ -195,11 +189,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @optional
 /**
- * deviceStartedCommunicating:
+ * Notifies delegate the device is currently actively communicating.
  *
- * Notifies delegate the device is currently communicating
+ * This can be used as a hint that now is a good time to send commands to the
+ * device, especially if the device is sleepy and might not be active very often.
  */
-- (void)didReceiveCommunicationFromDevice:(MTRDevice *)device;
+- (void)deviceBecameActive:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
 @end
 

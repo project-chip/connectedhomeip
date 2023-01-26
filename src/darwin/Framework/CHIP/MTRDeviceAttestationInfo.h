@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRAttestationInfo : NSObject
+@interface MTRDeviceAttestationInfo : NSObject
 
 /**
  * The attestation challenge from the secure session.
@@ -70,18 +70,18 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, readonly, nullable) NSData * firmwareInfo;
 
-- (instancetype)initWithChallenge:(NSData *)challenge
-                                        nonce:(NSData *)nonce
-                                  elementsTLV:(MTRTLVBytes)elementsTLV
-                            elementsSignature:(NSData *)elementsSignature
-                 deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
-    productAttestationIntermediateCertificate:(MTRCertificateDERBytes)processAttestationIntermediateCertificate
-                     certificationDeclaration:(NSData *)certificationDeclaration
-                                 firmwareInfo:(NSData *)firmwareInfo;
+- (instancetype)initWithDeviceAttestationChallenge:(NSData *)challenge
+                                             nonce:(NSData *)nonce
+                                       elementsTLV:(MTRTLVBytes)elementsTLV
+                                 elementsSignature:(NSData *)elementsSignature
+                      deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
+         productAttestationIntermediateCertificate:(MTRCertificateDERBytes)processAttestationIntermediateCertificate
+                          certificationDeclaration:(NSData *)certificationDeclaration
+                                      firmwareInfo:(NSData *)firmwareInfo;
 
 @end
 
-MTR_NEWLY_DEPRECATED("Please use MTRAttestationInfo")
+MTR_NEWLY_DEPRECATED("Please use MTRDeviceAttestationInfo")
 @interface AttestationInfo : NSObject
 
 @property (nonatomic, copy) NSData * challenge;

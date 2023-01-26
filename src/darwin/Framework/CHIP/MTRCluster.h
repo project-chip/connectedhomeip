@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -99,9 +99,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If nil (the default value), all of the queued events will be reported from lowest to highest event number.
  *
- * If not nil, queued events with an event number smaller than minimumEventNumber will not be reported.
+ * If not nil, queued events with an event number smaller than minEventNumber will not be reported.
  */
-@property (nonatomic, copy, nullable) NSNumber * minimumEventNumber MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSNumber * minEventNumber MTR_NEWLY_AVAILABLE;
 
 @end
 
@@ -136,14 +136,14 @@ NS_ASSUME_NONNULL_BEGIN
  * called again.
  *
  */
-@property (nonatomic, assign, getter=shouldResubscribeIfLost) BOOL resubscribeIfLost MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign, getter=shouldResubscribeAutomatically) BOOL resubscribeAutomatically MTR_NEWLY_AVAILABLE;
 
 /**
  * The minimum time, in seconds, between consecutive reports a server will send
  * for this subscription.  This can be used to rate-limit the subscription
  * traffic.  Any non-negative value is allowed, including 0.
  */
-@property (nonatomic, copy) NSNumber * minInterval;
+@property (nonatomic, copy) NSNumber * minInterval MTR_NEWLY_AVAILABLE;
 
 /**
  * The suggested maximum time, in seconds, during which the server is allowed to
@@ -151,7 +151,7 @@ NS_ASSUME_NONNULL_BEGIN
  * minInterval.  The server is allowed to use a larger time than this as the
  * maxInterval it selects if it needs to (e.g. to meet its power budget).
  */
-@property (nonatomic, copy) NSNumber * maxInterval;
+@property (nonatomic, copy) NSNumber * maxInterval MTR_NEWLY_AVAILABLE;
 
 /**
  * Controls whether events will be reported urgently. The default value is YES.
@@ -160,7 +160,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If NO, the events will be reported at the maximum interval.
  */
-@property (nonatomic, assign) BOOL reportEventsUrgently MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign, getter=shouldReportEventsUrgently) BOOL reportEventsUrgently MTR_NEWLY_AVAILABLE;
 
 /**
  * Initialize an MTRSubscribeParams.  Must provide a minInterval and
@@ -180,7 +180,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy, nullable)
     NSNumber * keepPreviousSubscriptions MTR_NEWLY_DEPRECATED("Please use replaceExistingSubscriptions");
-@property (nonatomic, copy, nullable) NSNumber * autoResubscribe MTR_NEWLY_DEPRECATED("Please use resubscribeIfLost");
+@property (nonatomic, copy, nullable) NSNumber * autoResubscribe MTR_NEWLY_DEPRECATED("Please use resubscribeAutomatically");
 
 /**
  * init and new exist for now, for backwards compatibility, and initialize with
