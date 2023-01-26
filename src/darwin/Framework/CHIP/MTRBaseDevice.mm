@@ -1866,8 +1866,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return [NSString
-        stringWithFormat:@"<MTRClusterPath> endpoint %u cluster %u", _endpoint.unsignedShortValue, _cluster.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTRClusterPath> endpoint %u cluster %u", (uint16_t) _endpoint.unsignedShortValue,
+                     (uint32_t) _cluster.unsignedLongValue];
 }
 
 + (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
@@ -1914,8 +1914,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u", self.endpoint.unsignedShortValue,
-                     self.cluster.unsignedLongValue, _attribute.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u",
+                     (uint16_t) self.endpoint.unsignedShortValue, (uint32_t) self.cluster.unsignedLongValue,
+                     (uint32_t) _attribute.unsignedLongValue];
 }
 
 + (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
@@ -1973,8 +1974,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u", self.endpoint.unsignedShortValue,
-                     self.cluster.unsignedLongValue, _event.unsignedLongValue];
+    return
+        [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u", (uint16_t) self.endpoint.unsignedShortValue,
+                  (uint32_t) self.cluster.unsignedLongValue, (uint32_t) _event.unsignedLongValue];
 }
 
 + (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
