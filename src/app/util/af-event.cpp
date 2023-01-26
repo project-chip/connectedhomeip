@@ -28,7 +28,6 @@
 
 #include <app-common/zap-generated/callback.h>
 
-#include <zap-generated/af-gen-event.h>
 
 using namespace chip;
 
