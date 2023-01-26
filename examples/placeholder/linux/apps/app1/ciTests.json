@@ -22,7 +22,8 @@
         "Test_TC_OCC_2_2_Simulated",
         "Test_TC_OCC_2_4_Simulated",
         "Test_TC_ULABEL_3_1_Simulated",
-        "Test_TC_FLABEL_3_1_Simulated"
+        "Test_TC_FLABEL_3_1_Simulated",
+        "Test_TC_LTIME_1_1_Simulated"
     ],
     "collection": ["Test"]
 }
