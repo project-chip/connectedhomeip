@@ -144,14 +144,14 @@ int AppTask::Init()
         while (true)
             ;
     }
-    PLAT_LOG("Start Event Loop Task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
-        while (true)
-            ;
-    }
+    // PLAT_LOG("Start Event Loop Task");
+    // ret = PlatformMgr().StartEventLoopTask();
+    // if (ret != CHIP_NO_ERROR)
+    // {
+    //     PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
+    //     while (true)
+    //         ;
+    // }
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
