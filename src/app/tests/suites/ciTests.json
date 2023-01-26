@@ -11,6 +11,7 @@
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10"
     ],
+    "AccessControlEnforcement": ["Test_TC_ACE_1_5"],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
     "BridgedDeviceBasicInformation": [
@@ -271,6 +272,7 @@
     ],
     "collection": [
         "AccessControl",
+        "AccessControlEnforcement",
         "BooleanState",
         "BridgedDeviceBasicInformation",
         "Actions",
