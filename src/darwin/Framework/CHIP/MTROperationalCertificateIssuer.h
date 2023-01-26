@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MTRDeviceController;
 
 /**
- * A representation of the operation certificate info for a node.
+ * A representation of the operational certificate chain for a node.
  *
  * A nil intermediateCertificate means there is no intermediate.
  *
