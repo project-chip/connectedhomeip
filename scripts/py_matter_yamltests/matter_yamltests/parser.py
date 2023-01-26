@@ -371,11 +371,14 @@ class _TestStepWithPlaceholders:
         # the wrong thing below.
         if value is not None and value not in self._parsing_config_variable_storage:
             if mapping_type == 'int64u' or mapping_type == 'int64s' or mapping_type == 'bitmap64' or mapping_type == 'epoch_us':
+                value = fixes.try_apply_float_to_integer_fix(value)
                 value = fixes.try_apply_yaml_cpp_longlong_limitation_fix(value)
                 value = fixes.try_apply_yaml_unrepresentable_integer_for_javascript_fixes(
                     value)
             elif mapping_type == 'single' or mapping_type == 'double':
                 value = fixes.try_apply_yaml_float_written_as_strings(value)
+            elif isinstance(value, float) and mapping_type != 'single' and mapping_type != 'double':
+                value = fixes.try_apply_float_to_integer_fix(value)
             elif mapping_type == 'octet_string' or mapping_type == 'long_octet_string':
                 value = fixes.convert_yaml_octet_string_to_bytes(value)
             elif mapping_type == 'boolean':
