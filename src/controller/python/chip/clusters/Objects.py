@@ -5696,7 +5696,7 @@ class PowerSource(Cluster):
 
     class Enums:
         class BatChargeFault(MatterIntEnum):
-            kUnspecfied = 0x00
+            kUnspecified = 0x00
             kAmbientTooHot = 0x01
             kAmbientTooCold = 0x02
             kBatteryTooHot = 0x03
@@ -5756,7 +5756,7 @@ class PowerSource(Cluster):
             kUnknownEnumValue = 4,
 
         class PowerSourceStatus(MatterIntEnum):
-            kUnspecfied = 0x00
+            kUnspecified = 0x00
             kActive = 0x01
             kStandby = 0x02
             kUnavailable = 0x03

@@ -558,7 +558,7 @@ namespace PowerSource {
 // Enum for BatChargeFault
 enum class BatChargeFault : uint8_t
 {
-    kUnspecfied          = 0x00,
+    kUnspecified         = 0x00,
     kAmbientTooHot       = 0x01,
     kAmbientTooCold      = 0x02,
     kBatteryTooHot       = 0x03,
@@ -633,7 +633,7 @@ enum class BatReplaceability : uint8_t
 // Enum for PowerSourceStatus
 enum class PowerSourceStatus : uint8_t
 {
-    kUnspecfied  = 0x00,
+    kUnspecified = 0x00,
     kActive      = 0x01,
     kStandby     = 0x02,
     kUnavailable = 0x03,
