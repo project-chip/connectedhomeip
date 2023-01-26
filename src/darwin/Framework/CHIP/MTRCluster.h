@@ -77,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * MTRReadParams
- *    This is used to control the behavior of attribute reads and subscribes.
+ *    This is used to control the behavior of attribute/event reads and subscribes.
  *    If not provided (i.e. nil passed for the MTRReadParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
@@ -94,11 +94,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, getter=shouldFilterByFabric) BOOL filterByFabric MTR_NEWLY_AVAILABLE;
 
+/**
+ * Sets a filter for which events will be reported in the read/subscribe interaction.
+ *
+ * If nil (the default value), all of the queued events will be reported from lowest to highest event number.
+ *
+ * If not nil, queued events with an event number smaller than minimumEventNumber will not be reported.
+ */
+@property (nonatomic, copy, nullable) NSNumber * minimumEventNumber MTR_NEWLY_AVAILABLE;
+
 @end
 
 /**
  * MTRSubscribeParams
- *    This is used to control the behavior of attribute subscribes.  If not
+ *    This is used to control the behavior of attribute/event subscribes.  If not
  *    provided (i.e. nil passed for the MTRSubscribeParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
@@ -143,6 +152,15 @@ NS_ASSUME_NONNULL_BEGIN
  * maxInterval it selects if it needs to (e.g. to meet its power budget).
  */
 @property (nonatomic, copy) NSNumber * maxInterval;
+
+/**
+ * Controls whether events will be reported urgently. The default value is YES.
+ *
+ * If YES, the events will be reported as soon as the minInterval does not prevent it.
+ *
+ * If NO, the events will be reported at the maximum interval.
+ */
+@property (nonatomic, assign) BOOL reportEventsUrgently MTR_NEWLY_AVAILABLE;
 
 /**
  * Initialize an MTRSubscribeParams.  Must provide a minInterval and

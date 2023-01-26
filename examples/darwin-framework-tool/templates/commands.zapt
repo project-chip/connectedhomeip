@@ -292,6 +292,12 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{/if}}
         {{/unless}}
         {{/chip_server_cluster_attributes}}
+        {{#zcl_events}}
+        {{#first}}
+        make_unique<ReadEvent>(Id), //
+        make_unique<SubscribeEvent>(Id), //
+        {{/first}}
+        {{/zcl_events}}
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -308,6 +314,8 @@ void registerClusterAny(Commands & commands)
         make_unique<ReadAttribute>(),   //
         make_unique<WriteAttribute>(),  //
         make_unique<SubscribeAttribute>(), //
+        make_unique<ReadEvent>(),     //
+        make_unique<SubscribeEvent>(chip::kInvalidClusterId, true), //
         make_unique<SubscribeEvent>(),     //
     };
 

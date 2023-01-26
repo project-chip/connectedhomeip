@@ -35,6 +35,18 @@ def try_apply_yaml_cpp_longlong_limitation_fix(value):
     return value
 
 
+def try_apply_float_to_integer_fix(value):
+    '''Fix math operations where values ends up beeing a float for integer types.
+
+    For example one of the color control test configure the ColoremperatureMireds value to be:
+        (ColorTempPhysicalMinMireds + ColorTempPhysicalMaxMireds)/2
+    In this specific example it ends up as '32639.5', which is invalid.
+    '''
+    if isinstance(value, float):
+        return int(value)
+    return value
+
+
 def try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value):
     '''Fix up large integers that are represented within a string.
 
