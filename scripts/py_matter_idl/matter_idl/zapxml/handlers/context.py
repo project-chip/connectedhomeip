@@ -103,7 +103,6 @@ class Context:
 
         return f"{self.file_name}:{meta.line}:{meta.column}"
 
-
     def GetGlobalAttribute(self, code):
         if code in self._global_attributes:
             return self._global_attributes[code]
