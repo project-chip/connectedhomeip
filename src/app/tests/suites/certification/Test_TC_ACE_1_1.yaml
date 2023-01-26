@@ -374,7 +374,7 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          TP24(11) - Write the location attribute (Basic - requires administer)"
+          "TP24(11) - Write the location attribute (Basic - requires administer)"
       cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "Location"
