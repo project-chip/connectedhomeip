@@ -14,6 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import atexit
 import os
 import tempfile
 import traceback
@@ -37,6 +38,11 @@ _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 _CLUSTER_XML_DIRECTORY_PATH = os.path.abspath(
     os.path.join(_DEFAULT_CHIP_ROOT, "src/app/zap-templates/zcl/data-model/"))
+
+
+def StackShutdown():
+    certificateAuthorityManager.Shutdown()
+    builtins.chipStack.Shutdown()
 
 
 @click.command()
@@ -78,9 +84,18 @@ def main(setup_code, yaml_path, node_id, pics_file):
         dev_ctrl = ca_list[0].adminList[0].NewController()
         dev_ctrl.CommissionWithCode(setup_code, node_id)
 
+        def _StackShutDown():
+            # Tearing down chip stack. If not done in the correct order test will fail.
+            certificate_authority_manager.Shutdown()
+            chip_stack.Shutdown()
+
+        atexit.register(_StackShutDown)
+
         try:
             # Creating Cluster definition.
-            clusters_definitions = SpecDefinitionsFromPath(_CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml')
+            clusters_definitions = SpecDefinitionsFromPath(
+                _CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml',
+            )
 
             # Parsing YAML test and setting up chip-repl yamltests runner.
             yaml = TestParser(yaml_path, pics_file, clusters_definitions)
@@ -105,9 +120,6 @@ def main(setup_code, yaml_path, node_id, pics_file):
             exit(-2)
 
         runner.shutdown()
-        # Tearing down chip stack. If not done in the correct order test will fail.
-        certificate_authority_manager.Shutdown()
-        chip_stack.Shutdown()
 
 
 if __name__ == '__main__':
