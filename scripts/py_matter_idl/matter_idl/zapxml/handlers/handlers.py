@@ -21,7 +21,6 @@ from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
 from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
 
-
 LOGGER = logging.getLogger('matter-xml-parser')
 
 
@@ -234,7 +233,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
 
                 if not found:
                     LOGGER.error('Enum %s could not find cluster (code %d/0x%X)' %
-                                  (self._struct.name, code, code))
+                                 (self._struct.name, code, code))
         else:
             idl.structs.append(self._struct)
 
@@ -283,7 +282,7 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
 
             if not found:
                 LOGGER.error('Enum %s could not find its cluster (code %d/0x%X)' %
-                              (self._enum.name, self._cluster_code, self._cluster_code))
+                             (self._enum.name, self._cluster_code, self._cluster_code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -333,7 +332,7 @@ class BitmapHandler(BaseHandler):
                     found = True
             if not found:
                 LOGGER.error('Bitmap %s could not find its cluster (code %d/0x%X)' %
-                              (self._bitmap.name, code, code))
+                             (self._bitmap.name, code, code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -537,7 +536,7 @@ class ClusterExtensionHandler(ClusterHandler, IdlPostProcessor):
 
         if not found:
             LOGGER.error('Could not extend cluster 0x%X (%d): cluster not found' %
-                          (self._cluster_code, self._cluster_code))
+                         (self._cluster_code, self._cluster_code))
 
 
 class GlobalAttributeHandler(BaseHandler):

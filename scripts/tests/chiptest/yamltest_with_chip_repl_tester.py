@@ -44,6 +44,7 @@ def StackShutdown():
     certificateAuthorityManager.Shutdown()
     builtins.chipStack.Shutdown()
 
+
 @click.command()
 @click.option(
     '--setup-code',
