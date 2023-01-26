@@ -74,9 +74,10 @@ class _ExecutionContext:
 class BaseAction(ABC):
     '''Interface for a single YAML action that is to be executed.'''
 
-    def __init__(self, label, identity):
-        self._label = label
-        self._identity = identity
+    def __init__(self, test_step):
+        self._label = test_step.label
+        self._identity = test_step.identity
+        self._pics_enabled = test_step.is_pics_enabled
 
     @property
     def label(self):
@@ -85,6 +86,10 @@ class BaseAction(ABC):
     @property
     def identity(self):
         return self._identity
+
+    @property
+    def pics_enabled(self):
+        return self._pics_enabled
 
     @abstractmethod
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
@@ -106,7 +111,7 @@ class InvokeAction(BaseAction):
             action to perform for this write attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._busy_wait_ms = test_step.busy_wait_ms
         self._command_name = stringcase.pascalcase(test_step.command)
         self._cluster = cluster
@@ -167,7 +172,7 @@ class ReadAttributeAction(BaseAction):
             action to perform for this read attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._cluster = cluster
         self._endpoint = test_step.endpoint
@@ -235,7 +240,7 @@ class WaitForCommissioneeAction(BaseAction):
     ''' Wait for commissionee action to be executed.'''
 
     def __init__(self, test_step):
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._node_id = test_step.node_id
         self._expire_existing_session = False
         # This is the default when no timeout is provided.
@@ -357,7 +362,7 @@ class WriteAttributeAction(BaseAction):
             action to perform for this write attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._busy_wait_ms = test_step.busy_wait_ms
         self._cluster = cluster
@@ -421,7 +426,7 @@ class WaitForReportAction(BaseAction):
         Raises:
           UnexpectedParsingError: Raised if the expected queue does not exist.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._output_queue = context.subscription_callback_result_queue.get(self._attribute_name,
                                                                             None)
@@ -451,7 +456,7 @@ class CommissionerCommandAction(BaseAction):
         Raises:
           UnexpectedParsingError: Raised if the expected queue does not exist.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         if test_step.command != 'PairWithCode':
             raise UnexpectedParsingError(f'Unexpected CommisionerCommand {test_step.command}')
 

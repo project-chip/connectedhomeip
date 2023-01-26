@@ -19,6 +19,7 @@
 #include "WebSocketServer.h"
 
 #include <lib/support/ScopedBuffer.h>
+#include <libwebsockets.h>
 
 constexpr uint16_t kDefaultWebSocketServerPort = 9002;
 constexpr uint16_t kMaxMessageBufferLen        = 8192;

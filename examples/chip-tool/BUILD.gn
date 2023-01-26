@@ -28,6 +28,7 @@ assert(chip_build_tools)
 config("config") {
   include_dirs = [
     ".",
+    "${chip_root}/examples/common",
     "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
@@ -87,13 +88,11 @@ static_library("chip-tool-utils") {
   deps = []
 
   if (config_use_interactive_mode) {
-    sources += [
-      "commands/interactive/InteractiveCommands.cpp",
-      "commands/interactive/WebSocketServer.cpp",
-      "commands/interactive/WebSocketServer.h",
-      "commands/interactive/WebSocketServerDelegate.h",
+    sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+    deps += [
+      "${chip_root}/examples/common/websocket-server",
+      "${editline_root}:editline",
     ]
-    deps += [ "${editline_root}:editline" ]
   }
 
   if (config_enable_yaml_tests) {
@@ -116,7 +115,6 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
-    "${chip_root}/third_party/libwebsockets",
   ]
 
   public_configs = [ ":config" ]

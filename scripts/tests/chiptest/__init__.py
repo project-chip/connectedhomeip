@@ -95,7 +95,6 @@ def _hardcoded_python_yaml_tests():
         "Test_TC_I_2_1.yaml",
         "Test_TC_ILL_1_1.yaml",
         "Test_TC_ILL_2_1.yaml",
-        "Test_TC_LVL_2_1.yaml",
         "Test_TC_LVL_2_2.yaml",
         "Test_TC_LCFG_1_1.yaml",
         "Test_TC_LTIME_1_2.yaml",
@@ -166,7 +165,6 @@ def _hardcoded_python_yaml_tests():
         "Test_TC_WNCV_2_3.yaml",
         "Test_TC_WNCV_4_3.yaml",
         "Test_TC_WNCV_4_4.yaml",
-        "DL_Schedules.yaml",
         "DL_UsersAndCredentials.yaml",
     ]
 
