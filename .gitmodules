@@ -293,4 +293,4 @@
 [submodule "third_party/libwebsockets/repo"]
 	path = third_party/libwebsockets/repo
 	url = https://github.com/warmcat/libwebsockets
-	platforms = linux,darwin
+	platforms = linux,darwin,tizen
