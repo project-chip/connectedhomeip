@@ -677,7 +677,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttributeId)), attributeId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttributeID)), attributeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttributeValue)), attributeValue));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -698,8 +698,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kAttributeId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, attributeId));
+        case to_underlying(Fields::kAttributeID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, attributeID));
             break;
         case to_underlying(Fields::kAttributeValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, attributeValue));
@@ -721,7 +721,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kClusterId)), clusterId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kClusterID)), clusterID));
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttributeValueList)), attributeValueList));
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -743,8 +743,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kClusterId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, clusterId));
+        case to_underlying(Fields::kClusterID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, clusterID));
             break;
         case to_underlying(Fields::kAttributeValueList):
             ReturnErrorOnFailure(DataModel::Decode(reader, attributeValueList));
@@ -769,8 +769,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneName)), sceneName));
     ReturnErrorOnFailure(
@@ -793,11 +793,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
@@ -824,8 +824,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -847,11 +847,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         default:
             break;
@@ -868,8 +868,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -888,11 +888,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         default:
             break;
@@ -910,8 +910,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneName)), sceneName));
     ReturnErrorOnFailure(
@@ -937,11 +937,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
@@ -967,8 +967,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -987,11 +987,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         default:
             break;
@@ -1009,8 +1009,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1032,11 +1032,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         default:
             break;
@@ -1053,7 +1053,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1072,8 +1072,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
         default:
             break;
@@ -1091,7 +1091,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1113,8 +1113,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
         default:
             break;
@@ -1131,8 +1131,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1151,11 +1151,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         default:
             break;
@@ -1173,8 +1173,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1196,11 +1196,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         default:
             break;
@@ -1217,8 +1217,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -1238,11 +1238,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
@@ -1262,7 +1262,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1281,8 +1281,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
         default:
             break;
@@ -1301,7 +1301,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCapacity)), capacity));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneList)), sceneList));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -1327,8 +1327,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kCapacity):
             ReturnErrorOnFailure(DataModel::Decode(reader, capacity));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
         case to_underlying(Fields::kSceneList):
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneList));
@@ -1348,8 +1348,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneName)), sceneName));
     ReturnErrorOnFailure(
@@ -1372,11 +1372,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
@@ -1403,8 +1403,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1426,11 +1426,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         default:
             break;
@@ -1447,8 +1447,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1467,11 +1467,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         default:
             break;
@@ -1489,8 +1489,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneId)), sceneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupID)), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneID)), sceneID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneName)), sceneName));
     ReturnErrorOnFailure(
@@ -1516,11 +1516,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroupID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
             break;
-        case to_underlying(Fields::kSceneId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneId));
+        case to_underlying(Fields::kSceneID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
             break;
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
@@ -1547,10 +1547,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMode)), mode));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupIdFrom)), groupIdFrom));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneIdFrom)), sceneIdFrom));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupIdTo)), groupIdTo));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneIdTo)), sceneIdTo));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupIdentifierFrom)), groupIdentifierFrom));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneIdentifierFrom)), sceneIdentifierFrom));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupIdentifierTo)), groupIdentifierTo));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneIdentifierTo)), sceneIdentifierTo));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1572,17 +1574,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kMode):
             ReturnErrorOnFailure(DataModel::Decode(reader, mode));
             break;
-        case to_underlying(Fields::kGroupIdFrom):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdFrom));
+        case to_underlying(Fields::kGroupIdentifierFrom):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierFrom));
             break;
-        case to_underlying(Fields::kSceneIdFrom):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdFrom));
+        case to_underlying(Fields::kSceneIdentifierFrom):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierFrom));
             break;
-        case to_underlying(Fields::kGroupIdTo):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdTo));
+        case to_underlying(Fields::kGroupIdentifierTo):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierTo));
             break;
-        case to_underlying(Fields::kSceneIdTo):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdTo));
+        case to_underlying(Fields::kSceneIdentifierTo):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierTo));
             break;
         default:
             break;
@@ -1600,8 +1602,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupIdFrom)), groupIdFrom));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneIdFrom)), sceneIdFrom));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupIdentifierFrom)), groupIdentifierFrom));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneIdentifierFrom)), sceneIdentifierFrom));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1623,11 +1627,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kGroupIdFrom):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdFrom));
+        case to_underlying(Fields::kGroupIdentifierFrom):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierFrom));
             break;
-        case to_underlying(Fields::kSceneIdFrom):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdFrom));
+        case to_underlying(Fields::kSceneIdentifierFrom):
+            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierFrom));
             break;
         default:
             break;

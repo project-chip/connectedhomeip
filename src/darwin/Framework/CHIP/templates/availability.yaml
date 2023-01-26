@@ -4054,7 +4054,6 @@
           OnOff:
               - OnOffControl
               - OnOffFeature
-              - SceneFeatures
           LevelControl:
               - LevelControlFeature
           Actions:
@@ -4142,8 +4141,6 @@
                   - AcceptOnlyWhenOn
               OnOffFeature:
                   - Lighting
-              SceneFeatures:
-                  - SceneNames
           LevelControl:
               LevelControlFeature:
                   - OnOff
@@ -5040,6 +5037,62 @@
               LauncherResponse:
                   - status
                   - data
+          Scenes:
+              AddScene:
+                  - groupID
+                  - sceneID
+              ViewScene:
+                  - groupID
+                  - sceneID
+              RemoveScene:
+                  - groupID
+                  - sceneID
+              RemoveAllScenes:
+                  - groupID
+              StoreScene:
+                  - groupID
+                  - sceneID
+              RecallScene:
+                  - groupID
+                  - sceneID
+              GetSceneMembership:
+                  - groupID
+              EnhancedAddScene:
+                  - groupID
+                  - sceneID
+              EnhancedViewScene:
+                  - groupID
+                  - sceneID
+              CopyScene:
+                  - groupIdentifierFrom
+                  - sceneIdentifierFrom
+                  - groupIdentifierTo
+                  - sceneIdentifierTo
+              AddSceneResponse:
+                  - groupID
+                  - sceneID
+              ViewSceneResponse:
+                  - groupID
+                  - sceneID
+              RemoveSceneResponse:
+                  - groupID
+                  - sceneID
+              RemoveAllScenesResponse:
+                  - groupID
+              StoreSceneResponse:
+                  - groupID
+                  - sceneID
+              GetSceneMembershipResponse:
+                  - groupID
+              EnhancedAddSceneResponse:
+                  - groupID
+                  - sceneID
+              EnhancedViewSceneResponse:
+                  - groupID
+                  - sceneID
+              CopySceneResponse:
+                  - groupIdentifierFrom
+                  - sceneIdentifierFrom
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5284,6 +5337,11 @@
                   # introduced them in this release.
                   - catalogVendorId
                   - applicationId
+          Scenes:
+              AttributeValuePair:
+                  - attributeID
+              ExtensionFieldSet:
+                  - clusterID
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5644,6 +5702,8 @@
               - DaysMaskMap
           PumpConfigurationAndControl:
               - PumpFeature
+          Scenes:
+              - SceneFeatures
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5718,6 +5778,9 @@
               ModeForSequence:
                   - HeatSetpointPresent
                   - CoolSetpointPresent
+          Scenes:
+              SceneFeatures:
+                  - SceneNames
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5796,6 +5859,62 @@
               AnnounceOTAProvider:
                   - providerNodeId
                   - vendorId
+          Scenes:
+              AddScene:
+                  - groupId
+                  - sceneId
+              ViewScene:
+                  - groupId
+                  - sceneId
+              RemoveScene:
+                  - groupId
+                  - sceneId
+              RemoveAllScenes:
+                  - groupId
+              StoreScene:
+                  - groupId
+                  - sceneId
+              RecallScene:
+                  - groupId
+                  - sceneId
+              GetSceneMembership:
+                  - groupId
+              EnhancedAddScene:
+                  - groupId
+                  - sceneId
+              EnhancedViewScene:
+                  - groupId
+                  - sceneId
+              CopyScene:
+                  - groupIdFrom
+                  - sceneIdFrom
+                  - groupIdTo
+                  - sceneIdTo
+              AddSceneResponse:
+                  - groupId
+                  - sceneId
+              ViewSceneResponse:
+                  - groupId
+                  - sceneId
+              RemoveSceneResponse:
+                  - groupId
+                  - sceneId
+              RemoveAllScenesResponse:
+                  - groupId
+              StoreSceneResponse:
+                  - groupId
+                  - sceneId
+              GetSceneMembershipResponse:
+                  - groupId
+              EnhancedAddSceneResponse:
+                  - groupId
+                  - sceneId
+              EnhancedViewSceneResponse:
+                  - groupId
+                  - sceneId
+              CopySceneResponse:
+                  - groupIdFrom
+                  - sceneIdFrom
       structs:
           Descriptor:
               - DeviceType
@@ -5859,6 +5978,11 @@
               ApplicationStruct:
                   - catalogVendorId
                   - applicationId
+          Scenes:
+              AttributeValuePair:
+                  - attributeId
+              ExtensionFieldSet:
+                  - clusterId
       event fields:
           Switch:
               MultiPressComplete:
@@ -6124,6 +6248,62 @@
           ColorControl:
               MoveToColorTemperature:
                   colorTemperatureMireds: colorTemperature
+          Scenes:
+              AddScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              ViewScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveAllScenes:
+                  groupID: groupId
+              StoreScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RecallScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              GetSceneMembership:
+                  groupID: groupId
+              EnhancedAddScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              EnhancedViewScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              CopyScene:
+                  groupIdentifierFrom: groupIdFrom
+                  sceneIdentifierFrom: sceneIdFrom
+                  groupIdentifierTo: groupIdTo
+                  sceneIdentifierTo: sceneIdTo
+              AddSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              ViewSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveAllScenesResponse:
+                  groupID: groupId
+              StoreSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              GetSceneMembershipResponse:
+                  groupID: groupId
+              EnhancedAddSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              EnhancedViewSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              CopySceneResponse:
+                  groupIdentifierFrom: groupIdFrom
+                  sceneIdentifierFrom: sceneIdFrom
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
@@ -6181,6 +6361,11 @@
               ApplicationStruct:
                   catalogVendorID: catalogVendorId
                   applicationID: applicationId
+          Scenes:
+              AttributeValuePair:
+                  attributeID: attributeId
+              ExtensionFieldSet:
+                  clusterID: clusterId
       event fields:
           Switch:
               MultiPressComplete:

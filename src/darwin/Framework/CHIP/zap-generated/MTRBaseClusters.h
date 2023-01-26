@@ -17065,6 +17065,10 @@ typedef NS_OPTIONS(uint32_t, MTRGroupsGroupClusterFeature) {
     MTRGroupsGroupClusterFeatureGroupNames API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_OPTIONS(uint32_t, MTRScenesSceneFeatures) {
+    MTRScenesSceneFeaturesSceneNames MTR_NEWLY_AVAILABLE = 0x1,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_OPTIONS(uint8_t, MTRScenesCopyMode) {
     MTRScenesCopyModeCopyAllScenes API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
@@ -17100,10 +17104,6 @@ typedef NS_OPTIONS(uint8_t, MTROnOffControl) {
 
 typedef NS_OPTIONS(uint32_t, MTROnOffFeature) {
     MTROnOffFeatureLighting API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_OPTIONS(uint32_t, MTROnOffSceneFeatures) {
-    MTROnOffSceneFeaturesSceneNames API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRLevelControlMoveMode) {

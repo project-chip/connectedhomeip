@@ -132,10 +132,6 @@ server cluster OnOff = 6 {
     kLighting = 0x1;
   }
 
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
-  }
-
   readonly attribute boolean onOff = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;

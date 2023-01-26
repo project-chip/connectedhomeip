@@ -222,10 +222,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("attributeValue")));
 
     char labelWithMember[kMaxLabelLength];
-    if (value.isMember("attributeId"))
+    if (value.isMember("attributeID"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeId");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.attributeId, value["attributeId"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.attributeID, value["attributeID"]));
     }
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeValue");
@@ -236,7 +236,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::Scenes::Structs::AttributeValuePair::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.attributeId);
+    ComplexArgumentParser::Finalize(request.attributeID);
     ComplexArgumentParser::Finalize(request.attributeValue);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -644,13 +644,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ExtensionFieldSet.clusterId", "clusterId", value.isMember("clusterId")));
+        ComplexArgumentParser::EnsureMemberExist("ExtensionFieldSet.clusterID", "clusterID", value.isMember("clusterID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ExtensionFieldSet.attributeValueList", "attributeValueList",
                                                                   value.isMember("attributeValueList")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clusterId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clusterId, value["clusterId"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clusterID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clusterID, value["clusterID"]));
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeValueList");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.attributeValueList, value["attributeValueList"]));
@@ -660,7 +660,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.clusterId);
+    ComplexArgumentParser::Finalize(request.clusterID);
     ComplexArgumentParser::Finalize(request.attributeValueList);
 }
 CHIP_ERROR

@@ -107,6 +107,12 @@ enum class GroupClusterFeature : uint32_t
 
 namespace Scenes {
 
+// Bitmap for SceneFeatures
+enum class SceneFeatures : uint32_t
+{
+    kSceneNames = 0x1,
+};
+
 // Bitmap for ScenesCopyMode
 enum class ScenesCopyMode : uint8_t
 {
@@ -199,12 +205,6 @@ enum class OnOffControl : uint8_t
 enum class OnOffFeature : uint32_t
 {
     kLighting = 0x1,
-};
-
-// Bitmap for SceneFeatures
-enum class SceneFeatures : uint32_t
-{
-    kSceneNames = 0x1,
 };
 } // namespace OnOff
 

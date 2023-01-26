@@ -25,12 +25,12 @@ import javax.annotation.Nullable;
 
 public class ChipStructs {
   public static class ScenesClusterAttributeValuePair {
-    public Optional<Long> attributeId;
+    public Optional<Long> attributeID;
     public ArrayList<Object> attributeValue;
 
     public ScenesClusterAttributeValuePair(
-        Optional<Long> attributeId, ArrayList<Object> attributeValue) {
-      this.attributeId = attributeId;
+        Optional<Long> attributeID, ArrayList<Object> attributeValue) {
+      this.attributeID = attributeID;
       this.attributeValue = attributeValue;
     }
 
@@ -38,8 +38,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("ScenesClusterAttributeValuePair {\n");
-      output.append("\tattributeId: ");
-      output.append(attributeId);
+      output.append("\tattributeID: ");
+      output.append(attributeID);
       output.append("\n");
       output.append("\tattributeValue: ");
       output.append(attributeValue);
@@ -50,12 +50,12 @@ public class ChipStructs {
   }
 
   public static class ScenesClusterExtensionFieldSet {
-    public Long clusterId;
+    public Long clusterID;
     public ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList;
 
     public ScenesClusterExtensionFieldSet(
-        Long clusterId, ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList) {
-      this.clusterId = clusterId;
+        Long clusterID, ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList) {
+      this.clusterID = clusterID;
       this.attributeValueList = attributeValueList;
     }
 
@@ -63,8 +63,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("ScenesClusterExtensionFieldSet {\n");
-      output.append("\tclusterId: ");
-      output.append(clusterId);
+      output.append("\tclusterID: ");
+      output.append(clusterID);
       output.append("\n");
       output.append("\tattributeValueList: ");
       output.append(attributeValueList);

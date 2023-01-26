@@ -7639,7 +7639,7 @@ bool emberAfScenesClusterAddSceneCallback(chip::app::CommandHandler * commandObj
  * @brief Scenes Cluster AddSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterAddSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
-                                                  chip::GroupId GroupId, uint8_t SceneId);
+                                                  chip::GroupId GroupID, uint8_t SceneID);
 /**
  * @brief Scenes Cluster ViewScene Command callback (from client)
  */
@@ -7650,7 +7650,7 @@ bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandOb
  * @brief Scenes Cluster ViewSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterViewSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
-                                                   chip::GroupId GroupId, uint8_t SceneId, uint16_t TransitionTime,
+                                                   chip::GroupId GroupID, uint8_t SceneID, uint16_t TransitionTime,
                                                    chip::CharSpan SceneName,
                                                    /* TYPE WARNING: array array defaults to */ uint8_t * ExtensionFieldSets);
 /**
@@ -7663,7 +7663,7 @@ bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * command
  * @brief Scenes Cluster RemoveSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterRemoveSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                     uint8_t Status, chip::GroupId GroupId, uint8_t SceneId);
+                                                     uint8_t Status, chip::GroupId GroupID, uint8_t SceneID);
 /**
  * @brief Scenes Cluster RemoveAllScenes Command callback (from client)
  */
@@ -7674,7 +7674,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(
  * @brief Scenes Cluster RemoveAllScenesResponse Command callback (from server)
  */
 bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t Status, chip::GroupId GroupId);
+                                                         uint8_t Status, chip::GroupId GroupID);
 /**
  * @brief Scenes Cluster StoreScene Command callback (from client)
  */
@@ -7685,7 +7685,7 @@ bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandO
  * @brief Scenes Cluster StoreSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterStoreSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                    uint8_t Status, chip::GroupId GroupId, uint8_t SceneId);
+                                                    uint8_t Status, chip::GroupId GroupID, uint8_t SceneID);
 /**
  * @brief Scenes Cluster RecallScene Command callback (from client)
  */
@@ -7702,7 +7702,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(
  * @brief Scenes Cluster GetSceneMembershipResponse Command callback (from server)
  */
 bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t Status, uint8_t Capacity, chip::GroupId GroupId,
+                                                            uint8_t Status, uint8_t Capacity, chip::GroupId GroupID,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * SceneList);
 /**
  * @brief Scenes Cluster EnhancedAddScene Command callback (from client)
@@ -7714,7 +7714,7 @@ bool emberAfScenesClusterEnhancedAddSceneCallback(
  * @brief Scenes Cluster EnhancedAddSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterEnhancedAddSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                          uint8_t Status, chip::GroupId GroupId, uint8_t SceneId);
+                                                          uint8_t Status, chip::GroupId GroupID, uint8_t SceneID);
 /**
  * @brief Scenes Cluster EnhancedViewScene Command callback (from client)
  */
@@ -7725,7 +7725,7 @@ bool emberAfScenesClusterEnhancedViewSceneCallback(
  * @brief Scenes Cluster EnhancedViewSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterEnhancedViewSceneResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status, chip::GroupId GroupId, uint8_t SceneId,
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status, chip::GroupId GroupID, uint8_t SceneID,
     uint16_t TransitionTime, chip::CharSpan SceneName, /* TYPE WARNING: array array defaults to */ uint8_t * ExtensionFieldSets);
 /**
  * @brief Scenes Cluster CopyScene Command callback (from client)
@@ -7737,7 +7737,7 @@ bool emberAfScenesClusterCopySceneCallback(chip::app::CommandHandler * commandOb
  * @brief Scenes Cluster CopySceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterCopySceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
-                                                   chip::GroupId GroupIdFrom, uint8_t SceneIdFrom);
+                                                   chip::GroupId GroupIdentifierFrom, uint8_t SceneIdentifierFrom);
 /**
  * @brief On/Off Cluster Off Command callback (from client)
  */
