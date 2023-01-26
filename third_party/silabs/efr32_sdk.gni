@@ -123,8 +123,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/common",
       "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32",
       "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/rf/common/cortex",
-      "${efr32_sdk_root}/platform/radio/rail_lib/hal",
-      "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32",
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ieee802154",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti",
@@ -176,6 +174,13 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/config",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen",
     ]
+
+    if (silabs_family != "mgm24") {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/radio/rail_lib/hal",
+        "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32",
+      ]
+    }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
     # define. This means the build system by default does not pick up changes in
@@ -476,7 +481,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_system.c",
       "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
       "${efr32_sdk_root}/platform/peripheral/src/peripheral_sysrtc.c",
-      "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32/hal_efr.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/aes_aes.c",
@@ -624,6 +628,11 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_device_init_clocks.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_event_handler.c",
     ]
+
+    if (silabs_family != "mgm24") {
+      sources +=
+          [ "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32/hal_efr.c" ]
+    }
 
     if (use_wstk_buttons) {
       sources += [
@@ -815,7 +824,6 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/startup_mgm24.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/system_mgm24.c",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_curves_efr32.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_attestation.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_cipher.c",
