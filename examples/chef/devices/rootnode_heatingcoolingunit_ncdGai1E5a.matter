@@ -1172,6 +1172,21 @@ client cluster Thermostat = 513 {
     kBoth = 2;
   }
 
+  enum StartOfWeek : ENUM8 {
+    kSunday = 0;
+    kMonday = 1;
+    kTuesday = 2;
+    kWednesday = 3;
+    kThursday = 4;
+    kFriday = 5;
+    kSaturday = 6;
+  }
+
+  enum TemperatureSetpointHold : ENUM8 {
+    kSetpointHoldOff = 0;
+    kSetpointHoldOn = 1;
+  }
+
   enum ThermostatControlSequence : ENUM8 {
     kCoolingOnly = 0;
     kCoolingWithReheat = 1;
@@ -1215,6 +1230,12 @@ client cluster Thermostat = 513 {
     kCoolSetpointPresent = 0x2;
   }
 
+  bitmap ThermostatAlarmMask : BITMAP8 {
+    kInitializationFailure = 0x1;
+    kHardwareFailure = 0x2;
+    kSelfCalibrationFailure = 0x4;
+  }
+
   bitmap ThermostatFeature : BITMAP32 {
     kHeating = 0x1;
     kCooling = 0x2;
@@ -1224,11 +1245,31 @@ client cluster Thermostat = 513 {
     kAutoMode = 0x20;
   }
 
+  bitmap ThermostatOccupancy : BITMAP8 {
+    kOccupied = 0x1;
+  }
+
+  bitmap ThermostatRemoteSensing : BITMAP8 {
+    kLocalTemperature = 0x1;
+    kOutdoorTemperature = 0x2;
+    kOccupancy = 0x4;
+  }
+
+  bitmap ThermostatRunningState : BITMAP16 {
+    kHeat = 0x1;
+    kCool = 0x2;
+    kFan = 0x4;
+    kHeatStage2 = 0x8;
+    kCoolStage2 = 0x10;
+    kFanStage2 = 0x20;
+    kFanStage3 = 0x40;
+  }
+
   readonly attribute nullable int16s localTemperature = 0;
   attribute int16s occupiedCoolingSetpoint = 17;
   attribute int16s occupiedHeatingSetpoint = 18;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute access(write: manage) enum8 systemMode = 28;
+  attribute access(write: manage) ThermostatSystemMode systemMode = 28;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

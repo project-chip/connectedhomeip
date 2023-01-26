@@ -1034,6 +1034,21 @@ server cluster Thermostat = 513 {
     kBoth = 2;
   }
 
+  enum StartOfWeek : ENUM8 {
+    kSunday = 0;
+    kMonday = 1;
+    kTuesday = 2;
+    kWednesday = 3;
+    kThursday = 4;
+    kFriday = 5;
+    kSaturday = 6;
+  }
+
+  enum TemperatureSetpointHold : ENUM8 {
+    kSetpointHoldOff = 0;
+    kSetpointHoldOn = 1;
+  }
+
   enum ThermostatControlSequence : ENUM8 {
     kCoolingOnly = 0;
     kCoolingWithReheat = 1;
@@ -1077,6 +1092,12 @@ server cluster Thermostat = 513 {
     kCoolSetpointPresent = 0x2;
   }
 
+  bitmap ThermostatAlarmMask : BITMAP8 {
+    kInitializationFailure = 0x1;
+    kHardwareFailure = 0x2;
+    kSelfCalibrationFailure = 0x4;
+  }
+
   bitmap ThermostatFeature : BITMAP32 {
     kHeating = 0x1;
     kCooling = 0x2;
@@ -1086,9 +1107,29 @@ server cluster Thermostat = 513 {
     kAutoMode = 0x20;
   }
 
+  bitmap ThermostatOccupancy : BITMAP8 {
+    kOccupied = 0x1;
+  }
+
+  bitmap ThermostatRemoteSensing : BITMAP8 {
+    kLocalTemperature = 0x1;
+    kOutdoorTemperature = 0x2;
+    kOccupancy = 0x4;
+  }
+
+  bitmap ThermostatRunningState : BITMAP16 {
+    kHeat = 0x1;
+    kCool = 0x2;
+    kFan = 0x4;
+    kHeatStage2 = 0x8;
+    kCoolStage2 = 0x10;
+    kFanStage2 = 0x20;
+    kFanStage3 = 0x40;
+  }
+
   readonly attribute nullable int16s localTemperature = 0;
   readonly attribute nullable int16s outdoorTemperature = 1;
-  readonly attribute bitmap8 occupancy = 2;
+  readonly attribute ThermostatOccupancy occupancy = 2;
   readonly attribute int16s absMinHeatSetpointLimit = 3;
   readonly attribute int16s absMaxHeatSetpointLimit = 4;
   readonly attribute int16s absMinCoolSetpointLimit = 5;
@@ -1106,11 +1147,11 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) int16s minCoolSetpointLimit = 23;
   attribute access(write: manage) int16s maxCoolSetpointLimit = 24;
   attribute access(write: manage) int8s minSetpointDeadBand = 25;
-  attribute access(write: manage) bitmap8 remoteSensing = 26;
+  attribute access(write: manage) ThermostatRemoteSensing remoteSensing = 26;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute access(write: manage) enum8 systemMode = 28;
-  readonly attribute enum8 thermostatRunningMode = 30;
-  readonly attribute enum8 startOfWeek = 32;
+  attribute access(write: manage) ThermostatSystemMode systemMode = 28;
+  readonly attribute ThermostatRunningMode thermostatRunningMode = 30;
+  readonly attribute StartOfWeek startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;
   readonly attribute int8u numberOfDailyTransitions = 34;
   readonly attribute command_id generatedCommandList[] = 65528;
