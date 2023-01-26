@@ -196,11 +196,12 @@ void matter_node_state_monitor::erase_mapper_endpoint(const std::string unid, ch
 
 void matter_node_state_monitor::display_map(std::ostream & os)
 {
-    os << std::setw(10) << "Unify Unid |" << std::setw(10) << "Unify Endpoint |" << std::setw(10) << "Matter Endpoint\n";
+    const unsigned int columnWidth = 20;
+    os << std::setw(columnWidth) << "Unify Unid" << "|" << std::setw(columnWidth) << "Unify Endpoint" << "|" << std::setw(columnWidth) << "Matter Endpoint\n";
     for (auto ep = bridged_endpoints.begin(); ep != bridged_endpoints.end(); ep++)
     {
-        os << std::setw(10) << ep->second.unify_unid.c_str() << "|" << std::setw(10) << ep->second.unify_endpoint << "|"
-           << std::setw(10) << ep->second.matter_endpoint << "\n";
+        os << std::setw(columnWidth) << ep->second.unify_unid.c_str() << "|" << std::setw(columnWidth) << unsigned(ep->second.unify_endpoint) << "|"
+           << std::setw(columnWidth) << ep->second.matter_endpoint << "\n";
     }
 }
 
