@@ -240,7 +240,7 @@ class BaseTestHelper:
             self.controllerNodeId, self.paaTrustStorePath)
         return True
 
-    async def TestRevokeCommissioningWindow(self, ip:str, setuppin: int, nodeid: int):
+    async def TestRevokeCommissioningWindow(self, ip: str, setuppin: int, nodeid: int):
         await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
         if not self.TestPaseOnly(ip=ip, setuppin=setuppin, nodeid=nodeid, devCtrl=self.devCtrl2):
             return False
@@ -252,11 +252,11 @@ class BaseTestHelper:
         await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(),  timedRequestTimeoutMs=10000)
         return True
 
-    def TestEnhancedCommissioningWindow(self, ip:str, nodeid:int):
+    def TestEnhancedCommissioningWindow(self, ip: str, nodeid: int):
         pin, code = self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
         return self.TestPaseOnly(ip=ip, nodeid=nodeid, setuppin=pin, devCtrl=self.devCtrl2)
 
-    def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int, devCtrl = None):
+    def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int, devCtrl=None):
         if devCtrl is None:
             devCtrl = self.devCtrl
         self.logger.info(

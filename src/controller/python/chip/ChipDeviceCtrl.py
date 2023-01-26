@@ -760,7 +760,7 @@ class ChipDeviceController():
                 self.devCtrl)
         ).raise_on_error()
 
-    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int, discriminator: int, option: int) -> (int,str):
+    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int, discriminator: int, option: int) -> (int, str):
         self.CheckIsActive()
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(

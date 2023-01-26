@@ -36,27 +36,29 @@ class TC_CGEN_2_4(MatterBaseTest):
 
     def OpenCommissioningWindow(self) -> int:
         try:
-            pin, code = self.th1.OpenCommissioningWindow(nodeid = self.dut_node_id, timeout = 600, iteration = 10000, discriminator = self.matter_test_config.discriminator, option = 1)
+            pin, code = self.th1.OpenCommissioningWindow(
+                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminator, option=1)
             return pin, code
 
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
 
-    async def CommissionToStageSendCompleteAndCleanup(self, stage:int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
+    async def CommissionToStageSendCompleteAndCleanup(self, stage: int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
 
         logging.info("-----------------Fail on step {}-------------------------".format(stage))
         pin, code = self.OpenCommissioningWindow()
         self.th2.ResetTestCommissioner()
         # This will run the commissioning up to the point where stage x is run and the response is sent before the test commissioner simulates a failure
         self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
-        success, errcode = self.th2.CommissionOnNetwork(nodeId=self.dut_node_id, setupPinCode=pin, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator)
+        success, errcode = self.th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id, setupPinCode=pin, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator)
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(success, errcode))
         asserts.assert_false(success, 'Commissioning complete did not error as expected')
         asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
         asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid = self.dut_node_id, endpoint = 0, payload = revokeCmd, timedRequestTimeoutMs = 6000)
+        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         time.sleep(1)
 
@@ -88,11 +90,12 @@ class TC_CGEN_2_4(MatterBaseTest):
 
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()
-        success, errcode = self.th2.CommissionOnNetwork(nodeId=self.dut_node_id, setupPinCode=pin, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator)
+        success, errcode = self.th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id, setupPinCode=pin, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator)
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(success, errcode))
 
         logging.info('Step 17 - TH1 sends an arm failsafe')
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb = 0)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
         # This will throw if not successful
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
 
@@ -110,29 +113,32 @@ class TC_CGEN_2_4(MatterBaseTest):
 
         logging.info('Step 19 Send SetRgulatoryConfig with incorrect location')
         #cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(newRegulatoryConfig=newloc, countryCode="XX", breadcrumb=0)
-        #try:
+        # try:
         #    await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-        #except InteractionModelError as ex:
+        # except InteractionModelError as ex:
         #    print("got the real error")
         #    pass
 
         logging.info('Step 20 - TH2 sends CommissioningComplete')
         cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
         resp = await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-        asserts.assert_true(isinstance(resp, Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse), 'Incorrect response type from command')
-        asserts.assert_true(resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningError.kInvalidAuthentication, 'Incorrect error code')
-
+        asserts.assert_true(isinstance(resp, Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse),
+                            'Incorrect response type from command')
+        asserts.assert_true(
+            resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningError.kInvalidAuthentication, 'Incorrect error code')
 
         logging.info('Step 21 - TH1 sends an arm failsafe with timeout==0')
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb = 0)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         # This will throw if not successful
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
 
         logging.info('Step 22 - TH1 sends CommissioningComplete')
         cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
         resp = await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-        asserts.assert_true(isinstance(resp, Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse), 'Incorrect response type from command')
-        asserts.assert_true(resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningError.kNoFailSafe, 'Incorrect error code')
+        asserts.assert_true(isinstance(resp, Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse),
+                            'Incorrect response type from command')
+        asserts.assert_true(resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningError.kNoFailSafe,
+                            'Incorrect error code')
 
         logging.info('Step 23 - TH2 reads fabric index')
         attr = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
@@ -141,6 +147,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         logging.info('Step 24 - TH1 removes TH2')
         cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2FabricIndex)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
