@@ -105,7 +105,6 @@ chip_test_suite("tests") {
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
-    "TestSimpleSubscriptionResumptionStorage.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTimedHandler.cpp",
@@ -146,5 +145,9 @@ chip_test_suite("tests") {
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]
     public_deps += [ "${chip_root}/src/app/server" ]
+  }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
 }
