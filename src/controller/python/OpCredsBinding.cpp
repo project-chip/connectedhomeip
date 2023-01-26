@@ -133,6 +133,30 @@ public:
             // Pretend we received an error from the device during this stage
             err = CHIP_ERROR_INTERNAL;
         }
+        if (mPrematureCompleteAfter == report.stageCompleted)
+        {
+            auto commissioner = chip::Controller::AutoCommissioner::GetCommissioner();
+            auto proxy        = chip::Controller::AutoCommissioner::GetCommissioneeDeviceProxy();
+            auto stage        = chip::Controller::CommissioningStage::kSendComplete;
+            auto params       = chip::Controller::CommissioningParameters();
+            commissioner->PerformCommissioningStep(proxy, stage, params, this, 0, GetCommandTimeout(proxy, stage));
+            return CHIP_NO_ERROR;
+        }
+
+        if (mPrematureCompleteAfter != chip::Controller::CommissioningStage::kError &&
+            report.stageCompleted == chip::Controller::CommissioningStage::kSendComplete)
+        {
+            if (report.Is<chip::Controller::CommissioningErrorInfo>())
+            {
+                uint8_t code     = chip::to_underlying(report.Get<chip::Controller::CommissioningErrorInfo>().commissioningError);
+                mCompletionError = chip::ChipError(chip::ChipError::SdkPart::kIMClusterStatus, code);
+            }
+            else
+            {
+                mCompletionError = err;
+            }
+        }
+
         return chip::Controller::AutoCommissioner::CommissioningStepFinished(err, report);
     }
     // This will cause the COMMISSIONER to fail after the given stage. Setting this to kSecurePairing will cause the
@@ -154,6 +178,15 @@ public:
             return false;
         }
         mFailOnReportAfterStage = stage;
+        return true;
+    }
+    bool PrematureCompleteAfter(chip::Controller::CommissioningStage stage)
+    {
+        if (!ValidStage(stage) && stage != chip::Controller::CommissioningStage::kError)
+        {
+            return false;
+        }
+        mPrematureCompleteAfter = stage;
         return true;
     }
     bool CheckCallbacks()
@@ -208,6 +241,7 @@ public:
         }
         mSimulateFailureOnStage = chip::Controller::CommissioningStage::kError;
         mFailOnReportAfterStage = chip::Controller::CommissioningStage::kError;
+        mPrematureCompleteAfter = chip::Controller::CommissioningStage::kError;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
@@ -226,19 +260,35 @@ public:
         {
             mReceivedStageFailure[chip::to_underlying(stageCompleted)] = true;
         }
+        if (stageCompleted == chip::Controller::CommissioningStage::kCleanup &&
+            mPrematureCompleteAfter != chip::Controller::CommissioningStage::kError)
+        {
+            // We need to manually clean up the proxy here because we're doing bad things in the name of testing
+            ChipLogProgress(Controller, "Cleaning up dangling proxies");
+            auto commissioner = chip::Controller::AutoCommissioner::GetCommissioner();
+            auto proxy        = chip::Controller::AutoCommissioner::GetCommissioneeDeviceProxy();
+            if (proxy != nullptr)
+            {
+                commissioner->StopPairing(proxy->GetDeviceId());
+            }
+        }
     }
+
+    CHIP_ERROR GetCompletionError() { return mCompletionError; }
 
 private:
     static constexpr uint8_t kNumCommissioningStages = chip::to_underlying(chip::Controller::CommissioningStage::kCleanup) + 1;
     chip::Controller::CommissioningStage mSimulateFailureOnStage            = chip::Controller::CommissioningStage::kError;
     chip::Controller::CommissioningStage mFailOnReportAfterStage            = chip::Controller::CommissioningStage::kError;
+    chip::Controller::CommissioningStage mPrematureCompleteAfter            = chip::Controller::CommissioningStage::kError;
     bool mTestCommissionerUsed                                              = false;
     bool mReceivedCommissioningSuccess                                      = false;
     chip::Controller::CommissioningStage mReceivedCommissioningFailureStage = chip::Controller::CommissioningStage::kError;
     bool mReceivedStageSuccess[kNumCommissioningStages];
     bool mReceivedStageFailure[kNumCommissioningStages];
-    bool mIsWifi   = false;
-    bool mIsThread = false;
+    bool mIsWifi                = false;
+    bool mIsThread              = false;
+    CHIP_ERROR mCompletionError = CHIP_NO_ERROR;
     bool ValidStage(chip::Controller::CommissioningStage stage)
     {
         if (!mIsWifi &&
@@ -468,6 +518,15 @@ bool pychip_SetTestCommissionerSimulateFailureOnStage(uint8_t failStage)
 bool pychip_SetTestCommissionerSimulateFailureOnReport(uint8_t failStage)
 {
     return sTestCommissioner.SimulateFailOnReport(static_cast<chip::Controller::CommissioningStage>(failStage));
+}
+bool pychip_SetTestCommissionerPrematureCompleteAfter(uint8_t stage)
+{
+    return sTestCommissioner.PrematureCompleteAfter(static_cast<chip::Controller::CommissioningStage>(stage));
+}
+
+PyChipError pychip_GetCompletionError()
+{
+    return ToPyChipError(sTestCommissioner.GetCompletionError());
 }
 
 } // extern "C"

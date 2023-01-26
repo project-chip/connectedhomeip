@@ -44,6 +44,7 @@ CIRQUE_TESTS=(
     "SplitCommissioningTest"
     "CommissioningFailureTest"
     "CommissioningFailureOnReportTest"
+    "CommissioningWindowTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"

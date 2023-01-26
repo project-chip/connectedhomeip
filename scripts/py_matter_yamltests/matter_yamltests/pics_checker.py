@@ -92,12 +92,12 @@ class PICSChecker():
 
         if token == '&&':
             self.__expression_index += 1
-            rightExpr = self.__evaluate_sub_expression(tokens, pics)
+            rightExpr = self.__evaluate_expression(tokens, pics)
             return leftExpr and rightExpr
 
         if token == '||':
             self.__expression_index += 1
-            rightExpr = self.__evaluate_sub_expression(tokens, pics)
+            rightExpr = self.__evaluate_expression(tokens, pics)
             return leftExpr or rightExpr
 
         raise InvalidPICSParsingError(f'Unknown token: {token}')
@@ -115,7 +115,7 @@ class PICSChecker():
 
         if token == '!':
             self.__expression_index += 1
-            expr = self.__evaluate_expression(tokens, pics)
+            expr = self.__evaluate_sub_expression(tokens, pics)
             return not expr
 
         token = self.__normalize(token)
