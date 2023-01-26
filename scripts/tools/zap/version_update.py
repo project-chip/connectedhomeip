@@ -49,11 +49,6 @@ ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)-nightly')
 # Set as a separate list to not pay the price of a full grep as the list of
 # files is not likely to change often
 USAGE_FILES_DEPENDING_ON_ZAP_VERSION = [
-    '.github/workflows/build.yaml',
-    '.github/workflows/darwin-tests.yaml',
-    '.github/workflows/darwin.yaml',
-    '.github/workflows/fuzzing-build.yaml',
-    '.github/workflows/tests.yaml',
     'integrations/docker/images/chip-cert-bins/Dockerfile',
     'scripts/zap.json',
 ]
@@ -96,9 +91,11 @@ __UPDATE_CHOICES__ = {
 #
 # That line is of the form "MIN_ZAP_VERSION = '2021.1.9'"
 ZAP_EXECUTION_SCRIPT = 'scripts/tools/zap/zap_execution.py'
-ZAP_EXECUTION_MIN_RE = re.compile(r'(MIN_ZAP_VERSION = .)(\d\d\d\d\.\d\d?\.\d\d?)(.)')
+ZAP_EXECUTION_MIN_RE = re.compile(
+    r'(MIN_ZAP_VERSION = .)(\d\d\d\d\.\d\d?\.\d\d?)(.)')
 
-CHIP_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+CHIP_ROOT_DIR = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), '..', '..', '..'))
 
 
 @click.command()
@@ -117,14 +114,16 @@ CHIP_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
     default=None,
     help='What version of ZAP to update to (like "v2023.01.09-nightly". If not set, versions will just be printed.')
 def version_update(log_level, update, new_version):
-    coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+    coloredlogs.install(level=__LOG_LEVELS__[
+                        log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
 
     update = __UPDATE_CHOICES__[update]
 
     if new_version:
         parsed = ZAP_VERSION_RE.match(new_version)
         if not parsed:
-            logging.error(f"Version '{new_version}' does not seem to parse as a ZAP VERSION")
+            logging.error(
+                f"Version '{new_version}' does not seem to parse as a ZAP VERSION")
             sys.exit(1)
 
         # get the numeric version for zap_execution
@@ -161,15 +160,18 @@ def version_update(log_level, update, new_version):
             while m:
                 version = file_data[m.start():m.end()]
                 if version == new_version:
-                    logging.warning("Nothing to replace. Version already %s", version)
+                    logging.warning(
+                        "Nothing to replace. Version already %s", version)
                     break
-                file_data = file_data[:m.start()] + new_version + file_data[m.end():]
+                file_data = file_data[:m.start()] + \
+                    new_version + file_data[m.end():]
                 need_replace = True
                 search_pos = m.end()  # generally ok since our versions are fixed length
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
 
             if need_replace:
-                logging.info('Replacing with version %s in %s', new_version, name)
+                logging.info('Replacing with version %s in %s',
+                             new_version, name)
 
                 with open(os.path.join(CHIP_ROOT_DIR, name), 'wt') as f:
                     f.write(file_data)
@@ -183,8 +185,10 @@ def version_update(log_level, update, new_version):
         logging.info("Min version %s in %s", m.group(2), ZAP_EXECUTION_SCRIPT)
         if new_version:
             new_min_version = ("%d.%d.%d" % zap_min_version)
-            file_data = file_data[:m.start()] + m.group(1) + new_min_version + m.group(3) + file_data[m.end():]
-            logging.info('Updating min version to %s in %s', new_min_version, ZAP_EXECUTION_SCRIPT)
+            file_data = file_data[:m.start()] + m.group(1) + \
+                new_min_version + m.group(3) + file_data[m.end():]
+            logging.info('Updating min version to %s in %s',
+                         new_min_version, ZAP_EXECUTION_SCRIPT)
 
             with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'wt') as f:
                 f.write(file_data)
