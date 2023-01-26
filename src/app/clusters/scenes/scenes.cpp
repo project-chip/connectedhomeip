@@ -189,26 +189,26 @@ void emAfPluginScenesServerPrintInfo()
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
             if (!entry.currentPositionLiftPercentageValue.IsNull() && !entry.currentPositionTiltPercentageValue.IsNull())
             {
-                emberAfCorePrint(" Window percentage Lift %3u, Tilt %3u", entry.currentPositionLiftPercentageValue.Value(),
+                emberAfCorePrint(" Window current percentage Lift %3u, Tilt %3u", entry.currentPositionLiftPercentageValue.Value(),
                                  entry.currentPositionTiltPercentageValue.Value());
             }
             else if (!entry.currentPositionLiftPercentageValue.IsNull())
             {
-                emberAfCorePrint(" Window percentage Lift %3u", entry.currentPositionLiftPercentageValue.Value());
+                emberAfCorePrint(" Window current percentage Lift %3u", entry.currentPositionLiftPercentageValue.Value());
             }
             else if (!entry.currentPositionTiltPercentageValue.IsNull())
             {
-                emberAfCorePrint(" Window percentage Tilt %3u", entry.currentPositionTiltPercentageValue.Value());
+                emberAfCorePrint(" Window current percentage Tilt %3u", entry.currentPositionTiltPercentageValue.Value());
             }
 
             if (!entry.targetPositionLiftPercent100thsValue.IsNull() && !entry.targetPositionTiltPercent100thsValue.IsNull())
             {
-                emberAfCorePrint(" Window percent100ths Lift %5u, Tilt %5u", entry.targetPositionLiftPercent100thsValue.Value(),
+                emberAfCorePrint(" Window target percent100ths Lift %5u, Tilt %5u", entry.targetPositionLiftPercent100thsValue.Value(),
                                  entry.targetPositionTiltPercent100thsValue.Value());
             }
             else if (!entry.targetPositionLiftPercent100thsValue.IsNull())
             {
-                emberAfCorePrint(" Window percent100ths Lift %5u", entry.targetPositionLiftPercent100thsValue.Value());
+                emberAfCorePrint(" Window target percent100ths Lift %5u", entry.targetPositionLiftPercent100thsValue.Value());
             }
             else if (!entry.targetPositionTiltPercent100thsValue.IsNull())
             {
@@ -708,12 +708,12 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
                 if (entry.hasTargetPositionLiftPercent100thsValue)
                 {
                     logWriteError(TargetPositionLiftPercent100ths::Set(endpoint, entry.targetPositionLiftPercent100thsValue),
-                                  "TragetPositionLiftPercent100ths");
+                                  "TargetPositionLiftPercent100ths");
                 }
                 if (entry.hasTargetPositionTiltPercent100thsValue)
                 {
                     logWriteError(TargetPositionTiltPercent100ths::Set(endpoint, entry.targetPositionTiltPercent100thsValue),
-                                  "TragetPositionTiltPercent100ths");
+                                  "TargetPositionTiltPercent100ths");
                 }
             }
 #endif
