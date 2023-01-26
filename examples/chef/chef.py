@@ -522,9 +522,12 @@ def main() -> int:
     #
 
     if options.do_run_gui or options.do_run_zap:
-        if (shell.run_cmd(f"if [[ -x $(which zap-cli) ]]; then echo \"zap-cli found\"; else echo \"\"; fi", return_cmd_output=True) != "zap-cli found\n"):
+        zap_binary_found = shell.run_cmd(
+            f"if [[ -x $(which zap) ]]; then echo \"zap found\"; else echo \"\"; fi", return_cmd_output=True)
+        zap_dev_path_found = os.getenv("ZAP_INSTALL_PATH")
+        if (zap_binary_found != "zap found\n" and (zap_dev_path_found == None or zap_dev_path_found == "")):
             flush_print(
-                "zap-cli not found in path. Download it from https://github.com/project-chip/zap/releases and add to your local path")
+                "zap not found. See README for instructions")
             return 1
 
     if options.do_run_gui:

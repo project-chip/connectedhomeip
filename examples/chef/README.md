@@ -18,9 +18,11 @@ All device types available (.zap files) are found inside the `devices` folder.
 ## Building your first sample
 
 1. Make sure you have the toolchain installed for your desired target.
-2. Install `zap-cli` downloading a
-   [binary release of ZAP](https://github.com/project-chip/zap/releases) and
-   adding it to your path/.
+2. Check the
+   [zap installation procedures](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#installing-zap-and-environment-variables)
+   and make sure you have either zap binaries or you've set up a folder to run
+   it from source. If your platform has pre-built zap binaries and you don't
+   need to make changes to its code, it's advised to use pre-built zap binaries.
 3. Run `chef.py` the first time to create a `config.yaml` configuration file. If
    you already have SDK environment variables such as IDF_PATH (esp32) and
    ZEPHYR_BASE (nrfconnect) it will use those values as default.
