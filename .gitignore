@@ -71,3 +71,6 @@ compile_commands.json
 # log files
 *.log
 examples/thermostat/ameba/build
+
+# Downloaded zap without a pigweed root (via zap_download.py)
+.zap

@@ -27,6 +27,9 @@ jobs:
     pull_request_update:
         name: Report on pull requests
 
+        # Don't run on forked repos
+        if: github.repository_owner == 'project-chip'
+
         runs-on: ubuntu-latest
 
         container:
