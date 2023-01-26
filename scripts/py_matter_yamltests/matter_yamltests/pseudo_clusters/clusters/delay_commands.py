@@ -17,6 +17,7 @@ import sys
 import time
 
 from ..pseudo_cluster import PseudoCluster
+from .accessory_server_bridge import AccessoryServerBridge
 
 
 class DelayCommands(PseudoCluster):
@@ -31,3 +32,6 @@ class DelayCommands(PseudoCluster):
 
         sys.stdout.flush()
         time.sleep(duration_in_ms / 1000)
+
+    async def WaitForMessage(self, request):
+        AccessoryServerBridge.waitForMessage(request)
