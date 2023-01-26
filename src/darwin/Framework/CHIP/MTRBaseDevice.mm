@@ -338,7 +338,6 @@ public:
                                       auto attributePath = std::make_unique<AttributePathParams>();
                                       auto eventPath = std::make_unique<EventPathParams>();
                                       // We want to get event reports at the minInterval, not the maxInterval.
-                                      eventPath->mIsUrgentEvent = true;
                                       ReadPrepareParams readParams(session.Value());
                                       [params toReadPrepareParams:readParams];
                                       readParams.mpAttributePathParamsList = attributePath.get();
@@ -1693,9 +1692,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                    if (eventID) {
                        container.eventPathParams->mEventId = static_cast<chip::EventId>([eventID unsignedLongValue]);
                    }
-                   if (params.reportEventsUrgently) {
-                       container.eventPathParams->mIsUrgentEvent = params.reportEventsUrgently;
-                   }
+                   container.eventPathParams->mIsUrgentEvent = params.reportEventsUrgently;
 
                    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
                    CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1869,8 +1866,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRClusterPath> endpoint %u cluster %u", (uint16_t) _endpoint.unsignedShortValue,
-                     (uint32_t) _cluster.unsignedLongValue];
+    return [NSString
+        stringWithFormat:@"<MTRClusterPath> endpoint %u cluster %u", _endpoint.unsignedShortValue, _cluster.unsignedLongValue];
 }
 
 + (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
@@ -1917,9 +1914,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u",
-                     (uint16_t) self.endpoint.unsignedShortValue, (uint32_t) self.cluster.unsignedLongValue,
-                     (uint32_t) _attribute.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u", self.endpoint.unsignedShortValue,
+                     self.cluster.unsignedLongValue, _attribute.unsignedLongValue];
 }
 
 + (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
@@ -1977,9 +1973,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return
-        [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u", (uint16_t) self.endpoint.unsignedShortValue,
-                  (uint32_t) self.cluster.unsignedLongValue, (uint32_t) _event.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u", self.endpoint.unsignedShortValue,
+                     self.cluster.unsignedLongValue, _event.unsignedLongValue];
 }
 
 + (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID

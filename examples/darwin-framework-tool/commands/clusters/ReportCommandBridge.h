@@ -231,9 +231,11 @@ public:
         }
 
         if (strcmp(GetName(), "subscribe-event-by-id") == 0) {
-            [device subscribeToEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
-                clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
-                eventID:[NSNumber numberWithUnsignedInteger:mEventId]
+            [device subscribeToEventsWithEndpointID:(endpointId == chip::kInvalidEndpointId)
+                        ? nil
+                        : [NSNumber numberWithUnsignedShort:endpointId]
+                clusterID:(mClusterId == chip::kInvalidClusterId) ? nil : [NSNumber numberWithUnsignedInteger:mClusterId]
+                eventID:(mEventId == chip::kInvalidEventId) ? nil : [NSNumber numberWithUnsignedInteger:mEventId]
                 params:params
                 queue:callbackQueue
                 reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -331,22 +333,23 @@ public:
             params.minimumEventNumber = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
         }
 
-        [device readEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
-                               clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
-                                 eventID:[NSNumber numberWithUnsignedInteger:mEventId]
-                                  params:params
-                                   queue:callbackQueue
-                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  if (error != nil) {
-                                      LogNSError("Error reading event", error);
+        [device
+            readEventsWithEndpointID:(endpointId == chip::kInvalidEndpointId) ? nil : [NSNumber numberWithUnsignedShort:endpointId]
+                           clusterID:(mClusterId == chip::kInvalidClusterId) ? nil : [NSNumber numberWithUnsignedInteger:mClusterId]
+                             eventID:(mEventId == chip::kInvalidEventId) ? nil : [NSNumber numberWithUnsignedInteger:mEventId]
+                              params:params
+                               queue:callbackQueue
+                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                              if (error != nil) {
+                                  LogNSError("Error reading event", error);
+                              }
+                              if (values) {
+                                  for (id item in values) {
+                                      NSLog(@"Response Item: %@", [item description]);
                                   }
-                                  if (values) {
-                                      for (id item in values) {
-                                          NSLog(@"Response Item: %@", [item description]);
-                                      }
-                                  }
-                                  SetCommandExitStatus(error);
-                              }];
+                              }
+                              SetCommandExitStatus(error);
+                          }];
         return CHIP_NO_ERROR;
     }
 

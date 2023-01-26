@@ -99,7 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If nil (the default value), all of the queued events will be reported from lowest to highest event number.
  *
- * If not nil, queued events with an event number smaller than eventMin will not be reported.
+ * If not nil, queued events with an event number smaller than minimumEventNumber will not be reported.
  */
 @property (nonatomic, copy, nullable) NSNumber * minimumEventNumber MTR_NEWLY_AVAILABLE;
 

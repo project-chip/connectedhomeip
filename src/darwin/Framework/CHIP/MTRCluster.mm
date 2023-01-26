@@ -118,9 +118,6 @@ using namespace ::chip;
     readPrepareParams.mMinIntervalFloorSeconds = self.minInterval.unsignedShortValue;
     readPrepareParams.mMaxIntervalCeilingSeconds = self.maxInterval.unsignedShortValue;
     readPrepareParams.mKeepSubscriptions = !self.replaceExistingSubscriptions;
-    if (self.minimumEventNumber) {
-        readPrepareParams.mEventNumber.SetValue(static_cast<chip::EventNumber>([self.minimumEventNumber unsignedLongLongValue]));
-    }
 }
 
 @end
