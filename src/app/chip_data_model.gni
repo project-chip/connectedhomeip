@@ -138,20 +138,20 @@ template("chip_data_model") {
                                      [ invoker.zap_file ])
     }
 
-    _cust_impl_clusters = []
+    _custom_impl_clusters = []
     if (defined(invoker.zap_clusters_with_custom_implementation)) {
-      _cust_impl_clusters = invoker.zap_clusters_with_custom_implementation
+      _custom_impl_clusters = invoker.zap_clusters_with_custom_implementation
     }
 
     foreach(cluster, _cluster_sources) {
-      _cust_impl = false
-      foreach(ci, _cust_impl_clusters) {
+      _custom_impl = false
+      foreach(ci, _custom_impl_clusters) {
         if (cluster == ci) {
-          _cust_impl = true
+          _custom_impl = true
         }
       }
 
-      if (_cust_impl) {
+      if (_custom_impl) {
         # do not include any sources, we have a custom implementation for this cluster
       } else if (cluster == "door-lock-server") {
         sources += [
