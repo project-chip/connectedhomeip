@@ -18,10 +18,13 @@ All device types available (.zap files) are found inside the `devices` folder.
 ## Building your first sample
 
 1. Make sure you have the toolchain installed for your desired target.
-2. Run `chef.py` the first time to create a `config.yaml` configuration file. If
+2. Install `zap-cli` downloading a
+   [binary release of ZAP](https://github.com/project-chip/zap/releases) and
+   adding it to your path/.
+3. Run `chef.py` the first time to create a `config.yaml` configuration file. If
    you already have SDK environment variables such as IDF_PATH (esp32) and
    ZEPHYR_BASE (nrfconnect) it will use those values as default.
-3. Update your the SDK paths on `config.yaml`. TTY is the path used by the
+4. Update your the SDK paths on `config.yaml`. TTY is the path used by the
    platform to enumerate its device as a serial port. Typical values are:
 
 ```

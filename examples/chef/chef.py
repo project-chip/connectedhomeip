@@ -284,7 +284,7 @@ def main() -> int:
         """)
     parser = optparse.OptionParser(usage=usage)
 
-    parser.add_option("-u", "--update_toolchain", help="updates toolchain & installs zap",
+    parser.add_option("-u", "--update_toolchain", help="updates toolchain",
                       action="store_true", dest="do_update_toolchain")
     parser.add_option("-b", "--build", help="builds",
                       action="store_true", dest="do_build")
@@ -520,6 +520,12 @@ def main() -> int:
     #
     # Cluster customization
     #
+
+    if options.do_run_gui or options.do_run_zap:
+        if (shell.run_cmd(f"if [[ -x $(which zap-cli) ]]; then echo \"zap-cli found\"; else echo \"\"; fi", return_cmd_output=True) != "zap-cli found\n"):
+            flush_print(
+                "zap-cli not found in path. Download it from https://github.com/project-chip/zap/releases and add to your local path")
+            return 1
 
     if options.do_run_gui:
         flush_print("Starting ZAP GUI editor")
