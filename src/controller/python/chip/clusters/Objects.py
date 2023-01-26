@@ -9802,6 +9802,11 @@ class WiFiNetworkDiagnostics(Cluster):
             kUnknownEnumValue = 6,
 
 
+    class Bitmaps:
+        class WiFiNetworkDiagnosticsFeature(IntFlag):
+            kPacketCounts = 0x1
+            kErrorCounts = 0x2
+
 
 
     class Commands:
@@ -10228,6 +10233,11 @@ class EthernetNetworkDiagnostics(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 10,
 
+
+    class Bitmaps:
+        class EthernetNetworkDiagnosticsFeature(IntFlag):
+            kPacketCounts = 0x1
+            kErrorCounts = 0x2
 
 
 

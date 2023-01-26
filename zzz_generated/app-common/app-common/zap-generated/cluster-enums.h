@@ -1071,6 +1071,13 @@ enum class WiFiVersionType : uint8_t
 using WiFiVersionType                                                                  = EmberAfWiFiVersionType;
 static WiFiVersionType __attribute__((unused)) kWiFiVersionTypekUnknownEnumValue       = static_cast<WiFiVersionType>(6);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+
+// Bitmap for WiFiNetworkDiagnosticsFeature
+enum class WiFiNetworkDiagnosticsFeature : uint32_t
+{
+    kPacketCounts = 0x1,
+    kErrorCounts  = 0x2,
+};
 } // namespace WiFiNetworkDiagnostics
 
 namespace EthernetNetworkDiagnostics {
@@ -1101,6 +1108,13 @@ enum class PHYRateEnum : uint8_t
 using PHYRateEnum                                                                      = EmberAfPHYRateEnum;
 static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue               = static_cast<PHYRateEnum>(10);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+
+// Bitmap for EthernetNetworkDiagnosticsFeature
+enum class EthernetNetworkDiagnosticsFeature : uint32_t
+{
+    kPacketCounts = 0x1,
+    kErrorCounts  = 0x2,
+};
 } // namespace EthernetNetworkDiagnostics
 
 namespace TimeSynchronization {
