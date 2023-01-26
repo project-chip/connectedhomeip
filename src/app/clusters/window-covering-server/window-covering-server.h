@@ -18,7 +18,6 @@
 #pragma once
 
 #include "window-covering-delegate.h"
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
