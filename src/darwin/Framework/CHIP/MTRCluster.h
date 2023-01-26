@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If NO, the subscribe will allow any previous subscriptions to remain.
  */
-@property (nonatomic, assign, getter=shouldReplaceExistingSubscriptions) BOOL replaceExistingSubscriptions;
+@property (nonatomic, assign, getter=shouldReplaceExistingSubscriptions) BOOL replaceExistingSubscriptions MTR_NEWLY_AVAILABLE;
 
 /**
  * Whether the subscription should automatically try to re-establish if it
@@ -127,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
  * called again.
  *
  */
-@property (nonatomic, assign, getter=shouldResubscribeIfLost) BOOL resubscribeIfLost;
+@property (nonatomic, assign, getter=shouldResubscribeIfLost) BOOL resubscribeIfLost MTR_NEWLY_AVAILABLE;
 
 /**
  * The minimum time, in seconds, between consecutive reports a server will send

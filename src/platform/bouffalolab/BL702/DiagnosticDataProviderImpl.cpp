@@ -23,8 +23,7 @@
 
 #include <lwip/tcpip.h>
 
-#include "AppConfig.h"
-#include "FreeRTOS.h"
+#include <FreeRTOS.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 

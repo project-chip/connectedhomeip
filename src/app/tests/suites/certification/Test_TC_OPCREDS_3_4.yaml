@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          TH and DUT are commissioned
+      disabled: true
+
     - label: "TH1 fully commissions the DUT"
       verification: |
           "DUT side:
@@ -328,11 +333,6 @@ tests:
           cluster over PASE with the following fields: NOCValue is set to
           noc_pase ICACValue is to set icac_pase"
       PICS: OPCREDS.S.C07.Rsp
-      verification: |
-
-      disabled: true
-
-    - label: ""
       verification: |
 
       disabled: true

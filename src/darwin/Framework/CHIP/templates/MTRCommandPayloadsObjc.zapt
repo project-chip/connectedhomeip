@@ -40,6 +40,15 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+ @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 {{! This is using the pre-renaming names for the isAvailableBefore test, because the pre-rename things inherit
     from the post-rename ones and need to have this selector.}}
 {{else if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name))}}

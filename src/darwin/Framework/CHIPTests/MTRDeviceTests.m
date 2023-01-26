@@ -104,7 +104,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
                                 error:&commissionError];
     XCTAssertNil(commissionError);
 
-    // Keep waiting for controller:MTRXPCListenerSampleTests.mcommissioningComplete
+    // Keep waiting for controller:commissioningComplete:
 }
 
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error

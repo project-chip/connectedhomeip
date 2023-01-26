@@ -24,7 +24,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventHeader.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/data-model/DecodableList.h>
+#include <commands/common/RemoteDataModelLogger.h>
 #include <lib/support/BytesToHex.h>
 
 class DataModelLogger

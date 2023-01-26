@@ -68,9 +68,9 @@ tests:
           documentation."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          Verify on the TH as commissionee side:
+          Verifiy on TH(ALL-CLUSTER-APP):
 
-          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2 --custom-flow 1 --ble-device 1
+           ./chip-all-clusters-app --capabilities 2 --custom-flow 1 --ble-device 1
           ...
           [1657234110.765249][370717:370717] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
           [1657234110.765314][370717:370717] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
@@ -90,8 +90,8 @@ tests:
       verification: |
           1. Parse the payload of the TH commissionee
 
-          Verify on the DUT Commissioner side:
-          $ ./chip-tool payload parse-setup-payload MT:-24J0YXE00KA0648G00
+          Verify on the DUT (CHIP-TOOL):
+           ./chip-tool payload parse-setup-payload MT:-24J0YXE00KA0648G00
 
           2. Verify that TH logs do not show the commissionee being commissioned by the DUT.
       disabled: true
@@ -102,11 +102,11 @@ tests:
           commissioning process using BLE."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          Verify on the TH Commissionee side:
+          Verifiy on TH(ALL-CLUSTER-APP):
           [1651101988.943015][23212:23212] CHIP:SVR: Commissioning completed successfully
           [1651101988.943058][23212:23212] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on the  DUT Commissioner side:
+          Verify on the DUT (CHIP-TOOL):
           ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
           [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
           [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
@@ -123,8 +123,9 @@ tests:
           documentation."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          Verify on the TH Commissionee side:
-          $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 1 --capabilities 4
+          Verifiy on TH(ALL-CLUSTER-APP):
+          ./chip-all-clusters-app --custom-flow 1 --capabilities 4
+
           [1660353382.200125][249074:249074] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
           [1660353382.200152][249074:249074] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
           [1660353382.200173][249074:249074] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
@@ -143,8 +144,8 @@ tests:
       verification: |
           1. Parse the payload of the TH commissionee
 
-          Verify on the DUT Commissioner side:
-          $ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          Verify on the DUT (CHIP-TOOL):
+           ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
 
           2. Verify that TH logs do not show the commissionee being commissioned by the DUT.
       disabled: true
@@ -155,11 +156,11 @@ tests:
           commissioning process using IP Network."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          Verify on the TH Commissionee side:
+          Verifiy on TH(ALL-CLUSTER-APP):
           [1657234324.992098][370755:370755] CHIP:SVR: Commissioning completed successfully
           [1657234324.992146][370755:370755] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on the  DUT Commissioner side:
+          Verify on the DUT (CHIP-TOOL):
           ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
           [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
           [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"

@@ -34,8 +34,17 @@ tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
-          "1. Provision the device using TH_CR1 -chip tool(use above instructions) ,
-          "
+          "1. Provision the device using TH_CR1 -chip tool(use above instructions) ,"
+
+          ./chip-tool operationalcredentials read supported-fabrics 1 0
+
+          verify the supported fabric value in  TH_CR1 (chip-tool) Log
+
+          [1673255944.863014][1855:1857] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0002 DataVersion: 1416179233
+          [1673255944.866488][1855:1857] CHIP:TOO:   SupportedFabrics: 16
+          [1673255944.866687][1855:1857] CHIP:EM: <<< [E:54030i M:262581331 (Ack:252819622)] (S) Msg TX to 1:0000000000000001 [2933] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1673255944.866740][1855:1857] CHIP:IN: (S) Sending msg 262581331 on secure session with LSID: 35076
+          [1673255944.866870][1855:1857] CHIP:EM: Flushed pending ack for MessageCounter:252819622 on exchange 54030i
       disabled: true
 
     - label:
@@ -79,7 +88,7 @@ tests:
           to reach an index value of SupportedFabrics on DUT_CE"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          Repeat step 3 until  CommissionedFabrics=SupportedFabrics  (Supported fabrics value obtained in the precondition)
+          Repeat step 3 until  CommissionedFabrics=SupportedFabrics  (Supported fabrics value obtained in the step 1)
 
           Use the following command to verify the currentcommissioned fabric (Output number may vary depends on the number successful commissioning )
 

@@ -25,11 +25,11 @@
 
 #include <FreeRTOS.h>
 
-#include "AppConfig.h"
 #include <AppTask.h>
 #include <easyflash.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <plat.h>
 
 extern "C" {
 
@@ -329,6 +329,7 @@ extern "C" void START_ENTRY(void)
     app_init();
 
     easyflash_init();
+    ef_load_env_cache();
 
     ChipLogProgress(NotSpecified, "Init CHIP Memory");
     chip::Platform::MemoryInit(NULL, 0);

@@ -52,7 +52,8 @@ TestCommand * GetTargetTest()
     return test.get();
 }
 
-void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath)
+void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                       const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     auto test = GetTargetTest();
     VerifyOrReturn(test != nullptr && test->isRunning);

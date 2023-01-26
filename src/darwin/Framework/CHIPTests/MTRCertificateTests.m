@@ -284,7 +284,16 @@
     __auto_type * csr = [MTRCertificates createCertificateSigningRequest:testKeys error:nil];
     XCTAssertNotNil(csr);
 
-    // Wish there was something we could test here about the CSR.
+    __auto_type * publicKey = [MTRCertificates extractPublicKeyFromCertificateSigningRequest:csr error:nil];
+    XCTAssertNotNil(publicKey);
+
+    SecKeyRef originalKeyRef = [testKeys publicKey];
+    XCTAssertTrue(originalKeyRef != NULL);
+
+    NSData * originalPublicKey = (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation(originalKeyRef, nil);
+    XCTAssertNotNil(originalPublicKey);
+
+    XCTAssertEqualObjects(publicKey, originalPublicKey);
 }
 
 @end

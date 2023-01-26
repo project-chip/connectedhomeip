@@ -77,7 +77,7 @@ class ZapApplicationPregenerator:
     def __init__(self, sdk_root):
         self.sdk_root = sdk_root
 
-    def Accept(self, idl: InputIdlFile, cpp_only: bool):
+    def Accept(self, idl: InputIdlFile):
         if idl.file_type != IdlFileType.ZAP:
             return False
 

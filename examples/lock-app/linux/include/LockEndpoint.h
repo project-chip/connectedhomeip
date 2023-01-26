@@ -39,6 +39,7 @@ struct YearDayScheduleInfo;
 struct HolidayScheduleInfo;
 
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
+static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES     = 6;
 
 class LockEndpoint
 {
@@ -48,7 +49,7 @@ public:
                  uint8_t numberOfHolidaySchedules) :
         mEndpointId{ endpointId },
         mLockState{ DlLockState::kLocked }, mDoorState{ DoorStateEnum::kDoorClosed }, mLockUsers(numberOfLockUsersSupported),
-        mLockCredentials(numberOfCredentialsSupported + 1),
+        mLockCredentials(DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES, std::vector<LockCredentialInfo>(numberOfCredentialsSupported + 1)),
         mWeekDaySchedules(numberOfLockUsersSupported, std::vector<WeekDaysScheduleInfo>(weekDaySchedulesPerUser)),
         mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(yearDaySchedulesPerUser)),
         mHolidaySchedules(numberOfHolidaySchedules)
@@ -109,7 +110,7 @@ private:
     // This is very naive implementation of users/credentials/schedules database and by no means the best practice. Proper storage
     // of those items is out of scope of this example.
     std::vector<LockUserInfo> mLockUsers;
-    std::vector<LockCredentialInfo> mLockCredentials;
+    std::vector<std::vector<LockCredentialInfo>> mLockCredentials;
     std::vector<std::vector<WeekDaysScheduleInfo>> mWeekDaySchedules;
     std::vector<std::vector<YearDayScheduleInfo>> mYearDaySchedules;
     std::vector<HolidayScheduleInfo> mHolidaySchedules;

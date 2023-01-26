@@ -50,6 +50,7 @@
 //
 // Implied Options
 //
+#define LWS_HAS_INTPTR_T
 #define LWS_WITH_POLL
 #define LWS_MAX_SMP 1
 

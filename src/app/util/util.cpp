@@ -165,6 +165,7 @@ void emberAfTick()
 
 // Cluster init functions that don't have a cluster implementation to define
 // them in.
+void MatterBallastConfigurationPluginServerInitCallback() {}
 void MatterBooleanStatePluginServerInitCallback() {}
 void MatterElectricalMeasurementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}

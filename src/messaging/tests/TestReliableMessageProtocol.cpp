@@ -366,7 +366,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
-    ChipLogProgress(Test, "Attempt #1  Timeout : %d ms", timeoutTime.count());
+    ChipLogProgress(Test, "Attempt #1  Timeout : %" PRIu32 "ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[0];
     NL_TEST_ASSERT(inSuite, timeoutTime >= expectedBackoff->backoffMin - margin);
 
@@ -383,7 +383,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
-    ChipLogProgress(Test, "Attempt #2  Timeout : %d ms", timeoutTime.count());
+    ChipLogProgress(Test, "Attempt #2  Timeout : %" PRIu32 "ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[1];
     NL_TEST_ASSERT(inSuite, timeoutTime >= expectedBackoff->backoffMin - margin);
 
@@ -400,7 +400,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
-    ChipLogProgress(Test, "Attempt #3  Timeout : %d ms", timeoutTime.count());
+    ChipLogProgress(Test, "Attempt #3  Timeout : %" PRIu32 "ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[2];
     NL_TEST_ASSERT(inSuite, timeoutTime >= expectedBackoff->backoffMin - margin);
 
@@ -417,7 +417,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     ctx.GetIOContext().DriveIOUntil(1500_ms32, [&] { return loopback.mSentMessageCount >= 5; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
-    ChipLogProgress(Test, "Attempt #4  Timeout : %d ms", timeoutTime.count());
+    ChipLogProgress(Test, "Attempt #4  Timeout : %" PRIu32 "ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[3];
     NL_TEST_ASSERT(inSuite, timeoutTime >= expectedBackoff->backoffMin - margin);
 

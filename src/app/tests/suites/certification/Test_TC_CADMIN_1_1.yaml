@@ -73,7 +73,7 @@ tests:
 
           Verify 1 entry in the Fabrics list attributeOn TH_CR1(CHIP-TOOL) Log
 
-           Verify TH_CE reports 1 entry in fabrics list
+          Verify TH_CE reports 1 entry in fabrics list
 
 
           [1661486369.837260][7071:7071] CHIP:DMG:                 AttributeReportIB =
@@ -130,7 +130,7 @@ tests:
 
           On TH_CR1 send the below command
 
-          ubuntu@ubuntu:~/may10_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+           avahi-browse -rt _matter._tcp
           +   eth0 IPv6 E0AF53B23E580769-0000000000000002             _matter._tcp         local
           +   eth0 IPv6 7FF84D214A19B581-0000000000000001             _matter._tcp         local
           =   eth0 IPv6 E0AF53B23E580769-0000000000000002             _matter._tcp         local
@@ -154,8 +154,7 @@ tests:
 
           On DUT_CR2 send the below command
 
-
-          ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
 
           Verify Write request on TH_CE(all-clusters-app) Log
 
@@ -180,7 +179,7 @@ tests:
           [1660894021.902912][2871:2871] CHIP:DMG:                         Data = "te5new" (6 chars),
           [1660894021.902985][2871:2871] CHIP:DMG:                 },
 
-          ./chip-tool basic read node-label 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
 
           Verify read request on TH_CE(all-clusters-app) Log
 
@@ -279,7 +278,7 @@ tests:
 
           On TH_CR1 send the below command
 
-          ./chip-tool basic write node-label te8 1 0
+          ./chip-tool  basicinformation write node-label te8 1 0
 
           Verify the Write request On TH_CE(all-clusters-app) Log
 
@@ -305,7 +304,7 @@ tests:
           [1660894538.806010][2871:2871] CHIP:DMG:                         Data = "te8" (3 chars),
           [1660894538.806082][2871:2871] CHIP:DMG:                 },
 
-          ./chip-tool basic read node-label 1 0
+          ./chip-tool  basicinformation read node-label 1 0
 
           Verify the Read request On TH_CE(all-clusters-app) Log
 
@@ -332,7 +331,7 @@ tests:
 
           On DUT_CR2 send the below command
 
-          ./chip-tool basic read node-label 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
 
           Verify the Read request On TH_CE(all-clusters-app) Log
 
@@ -352,7 +351,7 @@ tests:
           [1660902253.380208][3045:3045] CHIP:DMG:         ],
 
 
-          ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
 
           Verify the Write request On TH_CE(all-clusters-app) Log
 
@@ -380,7 +379,7 @@ tests:
 
           Verify read attribute returns the updated value written
 
-          ./chip-tool basic read node-label 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
 
           Verify the Read request On TH_CE(all-clusters-app) Log
 
@@ -455,9 +454,14 @@ tests:
 
           verify you got the following message in the TH_CR3(chip-tool) log
 
-          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
-          CHIP:TOO: Secure Pairing Failed
-          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
+          [1670391303.300531][1397:1397] CHIP:TS: Reverted Last Known Good Time to previous value
+          [1670391303.301023][1397:1397] CHIP:DL: writing settings to file (/tmp/chip_counters.ini-E9JWJd)
+          [1670391303.302361][1397:1397] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
+          [1670391303.302492][1397:1397] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
+          [1670391303.302553][1397:1397] CHIP:DL: Inet Layer shutdown
+          [1670391303.302602][1397:1397] CHIP:DL: BLE shutdown
+          [1670391303.302653][1397:1397] CHIP:DL: System Layer shutdown
+          [1670391303.303218][1397:1397] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:179: CHIP Error 0x00000003: Incorrect state
       disabled: true
 
     - label:
@@ -469,7 +473,7 @@ tests:
 
           On DUT_CR2 send the below command
 
-          ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
 
           Verify the Write request On TH_CE(all-clusters-app) Log
 
@@ -495,7 +499,7 @@ tests:
           [1660902144.915292][3045:3045] CHIP:DMG:                 },
           [1660902144.915374][3045:3045] CHIP:DMG:
 
-          ./chip-tool basic read node-label 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
 
           Verify the Read request On TH_CE(all-clusters-app) Log
 

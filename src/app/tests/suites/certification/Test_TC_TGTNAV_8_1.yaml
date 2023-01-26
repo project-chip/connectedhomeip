@@ -58,7 +58,7 @@ tests:
       command: "NavigateTarget"
       arguments:
           values:
-              - name: "target"
+              - name: "Target"
                 value: targetvalue
 
     - label: "Reads the CurrentTarget attribute"

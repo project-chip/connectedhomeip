@@ -41,8 +41,8 @@ jobs:
             LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
             # NOTE: Generally kept in sync within the repo using
             #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.18-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
+            ZAP_VERSION: v2023.01.19-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest

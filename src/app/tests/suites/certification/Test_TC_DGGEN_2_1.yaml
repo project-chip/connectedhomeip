@@ -17,7 +17,6 @@ name: 85.2.1. [TC-DGGEN-2.1] Attributes with server as DUT
 
 PICS:
     - DGGEN.S
-    - DGGEN.S.A
 
 config:
     nodeId: 0x12344321
@@ -153,10 +152,11 @@ tests:
     #issue #13029
     - label: "TH reads ActiveHardwareFaults attribute value from DUT."
       verification: |
+          This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
+
           ./chip-tool generaldiagnostics read active-hardware-faults 1 0
 
-          On TH(chip-tool), verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1
-
+          On TH(chip-tool), Verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1.
           [1654682785.894724][33006:33011] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 804003636
           [1654682785.894846][33006:33011] CHIP:TOO:   ActiveHardwareFaults: 0 entries
           [1654682785.894952][33006:33011] CHIP:EM: Sending Standalone Ack for MessageCounter:30803984 on exchange 62441i
@@ -226,8 +226,10 @@ tests:
 
     - label: "TH reads ActiveRadioFaults attribute value from DUT."
       verification: |
+          This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
+
           ./chip-tool generaldiagnostics read active-radio-faults 1 0
-          On TH(chip-tool), verify that ActiveRadioFaults attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2.
+          On TH(chip-tool), Verify that ActiveRadioFaults attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2.
 
           [1654682886.109092][33026:33031] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 804003636
           [1654682886.109197][33026:33031] CHIP:TOO:   ActiveRadioFaults: 0 entries
@@ -268,9 +270,11 @@ tests:
 
     - label: "TH reads ActiveNetworkFaults attribute value from DUT."
       verification: |
+          This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
+
           ./chip-tool generaldiagnostics read active-network-faults 1 0
 
-          On TH(chip-tool), verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM table 11.11.6.3
+          On TH(chip-tool), Verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM table 11.11.6.3
 
           [1654683004.591353][33044:33049] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 804003636
           [1654683004.591438][33044:33049] CHIP:TOO:   ActiveNetworkFaults: 0 entries
@@ -312,7 +316,7 @@ tests:
     - label: "TH reads TestEventTriggersEnabled attribute value"
       verification: |
           ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
-          On TH (chip-tool), verify that TestEventTriggersEnabled attribute value should be data type bool
+          On TH(chip-tool), Verify that TestEventTriggersEnabled attribute value should be data type bool on TH(chip-tool) log
 
           [1655188892.957794][2868:2873] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 3562689442
           [1655188892.957869][2868:2873] CHIP:TOO:   TestEventTriggersEnabled: FALSE

@@ -87,7 +87,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid null --Breadcrumb 1
 
-          Verify "wiFiScanResults entries and its arguments" on the TH(Chip-tool) Log:
+          Verify "WiFiScanResults entries and its arguments" on the TH(Chip-tool) Log:
 
           [1653475026.012811][29937:29942] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
           [1653475026.012942][29937:29942] CHIP:TOO:   ScanNetworksResponse: {
@@ -219,8 +219,7 @@ tests:
       disabled: true
 
     - label:
-          "TH reads  Breadcumb  attribute from
-          the  General  Commissioning  Cluster"
+          "TH reads  Breadcumb  attribute from the General Commissioning Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
@@ -231,9 +230,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  ScanNetworks  Command to the  DUT with SSID  field set
-          to  PIXIT.CNET.WIFI_  1ST_ACCESSPOINT  _SSID and  Breadcrumb
-          field  set to 2"
+          "TH sends ScanNetworks Command to the DUT with SSID field set to
+          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 2"
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
           Below is an example:
@@ -259,8 +257,7 @@ tests:
       disabled: true
 
     - label:
-          "TH reads  Breadcumb  attribute from
-          the  General  Commissioning  Cluster"
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 

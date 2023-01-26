@@ -29,7 +29,7 @@ tests:
           a given cluster and endpoint. On receipt of this message, DUT should
           send a write response action."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
           ./chip-tool levelcontrol write on-level 2 1 1
 
@@ -80,9 +80,9 @@ tests:
           data type bool. +"
       PICS: MCORE.IDM.S.Attribute_W.DataType_Bool
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          sudo ./chip-tool basic write local-config-disabled 1 1 0
+           ./chip-tool  basicinformation write local-config-disabled 1 1 0
 
 
           On TH, verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
@@ -115,7 +115,7 @@ tests:
           [1655201045.953951][3550:3555] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
 
-          ./chip-tool basic read local-config-disabled 1 0
+          ./chip-tool  basicinformation read local-config-disabled 1 0
           On TH, verify the attribute value that was modified in above step
           [1655201064.564646][3556:3561] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 1458477847
           [1655201064.564696][3556:3561] CHIP:TOO: LocalConfigDisabled: TRUE
@@ -127,10 +127,10 @@ tests:
           data type string. +"
       PICS: MCORE.IDM.S.Attribute_W.DataType_String
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
-          ./chip-tool basic write node-label new 1 0
+          ./chip-tool  basicinformation write node-label new 1 0
 
           On TH, verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and veriffy by sending a ReadRequestMessage to read the value that was modified.
 
@@ -161,7 +161,7 @@ tests:
           [1655806131.664278][7241:7246] CHIP:DMG: }
           [1655806131.664372][7241:7246] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
-          ./chip-tool basic read node-label 1 0
+          ./chip-tool  basicinformation read node-label 1 0
           On TH, verify the attribute value that was modified in above step
           [1655806189.835517][7250:7255] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 1238808428
           [1655806189.835566][7250:7255] CHIP:TOO: NodeLabel: new
@@ -173,7 +173,7 @@ tests:
           data type unsigned integer. +"
       PICS: MCORE.IDM.S.Attribute_W.DataType_UnsignedInteger
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
           ./chip-tool any write-by-id 0x0008 0x0010 1 1 1
@@ -267,9 +267,8 @@ tests:
           data type enum. +"
       PICS: MCORE.IDM.S.Attribute_W.DataType_Enum
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
-          sudo ./chip-tool any write-by-id 0x0204 0 1 1 1
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+           ./chip-tool any write-by-id 0x0204 0 1 1 1
 
           On TH, verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
 
@@ -310,9 +309,9 @@ tests:
           data type bitmap. +"
       PICS: MCORE.IDM.S.Attribute_W.DataType_Bitmap
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          sudo ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
+           ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
 
           On TH, verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
 
@@ -361,9 +360,9 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write any attribute on
           an unsupported Endpoint. DUT responds with the Write Response action"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          sudo ./chip-tool levelcontrol write on-level 2 1 20
+           ./chip-tool levelcontrol write on-level 2 1 20
 
           On TH, Verify  that the DUT sends the status code UNSUPPORTED_ENDPOINT for the data sent in the above command
 
@@ -400,9 +399,9 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write any attribute on
           an unsupported cluster. DUT responds with the Write Response action"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          sudo ./chip-tool thermostat write unoccupied-heating-setpoint 1200 1 0
+           ./chip-tool thermostat write unoccupied-heating-setpoint 1200 1 0
 
           On TH, Verify  that the DUT sends the status code UNSUPPORTED_CLUSTER for the data sent in the above command
 
@@ -438,9 +437,9 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write an unsupported
           attribute DUT responds with the Write Response action"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          sudo ./chip-tool thermostat write unoccupied-heating-setpoint 1200 1 1
+           ./chip-tool thermostat write unoccupied-heating-setpoint 1200 1 1
 
           On TH, Verify  that the DUT sends the status code  UNSUPPORTED_ATTRIBUTE for the data sent in the above command
 
@@ -476,9 +475,9 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write an attribute
           which is not writable. DUT responds with the Write Response action"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-           ./chip-tool basic write-by-id 0x7 2 1 0
+           ./chip-tool  basicinformation write-by-id 0x7 2 1 0
 
           On TH, Verify  that the DUT sends the status code  UNSUPPORTED_WRITE for the data sent in the above command
 
@@ -516,7 +515,7 @@ tests:
           in the path that requires a privilege that is not granted for the
           cluster in the path. DUT responds with the Write Response action"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
@@ -586,9 +585,9 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write one attribute on
           a given cluster and endpoint. Repeat the above steps 3 times."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          sudo ./chip-tool levelcontrol write on-level 2 1 1
+           ./chip-tool levelcontrol write on-level 2 1 1
 
 
           Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
@@ -621,40 +620,93 @@ tests:
 
            ./chip-tool levelcontrol read on-level 1 1
           On TH, verify the attribute value that was modified in above step
-          [1653028474.240088][6540:6545] CHIP:DMG: ReportDataMessage =
-          [1653028474.240100][6540:6545] CHIP:DMG: {
-          [1653028474.240110][6540:6545] CHIP:DMG: AttributeReportIBs =
-          [1653028474.240126][6540:6545] CHIP:DMG: [
-          [1653028474.240136][6540:6545] CHIP:DMG: AttributeReportIB =
-          [1653028474.240152][6540:6545] CHIP:DMG: {
-          [1653028474.240162][6540:6545] CHIP:DMG: AttributeDataIB =
-          [1653028474.240175][6540:6545] CHIP:DMG: {
-          [1653028474.240187][6540:6545] CHIP:DMG: DataVersion = 0xc4c9d7ad,
-          [1653028474.240198][6540:6545] CHIP:DMG: AttributePathIB =
-          [1653028474.240211][6540:6545] CHIP:DMG: {
-          [1653028474.240223][6540:6545] CHIP:DMG: Endpoint = 0x1,
-          [1653028474.240235][6540:6545] CHIP:DMG: Cluster = 0x8,
-          [1653028474.240249][6540:6545] CHIP:DMG: Attribute = 0x0000_0011,
-          [1653028474.240260][6540:6545] CHIP:DMG: }
-          [1653028474.240274][6540:6545] CHIP:DMG:
-          [1653028474.240287][6540:6545] CHIP:DMG: Data = 2,
-          [1653028474.240298][6540:6545] CHIP:DMG: },
-          [1653028474.240312][6540:6545] CHIP:DMG:
-          [1653028474.240322][6540:6545] CHIP:DMG: },
-          [1653028474.240337][6540:6545] CHIP:DMG:
-          [1653028474.240346][6540:6545] CHIP:DMG: ],
-          [1653028474.240361][6540:6545] CHIP:DMG:
-          [1653028474.240372][6540:6545] CHIP:DMG: SuppressResponse = true,
-          [1653028474.240383][6540:6545] CHIP:DMG: InteractionModelRevision = 1
-          [1653028474.240393][6540:6545] CHIP:DMG: }
-          [1653028474.240473][6540:6545] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 3301562285
-          [1653028474.240815][6540:6545] CHIP:TOO: on level: 2
+          [1666869501.888524][36718:36723] CHIP:DMG:         InteractionModelRevision = 1
+          [1666869501.888527][36718:36723] CHIP:DMG: }
+          [1666869501.888551][36718:36723] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 675908054
+          [1666869501.888558][36718:36723] CHIP:TOO:   OnLevel: 2
+          [1666869501.888582][36718:36723] CHIP:EM: <<< [E:18650i M:29255186 (Ack:60838531)] (S) Msg TX to 1:0000000000000001 [D8F1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1666869501.888587][36718:36723] CHIP:IN: (S) Sending msg 29255186 on secure session with LSID: 21445
+
 
 
 
 
            ./chip-tool levelcontrol write on-level 3 1 1
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
+          [1666869547.034233][36726:36731] CHIP:DMG: WriteResponseMessage =
+          [1666869547.034242][36726:36731] CHIP:DMG: {
+          [1666869547.034249][36726:36731] CHIP:DMG:         AttributeStatusIBs =
+          [1666869547.034268][36726:36731] CHIP:DMG:         [
+          [1666869547.034275][36726:36731] CHIP:DMG:                 AttributeStatusIB =
+          [1666869547.034291][36726:36731] CHIP:DMG:                 {
+          [1666869547.034299][36726:36731] CHIP:DMG:                         AttributePathIB =
+          [1666869547.034312][36726:36731] CHIP:DMG:                         {
+          [1666869547.034324][36726:36731] CHIP:DMG:                                 Endpoint = 0x1,
+          [1666869547.034341][36726:36731] CHIP:DMG:                                 Cluster = 0x8,
+          [1666869547.034356][36726:36731] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1666869547.034369][36726:36731] CHIP:DMG:                         }
+          [1666869547.034388][36726:36731] CHIP:DMG:
+          [1666869547.034401][36726:36731] CHIP:DMG:                         StatusIB =
+          [1666869547.034413][36726:36731] CHIP:DMG:                         {
+          [1666869547.034425][36726:36731] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1666869547.034437][36726:36731] CHIP:DMG:                         },
+          [1666869547.034449][36726:36731] CHIP:DMG:
+          [1666869547.034461][36726:36731] CHIP:DMG:                 },
+          [1666869547.034477][36726:36731] CHIP:DMG:
+          [1666869547.034485][36726:36731] CHIP:DMG:         ],
+          [1666869547.034501][36726:36731] CHIP:DMG:
+          [1666869547.034512][36726:36731] CHIP:DMG:         InteractionModelRevision = 1
+          [1666869547.034520][36726:36731] CHIP:DMG: }
+          [1666869547.034566][36726:36731] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+           ./chip-tool levelcontrol read on-level 1 1
+          On TH, verify the attribute value that was modified in above step
+          [1666869620.770718][36742:36747] CHIP:DMG:         InteractionModelRevision = 1
+          [1666869620.770726][36742:36747] CHIP:DMG: }
+          [1666869620.770797][36742:36747] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 675908055
+          [1666869620.770823][36742:36747] CHIP:TOO:   OnLevel: 3
+          [1666869620.770891][36742:36747] CHIP:EM: <<< [E:14699i M:79319456 (Ack:188579584)] (S) Msg TX to 1:0000000000000001 [D8F1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+
            ./chip-tool levelcontrol write on-level 1 1 1
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
+          [1666869670.727210][36753:36758] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1666869670.727233][36753:36758] CHIP:DMG: WriteResponseMessage =
+          [1666869670.727241][36753:36758] CHIP:DMG: {
+          [1666869670.727250][36753:36758] CHIP:DMG:         AttributeStatusIBs =
+          [1666869670.727267][36753:36758] CHIP:DMG:         [
+          [1666869670.727277][36753:36758] CHIP:DMG:                 AttributeStatusIB =
+          [1666869670.727288][36753:36758] CHIP:DMG:                 {
+          [1666869670.727298][36753:36758] CHIP:DMG:                         AttributePathIB =
+          [1666869670.727309][36753:36758] CHIP:DMG:                         {
+          [1666869670.727318][36753:36758] CHIP:DMG:                                 Endpoint = 0x1,
+          [1666869670.727330][36753:36758] CHIP:DMG:                                 Cluster = 0x8,
+          [1666869670.727343][36753:36758] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1666869670.727352][36753:36758] CHIP:DMG:                         }
+          [1666869670.727369][36753:36758] CHIP:DMG:
+          [1666869670.727378][36753:36758] CHIP:DMG:                         StatusIB =
+          [1666869670.727390][36753:36758] CHIP:DMG:                         {
+          [1666869670.727417][36753:36758] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1666869670.727427][36753:36758] CHIP:DMG:                         },
+          [1666869670.727438][36753:36758] CHIP:DMG:
+          [1666869670.727449][36753:36758] CHIP:DMG:                 },
+          [1666869670.727463][36753:36758] CHIP:DMG:
+          [1666869670.727471][36753:36758] CHIP:DMG:         ],
+          [1666869670.727486][36753:36758] CHIP:DMG:
+          [1666869670.727496][36753:36758] CHIP:DMG:         InteractionModelRevision = 1
+          [1666869670.727504][36753:36758] CHIP:DMG: }
+          [1666869670.727549][36753:36758] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1666869670.727595][36753:36758] CHIP:EM: <<< [E:47112i M:145295717 (Ack:122146940)] (S) Msg TX to 1:0000000000000001 [D8F1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+
+           ./chip-tool levelcontrol read on-level 1 1
+          On TH, verify the attribute value that was modified in above step
+          [1666869679.964919][36761:36766] CHIP:DMG: }
+          [1666869679.964987][36761:36766] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 675908056
+          [1666869679.965005][36761:36766] CHIP:TOO:   OnLevel: 1
+          [1666869679.965070][36761:36766] CHIP:EM: <<< [E:38092i M:162624724 (Ack:53739985)] (S) Msg TX to 1:0000000000000001 [D8F1] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label:
@@ -697,7 +749,7 @@ tests:
           with the DataVersion field set to the one received in the prior step.
           +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
           ./chip-tool levelcontrol read on-level 1 1
@@ -779,7 +831,7 @@ tests:
           DUT to modify the value of an attribute with the dataversion field set
           to the value received earlier."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
 

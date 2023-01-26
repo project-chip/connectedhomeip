@@ -30,6 +30,7 @@
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRCSRInfo.h>
+#import <Matter/MTRCertificateInfo.h>
 #import <Matter/MTRCertificates.h>
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRClusterConstants.h>

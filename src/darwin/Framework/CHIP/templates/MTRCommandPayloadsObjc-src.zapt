@@ -20,6 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
           (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
     _timedInvokeTimeoutMs = nil;
 {{/if}}
+{{#if (isStrEqual source "client")}}
+    _serverSideProcessingTimeout = nil;
+{{/if}}
   }
   return self;
 }
@@ -34,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (or (isStrEqual source "client")
           (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
   other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+{{/if}}
+{{#if (isStrEqual source "client")}}
+  other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 {{/if}}
 
   return other;

@@ -35,7 +35,7 @@ CHIP_ERROR PauseCommand::Invoke(std::function<void(CHIP_ERROR)> responseCallback
 
 CHIP_ERROR StopPlaybackCommand::Invoke(std::function<void(CHIP_ERROR)> responseCallback)
 {
-    MediaPlayback::Commands::StopPlayback::Type request;
+    MediaPlayback::Commands::Stop::Type request;
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 

@@ -55,8 +55,6 @@ class TargetFilter:
     # If non-empty only the given paths will be code-generated
     path_glob: List[str] = field(default_factory=list)
 
-    cpp_only: bool = False
-
 
 # TODO: the build GlobMatcher is more complete by supporting `{}` grouping
 #       For now this limited glob seems sufficient.
@@ -100,5 +98,5 @@ def FindPregenerationTargets(sdk_root: str, filter: TargetFilter, runner):
                 continue
 
         for generator in generators:
-            if generator.Accept(idl, filter.cpp_only):
+            if generator.Accept(idl):
                 yield generator.CreateTarget(idl, runner=runner)

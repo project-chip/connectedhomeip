@@ -14,12 +14,14 @@
 #    limitations under the License.
 
 import copy
-from enum import Enum
+from enum import Enum, auto
 
 import yaml
 
 from . import fixes
 from .constraints import get_constraints, is_typed_constraint
+from .definitions import SpecDefinitions
+from .pics_checker import PICSChecker
 
 _TESTS_SECTION = [
     'name',
@@ -36,6 +38,7 @@ _TEST_SECTION = [
     'endpoint',
     'identity',
     'fabricFiltered',
+    'groupId',
     'verification',
     'nodeId',
     'attribute',
@@ -47,6 +50,7 @@ _TEST_SECTION = [
     'maxInterval',
     'timedInteractionTimeoutMs',
     'busyWaitMs',
+    'wait',
 ]
 
 _TEST_ARGUMENTS_SECTION = [
@@ -88,11 +92,12 @@ class PostProcessCheckStatus(Enum):
 
 class PostProcessCheckType(Enum):
     '''Indicates the post processing check step type.'''
-    IM_STATUS = 'IMStatus',
-    CLUSTER_STATUS = 'ClusterStatus',
-    RESPONSE_VALIDATION = 'Response',
-    CONSTRAINT_VALIDATION = 'Constraints',
-    SAVE_AS_VARIABLE = 'SaveAs'
+    IM_STATUS = auto()
+    CLUSTER_STATUS = auto()
+    RESPONSE_VALIDATION = auto()
+    CONSTRAINT_VALIDATION = auto()
+    SAVE_AS_VARIABLE = auto()
+    WAIT_VALIDATION = auto()
 
 
 class PostProcessCheck:
@@ -182,7 +187,7 @@ class _TestStepWithPlaceholders:
     processed.
     '''
 
-    def __init__(self, test: dict, config: dict, definitions):
+    def __init__(self, test: dict, config: dict, definitions: SpecDefinitions, pics_checker: PICSChecker):
         # Disabled tests are not parsed in order to allow the test to be added to the test
         # suite even if the feature is not implemented yet.
         self.is_enabled = not ('disabled' in test and test['disabled'])
@@ -196,10 +201,12 @@ class _TestStepWithPlaceholders:
         self.label = _value_or_none(test, 'label')
         self.optional = _value_or_none(test, 'optional')
         self.node_id = _value_or_config(test, 'nodeId', config)
+        self.group_id = _value_or_config(test, 'groupId', config)
         self.cluster = _value_or_config(test, 'cluster', config)
         self.command = _value_or_config(test, 'command', config)
         self.attribute = _value_or_none(test, 'attribute')
         self.endpoint = _value_or_config(test, 'endpoint', config)
+        self.is_pics_enabled = pics_checker.check(_value_or_none(test, 'PICS'))
 
         self.identity = _value_or_none(test, 'identity')
         self.fabric_filtered = _value_or_none(test, 'fabricFiltered')
@@ -208,9 +215,10 @@ class _TestStepWithPlaceholders:
         self.timed_interaction_timeout_ms = _value_or_none(
             test, 'timedInteractionTimeoutMs')
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
+        self.wait_for = _value_or_none(test, 'wait')
 
-        self.is_attribute = self.command in _ATTRIBUTE_COMMANDS
-        self.is_event = self.command in _EVENT_COMMANDS
+        self.is_attribute = self.command in _ATTRIBUTE_COMMANDS or self.wait_for in _ATTRIBUTE_COMMANDS
+        self.is_event = self.command in _EVENT_COMMANDS or self.wait_for in _EVENT_COMMANDS
 
         self.arguments_with_placeholders = _value_or_none(test, 'arguments')
         self.response_with_placeholders = _value_or_none(test, 'response')
@@ -243,12 +251,12 @@ class _TestStepWithPlaceholders:
                 response_mapping = self._as_mapping(
                     definitions, self.cluster, command.output_param)
 
-        self._update_with_definition(
-            self.arguments_with_placeholders, argument_mapping)
-        self._update_with_definition(
-            self.response_with_placeholders, response_mapping)
+        self.argument_mapping = argument_mapping
+        self.response_mapping = response_mapping
+        self.update_arguments(self.arguments_with_placeholders)
+        self.update_response(self.response_with_placeholders)
 
-        # This performs a very basic sanity parse time check of constrains. This parsing happens
+        # This performs a very basic sanity parse time check of constraints. This parsing happens
         # again inside post processing response since at that time we will have required variables
         # to substitute in. This parsing check here has value since some test can take a really
         # long time to run so knowing earlier on that the test step would have failed at parsing
@@ -295,6 +303,14 @@ class _TestStepWithPlaceholders:
             target_name = target_name.lower()
 
         return target_name
+
+    def update_arguments(self, arguments_with_placeholders):
+        self._update_with_definition(
+            arguments_with_placeholders, self.argument_mapping)
+
+    def update_response(self, response_with_placeholders):
+        self._update_with_definition(
+            response_with_placeholders, self.response_mapping)
 
     def _update_with_definition(self, container: dict, mapping_type):
         if not container or not mapping_type:
@@ -384,10 +400,18 @@ class TestStep:
         self.response = copy.deepcopy(test.response_with_placeholders)
         self._update_placeholder_values(self.arguments)
         self._update_placeholder_values(self.response)
+        self._test.node_id = self._config_variable_substitution(
+            self._test.node_id)
+        test.update_arguments(self.arguments)
+        test.update_response(self.response)
 
     @property
     def is_enabled(self):
         return self._test.is_enabled
+
+    @property
+    def is_pics_enabled(self):
+        return self._test.is_pics_enabled
 
     @property
     def is_attribute(self):
@@ -408,6 +432,10 @@ class TestStep:
     @property
     def node_id(self):
         return self._test.node_id
+
+    @property
+    def group_id(self):
+        return self._test.group_id
 
     @property
     def cluster(self):
@@ -449,8 +477,16 @@ class TestStep:
     def busy_wait_ms(self):
         return self._test.busy_wait_ms
 
+    @property
+    def wait_for(self):
+        return self._test.wait_for
+
     def post_process_response(self, response: dict):
         result = PostProcessResponseResult()
+
+        if self.wait_for is not None:
+            self._response_cluster_wait_validation(response, result)
+            return result
 
         if self._skip_post_processing(response, result):
             return result
@@ -463,6 +499,52 @@ class TestStep:
             self._maybe_save_as(response, result)
 
         return result
+
+    def _response_cluster_wait_validation(self, response, result):
+        """Check if the response concrete path matches the configuration of the test step
+           and validate that the response type (e.g readAttribute/writeAttribute/...) matches
+           the expectation from the test step."""
+        check_type = PostProcessCheckType.WAIT_VALIDATION
+        error_success = 'The test expectation "{wait_for}" for "{cluster}.{wait_type}" on endpoint {endpoint} is true'
+        error_failure = 'The test expectation "{expected} == {received}" is false'
+
+        if self.is_attribute:
+            expected_wait_type = self.attribute
+            received_wait_type = response.get('attribute')
+        elif self.is_event:
+            expected_wait_type = self.event
+            received_wait_type = response.get('event')
+        else:
+            expected_wait_type = self.command
+            received_wait_type = response.get('command')
+
+        expected_values = [
+            self.wait_for,
+            self.endpoint,
+            # TODO The name in tests does not always use spaces
+            self.cluster.replace(' ', ''),
+            expected_wait_type
+        ]
+
+        received_values = [
+            response.get('wait_for'),
+            response.get('endpoint'),
+            response.get('cluster'),
+            received_wait_type
+        ]
+
+        success = True
+        for expected_value in expected_values:
+            received_value = received_values.pop(0)
+
+            if expected_value != received_value:
+                result.error(check_type, error_failure.format(
+                    expected=expected_value, received=received_value))
+                success = False
+
+        if success:
+            result.success(check_type, error_success.format(
+                wait_for=self.wait_for, cluster=self.cluster, wait_type=expected_wait_type, endpoint=self.endpoint))
 
     def _skip_post_processing(self, response: dict, result) -> bool:
         '''Should we skip perform post processing.
@@ -690,8 +772,9 @@ class TestStep:
                     variable_info = self._runtime_config_variable_storage[token]
                     if type(variable_info) is dict and 'defaultValue' in variable_info:
                         variable_info = variable_info['defaultValue']
-                    tokens[idx] = variable_info
-                    substitution_occured = True
+                    if variable_info is not None:
+                        tokens[idx] = variable_info
+                        substitution_occured = True
 
             if len(tokens) == 1:
                 return tokens[0]
@@ -716,12 +799,12 @@ class YamlTests:
     multiple runs.
     '''
 
-    def __init__(self, parsing_config_variable_storage: dict, definitions, tests: dict):
+    def __init__(self, parsing_config_variable_storage: dict, definitions: SpecDefinitions, pics_checker: PICSChecker, tests: dict):
         self._parsing_config_variable_storage = parsing_config_variable_storage
         enabled_tests = []
         for test in tests:
             test_with_placeholders = _TestStepWithPlaceholders(
-                test, self._parsing_config_variable_storage, definitions)
+                test, self._parsing_config_variable_storage, definitions, pics_checker)
             if test_with_placeholders.is_enabled:
                 enabled_tests.append(test_with_placeholders)
         fixes.try_update_yaml_node_id_test_runner_state(
@@ -748,24 +831,28 @@ class YamlTests:
 
 class TestParser:
     def __init__(self, test_file, pics_file, definitions):
-        # TODO Needs supports for PICS file
+        data = self.__load_yaml(test_file)
+
+        _check_valid_keys(data, _TESTS_SECTION)
+
+        self.name = _value_or_none(data, 'name')
+        self.PICS = _value_or_none(data, 'PICS')
+
+        self._parsing_config_variable_storage = _value_or_none(data, 'config')
+
+        pics_checker = PICSChecker(pics_file)
+        tests = _value_or_none(data, 'tests')
+        self.tests = YamlTests(
+            self._parsing_config_variable_storage, definitions, pics_checker, tests)
+
+    def update_config(self, key, value):
+        self._parsing_config_variable_storage[key] = value
+
+    def __load_yaml(self, test_file):
         with open(test_file) as f:
             loader = yaml.FullLoader
             loader = fixes.try_add_yaml_support_for_scientific_notation_without_dot(
                 loader)
 
-            data = yaml.load(f, Loader=loader)
-            _check_valid_keys(data, _TESTS_SECTION)
-
-            self.name = _value_or_none(data, 'name')
-            self.PICS = _value_or_none(data, 'PICS')
-
-            self._parsing_config_variable_storage = _value_or_none(
-                data, 'config')
-
-            tests = _value_or_none(data, 'tests')
-            self.tests = YamlTests(
-                self._parsing_config_variable_storage, definitions, tests)
-
-    def update_config(self, key, value):
-        self._parsing_config_variable_storage[key] = value
+            return yaml.load(f, Loader=loader)
+        return None

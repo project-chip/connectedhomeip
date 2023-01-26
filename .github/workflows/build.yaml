@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.32
+            image: connectedhomeip/chip-build:0.6.34
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -138,7 +138,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.32
+            image: connectedhomeip/chip-build:0.6.34
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -298,7 +298,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.32
+            image: connectedhomeip/chip-build:0.6.34
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -356,8 +356,8 @@ jobs:
         env:
             # NOTE: Generally kept in sync within the repo using
             #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.18-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.18-nightly
+            ZAP_VERSION: v2023.01.19-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
@@ -471,7 +471,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.32
+            image: connectedhomeip/chip-build:0.6.34
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0

@@ -312,7 +312,7 @@ private:
         });
     }
 
-    // in case this is called dyring exponential back off of subscription
+    // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
     [self _setupSubscription];
 

@@ -45,6 +45,9 @@ class FactoryDataWriter:
     HW_VER_STR_NVM3_KEY = "0x8720F:"
     UNIQUE_ID_NVM3_KEY = "0x8721F:"
     HW_VER_NVM3_KEY = "0x87308:"
+    PRODUCT_LABEL_NVM3_KEY = "0x87210:"
+    PRODUCT_URL_NVM3_KEY = "0x87211:"
+    PART_NUMBER_NVM3_KEY = "0x87212:"
 
     def generate_spake2p_verifier(self):
         """ Generate Spake2+ verifier using the external spake2p tool
@@ -131,6 +134,10 @@ class FactoryDataWriter:
         kMaxHardwareVersionStringLength = 64
         kMaxSerialNumberLength = 32
         kUniqueIDLength = 16
+        kMaxProductUrlLenght = 256
+        kMaxPartNumberLength = 32
+        kMaxProductLabelLength = 64
+
         INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444,
                              55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
 
@@ -161,6 +168,12 @@ class FactoryDataWriter:
             assert (self._args.rendezvous_flag <= 7), "Invalid rendez-vous flag value"
         if self._args.gen_spake2p_path:
             self._args.spake2_verifier = self.generate_spake2p_verifier()
+        if self._args.product_label:
+            assert (len(self._args.product_label) <= kMaxProductLabelLength), "Product Label exceeds the size limit"
+        if self._args.product_url:
+            assert (len(self._args.product_url) <= kMaxProductUrlLenght), "Product URL exceeds the size limit"
+        if self._args.part_number:
+            assert (len(self._args.part_number) <= kMaxPartNumberLength), "Part number exceeds the size limit"
 
     def add_SerialNo_To_CMD(self, cmdList):
         """ Add the jtag serial command to the commander command
@@ -260,6 +273,18 @@ class FactoryDataWriter:
             serialNumberByteArray = bytes(self._args.serial_number, 'utf-8').hex()
             cmd.extend(["--object", self.SERIAL_NUMBER_NVM3_KEY + str(serialNumberByteArray)])
 
+        if self._args.part_number:
+            partNumberByteArray = bytes(self._args.part_number, 'utf-8').hex()
+            cmd.extend(["--object", self.PART_NUMBER_NVM3_KEY + str(partNumberByteArray)])
+
+        if self._args.product_label:
+            productLabelByteArray = bytes(self._args.product_label, 'utf-8').hex()
+            cmd.extend(["--object", self.PRODUCT_LABEL_NVM3_KEY + str(productLabelByteArray)])
+
+        if self._args.product_url:
+            productUrlByteArray = bytes(self._args.product_url, 'utf-8').hex()
+            cmd.extend(["--object", self.PRODUCT_URL_NVM3_KEY + str(productUrlByteArray)])
+
         cmd.extend(["--outfile", self.OUT_FILE])
         results = subprocess.run(cmd)
 
@@ -309,12 +334,18 @@ def main():
                         help="[int | hex int] Provide the hardware version value[optional]")
     parser.add_argument("--hw_version_str", type=str,
                         help="[string] Provide the hardware version string[optional]")
+    parser.add_argument("--product_label", type=str,
+                        help="[string] Provide the product label [optional]")
+    parser.add_argument("--product_url", type=str,
+                        help="[string] Provide the product url [optional]")
     parser.add_argument("--rotating_id", type=str,
                         help="[hex_string] A 128 bits hex string unique id (without 0x) [optional]")
     parser.add_argument("--serial_number", type=str,
                         help="[string] Provide serial number of the device")
     parser.add_argument("--manufacturing_date", type=str,
                         help="[string] Provide Manufacturing date in YYYY-MM-DD format [optional]")
+    parser.add_argument("--part_number", type=str,
+                        help="[string] Provide part number [optional]")
     parser.add_argument("--commissioning_flow", type=all_int_format, default=0,
                         help="[int| hex] Provide Commissioning Flow: 0=Standard, 1=kUserActionRequired, 2=Custom (Default:Standard)")
     parser.add_argument("--rendezvous_flag", type=all_int_format, default=2,

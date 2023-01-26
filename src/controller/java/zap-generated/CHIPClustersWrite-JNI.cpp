@@ -4644,12 +4644,12 @@ JNI_METHOD(void, BallastConfigurationCluster, writeMaxLevelAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, BallastConfigurationCluster, writeIntrinsicBalanceFactorAttribute)
+JNI_METHOD(void, BallastConfigurationCluster, writeIntrinsicBallastFactorAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBalanceFactor::TypeInfo;
+    using TypeInfo = chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBallastFactor::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;

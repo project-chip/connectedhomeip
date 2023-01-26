@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-imx:0.6.32
+            image: connectedhomeip/chip-build-imx:0.6.34
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36

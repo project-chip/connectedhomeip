@@ -30,25 +30,25 @@ tests:
 
     - label: "Read location"
       command: "readAttribute"
-      attribute: "location"
+      attribute: "Location"
       response:
           value: "XX"
 
     - label: "Write location"
       command: "writeAttribute"
-      attribute: "location"
+      attribute: "Location"
       arguments:
           value: "US"
 
     - label: "Read back location"
       command: "readAttribute"
-      attribute: "location"
+      attribute: "Location"
       response:
           value: "US"
 
     - label: "Restore initial location value"
       command: "writeAttribute"
-      attribute: "location"
+      attribute: "Location"
       arguments:
           value: "XX"
 

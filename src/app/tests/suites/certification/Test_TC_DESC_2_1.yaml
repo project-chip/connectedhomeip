@@ -27,7 +27,7 @@ tests:
     - label: "Note"
       verification: |
           Mandatory cluster requirements for each device type can be found here.
-          github link
+          https://github.com/CHIP-Specifications/chip-test-plans/tree/master/tools/device-type-requirements
           Use the correct json required for the DUT, this file is PIXIT.DESC.DeviceTypeConformanceList.
       disabled: true
 
@@ -46,7 +46,7 @@ tests:
 
           ./chip-tool descriptor read  parts-list 1 0
 
-          Verify PartsList response on the TH (Chip-tool) Log:
+          Verify "PartsList" response is not empty (use this list of endpoints in step 1b) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1641456769.777217][16238:16244] CHIP:DMG:      SuppressResponse = true,
           [1641456769.777267][16238:16244] CHIP:DMG: }
@@ -57,7 +57,7 @@ tests:
 
           ./chip-tool descriptor read device-list 1 0
 
-          Verify DeviceList response on the TH (Chip-tool) Log:
+          Verify "DeviceList" response at least one entry it contains one Root Node Device Type and not an Application Device Types  on TH (Chip-tool) and below is the sample log provided for the raspi platform and   Revision value is not less than 1:
 
           [1641454498.809603][16120:16125] CHIP:TOO: Descriptor.DeviceList response: 1 entries
           [1641454498.809737][16120:16125] CHIP:TOO:   [1]: {
@@ -78,16 +78,16 @@ tests:
 
           ./chip-tool descriptor read  parts-list 1 1
 
-          Verify  parts-list response on the TH(Chip-tool) Log:
+          Verify  parts-list response 0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1660127331.634565][46437:46442] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 934889243
           [1660127331.634631][46437:46442] CHIP:TOO:   parts list: 0 entries
 
 
 
-          ./chip-tool descriptor read device-list 1 1
+          ./chip-tool descriptor read device-type-list 1 1
 
-          Verify DeviceList response on the TH(Chip-tool) Log:
+          Verify DeviceTypeList response 1 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
 
           [1657200303.724408][2509:2514] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1624758542
@@ -101,14 +101,14 @@ tests:
 
           ./chip-tool descriptor read  parts-list 1 2
 
-          Verify parts-list response on the TH(Chip-tool) Log:
+          Verify parts-list response  0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1660127879.565330][46472:46477] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1237610137
           [1660127879.565473][46472:46477] CHIP:TOO:   parts list: 0 entries
 
-          ./chip-tool descriptor read device-list 1 2
+          ./chip-tool descriptor read device-type-list 1 2
 
-          Verify DeviceList response on the TH(Chip-tool) Log:
+          Verify DeviceTypeList response  1 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1660127725.802512][46460:46465] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1237610137
           [1660127725.802614][46460:46465] CHIP:TOO:   device list: 1 entries
@@ -125,7 +125,7 @@ tests:
 
           ./chip-tool descriptor read server-list 1 1
 
-          Verify server list on the TH (Chip-tool) Log:
+          Verify server list on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1660149731.921734][49539:49544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 2312399478
           [1660149731.921749][49539:49544] CHIP:TOO:   server list: 44 entries
@@ -174,8 +174,9 @@ tests:
           [1660149731.921848][49539:49544] CHIP:TOO:     [43]: 2820
           [1660149731.921851][49539:49544] CHIP:TOO:     [44]: 4294048773
 
-
           ./chip-tool descriptor read server-list 1 2
+
+          Verify server list on RPI in the TH (Chip-tool) Log:
 
           [1660146145.982691][46811:46816] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1051414887
           [1660146145.982733][46811:46816] CHIP:TOO:   server list: 5 entries
@@ -191,16 +192,17 @@ tests:
       verification: |
           For all the Endpoint id’s listed in step 1a run the following steps. For all the client list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
 
-
           ./chip-tool descriptor read client-list 1 1
 
-          Verify client list on the TH (Chip-tool) Log:
+          Verify client list on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
           [1660195618.042544][2905:2910] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 2955150741
           [1660195618.042605][2905:2910] CHIP:TOO:   client list: 0 entries
 
-           ./chip-tool descriptor read client-list 1 2
 
-          Verify client list on the TH (Chip-tool) Log:
+          ./chip-tool descriptor read client-list 1 2
+
+          Verify client list on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1660146160.390200][46818:46823] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1051414887
           [1660146160.390211][46818:46823] CHIP:TOO:   client list: 0 entries
@@ -211,7 +213,7 @@ tests:
       verification: |
           ./chip-tool descriptor read  parts-list 1 0
 
-          Verify PartsList response on the TH (Chip-tool) Log:
+          Verify PartsList response  greater than 0 and  Endpoint is in the range of 1 to 65534 on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1641456769.777217][16238:16244] CHIP:DMG:      SuppressResponse = true,
           [1641456769.777267][16238:16244] CHIP:DMG: }

@@ -15,8 +15,7 @@
 
 name:
     3.1.15. [TC-DD-1.15] Onboarding Payload Verification - Unique Discriminator
-    and Passcode Values    [DUT - Commissionee]
-
+    and Passcode Values [DUT - Commissionee]
 PICS:
     - MCORE.ROLE.COMMISSIONEE
 
@@ -35,19 +34,22 @@ tests:
           "Using the TH Onboarding payload reader, scan or read the Onboarding
           payload from DUT1"
       verification: |
-          1. Parse payload for DUT1
+          1.Run DUT. Example for DUT=all-clusters app
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
 
-          $  ./chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
-          Verify in TH as commissioner side:
+          2. Parse payload for DUT1
+          ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
 
-          [1651194471211] [16050:465158] CHIP: [SPL] Parsing base38Representation: MT:-24J0AFN00KA0648G00
-          [1651194471211] [16050:465158] CHIP: [SPL] CommissioningFlow: 0
-          [1651194471211] [16050:465158] CHIP: [SPL] VendorID: 65521
-          [1651194471211] [16050:465158] CHIP: [SPL] Version: 0
-          [1651194471211] [16050:465158] CHIP: [SPL] ProductID: 32769
-          [1651194471211] [16050:465158] CHIP: [SPL] Discriminator: 3840
-          [1651194471211] [16050:465158] CHIP: [SPL] SetUpPINCode: 20202021
-          [1651194471211] [16050:465158] CHIP: [SPL] RendezvousInformation: 4
+          Verify in TH (CHIP-TOOL)
+
+          [1667815270.314685][10645:10645] CHIP:SPL: Parsing base38Representation: MT:-24J029Q00KA0648G00
+          [1667815270.315022][10645:10645] CHIP:SPL: Version:             0
+          [1667815270.315088][10645:10645] CHIP:SPL: VendorID:            65521
+          [1667815270.315134][10645:10645] CHIP:SPL: ProductID:           32769
+          [1667815270.315183][10645:10645] CHIP:SPL: Custom flow:         2    (CUSTOM)
+          [1667815270.315238][10645:10645] CHIP:SPL: Discovery Bitmask:   0x04 (On IP network)
+          [1667815270.315295][10645:10645] CHIP:SPL: Long discriminator:  3840   (0xf00)
+          [1667815270.315346][10645:10645] CHIP:SPL: Passcode:            20202021
       disabled: true
 
     - label:
@@ -62,10 +64,13 @@ tests:
           "Using the TH Onboarding payload reader, scan or read the Onboarding
           payload from DUT2"
       verification: |
-          1. Parse payload for DUT2
+          1.Run DUT. Example for DUT=all-clusters app
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3841 --passcode 20202022
 
-          $  ./chip-tool payload parse-setup-payload MT:-24J0IRV01WCCN68G00
-          Verify in TH as commissioner side:
+          2. Parse payload for DUT2
+
+          ./chip-tool payload parse-setup-payload MT:-24J0ALY010O0648G00
+          Verify in TH (CHIP-TOOL)
 
           [1651194577916] [16053:466154] CHIP: [SPL] Parsing base38Representation: MT:-24J0IRV01WCCN68G00
           [1651194577916] [16053:466154] CHIP: [SPL] CommissioningFlow: 0

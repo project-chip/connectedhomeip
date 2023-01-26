@@ -144,28 +144,30 @@ limitations under the License.
   </enum>
   <enum name="ThermostatControlSequence" type="ENUM8">
     <cluster code="0x0201"/>
-    <item name="coolingOnly" value="0x0"/>
-    <item name="coolingWithReheat" value="0x1"/>
-    <item name="heatingOnly" value="0x2"/>
-    <item name="heatingWithReheat" value="0x3"/>
-    <item name="coolingAndHeating" value="0x4"/>
-    <item name="coolingAndHeatingWithReheat" value="0x5"/>
+    <item name="CoolingOnly" value="0x0"/>
+    <item name="CoolingWithReheat" value="0x1"/>
+    <item name="HeatingOnly" value="0x2"/>
+    <item name="HeatingWithReheat" value="0x3"/>
+    <item name="CoolingAndHeating" value="0x4"/>
+    <item name="CoolingAndHeatingWithReheat" value="0x5"/>
   </enum>
   <enum name="ThermostatSystemMode" type="ENUM8">
     <cluster code="0x0201"/>
-    <item name="off" value="0x0"/>
-    <item name="auto" value="0x1"/>
-    <item name="cool" value="0x3"/>
-    <item name="heat" value="0x4"/>
-    <item name="emergencyHeating" value="0x5"/>
-    <item name="precooling" value="0x6"/>
-    <item name="fanOnly" value="0x7"/>
+    <item name="Off" value="0x0"/>
+    <item name="Auto" value="0x1"/>
+    <item name="Cool" value="0x3"/>
+    <item name="Heat" value="0x4"/>
+    <item name="EmergencyHeat" value="0x5"/>
+    <item name="Precooling" value="0x6"/>
+    <item name="FanOnly" value="0x7"/>
+    <item name="Dry" value="0x8"/>
+    <item name="Sleep" value="0x9"/>
   </enum>
   <enum name="SetpointAdjustMode" type="ENUM8">
     <cluster code="0x0201"/>
-    <item name="heatSetpoint" value="0x0"/>
-    <item name="coolSetpoint" value="0x1"/>
-    <item name="heatAndCoolSetpoints" value="0x2"/>
+    <item name="Heat" value="0x0"/>
+    <item name="Cool" value="0x1"/>
+    <item name="Both" value="0x2"/>
   </enum>
   <enum name="FanMode" type="ENUM8">
     <item name="off" value="0x0"/>
@@ -582,12 +584,12 @@ limitations under the License.
     <field name="Thursday" mask="0x10"/>
     <field name="Friday" mask="0x20"/>
     <field name="Saturday" mask="0x40"/>
-    <field name="AwayOrVacation" mask="0x80"/>
+    <field name="Away" mask="0x80"/>
   </bitmap>
   <bitmap name="ModeForSequence" type="BITMAP8">
     <cluster code="0x0201"/>
-    <field name="HeatSetpointFieldPresent" mask="0x01"/>
-    <field name="CoolSetpointFieldPresent" mask="0x02"/>
+    <field name="HeatSetpointPresent" mask="0x01"/>
+    <field name="CoolSetpointPresent" mask="0x02"/>
   </bitmap>
   <enum name="ProductTypeId" type="ENUM16">
     <item name="WhiteGoods" value="0x0000"/>

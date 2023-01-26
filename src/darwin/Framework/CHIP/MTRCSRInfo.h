@@ -19,8 +19,6 @@
 
 #import <Matter/MTRDefines.h>
 
-typedef NSData * MTRCSRDERBytes;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**

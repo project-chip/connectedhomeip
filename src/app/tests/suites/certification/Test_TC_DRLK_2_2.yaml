@@ -36,48 +36,48 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
-              - name: "credentials"
+              - name: "Credentials"
                 value: null
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextUserIndex"
+              - name: "NextUserIndex"
                 value: null
 
     - label: "Create new PIN credential and lock/unlock user"
@@ -85,44 +85,44 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
+              - name: "CredentialData"
                 value: "123456"
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: null
-              - name: "userType"
+              - name: "UserType"
                 value: null
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: 2
 
     - label: "Verify created PIN credential"
       command: "GetCredentialStatus"
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
       response:
           values:
-              - name: "credentialExists"
+              - name: "CredentialExists"
                 value: true
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: null
 
     - label:
@@ -165,7 +165,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "pinCode"
+              - name: "PINCode"
                 value: "123456"
 
     - label:
@@ -201,7 +201,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "pinCode"
+              - name: "PINCode"
                 value: "123456"
 
     - label: "TH sends Lock Door Command to the DUT without valid PINCode"
@@ -210,7 +210,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "pinCode"
+              - name: "PINCode"
                 value: "645321"
       response:
           error: FAILURE
@@ -401,7 +401,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Cleanup the created credential"
@@ -410,5 +410,5 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }

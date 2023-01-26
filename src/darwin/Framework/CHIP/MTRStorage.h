@@ -48,7 +48,7 @@ MTR_NEWLY_AVAILABLE
  * Delete the key and corresponding data.  Returns YES if the key was present,
  * NO if the key was not present.
  */
-- (BOOL)removeStorageDataForKey:(NSString *)key;
+- (BOOL)removeStorageDataForKey:(NSString *)key NS_SWIFT_NAME(removeStorageData(forKey:));
 
 @end
 

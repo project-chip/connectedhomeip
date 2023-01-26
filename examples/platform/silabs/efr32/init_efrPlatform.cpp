@@ -45,6 +45,7 @@ extern "C" {
 #include <utils/uart.h>
 
 #include "platform-efr32.h"
+#include "sl_openthread.h"
 
 #if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #include "openthread/heap.h"
@@ -65,7 +66,16 @@ void initAntenna(void);
 void init_efrPlatform(void)
 {
     sl_system_init();
-    sl_mbedtls_init();
+
+#if CHIP_ENABLE_OPENTHREAD
+#ifdef MGM24
+    sl_openthread_init();
+#endif
+    efr32RadioInit();
+    efr32AlarmInit();
+    efr32MiscInit();
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #if SL_SYSTEM_VIEW
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_Start();
@@ -74,11 +84,6 @@ void init_efrPlatform(void)
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif
-
-#if CHIP_ENABLE_OPENTHREAD
-    efr32RadioInit();
-    efr32AlarmInit();
-#endif // CHIP_ENABLE_OPENTHREAD
 }
 
 #ifdef __cplusplus

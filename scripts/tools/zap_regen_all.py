@@ -19,14 +19,45 @@ import argparse
 import logging
 import multiprocessing
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
+from enum import Flag, auto
 from pathlib import Path
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
+
+
+# Type of targets that can be re-generated
+class TargetType(Flag):
+
+    # Tests for golden images
+    TESTS = auto()
+
+    # Global templates: generally examples and chip controller
+    GLOBAL = auto()
+
+    # App-specific templates (see getSpecificTemplatesTargets)
+    SPECIFIC = auto()
+
+    # Golden compares for unit tests of zap codegen
+    GOLDEN_TEST_IMAGES = auto()
+
+    # All possible targets. Convenience constant
+    ALL = TESTS | GLOBAL | SPECIFIC | GOLDEN_TEST_IMAGES
+
+
+__TARGET_TYPES__ = {
+    'tests': TargetType.TESTS,
+    'global': TargetType.GLOBAL,
+    'specific': TargetType.SPECIFIC,
+    'golden_test_images': TargetType.GOLDEN_TEST_IMAGES,
+    'all': TargetType.ALL,
+}
 
 
 @dataclass
@@ -113,39 +144,43 @@ class ZAPGenerateTarget:
         )
 
 
-class ZAPPregenerateTarget:
-    def __init__(self, input_glob, output_dir, generator=None):
-        self.input_glob = input_glob
-        self.output_dir = output_dir
-        self.script = "./scripts/codepregen.py"
-        self.command = [self.script, "--input-glob", input_glob]
-        self.generator = generator
+class GoldenTestImageTarget():
+    def __init__(self):
+        # NOTE: output-path is inside the tree. This is because clang-format
+        #       will search for a .clang-format file in the directory tree
+        #       so attempts to format outside the tree will generate diffs.
+        # NOTE: relative path because this script generally does a
+        #       os.chdir to CHIP_ROOT anyway.
+        os.makedirs('./out', exist_ok=True)
+        self.tempdir = tempfile.mkdtemp(prefix='test_golden', dir='./out')
 
-        if generator is not None:
-            self.command.extend(["--generator", generator])
-        self.command.append(output_dir)
+        # This runs a test, but the important bit is we pass `--regenerate`
+        # to it and this will cause it to OVERWRITE golden images.
+        self.command = ["./scripts/tools/zap/test_generate.py",
+                        "--output", self.tempdir, "--regenerate"]
 
-    def distinct_output(self):
-        input_template = self.input_glob
-        if self.generator is not None:
-            input_template += " " + self.generator
-        return ZapDistinctOutput(input_template=input_template, output_directory=self.output_dir)
-
-    def log_command(self):
-        logging.info("  %s" % " ".join(self.command))
+    def __del__(self):
+        # Clean up
+        if os.path.isdir(self.tempdir):
+            shutil.rmtree(self.tempdir)
 
     def generate(self) -> TargetRunStats:
-        logging.info("Generating target: %s" % " ".join(self.command))
-
         generate_start = time.time()
         subprocess.check_call(self.command)
         generate_end = time.time()
 
         return TargetRunStats(
             generate_time=generate_end - generate_start,
-            config=self.script,
-            template=self.script,
+            config='./scripts/tools/zap/test_generate.py',
+            template='./scripts/tools/zap/test_generate.py',
         )
+
+    def distinct_output(self):
+        # Fake output - this is a single target that generates golden images
+        return ZapDistinctOutput(input_template='GOLDEN_IMAGES', output_directory='GOLDEN_IMAGES')
+
+    def log_command(self):
+        logging.info("  %s" % " ".join(self.command))
 
 
 def checkPythonVersion():
@@ -158,7 +193,7 @@ def checkPythonVersion():
 def setupArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Generate content from ZAP files')
-    parser.add_argument('--type', default='all', choices=['all', 'tests'],
+    parser.add_argument('--type', action='append', choices=__TARGET_TYPES__.keys(),
                         help='Choose which content type to generate (default: all)')
     parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'darwin-framework-tool', 'app1', 'app2'],
                         help='When generating tests only target, Choose which tests to generate (default: all)')
@@ -171,7 +206,21 @@ def setupArgumentsParser():
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
     parser.set_defaults(parallel=True)
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    # Convert a list of target_types (as strings)
+    # into a single flag value
+    if not args.type:
+        args.type = TargetType.ALL  # default instead of a list
+    else:
+        # convert the list into a single flag value
+        types = [t for t in map(lambda x: __TARGET_TYPES__[
+                                x.lower()], args.type)]
+        args.type = types[0]
+        for t in types:
+            args.type = args.type | t
+
+    return args
 
 
 def getGlobalTemplatesTargets():
@@ -235,10 +284,10 @@ def getGlobalTemplatesTargets():
     #
     # TODO: These files can be code generated at compile time, we should figure
     #       out a path for this codegen to not be required.
-    targets.append(ZAPPregenerateTarget(
-        "*controller-clusters*", "zzz_generated/darwin", generator="zap"))
-    targets.append(ZAPPregenerateTarget(
-        "*controller-clusters*", "zzz_generated/darwin", generator="codegen-cpp-only"))
+    targets.append(ZAPGenerateTarget(
+        'src/controller/data_model/controller-clusters.zap',
+        template="src/app/zap-templates/app-templates.json",
+        output_dir=os.path.join('zzz_generated/darwin/controller-clusters/zap-generated')))
 
     return targets
 
@@ -268,6 +317,10 @@ def getTestsTemplatesTargets(test_target):
     return targets
 
 
+def getGoldenTestImageTargets():
+    return [GoldenTestImageTarget()]
+
+
 def getSpecificTemplatesTargets():
     zap_filepath = 'src/controller/data_model/controller-clusters.zap'
 
@@ -294,12 +347,17 @@ def getSpecificTemplatesTargets():
 def getTargets(type, test_target):
     targets = []
 
-    if type == 'all':
-        targets.extend(getGlobalTemplatesTargets())
+    if type & TargetType.TESTS:
         targets.extend(getTestsTemplatesTargets('all'))
+
+    if type & TargetType.GLOBAL:
+        targets.extend(getGlobalTemplatesTargets())
+
+    if type & TargetType.SPECIFIC:
         targets.extend(getSpecificTemplatesTargets())
-    elif type == 'tests':
-        targets.extend(getTestsTemplatesTargets(test_target))
+
+    if type & TargetType.GOLDEN_TEST_IMAGES:
+        targets.extend(getGoldenTestImageTargets())
 
     logging.info("Targets to be generated:")
     for target in targets:
@@ -343,40 +401,41 @@ def main():
 
     targets = getTargets(args.type, args.tests)
 
-    if not args.dry_run:
+    if args.dry_run:
+        sys.exit(0)
 
-        if args.run_bootstrap:
-            subprocess.check_call(os.path.join(
-                CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+    if args.run_bootstrap:
+        subprocess.check_call(os.path.join(
+            CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
-        timings = []
-        if args.parallel:
-            # Ensure each zap run is independent
-            os.environ['ZAP_TEMPSTATE'] = '1'
-            with multiprocessing.Pool() as pool:
-                for timing in pool.imap_unordered(_ParallelGenerateOne, targets):
-                    timings.append(timing)
-        else:
-            for target in targets:
-                timings.append(target.generate())
+    timings = []
+    if args.parallel:
+        # Ensure each zap run is independent
+        os.environ['ZAP_TEMPSTATE'] = '1'
+        with multiprocessing.Pool() as pool:
+            for timing in pool.imap_unordered(_ParallelGenerateOne, targets):
+                timings.append(timing)
+    else:
+        for target in targets:
+            timings.append(target.generate())
 
-        timings.sort(key=lambda t: t.generate_time)
+    timings.sort(key=lambda t: t.generate_time)
 
-        print(" Time (s) | {:^50} | {:^50}".format("Config", "Template"))
-        for timing in timings:
-            tmpl = timing.template
+    print(" Time (s) | {:^50} | {:^50}".format("Config", "Template"))
+    for timing in timings:
+        tmpl = timing.template
 
-            if len(tmpl) > 50:
-                # easier to distinguish paths ... shorten common in-fixes
-                tmpl = tmpl.replace("/zap-templates/", "/../")
-                tmpl = tmpl.replace("/templates/", "/../")
+        if len(tmpl) > 50:
+            # easier to distinguish paths ... shorten common in-fixes
+            tmpl = tmpl.replace("/zap-templates/", "/../")
+            tmpl = tmpl.replace("/templates/", "/../")
 
-            print(" %8d | %50s | %50s" % (
-                timing.generate_time,
-                ".." + timing.config[len(timing.config) -
-                                     48:] if len(timing.config) > 50 else timing.config,
-                ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl,
-            ))
+        print(" %8d | %50s | %50s" % (
+            timing.generate_time,
+            ".." + timing.config[len(timing.config) -
+                                 48:] if len(timing.config) > 50 else timing.config,
+            ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl,
+        ))
 
 
 if __name__ == '__main__':

@@ -213,15 +213,15 @@ limitations under the License.
     <field name="Heating" mask="0x1"/>
     <field name="Cooling" mask="0x2"/>
     <field name="Occupancy" mask="0x4"/>
-    <field name="Schedule" mask="0x8"/>
+    <field name="ScheduleConfiguration" mask="0x8"/>
     <field name="Setback" mask="0x10"/>
-    <field name="Automode" mask="0x20"/>
+    <field name="AutoMode" mask="0x20"/>
   </bitmap>
 
   <struct name="ThermostatScheduleTransition">
     <cluster code="0x0201"/>
     <item fieldId="0" name="TransitionTime" type="INT16U"/>
-    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/5238 for HeatSetpoint and CoolSetpoint.  For now, going to guess they are in fact meant to be nullable. -->
+    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
     <item fieldId="1" name="HeatSetpoint" type="INT16S" isNullable="true"/>
     <item fieldId="2" name="CoolSetpoint" type="INT16S" isNullable="true"/>
   </struct>

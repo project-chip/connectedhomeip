@@ -228,6 +228,12 @@ public:
                                                      const Sig & signature) const                                              = 0;
 };
 
+/**
+ * @brief Helper class for holding sensitive data that should be erased from memory after use.
+ *
+ * The sensitive data buffer is a variable-length, fixed-capacity buffer class that securely erases
+ * the contents of a buffer when the buffer is destroyed.
+ */
 template <size_t kCapacity>
 class SensitiveDataBuffer
 {
@@ -291,6 +297,12 @@ private:
     size_t mLength = 0;
 };
 
+/**
+ * @brief Helper class for holding fixed-sized sensitive data that should be erased from memory after use.
+ *
+ * The sensitive data buffer is a fixed-length, fixed-capacity buffer class that securely erases
+ * the contents of a buffer when the buffer is destroyed.
+ */
 template <size_t kCapacity>
 class SensitiveDataFixedBuffer
 {

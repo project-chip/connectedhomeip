@@ -45,8 +45,8 @@ tests:
     - label: "TH starts matter announcement procedure using BLE transport"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          $ ./out/ble/chip-all-clusters-app --ble-device 1 --discriminator 3841
-          Verify in TH as commissionee side:
+          ./chip-all-clusters-app --wifi  --discriminator 3841
+          Verify in DUT (ALL-CLUSTER-APP):
 
           [1657221603.350406][368108:368108] CHIP:DL: Device Configuration:
           [1657221603.350445][368108:368108] CHIP:DL:   Serial Number: TEST_SN
@@ -73,14 +73,14 @@ tests:
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing
 
-          Verify in TH as commissioner side:
-          $  ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
+          Verify in TH (CHIP-TOOL)
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
           [1651743342.299897][3461:3464] CHIP:BLE: New device scanned: E4:5F:01:0F:1A:02
           [1651743342.299951][3461:3464] CHIP:BLE: Device discriminator match. Attempting to connect.
           [1651743342.303783][3461:3464] CHIP:BLE: Scan complete notification without an active scan.
           [1651743346.244175][3461:3464] CHIP:DL: ConnectDevice complete
 
-          Verify in DUT as commissionee side:
+          Verify in DUT(ALL-CLUSTER-APP)
           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
           [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
@@ -131,14 +131,14 @@ tests:
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
 
-          Verify in TH as commissioner side:
-          $  ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
+          Verify in TH (CHIP-TOOL)
+            ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
           [1651743342.299897][3461:3464] CHIP:BLE: New device scanned: E4:5F:01:0F:1A:02
           [1651743342.299951][3461:3464] CHIP:BLE: Device discriminator match. Attempting to connect.
           [1651743342.303783][3461:3464] CHIP:BLE: Scan complete notification without an active scan.
           [1651743346.244175][3461:3464] CHIP:DL: ConnectDevice complete
 
-          Verify in DUT as commissionee side:
+          Verify in DUT(ALL-CLUSTER-APP)
           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
           [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
@@ -187,9 +187,9 @@ tests:
     - label: "TH starts matter announcement using BLE transport"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
+          ./chip-all-clusters-app --wifi --discriminator 3841
 
-          Verify in TH as commissionee side
+          Verify in DUT(ALL-CLUSTER-APP)
           [1653087913.247229][8083:8083] CHIP:SVR: Server Listening...
           [1653087913.247636][8083:8083] CHIP:DL: Device Configuration:
           [1653087913.248094][8083:8083] CHIP:DL:   Serial Number: TEST_SN
@@ -207,7 +207,9 @@ tests:
           [1653087913.254268][8083:8083] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 29f72814
       disabled: true
 
-    - label: ""
+    - label:
+          "DUT must find TH and provide onboarding data for validation.Pass
+          Criteria: DUT is able to report the Onboarding payload as set on TH"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
@@ -310,8 +312,8 @@ tests:
       verification: |
           1. TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements. This can also be verified using through the DUT"s pairing command over IP.
 
-          Verify in TH as commissionee side:
-          $ ./out/all-clusters-app/chip-all-clusters-app
+          Verify in DUT(ALL-CLUSTER-APP):
+          ./chip-all-clusters-app
           [1660154789.496930][7968:7968] CHIP:DIS: CHIP minimal mDNS started advertising.
           [1660154789.499623][7968:7968] CHIP:DL: Using wifi MAC for hostname
           [1660154789.499743][7968:7968] CHIP:DIS: Advertise commission parameter vendorID=65521 productID=32769 discriminator=3840/15 cm=1
@@ -327,12 +329,13 @@ tests:
           [1660154789.501966][7968:7968] CHIP:DIS: CHIP minimal mDNS configured as "Commissionable node device".
 
 
-          Verify in DUT as commissioner side:
-          $  ./chip-tool discover commissionables
+          Verify in TH(ALL-CLUSTER-APP):
+            ./chip-tool discover commissionables
           OR
-          $ ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
+           ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
           [1660155158954] [99591:10441026] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fe80::e5d0:7f0d:7aad:d736
-          [1660155158954] [99591:10441026] CHIP: [DIS]         Hostname: DCA632A849EA0000        [1660155158954] [99591:10441026] CHIP: [DIS]         IP Address #1: fd54:23a1:c6de:4637:1fac:42fd:dd74:dcc5
+          [1660155158954] [99591:10441026] CHIP: [DIS]         Hostname: DCA632A849EA0000
+          [1660155158954] [99591:10441026] CHIP: [DIS]         IP Address #1: fd54:23a1:c6de:4637:1fac:42fd:dd74:dcc5
           [1660155158954] [99591:10441026] CHIP: [DIS]         IP Address #2: 2603:8001:7e00:e001:d669:2a30:7e9e:7121
           [1660155158954] [99591:10441026] CHIP: [DIS]         IP Address #3: fe80::e5d0:7f0d:7aad:d736
           [1660155158954] [99591:10441026] CHIP: [DIS]         Port: 5540
