@@ -297,7 +297,7 @@ limitations under the License.
     <item name="SubmittedRegistrationRequest" value="0x3"/>
     <item name="RegistrationRejected" value="0x4"/>
     <item name="Registered" value="0x5"/>
-    <item name="RegisterationNotPossible" value="0x6"/>
+    <item name="RegistrationNotPossible" value="0x6"/>
   </enum>
   <enum name="AnonymousDataState" type="ENUM8">
     <item name="NoSourceFound" value="0x0"/>
