@@ -29,7 +29,6 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lock-app/"
                      "${CMAKE_CURRENT_LIST_DIR}/include"
                      "${IDF_PATH}/components/freertos/include/freertos"
                       SRC_DIRS
@@ -203,4 +202,3 @@ include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
 
 chip_app_component_codegen("${CHIP_ROOT}/examples/lock-app/lock-common/lock-app.matter")
 chip_app_component_zapgen("${CHIP_ROOT}/examples/lock-app/lock-common/lock-app.zap")
-

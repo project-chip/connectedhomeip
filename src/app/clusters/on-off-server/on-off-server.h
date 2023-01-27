@@ -81,6 +81,13 @@ private:
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
     uint32_t calculateNextWaitTimeMS(void);
+
+    // Matter timer scheduling glue logic
+    static void timerCallback(chip::System::Layer *, void * callbackContext);
+    void schedule(EmberEventControl * control, uint32_t delayMs);
+    void deactivate(EmberEventControl * control);
+    void deactivate(chip::EndpointId endpoint);
+
     /**********************************************************
      * Attributes Declaration
      *********************************************************/

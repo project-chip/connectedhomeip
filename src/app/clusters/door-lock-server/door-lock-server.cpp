@@ -46,11 +46,6 @@ using chip::Protocols::InteractionModel::Status;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 59;
 
-// emberEventControlSetDelayMS() uses uint32_t for timeout in milliseconds but doesn't accept
-// values more than MAX(UINT32) / 2. This is internal value. Thus, lets limit our relock timeout
-// in seconds with the appropriate maximum to ensure that delay setting won't fail.
-static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / (2 * MILLISECOND_TICKS_PER_SECOND);
-
 DoorLockServer DoorLockServer::instance;
 
 class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
@@ -3396,18 +3391,14 @@ void DoorLockServer::SendLockOperationEvent(chip::EndpointId endpointId, LockOpe
 
 void DoorLockServer::ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec)
 {
-    emberEventControlSetInactive(&AutolockEvent);
+    uint32_t timeoutMs = timeoutSec * MILLISECOND_TICKS_PER_SECOND;
+    CHIP_ERROR err =
+        DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeoutMs), DoorLockOnAutoRelockCallback,
+                                              reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
 
-    AutolockEvent.endpoint = endpointId;
-    AutolockEvent.callback = DoorLockOnAutoRelockCallback;
-
-    uint32_t timeoutMs =
-        (DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC >= timeoutSec) ? timeoutSec * MILLISECOND_TICKS_PER_SECOND : DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC;
-    auto err = emberEventControlSetDelayMS(&AutolockEvent, timeoutMs);
-
-    if (EMBER_SUCCESS != err)
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to schedule autorelock: timeout=%" PRIu32 ", status=0x%x", timeoutSec, err);
+        ChipLogError(Zcl, "Color Control Server failed to schedule event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -3770,9 +3761,9 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 // Timer callbacks
 // =============================================================================
 
-void DoorLockServer::DoorLockOnAutoRelockCallback(chip::EndpointId endpointId)
+void DoorLockServer::DoorLockOnAutoRelockCallback(System::Layer *, void * callbackContext)
 {
-    emberEventControlSetInactive(&DoorLockServer::Instance().AutolockEvent);
+    auto endpointId = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext));
 
     Nullable<DlLockState> lockState;
     if (Attributes::LockState::Get(endpointId, lockState) != EMBER_ZCL_STATUS_SUCCESS || lockState.IsNull() ||

@@ -178,8 +178,13 @@ static uint32_t computeCallbackWaitTimeMs(CallbackScheduleState & callbackSchedu
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
 {
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
-                                          reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                                           reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Level Control Server failed to schedule event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 static void deactivate(EndpointId endpoint)

@@ -874,17 +874,9 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             uint8_t i;
             for (i = 0; i < emAfEndpoints[index].endpointType->clusterCount; i++)
             {
-                const EmberAfCluster * cluster = &((emAfEndpoints[index].endpointType->cluster)[i]);
-                //        emberAfCorePrintln("Disabling cluster tick for ep:%d, cluster:0x%2X, %p",
-                //                           endpoint,
-                //                           cluster->clusterId,
-                //                           ((cluster->mask & CLUSTER_MASK_CLIENT)
-                //                            ? "client"
-                //                            : "server"));
-                //        emberAfCoreFlush();
-                emberAfDeactivateClusterTick(
-                    endpoint, cluster->clusterId,
-                    (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
+                // Note: Matter has no central "tick" engine for clusters
+                // if we decide to refactor and have a central engine,
+                // here you would deactivate ticks fired to that cluster
             }
 
             // Clear out any command handler overrides registered for this

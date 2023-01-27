@@ -23,11 +23,49 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ColorControl;
 using chip::Protocols::InteractionModel::Status;
+
+/**********************************************************
+ * Matter timer scheduling glue logic
+ *********************************************************/
+
+void ColorControlServer::timerCallback(System::Layer *, void * callbackContext)
+{
+    auto control = static_cast<EmberEventControl *>(callbackContext);
+    (control->callback)(control->endpoint);
+}
+
+void ColorControlServer::schedule(EmberEventControl * control, uint32_t delayMs)
+{
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                                           reinterpret_cast<void *>(control));
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Color Control Server failed to schedule event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void ColorControlServer::deactivate(EmberEventControl * control)
+{
+    if (control->status != EMBER_EVENT_INACTIVE)
+    {
+        control->status = EMBER_EVENT_INACTIVE;
+    }
+    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(control));
+}
+
+void ColorControlServer::deactivate(EndpointId endpoint)
+{
+    auto control = ColorControlServer::getEventControl(endpoint);
+    deactivate(control);
+}
 
 /**********************************************************
  * Attributes Definition
@@ -58,8 +96,9 @@ Status ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
     EmberEventControl * event = getEventControl(endpoint);
     VerifyOrReturnError(event != nullptr, Status::UnsupportedEndpoint);
 
-    emberEventControlSetInactive(event);
+    deactivate(event);
     return Status::Success;
+
 }
 
 bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -567,7 +606,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
 
     Attributes::RemainingTime::Set(endpoint, MAX_INT16U_VALUE);
 
-    emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 }
 
 /**
@@ -849,7 +888,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     colorSaturationTransitionState->stepsRemaining = 0;
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -997,7 +1036,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1125,7 +1164,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1236,7 +1275,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1306,7 +1345,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1381,7 +1420,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1456,7 +1495,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1601,7 +1640,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     }
     else
     {
-        emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+        schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
     }
 
     if (colorHueTransitionState->isEnhancedHue)
@@ -1766,7 +1805,7 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1859,7 +1898,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     }
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1933,7 +1972,7 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1962,7 +2001,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     }
     else
     {
-        emberEventControlSetDelayMS(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+        schedule(configureXYEventControl(endpoint), UPDATE_TIME_MS);
     }
 
     // update the attributes
@@ -2050,7 +2089,7 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     colorTempTransitionState->highLimit      = temperatureMax;
 
     // kick off the state machine
-    emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureTempEventControl(endpoint), UPDATE_TIME_MS);
     return Status::Success;
 }
 
@@ -2162,7 +2201,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
     }
     else
     {
-        emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+        schedule(configureTempEventControl(endpoint), UPDATE_TIME_MS);
     }
 
     Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue);
@@ -2275,7 +2314,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureTempEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -2394,7 +2433,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    schedule(configureTempEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);

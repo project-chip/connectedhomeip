@@ -421,7 +421,7 @@ private:
      */
     void ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec);
 
-    static void DoorLockOnAutoRelockCallback(chip::EndpointId endpointId);
+    static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
 
     /**
      * @brief Send generic event
@@ -538,8 +538,6 @@ private:
     friend bool emberAfDoorLockClusterClearYearDayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
-
-    EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
 
     std::array<EmberAfDoorLockEndpointContext, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT> mEndpointCtx;
 
