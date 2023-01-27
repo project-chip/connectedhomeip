@@ -638,7 +638,7 @@ server cluster PowerSourceConfiguration = 46 {
 
 server cluster PowerSource = 47 {
   enum BatChargeFault : ENUM8 {
-    kUnspecfied = 0;
+    kUnspecified = 0;
     kAmbientTooHot = 1;
     kAmbientTooCold = 2;
     kBatteryTooHot = 3;
@@ -678,7 +678,7 @@ server cluster PowerSource = 47 {
   }
 
   enum PowerSourceStatus : ENUM8 {
-    kUnspecfied = 0;
+    kUnspecified = 0;
     kActive = 1;
     kStandby = 2;
     kUnavailable = 3;

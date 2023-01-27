@@ -103,7 +103,7 @@ limitations under the License.
 
   <enum name="BatChargeFault" type="ENUM8">
     <cluster code="0x002F"/>
-    <item name="Unspecfied" value="0x00"/>
+    <item name="Unspecified" value="0x00"/>
     <item name="AmbientTooHot" value="0x01"/>
     <item name="AmbientTooCold" value="0x02"/>
     <item name="BatteryTooHot" value="0x03"/>
@@ -118,7 +118,7 @@ limitations under the License.
 
   <enum name="PowerSourceStatus" type="ENUM8">
     <cluster code="0x002F"/>
-    <item name="Unspecfied" value="0x00"/>
+    <item name="Unspecified" value="0x00"/>
     <item name="Active" value="0x01"/>
     <item name="Standby" value="0x02"/>
     <item name="Unavailable" value="0x03"/>
