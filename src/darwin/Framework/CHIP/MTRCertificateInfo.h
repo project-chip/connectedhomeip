@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Note: This class does not support parsing certificates related to Device Attestation.
  */
 NS_SWIFT_SENDABLE
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRCertificateInfo : NSObject <NSCopying>
 
 + (instancetype)new NS_UNAVAILABLE;
@@ -50,7 +50,7 @@ MTR_NEWLY_AVAILABLE
  * Represents the Matter-specific components of an X.509 Distinguished Name.
  */
 NS_SWIFT_SENDABLE
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDistinguishedNameInfo : NSObject <NSCopying>
 
 + (instancetype)new NS_UNAVAILABLE;
@@ -79,7 +79,7 @@ MTR_NEWLY_AVAILABLE
 /**
  * The set of CASE Authenticated Tags contained in the DN.
  */
-@property (readonly) NSSet<NSNumber *> * tags;
+@property (readonly) NSSet<NSNumber *> * caseAuthenticatedTags;
 
 @end
 

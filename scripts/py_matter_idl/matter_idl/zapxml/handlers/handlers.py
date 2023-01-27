@@ -21,6 +21,8 @@ from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
 from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
 
+LOGGER = logging.getLogger('matter-xml-parser')
+
 
 class ClusterNameHandler(BaseHandler):
     """Handles /configurator/cluster/name elements."""
@@ -137,7 +139,7 @@ class AttributeHandler(BaseHandler):
                 elif attrs['op'] == 'write':
                     self._attribute.writeacl = role
                 else:
-                    logging.error("Unknown access: %r" % attrs['op'])
+                    LOGGER.error("Unknown access: %r" % attrs['op'])
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
@@ -230,8 +232,8 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                         found = True
 
                 if not found:
-                    logging.error('Enum %s could not find cluster (code %d/0x%X)' %
-                                  (self._struct.name, code, code))
+                    LOGGER.error('Enum %s could not find cluster (code %d/0x%X)' %
+                                 (self._struct.name, code, code))
         else:
             idl.structs.append(self._struct)
 
@@ -279,8 +281,8 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
                     found = True
 
             if not found:
-                logging.error('Enum %s could not find its cluster (code %d/0x%X)' %
-                              (self._enum.name, self._cluster_code, self._cluster_code))
+                LOGGER.error('Enum %s could not find its cluster (code %d/0x%X)' %
+                             (self._enum.name, self._cluster_code, self._cluster_code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -319,7 +321,7 @@ class BitmapHandler(BaseHandler):
             # Log only instead of critical, as not our XML is well formed.
             # For example at the time of writing this, SwitchFeature in switch-cluster.xml
             # did not have a code associated with it.
-            logging.error("Bitmap %r has no cluster codes" % self._bitmap)
+            LOGGER.error("Bitmap %r has no cluster codes" % self._bitmap)
             return
 
         for code in self._cluster_codes:
@@ -329,8 +331,8 @@ class BitmapHandler(BaseHandler):
                     c.bitmaps.append(self._bitmap)
                     found = True
             if not found:
-                logging.error('Bitmap %s could not find its cluster (code %d/0x%X)' %
-                              (self._bitmap.name, code, code))
+                LOGGER.error('Bitmap %s could not find its cluster (code %d/0x%X)' %
+                             (self._bitmap.name, code, code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -413,7 +415,7 @@ class CommandHandler(BaseHandler):
             if self._command:
                 self._command.invokeacl = AttrsToAccessPrivilege(attrs)
             else:
-                logging.warning(
+                LOGGER.warning(
                     "Ignored access role for reply %r" % self._struct)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'arg':
@@ -448,7 +450,7 @@ class ClusterGlobalAttributeHandler(BaseHandler):
         if name.lower() == 'featurebit':
             # It is uncler what featurebits mean. likely a bitmap should be created
             # here, however only one such example exists currently: door-lock-cluster.xml
-            logging.info('Ignoring featurebit tag for global attribute 0x%X (%d)' % (
+            LOGGER.info('Ignoring featurebit tag for global attribute 0x%X (%d)' % (
                 self._code, self._code))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
@@ -533,8 +535,8 @@ class ClusterExtensionHandler(ClusterHandler, IdlPostProcessor):
                 c.commands.extend(self._cluster.commands)
 
         if not found:
-            logging.error('Could not extend cluster 0x%X (%d): cluster not found' %
-                          (self._cluster_code, self._cluster_code))
+            LOGGER.error('Could not extend cluster 0x%X (%d): cluster not found' %
+                         (self._cluster_code, self._cluster_code))
 
 
 class GlobalAttributeHandler(BaseHandler):
@@ -572,7 +574,7 @@ class GlobalHandler(BaseHandler):
             if attrs['side'].lower() == 'client':
                 # We expect to also have 'server' equivalent, so ignore client
                 # side attributes
-                logging.debug(
+                LOGGER.debug(
                     'Ignoring global client-side attribute %s' % (attrs['code']))
                 return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
 

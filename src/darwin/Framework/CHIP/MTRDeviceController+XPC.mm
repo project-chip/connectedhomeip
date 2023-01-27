@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -157,7 +157,7 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
     NSMutableDictionary<NSString *, id> * result =
         [NSMutableDictionary dictionaryWithDictionary:[MTRDeviceController encodeXPCReadParams:params]];
     result[kKeepPreviousSubscriptionsKey] = @(!params.replaceExistingSubscriptions);
-    result[kAutoResubscribeKey] = @(params.resubscribeIfLost);
+    result[kAutoResubscribeKey] = @(params.resubscribeAutomatically);
     result[kMinIntervalKey] = params.minInterval;
     result[kMaxIntervalKey] = params.maxInterval;
     return result;
@@ -182,9 +182,9 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
 
     NSNumber * _Nullable autoResubscribe = params[kAutoResubscribeKey];
     if (autoResubscribe == nil) {
-        result.resubscribeIfLost = YES;
+        result.resubscribeAutomatically = YES;
     } else {
-        result.resubscribeIfLost = [autoResubscribe boolValue];
+        result.resubscribeAutomatically = [autoResubscribe boolValue];
     }
 
     return result;

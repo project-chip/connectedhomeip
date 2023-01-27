@@ -17,7 +17,6 @@
 
 #include "ias-zone-server.h"
 #include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -197,7 +196,7 @@ MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttribu
 
     // If this is not a CIE Address write, the CIE address has already been
     // written, or the IAS Zone server is already enrolled, do nothing.
-    if (attributePath.mAttributeId != ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID || emberAfCurrentCommand() == nullptr)
+    if (attributePath.mAttributeId != Attributes::IasCieAddress::Id || emberAfCurrentCommand() == nullptr)
     {
         return Protocols::InteractionModel::Status::Success;
     }
@@ -238,7 +237,7 @@ MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttribu
     }
 
     zeroAddress = true;
-    emberAfReadServerAttribute(endpoint, IasZone::Id, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID, (uint8_t *) ieeeAddress, 8);
+    emberAfReadServerAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id, (uint8_t *) ieeeAddress, 8);
     for (i = 0; i < 8; i++)
     {
         if (ieeeAddress[i] != 0)
@@ -298,7 +297,7 @@ bool emberAfIasZoneClusterAmIEnrolled(EndpointId endpoint)
 {
     EmberAfIasZoneState zoneState = EMBER_ZCL_IAS_ZONE_STATE_NOT_ENROLLED; // Clear this out completely.
     EmberAfStatus status;
-    status = emberAfReadServerAttribute(endpoint, IasZone::Id, ZCL_ZONE_STATE_ATTRIBUTE_ID, (unsigned char *) &zoneState,
+    status = emberAfReadServerAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id, (unsigned char *) &zoneState,
                                         1); // uint8_t size
 
     return (status == EMBER_ZCL_STATUS_SUCCESS && zoneState == EMBER_ZCL_IAS_ZONE_STATE_ENROLLED);
@@ -308,8 +307,7 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
 {
     EmberAfIasZoneState zoneState = (enrolled ? EMBER_ZCL_IAS_ZONE_STATE_ENROLLED : EMBER_ZCL_IAS_ZONE_STATE_NOT_ENROLLED);
 
-    emberAfWriteServerAttribute(endpoint, IasZone::Id, ZCL_ZONE_STATE_ATTRIBUTE_ID, (uint8_t *) &zoneState,
-                                ZCL_INT8U_ATTRIBUTE_TYPE);
+    emberAfWriteServerAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id, (uint8_t *) &zoneState, ZCL_INT8U_ATTRIBUTE_TYPE);
     emberAfIasZoneClusterPrintln("IAS Zone Server State: %pEnrolled", (enrolled ? "" : "NOT "));
 }
 
@@ -324,7 +322,7 @@ bool emberAfIasZoneClusterZoneEnrollResponseCallback(app::CommandHandler * comma
     EmberAfStatus status;
 
     endpoint = emberAfCurrentEndpoint();
-    status   = emberAfReadServerAttribute(endpoint, IasZone::Id, ZCL_ZONE_ID_ATTRIBUTE_ID, &epZoneId, sizeof(uint8_t));
+    status   = emberAfReadServerAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id, &epZoneId, sizeof(uint8_t));
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
         if (enrollResponseCode == EMBER_ZCL_IAS_ENROLL_RESPONSE_CODE_SUCCESS)
@@ -380,7 +378,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
 #endif
     EmberStatus sendStatus = EMBER_SUCCESS;
 
-    emberAfWriteServerAttribute(endpoint, IasZone::Id, ZCL_ZONE_STATUS_ATTRIBUTE_ID, (uint8_t *) &newStatus,
+    emberAfWriteServerAttribute(endpoint, IasZone::Id, Attributes::ZoneStatus::Id, (uint8_t *) &newStatus,
                                 ZCL_INT16U_ATTRIBUTE_TYPE);
 
     if (enrollmentMethod == EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_TRIP_TO_PAIR)
@@ -523,7 +521,7 @@ void emberAfIasZoneClusterServerInitCallback(EndpointId endpoint)
 #endif
 
     zoneType = (EmberAfIasZoneType) EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE;
-    emberAfWriteAttribute(endpoint, IasZone::Id, ZCL_ZONE_TYPE_ATTRIBUTE_ID, (uint8_t *) &zoneType, ZCL_INT16U_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id, (uint8_t *) &zoneType, ZCL_INT16U_ATTRIBUTE_TYPE);
 
     emberAfPluginIasZoneServerUpdateZoneStatus(endpoint,
                                                0,  // status: All alarms cleared
@@ -538,7 +536,7 @@ void emberAfIasZoneClusterServerTickCallback(EndpointId endpoint)
 uint8_t emberAfPluginIasZoneServerGetZoneId(EndpointId endpoint)
 {
     uint8_t zoneId = UNDEFINED_ZONE_ID;
-    emberAfReadServerAttribute(endpoint, IasZone::Id, ZCL_ZONE_ID_ATTRIBUTE_ID, &zoneId,
+    emberAfReadServerAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id, &zoneId,
                                emberAfGetDataSize(ZCL_INT8U_ATTRIBUTE_TYPE));
     return zoneId;
 }
@@ -566,7 +564,7 @@ static bool areZoneServerAttributesNonVolatile(EndpointId endpoint)
 static void setZoneId(EndpointId endpoint, uint8_t zoneId)
 {
     emberAfIasZoneClusterPrintln("IAS Zone Server Zone ID: 0x%X", zoneId);
-    emberAfWriteServerAttribute(endpoint, IasZone::Id, ZCL_ZONE_ID_ATTRIBUTE_ID, &zoneId, ZCL_INT8U_ATTRIBUTE_TYPE);
+    emberAfWriteServerAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id, &zoneId, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 static void unenrollSecurityDevice(EndpointId endpoint)
@@ -574,11 +572,10 @@ static void unenrollSecurityDevice(EndpointId endpoint)
     uint8_t ieeeAddress[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     uint16_t zoneType     = EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE;
 
-    emberAfWriteServerAttribute(endpoint, IasZone::Id, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID, (uint8_t *) ieeeAddress,
+    emberAfWriteServerAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id, (uint8_t *) ieeeAddress,
                                 ZCL_NODE_ID_ATTRIBUTE_TYPE);
 
-    emberAfWriteServerAttribute(endpoint, IasZone::Id, ZCL_ZONE_TYPE_ATTRIBUTE_ID, (uint8_t *) &zoneType,
-                                ZCL_INT16U_ATTRIBUTE_TYPE);
+    emberAfWriteServerAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id, (uint8_t *) &zoneType, ZCL_INT16U_ATTRIBUTE_TYPE);
 
     setZoneId(endpoint, UNDEFINED_ZONE_ID);
     // Restore the enrollment method back to its default value.

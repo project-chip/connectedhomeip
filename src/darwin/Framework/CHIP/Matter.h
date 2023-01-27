@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 #endif
 
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
-#import <Matter/MTRAttestationInfo.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRCSRInfo.h>
@@ -41,6 +40,7 @@
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDevice.h>
 #import <Matter/MTRDeviceAttestationDelegate.h>
+#import <Matter/MTRDeviceAttestationInfo.h>
 #import <Matter/MTRDeviceController+XPC.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerDelegate.h>

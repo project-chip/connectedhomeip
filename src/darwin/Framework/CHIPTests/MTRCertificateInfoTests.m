@@ -70,7 +70,7 @@
     XCTAssertEqualObjects(subject.rootCACertificateID, @1);
     XCTAssertNil(subject.fabricID);
     XCTAssertNil(subject.nodeID);
-    XCTAssertEqualObjects(subject.tags, [NSSet set]);
+    XCTAssertEqualObjects(subject.caseAuthenticatedTags, [NSSet set]);
 
     XCTAssertEqualObjects(info.issuer, subject);
 }
@@ -124,7 +124,7 @@
     XCTAssertNotNil(subject);
     XCTAssertEqualObjects(subject.fabricID, @0x0000000000000001);
     XCTAssertEqualObjects(subject.nodeID, @0x000000000001B669);
-    XCTAssertEqualObjects(subject.tags, ([NSSet setWithObjects:@0x00010001, @0x00080001, nil]));
+    XCTAssertEqualObjects(subject.caseAuthenticatedTags, ([NSSet setWithObjects:@0x00010001, @0x00080001, nil]));
     XCTAssertNil(subject.rootCACertificateID);
 
     XCTAssertNotEqualObjects(info.issuer, subject);

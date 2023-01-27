@@ -1,0 +1,172 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 42.1.5. [TC-ACE-1.5] Multi-fabric
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved for TH1"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH1 reads the fabric index"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th1FabricIndex
+
+    - label: "Open Commissioning Window from alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from TH2"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for TH2"
+      identity: beta
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH2 reads the fabric index"
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th2FabricIndex
+
+    - label: "TH1 writes ACL giving view privilege for descriptor cluster"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: th1FabricIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: 0x001f, Endpoint: 0, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: th1FabricIndex,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: 0x001d, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    - label: "TH2 writes ACL giving view privilge for basic cluster"
+      identity: beta
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: th2FabricIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: 0x001f, Endpoint: 0, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: th2FabricIndex,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: 0x0028, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    - label: "TH1 reads descriptor cluster - expect SUCCESS"
+      command: "readAttribute"
+      cluster: "Descriptor"
+      attribute: "DeviceTypeList"
+
+    - label: "TH1 reads basic cluster - expect UNSUPPORTED_ACCESS"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "VendorID"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label: "TH2 reads descriptor cluster - expect UNSUPPORTED_ACCESS"
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Descriptor"
+      attribute: "DeviceTypeList"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label: "TH2 reads basic cluster - expect SUCCESS"
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "VendorID"
+
+    - label: "TH1 resets ACL to default"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "TH1 sends RemoveFabric command for TH2"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: th2FabricIndex

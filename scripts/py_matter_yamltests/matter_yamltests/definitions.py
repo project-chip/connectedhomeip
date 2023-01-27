@@ -232,7 +232,7 @@ class SpecDefinitions:
                     f'Unknown target {target_name}. Did you mean {name} ?')
 
 
-def SpecDefinitionsFromPath(path: str):
+def SpecDefinitionsFromPaths(paths: str):
     def sort_with_global_attribute_first(a, b):
         if a.endswith('global-attributes.xml'):
             return -1
@@ -245,7 +245,13 @@ def SpecDefinitionsFromPath(path: str):
         elif a < b:
             return -1
 
-    filenames = glob.glob(path, recursive=False)
+    filenames = []
+    for path in paths:
+        if '*' in path or '?' in path:
+            filenames.extend(glob.glob(path, recursive=False))
+        else:
+            filenames.append(path)
+
     filenames.sort(key=functools.cmp_to_key(sort_with_global_attribute_first))
     sources = [ParseSource(source=name) for name in filenames]
     return SpecDefinitions(sources)

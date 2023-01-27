@@ -61,6 +61,8 @@ __all__ = ["ChipDeviceController"]
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, PyChipError)
+_DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
+    None, c_uint64, c_uint32, c_char_p, PyChipError)
 _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
     None, c_uint64, c_uint8, PyChipError)
 # void (*)(Device *, CHIP_ERROR).
@@ -256,11 +258,23 @@ class ChipDeviceController():
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
             self._ChipStack.commissioningEventRes = err
+            if self._dmLib.pychip_TestCommissionerUsed():
+                self._ChipStack.commissioningEventRes = self._dmLib.pychip_GetCompletionError()
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
 
-        def HandlePASEEstablishmentComplete(err: PyChipError):
+        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupCode: str, err: PyChipError) -> None:
             if err.is_success:
+                print("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
+                self._ChipStack.openCommissioningWindowPincode[nodeid] = (setupPinCode, setupCode)
+            else:
+                print("Failed to open commissioning window: {}".format(err))
+
+            self._ChipStack.callbackRes = err
+            self._ChipStack.completeEvent.set()
+
+        def HandlePASEEstablishmentComplete(err: PyChipError):
+            if not err.is_success:
                 print("Failed to establish secure session to device: {}".format(err))
                 self._ChipStack.callbackRes = err.to_exception()
             else:
@@ -287,6 +301,11 @@ class ChipDeviceController():
             HandleCommissioningComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.devCtrl, self.cbHandleCommissioningCompleteFunct)
+
+        self.cbHandleOpenWindowCompleteFunct = _DevicePairingDelegate_OnOpenWindowCompleteFunct(
+            HandleOpenWindowComplete)
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
+            self.devCtrl, self.cbHandleOpenWindowCompleteFunct)
 
         self.state = DCState.IDLE
         self._isActive = True
@@ -469,6 +488,10 @@ class ChipDeviceController():
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport(
             stage)
 
+    def SetTestCommissionerPrematureCompleteAfter(self, stage: int):
+        return self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter(
+            stage)
+
     def CheckTestCommissionerCallbacks(self):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissioningCallbacks()
@@ -512,8 +535,8 @@ class ChipDeviceController():
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
-            return False
-        return self._ChipStack.commissioningEventRes == 0
+            return False, -1
+        return self._ChipStack.commissioningEventRes == 0, self._ChipStack.commissioningEventRes
 
     def CommissionWithCode(self, setupPayload: str, nodeid: int):
         self.CheckIsActive()
@@ -737,13 +760,14 @@ class ChipDeviceController():
                 self.devCtrl)
         ).raise_on_error()
 
-    def OpenCommissioningWindow(self, nodeid, timeout, iteration, discriminator, option):
+    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int, discriminator: int, option: int) -> (int, str):
         self.CheckIsActive()
-
-        self._ChipStack.Call(
+        self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                 self.devCtrl, nodeid, timeout, iteration, discriminator, option)
         ).raise_on_error()
+        self._ChipStack.callbackRes.raise_on_error()
+        return self._ChipStack.openCommissioningWindowPincode[nodeid]
 
     def GetCompressedFabricId(self):
         self.CheckIsActive()
@@ -1366,9 +1390,13 @@ class ChipDeviceController():
                 c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = PyChipError
 
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback.argtypes = [
+                c_void_p, _DevicePairingDelegate_OnOpenWindowCompleteFunct]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback.restype = PyChipError
+
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = PyChipError
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.restype = PyChipError
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]
@@ -1414,6 +1442,13 @@ class ChipDeviceController():
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.argtypes = [
                 c_uint8]
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.restype = c_bool
+
+            self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter.argtypes = [
+                c_uint8]
+            self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter.restype = c_bool
+
+            self._dmLib.pychip_GetCompletionError.argtypes = []
+            self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64

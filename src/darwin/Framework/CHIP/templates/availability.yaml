@@ -4580,14 +4580,17 @@
               DeviceTypeStruct: DeviceType
 
 - release: "First major API revamp"
-  versions: "future"
+  versions:
+      ios: "16.4"
+      macos: "13.3"
+      watchos: "9.4"
+      tvos: "16.4"
   introduced:
       clusters:
           - OTASoftwareUpdateProvider
           - OTASoftwareUpdateRequestor
           - UnitTesting
           - WakeOnLAN
-          - ClientMonitoring
           - BasicInformation
           - BridgedDeviceBasicInformation
       attributes:
@@ -4603,16 +4606,6 @@
               - PIROccupiedToUnoccupiedDelay
               - PIRUnoccupiedToOccupiedDelay
               - PIRUnoccupiedToOccupiedThreshold
-          ClientMonitoring:
-              - IdleModeInterval
-              - ActiveModeInterval
-              - ActiveModeThreshold
-              - ExpectedClients
-              - FeatureMap
-              - ClusterRevision
-              - AttributeList
-              - GeneratedCommandList
-              - AcceptedCommandList
           UnitTesting:
               - Boolean
               - Bitmap8
@@ -4823,10 +4816,6 @@
               - TestSimpleOptionalArgumentRequest
               - TestEmitTestEventRequest
               - TestEmitTestFabricScopedEventRequest
-          ClientMonitoring:
-              - RegisterClientMonitoring
-              - UnregisterClientMonitoring
-              - StayAwakeRequest
           ContentLauncher:
               - LauncherResponse
           MediaPlayback:
@@ -4988,13 +4977,6 @@
                   # Next two were introduced and deprecated at the same time, effectively
                   - providerNodeId
                   - vendorId
-          ClientMonitoring:
-              RegisterClientMonitoring:
-                  - clientNodeId
-                  - iCid
-              UnregisterClientMonitoring:
-                  - clientNodeId
-                  - iCid
           Groups:
               AddGroup:
                   - groupID
@@ -5104,8 +5086,6 @@
               - NestedStructList
               - DoubleNestedStructList
               - TestListStructOctet
-          ClientMonitoring:
-              - MonitoringRegistration
           BasicInformation:
               - CapabilityMinimaStruct
           AccessControl:
@@ -5198,11 +5178,6 @@
               ProviderLocation:
                   - providerNodeID
                   - endpoint
-                  - fabricIndex
-          ClientMonitoring:
-              MonitoringRegistration:
-                  - clientNodeId
-                  - iCid
                   - fabricIndex
           BasicInformation:
               CapabilityMinimaStruct:
@@ -5511,6 +5486,10 @@
           PowerSource:
               BatChargeLevel:
                   - OK
+              BatChargeFault:
+                  - Unspecified
+              PowerSourceStatus:
+                  - Unspecified
           ThreadNetworkDiagnostics:
               ConnectionStatusEnum:
                   - Connected
@@ -5702,8 +5681,10 @@
               - DaysMaskMap
           PumpConfigurationAndControl:
               - PumpFeature
-          Scenes:
-              - SceneFeatures
+          WiFiNetworkDiagnostics:
+              - WiFiNetworkDiagnosticsFeature
+          EthernetNetworkDiagnostics:
+              - EthernetNetworkDiagnosticsFeature
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5778,9 +5759,14 @@
               ModeForSequence:
                   - HeatSetpointPresent
                   - CoolSetpointPresent
-          Scenes:
-              SceneFeatures:
-                  - SceneNames
+          WiFiNetworkDiagnostics:
+              WiFiNetworkDiagnosticsFeature:
+                  - PacketCounts
+                  - ErrorCounts
+          EthernetNetworkDiagnostics:
+              EthernetNetworkDiagnosticsFeature:
+                  - PacketCounts
+                  - ErrorCounts
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -6036,6 +6022,10 @@
           PowerSource:
               BatChargeLevel:
                   - Ok
+              BatChargeFault:
+                  - Unspecfied
+              PowerSourceStatus:
+                  - Unspecfied
           WiFiNetworkDiagnostics:
               WiFiVersionType:
                   - 80211a
@@ -6165,6 +6155,13 @@
                   - Dual
               CredentialRuleEnum:
                   - Double
+      bitmaps:
+          Scenes:
+              # All the other feature map bitmaps have names ending in
+              # "Feature", so let's not ship this one until it aligns
+              # with the others.
+              # See https://github.com/project-chip/connectedhomeip/issues/24681
+              - SceneFeatures
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -6405,6 +6402,10 @@
           PowerSource:
               BatChargeLevel:
                   OK: Ok
+              BatChargeFault:
+                  Unspecified: Unspecfied
+              PowerSourceStatus:
+                  Unspecified: Unspecfied
           WiFiNetworkDiagnostics:
               WiFiVersionType:
                   A: 80211a
@@ -6501,3 +6502,6 @@
               ModeForSequence:
                   HeatSetpointPresent: HeatSetpointFieldPresent
                   CoolSetpointPresent: CoolSetpointFieldPresent
+
+- release: "Future"
+  versions: "future"

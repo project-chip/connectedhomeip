@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -188,15 +188,15 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
     if (!firmwareInfoSpan.empty()) {
         firmwareInfo = AsData(firmwareInfoSpan);
     }
-    MTRAttestationInfo * attestationInfo =
-        [[MTRAttestationInfo alloc] initWithChallenge:AsData(attestationChallenge)
-                                                nonce:AsData(commissioningParameters.Value().GetAttestationNonce().Value())
-                                          elementsTLV:AsData(commissioningParameters.Value().GetAttestationElements().Value())
-                                    elementsSignature:AsData(commissioningParameters.Value().GetAttestationSignature().Value())
-                         deviceAttestationCertificate:AsData(DAC)
-            productAttestationIntermediateCertificate:AsData(PAI)
-                             certificationDeclaration:AsData(certificationDeclarationSpan)
-                                         firmwareInfo:firmwareInfo];
+    MTRDeviceAttestationInfo * attestationInfo = [[MTRDeviceAttestationInfo alloc]
+               initWithDeviceAttestationChallenge:AsData(attestationChallenge)
+                                            nonce:AsData(commissioningParameters.Value().GetAttestationNonce().Value())
+                                      elementsTLV:AsData(commissioningParameters.Value().GetAttestationElements().Value())
+                                elementsSignature:AsData(commissioningParameters.Value().GetAttestationSignature().Value())
+                     deviceAttestationCertificate:AsData(DAC)
+        productAttestationIntermediateCertificate:AsData(PAI)
+                         certificationDeclaration:AsData(certificationDeclarationSpan)
+                                     firmwareInfo:firmwareInfo];
 
     MTRDeviceController * __weak weakController = mWeakController;
     dispatch_async(mOperationalCertificateIssuerQueue, ^{
@@ -204,13 +204,13 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
             issueOperationalCertificateForRequest:csrInfo
                                   attestationInfo:attestationInfo
                                        controller:strongController
-                                       completion:^(MTROperationalCertificateInfo * _Nullable info, NSError * _Nullable error) {
+                                       completion:^(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error) {
                                            MTRDeviceController * strongController = weakController;
                                            if (strongController == nil || !strongController.isRunning) {
                                                // No longer safe to touch "this"
                                                return;
                                            }
-                                           this->ExternalNOCChainGenerated(info, error);
+                                           this->ExternalNOCChainGenerated(chain, error);
                                        }];
     });
 
@@ -218,7 +218,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 }
 
 void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
-    MTROperationalCertificateInfo * _Nullable info, NSError * _Nullable error)
+    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error)
 {
     // Dispatch will only happen if the controller is still running, which means we
     // are safe to touch our members.
@@ -238,7 +238,7 @@ void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
                 return;
             }
 
-            if (info == nil) {
+            if (chain == nil) {
                 onCompletion->mCall(onCompletion->mContext, [MTRError errorToCHIPErrorCode:error], ByteSpan(), ByteSpan(),
                     ByteSpan(), NullOptional, NullOptional);
                 return;
@@ -252,19 +252,19 @@ void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
             IdentityProtectionKeySpan ipk = commissioningParameters.Value().GetIpk().ValueOr(GetIPK());
 
             Optional<NodeId> adminSubject;
-            if (info.adminSubject != nil) {
-                adminSubject.SetValue(info.adminSubject.unsignedLongLongValue);
+            if (chain.adminSubject != nil) {
+                adminSubject.SetValue(chain.adminSubject.unsignedLongLongValue);
             } else {
                 adminSubject = commissioningParameters.Value().GetAdminSubject();
             }
 
             ByteSpan intermediateCertificate;
-            if (info.intermediateCertificate != nil) {
-                intermediateCertificate = AsByteSpan(info.intermediateCertificate);
+            if (chain.intermediateCertificate != nil) {
+                intermediateCertificate = AsByteSpan(chain.intermediateCertificate);
             }
 
-            onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, AsByteSpan(info.operationalCertificate),
-                intermediateCertificate, AsByteSpan(info.rootCertificate), MakeOptional(ipk), adminSubject);
+            onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, AsByteSpan(chain.operationalCertificate),
+                intermediateCertificate, AsByteSpan(chain.rootCertificate), MakeOptional(ipk), adminSubject);
         }
                              // If we can't run the block, we're torn down and should
                              // just do nothing.
@@ -443,7 +443,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateIntermediateCertificate(id
 
 CHIP_ERROR MTROperationalCredentialsDelegate::GenerateOperationalCertificate(id<MTRKeypair> signingKeypair,
     NSData * signingCertificate, SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId,
-    NSArray<NSNumber *> * _Nullable caseAuthenticatedTags, NSData * _Nullable __autoreleasing * _Nonnull operationalCert)
+    NSSet<NSNumber *> * _Nullable caseAuthenticatedTags, NSData * _Nullable __autoreleasing * _Nonnull operationalCert)
 {
     *operationalCert = nil;
 
@@ -471,7 +471,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateOperationalCertificate(id<
     CATValues cats;
     if (caseAuthenticatedTags != nil) {
         size_t idx = 0;
-        for (NSNumber * cat in caseAuthenticatedTags) {
+        for (NSNumber * cat in [caseAuthenticatedTags.allObjects sortedArrayUsingSelector:@selector(compare:)]) {
             cats.values[idx++] = [cat unsignedIntValue];
         }
     }
