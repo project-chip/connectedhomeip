@@ -63,11 +63,28 @@ SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
 namespace {
-constexpr int kFactoryResetTriggerTimeout = 2000;
-constexpr int kAppEventQueueSize          = 10;
-constexpr uint8_t kButtonPushEvent        = 1;
-constexpr uint8_t kButtonReleaseEvent     = 0;
+constexpr int kFactoryResetTriggerTimeout       = 2000;
+constexpr int kAppEventQueueSize                = 10;
+constexpr uint8_t kButtonPushEvent              = 1;
+constexpr uint8_t kButtonReleaseEvent           = 0;
+constexpr EndpointId kEndpointId                = 1;
+constexpr uint8_t kDefaultMinLevel              = 0;
+constexpr uint8_t kDefaultMaxLevel              = 254;
+constexpr uint32_t kIdentifyBlinkRateMs         = 200;
+constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
+constexpr uint32_t kIdentifyOkayOffRateMs       = 950;
+constexpr uint32_t kIdentifyFinishOnRateMs      = 950;
+constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
+constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
+constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
+
+const struct pwm_dt_spec sPwmIdentifySpecGreenLed = LIGHTING_PWM_SPEC_IDENTIFY_GREEN;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFactoryResetTimer;
@@ -88,29 +105,11 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 void OnIdentifyTriggerEffect(Identify * identify)
 {
-    switch (identify->mCurrentEffectIdentifier)
-    {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-        break;
-    }
-    return;
+    AppTask::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
 }
 
 Identify sIdentify = {
-    chip::EndpointId{ 1 },
+    kEndpointId,
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
@@ -118,11 +117,6 @@ Identify sIdentify = {
 };
 
 } // namespace
-
-using namespace ::chip;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
 
 AppTask AppTask::sAppTask;
 
@@ -139,16 +133,14 @@ class AppFabricTableDelegate : public FabricTable::Delegate
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::Init(void)
 {
-    CHIP_ERROR ret;
-
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Initialize status LED
-    LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
+    LEDWidget::InitGpio(LEDS_PORT);
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
-    sStatusLED.Init(SYSTEM_STATE_LED_PIN);
+    sStatusLED.Init(SYSTEM_STATE_LED);
 
     UpdateStatusLED();
 
@@ -162,6 +154,16 @@ CHIP_ERROR AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
+
+    // Initialize PWM Identify led
+    CHIP_ERROR err = sAppTask.mPwmIdentifyLed.Init(&sPwmIdentifySpecGreenLed, kDefaultMinLevel, kDefaultMaxLevel, kDefaultMaxLevel);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Green IDENTIFY PWM Device Init fail");
+        return err;
+    }
+
+    sAppTask.mPwmIdentifyLed.SetCallbacks(nullptr, nullptr, ActionIdentifyStateUpdateHandler);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -181,11 +183,11 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // Configure Bindings
-    ret = InitBindingHandlers();
-    if (ret != CHIP_NO_ERROR)
+    err = InitBindingHandlers();
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("InitBindingHandlers fail");
-        return ret;
+        return err;
     }
 
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -195,24 +197,24 @@ CHIP_ERROR AppTask::Init()
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
-    ret = ConnectivityMgr().SetBLEDeviceName("TelinkApp");
-    if (ret != CHIP_NO_ERROR)
+    err = ConnectivityMgr().SetBLEDeviceName("TelinkApp");
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");
-        return ret;
+        return err;
     }
 
-    ret = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
-    if (ret != CHIP_NO_ERROR)
+    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("AppFabricTableDelegate fail");
-        return ret;
+        return err;
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::StartApp()
+CHIP_ERROR AppTask::StartApp(void)
 {
     CHIP_ERROR err = Init();
 
@@ -234,6 +236,56 @@ CHIP_ERROR AppTask::StartApp()
             ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
         }
     }
+}
+
+void AppTask::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_IdentifyStart;
+
+    switch (aEffect)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+        event.Handler = [](AppEvent *) {
+            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
+        };
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+        event.Handler = [](AppEvent *) {
+            sAppTask.mPwmIdentifyLed.InitiateBreatheAction(PWMDevice::kBreatheType_Both, kIdentifyBreatheRateMs);
+        };
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+        event.Handler = [](AppEvent *) {
+            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
+        };
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+        event.Handler = [](AppEvent *) {
+            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
+        };
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT");
+        event.Handler = [](AppEvent *) {
+            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
+        };
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT");
+        event.Handler = [](AppEvent *) { sAppTask.mPwmIdentifyLed.StopAction(); };
+        event.Type    = AppEvent::kEventType_IdentifyStop;
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
+
+    sAppTask.PostEvent(&event);
 }
 
 void AppTask::FactoryResetButtonEventHandler(void)
@@ -276,7 +328,7 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         // Switch context from BLE to Thread
-        BLEManagerImpl sInstance;
+        Internal::BLEManagerImpl sInstance;
         sInstance.SwitchToIeee802154();
         StartDefaultThreadNetwork();
     }
@@ -336,7 +388,7 @@ void AppTask::LEDStateUpdateHandler(LEDWidget * ledWidget)
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::UpdateStatusLED()
+void AppTask::UpdateStatusLED(void)
 {
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
@@ -382,10 +434,21 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     }
 }
 
+void AppTask::ActionIdentifyStateUpdateHandler(k_timer * timer)
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_UpdateLedState;
+    event.Handler = UpdateIdentifyStateEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
+{
+    sAppTask.mPwmIdentifyLed.UpdateAction();
+}
+
 void AppTask::PostEvent(AppEvent * aEvent)
 {
-    if (!aEvent)
-        return;
     if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT) != 0)
     {
         LOG_INF("PostEvent fail");
@@ -394,8 +457,6 @@ void AppTask::PostEvent(AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-    if (!aEvent)
-        return;
     if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);

@@ -20,6 +20,7 @@
 
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#include "PWMDevice.h"
 #include "SensorManager.h"
 #include "TemperatureManager.h"
 
@@ -34,23 +35,28 @@
 #include <cstdint>
 
 struct k_timer;
+struct Identify;
 
 class AppTask
 {
 public:
-    CHIP_ERROR StartApp();
+    CHIP_ERROR StartApp(void);
 
     void PostEvent(AppEvent * event);
-    void UpdateClusterState();
-    void UpdateThermoStatUI();
+    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
+
+    void UpdateClusterState(void);
+    void UpdateThermoStatUI(void);
 
 private:
     friend AppTask & GetAppTask(void);
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(void);
+
+    static void ActionIdentifyStateUpdateHandler(k_timer * timer);
 
     void DispatchEvent(AppEvent * event);
 
-    static void UpdateStatusLED();
+    static void UpdateStatusLED(void);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
     static void FactoryResetButtonEventHandler(void);
     static void StartThreadButtonEventHandler(void);
@@ -65,12 +71,14 @@ private:
     static void StartThreadHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
     static void UpdateLedStateEventHandler(AppEvent * aEvent);
+    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
 
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
+    PWMDevice mPwmIdentifyLed;
 
 #if CONFIG_CHIP_FACTORY_DATA
     // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
