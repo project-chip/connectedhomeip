@@ -65,7 +65,7 @@ class K32WBuilder(GnBuilder):
                  disable_ota: bool = False,
                  disable_logs: bool = False,
                  se05x: bool = False,
-                 tinycrypt: bool = False
+                 tinycrypt: bool = False,
                  crypto_platform: bool = False):
         super(K32WBuilder, self).__init__(
             root=app.BuildRoot(root),
