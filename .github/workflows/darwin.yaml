@@ -110,7 +110,7 @@ jobs:
             - name: Make zap-cli work again
               run: scripts/run_in_build_env.sh 'mv $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli.moved $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli'
             - name: Validate zap-cli is again available
-              run: zap-cli --version
+              run: bash -c 'zap-cli --version'
             - name: Build example All Clusters Server
               timeout-minutes: 15
               run: |
