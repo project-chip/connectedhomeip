@@ -67,7 +67,7 @@ jobs:
               # xcodebuild is NOT expected to require zap-cli
               run: scripts/run_in_build_env.sh 'mv $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli.moved'
             - name: Validate zap-cli is NOT available
-              run: bash -c '(zap-cli && exit 1) || exit 0'
+              run: bash -c '(zap-cli --version && exit 1) || exit 0'
             - name: Run iOS Build Debug
               timeout-minutes: 50
               working-directory: src/darwin/Framework
@@ -109,6 +109,8 @@ jobs:
               working-directory: src/darwin/Framework
             - name: Make zap-cli work again
               run: scripts/run_in_build_env.sh 'mv $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli.moved $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli'
+            - name: Validate zap-cli is again available
+              run: zap-cli --version
             - name: Build example All Clusters Server
               timeout-minutes: 15
               run: |
