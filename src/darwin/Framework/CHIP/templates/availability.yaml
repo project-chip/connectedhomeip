@@ -5515,6 +5515,10 @@
           PowerSource:
               BatChargeLevel:
                   - OK
+              BatChargeFault:
+                  - Unspecified
+              PowerSourceStatus:
+                  - Unspecified
           ThreadNetworkDiagnostics:
               ConnectionStatusEnum:
                   - Connected
@@ -6040,6 +6044,10 @@
           PowerSource:
               BatChargeLevel:
                   - Ok
+              BatChargeFault:
+                  - Unspecfied
+              PowerSourceStatus:
+                  - Unspecfied
           WiFiNetworkDiagnostics:
               WiFiVersionType:
                   - 80211a
@@ -6409,6 +6417,10 @@
           PowerSource:
               BatChargeLevel:
                   OK: Ok
+              BatChargeFault:
+                  Unspecified: Unspecfied
+              PowerSourceStatus:
+                  Unspecified: Unspecfied
           WiFiNetworkDiagnostics:
               WiFiVersionType:
                   A: 80211a
