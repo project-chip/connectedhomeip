@@ -86,8 +86,10 @@ public:
         virtual void OnEndpointAdded(ClusterStateCache * cache, EndpointId endpointId){};
     };
 
-    ClusterStateCache(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing()) :
-        mCallback(callback), mBufferedReader(*this)
+    ClusterStateCache(Callback & callback, bool cacheData = true,
+                      Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing()) :
+        mCallback(callback),
+        mBufferedReader(*this), mCacheData(cacheData)
     {
         mHighestReceivedEventNumber = highestReceivedEventNumber;
     }
@@ -622,6 +624,7 @@ private:
     std::map<ConcreteEventPath, StatusIB> mEventStatusCache;
     BufferedReadCallback mBufferedReader;
     ConcreteClusterPath mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
+    bool mCacheData                         = true;
 };
 
 }; // namespace app
