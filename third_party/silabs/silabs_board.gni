@@ -29,6 +29,10 @@ declare_args() {
 
   # Boards BRD2703A and BRD4319A disable this explicitly
   use_external_flash = true
+
+  # WIFI rcp boards options for wifi apps.
+  use_wf200 = false
+  use_rs911x = false
 }
 
 declare_args() {

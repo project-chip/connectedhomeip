@@ -42,6 +42,8 @@ declare_args() {
 
   # Enable Sleepy end device
   enable_sleepy_device = false
+
+  use_rs911x_sockets = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -57,12 +59,6 @@ template("efr32_sdk") {
   }
 
   assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
-  use_wf200 = false
-  if (defined(invoker.use_wf200)) {
-    if (invoker.use_wf200) {
-      use_wf200 = true
-    }
-  }
 
   sdk_target_name = target_name
 
@@ -193,6 +189,60 @@ template("efr32_sdk") {
 
       #"__STACK_SIZE=0",
     ]
+
+    if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
+      if (use_rs911x) {
+        defines += [
+          "SL_HEAP_SIZE=32768",
+          "SL_WIFI=1",
+          "SL_WFX_USE_SPI",
+          "EFX32_RS911X=1",
+          "RS911X_WIFI",
+          "RSI_WLAN_ENABLE",
+          "RSI_SPI_INTERFACE",
+          "RSI_WITH_OS",
+        ]
+      } else if (use_wf200) {
+        defines += [
+          "SL_HEAP_SIZE=24576",
+          "WF200_WIFI=1",
+          "SL_WIFI=1",
+          "SL_WFX_USE_SPI",
+          "SL_WFX_DEBUG_MASK=0x0003",
+        ]
+      }
+
+      if (use_rs911x_sockets) {
+        include_dirs += [ "wifi/rsi-sockets" ]
+        defines += rs911x_sock_defs
+      } else {
+        import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
+        defines += [ "LWIP_NETIF_API=1" ]
+
+        if (lwip_ipv4) {
+          defines += [
+            "LWIP_IPV4=1",
+
+            # adds following options to provide
+            # them to .cpp source files
+            # flags ported from lwipopts file
+            # TODO: move lwipopts to one location
+            "LWIP_ARP=1",
+            "LWIP_ICMP=1",
+            "LWIP_IGMP=1",
+            "LWIP_DHCP=1",
+            "LWIP_DNS=0",
+          ]
+        } else {
+          defines += [ "LWIP_IPV4=0" ]
+        }
+        if (lwip_ipv4) {
+          defines += [ "LWIP_IPV6=1" ]
+        } else {
+          defines += [ "LWIP_IPV6=0" ]
+        }
+      }
+    }
 
     if (use_system_view) {
       _include_dirs += [
@@ -396,13 +446,6 @@ template("efr32_sdk") {
 
     if (silabs_family == "efr32mg24" || silabs_family == "mgm24") {
       cflags += [ "-mcmse" ]
-    }
-
-    if (defined(invoker.use_rs911x)) {
-      if (invoker.use_rs911x == true) {
-        #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
-        cflags += invoker.rs911x_cflags
-      }
     }
 
     if (defined(invoker.defines)) {

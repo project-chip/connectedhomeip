@@ -1,6 +1,4 @@
 import("//build_overrides/chip.gni")
-import("//build_overrides/efr32_sdk.gni")
-import("//build_overrides/pigweed.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
@@ -85,16 +83,7 @@ rs911x_src_lwip = [
   "${wifi_sdk_dir}/dhcp_client.cpp",
   "${wifi_sdk_dir}/lwip_netif.cpp",
 ]
-rs911x_defs = [
-  "SL_HEAP_SIZE=32768",
-  "SL_WIFI=1",
-  "SL_WFX_USE_SPI",
-  "EFX32_RS911X=1",
-  "RS911X_WIFI",
-  "RSI_WLAN_ENABLE",
-  "RSI_SPI_INTERFACE",
-  "RSI_WITH_OS",
-]
+
 rs911x_sock_defs = [
   "RS911X_SOCKETS",
   "RSI_IPV6_ENABLE",
