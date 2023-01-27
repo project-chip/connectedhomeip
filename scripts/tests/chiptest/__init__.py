@@ -190,7 +190,7 @@ def _hardcoded_python_yaml_tests():
 
         file_path = str(path)
 
-        target = target_for_name(file_path)
+        target = target_for_name(path.name)
 
         # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
         yield TestDefinition(
