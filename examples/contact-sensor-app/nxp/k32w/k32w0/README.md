@@ -147,7 +147,7 @@ cause the device to reset its persistent configuration and initiate a reboot.
 The reset action can be cancelled by press SW2 button at any point before the 6
 second limit.
 
-**Button SW3** can be used to change the state of the simulated contact senosr.
+**Button SW3** can be used to change the state of the simulated contact sensor.
 The button behaves as a toggle, swapping the state every time it is pressed.
 
 **Button SW4** can be used for initiating the OTA software update process.
@@ -214,7 +214,7 @@ In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
-running oscilator as a clock source. In this case one must set the use_fro_32k
+running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
@@ -363,7 +363,7 @@ In order to use the Tinycrypt ECC library, use the following build arguments:
 
 -   Build without Secure element (_chip_with_se05x=0_), with crypto platform
     (_chip_crypto=\"platform\"_) and with tinycrypt selected
-    (_chip_crypto_flavour=\"tinycrypt\"_).
+    (_chip_crypto_flavor=\"tinycrypt\"_).
 
 ## OTA
 

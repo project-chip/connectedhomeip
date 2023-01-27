@@ -111,7 +111,7 @@ class K32WBuilder(GnBuilder):
             args.append('chip_with_se05x=true')
 
         if self.tinycrypt:
-            args.append('chip_crypto=\"platform\" chip_crypto_flavour=\"tinycrypt\"')
+            args.append('chip_crypto=\"platform\" chip_crypto_flavor=\"tinycrypt\"')
 
         if self.crypto_platform:
             args.append('chip_crypto=\"platform\"')

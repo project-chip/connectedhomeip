@@ -53,7 +53,7 @@ class InputArgument:
                 its internal value.
 
     Main usage is to iterate over an iterable entity of InputArguments and call
-    the output() method to generate the (K, L, V) tuple. Note that the ouput()
+    the output() method to generate the (K, L, V) tuple. Note that the output()
     method should not be implemented, since its a common functionality across
     all InputArgument classes.
     '''

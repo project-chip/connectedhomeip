@@ -61,7 +61,7 @@ config("mbedtls_k32w0_config") {
     ]
   }
 
-  if (chip_crypto == "platform" && chip_crypto_flavour == "tinycrypt") {
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
     defines += [
       "MBEDTLS_USE_TINYCRYPT",
       "MBEDTLS_OPTIMIZE_TINYCRYPT_ASM",
@@ -70,7 +70,7 @@ config("mbedtls_k32w0_config") {
 
   include_dirs = [ chip_root ]
 
-  if (chip_crypto == "platform" && chip_crypto_flavour == "tinycrypt") {
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
     include_dirs += [
       "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/inc",
     ]
@@ -83,7 +83,7 @@ mbedtls_target("mbedtls") {
     "${k32w0_sdk_root}/middleware/mbedtls/port/matter/ksdk_mbedtls.c",
   ]
 
-  if (chip_crypto == "platform" && chip_crypto_flavour == "tinycrypt") {
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
     sources += [
       "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc.c",
       "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc_dh.c",

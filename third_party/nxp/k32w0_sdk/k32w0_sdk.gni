@@ -41,15 +41,15 @@ declare_args() {
   chip_with_factory_data = 0
   use_fro_32k = 0
   use_custom_factory_provider = 0
-  chip_crypto_flavour = "NXP-Ultrafast-P256"
+  chip_crypto_flavor = "NXP-Ultrafast-P256"
   chip_reduce_ssbl_size = false
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
 
 if (chip_crypto == "platform") {
-  assert(chip_crypto_flavour == "tinycrypt" ||
-             chip_crypto_flavour == "NXP-Ultrafast-P256",
+  assert(chip_crypto_flavor == "tinycrypt" ||
+             chip_crypto_flavor == "NXP-Ultrafast-P256",
          "choose tinycrypt or NXP-Ultrafast-P256 as crypto platform")
 }
 
@@ -138,7 +138,7 @@ template("k32w0_sdk") {
   print("low power: ", chip_with_low_power)
 
   if (chip_crypto == "platform") {
-    print("ECC crypto lib: ", chip_crypto_flavour)
+    print("ECC crypto lib: ", chip_crypto_flavor)
   }
 
   device_lowercase = string_replace(board, "dk6", "")
@@ -244,7 +244,7 @@ template("k32w0_sdk") {
     ]
 
     if (chip_crypto == "platform" &&
-        chip_crypto_flavour == "NXP-Ultrafast-P256") {
+        chip_crypto_flavor == "NXP-Ultrafast-P256") {
       libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4_dspext.a" ]
     } else {
       libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a" ]
@@ -309,7 +309,7 @@ template("k32w0_sdk") {
     ]
 
     if (chip_crypto == "platform" &&
-        chip_crypto_flavour == "NXP-Ultrafast-P256") {
+        chip_crypto_flavor == "NXP-Ultrafast-P256") {
       defines += [ "EC_P256_DSPEXT=1" ]
     }
 
