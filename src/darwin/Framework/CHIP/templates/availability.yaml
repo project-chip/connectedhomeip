@@ -5710,8 +5710,6 @@
               - DaysMaskMap
           PumpConfigurationAndControl:
               - PumpFeature
-          Scenes:
-              - SceneFeatures
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5786,9 +5784,6 @@
               ModeForSequence:
                   - HeatSetpointPresent
                   - CoolSetpointPresent
-          Scenes:
-              SceneFeatures:
-                  - SceneNames
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -6177,6 +6172,13 @@
                   - Dual
               CredentialRuleEnum:
                   - Double
+      bitmaps:
+          Scenes:
+              # All the other feature map bitmaps have names ending in
+              # "Feature", so let's not ship this one until it aligns
+              # with the others.
+              # See https://github.com/project-chip/connectedhomeip/issues/24681
+              - SceneFeatures
   renames:
       clusters:
           UnitTesting: TestCluster
