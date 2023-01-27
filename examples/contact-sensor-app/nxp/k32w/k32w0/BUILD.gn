@@ -92,13 +92,13 @@ k32w0_executable("contact_sensor_app") {
 
   if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
     sources += [
-      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.cpp",
+      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
     ]
 
     defines = [
       "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
-      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3"
+      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3",
     ]
   }
 
@@ -132,8 +132,9 @@ k32w0_executable("contact_sensor_app") {
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir),
-              "-Wl,-print-memory-usage",
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -144,13 +145,12 @@ k32w0_executable("contact_sensor_app") {
         "-Wl,--defsym",
         "-Wl,__app_stated_size__=0x9B200",
       ]
-    }
-    else {
+    } else {
       ldflags += [
-         "-Wl,--defsym",
-         "-Wl,__app_load_address__=0x4000",
-         "-Wl,--defsym",
-         "-Wl,__app_stated_size__=0x99200",
+        "-Wl,--defsym",
+        "-Wl,__app_load_address__=0x4000",
+        "-Wl,--defsym",
+        "-Wl,__app_stated_size__=0x99200",
       ]
     }
   }

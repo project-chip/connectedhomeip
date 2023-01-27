@@ -32,7 +32,7 @@ if (chip_crypto == "") {
 
 assert(
     chip_crypto == "mbedtls" || chip_crypto == "psa" ||
-        chip_crypto == "openssl" || chip_crypto == "boringssl" || 
+        chip_crypto == "openssl" || chip_crypto == "boringssl" ||
         chip_crypto == "platform",
     "Please select a valid crypto implementation: mbedtls, psa, openssl, boringssl, platform")
 

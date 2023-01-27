@@ -71,7 +71,9 @@ config("mbedtls_k32w0_config") {
   include_dirs = [ chip_root ]
 
   if (chip_crypto == "platform" && chip_crypto_flavour == "tinycrypt") {
-    include_dirs += [ "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/inc" ]
+    include_dirs += [
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/inc",
+    ]
   }
 }
 

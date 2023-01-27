@@ -57,8 +57,8 @@ source_set("openthread_mbedtls_config_k32w0") {
 
 source_set("libopenthread-k32w0") {
   sources = [
-    "${openthread_nxp_root}/src/common/ram_storage.c",
     "${openthread_nxp_root}/src/common/crypto.c",
+    "${openthread_nxp_root}/src/common/ram_storage.c",
     "${openthread_nxp_root}/src/k32w0/platform/alarm.c",
     "${openthread_nxp_root}/src/k32w0/platform/diag.c",
     "${openthread_nxp_root}/src/k32w0/platform/entropy.c",
@@ -73,13 +73,16 @@ source_set("libopenthread-k32w0") {
   ]
 
   if (chip_crypto == "platform" && chip_crypto_flavour == "tinycrypt") {
-    sources += [ "${openthread_nxp_root}/src/common/crypto/ecdsa_tinycrypt.cpp" ]
+    sources +=
+        [ "${openthread_nxp_root}/src/common/crypto/ecdsa_tinycrypt.cpp" ]
   }
 
-  if (chip_crypto == "platform" && chip_crypto_flavour == "NXP-Ultrafast-P256") {
-    sources += [ "${openthread_nxp_root}/src/k32w0/platform/ecdsa-nxp-ultrafast-p256.cpp" ]
+  if (chip_crypto == "platform" &&
+      chip_crypto_flavour == "NXP-Ultrafast-P256") {
+    sources += [
+      "${openthread_nxp_root}/src/k32w0/platform/ecdsa-nxp-ultrafast-p256.cpp",
+    ]
   }
-
 
   if (chip_with_ot_cli == 1) {
     sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]

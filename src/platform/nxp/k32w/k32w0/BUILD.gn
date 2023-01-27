@@ -90,26 +90,18 @@ static_library("k32w0") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_crypto == "platform") {
-    if(chip_crypto_flavour == "tinycrypt") {
+    if (chip_crypto_flavour == "tinycrypt") {
+      sources += [ "${chip_root}/src/platform/nxp/common/crypto/CHIPCryptoPALTinyCrypt.cpp" ]
 
-      sources += [
-        "${chip_root}/src/platform/nxp/common/crypto/CHIPCryptoPALTinyCrypt.cpp",
-      ]
-
-      public_deps += [
-        "${mbedtls_root}:mbedtls",
-      ]
+      public_deps += [ "${mbedtls_root}:mbedtls" ]
     }
 
-    if(chip_crypto_flavour == "NXP-Ultrafast-P256") {
-
-      sources += [
-        "${chip_root}/src/platform/nxp/k32w/k32w0/crypto/CHIPCryptoPALNXPUltrafastP256.cpp",
-      ]
+    if (chip_crypto_flavour == "NXP-Ultrafast-P256") {
+      sources += [ "${chip_root}/src/platform/nxp/k32w/k32w0/crypto/CHIPCryptoPALNXPUltrafastP256.cpp" ]
 
       public_deps += [
-        "${mbedtls_root}:mbedtls",
         "${chip_root}/third_party/nxp/k32w0_sdk:k32w0_sdk",
+        "${mbedtls_root}:mbedtls",
       ]
     }
   }

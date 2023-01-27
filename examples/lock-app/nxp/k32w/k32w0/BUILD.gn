@@ -92,13 +92,13 @@ k32w0_executable("lock_app") {
 
   if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
     sources += [
-      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.cpp",
+      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
     ]
 
     defines = [
       "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
-      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3"
+      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3",
     ]
   }
 
@@ -134,8 +134,9 @@ k32w0_executable("lock_app") {
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir),
-              "-Wl,-print-memory-usage",
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
   ]
 }
 

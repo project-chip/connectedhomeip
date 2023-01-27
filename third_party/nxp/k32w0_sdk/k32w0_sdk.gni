@@ -48,8 +48,9 @@ declare_args() {
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
 
 if (chip_crypto == "platform") {
-  assert(chip_crypto_flavour == "tinycrypt" || chip_crypto_flavour == "NXP-Ultrafast-P256",
-    "choose tinycrypt or NXP-Ultrafast-P256 as crypto platform")
+  assert(chip_crypto_flavour == "tinycrypt" ||
+             chip_crypto_flavour == "NXP-Ultrafast-P256",
+         "choose tinycrypt or NXP-Ultrafast-P256 as crypto platform")
 }
 
 # Defines an k32w SDK build target.
@@ -75,15 +76,17 @@ template("k32w0_sdk") {
                chip_with_ot_cli == 0 && chip_with_se05x == 0),
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
-  assert(
-      chip_with_low_power == 0 || chip_logging == false &&
-      (invoker.chip_detail_logging == false && invoker.chip_progress_logging == false &&
-       invoker.chip_automation_logging == false && invoker.chip_error_logging == false),
-      "Please disable all logs when low power is enabled!")
+  assert(chip_with_low_power == 0 ||
+             (chip_logging == false &&
+                  (invoker.chip_detail_logging == false &&
+                       invoker.chip_progress_logging == false &&
+                       invoker.chip_automation_logging == false &&
+                       invoker.chip_error_logging == false)),
+         "Please disable all logs when low power is enabled!")
 
   assert(
-    use_custom_factory_provider == 0 || chip_with_factory_data == 1,
-    "Please set chip_with_factory_data=1 if using custom factory provider.")
+      use_custom_factory_provider == 0 || chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using custom factory provider.")
 
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
@@ -240,10 +243,10 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
     ]
 
-    if (chip_crypto == "platform" && chip_crypto_flavour == "NXP-Ultrafast-P256") {
+    if (chip_crypto == "platform" &&
+        chip_crypto_flavour == "NXP-Ultrafast-P256") {
       libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4_dspext.a" ]
-    }
-    else {
+    } else {
       libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a" ]
     }
 
@@ -305,7 +308,8 @@ template("k32w0_sdk") {
       "gOTA_UseSecLibAes=1",
     ]
 
-    if (chip_crypto == "platform" && chip_crypto_flavour == "NXP-Ultrafast-P256") {
+    if (chip_crypto == "platform" &&
+        chip_crypto_flavour == "NXP-Ultrafast-P256") {
       defines += [ "EC_P256_DSPEXT=1" ]
     }
 
