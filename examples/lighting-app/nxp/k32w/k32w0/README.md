@@ -213,9 +213,11 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ 
 Note that option chip_enable_ota_requestor=false are required for building with
 Secure Element. These can be changed if building without Secure Element
 
-- K32W041AM flavor
+-   K32W041AM flavor
 
-    Exactly the same steps as above but set argument build_for_k32w041am=1 in the gn command and use [K32W041AMDK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W041AMDK6.zip).
+    Exactly the same steps as above but set argument build_for_k32w041am=1 in
+    the gn command and use
+    [K32W041AMDK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W041AMDK6.zip).
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -270,9 +272,13 @@ passcode is 1000. These demo certificates are working with the CDs installed in
 CHIPProjectConfig.h.
 
 Regarding factory data provider, there are two options:
-* use the default factory data provider: `K32W0FactoryDataProvider` by setting `chip_with_factory_data=1` in the gn build command.
-* use a custom factory data provider: please see
-[Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md). This can be enabled when `chip_with_factory_data=1` by setting `use_custom_factory_provider=1` in the gn build command.
+
+-   use the default factory data provider: `K32W0FactoryDataProvider` by setting
+    `chip_with_factory_data=1` in the gn build command.
+-   use a custom factory data provider: please see
+    [Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md).
+    This can be enabled when `chip_with_factory_data=1` by setting
+    `use_custom_factory_provider=1` in the gn build command.
 
 ## Flashing and debugging
 
@@ -353,14 +359,14 @@ unplug and plug the board and then rerun the script.
 
 ### Building steps
 
-By default, the application builds with NXP Ultrafast P256 ECC Library.
-To build with this library, use the following arguments:
+By default, the application builds with NXP Ultrafast P256 ECC Library. To build
+with this library, use the following arguments:
 
 -   Build without Secure element (_chip_with_se05x=0_) and with crypto platform
     (_chip_crypto=\"platform\"_).
 
-To stop using  Ultrafast P256 ECC Library, simply build with _chip_crypto=\"mbedtls\"_
-or with Tinycrypt.
+To stop using Ultrafast P256 ECC Library, simply build with
+_chip_crypto=\"mbedtls\"_ or with Tinycrypt.
 
 ## Tinycrypt ECC library
 
@@ -503,7 +509,13 @@ user@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD
 user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
 user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
 ```
-A note regarding OTA image header version (`-vn` option). An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.
+
+A note regarding OTA image header version (`-vn` option). An application binary
+has its own software version (given by
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For
+having a correct OTA process, the OTA header version should be the same as the
+binary embedded software version. A user can set a custom software version in
+the gn build args by setting `chip_software_version` to the wanted version.
 
 Build Linux chip-tool:
 

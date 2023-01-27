@@ -40,6 +40,7 @@ network.
 -   [Low power](#low-power)
 
     -   [Known issues](#known-issues-3)
+
 -   [Removing SSBL Upgrade region](#removing-ssbl-upgrade-region)
 
     </hr>
@@ -167,7 +168,8 @@ DS3, which can be found on the DK6 board.
 Also, by long pressing the **USERINTERFACE** button, the factory reset action
 will be initiated.
 
-When low power is enabled, the **ISP button** on DK6 board is used to change contact status.
+When low power is enabled, the **ISP button** on DK6 board is used to change
+contact status.
 
 ## Building
 
@@ -198,9 +200,11 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 Note that option chip_enable_ota_requestor=false are required for building with
 Secure Element. These can be changed if building without Secure Element
 
-- K32W041AM flavor
+-   K32W041AM flavor
 
-    Exactly the same steps as above but set argument build_for_k32w041am=1 in the gn command and use [K32W041AMDK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W041AMDK6.zip).
+    Exactly the same steps as above but set argument build_for_k32w041am=1 in
+    the gn command and use
+    [K32W041AMDK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W041AMDK6.zip).
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -239,18 +243,29 @@ The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 See
 [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 
-There are factory data generated binaries available in examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.
-These are based on the DAC, PAI and PAA certificates found in scripts/tools/nxp/demo_generated_certs folder.
-The demo_factory_data_dut1.bin uses the DAC certificate and private key found in examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data/dac/dut1 folder.
-The demo_factory_data_dut2.bin uses the DAC certificate and private key found in examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data/dac/dut2 folder.
-These two factory data binaries can be used for testing topologies with 2 DUTS. They contain the corresponding DACs/PAIs generated using generate_nxp_chip_factory_bin.py script.
-The discriminator is 14014 and the passcode is 1000.
-These demo certificates are working with the CDs installed in CHIPProjectConfig.h.
+There are factory data generated binaries available in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.
+These are based on the DAC, PAI and PAA certificates found in
+scripts/tools/nxp/demo_generated_certs folder. The demo_factory_data_dut1.bin
+uses the DAC certificate and private key found in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data/dac/dut1
+folder. The demo_factory_data_dut2.bin uses the DAC certificate and private key
+found in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data/dac/dut2
+folder. These two factory data binaries can be used for testing topologies with
+2 DUTS. They contain the corresponding DACs/PAIs generated using
+generate_nxp_chip_factory_bin.py script. The discriminator is 14014 and the
+passcode is 1000. These demo certificates are working with the CDs installed in
+CHIPProjectConfig.h.
 
 Regarding factory data provider, there are two options:
-* use the default factory data provider: `K32W0FactoryDataProvider` by setting `chip_with_factory_data=1` in the gn build command.
-* use a custom factory data provider: please see
-[Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md). This can be enabled when `chip_with_factory_data=1` by setting `use_custom_factory_provider=1` in the gn build command.
+
+-   use the default factory data provider: `K32W0FactoryDataProvider` by setting
+    `chip_with_factory_data=1` in the gn build command.
+-   use a custom factory data provider: please see
+    [Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md).
+    This can be enabled when `chip_with_factory_data=1` by setting
+    `use_custom_factory_provider=1` in the gn build command.
 
 ## Flashing and debugging
 
@@ -331,14 +346,14 @@ unplug and plug the board and then rerun the script.
 
 ### Building steps
 
-By default, the application builds with NXP Ultrafast P256 ECC Library.
-To build with this library, use the following arguments:
+By default, the application builds with NXP Ultrafast P256 ECC Library. To build
+with this library, use the following arguments:
 
 -   Build without Secure element (_chip_with_se05x=0_) and with crypto platform
     (_chip_crypto=\"platform\"_).
 
-To stop using  Ultrafast P256 ECC Library, simply build with _chip_crypto=\"mbedtls\"_
-or with Tinycrypt.
+To stop using Ultrafast P256 ECC Library, simply build with
+_chip_crypto=\"mbedtls\"_ or with Tinycrypt.
 
 ## Tinycrypt ECC library
 
@@ -481,7 +496,13 @@ user@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD
 user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
 user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
 ```
-A note regarding OTA image header version (`-vn` option). An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.
+
+A note regarding OTA image header version (`-vn` option). An application binary
+has its own software version (given by
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For
+having a correct OTA process, the OTA header version should be the same as the
+binary embedded software version. A user can set a custom software version in
+the gn build args by setting `chip_software_version` to the wanted version.
 
 Build Linux chip-tool:
 
@@ -579,17 +600,19 @@ professional tools must be used if exact power consumption needs to be known.
 -   Power Measurement Tool may not work correctly in MCUXpresso versions greater
     that 11.0.1.
 
-
 ## Removing SSBL Upgrade Region
 
-The example also offers the possibility to remove SSBL upgrade region, for reserving more
-space for application level.
+The example also offers the possibility to remove SSBL upgrade region, for
+reserving more space for application level.
 
-A new flag `chip_reduce_ssbl_size` is introduced. In order to remove the SSBL upgrade region,
-`chip_reduce_ssbl_size=true` must be provided to the build system
+A new flag `chip_reduce_ssbl_size` is introduced. In order to remove the SSBL
+upgrade region, `chip_reduce_ssbl_size=true` must be provided to the build
+system
 
 The programming method will change:
-* writing image directory 1 should change to
+
+-   writing image directory 1 should change to
+
     ```
     DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00200000D9040101
     ```
@@ -602,7 +625,8 @@ The programming method will change:
     01       -> bootable flag
     01       -> image type for the application
     ```
-* Matter application offset address should change to
+
+-   Matter application offset address should change to
     ```
     DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x2000="chip-k32w0x-contact-example.bin"
     ```

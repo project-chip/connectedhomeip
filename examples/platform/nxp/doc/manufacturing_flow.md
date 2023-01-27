@@ -26,17 +26,23 @@ possible for a final stage application to generate its own manufacturing data:
     user@ubuntu:~/Desktop/git/connectedhomeip$ ./examples/platform/nxp/k32w/k32w0/scripts/generate_cert.sh  ./src/tools/chip-cert/out/chip-cert
     ```
 
--   Generate new provisioning data and convert all the data to a binary (unencrypted data):
+-   Generate new provisioning data and convert all the data to a binary
+    (unencrypted data):
+
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$  python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid 0x1037 --pid 0xa220 --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "SN:12345678" --date "2022-10-21" --hw_version 1 --hw_version_str "1.0" --cert_declaration /home/ubuntu/manufacturing/Chip-Test-CD-1037-a220.der --dac_cert /home/ubuntu/manufacturing/Chip-DAC-NXP-Cert.der --dac_key /home/ubuntu/manufacturing/Chip-DAC-NXP-Key.der --pai_cert /home/ubuntu/manufacturing/Chip-PAI-NXP-Cert.der --spake2p_path ./src/tools/spake2p/out/spake2p --out out.bin
     ```
 
--   Same example as above, but with an already generated verifier passed as input:
+-   Same example as above, but with an already generated verifier passed as
+    input:
+
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$  python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid 0x1037 --pid 0xa220 --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "SN:12345678" --date "2022-10-21" --hw_version 1 --hw_version_str "1.0" --cert_declaration /home/ubuntu/manufacturing/Chip-Test-CD-1037-a220.der --dac_cert /home/ubuntu/manufacturing/Chip-DAC-NXP-Cert.der --dac_key /home/ubuntu/manufacturing/Chip-DAC-NXP-Key.der --pai_cert /home/ubuntu/manufacturing/Chip-PAI-NXP-Cert.der --spake2p_path ./src/tools/spake2p/out/spake2p --spake2p_verifier ivD5n3L2t5+zeFt6SjW7BhHRF30gFXWZVvvXgDxgCNcE+BGuTA5AUaVm3qDZBcMMKn1a6CakI4SxyPUnJr0CpJ4pwpr0DvpTlkQKqaRvkOQfAQ1XDyf55DuavM5KVGdDrg== --out out.bin
     ```
 
--   Generate new provisioning data and convert all the data to a binary (encrypted data with the AES key):
+-   Generate new provisioning data and convert all the data to a binary
+    (encrypted data with the AES key):
+
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$  python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid 0x1037 --pid 0xa220 --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "SN:12345678" --date "2022-10-21" --hw_version 1 --hw_version_str "1.0" --cert_declaration /home/ubuntu/manufacturing/Chip-Test-CD-1037-a220.der --dac_cert /home/ubuntu/manufacturing/Chip-DAC-NXP-Cert.der --dac_key /home/ubuntu/manufacturing/Chip-DAC-NXP-Key.der --pai_cert /home/ubuntu/manufacturing/Chip-PAI-NXP-Cert.der --spake2p_path ./src/tools/spake2p/out/spake2p --out outEncrypted.bin --aes128_key 2B7E151628AED2A6ABF7158809CF4F3C
     ```
@@ -68,9 +74,11 @@ possible for a final stage application to generate its own manufacturing data:
                           will not be used to generate a new verifier on the fly.
     ```
 
--   Write out.bin to the $platform:
+-   Write out.bin to the \$platform:
 
-    For the K32W0x1 platform, the binary needs to be written in the internal flash at location 0x9D600 using DK6Programmer:
+    For the K32W0x1 platform, the binary needs to be written in the internal
+    flash at location 0x9D600 using DK6Programmer:
+
     ```
     DK6Programmer.exe -Y -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x9D600="out.bin"
     ```
@@ -85,12 +93,16 @@ possible for a final stage application to generate its own manufacturing data:
     current chip-tool version. To use this certificate and avoid generating a
     new one, lines 69-70 must be commented in the _gen-test-cds.sh_ script (the
     ones that are generating a new CD signing authority).
+
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$ ./credentials/test/gen-test-cds.sh ./src/tools/chip-cert/out/chip-cert
     ```
 
--   Set the correct VID/PID and CD in the examples/$APP_NAME/nxp/$platform/ChipProjectConfig.h file
-    VID and PID values should correspond to the ones used for DAC. CD bytes should be the ones obtained at the step above:
+-   Set the correct VID/PID and CD in the
+    examples/$APP_NAME/nxp/$platform/ChipProjectConfig.h file VID and PID values
+    should correspond to the ones used for DAC. CD bytes should be the ones
+    obtained at the step above:
+
     ```
     user@ubuntu:~/manufacturing hexdump -ve '1/1 "0x%.2x, "' Chip-Test-CD-1037-A220.der
     ```
