@@ -27,17 +27,17 @@ _YAML_TEST_SUITE_PATH = os.path.abspath(
     os.path.join(_DEFAULT_CHIP_ROOT, "src/app/tests/suites"))
 
 
-def _FindYamlTestPath(name: str):
+def _AllYamlTests():
     yaml_test_suite_path = Path(_YAML_TEST_SUITE_PATH)
+
     if not yaml_test_suite_path.exists():
-        raise FileNotFoundError(f"Expected directory {_YAML_TEST_SUITE_PATH} to exist")
-    for path in yaml_test_suite_path.rglob(name):
+        raise FileNotFoundError(
+            f"Expected directory {_YAML_TEST_SUITE_PATH} to exist")
+
+    for path in yaml_test_suite_path.rglob("*.yaml"):
         if not path.is_file():
             continue
-        if path.name != name:
-            continue
-        return str(path)
-    return None
+        yield path
 
 
 def target_for_name(name: str):
@@ -76,7 +76,7 @@ def tests_with_command(chip_tool: str, is_manual: bool):
 # TODO We will move away from hardcoded list of yamltests to run all file when yamltests
 # parser/runner reaches parity with the code gen version.
 def _hardcoded_python_yaml_tests():
-    currently_supported_yaml_tests = [
+    currently_supported_yaml_tests = {
         "Test_TC_ACL_1_1.yaml",
         "Test_TC_ACL_2_1.yaml",
         "Test_TC_BOOL_1_1.yaml",
@@ -95,6 +95,7 @@ def _hardcoded_python_yaml_tests():
         "Test_TC_I_2_1.yaml",
         "Test_TC_ILL_1_1.yaml",
         "Test_TC_ILL_2_1.yaml",
+        # "Test_TC_LVL_2_1.yaml", # TODO: Fix flakyness
         "Test_TC_LVL_2_2.yaml",
         "Test_TC_LCFG_1_1.yaml",
         "Test_TC_LTIME_1_2.yaml",
@@ -165,19 +166,40 @@ def _hardcoded_python_yaml_tests():
         "Test_TC_WNCV_2_3.yaml",
         "Test_TC_WNCV_4_3.yaml",
         "Test_TC_WNCV_4_4.yaml",
+        # "DL_Schedules.yaml",  # TODO: Fix flakyness
         "DL_UsersAndCredentials.yaml",
-    ]
+    }
 
-    for name in currently_supported_yaml_tests:
-        yaml_test_path = _FindYamlTestPath(name)
-        if not yaml_test_path:
-            raise FileNotFoundError(f"Could not find YAML test {name}")
+    invalid_tests = {
+        "tests.yaml",  # src/app/tests/suites/certification/tests.yaml is not a real test
+        "PICS.yaml",  # src/app/tests/suites/certification/PICS.yaml is not a real test
+    }
 
-        target = target_for_name(name)
+    # By default assume all yaml files are valid test cases, however only a
+    # smaller subset is known to pass, all the rest are marked "manual"
+    # For sanity check, all known supported tests MUST exist
+    found_supported_tests = set()
+    for path in _AllYamlTests():
+        if path.name in invalid_tests:
+            continue
 
+        is_supported = path.name in currently_supported_yaml_tests
+
+        if is_supported:
+            found_supported_tests.add(path.name)
+
+        file_path = str(path)
+
+        target = target_for_name(path.name)
+
+        # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
         yield TestDefinition(
-            run_name=yaml_test_path, name=name, target=target, is_manual=False, use_chip_repl_yaml_tester=True
+            run_name=file_path, name=path.stem, target=target, is_manual=not is_supported, use_chip_repl_yaml_tester=True
         )
+
+    if found_supported_tests != currently_supported_yaml_tests:
+        raise Exception("Did not find YAMLs for all supported tests: %r" % (
+            currently_supported_yaml_tests - found_supported_tests))
 
 
 def AllTests(chip_tool: str, run_yamltests_with_chip_repl: bool):
