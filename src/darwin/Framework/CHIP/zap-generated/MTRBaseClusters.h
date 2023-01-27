@@ -19633,9 +19633,9 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersionType) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRWiFiNetworkDiagnosticsFeature) {
-    MTRWiFiNetworkDiagnosticsFeaturePacketCounts MTR_NEWLY_AVAILABLE = 0x1,
-    MTRWiFiNetworkDiagnosticsFeatureErrorCounts MTR_NEWLY_AVAILABLE = 0x2,
-} MTR_NEWLY_AVAILABLE;
+    MTRWiFiNetworkDiagnosticsFeaturePacketCounts API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x1,
+    MTRWiFiNetworkDiagnosticsFeatureErrorCounts API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x2,
+} API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRate) {
     MTREthernetNetworkDiagnosticsPHYRateRate10M API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
@@ -19685,9 +19685,9 @@ typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRateType) {
     tvos(16.1, 16.4));
 
 typedef NS_OPTIONS(uint32_t, MTREthernetNetworkDiagnosticsFeature) {
-    MTREthernetNetworkDiagnosticsFeaturePacketCounts MTR_NEWLY_AVAILABLE = 0x1,
-    MTREthernetNetworkDiagnosticsFeatureErrorCounts MTR_NEWLY_AVAILABLE = 0x2,
-} MTR_NEWLY_AVAILABLE;
+    MTREthernetNetworkDiagnosticsFeaturePacketCounts API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x1,
+    MTREthernetNetworkDiagnosticsFeatureErrorCounts API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x2,
+} API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 typedef NS_ENUM(uint8_t, MTRTimeSynchronizationGranularity) {
     MTRTimeSynchronizationGranularityNoTimeGranularity API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
