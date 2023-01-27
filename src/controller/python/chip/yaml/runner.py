@@ -629,6 +629,9 @@ class ReplTestRunner:
             return decoded_response
 
         cluster_name = self._test_spec_definition.get_cluster_name(response.cluster_id)
+        if cluster_name is None:
+            raise Exception("Cannot find cluster name for id 0x%0X / %d" % (response.cluster_id, response.cluster_id))
+
         decoded_response['clusterId'] = cluster_name
 
         if hasattr(response, 'command_id'):
