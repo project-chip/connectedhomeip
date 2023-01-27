@@ -19210,7 +19210,10 @@ typedef NS_OPTIONS(uint32_t, MTRUnitLocalizationFeature) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeFault) {
-    MTRPowerSourceBatChargeFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRPowerSourceBatChargeFaultUnspecified API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
+    MTRPowerSourceBatChargeFaultUnspecfied API_DEPRECATED("Please use MTRPowerSourceBatChargeFaultUnspecified", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00,
     MTRPowerSourceBatChargeFaultAmbientTooHot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRPowerSourceBatChargeFaultAmbientTooCold API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRPowerSourceBatChargeFaultBatteryTooHot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
@@ -19253,7 +19256,10 @@ typedef NS_ENUM(uint8_t, MTRPowerSourceBatReplaceability) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceStatus) {
-    MTRPowerSourceStatusUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRPowerSourceStatusUnspecified API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
+    MTRPowerSourceStatusUnspecfied API_DEPRECATED(
+        "Please use MTRPowerSourceStatusUnspecified", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00,
     MTRPowerSourceStatusActive API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRPowerSourceStatusStandby API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRPowerSourceStatusUnavailable API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
