@@ -46,12 +46,14 @@ CHIP_ERROR PersistenceManager::AddVideoPlayer(TargetVideoPlayerInfo * targetVide
         // found the same video player, overwrite the data
         if (cachedVideoPlayers[i] == *targetVideoPlayerInfo)
         {
+            ChipLogProgress(AppServer, "PersistenceManager::AddVideoPlayer found video player already cached. Overwriting at position: %zu", i);
             cachedVideoPlayers[i] = *targetVideoPlayerInfo;
             newVideoPlayer        = false;
         }
     }
     if (newVideoPlayer)
     {
+        ChipLogProgress(AppServer, "PersistenceManager::AddVideoPlayer writing new video player at position: %zu", i);
         VerifyOrReturnError(i < kMaxCachedVideoPlayers, CHIP_ERROR_BUFFER_TOO_SMALL);
         cachedVideoPlayers[i] = *targetVideoPlayerInfo;
     }
@@ -152,8 +154,8 @@ CHIP_ERROR PersistenceManager::WriteAllVideoPlayers(TargetVideoPlayerInfo videoP
 
             ReturnErrorOnFailure(tlvWriter.Finalize());
             ChipLogProgress(AppServer,
-                            "PersistenceManager::WriteAllVideoPlayers TLV(CastingData).LengthWritten: %d bytes and version: %d",
-                            tlvWriter.GetLengthWritten(), kCurrentCastingDataVersion);
+                            "PersistenceManager::WriteAllVideoPlayers TLV(CastingData).LengthWritten: %d bytes, video player count: %zu and version: %d",
+                            tlvWriter.GetLengthWritten(), videoPlayerIndex, kCurrentCastingDataVersion);
             return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kCastingDataKey, castingData,
                                                                                tlvWriter.GetLengthWritten());
         }

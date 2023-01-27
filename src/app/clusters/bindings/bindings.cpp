@@ -50,7 +50,7 @@ private:
     CHIP_ERROR ReadBindingTable(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
 
-    CHIP_ERROR NotifyBindingsChanged();
+    CHIP_ERROR NotifyBindingsChanged(FabricIndex accessingFabricIndex);
 };
 
 BindingTableAccess gAttrAccess;
@@ -193,7 +193,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             CreateBindingEntry(iter.GetValue(), path.mEndpointId);
         }
-        LogErrorOnFailure(NotifyBindingsChanged());
+        LogErrorOnFailure(NotifyBindingsChanged(accessingFabricIndex));
         return CHIP_NO_ERROR;
     }
     if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -205,16 +205,17 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         CreateBindingEntry(target, path.mEndpointId);
-        LogErrorOnFailure(NotifyBindingsChanged());
+        LogErrorOnFailure(NotifyBindingsChanged(accessingFabricIndex));
         return CHIP_NO_ERROR;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
 
-CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
+CHIP_ERROR BindingTableAccess::NotifyBindingsChanged(FabricIndex accessingFabricIndex)
 {
     DeviceLayer::ChipDeviceEvent event;
-    event.Type = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
+    event.Type                        = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
+    event.BindingsChanged.fabricIndex = accessingFabricIndex;
     return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
 }
 
