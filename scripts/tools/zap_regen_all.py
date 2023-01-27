@@ -128,9 +128,6 @@ class ZAPGenerateTarget:
         generate_end = time.time()
 
         if "chef" in self.zap_config:
-            af_gen_event = os.path.join(self.output_dir, "af-gen-event.h")
-            with open(af_gen_event, "w+"):  # Empty file needed for linux
-                pass
             idl_path = self.zap_config.replace(".zap", ".matter")
             target_path = os.path.join("examples",
                                        "chef",
