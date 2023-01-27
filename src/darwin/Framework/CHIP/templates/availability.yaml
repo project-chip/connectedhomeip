@@ -4591,7 +4591,6 @@
           - OTASoftwareUpdateRequestor
           - UnitTesting
           - WakeOnLAN
-          - ClientMonitoring
           - BasicInformation
           - BridgedDeviceBasicInformation
       attributes:
@@ -4607,16 +4606,6 @@
               - PIROccupiedToUnoccupiedDelay
               - PIRUnoccupiedToOccupiedDelay
               - PIRUnoccupiedToOccupiedThreshold
-          ClientMonitoring:
-              - IdleModeInterval
-              - ActiveModeInterval
-              - ActiveModeThreshold
-              - ExpectedClients
-              - FeatureMap
-              - ClusterRevision
-              - AttributeList
-              - GeneratedCommandList
-              - AcceptedCommandList
           UnitTesting:
               - Boolean
               - Bitmap8
@@ -4827,10 +4816,6 @@
               - TestSimpleOptionalArgumentRequest
               - TestEmitTestEventRequest
               - TestEmitTestFabricScopedEventRequest
-          ClientMonitoring:
-              - RegisterClientMonitoring
-              - UnregisterClientMonitoring
-              - StayAwakeRequest
           ContentLauncher:
               - LauncherResponse
           MediaPlayback:
@@ -4992,13 +4977,6 @@
                   # Next two were introduced and deprecated at the same time, effectively
                   - providerNodeId
                   - vendorId
-          ClientMonitoring:
-              RegisterClientMonitoring:
-                  - clientNodeId
-                  - iCid
-              UnregisterClientMonitoring:
-                  - clientNodeId
-                  - iCid
           Groups:
               AddGroup:
                   - groupID
@@ -5108,8 +5086,6 @@
               - NestedStructList
               - DoubleNestedStructList
               - TestListStructOctet
-          ClientMonitoring:
-              - MonitoringRegistration
           BasicInformation:
               - CapabilityMinimaStruct
           AccessControl:
@@ -5202,11 +5178,6 @@
               ProviderLocation:
                   - providerNodeID
                   - endpoint
-                  - fabricIndex
-          ClientMonitoring:
-              MonitoringRegistration:
-                  - clientNodeId
-                  - iCid
                   - fabricIndex
           BasicInformation:
               CapabilityMinimaStruct:
