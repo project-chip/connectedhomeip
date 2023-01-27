@@ -48,7 +48,7 @@ public:
 
     /* SetCustomIds() must be implemented in order to define custom IDs. */
     CHIP_ERROR SetCustomIds() override;
-    
+
     /* Declare here custom functions to be implemented. */
     CHIP_ERROR ParseFunctionExample();
 };

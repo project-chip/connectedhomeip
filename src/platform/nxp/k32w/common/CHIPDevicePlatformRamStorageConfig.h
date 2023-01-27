@@ -55,7 +55,7 @@
  *
  * Base key id used for KVS keys RAM storage.
  */
-#ifndef kKeyId_KvsKeys     
+#ifndef kKeyId_KvsKeys
 #define kKeyId_KvsKeys   (uint8_t)0x04
 #endif
 
@@ -64,7 +64,7 @@
  *
  * Base key id used for KVS values RAM storage.
  */
-#ifndef kKeyId_KvsValues     
+#ifndef kKeyId_KvsValues
 #define kKeyId_KvsValues (uint8_t)0x05
 #endif
 
@@ -74,7 +74,7 @@
  *
  * PDM ID used for factory RAM storage.
  */
-#ifndef kNvmId_Factory  
+#ifndef kNvmId_Factory
 #define kNvmId_Factory      (uint16_t)0x5001
 #endif
 
@@ -83,7 +83,7 @@
  *
  * PDM ID used for config RAM storage.
  */
-#ifndef kNvmId_Config  
+#ifndef kNvmId_Config
 #define kNvmId_Config       (uint16_t)0x5002
 #endif
 
@@ -92,7 +92,7 @@
  *
  * PDM ID used for counter RAM storage.
  */
-#ifndef kNvmId_Counter  
+#ifndef kNvmId_Counter
 #define kNvmId_Counter      (uint16_t)0x5003
 #endif
 
@@ -110,7 +110,7 @@
  *
  * PDM ID used for KVS values RAM storage.
  */
-#ifndef kNvmId_KvsValues  
+#ifndef kNvmId_KvsValues
 #define kNvmId_KvsValues    (uint16_t)0x6001
 #endif
 

@@ -66,7 +66,7 @@ public:
 #if !CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS
 #error "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS must be > 0 if custom provider is enabled."
 #endif
-    static constexpr uint16_t kNumberOfIds = 
+    static constexpr uint16_t kNumberOfIds =
         FactoryDataId::kMaxId + CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS;
 #else
     static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId;
