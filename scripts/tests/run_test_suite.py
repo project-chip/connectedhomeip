@@ -271,7 +271,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
-                    logging.info("Would run test %s:" % test.name)
+                    logging.info("Would run test: %s" % test.name)
+                    continue
 
                 logging.info('%-20s - Starting test' % (test.name))
                 test.Run(runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run)
