@@ -358,9 +358,10 @@ DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
 CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 {
-    ReturnErrorCodeIf(mDnssdInitialized, CHIP_NO_ERROR);
-    ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this));
+    VerifyOrReturnError(mState == State::kUninitialized, CHIP_NO_ERROR);
+    mState = State::kInitializing;
 
+    ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this));
     UpdateCommissionableInstanceName();
 
     return CHIP_NO_ERROR;
@@ -368,10 +369,10 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 
 void DiscoveryImplPlatform::Shutdown()
 {
-    VerifyOrReturn(mDnssdInitialized);
+    VerifyOrReturn(mState != State::kUninitialized);
     mResolverProxy.Shutdown();
     ChipDnssdShutdown();
-    mDnssdInitialized = false;
+    mState = State::kUninitialized;
 }
 
 void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError)
@@ -380,7 +381,7 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
 
     if (initError == CHIP_NO_ERROR)
     {
-        publisher->mDnssdInitialized = true;
+        publisher->mState = State::kInitialized;
 
         // TODO: this is wrong, however we need resolverproxy initialized
         // otherwise DiscoveryImplPlatform is not usable.
@@ -409,14 +410,12 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
     else
     {
         ChipLogError(Discovery, "DNS-SD initialization failed with %" CHIP_ERROR_FORMAT, initError.Format());
-        publisher->mDnssdInitialized = false;
+        publisher->mState = State::kUninitialized;
     }
 }
 
 void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 {
-    DiscoveryImplPlatform * publisher = static_cast<DiscoveryImplPlatform *>(context);
-
     if (error == CHIP_ERROR_FORCED_RESET)
     {
         DeviceLayer::ChipDeviceEvent event;
@@ -487,7 +486,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                                                  Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                                                  DnssdServiceProtocol protocol, PeerId peerId)
 {
-    ReturnErrorCodeIf(mDnssdInitialized == false, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     DnssdService service;
     ReturnErrorOnFailure(MakeHostName(service.mHostName, sizeof(service.mHostName), mac));
