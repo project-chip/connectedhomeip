@@ -77,8 +77,7 @@ source_set("libopenthread-k32w0") {
         [ "${openthread_nxp_root}/src/common/crypto/ecdsa_tinycrypt.cpp" ]
   }
 
-  if (chip_crypto == "platform" &&
-      chip_crypto_flavor == "NXP-Ultrafast-P256") {
+  if (chip_crypto == "platform" && chip_crypto_flavor == "NXP-Ultrafast-P256") {
     sources += [
       "${openthread_nxp_root}/src/k32w0/platform/ecdsa-nxp-ultrafast-p256.cpp",
     ]
