@@ -16,15 +16,15 @@
 #    limitations under the License.
 #
 
-import os
-import sys
 import argparse
-import subprocess
-import logging
 import hashlib
+import logging
+import os
+import subprocess
+import sys
 
-from default import InputArgument
 from custom import *
+from default import InputArgument
 
 
 def set_logger():
