@@ -52,7 +52,7 @@ private:
     CHIP_ERROR ReadBindingTable(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
 
-    CHIP_ERROR NotifyBindingsChanged(FabricIndex accessingFabricIndex = 0);
+    CHIP_ERROR NotifyBindingsChanged(FabricIndex accessingFabricIndex);
 };
 
 BindingTableAccess gAttrAccess;
@@ -190,7 +190,7 @@ CHIP_ERROR BindingTableAccess::Write(const ConcreteDataAttributePath & path, Att
 void BindingTableAccess::OnListWriteEnd(const app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful)
 {
     // Notify binding table has changed
-    LogErrorOnFailure(NotifyBindingsChanged());
+    LogErrorOnFailure(NotifyBindingsChanged(0));
 }
 
 CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)

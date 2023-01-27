@@ -341,7 +341,8 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
     if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
     {
         ChipLogProgress(AppServer, "CastingServer::DeviceEventCallback kBindingsChangedViaCluster received");
-        if (CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized())
+        if (CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized() &&
+            CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->GetOperationalDeviceProxy() != nullptr)
         {
             ChipLogProgress(AppServer,
                             "CastingServer::DeviceEventCallback already connected to video player, reading server clusters");
