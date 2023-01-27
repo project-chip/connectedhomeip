@@ -241,7 +241,6 @@ class WaitForCommissioneeAction(BaseAction):
 
     def __init__(self, test_step):
         super().__init__(test_step)
-        self._node_id = test_step.node_id
         self._expire_existing_session = False
         # This is the default when no timeout is provided.
         _DEFAULT_TIMEOUT_MS = 10 * 1000
@@ -254,6 +253,7 @@ class WaitForCommissioneeAction(BaseAction):
         args = test_step.arguments['values']
         request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
 
+        self._node_id = request_data_as_dict['nodeId']
         self._expire_existing_session = request_data_as_dict.get('expireExistingSession', False)
         if 'timeout' in request_data_as_dict:
             # Timeout is provided in seconds we need to conver to milliseconds.
