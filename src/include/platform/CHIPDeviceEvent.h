@@ -230,6 +230,15 @@ enum PublicEventTypes
      * Signals that the state of the OTA engine changed.
      */
     kOtaStateChanged,
+
+    /**
+     * Server initialization has completed.
+     *
+     * Signals that all server components have been initialized and the node is ready to establish
+     * connections with other nodes. This event can be used to trigger on-boot actions that require
+     * sending messages to other nodes.
+     */
+    kServerReady,
 };
 
 /**

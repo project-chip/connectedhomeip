@@ -28,6 +28,7 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BLEEndPoint.h>
 #endif
+#include <dnssd/DnssdBuildConfig.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -353,11 +354,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         }
     }
 
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    ResumeSubscriptions();
-#endif
-
+    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
     PlatformMgr().HandleServerStarted();
+
+#if CHIP_DNSSD_PLATFORM
+    // Platform DNS-SD implementation uses kPlatformDnssdInitialized event to signal that it's ready.
+    mIsDnssdReady = false;
+#else
+    // Minimal mDNS implementation is initialized synchronously so mark it as ready.
+    mIsDnssdReady = true;
+    CheckServerReadyEvent();
+#endif
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -370,6 +377,45 @@ exit:
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
+}
+
+void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
+{
+    switch (event.Type)
+    {
+    case DeviceEventType::kServerReady:
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+        ResumeSubscriptions();
+#endif
+        break;
+#if CHIP_DNSSD_PLATFORM
+    case DeviceEventType::kDnssdPlatformInitialized:
+        if (!mIsDnssdReady)
+        {
+            mIsDnssdReady = true;
+            CheckServerReadyEvent();
+        }
+        break;
+#endif
+    default:
+        break;
+    }
+}
+
+void Server::CheckServerReadyEvent()
+{
+    // Check if all asynchronously initialized components (currently, only DNS-SD) are ready, and
+    // emit the 'server ready' event if so.
+    if (mIsDnssdReady)
+    {
+        ChipDeviceEvent event = { .Type = DeviceEventType::kServerReady };
+        PlatformMgr().PostEventOrDie(&event);
+    }
+}
+
+void Server::OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    Server::GetInstance().OnPlatformEvent(*event);
 }
 
 void Server::RejoinExistingMulticastGroups()
@@ -423,6 +469,7 @@ void Server::ScheduleFactoryReset()
 
 void Server::Shutdown()
 {
+    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);

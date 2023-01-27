@@ -377,6 +377,10 @@ private:
     static Server sServer;
 
     void InitFailSafe();
+    void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event);
+    void CheckServerReadyEvent();
+
+    static void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
@@ -561,6 +565,7 @@ private:
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;
     Inet::InterfaceId mInterfaceId;
+    bool mIsDnssdReady = false;
 };
 
 } // namespace chip
