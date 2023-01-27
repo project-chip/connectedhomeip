@@ -262,12 +262,12 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
-    if (button == 1)
+    if (button == SIWx917_BTN1)
     {
         button_event.Handler = SwitchActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (button == 0)
+    else if (button == SIWx917_BTN0)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

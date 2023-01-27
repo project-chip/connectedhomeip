@@ -127,7 +127,6 @@ void rsi_m4_ta_interrupt_init(void)
 #ifdef RSI_WITH_OS
     //! Set P2P Intr priority
     NVIC_SetPriority(TASS_P2P_IRQn, TASS_P2P_INTR_PRI);
-//  NVIC_SetPriority(74, TASS_P2P_INTR_PRI);
 #endif
 
     return;

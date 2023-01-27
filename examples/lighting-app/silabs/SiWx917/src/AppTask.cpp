@@ -40,9 +40,6 @@
 
 #ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
-
-#ifdef ENABLE_WSTK_LEDS
 #define APP_ACTION_LED 1
 #endif // ENABLE_WSTK_LEDS
 
@@ -246,12 +243,12 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
-    if (button == 1 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (button == SIWx917_BTN1 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         button_event.Handler = LightActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (button == 0)
+    else if (button == SIWx917_BTN0)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

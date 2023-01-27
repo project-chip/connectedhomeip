@@ -318,33 +318,26 @@ void BaseApplication::LightEventHandler()
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, blink the LED ON for a very short time.
+#ifdef ENABLE_WSTK_LEDS
     if (mFunction != kFunction_FactoryReset)
     {
         if ((gIdentifyptr != nullptr) && (gIdentifyptr->mActive))
         {
-#ifdef ENABLE_WSTK_LEDS
             sStatusLED.Blink(250, 250);
-#endif // ENABLE_WSTK_LEDS
         }
         else if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
         {
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
             {
-#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Blink(50, 50);
-#endif // ENABLE_WSTK_LEDS
             }
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
             {
-#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Blink(1000, 1000);
-#endif // ENABLE_WSTK_LEDS
             }
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
             {
-#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Blink(300, 700);
-#endif // ENABLE_WSTK_LEDS
             }
         }
 #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
@@ -352,33 +345,24 @@ void BaseApplication::LightEventHandler()
         {
             if (sIsAttached)
             {
-#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Set(true);
-#endif // ENABLE_WSTK_LEDS
             }
             else
             {
-#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Blink(950, 50);
-#endif
             }
         }
         else if (sHaveBLEConnections)
         {
-#ifdef ENABLE_WSTK_LEDS
             sStatusLED.Blink(100, 100);
-#endif // ENABLE_WSTK_LEDS
         }
         else
         {
-#ifdef ENABLE_WSTK_LEDS
             sStatusLED.Blink(50, 950);
-#endif // ENABLE_WSTK_LEDS
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
     }
 
-#ifdef ENABLE_WSTK_LEDS
     sStatusLED.Animate();
 #endif // ENABLE_WSTK_LEDS
 }

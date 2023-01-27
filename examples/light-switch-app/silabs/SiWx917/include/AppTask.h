@@ -38,7 +38,10 @@
 /**********************************************************
  * Defines
  *********************************************************/
+// Button specific defines for SiWx917
 #define SL_SIMPLE_BUTTON_PRESSED 1U
+#define SIWx917_BTN0 0
+#define SIWx917_BTN1 1
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
