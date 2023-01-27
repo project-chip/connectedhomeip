@@ -115,10 +115,10 @@ class RunContext:
 )
 @click.option(
     '--manual',
-    hidden=True,
     type=click.Choice(['skip', 'only', 'include'], case_sensitive=False),
     default='skip',
-    help='Internal flag to determine how to handle manual tests',
+    show_default=True,
+    help='Internal flag to determine how to handle manual tests. ONLY for "all" test choice.",
 )
 @click.option(
     '--run-yamltests-with-chip-repl',
