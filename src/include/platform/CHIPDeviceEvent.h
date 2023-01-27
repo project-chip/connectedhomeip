@@ -217,6 +217,11 @@ enum PublicEventTypes
     kDnssdPlatformInitialized,
 
     /**
+     * DNS-SD needs restart
+     */
+    kDnssdRestartNeeded,
+
+    /**
      * Signals that bindings were updated.
      */
     kBindingsChangedViaCluster,

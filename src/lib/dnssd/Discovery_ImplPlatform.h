@@ -83,12 +83,6 @@ private:
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                               DnssdServiceProtocol procotol, PeerId peerId);
 
-    OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionerNodeAdvertisingParams;
-    bool mIsOperationalNodePublishing    = false;
-    bool mIsCommissionableNodePublishing = false;
-    bool mIsCommissionerNodePublishing   = false;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
 
     bool mDnssdInitialized = false;

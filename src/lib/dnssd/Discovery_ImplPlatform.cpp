@@ -396,17 +396,15 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         // class that it is contained in).
         publisher->mResolverProxy.Init(nullptr);
 
-#if !CHIP_DEVICE_LAYER_NONE
         // Post an event that will start advertising
-        chip::DeviceLayer::ChipDeviceEvent event;
-        event.Type = chip::DeviceLayer::DeviceEventType::kDnssdPlatformInitialized;
+        DeviceLayer::ChipDeviceEvent event;
+        event.Type = DeviceLayer::DeviceEventType::kDnssdPlatformInitialized;
 
-        CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+        CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Posting DNS-SD platform initialized event failed with %" CHIP_ERROR_FORMAT, error.Format());
         }
-#endif
     }
     else
     {
@@ -418,24 +416,17 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
 void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 {
     DiscoveryImplPlatform * publisher = static_cast<DiscoveryImplPlatform *>(context);
+
     if (error == CHIP_ERROR_FORCED_RESET)
     {
-        if (publisher->mIsOperationalNodePublishing)
-        {
-            publisher->Advertise(publisher->mOperationalNodeAdvertisingParams);
-        }
+        DeviceLayer::ChipDeviceEvent event;
+        event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
+        error      = DeviceLayer::PlatformMgr().PostEvent(&event);
 
-        if (publisher->mIsCommissionableNodePublishing)
+        if (error != CHIP_NO_ERROR)
         {
-            publisher->Advertise(publisher->mCommissionableNodeAdvertisingParams);
+            ChipLogError(Discovery, "Failed to post DNS-SD restart event: %" CHIP_ERROR_FORMAT, error.Format());
         }
-
-        if (publisher->mIsCommissionerNodePublishing)
-        {
-            publisher->Advertise(publisher->mCommissionerNodeAdvertisingParams);
-        }
-
-        publisher->FinalizeServiceUpdate();
     }
     else
     {
@@ -550,9 +541,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                                       sizeof(Name##SubTypeBuf), params.Get##Name()));
 
 #define PUBLISH_RECORDS(Type)                                                                                                      \
-    ReturnErrorOnFailure(PublishService(k##Type##ServiceName, textEntries, textEntrySize, subTypes, subTypeSize, params));         \
-    m##Type##NodeAdvertisingParams = params;                                                                                       \
-    mIs##Type##NodePublishing      = true;
+    ReturnErrorOnFailure(PublishService(k##Type##ServiceName, textEntries, textEntrySize, subTypes, subTypeSize, params));
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
 {
@@ -606,10 +595,6 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
 {
     ReturnErrorOnFailure(ChipDnssdRemoveServices());
-
-    mIsOperationalNodePublishing    = false;
-    mIsCommissionableNodePublishing = false;
-    mIsCommissionerNodePublishing   = false;
 
     return CHIP_NO_ERROR;
 }
