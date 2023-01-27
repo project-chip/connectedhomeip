@@ -26,19 +26,21 @@ import hashlib
 from default import InputArgument
 from custom import *
 
+
 def set_logger():
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
     logging.basicConfig(
-        level=logging.DEBUG, 
+        level=logging.DEBUG,
         format='[%(levelname)s] %(message)s',
         handlers=[stdout_handler]
     )
+
 
 class Spake2p:
 
     def __init__(self):
         pass
-    
+
     def generate(self, args):
         params = self._generate_params(args)
         args.spake2p_verifier = Verifier(params["Verifier"])
@@ -58,6 +60,7 @@ class Spake2p:
         out = out.decode("utf-8").splitlines()
         return dict(zip(out[0].split(','), out[1].split(',')))
 
+
 class KlvGenerator:
 
     def __init__(self, args):
@@ -67,7 +70,7 @@ class KlvGenerator:
         if self.args.spake2p_verifier is None:
             self.spake2p.generate(self.args)
         self.args.dac_key.generate_private_key(self.args.dac_key_password)
-    
+
     def _validate_args(self):
         if self.args.dac_key_password is None:
             logging.warning(
@@ -141,13 +144,13 @@ class KlvGenerator:
                 cipher = AES.new(bytes.fromhex(aes128_key), AES.MODE_ECB)
                 fullContentCipher = cipher.encrypt(fullContent)
 
-                #Add 4 bytes of hashing to generated binary to check for integrity
+                # Add 4 bytes of hashing to generated binary to check for integrity
                 hashing = hashlib.sha256(fullContent).hexdigest()
                 hashing = hashing[0:8]
                 logging.info("4 byte section hash (for integrity check): {}".format(hashing))
                 fullContentCipher = bytearray.fromhex(hashing) + fullContentCipher
 
-                #Add length of data to binary to know how to calculate SHA on embedded
+                # Add length of data to binary to know how to calculate SHA on embedded
                 fullContentCipher = size.to_bytes(4, "little") + fullContentCipher
 
                 # Add hash id
@@ -163,6 +166,7 @@ class KlvGenerator:
         out_hash = hashlib.sha256(fullContent).hexdigest()
         logging.info("SHA256 of generated binary: {}".format(out_hash))
 
+
 def main():
     set_logger()
     parser = argparse.ArgumentParser(description="NXP Factory Data Generator")
@@ -170,62 +174,63 @@ def main():
     required = parser.add_argument_group("required arguments")
 
     required.add_argument("-i", "--it", required=True, type=IterationCount,
-                        help="[int | hex] Spake2 Iteration Counter")
+                          help="[int | hex] Spake2 Iteration Counter")
     required.add_argument("-s", "--salt", required=True, type=Salt,
-                        help="[base64 str] Spake2 Salt")
+                          help="[base64 str] Spake2 Salt")
     required.add_argument("-p", "--passcode", required=True, type=SetupPasscode,
-                        help="[int | hex] PASE session passcode")
+                          help="[int | hex] PASE session passcode")
     required.add_argument("-d", "--discriminator", required=True, type=Discriminator,
-                        help="[int | hex] BLE Pairing discriminator")
+                          help="[int | hex] BLE Pairing discriminator")
     required.add_argument("--vid", required=True, type=VendorId,
-                        help="[int | hex] Vendor Identifier (VID)")
+                          help="[int | hex] Vendor Identifier (VID)")
     required.add_argument("--pid", required=True, type=ProductId,
-                        help="[int | hex] Product Identifier (PID)")
+                          help="[int | hex] Product Identifier (PID)")
     required.add_argument("--vendor_name", required=True, type=VendorName,
-                        help="[str] Vendor Name")
+                          help="[str] Vendor Name")
     required.add_argument("--product_name", required=True, type=ProductName,
-                        help="[str] Product Name")
+                          help="[str] Product Name")
     required.add_argument("--hw_version", required=True, type=HardwareVersion,
-                        help="[int | hex] Hardware version as number")
+                          help="[int | hex] Hardware version as number")
     required.add_argument("--hw_version_str", required=True, type=HardwareVersionStr,
-                        help="[str] Hardware version as string")
+                          help="[str] Hardware version as string")
     required.add_argument("--cert_declaration", required=True, type=CertDeclaration,
-                        help="[path] Path to Certification Declaration in DER format")
+                          help="[path] Path to Certification Declaration in DER format")
     required.add_argument("--dac_cert", required=True, type=DacCert,
-                        help="[path] Path to DAC certificate in DER format")
+                          help="[path] Path to DAC certificate in DER format")
     required.add_argument("--dac_key", required=True, type=DacPKey,
-                        help="[path] Path to DAC key in DER format")
+                          help="[path] Path to DAC key in DER format")
     required.add_argument("--pai_cert", required=True, type=PaiCert,
-                        help="[path] Path to PAI certificate in DER format")
+                          help="[path] Path to PAI certificate in DER format")
     required.add_argument("--spake2p_path", required=True, type=str,
-                        help="[path] Path to spake2p tool")
+                          help="[path] Path to spake2p tool")
     required.add_argument("--out", required=True, type=str,
-                        help="[path] Path to output binary")
+                          help="[path] Path to output binary")
 
     optional.add_argument("--dac_key_password", type=str,
-                        help="[path] Password to decode DAC Key if available")
+                          help="[path] Password to decode DAC Key if available")
     optional.add_argument("--spake2p_verifier", type=Verifier,
-                        help="[base64 str] Already generated spake2p verifier")
+                          help="[base64 str] Already generated spake2p verifier")
     optional.add_argument("--aes128_key",
-                        help="[hex] AES 128 bits key used to encrypt the whole dataset")
+                          help="[hex] AES 128 bits key used to encrypt the whole dataset")
     optional.add_argument("--date", type=ManufacturingDate,
-                        help="[str] Manufacturing Date (YYYY-MM-DD)")
+                          help="[str] Manufacturing Date (YYYY-MM-DD)")
     optional.add_argument("--part_number", type=PartNumber,
-                        help="[str] PartNumber as String")
+                          help="[str] PartNumber as String")
     optional.add_argument("--product_url", type=ProductURL,
-                        help="[str] ProductURL as String")
+                          help="[str] ProductURL as String")
     optional.add_argument("--product_label", type=ProductLabel,
-                        help="[str] ProductLabel as String")
+                          help="[str] ProductLabel as String")
     optional.add_argument("--serial_num", type=SerialNum,
-                        help="[str] Serial Number")
+                          help="[str] Serial Number")
     optional.add_argument("--unique_id", type=UniqueId,
-                        help="[str] Unique identifier for the device")
+                          help="[str] Unique identifier for the device")
 
     args = parser.parse_args()
 
     klv = KlvGenerator(args)
     data = klv.generate()
     klv.to_bin(data, args.out, args.aes128_key)
+
 
 if __name__ == "__main__":
     main()

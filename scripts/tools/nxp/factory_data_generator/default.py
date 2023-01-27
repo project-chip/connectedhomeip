@@ -31,6 +31,7 @@ import base64
 import logging
 import sys
 
+
 class InputArgument:
     '''Base class for any input argument that will be added to KLV.
 
@@ -56,9 +57,10 @@ class InputArgument:
     method should not be implemented, since its a common functionality across
     all InputArgument classes.
     '''
+
     def __init__(self):
         self.val = None
-    
+
     def key(self):
         logging.error("key() should be implemented in derived classes.")
 
@@ -70,8 +72,9 @@ class InputArgument:
 
     def output(self):
         out = (self.key(), self.length(), self.encode())
-        logging.info("'{}' length: {}".format(type(self).__name__, self.length())) 
+        logging.info("'{}' length: {}".format(type(self).__name__, self.length()))
         return out
+
 
 class IntArgument(InputArgument):
 
@@ -85,24 +88,26 @@ class IntArgument(InputArgument):
     def encode(self):
         return self.val.to_bytes(self.length(), "little")
 
+
 class Base64Argument(InputArgument):
 
     def __init__(self, arg):
         super().__init__()
         self.val = base64.b64decode(arg)
-    
+
     def length(self):
         return len(self.encode())
 
     def encode(self):
         return base64.b64encode(self.val)
 
+
 class StrArgument(InputArgument):
 
     def __init__(self, arg):
         super().__init__()
         self.val = str(arg)
-    
+
     def length(self):
         return len(self.encode())
 
@@ -112,13 +117,14 @@ class StrArgument(InputArgument):
     def max_length(self):
         return 32
 
+
 class FileArgument(InputArgument):
 
     def __init__(self, arg):
         super().__init__()
         with open(arg, "rb") as _file:
             self.val = _file.read()
-    
+
     def length(self):
         return len(self.val)
 
