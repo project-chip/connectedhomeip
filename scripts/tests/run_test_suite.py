@@ -118,7 +118,7 @@ class RunContext:
     type=click.Choice(['skip', 'only', 'include'], case_sensitive=False),
     default='skip',
     show_default=True,
-    help='Internal flag to determine how to handle manual tests. ONLY for "all" test choice.",
+    help='Internal flag to determine how to handle manual tests. ONLY for "all" test choice.',
 )
 @click.option(
     '--run-yamltests-with-chip-repl',
