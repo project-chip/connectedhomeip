@@ -63,7 +63,7 @@ steps:
               --target esp32-m5stack-all-clusters-minimal-rpc-ipv6only
               --target esp32-m5stack-ota-requestor
               --target genio-lighting-app
-              --target imx-all-clusters-app
+              --target imx-all-clusters
               --target imx-chip-tool
               --target imx-thermostat
               --target infineon-psoc6-all-clusters
@@ -83,8 +83,8 @@ steps:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
               --target linux-arm64-all-clusters-clang
-              --target linux-arm64-all-clusters-app-nodeps
-              --target linux-arm64-all-clusters-app-nodeps-ipv6only
+              --target linux-arm64-all-clusters-nodeps
+              --target linux-arm64-all-clusters-nodeps-ipv6only
               --target linux-arm64-all-clusters-ipv6only-clang
               --target linux-arm64-all-clusters-minimal-clang
               --target linux-arm64-all-clusters-minimal-ipv6only-clang
@@ -141,7 +141,7 @@ steps:
               --target mbed-CY8CPROTO_062_4343W-light-release
               --target mbed-CY8CPROTO_062_4343W-lock-release
               --target mbed-CY8CPROTO_062_4343W-pigweed-release
-              --target mw320-all-clusters-app
+              --target mw320-all-clusters
               --target nrf-nrf52840dk-all-clusters
               --target nrf-nrf52840dk-all-clusters-minimal
               --target nrf-nrf52840dk-light-rpc
