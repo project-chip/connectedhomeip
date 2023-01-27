@@ -323,7 +323,7 @@ CC32XXKVSList * pList;
 
 CHIP_ERROR CC32XXConfig::Init()
 {
-    cc32xxLog("[%s], KVS List created", __FUNCTION__);
+    cc32xxLog("[CC32XXConfig::Init] KVS List created");
     pList = new CC32XXKVSList();
     ReadKVSFromNV();
     return CHIP_NO_ERROR;

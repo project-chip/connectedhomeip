@@ -29,6 +29,7 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <examples/platform/cc32xx/CC32XXDeviceAttestationCreds.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -96,6 +97,10 @@ int AppTask::StartAppTask()
     return ret;
 }
 
+extern "C" {
+    bool gClearKVS = false;
+}
+
 int AppTask::Init()
 {
     CHIP_ERROR ret;
@@ -133,6 +138,8 @@ int AppTask::Init()
     gButtonRightHandle             = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(gButtonRightHandle, ButtonRightEventHandler);
 
+    gClearKVS = GPIO_read(CONFIG_GPIO_BTN_RIGHT_INPUT);
+
     PLAT_LOG("Initialize Wi-Fi");
     WiFi_init();
 
@@ -144,14 +151,6 @@ int AppTask::Init()
         while (true)
             ;
     }
-    // PLAT_LOG("Start Event Loop Task");
-    // ret = PlatformMgr().StartEventLoopTask();
-    // if (ret != CHIP_NO_ERROR)
-    // {
-    //     PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
-    //     while (true)
-    //         ;
-    // }
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
@@ -161,7 +160,12 @@ int AppTask::Init()
 
     // Initialize device attestation config
     PLAT_LOG("Initialize device attestation config");
+#ifdef CC32XX_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC32XX::GetCC32XXDacProvider());
+#else
+
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     // Initialize BoltLock module
     PLAT_LOG("Initialize BoltLock");
@@ -175,6 +179,7 @@ int AppTask::Init()
     PLAT_LOG("Print Onboarding Codes");
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork));
 
+    PLAT_LOG("Start CHIPDeviceManager and Start Event Loop Task");
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
     ret                           = deviceMgr.Init(&EchoCallbacks);
     if (ret != CHIP_NO_ERROR)
