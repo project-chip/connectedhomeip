@@ -266,8 +266,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_id
 
-    async def read_single_attribute(self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object) -> object:
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
+    async def read_single_attribute(self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
