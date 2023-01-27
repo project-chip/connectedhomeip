@@ -444,14 +444,14 @@ static EntropyContext * get_entropy_context()
     return &gsEntropyContext;
 }
 
-static int strong_entropy_func(void *data, unsigned char *output, size_t len)
+static int strong_entropy_func(void * data, unsigned char * output, size_t len)
 {
     int result = -1;
 #if defined(MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES)
-    size_t olen = 0;
-    EntropyContext * const ctxt = get_entropy_context();
+    size_t olen                                  = 0;
+    EntropyContext * const ctxt                  = get_entropy_context();
     mbedtls_entropy_f_source_ptr trng_get_random = ctxt->mEntropy.source[0].f_source;
-    result = trng_get_random(NULL, Uint8::to_uchar(output), len, &olen);
+    result                                       = trng_get_random(NULL, Uint8::to_uchar(output), len, &olen);
 #else
     result = mbedtls_entropy_func(data, output, len);
 #endif
@@ -544,10 +544,10 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    secEcdsaStatus_t result       	= gSecEcdsaInvalidState_c;
+    secEcdsaStatus_t result         = gSecEcdsaInvalidState_c;
     const ecp256KeyPair_t * keypair = to_const_keypair(&mKeypair);
 
-    result =  ECDSA_SignFromHash( out_signature.Bytes(), digest, sizeof(digest), keypair->private_key.raw_8bit);
+    result = ECDSA_SignFromHash(out_signature.Bytes(), digest, sizeof(digest), keypair->private_key.raw_8bit);
     VerifyOrExit(result == gSecEcdsaSuccess_c, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
@@ -584,12 +584,12 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     VerifyOrReturnError(signature.Length() == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    secEcdsaStatus_t result		= gSecEcdsaFailure_c;
+    secEcdsaStatus_t result = gSecEcdsaFailure_c;
 
-    const uint8_t *public_key 	= *this;
+    const uint8_t * public_key = *this;
 
     // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
-    result = ECDSA_VerifySignature( public_key + 1, hash, hash_length, Uint8::to_const_uchar(signature.ConstBytes()) );
+    result = ECDSA_VerifySignature(public_key + 1, hash, hash_length, Uint8::to_const_uchar(signature.ConstBytes()));
     VerifyOrExit(result == gSecEcdsaSuccess_c, error = CHIP_ERROR_INVALID_SIGNATURE);
 
 exit:
@@ -599,18 +599,17 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-    CHIP_ERROR error     = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
 #if defined(MBEDTLS_ECDH_C)
     secEcdhStatus_t result = gSecEcdhSuccess_c;
-    size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
+    size_t secret_length   = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
 
     const ecp256KeyPair_t * keypair = to_const_keypair(&mKeypair);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-    result =  Ecdh_ComputeSharedSecret((const uint8_t*)&keypair->private_key,
-                                        (const uint8_t*)remote_public_key.ConstBytes() + 1,
-                                        out_secret.Bytes());
+    result = Ecdh_ComputeSharedSecret((const uint8_t *) &keypair->private_key, (const uint8_t *) remote_public_key.ConstBytes() + 1,
+                                      out_secret.Bytes());
     VerifyOrExit(result == gSecEcdhSuccess_c, error = CHIP_ERROR_INTERNAL);
 
     SuccessOrExit(out_secret.SetLength(secret_length));
@@ -661,7 +660,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     Clear();
 
     secEcp256Status_t st;
-    ecp256KeyPair_t *keypair;
+    ecp256KeyPair_t * keypair;
     keypair = to_keypair(&mKeypair);
     if ((st = ECP256_GenerateKeyPair(&keypair->public_key, &keypair->private_key)) != gSecEcp256Success_c)
     {
@@ -669,7 +668,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     }
     else
     {
-        result = 0;
+        result                         = 0;
         Uint8::to_uchar(mPublicKey)[0] = 0x04;
         memcpy(Uint8::to_uchar(mPublicKey) + 1, keypair->public_key.raw, sizeof(ecp256Point_t));
     }
@@ -682,7 +681,7 @@ exit:
 
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
-    size_t len                           = output.Length() == 0 ? output.Capacity() : output.Length();
+    size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output.Bytes(), len);
     uint8_t privkey[kP256_PrivateKey_Length];
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -725,8 +724,8 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     bbuf.Put(input.Bytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
-    keypair                    = nullptr;
-    mInitialized    = true;
+    keypair      = nullptr;
+    mInitialized = true;
 exit:
     _log_mbedTLS_error(result);
     return error;
@@ -749,10 +748,10 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-	MutableByteSpan csr(out_csr, csr_length);
-	CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
-	csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
-	return err;
+    MutableByteSpan csr(out_csr, csr_length);
+    CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
+    csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
+    return err;
 }
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
@@ -828,7 +827,7 @@ typedef struct Spake2p_Context
     ecp256Point_t V;
     ecp256Point_t G;
 
-    big_int256_t w0; //big_int320_t not any more
+    big_int256_t w0; // big_int320_t not any more
     big_int256_t w1;
     big_int256_t xy;
     big_int256_t tempbn;
@@ -863,7 +862,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
     Z = &context->Z;
     G = &context->G;
 
-    //memset(&context->w0, 0, sizeof(big_int320_t));
+    // memset(&context->w0, 0, sizeof(big_int320_t));
     w0     = &context->w0;
     w1     = &context->w1;
     xy     = &context->xy;
@@ -918,14 +917,14 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    ECP256_FieldLoad((uint32_t*)fe, in, in_len);
+    ECP256_FieldLoad((uint32_t *) fe, in, in_len);
 
     return error;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out, size_t out_len)
 {
-    ECP256_FieldLoad((uint32_t*)out, (uint8_t*)fe, out_len);
+    ECP256_FieldLoad((uint32_t *) out, (uint8_t *) fe, out_len);
 
     return CHIP_NO_ERROR;
 }
@@ -933,9 +932,9 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    secEcp256Status_t    result;
-    ecp256Point_t        PublicKey;
-    ecp256Coordinate_t   PrivateKey;
+    secEcp256Status_t result;
+    ecp256Point_t PublicKey;
+    ecp256Coordinate_t PrivateKey;
 
     result = ECP256_GenerateKeyPair(&PublicKey, &PrivateKey);
 
@@ -943,7 +942,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
 
     VerifyOrExit(result == gSecEcp256Success_c, error = CHIP_ERROR_INTERNAL);
 
-    ecp_coordinate_copy((uint8_t*)fe, (const uint8_t*)&PrivateKey);
+    ecp_coordinate_copy((uint8_t *) fe, (const uint8_t *) &PrivateKey);
 
 exit:
     _log_mbedTLS_error(result);
@@ -955,7 +954,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, co
     CHIP_ERROR error = CHIP_NO_ERROR;
     secEcp256Status_t result;
 
-    result = ECP256_ScalarMultiplicationModN((uint32_t*)fer, (const uint32_t*)fe1, (const uint32_t*)fe2);
+    result = ECP256_ScalarMultiplicationModN((uint32_t *) fer, (const uint32_t *) fe1, (const uint32_t *) fe2);
     VerifyOrExit(result == gSecEcp256Success_c, error = CHIP_ERROR_INTERNAL);
 exit:
     _log_mbedTLS_error(result);
@@ -965,7 +964,7 @@ exit:
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const uint8_t * in, size_t in_len, void * R)
 {
-    ECP256_PointLoad((ecp256Point_t*)R, in, false);
+    ECP256_PointLoad((ecp256Point_t *) R, in, false);
 
     return CHIP_NO_ERROR;
 }
@@ -974,7 +973,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, uint8_t * o
 {
     memset(out, 0, out_len);
     out[0] = 0x04;
-    ecp_p256_copy(out+1, (const uint8_t*)R);
+    ecp_p256_copy(out + 1, (const uint8_t *) R);
 
     return CHIP_NO_ERROR;
 }
@@ -984,7 +983,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
     CHIP_ERROR error = CHIP_NO_ERROR;
     int ret;
 
-    ret = ECP256_PointMult((ecp256Point_t*)R, (const uint8_t*)P1, (const uint8_t*)fe1);
+    ret = ECP256_PointMult((ecp256Point_t *) R, (const uint8_t *) P1, (const uint8_t *) fe1);
     if (ret != gSecEcp256Success_c)
     {
         error = CHIP_ERROR_INTERNAL;
@@ -996,13 +995,13 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1, const void * fe1, const void * P2,
                                                       const void * fe2)
 {
-    CHIP_ERROR  status;
+    CHIP_ERROR status;
 
     status = CHIP_ERROR_INTERNAL;
 
     if (ECP256_DoublePointMulAdd(R, P1, fe1, P2, fe2) == gSecEcp256Success_c)
     {
-       status = CHIP_NO_ERROR;
+        status = CHIP_NO_ERROR;
     }
 
     return status;
@@ -1010,11 +1009,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
 {
-    CHIP_ERROR  status = CHIP_NO_ERROR;
+    CHIP_ERROR status = CHIP_NO_ERROR;
 
-    if (ECP256_PointInvert((uint32_t*)R, (const uint32_t*)R)  != gSecEcp256Success_c)
+    if (ECP256_PointInvert((uint32_t *) R, (const uint32_t *) R) != gSecEcp256Success_c)
     {
-       status = CHIP_ERROR_INTERNAL;
+        status = CHIP_ERROR_INTERNAL;
     }
     else
     {
@@ -1034,19 +1033,20 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     secEcp256Status_t result;
-    uint8_t *p;
+    uint8_t * p;
     uint32_t W1[ECP256_COORDINATE_WLEN];
-    do {
-        result = ECP256_ModularReductionN(W1,  w1in,  w1in_len);
+    do
+    {
+        result = ECP256_ModularReductionN(W1, w1in, w1in_len);
         if (result != gSecEcp256Success_c)
             break;
         ecp256Point_t gen_point;
-        result = ECP256_GeneratePublicKey((uint8_t *)&gen_point, (uint8_t *)&W1);
+        result = ECP256_GeneratePublicKey((uint8_t *) &gen_point, (uint8_t *) &W1);
         if (result != gSecEcp256Success_c)
             break;
-        p = Lout;
-        *p++ = 0x04;  /* uncompressed format */
-        memcpy(p, (uint8_t *)&gen_point, ECP256_COORDINATE_LEN*2);
+        p    = Lout;
+        *p++ = 0x04; /* uncompressed format */
+        memcpy(p, (uint8_t *) &gen_point, ECP256_COORDINATE_LEN * 2);
     } while (0);
 
 exit:
@@ -1057,8 +1057,9 @@ exit:
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
 {
     CHIP_ERROR status = CHIP_ERROR_INTERNAL;
-    do {
-        if (!ECP256_PointValid((ecp256Point_t*)R))
+    do
+    {
+        if (!ECP256_PointValid((ecp256Point_t *) R))
         {
             break;
         }
@@ -1464,7 +1465,7 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     CHIP_ERROR error = CHIP_NO_ERROR;
     mbedtls_x509_crt mbed_cert;
     ecp256KeyPair_t * keypair = nullptr;
-    size_t pubkey_size            = 0;
+    size_t pubkey_size        = 0;
 
     mbedtls_x509_crt_init(&mbed_cert);
 

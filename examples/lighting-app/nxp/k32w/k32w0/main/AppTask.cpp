@@ -18,8 +18,8 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include <app/server/Server.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
 #include <app/server/OnboardingCodesUtil.h>
@@ -72,8 +72,8 @@ static QueueHandle_t sAppEventQueue;
 static LEDWidget sStatusLED;
 static LEDWidget sLightLED;
 
-static bool sIsThreadProvisioned        = false;
-static bool sHaveBLEConnections         = false;
+static bool sIsThreadProvisioned = false;
+static bool sHaveBLEConnections  = false;
 
 static uint32_t eventMask = 0;
 
@@ -236,10 +236,7 @@ void AppTask::InitServer(intptr_t arg)
 void AppTask::PrintOnboardingInfo()
 {
     chip::PayloadContents payload;
-    CHIP_ERROR err = GetPayloadContents(
-        payload,
-        chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)
-    );
+    CHIP_ERROR err = GetPayloadContents(payload, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());

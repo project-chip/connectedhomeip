@@ -36,37 +36,37 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-RamStorage K32WConfig::sFactoryStorage { kNvmId_Factory };
-RamStorage K32WConfig::sConfigStorage  { kNvmId_Config };
-RamStorage K32WConfig::sCounterStorage { kNvmId_Counter };
+RamStorage K32WConfig::sFactoryStorage{ kNvmId_Factory };
+RamStorage K32WConfig::sConfigStorage{ kNvmId_Config };
+RamStorage K32WConfig::sCounterStorage{ kNvmId_Counter };
 
-const K32WConfig::Key K32WConfig::kConfigKey_SerialNum              { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x00 };
-const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceId            { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x01 };
-const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceCert          { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x02 };
-const K32WConfig::Key K32WConfig::kConfigKey_MfrDevicePrivateKey    { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x03 };
-const K32WConfig::Key K32WConfig::kConfigKey_ManufacturingDate      { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x04 };
-const K32WConfig::Key K32WConfig::kConfigKey_SetupPinCode           { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x05 };
-const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceICACerts      { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x06 };
-const K32WConfig::Key K32WConfig::kConfigKey_HardwareVersion        { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x07 };
-const K32WConfig::Key K32WConfig::kConfigKey_SetupDiscriminator     { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x08 };
-const K32WConfig::Key K32WConfig::kConfigKey_Spake2pIterationCount  { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x09 };
-const K32WConfig::Key K32WConfig::kConfigKey_Spake2pSalt            { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x0A };
-const K32WConfig::Key K32WConfig::kConfigKey_Spake2pVerifier        { &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x0B };
+const K32WConfig::Key K32WConfig::kConfigKey_SerialNum{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x00 };
+const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceId{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x01 };
+const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceCert{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x02 };
+const K32WConfig::Key K32WConfig::kConfigKey_MfrDevicePrivateKey{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x03 };
+const K32WConfig::Key K32WConfig::kConfigKey_ManufacturingDate{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x04 };
+const K32WConfig::Key K32WConfig::kConfigKey_SetupPinCode{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x05 };
+const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceICACerts{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x06 };
+const K32WConfig::Key K32WConfig::kConfigKey_HardwareVersion{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x07 };
+const K32WConfig::Key K32WConfig::kConfigKey_SetupDiscriminator{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x08 };
+const K32WConfig::Key K32WConfig::kConfigKey_Spake2pIterationCount{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x09 };
+const K32WConfig::Key K32WConfig::kConfigKey_Spake2pSalt{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x0A };
+const K32WConfig::Key K32WConfig::kConfigKey_Spake2pVerifier{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x0B };
 
-const K32WConfig::Key K32WConfig::kConfigKey_ServiceConfig          { &K32WConfig::sConfigStorage, kKeyId_Config, 0x01 };
-const K32WConfig::Key K32WConfig::kConfigKey_PairedAccountId        { &K32WConfig::sConfigStorage, kKeyId_Config, 0x02 };
-const K32WConfig::Key K32WConfig::kConfigKey_ServiceId              { &K32WConfig::sConfigStorage, kKeyId_Config, 0x03 };
-const K32WConfig::Key K32WConfig::kConfigKey_LastUsedEpochKeyId     { &K32WConfig::sConfigStorage, kKeyId_Config, 0x05 };
-const K32WConfig::Key K32WConfig::kConfigKey_FailSafeArmed          { &K32WConfig::sConfigStorage, kKeyId_Config, 0x06 };
-const K32WConfig::Key K32WConfig::kConfigKey_RegulatoryLocation     { &K32WConfig::sConfigStorage, kKeyId_Config, 0x07 };
-const K32WConfig::Key K32WConfig::kConfigKey_CountryCode            { &K32WConfig::sConfigStorage, kKeyId_Config, 0x08 };
-const K32WConfig::Key K32WConfig::kConfigKey_UniqueId               { &K32WConfig::sConfigStorage, kKeyId_Config, 0x0A };
-const K32WConfig::Key K32WConfig::kConfigKey_SoftwareVersion        { &K32WConfig::sConfigStorage, kKeyId_Config, 0x0B };
+const K32WConfig::Key K32WConfig::kConfigKey_ServiceConfig{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x01 };
+const K32WConfig::Key K32WConfig::kConfigKey_PairedAccountId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x02 };
+const K32WConfig::Key K32WConfig::kConfigKey_ServiceId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x03 };
+const K32WConfig::Key K32WConfig::kConfigKey_LastUsedEpochKeyId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x05 };
+const K32WConfig::Key K32WConfig::kConfigKey_FailSafeArmed{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x06 };
+const K32WConfig::Key K32WConfig::kConfigKey_RegulatoryLocation{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x07 };
+const K32WConfig::Key K32WConfig::kConfigKey_CountryCode{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x08 };
+const K32WConfig::Key K32WConfig::kConfigKey_UniqueId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0A };
+const K32WConfig::Key K32WConfig::kConfigKey_SoftwareVersion{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0B };
 
-const K32WConfig::Key K32WConfig::kCounterKey_RebootCount           { &K32WConfig::sCounterStorage, kKeyId_Counter, 0x00 };
-const K32WConfig::Key K32WConfig::kCounterKey_UpTime                { &K32WConfig::sCounterStorage, kKeyId_Counter, 0x01 };
-const K32WConfig::Key K32WConfig::kCounterKey_TotalOperationalHours { &K32WConfig::sCounterStorage, kKeyId_Counter, 0x02 };
-const K32WConfig::Key K32WConfig::kCounterKey_BootReason            { &K32WConfig::sCounterStorage, kKeyId_Counter, 0x03 };
+const K32WConfig::Key K32WConfig::kCounterKey_RebootCount{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x00 };
+const K32WConfig::Key K32WConfig::kCounterKey_UpTime{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x01 };
+const K32WConfig::Key K32WConfig::kCounterKey_TotalOperationalHours{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x02 };
+const K32WConfig::Key K32WConfig::kCounterKey_BootReason{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x03 };
 
 CHIP_ERROR K32WConfig::Init()
 {

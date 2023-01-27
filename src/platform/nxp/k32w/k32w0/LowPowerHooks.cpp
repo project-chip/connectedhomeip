@@ -71,7 +71,7 @@ static sDualModeAppStates dualModeStates;
 /* 15.4 warm time must be > 0, so this value will be
  * updated when 15.4 is initialized for the first time
  */
-constexpr uint16_t kThreadWarmNotInitializedValue = 1000;  /* 1 ms */
+constexpr uint16_t kThreadWarmNotInitializedValue = 1000; /* 1 ms */
 
 extern "C" void otTaskletsSignalPending(otInstance * p_instance);
 
@@ -239,8 +239,8 @@ void dm_switch_init15_4AfterWakeUp(void)
     otPlatRadioEnable(NULL);
 
     /* set the correct state */
-    vDynRequestState(E_DYN_SLAVE, E_DYN_STATE_INACTIVE);    /* 15.4 */
-    vDynRequestState(E_DYN_MASTER, E_DYN_STATE_ACTIVE);     /* BLE */
+    vDynRequestState(E_DYN_SLAVE, E_DYN_STATE_INACTIVE); /* 15.4 */
+    vDynRequestState(E_DYN_MASTER, E_DYN_STATE_ACTIVE);  /* BLE */
 
     sched_enable();
 

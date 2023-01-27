@@ -54,7 +54,7 @@ uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
     for (keyId = 0; keyId < kMaxNumberOfKeys; keyId++)
     {
         uint16_t keyStringSize = kMaxKeyValueBytes;
-        pdmInternalId = Internal::RamStorageKey::GetPdmId(kKeyId_KvsKeys, keyId);
+        pdmInternalId          = Internal::RamStorageKey::GetPdmId(kKeyId_KvsKeys, keyId);
         err = KeyValueStoreManagerImpl::sKeysStorage.Read(pdmInternalId, 0, (uint8_t *) keyString, &keyStringSize);
 
         if (err == CHIP_NO_ERROR)
@@ -77,17 +77,16 @@ uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
 CHIP_ERROR KeyValueStoreManagerImpl::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = sKeysStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
+    err            = sKeysStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer,
-            "Cannot init KVS keys storage with id: %" PRIu16 ". Error: %s", kNvmId_KvsKeys, ErrorStr(err));
+        ChipLogProgress(DeviceLayer, "Cannot init KVS keys storage with id: %" PRIu16 ". Error: %s", kNvmId_KvsKeys, ErrorStr(err));
     }
     err = sValuesStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer,
-            "Cannot init KVS values storage with id: %" PRIu16 ". Error: %s", kNvmId_KvsValues, ErrorStr(err));
+        ChipLogProgress(DeviceLayer, "Cannot init KVS values storage with id: %" PRIu16 ". Error: %s", kNvmId_KvsValues,
+                        ErrorStr(err));
     }
 
     return err;
@@ -97,7 +96,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
                                           size_t offset_bytes)
 {
     CHIP_ERROR err         = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    uint8_t  keyId         = 0;
+    uint8_t keyId          = 0;
     uint16_t pdmInternalId = 0;
     uint16_t valueSize     = value_size;
 
@@ -110,7 +109,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         // This is the ID of the actual data
         pdmInternalId = Internal::RamStorageKey::GetPdmId(kKeyId_KvsValues, keyId);
         ChipLogProgress(DeviceLayer, "KVS, get the value of Matter key [%s] with PDM id: %i", key, pdmInternalId);
-        err = KeyValueStoreManagerImpl::sValuesStorage.Read(pdmInternalId, 0, (uint8_t *) value, &valueSize);
+        err              = KeyValueStoreManagerImpl::sValuesStorage.Read(pdmInternalId, 0, (uint8_t *) value, &valueSize);
         *read_bytes_size = valueSize;
     }
     else
@@ -153,7 +152,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
         if (putKey)
         {
             pdmInternalId = Internal::RamStorageKey::GetPdmId(kKeyId_KvsKeys, keyId);
-            ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i and length %d", key, pdmInternalId, strlen(key) + 1);
+            ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i and length %d", key, pdmInternalId,
+                            strlen(key) + 1);
 
             err = sKeysStorage.Write(pdmInternalId, (uint8_t *) key, strlen(key) + 1);
             if (err != CHIP_NO_ERROR)

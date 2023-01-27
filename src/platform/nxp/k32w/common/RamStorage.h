@@ -19,8 +19,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "ram_storage.h"
 #include "PDM.h"
+#include "ram_storage.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -41,7 +41,7 @@ public:
 
     CHIP_ERROR Init(uint16_t aInitialSize);
     void FreeBuffer();
-    Buffer* GetBuffer() const { return mBuffer; }
+    Buffer * GetBuffer() const { return mBuffer; }
     CHIP_ERROR Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength) const;
     CHIP_ERROR Write(uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
     CHIP_ERROR Delete(uint16_t aKey, int aIndex);
@@ -52,7 +52,7 @@ private:
     CHIP_ERROR MapPdmStatusToChipError(PDM_teStatus status) const;
 
     uint16_t mPdmId;
-    Buffer*  mBuffer;
+    Buffer * mBuffer;
 };
 
 } // namespace Internal

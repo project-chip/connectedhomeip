@@ -111,7 +111,6 @@
 #define CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM 1
 #endif // CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM
 
-
 #ifndef CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
 #define CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL 0
 #endif // CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
@@ -190,7 +189,6 @@
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
-
 // ==================== Security Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_APPLICATION_GROUPS
@@ -223,7 +221,7 @@
 
 #ifndef CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
 /*
-* Increasing the default value to 10 to handle potential scenario where there is latency with the radio used
-*/
+ * Increasing the default value to 10 to handle potential scenario where there is latency with the radio used
+ */
 #define CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS 10
 #endif

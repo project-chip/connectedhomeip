@@ -22,15 +22,15 @@
 #endif
 
 #include "OtaUtils.h"
-#include "fsl_flash.h"
 #include "SecLib.h"
+#include "fsl_flash.h"
+#include <credentials/CHIPCert.h>
+#include <credentials/CertificationDeclaration.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Base64.h>
 #include <lib/support/Span.h>
-#include <credentials/CHIPCert.h>
-#include <credentials/CertificationDeclaration.h>
 #include <platform/ConfigurationManager.h>
 
 #include "K32W0FactoryDataProvider.h"
@@ -46,14 +46,13 @@ namespace DeviceLayer {
 
 static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
-static constexpr size_t kSpake2pSalt_MaxBase64Len =
-    BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 static constexpr size_t kMaxKeyLen                = 32;
 static constexpr size_t kHashLen                  = 4;
 static constexpr size_t kDataSizeLen              = 4;
 static constexpr size_t kHashId                   = 0xCE47BA5E;
 
-static uint32_t factoryDataActualSize = 0;
+static uint32_t factoryDataActualSize   = 0;
 static uint32_t factoryDataStartAddress = 0;
 
 typedef otaUtilsResult_t (*OtaUtils_EEPROM_ReadData)(uint16_t nbBytes, uint32_t address, uint8_t * pInbuf);
@@ -94,9 +93,9 @@ K32W0FactoryDataProvider::K32W0FactoryDataProvider()
 
 CHIP_ERROR K32W0FactoryDataProvider::Init()
 {
-    uint8_t sha256Output[SHA256_HASH_SIZE] = {0};
-    uint32_t start = (uint32_t)__FACTORY_DATA_START;
-    uint32_t sum = 0;
+    uint8_t sha256Output[SHA256_HASH_SIZE] = { 0 };
+    uint32_t start                         = (uint32_t) __FACTORY_DATA_START;
+    uint32_t sum                           = 0;
     uint32_t size;
     uint32_t hashId;
     uint8_t hashReadFromFlash[kHashLen];
@@ -109,16 +108,15 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
         sum += maxLengths[i];
     }
 
-    if(sum > (uint32_t)__FACTORY_DATA_SIZE)
+    if (sum > (uint32_t) __FACTORY_DATA_SIZE)
     {
-        ChipLogError(DeviceLayer,
-            "Max size of factory data: %" PRIu32 " is bigger than reserved factory data size: %" PRIu32,
-            sum, (uint32_t)__FACTORY_DATA_SIZE
-        );
+        ChipLogError(DeviceLayer, "Max size of factory data: %" PRIu32 " is bigger than reserved factory data size: %" PRIu32, sum,
+                     (uint32_t) __FACTORY_DATA_SIZE);
     }
 
     /* Before trying to verify the hash, make sure there is a hash there by checking its tag */
-    if (gOtaUtilsSuccess_c != OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(hashId), start, (uint8_t *) &hashId, NULL, pFunctionEepromRead))
+    if (gOtaUtilsSuccess_c !=
+        OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(hashId), start, (uint8_t *) &hashId, NULL, pFunctionEepromRead))
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -131,8 +129,11 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
     /* Read length of factory data from internal flash and 4 byte from computed SHA256 hash over factory data */
     start += sizeof(kHashId);
 
-    if (gOtaUtilsSuccess_c != OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(size), start, (uint8_t *)&size, NULL, pFunctionEepromRead) ||
-   		gOtaUtilsSuccess_c != OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(hashReadFromFlash), start + kHashLen, &hashReadFromFlash[0], NULL, pFunctionEepromRead))
+    if (gOtaUtilsSuccess_c !=
+            OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(size), start, (uint8_t *) &size, NULL, pFunctionEepromRead) ||
+        gOtaUtilsSuccess_c !=
+            OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(hashReadFromFlash), start + kHashLen, &hashReadFromFlash[0], NULL,
+                                           pFunctionEepromRead))
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -153,7 +154,7 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length)
+CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length)
 {
     CHIP_ERROR err                               = CHIP_ERROR_NOT_FOUND;
     uint32_t addr                                = factoryDataStartAddress;
@@ -162,17 +163,17 @@ CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *
 
     while (addr < (factoryDataStartAddress + (uint32_t) __FACTORY_DATA_SIZE))
     {
-        if (gOtaUtilsSuccess_c !=
-                OtaUtils_ReadFromInternalFlash((uint16_t)sizeof(type), addr, &type, NULL, pFunctionEepromRead) ||
+        if (gOtaUtilsSuccess_c != OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(type), addr, &type, NULL, pFunctionEepromRead) ||
             gOtaUtilsSuccess_c !=
-                OtaUtils_ReadFromInternalFlash((uint16_t)sizeof(length), addr + 1, (uint8_t*)&length, NULL, pFunctionEepromRead))
-        	break;
+                OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(length), addr + 1, (uint8_t *) &length, NULL, pFunctionEepromRead))
+            break;
 
         if (searchedType == type)
         {
             if ((type >= K32W0FactoryDataProvider::kNumberOfIds) || (length > maxLengths[type]))
             {
-                ChipLogError(DeviceLayer, "Failed validity check for factory data with: id=%" PRIu8 ", length=%" PRIu16, type, length);
+                ChipLogError(DeviceLayer, "Failed validity check for factory data with: id=%" PRIu8 ", length=%" PRIu16, type,
+                             length);
                 break;
             }
 
@@ -331,7 +332,7 @@ CHIP_ERROR K32W0FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
 CHIP_ERROR K32W0FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kVendorNameId, (uint8_t *)buf, bufSize, length));
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kVendorNameId, (uint8_t *) buf, bufSize, length));
     buf[length] = '\0';
 
     return CHIP_NO_ERROR;
@@ -348,7 +349,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 CHIP_ERROR K32W0FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductNameId, (uint8_t *)buf, bufSize, length));
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductNameId, (uint8_t *) buf, bufSize, length));
     buf[length] = '\0';
 
     return CHIP_NO_ERROR;
@@ -380,7 +381,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 CHIP_ERROR K32W0FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kSerialNumberId, (uint8_t *)buf, bufSize, length));
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kSerialNumberId, (uint8_t *) buf, bufSize, length));
     buf[length] = '\0';
 
     return CHIP_NO_ERROR;
@@ -391,12 +392,12 @@ CHIP_ERROR K32W0FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8
     uint16_t length = 0;
     uint8_t date[ConfigurationManager::kMaxManufacturingDateLength];
 
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kManufacturingDateId, date, ConfigurationManager::kMaxManufacturingDateLength, length));
+    ReturnErrorOnFailure(
+        SearchForId(FactoryDataId::kManufacturingDateId, date, ConfigurationManager::kMaxManufacturingDateLength, length));
     date[length] = '\0';
 
-    if (length == 10 && isdigit(date[0]) && isdigit(date[1]) && isdigit(date[2]) &&
-        isdigit(date[3]) && date[4] == '-' && isdigit(date[5]) && isdigit(date[6]) &&
-        date[7] == '-' && isdigit(date[8]) && isdigit(date[9]))
+    if (length == 10 && isdigit(date[0]) && isdigit(date[1]) && isdigit(date[2]) && isdigit(date[3]) && date[4] == '-' &&
+        isdigit(date[5]) && isdigit(date[6]) && date[7] == '-' && isdigit(date[8]) && isdigit(date[9]))
     {
         year  = 1000 * (date[0] - '0') + 100 * (date[1] - '0') + 10 * (date[2] - '0') + date[3] - '0';
         month = 10 * (date[5] - '0') + date[6] - '0';
@@ -415,8 +416,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersi
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(
-        SearchForId(FactoryDataId::kHardwareVersionId, (uint8_t *) &hardwareVersion, sizeof(hardwareVersion), length)
-    );
+        SearchForId(FactoryDataId::kHardwareVersionId, (uint8_t *) &hardwareVersion, sizeof(hardwareVersion), length));
 
     return CHIP_NO_ERROR;
 }
@@ -424,7 +424,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersi
 CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kHardwareVersionStrId, (uint8_t *)buf, bufSize, length));
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kHardwareVersionStrId, (uint8_t *) buf, bufSize, length));
     buf[length] = '\0';
 
     return CHIP_NO_ERROR;
@@ -435,12 +435,10 @@ CHIP_ERROR K32W0FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     char uniqueId[ConfigurationManager::kMaxUniqueIDLength] = { 0 };
-    uint16_t uniqueIdLen = 0;
+    uint16_t uniqueIdLen                                    = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kUniqueId, (uint8_t *) (&uniqueId[0]), sizeof(uniqueId), uniqueIdLen));
-    static_assert(
-        ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
-        "Length of unique ID for rotating device ID is smaller than minimum."
-    );
+    static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
+                  "Length of unique ID for rotating device ID is smaller than minimum.");
 
     ReturnErrorCodeIf(uniqueIdLen > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(uniqueIdLen != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);

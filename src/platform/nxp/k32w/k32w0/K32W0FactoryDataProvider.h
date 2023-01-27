@@ -32,10 +32,9 @@ namespace DeviceLayer {
  *        and Device Instance Info.
  */
 
-class K32W0FactoryDataProvider :
-    public DeviceInstanceInfoProvider,
-    public CommissionableDataProvider,
-    public Credentials::DeviceAttestationCredentialsProvider
+class K32W0FactoryDataProvider : public DeviceInstanceInfoProvider,
+                                 public CommissionableDataProvider,
+                                 public Credentials::DeviceAttestationCredentialsProvider
 {
 public:
     // Default factory data IDs
@@ -66,18 +65,17 @@ public:
 #if !CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS
 #error "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS must be > 0 if custom provider is enabled."
 #endif
-    static constexpr uint16_t kNumberOfIds =
-        FactoryDataId::kMaxId + CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS;
+    static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId + CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS;
 #else
     static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId;
 #endif
 
     static K32W0FactoryDataProvider & GetDefaultInstance();
 
-	K32W0FactoryDataProvider();
+    K32W0FactoryDataProvider();
 
     CHIP_ERROR Init();
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length);
 
     // Custom factory data providers must implement this method in order to define
     // their own custom IDs.

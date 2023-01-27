@@ -222,9 +222,8 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate,
-            "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32,
-            currentVersion, targetVersion);
+        ChipLogError(SoftwareUpdate, "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32,
+                     currentVersion, targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -311,15 +310,14 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
 void OTAImageProcessorImpl::HandleBlockEraseComplete(uint32_t context)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error      = CHIP_NO_ERROR;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     SystemLayer().ScheduleLambda([imageProcessor] {
-            if (imageProcessor->mDownloader)
-            {
-                imageProcessor->mDownloader->FetchNextData();
-            }
+        if (imageProcessor->mDownloader)
+        {
+            imageProcessor->mDownloader->FetchNextData();
         }
-    );
+    });
 }
 
 } // namespace chip

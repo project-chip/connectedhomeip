@@ -18,8 +18,8 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include <app/server/Server.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -70,8 +70,8 @@ static LEDWidget sStatusLED;
 static LEDWidget sContactSensorLED;
 #endif
 
-static bool sIsThreadProvisioned        = false;
-static bool sHaveBLEConnections         = false;
+static bool sIsThreadProvisioned = false;
+static bool sHaveBLEConnections  = false;
 
 static uint32_t eventMask = 0;
 
@@ -133,9 +133,9 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     // Initialize factory data provider
     ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
-	SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
-	SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
-	SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+    SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+    SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+    SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
@@ -227,10 +227,7 @@ void AppTask::InitServer(intptr_t arg)
 void AppTask::PrintOnboardingInfo()
 {
     chip::PayloadContents payload;
-    CHIP_ERROR err = GetPayloadContents(
-        payload,
-        chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)
-    );
+    CHIP_ERROR err = GetPayloadContents(payload, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());

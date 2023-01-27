@@ -32,10 +32,8 @@ CustomFactoryDataProvider & CustomFactoryDataProvider::GetDefaultInstance()
 
 CHIP_ERROR CustomFactoryDataProvider::SetCustomIds()
 {
-    static_assert(
-        CustomFactoryIds::kCustomMaxId == K32W0FactoryDataProvider::kNumberOfIds,
-        "kNumberOfIds is computed based on CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS."
-    );
+    static_assert(CustomFactoryIds::kCustomMaxId == K32W0FactoryDataProvider::kNumberOfIds,
+                  "kNumberOfIds is computed based on CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS.");
     maxLengths[CustomFactoryIds::kCustomId1] = kMaxLengthCustomId1;
     maxLengths[CustomFactoryIds::kCustomId2] = kMaxLengthCustomId2;
     maxLengths[CustomFactoryIds::kCustomId3] = kMaxLengthCustomId3;

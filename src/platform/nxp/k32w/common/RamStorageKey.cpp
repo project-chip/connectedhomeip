@@ -16,16 +16,15 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/k32w/common/RamStorageKey.h>
 #include <platform/nxp/k32w/common/RamStorage.h>
-
+#include <platform/nxp/k32w/common/RamStorageKey.h>
 
 namespace chip::DeviceLayer::Internal {
 
-RamStorageKey::RamStorageKey(RamStorage* storage, uint8_t keyId, uint8_t pdmId)
+RamStorageKey::RamStorageKey(RamStorage * storage, uint8_t keyId, uint8_t pdmId)
 {
     mStorage = storage;
-    mId = GetPdmId(keyId, pdmId);
+    mId      = GetPdmId(keyId, pdmId);
 }
 
 CHIP_ERROR RamStorageKey::Read(uint8_t * buf, uint16_t & sizeToRead) const

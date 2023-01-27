@@ -30,7 +30,6 @@ namespace DeviceLayer {
 class CustomFactoryDataProvider : public K32W0FactoryDataProvider
 {
 public:
-
     /* Custom IDs should start from FactoryDataId::kMaxId, which is
      * the next available valid ID. Last default ID is kMaxId - 1.
      */
@@ -42,9 +41,9 @@ public:
         kCustomMaxId
     };
 
-	static CustomFactoryDataProvider & GetDefaultInstance();
+    static CustomFactoryDataProvider & GetDefaultInstance();
 
-	CustomFactoryDataProvider() { }
+    CustomFactoryDataProvider() {}
 
     /* SetCustomIds() must be implemented in order to define custom IDs. */
     CHIP_ERROR SetCustomIds() override;

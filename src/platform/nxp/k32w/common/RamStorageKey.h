@@ -25,18 +25,16 @@ namespace Internal {
 class RamStorageKey
 {
 public:
-    RamStorageKey(RamStorage* storage, uint8_t keyId, uint8_t pdmId);
+    RamStorageKey(RamStorage * storage, uint8_t keyId, uint8_t pdmId);
     CHIP_ERROR Read(uint8_t * buf, uint16_t & sizeToRead) const;
     CHIP_ERROR Write(const uint8_t * buf, uint16_t length);
     CHIP_ERROR Delete();
 
-    static uint16_t GetPdmId(uint8_t keyId, uint8_t pdmId)
-    {
-        return static_cast<uint16_t>(keyId) << 8 | pdmId;
-    }
+    static uint16_t GetPdmId(uint8_t keyId, uint8_t pdmId) { return static_cast<uint16_t>(keyId) << 8 | pdmId; }
+
 private:
-    RamStorage* mStorage;
-    uint16_t    mId;
+    RamStorage * mStorage;
+    uint16_t mId;
 };
 
 } // namespace Internal

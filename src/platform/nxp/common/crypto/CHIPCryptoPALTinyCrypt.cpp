@@ -44,10 +44,10 @@
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
-#include <mbedtls/pk.h>
 #include <ecc.h>
 #include <ecc_dh.h>
 #include <ecc_dsa.h>
+#include <mbedtls/pk.h>
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
@@ -94,7 +94,7 @@ typedef struct
 typedef struct
 {
     uint8_t private_key[NUM_ECC_BYTES];
-    uint8_t public_key[2*NUM_ECC_BYTES];
+    uint8_t public_key[2 * NUM_ECC_BYTES];
 } mbedtls_uecc_keypair;
 
 static EntropyContext gsEntropyContext;
@@ -453,14 +453,14 @@ static EntropyContext * get_entropy_context()
     return &gsEntropyContext;
 }
 
-static int strong_entropy_func(void *data, unsigned char *output, size_t len)
+static int strong_entropy_func(void * data, unsigned char * output, size_t len)
 {
     int result = -1;
 #if defined(MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES)
-    size_t olen = 0;
-    EntropyContext * const ctxt = get_entropy_context();
+    size_t olen                                  = 0;
+    EntropyContext * const ctxt                  = get_entropy_context();
     mbedtls_entropy_f_source_ptr trng_get_random = ctxt->mEntropy.source[0].f_source;
-    result = trng_get_random(NULL, Uint8::to_uchar(output), len, &olen);
+    result                                       = trng_get_random(NULL, Uint8::to_uchar(output), len, &olen);
 #else
     result = mbedtls_entropy_func(data, output, len);
 #endif
@@ -755,10 +755,10 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-	MutableByteSpan csr(out_csr, csr_length);
-	CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
-	csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
-	return err;
+    MutableByteSpan csr(out_csr, csr_length);
+    CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
+    csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
+    return err;
 }
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)

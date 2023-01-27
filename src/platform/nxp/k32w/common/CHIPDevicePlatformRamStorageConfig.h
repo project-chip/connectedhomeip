@@ -21,7 +21,6 @@
  *          Configuration of RAM storage metadata: key IDs and NVM IDs.
  */
 
-
 /* Base key IDs used when creating new keys for RAM storage instances. */
 /**
  * @def kKeyId_Factory
@@ -29,7 +28,7 @@
  * Base key id used for factory RAM storage.
  */
 #ifndef kKeyId_Factory
-#define kKeyId_Factory   (uint8_t)0x01
+#define kKeyId_Factory (uint8_t) 0x01
 #endif
 
 /**
@@ -38,7 +37,7 @@
  * Base key id used for config RAM storage.
  */
 #ifndef kKeyId_Config
-#define kKeyId_Config    (uint8_t)0x02
+#define kKeyId_Config (uint8_t) 0x02
 #endif
 
 /**
@@ -47,7 +46,7 @@
  * Base key id used for counter RAM storage.
  */
 #ifndef kKeyId_Counter
-#define kKeyId_Counter   (uint8_t)0x03
+#define kKeyId_Counter (uint8_t) 0x03
 #endif
 
 /**
@@ -56,7 +55,7 @@
  * Base key id used for KVS keys RAM storage.
  */
 #ifndef kKeyId_KvsKeys
-#define kKeyId_KvsKeys   (uint8_t)0x04
+#define kKeyId_KvsKeys (uint8_t) 0x04
 #endif
 
 /**
@@ -65,7 +64,7 @@
  * Base key id used for KVS values RAM storage.
  */
 #ifndef kKeyId_KvsValues
-#define kKeyId_KvsValues (uint8_t)0x05
+#define kKeyId_KvsValues (uint8_t) 0x05
 #endif
 
 /* PDM IDs used when defining RAM storage instances or RAM buffers (OT). */
@@ -75,7 +74,7 @@
  * PDM ID used for factory RAM storage.
  */
 #ifndef kNvmId_Factory
-#define kNvmId_Factory      (uint16_t)0x5001
+#define kNvmId_Factory (uint16_t) 0x5001
 #endif
 
 /**
@@ -84,7 +83,7 @@
  * PDM ID used for config RAM storage.
  */
 #ifndef kNvmId_Config
-#define kNvmId_Config       (uint16_t)0x5002
+#define kNvmId_Config (uint16_t) 0x5002
 #endif
 
 /**
@@ -93,7 +92,7 @@
  * PDM ID used for counter RAM storage.
  */
 #ifndef kNvmId_Counter
-#define kNvmId_Counter      (uint16_t)0x5003
+#define kNvmId_Counter (uint16_t) 0x5003
 #endif
 
 /**
@@ -102,7 +101,7 @@
  * PDM ID used for KVS keys RAM storage.
  */
 #ifndef kNvmId_KvsKeys
-#define kNvmId_KvsKeys      (uint16_t)0x6000
+#define kNvmId_KvsKeys (uint16_t) 0x6000
 #endif
 
 /**
@@ -111,7 +110,7 @@
  * PDM ID used for KVS values RAM storage.
  */
 #ifndef kNvmId_KvsValues
-#define kNvmId_KvsValues    (uint16_t)0x6001
+#define kNvmId_KvsValues (uint16_t) 0x6001
 #endif
 
 /**
@@ -120,5 +119,5 @@
  * PDM ID used for OT RAM buffer.
  */
 #ifndef kNvmId_OTConfigData
-#define kNvmId_OTConfigData (uint16_t)0x4F00
+#define kNvmId_OTConfigData (uint16_t) 0x4F00
 #endif

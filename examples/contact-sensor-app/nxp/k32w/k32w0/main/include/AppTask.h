@@ -113,7 +113,7 @@ private:
 
     enum class Function : uint8_t
     {
-        kNoneSelected   = 0,
+        kNoneSelected = 0,
         kFactoryReset,
         kContact,
         kIdentify,
@@ -125,7 +125,6 @@ private:
     bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
-
 };
 
 inline AppTask & GetAppTask(void)

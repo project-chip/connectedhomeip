@@ -43,14 +43,13 @@
 #include <openthread/platform/entropy.h>
 
 #include "MemManager.h"
+#include "PDM.h"
 #include "RNG_Interface.h"
 #include "SecLib.h"
 #include "TimersManager.h"
+#include "board.h"
 #include "fsl_sha.h"
 #include "k32w0-chip-mbedtls-config.h"
-#include "SecLib.h"
-#include "PDM.h"
-#include "board.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -167,7 +166,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     err = PersistedStorage::KeyValueStoreManagerImpl::Init();
     SuccessOrExit(err);
-
 
     chipType = Chip_GetType();
     if ((chipType != CHIP_K32W061) && (chipType != CHIP_K32W041) && (chipType != CHIP_K32W041A) && (chipType != CHIP_K32W041AM))

@@ -18,8 +18,8 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include <app/server/Server.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -198,10 +198,7 @@ void AppTask::InitServer(intptr_t arg)
 void AppTask::PrintOnboardingInfo()
 {
     chip::PayloadContents payload;
-    CHIP_ERROR err = GetPayloadContents(
-        payload,
-        chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)
-    );
+    CHIP_ERROR err = GetPayloadContents(payload, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -764,8 +761,8 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new door lock state
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, chip::app::Clusters::DoorLock::Id, ZCL_LOCK_STATE_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    EmberAfStatus status = emberAfWriteAttribute(1, chip::app::Clusters::DoorLock::Id, ZCL_LOCK_STATE_ATTRIBUTE_ID,
+                                                 (uint8_t *) &newValue, ZCL_ENUM8_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {

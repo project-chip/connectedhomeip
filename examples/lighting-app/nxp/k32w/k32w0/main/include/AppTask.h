@@ -116,7 +116,7 @@ private:
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
+        kFunction_NoneSelected = 0,
         kFunction_FactoryReset,
         kFunctionTurnOnTurnOff,
         kFunction_Identify,
