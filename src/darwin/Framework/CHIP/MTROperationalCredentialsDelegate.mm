@@ -471,7 +471,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateOperationalCertificate(id<
     CATValues cats;
     if (caseAuthenticatedTags != nil) {
         size_t idx = 0;
-        for (NSNumber * cat in caseAuthenticatedTags) {
+        for (NSNumber * cat in [caseAuthenticatedTags.allObjects sortedArrayUsingSelector:@selector(compare:)]) {
             cats.values[idx++] = [cat unsignedIntValue];
         }
     }

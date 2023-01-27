@@ -93,11 +93,10 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                        error:(NSError * __autoreleasing *)error API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * After MTRDeviceAttestationDelegate's
+ * Call this method after MTRDeviceAttestationDelegate
  * deviceAttestationFailedForController:opaqueDeviceHandle:error: or
  * deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:
- * is called, continueCommissioningDevice:ignoreAttestationFailure:error: should
- * be called to continue commissioning the device.
+ * is called to continue commissioning the device.
  */
 - (BOOL)continueCommissioningDevice:(void *)opaqueDeviceHandle
            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure

@@ -32,9 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Prepare to initialize a controller given a keypair to use for signing
  * operational certificates.
  *
- * fabricID must be set to a valid (i.e. nonzero) value.
- *
- * ipk must be 16 bytes in length
+ * @param ipk The Identity Protection Key, must be 16 bytes in length
+ * @param fabricID The fabric identifier, must be non-zero.
  */
 - (instancetype)initWithIPK:(NSData *)ipk
                    fabricID:(NSNumber *)fabricID
@@ -48,8 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
  * The fabric id and node id to use will be derived from the provided
  * operationalCertificate.
  *
- * intermediateCertificate may be nil if operationalCertificate is signed by
- * rootCertificate.
+ * @param ipk The Identity Protection Key, must be 16 bytes in length
+ * @param intermediateCertificate may be nil if operationalCertificate is directly signed by rootCertificate.
  *
  * ipk must be 16 bytes in length.
  */

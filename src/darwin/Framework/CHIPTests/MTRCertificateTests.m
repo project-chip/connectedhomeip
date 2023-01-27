@@ -174,12 +174,6 @@
     [catsWithSameIdentifier addObject:@0x00020001];
     [catsWithSameIdentifier addObject:@0x00010002];
 
-    __auto_type * catsWithDuplicatedCAT = [[NSMutableSet alloc] initWithCapacity:3];
-    // High bits are identifier, low bits are version.
-    [catsWithDuplicatedCAT addObject:@0x00010001];
-    [catsWithDuplicatedCAT addObject:@0x00020001];
-    [catsWithDuplicatedCAT addObject:@0x00010001];
-
     __auto_type * catsWithInvalidVersion = [[NSMutableSet alloc] initWithCapacity:2];
     // High bits are identifier, low bits are version.
     [catsWithInvalidVersion addObject:@0x00010001];
@@ -214,17 +208,6 @@
                                               caseAuthenticatedTags:catsWithSameIdentifier
                                                               error:nil];
     XCTAssertNil(operationalCert);
-
-    // Multiple CATs with the same identifier and same version
-    operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
-                                                 signingCertificate:rootCert
-                                               operationalPublicKey:operationalKeys.publicKey
-                                                           fabricID:@1
-                                                             nodeID:@1
-                                              caseAuthenticatedTags:catsWithDuplicatedCAT
-                                                              error:nil];
-    // Our set made the CATs unique, so we are not putting in invalid input.
-    XCTAssertNotNil(operationalCert);
 
     // CAT with invalid version
     operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
