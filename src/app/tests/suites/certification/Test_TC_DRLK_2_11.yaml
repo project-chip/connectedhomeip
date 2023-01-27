@@ -176,6 +176,7 @@ tests:
       response:
           values:
               - name: "CredentialExists"
+                value: true
                 constraints:
                     type: boolean
               - name: "UserIndex"
@@ -197,6 +198,7 @@ tests:
       response:
           values:
               - name: "CredentialExists"
+                value: true
                 constraints:
                     type: boolean
               - name: "UserIndex"
@@ -218,6 +220,7 @@ tests:
       response:
           values:
               - name: "CredentialExists"
+                value: true
                 constraints:
                     type: boolean
               - name: "UserIndex"
@@ -238,6 +241,50 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
 
+    - label: "TH sends Get Credential Status Command with type RFID"
+      PICS: DRLK.S.F01 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 2, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label: "TH sends Get Credential Status Command with type FingerVein"
+      PICS: DRLK.S.F02 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 4, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
     - label: "TH sends Clear Credential Command to DUT with type RFID"
       PICS: DRLK.S.F01 && DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
@@ -246,6 +293,28 @@ tests:
           values:
               - name: "Credential"
                 value: { CredentialType: 2, CredentialIndex: 1 }
+
+    - label: "TH sends Get Credential Status Command with type FingerVein"
+      PICS: DRLK.S.F02 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 4, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
 
     - label: "TH sends Clear Credential Command to DUT with type FingerVein"
       PICS: DRLK.S.F02 && DRLK.S.F08 && DRLK.S.C26.Rsp
