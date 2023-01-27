@@ -64,7 +64,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board
 SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 #endif // CONFIG_CHIP_LIB_SHELL
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -488,15 +488,15 @@ void AppTask::ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor)
 {
     if (aAction == PWMDevice::ON_ACTION)
     {
-        LOG_INF("ON_ACTION initiated");
+        LOG_DBG("ON_ACTION initiated");
     }
     else if (aAction == PWMDevice::OFF_ACTION)
     {
-        LOG_INF("OFF_ACTION initiated");
+        LOG_DBG("OFF_ACTION initiated");
     }
     else if (aAction == PWMDevice::LEVEL_ACTION)
     {
-        LOG_INF("LEVEL_ACTION initiated");
+        LOG_DBG("LEVEL_ACTION initiated");
     }
 }
 
@@ -504,15 +504,15 @@ void AppTask::ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor)
 {
     if (aAction == PWMDevice::ON_ACTION)
     {
-        LOG_INF("ON_ACTION completed");
+        LOG_DBG("ON_ACTION completed");
     }
     else if (aAction == PWMDevice::OFF_ACTION)
     {
-        LOG_INF("OFF_ACTION completed");
+        LOG_DBG("OFF_ACTION completed");
     }
     else if (aAction == PWMDevice::LEVEL_ACTION)
     {
-        LOG_INF("LEVEL_ACTION completed");
+        LOG_DBG("LEVEL_ACTION completed");
     }
 
     if (aActor == AppEvent::kEventType_Button)

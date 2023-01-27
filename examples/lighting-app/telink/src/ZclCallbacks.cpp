@@ -26,6 +26,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
@@ -40,7 +42,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
+        ChipLogDetail(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
         GetAppTask().SetInitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
                                        static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
     }
@@ -48,7 +50,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         if (GetAppTask().GetPWMDevice().IsTurnedOn())
         {
-            ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
+            ChipLogDetail(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
             GetAppTask().SetInitiateAction(PWMDevice::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
         }
         else
@@ -78,7 +80,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 xy.y = *reinterpret_cast<uint16_t *>(value);
             }
 
-            ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
+            ChipLogDetail(Zcl, "New XY color: %u|%u", xy.x, xy.y);
             GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_Lighting),
                                            (uint8_t *) &xy);
         }
@@ -100,19 +102,19 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             {
                 hsv.s = *value;
             }
-            ChipLogProgress(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
+            ChipLogDetail(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
             GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_Lighting),
                                            (uint8_t *) &hsv);
         }
         /* Temperature Mireds color space */
         else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
         {
-            ChipLogProgress(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
+            ChipLogDetail(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
             GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
         }
         else
         {
-            ChipLogProgress(Zcl, "Ignore ColorControl attribute (%u) that is not currently processed!", attributeId);
+            ChipLogDetail(Zcl, "Ignore ColorControl attribute (%u) that is not currently processed!", attributeId);
         }
     }
 }
