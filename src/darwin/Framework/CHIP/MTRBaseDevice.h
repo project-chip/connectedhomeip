@@ -458,10 +458,10 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                errorHandler:(MTRDeviceErrorHandler)errorHandler
     subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
-    MTR_NEWLY_DEPRECATED(
-        "Please use "
-        "subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:"
-        "subscriptionEstablished:resubscriptionScheduled:");
+    API_DEPRECATED("Please use "
+                   "subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:"
+                   "subscriptionEstablished:resubscriptionScheduled:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
                           clusterId:(NSNumber * _Nullable)clusterId
@@ -489,8 +489,8 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
-    MTR_NEWLY_DEPRECATED(
-        "Please use invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion");
+    API_DEPRECATED("Please use invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
                                clusterId:(NSNumber * _Nullable)clusterId
@@ -501,9 +501,10 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
-    MTR_NEWLY_DEPRECATED("Please use "
-                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:"
-                         "reportHandler:subscriptionEstablished:");
+    API_DEPRECATED("Please use "
+                   "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:"
+                   "reportHandler:subscriptionEstablished:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue
                                      completion:(dispatch_block_t)completion

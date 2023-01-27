@@ -190,9 +190,10 @@ NS_ASSUME_NONNULL_BEGIN
                                              nodeId:(NSNumber *)nodeId
                               caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_DEPRECATED(
+    API_DEPRECATED(
         "Plase use "
-        "createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:");
+        "createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 + (nullable NSData *)generateCertificateSigningRequest:(id<MTRKeypair>)keypair
                                                  error:(NSError * __autoreleasing _Nullable * _Nullable)error

@@ -261,8 +261,8 @@ NS_ASSUME_NONNULL_BEGIN
                    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
                            rootCertificate:(MTRCertificateDERBytes)rootCertificate
                                        ipk:(NSData *)ipk
-    MTR_NEWLY_DEPRECATED(
-        "Please use initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:");
+    API_DEPRECATED("Please use initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 

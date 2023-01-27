@@ -219,9 +219,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                         clientQueue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
-    MTR_NEWLY_DEPRECATED("Please use "
-                         "invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:"
-                         "timedInvokeTimeout:queue:completion:");
+    API_DEPRECATED("Please use "
+                   "invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:"
+                   "timedInvokeTimeout:queue:completion:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 
