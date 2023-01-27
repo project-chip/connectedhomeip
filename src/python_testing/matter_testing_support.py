@@ -37,7 +37,6 @@ import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
 
 # isort: on
-
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
