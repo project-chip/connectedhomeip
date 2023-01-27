@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import enum
 import logging
 import os
 import sys
 import time
 import typing
-import enum
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -155,7 +155,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         else:
             manual_handling = ManualHandling.INCLUDE
     else:
-            manual_handling = ManualHandling.INCLUDE
+        manual_handling = ManualHandling.INCLUDE
 
     if 'all' not in target:
         tests = []
