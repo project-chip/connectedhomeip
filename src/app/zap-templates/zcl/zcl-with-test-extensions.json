@@ -5,6 +5,7 @@
     "xmlRoot": [
         ".",
         "./data-model/chip/",
+        "./data-model/draft/",
         "./data-model/silabs/",
         "./data-model/test"
     ],
@@ -19,6 +20,7 @@
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
         "audio-output-cluster.xml",
+        "barrier-control-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",
         "boolean-state-cluster.xml",
