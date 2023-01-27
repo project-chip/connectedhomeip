@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Represents information relating to product attestation.
  *
  */
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceAttestationInfo : NSObject
 
 /**
@@ -81,7 +81,7 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
-MTR_NEWLY_DEPRECATED("Please use MTRDeviceAttestationInfo")
+API_DEPRECATED("Please use MTRDeviceAttestationInfo", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface AttestationInfo : NSObject
 
 @property (nonatomic, copy) NSData * challenge;

@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If not nil, must be 32 bytes of data.
  */
-@property (nonatomic, copy, nullable) NSData * csrNonce MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSData * csrNonce API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The nonce to use when requesting attestation information from the device.
@@ -77,14 +77,16 @@ NS_ASSUME_NONNULL_BEGIN
  * If nil, the fail-safe will not be extended before calling into the
  * deviceAttestationDelegate.
  */
-@property (nonatomic, copy, nullable) NSNumber * failSafeTimeout MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSNumber * failSafeTimeout API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 
 @interface MTRCommissioningParameters (Deprecated)
 
-@property (nonatomic, copy, nullable) NSData * CSRNonce MTR_NEWLY_DEPRECATED("Please use csrNonce");
-@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs MTR_NEWLY_DEPRECATED("Please use failSafeTimeout");
+@property (nonatomic, copy, nullable) NSData * CSRNonce API_DEPRECATED(
+    "Please use csrNonce", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs API_DEPRECATED(
+    "Please use failSafeTimeout", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 

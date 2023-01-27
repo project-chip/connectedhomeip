@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A representation of the operational certificate chain for a node.
  */
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTROperationalCertificateChain : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -59,7 +59,7 @@ MTR_NEWLY_AVAILABLE
 
 typedef void (^MTROperationalCertificateIssuedHandler)(MTROperationalCertificateChain * _Nullable info, NSError * _Nullable error);
 
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @protocol MTROperationalCertificateIssuer
 @required
 
@@ -111,11 +111,13 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
-MTR_NEWLY_DEPRECATED("Please use MTROperationalCertificateIssuedHandler")
+API_DEPRECATED(
+    "Please use MTROperationalCertificateIssuedHandler", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^MTRNOCChainGenerationCompleteHandler)(NSData * operationalCertificate, NSData * intermediateCertificate,
     NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error);
 
-MTR_NEWLY_DEPRECATED("Please use MTROperationalCertificateIssuer")
+API_DEPRECATED(
+    "Please use MTROperationalCertificateIssuer", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @protocol MTRNOCChainIssuer <NSObject>
 @required
 

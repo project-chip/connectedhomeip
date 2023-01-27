@@ -30,12 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The vendor ID for the device from the Device Attestation Certificate. May be nil only if attestation was unsucessful.
  */
-@property (nonatomic, readonly, nullable) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable) NSNumber * vendorID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The product ID for the device from the Device Attestation Certificate. May be nil only if attestation was unsucessful.
  */
-@property (nonatomic, readonly, nullable) NSNumber * productID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable) NSNumber * productID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @property (nonatomic, readonly) MTRCertificateDERBytes dacCertificate;
 @property (nonatomic, readonly) MTRCertificateDERBytes dacPAICertificate;
@@ -74,7 +74,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deviceAttestationCompletedForController:(MTRDeviceController *)controller
                              opaqueDeviceHandle:(void *)opaqueDeviceHandle
                           attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
-                                          error:(NSError * _Nullable)error MTR_NEWLY_AVAILABLE;
+                                          error:(NSError * _Nullable)error
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Notify the delegate when device attestation fails.  If this callback is implemented,
@@ -87,7 +88,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)deviceAttestationFailedForController:(MTRDeviceController *)controller
                           opaqueDeviceHandle:(void *)opaqueDeviceHandle
-                                       error:(NSError * _Nonnull)error MTR_NEWLY_AVAILABLE;
+                                       error:(NSError * _Nonnull)error
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)deviceAttestation:(MTRDeviceController *)controller
        completedForDevice:(void *)device
@@ -99,7 +101,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deviceAttestation:(MTRDeviceController *)controller
           failedForDevice:(void *)device
                     error:(NSError * _Nonnull)error
-    MTR_NEWLY_DEPRECATED("Please implement deviceAttestationFailedForController:opaqueDeviceHandle:error:");
+    API_DEPRECATED("Please implement deviceAttestationFailedForController:opaqueDeviceHandle:error:", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 

@@ -51,7 +51,7 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
  * will return nil and the caller should try creating a new MTROTAHeader object and initializing it
  * with a larger chunk of the image.
  */
-- (instancetype)initWithData:(NSData *)data MTR_NEWLY_AVAILABLE;
+- (instancetype)initWithData:(NSData *)data API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The identifier of the vendor whose product this image is meant for.
@@ -128,7 +128,7 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
 
 @end
 
-MTR_NEWLY_DEPRECATED("Please use MTROTAHeader's initWithData:")
+API_DEPRECATED("Please use MTROTAHeader's initWithData:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTROTAHeaderParser : NSObject
 + (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error;
 @end

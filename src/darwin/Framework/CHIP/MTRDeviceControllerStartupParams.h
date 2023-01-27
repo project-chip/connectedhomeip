@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,7 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * ipk must be 16 bytes in length
  */
-- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner MTR_NEWLY_AVAILABLE;
+- (instancetype)initWithIPK:(NSData *)ipk
+                   fabricID:(NSNumber *)fabricID
+                  nocSigner:(id<MTRKeypair>)nocSigner API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Prepare to initialize a controller with a complete operational certificate
@@ -55,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
          operationalKeypair:(id<MTRKeypair>)operationalKeypair
      operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
     intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
-            rootCertificate:(MTRCertificateDERBytes)rootCertificate MTR_NEWLY_AVAILABLE;
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Keypair used to sign operational certificates.  This is the root CA keypair
@@ -80,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   key of the nocSigner keypair, since in this case we are not using an
  *   intermediate certificate.
  */
-@property (nonatomic, copy, readonly) NSNumber * fabricID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSNumber * fabricID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
@@ -104,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * Will override existing value if not nil. Otherwise existing value will be
  *   used.
  */
-@property (nonatomic, copy, nullable) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSNumber * vendorID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Node id for this controller.
@@ -134,7 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
  *    generated operational key.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * nodeID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSNumber * nodeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Root certificate, in X.509 DER form, to use.
@@ -229,25 +231,31 @@ NS_ASSUME_NONNULL_BEGIN
  * does not issue operational certificates at all or internally generates the
  * certificates to be issued.  In the latter case, nocSigner must not be nil.
  */
-@property (nonatomic, strong, nullable) id<MTROperationalCertificateIssuer> operationalCertificateIssuer MTR_NEWLY_AVAILABLE;
+@property (nonatomic, strong, nullable) id<MTROperationalCertificateIssuer> operationalCertificateIssuer API_AVAILABLE(
+    ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The dispatch queue on which operationalCertificateIssuer should be called.
  * Allowed to be nil if and only if operationalCertificateIssuer is nil.
  */
-@property (nonatomic, strong, nullable) dispatch_queue_t operationalCertificateIssuerQueue MTR_NEWLY_AVAILABLE;
+@property (nonatomic, strong, nullable)
+    dispatch_queue_t operationalCertificateIssuerQueue API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 
 @interface MTRDeviceControllerStartupParams (Deprecated)
 
-@property (nonatomic, assign, readonly) uint64_t fabricId MTR_NEWLY_DEPRECATED("Please use fabricID");
-@property (nonatomic, copy, nullable) NSNumber * vendorId MTR_NEWLY_DEPRECATED("Please use vendorID");
-@property (nonatomic, copy, nullable) NSNumber * nodeId MTR_NEWLY_DEPRECATED("Please use nodeID");
+@property (nonatomic, assign, readonly) uint64_t fabricId API_DEPRECATED(
+    "Please use fabricID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable) NSNumber * vendorId API_DEPRECATED(
+    "Please use vendorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable)
+    NSNumber * nodeId API_DEPRECATED("Please use nodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner
                               fabricId:(uint64_t)fabricId
-                                   ipk:(NSData *)ipk MTR_NEWLY_DEPRECATED("Please use initWithIPK:fabricID:nocSigner:");
+                                   ipk:(NSData *)ipk API_DEPRECATED("Please use initWithIPK:fabricID:nocSigner:", ios(16.1, 16.4),
+                                           macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
                     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate

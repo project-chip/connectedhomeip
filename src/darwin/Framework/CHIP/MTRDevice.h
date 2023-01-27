@@ -44,7 +44,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * retrieved when performing actions using a combination of MTRBaseDevice
  * and MTRAsyncCallbackQueue.
  */
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller MTR_NEWLY_AVAILABLE;
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID
+                      controller:(MTRDeviceController *)controller API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The current state of the device.
@@ -141,7 +142,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                               queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+                         completion:(MTRDeviceResponseHandler)completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Open a commissioning window on the device.
@@ -194,7 +196,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * This can be used as a hint that now is a good time to send commands to the
  * device, especially if the device is sleepy and might not be active very often.
  */
-- (void)deviceBecameActive:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
+- (void)deviceBecameActive:(MTRDevice *)device API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 
@@ -205,7 +207,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  */
 + (instancetype)deviceWithNodeID:(uint64_t)nodeID
                 deviceController:(MTRDeviceController *)deviceController
-    MTR_NEWLY_DEPRECATED("Please use deviceWithNodeID:controller:");
+    API_DEPRECATED(
+        "Please use deviceWithNodeID:controller:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID

@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Represents information relating to a certificate signing request for a Matter
  * operational certificate.
  */
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTROperationalCSRInfo : NSObject
 
 /**
@@ -61,7 +61,7 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
-MTR_NEWLY_DEPRECATED("Please use MTROperationalCSRInfo")
+API_DEPRECATED("Please use MTROperationalCSRInfo", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface CSRInfo : NSObject
 
 @property (nonatomic, copy) NSData * nonce;
