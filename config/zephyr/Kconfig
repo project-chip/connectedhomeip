@@ -254,6 +254,16 @@ config CHIP_CRYPTO_PSA
 	  based on the PSA crypto API (instead of the default implementation, which
 	  is based on the legacy mbedTLS APIs).
 
+config CHIP_PERSISTENT_SUBSCRIPTIONS
+	bool "Persistent subscriptions"
+	help
+	  Persists Matter subscriptions on the publisher node. This feature allows
+	  a Matter node to faster get back to the previous operation after it went
+	  offline, for example, due to a power outage. That is, the node can use the
+	  persisted subscription information to quickly re-establish the previous
+	  subscriptions instead of waiting for the subscriber node to realize that
+	  the publisher is alive again.
+
 config CHIP_LIB_SHELL
 	bool "Matter shell commands"
 	default n
