@@ -51,7 +51,7 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     case DeviceLayer::DeviceEventType::kDnssdPlatformInitialized:
     case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    case event->Type == DeviceLayer::DeviceEventType::kSEDIntervalChange:
+    case DeviceLayer::DeviceEventType::kSEDIntervalChange:
 #endif
         app::DnssdServer::Instance().StartServer();
         break;
