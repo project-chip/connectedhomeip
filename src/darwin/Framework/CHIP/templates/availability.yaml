@@ -5681,6 +5681,10 @@
               - DaysMaskMap
           PumpConfigurationAndControl:
               - PumpFeature
+          WiFiNetworkDiagnostics:
+              - WiFiNetworkDiagnosticsFeature
+          EthernetNetworkDiagnostics:
+              - EthernetNetworkDiagnosticsFeature
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5755,6 +5759,14 @@
               ModeForSequence:
                   - HeatSetpointPresent
                   - CoolSetpointPresent
+          WiFiNetworkDiagnostics:
+              WiFiNetworkDiagnosticsFeature:
+                  - PacketCounts
+                  - ErrorCounts
+          EthernetNetworkDiagnostics:
+              EthernetNetworkDiagnosticsFeature:
+                  - PacketCounts
+                  - ErrorCounts
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
