@@ -217,7 +217,7 @@ enum PublicEventTypes
     kDnssdPlatformInitialized,
 
     /**
-     * DNS-SD needs restart
+     * Signals that DNS-SD backend was restarted and services must be published again.
      */
     kDnssdRestartNeeded,
 
