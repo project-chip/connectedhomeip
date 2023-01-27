@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,20 +15,20 @@
  *    limitations under the License.
  */
 
-#import "MTRAttestationInfo.h"
+#import "MTRDeviceAttestationInfo.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation MTRAttestationInfo : NSObject
+@implementation MTRDeviceAttestationInfo
 
-- (instancetype)initWithChallenge:(NSData *)challenge
-                                        nonce:(NSData *)nonce
-                                  elementsTLV:(MTRTLVBytes)elementsTLV
-                            elementsSignature:(NSData *)elementsSignature
-                 deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
-    productAttestationIntermediateCertificate:(MTRCertificateDERBytes)productAttestationIntermediateCertificate
-                     certificationDeclaration:(NSData *)certificationDeclaration
-                                 firmwareInfo:(NSData *)firmwareInfo
+- (instancetype)initWithDeviceAttestationChallenge:(NSData *)challenge
+                                             nonce:(NSData *)nonce
+                                       elementsTLV:(MTRTLVBytes)elementsTLV
+                                 elementsSignature:(NSData *)elementsSignature
+                      deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
+         productAttestationIntermediateCertificate:(MTRCertificateDERBytes)productAttestationIntermediateCertificate
+                          certificationDeclaration:(NSData *)certificationDeclaration
+                                      firmwareInfo:(NSData *)firmwareInfo
 {
     if (self = [super init]) {
         _challenge = challenge;
@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation AttestationInfo : NSObject
+@implementation AttestationInfo
 
 - (instancetype)initWithChallenge:(NSData *)challenge
                             nonce:(NSData *)nonce

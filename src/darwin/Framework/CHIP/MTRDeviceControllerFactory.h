@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,14 +33,14 @@ NS_ASSUME_NONNULL_BEGIN
 @class MTRDeviceController;
 @class MTRDeviceControllerStartupParams;
 
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceControllerFactoryParams : NSObject
 /*
  * Storage delegate must be provided for correct functioning of Matter
  * controllers.  It is used to store persistent information for the fabrics the
  * controllers ends up interacting with.
  */
-@property (nonatomic, strong, readonly) id<MTRStorage> storage MTR_NEWLY_AVAILABLE;
+@property (nonatomic, strong, readonly) id<MTRStorage> storage;
 
 /*
  * OTA Provider delegate to be called when an OTA Requestor is requesting a software update.
@@ -59,6 +59,7 @@ MTR_NEWLY_AVAILABLE
  * Defaults to nil.
  */
 @property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
+
 /*
  * The Certification Declaration certificates whose public keys correspond to
  * private keys that are trusted to sign certification declarations.  Defaults
@@ -68,22 +69,34 @@ MTR_NEWLY_AVAILABLE
  * well-known certification declaration signing keys.
  */
 @property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
+
 /*
  * The network port to bind to.  If not specified, an ephemeral port will be
  * used.
  */
 @property (nonatomic, copy, nullable) NSNumber * port;
+
 /*
  * Whether to run a server capable of accepting incoming CASE
  * connections.  Defaults to NO.
  */
-@property (nonatomic, assign) BOOL shouldStartServer MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign) BOOL shouldStartServer;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStorage:(id<MTRStorage>)storage;
 @end
 
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceControllerFactory : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Return the single MTRDeviceControllerFactory we support existing.  It starts off
+ * in a "not started" state.
+ */
++ (instancetype)sharedInstance;
 
 /**
  * If true, the factory is in a state where it can create controllers:
@@ -91,12 +104,6 @@ MTR_NEWLY_AVAILABLE
  * since then.
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
-
-/**
- * Return the single MTRDeviceControllerFactory we support existing.  It starts off
- * in a "not started" state.
- */
-+ (instancetype)sharedInstance;
 
 /**
  * Start the controller factory. Repeated calls to startControllerFactory
@@ -142,23 +149,22 @@ MTR_NEWLY_AVAILABLE
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error;
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
 @end
 
-MTR_NEWLY_DEPRECATED("Please use MTRDeviceControllerFactoryParams")
+API_DEPRECATED(
+    "Please use MTRDeviceControllerFactoryParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRControllerFactoryParams : MTRDeviceControllerFactoryParams
-@property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate MTR_NEWLY_DEPRECATED(
-    "Please use the storage property");
-@property (nonatomic, assign) BOOL startServer MTR_NEWLY_DEPRECATED("Please use shouldStartServer");
-@property (nonatomic, copy, nullable)
-    NSArray<NSData *> * paaCerts MTR_NEWLY_DEPRECATED("Please use productAttestationAuthorityCertificates");
-@property (nonatomic, copy, nullable)
-    NSArray<NSData *> * cdCerts MTR_NEWLY_DEPRECATED("Please use certificationDeclarationCertificates");
+@property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate API_DEPRECATED(
+    "Please use the storage property", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, assign) BOOL startServer API_DEPRECATED(
+    "Please use shouldStartServer", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable) NSArray<NSData *> * paaCerts API_DEPRECATED(
+    "Please use productAttestationAuthorityCertificates", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable) NSArray<NSData *> * cdCerts API_DEPRECATED(
+    "Please use certificationDeclarationCertificates", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-MTR_NEWLY_DEPRECATED("Please use MTRDeviceControllerFactory")
+API_DEPRECATED("Please use MTRDeviceControllerFactory", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRControllerFactory : NSObject
 @property (readonly, nonatomic) BOOL isRunning;
 + (instancetype)sharedInstance;

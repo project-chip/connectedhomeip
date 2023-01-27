@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2022-2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -134,7 +134,7 @@ public:
             params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
         }
         if (mAutoResubscribe.HasValue()) {
-            params.resubscribeIfLost = mAutoResubscribe.Value();
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
 
         [device subscribeToAttributesWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
@@ -218,7 +218,7 @@ public:
 
         MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
         if (mEventNumber.HasValue()) {
-            params.minimumEventNumber = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
+            params.minEventNumber = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
         }
         if (mKeepSubscriptions.HasValue()) {
             params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
@@ -227,7 +227,7 @@ public:
             params.reportEventsUrgently = mIsUrgent.Value();
         }
         if (mAutoResubscribe.HasValue()) {
-            params.resubscribeIfLost = mAutoResubscribe.Value();
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
 
         if (strcmp(GetName(), "subscribe-event-by-id") == 0) {
@@ -330,7 +330,7 @@ public:
             params.filterByFabric = mFabricFiltered.Value();
         }
         if (mEventNumber.HasValue()) {
-            params.minimumEventNumber = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
+            params.minEventNumber = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
         }
 
         [device
