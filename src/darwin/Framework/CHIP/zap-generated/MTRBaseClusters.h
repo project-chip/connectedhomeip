@@ -18824,10 +18824,6 @@ typedef NS_OPTIONS(uint32_t, MTRGroupsGroupClusterFeature) {
     MTRGroupsGroupClusterFeatureGroupNames API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_OPTIONS(uint32_t, MTRScenesSceneFeatures) {
-    MTRScenesSceneFeaturesSceneNames API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x1,
-} API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-
 typedef NS_OPTIONS(uint8_t, MTRScenesCopyMode) {
     MTRScenesCopyModeCopyAllScenes API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
