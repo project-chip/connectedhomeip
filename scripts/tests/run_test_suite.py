@@ -107,6 +107,13 @@ class RunContext:
     help='Internal flag for running inside a unshared environment'
 )
 @click.option(
+    '--run-all-manual-tests',
+    hidden=True,
+    is_flag=True,
+    default=False,
+    help='Internal flag to run all manual tests'
+)
+@click.option(
     '--run-yamltests-with-chip-repl',
     default=False,
     is_flag=True,
@@ -116,7 +123,7 @@ class RunContext:
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, run_yamltests_with_chip_repl, chip_tool):
+         no_log_timestamps, root, internal_inside_unshare, run_all_manual_tests, run_yamltests_with_chip_repl, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -133,7 +140,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     tests = all_tests
 
     # Default to only non-manual tests unless explicit targets are specified.
-    skip_manual = 'all' in target
+    skip_manual = not run_all_manual_tests and ('all' in target)
     if 'all' not in target:
         tests = []
         for name in target:
@@ -209,14 +216,21 @@ def cmd_list(context):
     '--pics-file',
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
+    show_default=True,
     help='PICS file to use for test runs.')
+@click.option(
+    '--keep-going',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Keep running the rest of the tests even if a test fails.')
 @click.option(
     '--test-timeout-seconds',
     default=None,
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, chip_repl_yaml_tester, pics_file, test_timeout_seconds):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, chip_repl_yaml_tester, pics_file, keep_going, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -283,8 +297,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 test_end = time.monotonic()
                 logging.exception('%-30s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
-                apps_register.uninit()
-                sys.exit(2)
+                if not keep_going:
+                    apps_register.uninit()
+                    sys.exit(2)
 
     apps_register.uninit()
     if sys.platform == 'linux':
