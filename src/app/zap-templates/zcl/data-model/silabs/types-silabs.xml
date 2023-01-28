@@ -584,24 +584,4 @@ limitations under the License.
     <field name="ExecuteIfOff" mask="0x1"/>
     <field name="CoupleColorTempToLevel" mask="0x02"/>
   </bitmap>
-  <!-- Barrier Control Cluster -->
-  <bitmap name="BarrierControlCapabilities" type="BITMAP8">
-    <field name="partialBarrier" mask="0x01"/>
-  </bitmap>
-  <bitmap name="BarrierControlSafetyStatus" type="BITMAP16">
-    <field name="remoteLockout" mask="0x01"/>
-    <field name="temperDetected" mask="0x02"/>
-    <field name="failedCommunication" mask="0x04"/>
-    <field name="positionFailure" mask="0x08"/>
-  </bitmap>
-  <enum name="BarrierControlBarrierPosition" type="INT8U">
-    <item name="Closed" value="0"/>
-    <item name="Open" value="100"/>
-    <item name="Unknown" value="0xFF"/>
-  </enum>
-  <enum name="BarrierControlMovingState" type="ENUM8">
-    <item name="Stopped" value="0x00"/>
-    <item name="Closing" value="0x01"/>
-    <item name="Opening" value="0x02"/>
-  </enum>
 </configurator>

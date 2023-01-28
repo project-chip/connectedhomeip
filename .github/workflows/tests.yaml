@@ -173,6 +173,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
                       src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
+                      src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/silabs/general.xml \
                       src/app/zap-templates/zcl/data-model/silabs/ha-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/ha.xml \
