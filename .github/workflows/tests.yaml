@@ -260,10 +260,6 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
-            # NOTE: Generally kept in sync within the repo using
-            #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.19-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -297,15 +293,6 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
-            - name: Install zap
-              run: |
-                 sudo mkdir -p $ZAP_INSTALL_PATH
-                 sudo chown `whoami` $ZAP_INSTALL_PATH
-                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
-                      --output $ZAP_INSTALL_PATH/zap-mac.zip
-                 cd $ZAP_INSTALL_PATH
-                 unzip zap-mac.zip zap-cli
-                 rm zap-mac.zip
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -546,10 +533,6 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
-            # NOTE: Generally kept in sync within the repo using
-            #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.19-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
 
         if: github.actor != 'restyled-io[bot]' && false
         runs-on: macos-latest
@@ -577,15 +560,6 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
-            - name: Install zap
-              run: |
-                 sudo mkdir -p $ZAP_INSTALL_PATH
-                 sudo chown `whoami` $ZAP_INSTALL_PATH
-                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
-                      --output $ZAP_INSTALL_PATH/zap-mac.zip
-                 cd $ZAP_INSTALL_PATH
-                 unzip zap-mac.zip zap-cli
-                 rm zap-mac.zip
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
