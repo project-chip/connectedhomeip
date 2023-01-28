@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import enum
 import logging
 import os
 import sys
@@ -30,6 +31,12 @@ from chiptest.glob_matcher import GlobMatcher
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
+
+
+class ManualHandling(enum.Enum):
+    INCLUDE = enum.auto()
+    SKIP = enum.auto()
+    ONLY = enum.auto()
 
 
 def FindBinaryPath(name: str):
@@ -60,7 +67,7 @@ class RunContext:
     in_unshare: bool
     chip_tool: str
     dry_run: bool
-    skip_manual: bool
+    manual_handling: ManualHandling
 
 
 @click.group(chain=True)
@@ -107,6 +114,13 @@ class RunContext:
     help='Internal flag for running inside a unshared environment'
 )
 @click.option(
+    '--manual',
+    type=click.Choice(['skip', 'only', 'include'], case_sensitive=False),
+    default='skip',
+    show_default=True,
+    help='Internal flag to determine how to handle manual tests. ONLY for "all" test choice.',
+)
+@click.option(
     '--run-yamltests-with-chip-repl',
     default=False,
     is_flag=True,
@@ -116,7 +130,7 @@ class RunContext:
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, run_yamltests_with_chip_repl, chip_tool):
+         no_log_timestamps, root, internal_inside_unshare, manual, run_yamltests_with_chip_repl, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -133,7 +147,16 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     tests = all_tests
 
     # Default to only non-manual tests unless explicit targets are specified.
-    skip_manual = 'all' in target
+    if 'all' in target:
+        if manual == 'skip':
+            manual_handling = ManualHandling.SKIP
+        elif manual == 'only':
+            manual_handling = ManualHandling.ONLY
+        else:
+            manual_handling = ManualHandling.INCLUDE
+    else:
+        manual_handling = ManualHandling.INCLUDE
+
     if 'all' not in target:
         tests = []
         for name in target:
@@ -145,7 +168,6 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     if target_glob:
         matcher = GlobMatcher(target_glob.lower())
-        # Globs ignore manual tests, because it's too easy to mess up otherwise.
         tests = [test for test in tests if matcher.matches(test.name.lower())]
 
     if len(tests) == 0:
@@ -164,7 +186,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
                              chip_tool=chip_tool, dry_run=dry_run,
-                             skip_manual=skip_manual)
+                             manual_handling=manual_handling)
 
 
 @main.command(
@@ -209,14 +231,21 @@ def cmd_list(context):
     '--pics-file',
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
+    show_default=True,
     help='PICS file to use for test runs.')
+@click.option(
+    '--keep-going',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Keep running the rest of the tests even if a test fails.')
 @click.option(
     '--test-timeout-seconds',
     default=None,
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, chip_repl_yaml_tester, pics_file, test_timeout_seconds):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, chip_repl_yaml_tester, pics_file, keep_going, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -265,8 +294,12 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
-            if context.obj.skip_manual and test.is_manual:
-                continue
+            if test.is_manual:
+                if context.obj.manual_handling == ManualHandling.SKIP:
+                    continue
+            else:
+                if context.obj.manual_handling == ManualHandling.ONLY:
+                    continue
 
             test_start = time.monotonic()
             try:
@@ -283,8 +316,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 test_end = time.monotonic()
                 logging.exception('%-30s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
-                apps_register.uninit()
-                sys.exit(2)
+                if not keep_going:
+                    apps_register.uninit()
+                    sys.exit(2)
 
     apps_register.uninit()
     if sys.platform == 'linux':
