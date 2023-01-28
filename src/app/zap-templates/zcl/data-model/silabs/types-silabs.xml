@@ -119,16 +119,6 @@ limitations under the License.
     <item name="Off" value="0x1"/>
     <item name="Toggle" value="0x2"/>
   </enum>
-  <enum name="MoveMode" type="ENUM8">
-    <cluster code="0x0008"/>
-    <item name="Up" value="0x0"/>
-    <item name="Down" value="0x1"/>
-  </enum>
-  <enum name="StepMode" type="ENUM8">
-    <cluster code="0x0008"/>
-    <item name="Up" value="0x0"/>
-    <item name="Down" value="0x1"/>
-  </enum>
   <enum name="FanMode" type="ENUM8">
     <item name="off" value="0x0"/>
     <item name="low" value="0x1"/>
@@ -579,9 +569,4 @@ limitations under the License.
     <item name="SetToToggle" value="0x02"/>
     <!-- 0x03-0xFF reserved -->
   </enum>
-  <bitmap name="LevelControlOptions" type="BITMAP8">
-    <cluster code="0x0008"/>
-    <field name="ExecuteIfOff" mask="0x1"/>
-    <field name="CoupleColorTempToLevel" mask="0x02"/>
-  </bitmap>
 </configurator>
