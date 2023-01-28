@@ -42,8 +42,6 @@ declare_args() {
 
   # Enable Sleepy end device
   enable_sleepy_device = false
-
-  use_rs911x_sockets = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -212,13 +210,10 @@ template("efr32_sdk") {
         ]
       }
 
-      if (use_rs911x_sockets) {
-        include_dirs += [ "wifi/rsi-sockets" ]
-        defines += rs911x_sock_defs
-      } else {
+      if (use_wf200 || !use_rs911x_sockets) {
         import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
-        defines += [ "LWIP_NETIF_API=1" ]
 
+        defines += [ "LWIP_NETIF_API=1" ]
         if (lwip_ipv4) {
           defines += [
             "LWIP_IPV4=1",

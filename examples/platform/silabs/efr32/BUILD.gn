@@ -213,9 +213,8 @@ config("silabs-wifi-config") {
     defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
 
-  if (use_rs911x) {
-    include_dirs += rs911x_plat_incs
-  } else if (use_wf200) {
+  #TODO DO I NEED THIS HERE
+  if (use_wf200) {
     include_dirs += wf200_plat_incs
   }
 
@@ -295,22 +294,7 @@ source_set("efr32-common") {
 
       # All the stuff from wiseconnect
       sources += rs911x_src_sapi
-
-      # Apparently - the rsi library needs this (though we may not use use it)
-      sources += rs911x_src_sock
       include_dirs += rs911x_inc_plat
-
-      if (use_rs911x_sockets) {
-        #
-        # Using native sockets inside RS911x
-        #
-        include_dirs += rs911x_sock_inc
-      } else {
-        #
-        # We use LWIP - not built-in sockets
-        #
-        sources += rs911x_src_lwip
-      }
 
       #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
       cflags = rs911x_cflags

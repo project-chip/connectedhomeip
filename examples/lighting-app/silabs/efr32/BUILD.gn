@@ -56,6 +56,11 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
+  if (use_wf200) {
+    # TODO efr32_sdk should not need a header from this location
+    include_dirs += [ "${examples_plat_dir}/wf200" ]
+  }
+
   defines = []
   if (chip_enable_pw_rpc) {
     defines += [
