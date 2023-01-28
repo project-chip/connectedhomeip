@@ -1427,7 +1427,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithVersionOnlyCache
     responseDirective = kSendDataResponse;
 
     MockInteractionModelApp delegate;
-    chip::app::ClusterStateCache cache(delegate, false /*cachedData*/);
+    chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
 
     chip::app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     //

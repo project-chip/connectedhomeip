@@ -127,7 +127,7 @@ DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 class TestReadCallback : public app::ClusterStateCache::Callback
 {
 public:
-    TestReadCallback() : mClusterCacheAdapter(*this, false /*cacheData*/) {}
+    TestReadCallback() : mClusterCacheAdapter(*this, Optional<EventNumber>::Missing(), false /*cacheData*/) {}
     void OnDone(app::ReadClient *) {}
 
     app::ClusterStateCache mClusterCacheAdapter;
