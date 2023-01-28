@@ -41,5 +41,11 @@ int main(int argc, char * argv[])
     }
 
     ChipLinuxAppMainLoop();
+
+    if (test != nullptr)
+    {
+        return test->GetCommandExitCode();
+    }
+
     return 0;
 }

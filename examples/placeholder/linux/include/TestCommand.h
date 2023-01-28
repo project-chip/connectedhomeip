@@ -56,8 +56,10 @@ public:
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-        exit(CHIP_NO_ERROR == status ? EXIT_SUCCESS : EXIT_FAILURE);
+        mExitCode = (CHIP_NO_ERROR == status ? EXIT_SUCCESS : EXIT_FAILURE);
     }
+
+    int GetCommandExitCode() { return mExitCode; }
 
     template <typename T>
     size_t AddArgument(const char * name, chip::Optional<T> * value)
@@ -176,6 +178,8 @@ protected:
     chip::app::ConcreteAttributePath mAttributePath;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<chip::EndpointId> mEndpointId;
+    int mExitCode = EXIT_SUCCESS;
+
     void SetIdentity(const char * name){};
 
     /////////// DelayCommands Interface /////////
