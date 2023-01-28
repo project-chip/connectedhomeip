@@ -29,9 +29,7 @@
 #define BUTTON_PIN_2 0
 
 // LEDs config
-// System led config
-#define SYSTEM_STATE_LED_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
-#define SYSTEM_STATE_LED_PIN 7
-
-// Contact state led
-#define CONTACT_STATE_LED_PIN 4
+#define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
+#define SYSTEM_STATE_LED 7
+#define CONTACT_STATE_LED 4
+#define LIGHTING_PWM_SPEC_IDENTIFY_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3))

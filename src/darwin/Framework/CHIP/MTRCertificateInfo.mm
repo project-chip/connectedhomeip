@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -145,7 +145,7 @@ MTR_DIRECT_MEMBERS
     return (match) ? @(match->mChipVal) : nil;
 }
 
-- (NSSet<NSNumber *> *)tags
+- (NSSet<NSNumber *> *)caseAuthenticatedTags
 {
     NSMutableSet<NSNumber *> * result;
     for (auto const & rdn : _dn.rdn) {

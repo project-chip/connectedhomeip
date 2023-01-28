@@ -3,7 +3,7 @@
 //  MTRTests
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -903,7 +903,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
-    params.resubscribeIfLost = NO;
+    params.resubscribeAutomatically = NO;
     [device subscribeToAttributesWithEndpointID:@10000
         clusterID:@6
         attributeID:@0

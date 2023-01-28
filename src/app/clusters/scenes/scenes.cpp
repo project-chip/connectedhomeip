@@ -17,14 +17,14 @@
 
 #include "scenes.h"
 #include "app/util/common.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage-null-handling.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -44,32 +44,22 @@ uint8_t emberAfPluginScenesServerEntriesInUse = 0;
 EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[MATTER_SCENES_TABLE_SIZE];
 #endif
 
-static bool readServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,
-                                uint8_t * data, uint8_t size)
+static bool logReadError(EmberAfStatus status, const char * attributeName)
 {
-    bool success = false;
-    if (emberAfContainsServer(endpoint, clusterId))
+    // Don't log errors for the "this cluster is not even supported" cases.
+    if (status != EMBER_ZCL_STATUS_SUCCESS && status != EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT &&
+        status != EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER)
     {
-        EmberAfStatus status = emberAfReadServerAttribute(endpoint, clusterId, attributeId, data, size);
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
-        {
-            success = true;
-        }
-        else
-        {
-            emberAfScenesClusterPrintln("ERR: %ping %p 0x%x", "read", name, status);
-        }
+        emberAfScenesClusterPrintln("ERR: %sing %s 0x%x", "read", attributeName, status);
     }
-    return success;
+    return status == EMBER_ZCL_STATUS_SUCCESS;
 }
 
-static EmberAfStatus writeServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,
-                                          uint8_t * data, EmberAfAttributeType type)
+static EmberAfStatus logWriteError(EmberAfStatus status, const char * attributeName)
 {
-    EmberAfStatus status = emberAfWriteServerAttribute(endpoint, clusterId, attributeId, data, type);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfScenesClusterPrintln("ERR: %ping %p 0x%x", "writ", name, status);
+        emberAfScenesClusterPrintln("ERR: %sing %s 0x%x", "writ", attributeName, status);
     }
     return status;
 }
@@ -90,8 +80,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
     {
         // The high bit of Name Support indicates whether scene names are supported.
         uint8_t nameSupport = EMBER_BIT(7);
-        writeServerAttribute(endpoint, Scenes::Id, ZCL_SCENE_NAME_SUPPORT_ATTRIBUTE_ID, "name support", (uint8_t *) &nameSupport,
-                             ZCL_BITMAP8_ATTRIBUTE_TYPE);
+        logWriteError(Attributes::NameSupport::Set(endpoint, nameSupport), "NameSupport");
     }
 #endif
 #if !defined(EMBER_AF_PLUGIN_SCENES_USE_TOKENS) || defined(EZSP_HOST)
@@ -112,8 +101,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
 
 EmberAfStatus emberAfScenesSetSceneCountAttribute(EndpointId endpoint, uint8_t newCount)
 {
-    return writeServerAttribute(endpoint, Scenes::Id, ZCL_SCENE_COUNT_ATTRIBUTE_ID, "scene count", (uint8_t *) &newCount,
-                                ZCL_INT8U_ATTRIBUTE_TYPE);
+    return logWriteError(Attributes::SceneCount::Set(endpoint, newCount), "SceneCount");
 }
 
 EmberAfStatus emberAfScenesMakeValid(EndpointId endpoint, uint8_t sceneId, GroupId groupId)
@@ -122,31 +110,27 @@ EmberAfStatus emberAfScenesMakeValid(EndpointId endpoint, uint8_t sceneId, Group
     bool valid = true;
 
     // scene ID
-    status = writeServerAttribute(endpoint, Scenes::Id, ZCL_CURRENT_SCENE_ATTRIBUTE_ID, "current scene", (uint8_t *) &sceneId,
-                                  ZCL_INT8U_ATTRIBUTE_TYPE);
+    status = logWriteError(Attributes::CurrentScene::Set(endpoint, sceneId), "CurrentScene");
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return status;
     }
 
     // group ID
-    status = writeServerAttribute(endpoint, Scenes::Id, ZCL_CURRENT_GROUP_ATTRIBUTE_ID, "current group", (uint8_t *) &groupId,
-                                  ZCL_INT16U_ATTRIBUTE_TYPE);
+    status = logWriteError(Attributes::CurrentGroup::Set(endpoint, groupId), "CurrentGroup");
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return status;
     }
 
-    status = writeServerAttribute(endpoint, Scenes::Id, ZCL_SCENE_VALID_ATTRIBUTE_ID, "scene valid", (uint8_t *) &valid,
-                                  ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    status = logWriteError(Attributes::SceneValid::Set(endpoint, valid), "SceneValid");
     return status;
 }
 
 EmberAfStatus emberAfScenesClusterMakeInvalidCallback(EndpointId endpoint)
 {
     bool valid = false;
-    return writeServerAttribute(endpoint, Scenes::Id, ZCL_SCENE_VALID_ATTRIBUTE_ID, "scene valid", (uint8_t *) &valid,
-                                ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return logWriteError(Attributes::SceneValid::Set(endpoint, valid), "SceneValid");
 }
 
 void emAfPluginScenesServerPrintInfo()
@@ -172,7 +156,14 @@ void emAfPluginScenesServerPrintInfo()
             emberAfCorePrint(" on/off %x", entry.onOffValue);
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-            emberAfCorePrint(" lvl %x", entry.currentLevelValue);
+            if (entry.currentLevelValue.IsNull())
+            {
+                emberAfCorePrint(" lvl null");
+            }
+            else
+            {
+                emberAfCorePrint(" lvl %x", entry.currentLevelValue.Value());
+            }
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
             emberAfCorePrint(" therm %2x %2x %x", entry.occupiedCoolingSetpointValue, entry.occupiedHeatingSetpointValue,
@@ -186,13 +177,44 @@ void emAfPluginScenesServerPrintInfo()
             emberAfCoreFlush();
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-            emberAfCorePrint(" door %x", entry.lockStateValue);
+            if (entry.lockStateValue.IsNull())
+            {
+                emberAfCorePrint(" door null");
+            }
+            else
+            {
+                emberAfCorePrint(" door %x", to_underlying(entry.lockStateValue.Value()));
+            }
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-            emberAfCorePrint(" Window percentage Lift %3u, Tilt %3u", entry.currentPositionLiftPercentageValue,
-                             entry.currentPositionTiltPercentageValue);
-            emberAfCorePrint(" Window percent100ths Lift %5u, Tilt %5u", entry.targetPositionLiftPercent100thsValue,
-                             entry.targetPositionTiltPercent100thsValue);
+            if (!entry.currentPositionLiftPercentageValue.IsNull() && !entry.currentPositionTiltPercentageValue.IsNull())
+            {
+                emberAfCorePrint(" Window current percentage Lift %3u, Tilt %3u", entry.currentPositionLiftPercentageValue.Value(),
+                                 entry.currentPositionTiltPercentageValue.Value());
+            }
+            else if (!entry.currentPositionLiftPercentageValue.IsNull())
+            {
+                emberAfCorePrint(" Window current percentage Lift %3u", entry.currentPositionLiftPercentageValue.Value());
+            }
+            else if (!entry.currentPositionTiltPercentageValue.IsNull())
+            {
+                emberAfCorePrint(" Window current percentage Tilt %3u", entry.currentPositionTiltPercentageValue.Value());
+            }
+
+            if (!entry.targetPositionLiftPercent100thsValue.IsNull() && !entry.targetPositionTiltPercent100thsValue.IsNull())
+            {
+                emberAfCorePrint(" Window target percent100ths Lift %5u, Tilt %5u",
+                                 entry.targetPositionLiftPercent100thsValue.Value(),
+                                 entry.targetPositionTiltPercent100thsValue.Value());
+            }
+            else if (!entry.targetPositionLiftPercent100thsValue.IsNull())
+            {
+                emberAfCorePrint(" Window target percent100ths Lift %5u", entry.targetPositionLiftPercent100thsValue.Value());
+            }
+            else if (!entry.targetPositionTiltPercent100thsValue.IsNull())
+            {
+                emberAfCorePrint(" Window target percent100ths Tilt %5u", entry.targetPositionTiltPercent100thsValue.Value());
+            }
 #endif
         }
         emberAfCorePrintln("%s", "");
@@ -500,64 +522,59 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
     // When creating a new entry or refreshing an existing one, the extension
     // fields are updated with the current state of other clusters on the device.
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
-    entry.hasOnOffValue = readServerAttribute(endpoint, OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off", (uint8_t *) &entry.onOffValue,
-                                              sizeof(entry.onOffValue));
+    entry.hasOnOffValue = logReadError(OnOff::Attributes::OnOff::Get(endpoint, &entry.onOffValue), "OnOff");
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-    entry.hasCurrentLevelValue = readServerAttribute(endpoint, LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
-                                                     (uint8_t *) &entry.currentLevelValue, sizeof(entry.currentLevelValue));
+    entry.hasCurrentLevelValue =
+        logReadError(LevelControl::Attributes::CurrentLevel::Get(endpoint, entry.currentLevelValue), "CurrentLevel");
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-    entry.hasOccupiedCoolingSetpointValue =
-        readServerAttribute(endpoint, Thermostat::Id, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID, "occupied cooling setpoint",
-                            (uint8_t *) &entry.occupiedCoolingSetpointValue, sizeof(entry.occupiedCoolingSetpointValue));
-    entry.hasOccupiedHeatingSetpointValue =
-        readServerAttribute(endpoint, Thermostat::Id, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID, "occupied heating setpoint",
-                            (uint8_t *) &entry.occupiedHeatingSetpointValue, sizeof(entry.occupiedHeatingSetpointValue));
-    entry.hasSystemModeValue = readServerAttribute(endpoint, Thermostat::Id, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
-                                                   (uint8_t *) &entry.systemModeValue, sizeof(entry.systemModeValue));
+    {
+        using namespace Thermostat::Attributes;
+        entry.hasOccupiedCoolingSetpointValue =
+            logReadError(OccupiedCoolingSetpoint::Get(endpoint, &entry.occupiedCoolingSetpointValue), "OccupiedCoolingSetpoint");
+        entry.hasOccupiedHeatingSetpointValue =
+            logReadError(OccupiedHeatingSetpoint::Get(endpoint, &entry.occupiedHeatingSetpointValue), "OccupiedHeatingSetpoint");
+        entry.hasSystemModeValue = logReadError(SystemMode::Get(endpoint, &entry.systemModeValue), "SystemMode");
+    }
 #endif
 #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-    entry.hasCurrentXValue = readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, "current x",
-                                                 (uint8_t *) &entry.currentXValue, sizeof(entry.currentXValue));
-    entry.hasCurrentYValue = readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, "current y",
-                                                 (uint8_t *) &entry.currentYValue, sizeof(entry.currentYValue));
-    entry.hasEnhancedCurrentHueValue =
-        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID, "enhanced current hue",
-                            (uint8_t *) &entry.enhancedCurrentHueValue, sizeof(entry.enhancedCurrentHueValue));
-    entry.hasCurrentSaturationValue =
-        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, "current saturation",
-                            (uint8_t *) &entry.currentSaturationValue, sizeof(entry.currentSaturationValue));
-    entry.hasColorLoopActiveValue =
-        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID, "color loop active",
-                            (uint8_t *) &entry.colorLoopActiveValue, sizeof(entry.colorLoopActiveValue));
-    entry.hasColorLoopDirectionValue =
-        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID, "color loop direction",
-                            (uint8_t *) &entry.colorLoopDirectionValue, sizeof(entry.colorLoopDirectionValue));
-    entry.hasColorLoopTimeValue =
-        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID, "color loop time",
-                            (uint8_t *) &entry.colorLoopTimeValue, sizeof(entry.colorLoopTimeValue));
-    entry.hasColorTemperatureMiredsValue =
-        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID, "color temp mireds",
-                            (uint8_t *) &entry.colorTemperatureMiredsValue, sizeof(entry.colorTemperatureMiredsValue));
+    {
+        using namespace ColorControl::Attributes;
+        entry.hasCurrentXValue = logReadError(CurrentX::Get(endpoint, &entry.currentXValue), "CurrentX");
+        entry.hasCurrentYValue = logReadError(CurrentY::Get(endpoint, &entry.currentYValue), "CurrentY");
+        entry.hasEnhancedCurrentHueValue =
+            logReadError(EnhancedCurrentHue::Get(endpoint, &entry.enhancedCurrentHueValue), "EnhancedCurrentHue");
+        entry.hasCurrentSaturationValue =
+            logReadError(CurrentSaturation::Get(endpoint, &entry.currentSaturationValue), "CurrentSaturation");
+        entry.hasColorLoopActiveValue =
+            logReadError(ColorLoopActive::Get(endpoint, &entry.colorLoopActiveValue), "ColorLoopActive");
+        entry.hasColorLoopDirectionValue =
+            logReadError(ColorLoopDirection::Get(endpoint, &entry.colorLoopDirectionValue), "ColorLoopDirection");
+        entry.hasColorLoopTimeValue = logReadError(ColorLoopTime::Get(endpoint, &entry.colorLoopTimeValue), "ColorLoopTime");
+        entry.hasColorTemperatureMiredsValue =
+            logReadError(ColorTemperatureMireds::Get(endpoint, &entry.colorTemperatureMiredsValue), "ColorTemperatureMireds");
+    }
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-    entry.hasLockStateValue = readServerAttribute(endpoint, DoorLock::Id, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
-                                                  (uint8_t *) &entry.lockStateValue, sizeof(entry.lockStateValue));
+    entry.hasLockStateValue = logReadError(DoorLock::Attributes::LockState::Get(endpoint, entry.lockStateValue), "LockState");
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-    entry.hasCurrentPositionLiftPercentageValue = readServerAttribute(
-        endpoint, WindowCovering::Id, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, "currentPositionLiftPercentage",
-        (uint8_t *) &entry.currentPositionLiftPercentageValue, sizeof(entry.currentPositionLiftPercentageValue));
-    entry.hasCurrentPositionTiltPercentageValue = readServerAttribute(
-        endpoint, WindowCovering::Id, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, "currentPositionTiltPercentage",
-        (uint8_t *) &entry.currentPositionTiltPercentageValue, sizeof(entry.currentPositionTiltPercentageValue));
-    entry.hasTargetPositionLiftPercent100thsValue = readServerAttribute(
-        endpoint, WindowCovering::Id, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, "targetPositionLiftPercent100ths",
-        (uint8_t *) &entry.targetPositionLiftPercent100thsValue, sizeof(entry.targetPositionLiftPercent100thsValue));
-    entry.hasTargetPositionTiltPercent100thsValue = readServerAttribute(
-        endpoint, WindowCovering::Id, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, "targetPositionTiltPercent100ths",
-        (uint8_t *) &entry.targetPositionTiltPercent100thsValue, sizeof(entry.targetPositionTiltPercent100thsValue));
+    {
+        using namespace WindowCovering::Attributes;
+        entry.hasCurrentPositionLiftPercentageValue =
+            logReadError(CurrentPositionLiftPercentage::Get(endpoint, entry.currentPositionLiftPercentageValue),
+                         "CurrentPositionLiftPercentage");
+        entry.hasCurrentPositionTiltPercentageValue =
+            logReadError(CurrentPositionTiltPercentage::Get(endpoint, entry.currentPositionTiltPercentageValue),
+                         "CurrentPositionTiltPercentage");
+        entry.hasTargetPositionLiftPercent100thsValue =
+            logReadError(TargetPositionLiftPercent100ths::Get(endpoint, entry.targetPositionLiftPercent100thsValue),
+                         "TragetPositionLiftPercent100ths");
+        entry.hasTargetPositionTiltPercent100thsValue =
+            logReadError(TargetPositionTiltPercent100ths::Get(endpoint, entry.targetPositionTiltPercent100thsValue),
+                         "TragetPositionTiltPercent100ths");
+    }
 #endif
 
     // When creating a new entry, the name is set to the null string (i.e., the
@@ -603,111 +620,102 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
             if (entry.hasOnOffValue)
             {
-                writeServerAttribute(endpoint, OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off", (uint8_t *) &entry.onOffValue,
-                                     ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+                logWriteError(OnOff::Attributes::OnOff::Set(endpoint, entry.onOffValue), "OnOff");
             }
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
             if (entry.hasCurrentLevelValue)
             {
-                writeServerAttribute(endpoint, LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
-                                     (uint8_t *) &entry.currentLevelValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+                logWriteError(LevelControl::Attributes::CurrentLevel::Set(endpoint, entry.currentLevelValue), "CurrentLevel");
             }
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-            if (entry.hasOccupiedCoolingSetpointValue)
             {
-                writeServerAttribute(endpoint, Thermostat::Id, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID,
-                                     "occupied cooling setpoint", (uint8_t *) &entry.occupiedCoolingSetpointValue,
-                                     ZCL_INT16S_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasOccupiedHeatingSetpointValue)
-            {
-                writeServerAttribute(endpoint, Thermostat::Id, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID,
-                                     "occupied heating setpoint", (uint8_t *) &entry.occupiedHeatingSetpointValue,
-                                     ZCL_INT16S_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasSystemModeValue)
-            {
-                writeServerAttribute(endpoint, Thermostat::Id, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
-                                     (uint8_t *) &entry.systemModeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+                using namespace Thermostat::Attributes;
+                if (entry.hasOccupiedCoolingSetpointValue)
+                {
+                    logWriteError(OccupiedCoolingSetpoint::Set(endpoint, entry.occupiedCoolingSetpointValue),
+                                  "OccupiedCoolingSetpoint");
+                }
+                if (entry.hasOccupiedHeatingSetpointValue)
+                {
+                    logWriteError(OccupiedHeatingSetpoint::Set(endpoint, entry.occupiedHeatingSetpointValue),
+                                  "OccupiedHeatingSetpoint");
+                }
+                if (entry.hasSystemModeValue)
+                {
+                    logWriteError(SystemMode::Set(endpoint, entry.systemModeValue), "SystemMode");
+                }
             }
 #endif
 #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-            if (entry.hasCurrentXValue)
             {
-                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, "current x",
-                                     (uint8_t *) &entry.currentXValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasCurrentYValue)
-            {
-                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, "current y",
-                                     (uint8_t *) &entry.currentYValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-            }
+                using namespace ColorControl::Attributes;
+                if (entry.hasCurrentXValue)
+                {
+                    logWriteError(CurrentX::Set(endpoint, entry.currentXValue), "CurrentX");
+                }
+                if (entry.hasCurrentYValue)
+                {
+                    logWriteError(CurrentY::Set(endpoint, entry.currentXValue), "CurrentY");
+                }
 
-            if (entry.hasEnhancedCurrentHueValue)
-            {
-                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID,
-                                     "enhanced current hue", (uint8_t *) &entry.enhancedCurrentHueValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasCurrentSaturationValue)
-            {
-                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                     "current saturation", (uint8_t *) &entry.currentSaturationValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasColorLoopActiveValue)
-            {
-                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
-                                     "color loop active", (uint8_t *) &entry.colorLoopActiveValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasColorLoopDirectionValue)
-            {
-                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID,
-                                     "color loop direction", (uint8_t *) &entry.colorLoopDirectionValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasColorLoopTimeValue)
-            {
-                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID, "color loop time",
-                                     (uint8_t *) &entry.colorLoopTimeValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasColorTemperatureMiredsValue)
-            {
-                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
-                                     "color temp mireds", (uint8_t *) &entry.colorTemperatureMiredsValue,
-                                     ZCL_INT16U_ATTRIBUTE_TYPE);
+                if (entry.hasEnhancedCurrentHueValue)
+                {
+                    logWriteError(EnhancedCurrentHue::Set(endpoint, entry.enhancedCurrentHueValue), "EnhancedCurrentHue");
+                }
+                if (entry.hasCurrentSaturationValue)
+                {
+                    logWriteError(CurrentSaturation::Set(endpoint, entry.currentSaturationValue), "CurrentSaturation");
+                }
+                if (entry.hasColorLoopActiveValue)
+                {
+                    logWriteError(ColorLoopActive::Set(endpoint, entry.colorLoopActiveValue), "ColorLoopActive");
+                }
+                if (entry.hasColorLoopDirectionValue)
+                {
+                    logWriteError(ColorLoopDirection::Set(endpoint, entry.colorLoopDirectionValue), "ColorLoopDirection");
+                }
+                if (entry.hasColorLoopTimeValue)
+                {
+                    logWriteError(ColorLoopTime::Set(endpoint, entry.colorLoopTimeValue), "ColorLoopTime");
+                }
+                if (entry.hasColorTemperatureMiredsValue)
+                {
+                    logWriteError(ColorTemperatureMireds::Set(endpoint, entry.colorTemperatureMiredsValue),
+                                  "ColorTemperatureMireds");
+                }
             }
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
             if (entry.hasLockStateValue)
             {
-                writeServerAttribute(endpoint, DoorLock::Id, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
-                                     (uint8_t *) &entry.lockStateValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+                logWriteError(DoorLock::Attributes::LockState::Set(endpoint, entry.lockStateValue), "LockState");
             }
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-            if (entry.hasCurrentPositionLiftPercentageValue)
             {
-                writeServerAttribute(endpoint, WindowCovering::Id, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
-                                     "CurrentPositionLiftPercentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
-                                     ZCL_INT8U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasCurrentPositionTiltPercentageValue)
-            {
-                writeServerAttribute(endpoint, WindowCovering::Id, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
-                                     "CurrentPositionTiltPercentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
-                                     ZCL_INT8U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasTargetPositionLiftPercent100thsValue)
-            {
-                writeServerAttribute(endpoint, WindowCovering::Id, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID,
-                                     "TargetPositionLiftPercent100ths", (uint8_t *) &entry.targetPositionLiftPercent100thsValue,
-                                     ZCL_INT16U_ATTRIBUTE_TYPE);
-            }
-            if (entry.hasTargetPositionTiltPercent100thsValue)
-            {
-                writeServerAttribute(endpoint, WindowCovering::Id, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID,
-                                     "TargetPositionTiltPercent100ths", (uint8_t *) &entry.targetPositionTiltPercent100thsValue,
-                                     ZCL_INT16U_ATTRIBUTE_TYPE);
+                using namespace WindowCovering::Attributes;
+                if (entry.hasCurrentPositionLiftPercentageValue)
+                {
+                    logWriteError(CurrentPositionLiftPercentage::Set(endpoint, entry.currentPositionLiftPercentageValue),
+                                  "CurrentPositionLiftPercentage");
+                }
+                if (entry.hasCurrentPositionTiltPercentageValue)
+                {
+                    logWriteError(CurrentPositionTiltPercentage::Set(endpoint, entry.currentPositionTiltPercentageValue),
+                                  "CurrentPositionTiltPercentage");
+                }
+                if (entry.hasTargetPositionLiftPercent100thsValue)
+                {
+                    logWriteError(TargetPositionLiftPercent100ths::Set(endpoint, entry.targetPositionLiftPercent100thsValue),
+                                  "TargetPositionLiftPercent100ths");
+                }
+                if (entry.hasTargetPositionTiltPercent100thsValue)
+                {
+                    logWriteError(TargetPositionTiltPercent100ths::Set(endpoint, entry.targetPositionTiltPercent100thsValue),
+                                  "TargetPositionTiltPercent100ths");
+                }
             }
 #endif
             emberAfScenesMakeValid(endpoint, sceneId, groupId);
@@ -717,6 +725,17 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
+
+template <typename T>
+struct NullableUnderlyingType
+{
+};
+
+template <typename T>
+struct NullableUnderlyingType<app::DataModel::Nullable<T>>
+{
+    using Type = T;
+};
 
 bool emberAfPluginScenesServerParseAddScene(
     app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
@@ -839,14 +858,22 @@ bool emberAfPluginScenesServerParseAddScene(
             break;
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-        case LevelControl::Id:
+        case LevelControl::Id: {
             // We only know of one extension for the Level Control cluster and it is
             // just one byte, which means we can skip some logic for this cluster.  If
             // other extensions are added in this cluster, more logic will be needed
             // here.
             entry.hasCurrentLevelValue = true;
-            entry.currentLevelValue    = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            using Traits = NumericAttributeTraits<NullableUnderlyingType<decltype(entry.currentLevelValue)>::Type>;
+            // TODO: This is not right; we should be getting TLV values here or something!
+            Traits::StorageType storedValue = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            if (Traits::IsNullValue(storedValue)) {
+                entry.currentLevelValue.SetNull();
+            } else {
+                entry.currentLevelValue.SetValue(storedValue);
+            }
             break;
+        }
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
         case Thermostat::Id:
@@ -953,49 +980,99 @@ bool emberAfPluginScenesServerParseAddScene(
             break;
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-        case DoorLock::Id:
+        case DoorLock::Id: {
             // We only know of one extension for the Door Lock cluster and it is just
             // one byte, which means we can skip some logic for this cluster.  If
             // other extensions are added in this cluster, more logic will be needed
             // here.
             entry.hasLockStateValue = true;
-            entry.lockStateValue    = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            using Traits = NumericAttributeTraits<NullableUnderlyingType<decltype(entry.lockStateValue)>::Type>;
+            // TODO: This is not right; we should be getting TLV values here or something!
+            Traits::StorageType storedValue = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            if (Traits::IsNullValue(storedValue)) {
+                entry.lockStateValue.SetNull();
+            } else {
+                entry.lockStateValue.SetValue(storedValue);
+            }
             break;
+        }
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
         case WindowCovering::Id:
             // If we're here, we know we have at least one byte, so we can skip the
             // length check for the first field.
-            entry.hasCurrentPositionLiftPercentageValue = true;
-            entry.currentPositionLiftPercentageValue =
-                emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            {
+                entry.hasCurrentPositionLiftPercentageValue = true;
+                using Traits = NumericAttributeTraits<NullableUnderlyingType<decltype(entry.currentPositionLiftPercentageValue)>::Type>;
+                // TODO: This is not right; we should be getting TLV values here or something!
+                Traits::StorageType storedValue =
+                    emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+                if (Traits::IsNullValue(storedValue)){
+                    entry.currentPositionLiftPercentageValue.SetNull();
+                } else {
+                    entry.currentPositionLiftPercentageValue.SetValue(storedValue);
+                }
+            }
+
             extensionFieldSetsIndex++;
             length--;
             if (length < 1)
             {
                 break;
             }
-            entry.hasCurrentPositionTiltPercentageValue = true;
-            entry.currentPositionTiltPercentageValue =
-                emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+
+            {
+                entry.hasCurrentPositionTiltPercentageValue = true;
+                using Traits = NumericAttributeTraits<NullableUnderlyingType<decltype(entry.currentPositionTiltPercentageValue)>::Type>;
+                // TODO: This is not right; we should be getting TLV values here or something!
+                Traits::StorageType storedValue =
+                    emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+                if (Traits::IsNullValue(storedValue)){
+                    entry.currentPositionTiltPercentageValue.SetNull();
+                } else {
+                    entry.currentPositionTiltPercentageValue.SetValue(storedValue);
+                }
+            }
+
             extensionFieldSetsIndex++;
             length--;
             if (length < 2)
             {
                 break;
             }
-            entry.hasTargetPositionLiftPercent100thsValue = true;
-            entry.targetPositionLiftPercent100thsValue =
-                emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+
+            {
+                entry.hasTargetPositionLiftPercent100thsValue = true;
+                using Traits = NumericAttributeTraits<NullableUnderlyingType<decltype(entry.targetPositionLiftPercent100thsValue)>::Type>;
+                // TODO: This is not right; we should be getting TLV values here or something!
+                Traits::StorageType storedValue =
+                    emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+                if (Traits::IsNullValue(storedValue)){
+                    entry.targetPositionLiftPercent100thsValue.SetNull();
+                } else {
+                    entry.targetPositionLiftPercent100thsValue.SetValue(storedValue);
+                }
+            }
+
             extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
             length                  = static_cast<uint8_t>(length - 2);
             if (length < 2)
             {
                 break;
             }
-            entry.hasTargetPositionTiltPercent100thsValue = true;
-            entry.targetPositionTiltPercent100thsValue =
-                emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+
+            {
+                entry.hasTargetPositionTiltPercent100thsValue = true;
+                using Traits = NumericAttributeTraits<NullableUnderlyingType<decltype(entry.targetPositionTiltPercent100thsValue)>::Type>;
+                // TODO: This is not right; we should be getting TLV values here or something!
+                Traits::StorageType storedValue =
+                    emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+                if (Traits::IsNullValue(storedValue)){
+                    entry.targetPositionTiltPercent100thsValue.SetNull();
+                } else {
+                    entry.targetPositionTiltPercent100thsValue.SetValue(storedValue);
+                }
+            }
             // If additional Window Covering extensions are added, adjust the index
             // and length variables here.
             break;

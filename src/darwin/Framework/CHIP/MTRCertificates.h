@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                  issuerID:(NSNumber * _Nullable)issuerID
                                                  fabricID:(NSNumber * _Nullable)fabricID
                                                     error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_AVAILABLE;
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create an intermediate X.509 DER encoded certificate that has the
@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          issuerID:(NSNumber * _Nullable)issuerID
                                                          fabricID:(NSNumber * _Nullable)fabricID
                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_AVAILABLE;
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create an X.509 DER encoded certificate that has the
@@ -97,9 +97,9 @@ NS_ASSUME_NONNULL_BEGIN
                                             operationalPublicKey:(SecKeyRef)operationalPublicKey
                                                         fabricID:(NSNumber *)fabricID
                                                           nodeID:(NSNumber *)nodeID
-                                           caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                           caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_AVAILABLE;
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Check whether the given keypair's public key matches the given certificate's
@@ -151,16 +151,17 @@ NS_ASSUME_NONNULL_BEGIN
  * as a Matter TLV encoded certificate, or if the certificate cannot be
  * represented in the X.509v3 DER format).
  */
-+ (MTRCertificateDERBytes _Nullable)convertMatterCertificate:(MTRCertificateTLVBytes)matterCertificate MTR_NEWLY_AVAILABLE;
++ (MTRCertificateDERBytes _Nullable)convertMatterCertificate:(MTRCertificateTLVBytes)matterCertificate
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Extract the public key from the given PKCS#10 certificate signing request.
  * This is the public key that a certificate issued in response to the request
  * would need to have.
  */
-+ (NSData * _Nullable)extractPublicKeyFromCertificateSigningRequest:(MTRCSRDERBytes)certificateSigningRequest
-                                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_AVAILABLE;
++ (NSData * _Nullable)publicKeyFromCSR:(MTRCSRDERBytes)csr
+                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 
@@ -170,7 +171,8 @@ NS_ASSUME_NONNULL_BEGIN
                                     issuerId:(nullable NSNumber *)issuerId
                                     fabricId:(nullable NSNumber *)fabricId
                                        error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_DEPRECATED("Please use createRootCertificate:issuerID:fabricID:error:");
+    API_DEPRECATED("Please use createRootCertificate:issuerID:fabricID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
+        watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 + (nullable NSData *)generateIntermediateCertificate:(id<MTRKeypair>)rootKeypair
                                      rootCertificate:(NSData *)rootCertificate
@@ -178,7 +180,8 @@ NS_ASSUME_NONNULL_BEGIN
                                             issuerId:(nullable NSNumber *)issuerId
                                             fabricId:(nullable NSNumber *)fabricId
                                                error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_DEPRECATED("Please use createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:error:");
+    API_DEPRECATED("Please use createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:error:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 + (nullable NSData *)generateOperationalCertificate:(id<MTRKeypair>)signingKeypair
                                  signingCertificate:(NSData *)signingCertificate
@@ -187,13 +190,15 @@ NS_ASSUME_NONNULL_BEGIN
                                              nodeId:(NSNumber *)nodeId
                               caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_DEPRECATED(
+    API_DEPRECATED(
         "Plase use "
-        "createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:");
+        "createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 + (nullable NSData *)generateCertificateSigningRequest:(id<MTRKeypair>)keypair
                                                  error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_DEPRECATED("Please use createCertificateSigningRequest:error:");
+    API_DEPRECATED("Please use createCertificateSigningRequest:error:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+        tvos(16.1, 16.4));
 
 @end
 

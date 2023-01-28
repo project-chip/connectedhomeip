@@ -31,7 +31,7 @@ import chip.native
 import click
 from chip.ChipStack import *
 from chip.yaml.runner import ReplTestRunner
-from matter_yamltests.definitions import SpecDefinitionsFromPath
+from matter_yamltests.definitions import SpecDefinitionsFromPaths
 from matter_yamltests.parser import TestParser
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
@@ -75,7 +75,8 @@ def main(setup_code, yaml_path, node_id, pics_file):
             ca = certificate_authority_manager.NewCertificateAuthority()
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         elif len(certificate_authority_manager.activeCaList[0].adminList) == 0:
-            certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+            certificate_authority_manager.activeCaList[0].NewFabricAdmin(
+                vendorId=0xFFF1, fabricId=1)
 
         ca_list = certificate_authority_manager.activeCaList
 
@@ -93,26 +94,33 @@ def main(setup_code, yaml_path, node_id, pics_file):
 
         try:
             # Creating Cluster definition.
-            clusters_definitions = SpecDefinitionsFromPath(
-                _CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml',
-            )
+            clusters_definitions = SpecDefinitionsFromPaths([
+                _CLUSTER_XML_DIRECTORY_PATH + '/chip/*.xml',
+
+                # Some still-silabs clusters
+                _CLUSTER_XML_DIRECTORY_PATH + '/silabs/ha.xml',  # For fan control
+                _CLUSTER_XML_DIRECTORY_PATH + '/silabs/general.xml',  # For groups cluster
+            ])
 
             # Parsing YAML test and setting up chip-repl yamltests runner.
             yaml = TestParser(yaml_path, pics_file, clusters_definitions)
-            runner = ReplTestRunner(clusters_definitions, certificate_authority_manager, dev_ctrl)
+            runner = ReplTestRunner(
+                clusters_definitions, certificate_authority_manager, dev_ctrl)
 
             # Executing and validating test
             for test_step in yaml.tests:
                 test_action = runner.encode(test_step)
                 # TODO if test_action is None we should see if it is a pseudo cluster.
                 if test_action is None:
-                    raise Exception(f'Failed to encode test step {test_step.label}')
+                    raise Exception(
+                        f'Failed to encode test step {test_step.label}')
                 if not test_action.pics_enabled:
                     continue
 
                 response = runner.execute(test_action)
                 decoded_response = runner.decode(response)
-                post_processing_result = test_step.post_process_response(decoded_response)
+                post_processing_result = test_step.post_process_response(
+                    decoded_response)
                 if not post_processing_result.is_success():
                     raise Exception(f'Test step failed {test_step.label}')
         except Exception:

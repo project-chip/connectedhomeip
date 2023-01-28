@@ -5696,7 +5696,7 @@ class PowerSource(Cluster):
 
     class Enums:
         class BatChargeFault(MatterIntEnum):
-            kUnspecfied = 0x00
+            kUnspecified = 0x00
             kAmbientTooHot = 0x01
             kAmbientTooCold = 0x02
             kBatteryTooHot = 0x03
@@ -5756,7 +5756,7 @@ class PowerSource(Cluster):
             kUnknownEnumValue = 4,
 
         class PowerSourceStatus(MatterIntEnum):
-            kUnspecfied = 0x00
+            kUnspecified = 0x00
             kActive = 0x01
             kStandby = 0x02
             kUnavailable = 0x03
@@ -9802,6 +9802,11 @@ class WiFiNetworkDiagnostics(Cluster):
             kUnknownEnumValue = 6,
 
 
+    class Bitmaps:
+        class WiFiNetworkDiagnosticsFeature(IntFlag):
+            kPacketCounts = 0x1
+            kErrorCounts = 0x2
+
 
 
     class Commands:
@@ -10228,6 +10233,11 @@ class EthernetNetworkDiagnostics(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 10,
 
+
+    class Bitmaps:
+        class EthernetNetworkDiagnosticsFeature(IntFlag):
+            kPacketCounts = 0x1
+            kErrorCounts = 0x2
 
 
 

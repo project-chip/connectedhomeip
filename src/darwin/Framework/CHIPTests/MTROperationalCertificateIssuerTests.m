@@ -89,7 +89,7 @@ static MTRTestKeys * sTestKeys = nil;
 }
 
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
-                              attestationInfo:(MTRAttestationInfo *)attestationInfo
+                              attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
                                    controller:(MTRDeviceController *)controller
                                    completion:(MTROperationalCertificateIssuedHandler)completion
 {
