@@ -6001,7 +6001,7 @@
               - DlOperationSource
               - DlUserStatus
               - DlUserType
-              # The enums after this come from the silabs types.xml, not the
+              # The enums after this come from the silabs types-silabs.xml, not the
               # door lock cluster XML
               #
               # DoorLockUserStatus is not marked deprecated here because the

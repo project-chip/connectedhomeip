@@ -177,7 +177,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/silabs/ha-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/ha.xml \
                       src/app/zap-templates/zcl/data-model/silabs/lo-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/types.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/types-silabs.xml \
                       src/app/zap-templates/zcl/data-model/silabs/zll-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/zll.xml \
                     "
