@@ -30,6 +30,7 @@
    <xi:include href="chip/group-key-mgmt-cluster.xml" />
    <xi:include href="chip/identify-cluster.xml" />
    <xi:include href="chip/illuminance-measurement-cluster.xml" />
+   <xi:include href="chip/level-control-cluster.xml" />
    <xi:include href="chip/keypad-input-cluster.xml" />
    <xi:include href="chip/localization-configuration-cluster.xml" />
    <xi:include href="chip/low-power-cluster.xml" />

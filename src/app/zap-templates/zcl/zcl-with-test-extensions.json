@@ -46,6 +46,7 @@
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
         "keypad-input-cluster.xml",
+        "level-control-cluster.xml",
         "localization-configuration-cluster.xml",
         "low-power-cluster.xml",
         "media-input-cluster.xml",
