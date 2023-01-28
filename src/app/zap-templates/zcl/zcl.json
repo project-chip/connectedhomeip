@@ -40,6 +40,7 @@
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "global-attributes.xml",
+        "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",

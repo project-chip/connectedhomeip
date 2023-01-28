@@ -26,6 +26,7 @@
    <xi:include href="chip/general-commissioning-cluster.xml" />
    <xi:include href="chip/general-diagnostics-cluster.xml" />
    <xi:include href="chip/global-attributes.xml" />
+   <xi:include href="chip/groups-cluster.xml" />
    <xi:include href="chip/group-key-mgmt-cluster.xml" />
    <xi:include href="chip/identify-cluster.xml" />
    <xi:include href="chip/illuminance-measurement-cluster.xml" />

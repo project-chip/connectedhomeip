@@ -136,6 +136,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
+                      src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
