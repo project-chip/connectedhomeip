@@ -17,47 +17,36 @@
 
 /**
  *    @file
- *          Utilities for interacting with the the Open IoT SDK key-value storage.
+ *          Open IoT SDK key-value storage base on flash TDBStore.
  */
 
 #pragma once
 
+#include <string.h>
+
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <platform/PersistedStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
-#include "iotsdk/BufferedBlockDevice.h"
-#include "iotsdk/FlashIAPBlockDevice.h"
-
-extern "C" {
-#include "flash_cs300.h"
-#include "hal/flash_api.h"
-#include "iotsdk/TDBStore.h"
-}
-#include <string.h>
+#include <iotsdk/TDBStore.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Provides functions and definitions for accessing device configuration information on the ESP32.
- *
- * This class is designed to be mixed-in to concrete implementation classes as a means to
- * provide access to configuration information to generic base classes.
+ * This class provides access to configuration information for Open IoT SDK platform
+ * stored in Lightweight Key Value storage over a flash block device.
  */
-class OpenIoTSDKConfig
+class KVBlockDeviceStore
 {
 public:
-    using Key = const char *;
-
-    // NVS prefix used to store device configuration information.
-    static const char kConfigNamespace_ChipFactory[];
-    static const char kConfigNamespace_ChipConfig[];
-    static const char kConfigNamespace_ChipCounters[];
+    using Key = chip::Platform::PersistedStorage::Key;
 
     // Key definitions for well-known keys.
+    // Factory keys
     static const Key kConfigKey_SerialNum;
-    static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
@@ -65,49 +54,91 @@ public:
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
+    static const Key kConfigKey_SetupDiscriminator;
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_VendorId;
+    static const Key kConfigKey_ProductId;
+
+    // Config Keys
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
-    static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Spake2pIterationCount;
-    static const Key kConfigKey_Spake2pSalt;
-    static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_LocationCapability;
+    static const Key kConfigKey_UniqueId;
 
-    // Config value accessors.
+    // Counter Keys
+    static const Key kCounterKey_RebootCount;
+    static const Key kCounterKey_UpTime;
+    static const Key kCounterKey_TotalOperationalHours;
+    static const Key kCounterKey_BootReason;
+
+    // Initialization
+    static CHIP_ERROR Init(void);
+
+    // Config value accessors
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen, size_t offset);
+    static CHIP_ERROR ReadConfigValueCounter(Key counterId, uint32_t & val);
+
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
+    static CHIP_ERROR WriteConfigValueCounter(Key counterId, uint32_t val);
+
     static CHIP_ERROR ClearConfigValue(Key key);
-    static bool ConfigValueExists(Key key);
-    static CHIP_ERROR FactoryResetConfig();
-    static CHIP_ERROR Init(void);
 
-    // NVS Namespace helper functions.
-    static CHIP_ERROR ConstructCounterKey(Key id, char * buf, size_t bufSize);
-    static CHIP_ERROR ReadCounter(Key counterId, uint32_t & value);
-    static CHIP_ERROR WriteCounter(Key counterId, uint32_t value);
-    static CHIP_ERROR ClearNamespace(const char * ns);
-
+    // Additional functions
+    static CHIP_ERROR FactoryResetConfig(void);
     static void RunConfigUnitTest(void);
+    static bool ConfigValueExists(Key key);
 
 private:
     static iotsdk::storage::TDBStore * tdb;
-    static iotsdk::storage::FlashIAPBlockDevice * flash_bd;
+
+    // NVS Namespace helper functions
+    static CHIP_ERROR ConstructCounterKey(Key id, char * buf, size_t bufSize);
+    static CHIP_ERROR ClearNamespace(const char * ns);
 };
+
+class KVBlockDeviceStoreKeyBuilder
+{
+public:
+    KVBlockDeviceStoreKeyBuilder(const char * key);
+
+    void AddKey(void) {}
+    void RemoveKey(void) {}
+
+    KVBlockDeviceStore::Key GetKey() const;
+
+private:
+    char buffer[PersistentStorageDelegate::kKeyLengthMax + 1] = "chip-kvs-";
+    bool valid;
+    // Mbed KV storage does not accept these characters in the key definition
+    const char * illegalCharacters = " */?:;\"|<>\\";
+};
+
+inline KVBlockDeviceStore::Key KVBlockDeviceStoreKeyBuilder::GetKey() const
+{
+    return valid ? buffer : nullptr;
+}
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+
+using KVStoreConfig     = chip::DeviceLayer::Internal::KVBlockDeviceStore;
+using KVStoreKeyBuilder = chip::DeviceLayer::Internal::KVBlockDeviceStoreKeyBuilder;
