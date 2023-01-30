@@ -31,15 +31,20 @@ class InteractiveCommand : public CHIPCommand
 public:
     InteractiveCommand(const char * name, Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
         CHIPCommand(name, credsIssuerConfig), mHandler(commandsHandler)
-    {}
+    {
+        AddArgument("advertise-operational", 0, 1, &mAdvertiseOperational,
+                    "Advertise operational node over DNS-SD and accept incoming CASE sessions.");
+    }
 
     /////////// CHIPCommand Interface /////////
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+    bool NeedsOperationalAdvertising() override;
 
     bool ParseCommand(char * command, int * status);
 
 private:
     Commands * mHandler = nullptr;
+    chip::Optional<bool> mAdvertiseOperational;
 };
 
 class InteractiveStartCommand : public InteractiveCommand
