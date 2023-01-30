@@ -20,6 +20,7 @@
 
 #import <Matter/Matter.h>
 
+#include "GetCommissionerNodeIdCommand.h"
 #include "OpenCommissioningWindowCommand.h"
 #include "PairingCommandBridge.h"
 #include "PreWarmCommissioningCommand.h"
@@ -73,6 +74,7 @@ void registerCommandsPairing(Commands & commands)
         make_unique<Unpair>(),
         make_unique<OpenCommissioningWindowCommand>(),
         make_unique<PreWarmCommissioningCommand>(),
+        make_unique<GetCommissionerNodeIdCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);
