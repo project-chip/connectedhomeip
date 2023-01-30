@@ -280,7 +280,7 @@ class WaitForCommissioneeAction(BaseAction):
 
         # There's a chance the commissionee may have rebooted before this call here as part of a
         # test flow or is just starting out fresh outright. Unless expireExistingSession is
-        # explicitly set, the default behaviour it so make sure we're not re-using any cached CASE
+        # explicitly set, the default behaviour it to make sure we're not re-using any cached CASE
         # sessions that will now be stale and mismatched with the peer, causing subsequent
         # interactions to fail.
         self._expire_existing_session = request_data_as_dict.get('expireExistingSession', True)
