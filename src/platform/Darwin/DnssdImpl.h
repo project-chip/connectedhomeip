@@ -42,11 +42,20 @@ struct GenericContext
     void * context;
     DNSServiceRef serviceRef;
 
+protected:
+    // Whether the serviceRef is owned by this context.  Some contexts share a
+    // service ref with other contexts, in which case serviceRefIsOwned will be
+    // false.
+    bool serviceRefIsOwned = true;
+
+public:
     virtual ~GenericContext() {}
 
     CHIP_ERROR Finalize(DNSServiceErrorType err = kDNSServiceErr_NoError);
     virtual void DispatchFailure(DNSServiceErrorType err) = 0;
     virtual void DispatchSuccess()                        = 0;
+
+    bool OwnsServiceRef() const { return serviceRefIsOwned; }
 };
 
 struct RegisterContext;
@@ -133,6 +142,20 @@ struct BrowseContext : public GenericContext
 
     // Dispatch what we have found so far, but don't stop browsing.
     void DispatchPartialSuccess();
+
+    // While we are dispatching partial success, sContextDispatchingSuccess will
+    // be set to the BrowseContext doing the dispatch.  This allows resolves
+    // triggered by the browse dispatch to be associated with the browse.  This
+    // relies on our consumer starting the resolves synchronously from the
+    // partial success callback.
+    //
+    // The other option would be to do the resolve ourselves before signaling
+    // browse success, but that would only allow us to pass in one ip per
+    // discovered hostname, and we want to pass in all the IPs we resolve.
+    //
+    // TODO: Consider fixing the higher-level APIs to make it possible to pass
+    // in multiple IPs for a successful browse result.
+    static BrowseContext * sContextDispatchingSuccess;
 };
 
 struct InterfaceInfo
@@ -172,6 +195,8 @@ struct ResolveContext : public GenericContext
                         const unsigned char * txtRecord);
     bool HasInterface();
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
+
+    void ShareExistingConnection(DNSServiceRef existingConnection);
 };
 
 } // namespace Dnssd

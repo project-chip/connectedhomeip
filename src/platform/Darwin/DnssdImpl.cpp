@@ -37,7 +37,7 @@ constexpr const char * kProtocolTcp = "._tcp";
 constexpr const char * kProtocolUdp = "._udp";
 
 constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
-constexpr DNSServiceFlags kBrowseFlags          = 0;
+constexpr DNSServiceFlags kBrowseFlags          = kDNSServiceFlagsShareConnection;
 constexpr DNSServiceFlags kGetAddrInfoFlags     = kDNSServiceFlagsTimeout | kDNSServiceFlagsShareConnection;
 constexpr DNSServiceFlags kResolveFlags         = kDNSServiceFlagsShareConnection;
 constexpr DNSServiceFlags kReconfirmRecordFlags = 0;
@@ -270,11 +270,15 @@ CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfa
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
     ChipLogProgress(Discovery, "Browsing for: %s", StringOrNullMarker(type));
-    DNSServiceRef sdRef;
-    auto err = DNSServiceBrowse(&sdRef, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
+
+    auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    ReturnErrorOnFailure(MdnsContexts::GetInstance().Add(sdCtx, sdRef));
+    auto sdRefCopy = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
+    err            = DNSServiceBrowse(&sdRefCopy, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
+    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+
+    ReturnErrorOnFailure(MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef));
     *browseIdentifier = reinterpret_cast<intptr_t>(sdCtx);
     return CHIP_NO_ERROR;
 }
@@ -363,11 +367,19 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, addressType, name, std::move(counterHolder));
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
-    auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
-    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+    if (BrowseContext::sContextDispatchingSuccess == nullptr)
+    {
+        auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
+        VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+    }
+    else
+    {
+        // Share the connection of the browse.
+        sdCtx->ShareExistingConnection(BrowseContext::sContextDispatchingSuccess->serviceRef);
+    }
 
     auto sdRefCopy = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err            = DNSServiceResolve(&sdRefCopy, kResolveFlags, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
+    auto err       = DNSServiceResolve(&sdRefCopy, kResolveFlags, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     CHIP_ERROR retval = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);

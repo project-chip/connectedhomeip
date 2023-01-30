@@ -153,11 +153,17 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
-    if (kDNSServiceErr_NoError != err)
+    if (context->OwnsServiceRef())
     {
-        chip::Platform::Delete(context);
-        return Error::ToChipError(err);
+        auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+        if (kDNSServiceErr_NoError != err)
+        {
+            // We can't just use our Delete to deallocate the service ref here,
+            // because our context may not have its serviceRef set yet.
+            DNSServiceRefDeallocate(sdRef);
+            chip::Platform::Delete(context);
+            return Error::ToChipError(err);
+        }
     }
 
     context->serviceRef = sdRef;
@@ -217,7 +223,7 @@ CHIP_ERROR MdnsContexts::RemoveAllOfType(ContextType type)
 
 void MdnsContexts::Delete(GenericContext * context)
 {
-    if (context->serviceRef != nullptr)
+    if (context->serviceRef != nullptr && context->OwnsServiceRef())
     {
         DNSServiceRefDeallocate(context->serviceRef);
     }
@@ -297,6 +303,8 @@ void RegisterContext::DispatchSuccess()
     mHostNameRegistrar.Register();
 }
 
+BrowseContext * BrowseContext::sContextDispatchingSuccess = nullptr;
+
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
 {
     type     = ContextType::Browse;
@@ -314,13 +322,16 @@ void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 
 void BrowseContext::DispatchSuccess()
 {
-    callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
-    MdnsContexts::GetInstance().Remove(this);
+    // This should never be called: We either DispatchPartialSuccess or
+    // DispatchFailure.
+    VerifyOrDie(false);
 }
 
 void BrowseContext::DispatchPartialSuccess()
 {
+    sContextDispatchingSuccess = this;
     callback(context, services.data(), services.size(), false, CHIP_NO_ERROR);
+    sContextDispatchingSuccess = nullptr;
     services.clear();
 }
 
@@ -489,6 +500,12 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
 bool ResolveContext::HasInterface()
 {
     return interfaces.size();
+}
+
+void ResolveContext::ShareExistingConnection(DNSServiceRef existingConnection)
+{
+    serviceRef        = existingConnection;
+    serviceRefIsOwned = false;
 }
 
 InterfaceInfo::InterfaceInfo()
