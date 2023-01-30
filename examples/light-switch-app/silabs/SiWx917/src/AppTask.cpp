@@ -24,11 +24,13 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "binding-handler.h"
+#include "BindingHandler.h"
 
 #ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
 #endif // ENABLE_WSTK_LEDS
+
+#include "LightSwitchMgr.h"
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -36,6 +38,10 @@
 #include "qrcodegen.h"
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
+
+#if defined(ENABLE_CHIP_SHELL)
+#include "ShellCommands.h"
+#endif // defined(ENABLE_CHIP_SHELL)
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -59,6 +65,13 @@
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
 
+namespace {
+
+constexpr chip::EndpointId kLightSwitchEndpoint   = 1;
+constexpr chip::EndpointId kGenericSwitchEndpoint = 2;
+
+} // namespace
+
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 
@@ -69,8 +82,6 @@ namespace {
  *********************************************************/
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-
-bool mCurrentButtonState = false;
 
 /**********************************************************
  * Identify Callbacks
@@ -159,13 +170,16 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
-    // Configure Bindings - TODO ERROR PROCESSING
-    err = InitBindingHandler();
+    err = LightSwitchMgr::GetInstance().Init(kLightSwitchEndpoint, kGenericSwitchEndpoint);
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("InitBindingHandler() failed");
+        SILABS_LOG("LightSwitchMgr Init failed!");
         appError(err);
     }
+
+#if defined(ENABLE_CHIP_SHELL)
+    LightSwtichCommands::RegisterSwitchCommands();
+#endif // defined(ENABLE_CHIP_SHELL)
 
     return err;
 }
@@ -223,36 +237,32 @@ void AppTask::OnIdentifyStop(Identify * identify)
 
 void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        BindingCommandData * data = Platform::New<BindingCommandData>();
-        data->clusterId           = chip::app::Clusters::OnOff::Id;
+    VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
 
-        if (mCurrentButtonState)
-        {
-            mCurrentButtonState = false;
-            data->commandId     = chip::app::Clusters::OnOff::Commands::Off::Id;
-        }
-        else
-        {
-            data->commandId     = chip::app::Clusters::OnOff::Commands::On::Id;
-            mCurrentButtonState = true;
-        }
+    static bool mCurrentButtonState = false;
+
+    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+    {
+        mCurrentButtonState = !mCurrentButtonState;
+        LightSwitchMgr::LightSwitchAction action =
+            mCurrentButtonState ? LightSwitchMgr::LightSwitchAction::On : LightSwitchMgr::LightSwitchAction::Off;
+
+        LightSwitchMgr::GetInstance().TriggerLightSwitchAction(action);
+        LightSwitchMgr::GetInstance().GenericSwitchOnInitialPress();
 
 #ifdef DISPLAY_ENABLED
         sAppTask.GetLCD().WriteDemoUI(mCurrentButtonState);
 #endif
-
-        DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    }
+    else if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_RELEASED)
+    {
+        LightSwitchMgr::GetInstance().GenericSwitchOnShortRelease();
     }
 }
 
 void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
 {
-    if (buttonHandle == NULL)
-    {
-        return;
-    }
+    VerifyOrReturn(buttonHandle != NULL);
 
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
