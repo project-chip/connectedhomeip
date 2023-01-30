@@ -164,6 +164,21 @@ CHIP_ERROR AppTask::Init()
     sLightLED.Set(LightMgr().IsLightOn());
 #endif // ENABLE_WSTK_LEDS
 
+// Update the LCD with the Stored value. Show QR Code if not provisioned
+#ifdef DISPLAY_ENABLED
+    GetLCD().WriteDemoUI(LightMgr().IsLightOn());
+#ifdef QR_CODE_ENABLED
+#ifdef SL_WIFI
+    if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        GetLCD().ShowQRCode(true, true);
+    }
+#endif // QR_CODE_ENABLED
+#endif
+
     return err;
 }
 

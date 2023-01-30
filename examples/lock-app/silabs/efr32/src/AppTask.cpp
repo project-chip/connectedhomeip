@@ -252,6 +252,21 @@ CHIP_ERROR AppTask::Init()
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
 #endif // ENABLE_WSTK_LEDS
 
+    // Update the LCD with the Stored value. Show QR Code if not provisioned
+#ifdef DISPLAY_ENABLED
+    GetLCD().WriteDemoUI(state.Value() != DlLockState::kUnlocked);
+#ifdef QR_CODE_ENABLED
+#ifdef SL_WIFI
+    if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        GetLCD().ShowQRCode(true, true);
+    }
+#endif // QR_CODE_ENABLED
+#endif
+
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();

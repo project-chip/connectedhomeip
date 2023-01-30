@@ -449,7 +449,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeF
     using EnumType = PowerSource::BatChargeFault;
     switch (val)
     {
-    case EnumType::kUnspecfied:
+    case EnumType::kUnspecified:
     case EnumType::kAmbientTooHot:
     case EnumType::kAmbientTooCold:
     case EnumType::kBatteryTooHot:
@@ -524,7 +524,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::PowerSourc
     using EnumType = PowerSource::PowerSourceStatus;
     switch (val)
     {
-    case EnumType::kUnspecfied:
+    case EnumType::kUnspecified:
     case EnumType::kActive:
     case EnumType::kStandby:
     case EnumType::kUnavailable:

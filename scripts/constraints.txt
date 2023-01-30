@@ -28,7 +28,9 @@ brotli==1.0.9
 cbor==1.0.0
     # via -r requirements.txt
 cbor2==5.4.3
-    # via -r requirements.txt
+    # via
+    #   -r requirements.txt
+    #   imgtool
 certifi==2021.5.30
     # via requests
 cffi==1.15.1
@@ -41,6 +43,7 @@ click==8.1.3
     #   -r requirements.txt
     #   flask
     #   idf-component-manager
+    #   imgtool
     #   mbed-tools
     #   pip-tools
 colorama==0.4.4
@@ -61,7 +64,8 @@ cryptography==3.4.7
     # via
     #   -c constraints.esp32.txt
     #   -r requirements.txt
-cxxfilt==0.2.2 ; sys_platform == "linux"
+    #   imgtool
+cxxfilt==0.2.2
     # via -r requirements.txt
 decorator==5.0.9
     # via ipython
@@ -112,11 +116,14 @@ idf-component-manager==1.1.4
     # via -r requirements.esp32.txt
 idna==2.10
     # via requests
+imgtool==1.9.0
+    # via -r requirements.openiotsdk.txt
 iniconfig==1.1.1
     # via pytest
 intelhex==2.3.0
     # via
     #   -r requirements.txt
+    #   imgtool
     #   mbed-os-tools
 ipython==7.24.1
     # via -r requirements.txt

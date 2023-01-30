@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -306,9 +306,9 @@ private:
     [self _changeState:MTRDeviceStateReachable];
 
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate && [delegate respondsToSelector:@selector(didReceiveCommunicationFromDevice:)]) {
+    if (delegate && [delegate respondsToSelector:@selector(deviceBecameActive:)]) {
         dispatch_async(_delegateQueue, ^{
-            [delegate didReceiveCommunicationFromDevice:self];
+            [delegate deviceBecameActive:self];
         });
     }
 

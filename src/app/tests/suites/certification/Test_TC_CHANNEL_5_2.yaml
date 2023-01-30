@@ -71,4 +71,4 @@ tests:
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: [MajorNumber: majornumber, MinorNumber: minornumber]
+          value: { MajorNumber: majornumber, MinorNumber: minornumber }

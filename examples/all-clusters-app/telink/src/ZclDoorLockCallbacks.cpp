@@ -26,7 +26,7 @@ using namespace ::chip;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::DoorLock;
 
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 // Provided some empty callbacks and replaced feature map
 // to simulate DoorLock endpoint for All-Clusters-App example

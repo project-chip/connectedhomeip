@@ -63,6 +63,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -89,6 +90,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -106,6 +108,7 @@ tests:
               maxValue: 9200
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -123,6 +126,7 @@ tests:
               maxValue: 11500
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -140,6 +144,7 @@ tests:
               maxValue: 13800
 
     - label: "Wait 5s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -175,6 +180,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -201,6 +207,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -218,6 +225,7 @@ tests:
               maxValue: 25300
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -235,6 +243,7 @@ tests:
               maxValue: 41300
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -252,6 +261,7 @@ tests:
               maxValue: 62100
 
     - label: "Wait 5s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -287,6 +297,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -313,6 +324,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -330,6 +342,7 @@ tests:
               maxValue: 9200
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -347,6 +360,7 @@ tests:
               maxValue: 11500
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -364,6 +378,7 @@ tests:
               maxValue: 13800
 
     - label: "Wait 5s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -399,6 +414,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -425,6 +441,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -442,6 +459,7 @@ tests:
               maxValue: 11500
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -459,6 +477,7 @@ tests:
               maxValue: 9200
 
     - label: "Wait 10s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -476,6 +495,7 @@ tests:
               maxValue: 6900
 
     - label: "Wait 5s"
+      PICS: CC.S.F01
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

@@ -16,9 +16,124 @@ limitations under the License.
 -->
 <configurator>
   <domain name="HVAC"/>
+
+  <bitmap name="ThermostatFeature" type="BITMAP32">
+    <cluster code="0x0201"/>
+    <field name="Heating" mask="0x1"/>
+    <field name="Cooling" mask="0x2"/>
+    <field name="Occupancy" mask="0x4"/>
+    <field name="ScheduleConfiguration" mask="0x8"/>
+    <field name="Setback" mask="0x10"/>
+    <field name="AutoMode" mask="0x20"/>
+  </bitmap>
+
+  <bitmap name="ThermostatOccupancy" type="BITMAP8">
+    <field name="occupied" mask="0x1"/>
+  </bitmap>
+
+  <bitmap name="ThermostatSensing" type="BITMAP8">
+    <field name="localTempSensedRemotely" mask="0x1"/>
+    <field name="outdoorTempSensedRemotely" mask="0x2"/>
+    <field name="occupancySensedRemotely" mask="0x4"/>
+  </bitmap>
+
+  <bitmap name="ThermostatAlarmMask" type="BITMAP8">
+    <field name="initializationFailure" mask="0x1"/>
+    <field name="hardwareFailure" mask="0x2"/>
+    <field name="selfcalibrationFailure" mask="0x4"/>
+  </bitmap>
+
+  <bitmap name="ThermostatRunningState" type="BITMAP16">
+    <field name="HeatStateOn" mask="0x0001"/>
+    <field name="CoolStateOn" mask="0x0002"/>
+    <field name="FanStateOn" mask="0x0004"/>
+    <field name="HeatSecondStageStateOn" mask="0x0008"/>
+    <field name="CoolSecondStageStateOn" mask="0x0010"/>
+    <field name="FanSecondStageStateOn" mask="0x0020"/>
+    <field name="FanThirdStageStateOn" mask="0x0040"/>
+  </bitmap>
+
+  <bitmap name="DayOfWeek" type="BITMAP8">
+    <cluster code="0x0201"/>
+    <field name="Sunday" mask="0x01"/>
+    <field name="Monday" mask="0x02"/>
+    <field name="Tuesday" mask="0x04"/>
+    <field name="Wednesday" mask="0x08"/>
+    <field name="Thursday" mask="0x10"/>
+    <field name="Friday" mask="0x20"/>
+    <field name="Saturday" mask="0x40"/>
+    <field name="Away" mask="0x80"/>
+  </bitmap>
+
+  <bitmap name="ModeForSequence" type="BITMAP8">
+    <cluster code="0x0201"/>
+    <field name="HeatSetpointPresent" mask="0x01"/>
+    <field name="CoolSetpointPresent" mask="0x02"/>
+  </bitmap>
+
+  <enum name="ThermostatSystemMode" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="Off" value="0x0"/>
+    <item name="Auto" value="0x1"/>
+    <item name="Cool" value="0x3"/>
+    <item name="Heat" value="0x4"/>
+    <item name="EmergencyHeat" value="0x5"/>
+    <item name="Precooling" value="0x6"/>
+    <item name="FanOnly" value="0x7"/>
+    <item name="Dry" value="0x8"/>
+    <item name="Sleep" value="0x9"/>
+  </enum>
+
+  <enum name="ThermostatRunningMode" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="Off" value="0x00"/>
+    <item name="Cool" value="0x03"/>
+    <item name="Heat" value="0x04"/>
+  </enum>
+
+  <enum name="StartOfWeek" type="ENUM8">
+    <item name="Sunday" value="0x00"/>
+    <item name="Monday" value="0x01"/>
+    <item name="Tuesday" value="0x02"/>
+    <item name="Wednesday" value="0x03"/>
+    <item name="Thursday" value="0x04"/>
+    <item name="Friday" value="0x05"/>
+    <item name="Saturday" value="0x06"/>
+  </enum>
+
+  <enum name="ThermostatControlSequence" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="CoolingOnly" value="0x0"/>
+    <item name="CoolingWithReheat" value="0x1"/>
+    <item name="HeatingOnly" value="0x2"/>
+    <item name="HeatingWithReheat" value="0x3"/>
+    <item name="CoolingAndHeating" value="0x4"/>
+    <item name="CoolingAndHeatingWithReheat" value="0x5"/>
+  </enum>
+
+  <enum name="TemperatureSetpointHold" type="ENUM8">
+    <item name="SetpointHoldOff" value="0x00"/>
+    <item name="SetpointHoldOn" value="0x01"/>
+  </enum>
+
+  <enum name="SetpointAdjustMode" type="ENUM8">
+    <cluster code="0x0201"/>
+    <item name="Heat" value="0x0"/>
+    <item name="Cool" value="0x1"/>
+    <item name="Both" value="0x2"/>
+  </enum>
+
+  <struct name="ThermostatScheduleTransition">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="TransitionTime" type="INT16U"/>
+    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
+    <item fieldId="1" name="HeatSetpoint" type="INT16S" isNullable="true"/>
+    <item fieldId="2" name="CoolSetpoint" type="INT16S" isNullable="true"/>
+  </struct>
+
   <cluster>
     <name>Thermostat</name>
-	<domain>HVAC</domain>
+	  <domain>HVAC</domain>
     <description>An interface for configuring and controlling the functionality of a thermostat.</description>
     <code>0x0201</code>
     <define>THERMOSTAT_CLUSTER</define>
@@ -207,23 +322,4 @@ limitations under the License.
       <arg name="Transitions" type="ThermostatScheduleTransition" array="true"/>
     </command>
   </cluster>
-
-  <bitmap name="ThermostatFeature" type="BITMAP32">
-    <cluster code="0x0201"/>
-    <field name="Heating" mask="0x1"/>
-    <field name="Cooling" mask="0x2"/>
-    <field name="Occupancy" mask="0x4"/>
-    <field name="ScheduleConfiguration" mask="0x8"/>
-    <field name="Setback" mask="0x10"/>
-    <field name="AutoMode" mask="0x20"/>
-  </bitmap>
-
-  <struct name="ThermostatScheduleTransition">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="TransitionTime" type="INT16U"/>
-    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
-    <item fieldId="1" name="HeatSetpoint" type="INT16S" isNullable="true"/>
-    <item fieldId="2" name="CoolSetpoint" type="INT16S" isNullable="true"/>
-  </struct>
-
 </configurator>
