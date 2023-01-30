@@ -53,22 +53,12 @@ def _LoadManualTestsJson(json_file_path: str) -> Iterator[ManualTest]:
 def _GetManualTests() -> Set[ManualTest]:
     manualtests = set()
 
-    # Flaky tests? these seem to pass though
-    manualtests.add(ManualTest(yaml="DL_Schedules.yaml", reason="Flaky"))
-    manualtests.add(ManualTest(yaml="Test_TC_LVL_2_1.yaml", reason="Flaky"))
-
-    # Examples. Should these be manual?
-    manualtests.add(ManualTest(yaml="Config_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(yaml="Config_Variables_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(yaml="PICS_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(yaml="Response_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(yaml="Test_Example.yaml", reason="Example"))
-
-    # Flagged as manual from: src/app/tests/suites/manualTests.json
-    for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
-        manualtests.add(item)
-
-    # TODO: these should probably pass.
+    # TODO:
+    #
+    # These are NOT manual tests, but rather "tests that fail in yaml and
+    # for this reason are marked as manual".
+    #
+    # We are working to get this list down to 0.
     manualtests.add(ManualTest(yaml="DL_LockUnlock.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="OTA_SuccessfulTransfer.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_Example_1.yaml", reason="TODO"))
@@ -199,6 +189,28 @@ def _GetManualTests() -> Set[ManualTest]:
     manualtests.add(ManualTest(yaml="TestMultiAdmin.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestSystemCommands.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestUserLabelCluster.yaml", reason="TODO"))
+
+    # Flaky tests? these seem to pass though
+    manualtests.add(ManualTest(yaml="DL_Schedules.yaml", reason="Flaky"))
+    manualtests.add(ManualTest(yaml="Test_TC_LVL_2_1.yaml", reason="Flaky"))
+
+    # Examples:
+    #
+    # Currently these are not in ciTests.json, however yaml logic currently
+    # does NOT use allowlist json but rather finds all yaml files.
+    #
+    # This is on purpose for now to make it harder to orphan files, however
+    # we can reconsider as things evolve.
+    manualtests.add(ManualTest(yaml="Config_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(yaml="Config_Variables_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(yaml="PICS_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(yaml="Response_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(yaml="Test_Example.yaml", reason="Example"))
+
+    # Flagged as manual from: src/app/tests/suites/manualTests.json
+    for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
+        manualtests.add(item)
+
 
     return manualtests
 
