@@ -39,10 +39,11 @@ class InvalidPICSParsingError(Exception):
 
 class PICSChecker():
     """Class to compute a PICS expression"""
-    __pics: None
-    __expression_index: 0
 
     def __init__(self, pics_file: str):
+        self.__pics = {}
+        self.__expression_index = 0
+
         if pics_file is not None:
             self.__pics = self.__parse(pics_file)
 
@@ -91,12 +92,12 @@ class PICSChecker():
 
         if token == '&&':
             self.__expression_index += 1
-            rightExpr = self.__evaluate_sub_expression(tokens, pics)
+            rightExpr = self.__evaluate_expression(tokens, pics)
             return leftExpr and rightExpr
 
         if token == '||':
             self.__expression_index += 1
-            rightExpr = self.__evaluate_sub_expression(tokens, pics)
+            rightExpr = self.__evaluate_expression(tokens, pics)
             return leftExpr or rightExpr
 
         raise InvalidPICSParsingError(f'Unknown token: {token}')
@@ -114,7 +115,7 @@ class PICSChecker():
 
         if token == '!':
             self.__expression_index += 1
-            expr = self.__evaluate_expression(tokens, pics)
+            expr = self.__evaluate_sub_expression(tokens, pics)
             return not expr
 
         token = self.__normalize(token)

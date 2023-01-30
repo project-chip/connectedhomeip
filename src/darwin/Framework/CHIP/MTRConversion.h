@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 
 #include <lib/core/Optional.h>
+#include <lib/support/TimeUtils.h>
 #include <type_traits>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -30,6 +31,11 @@ inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>:
 AsNumber(chip::Optional<T> optional)
 {
     return (optional.HasValue()) ? @(optional.Value()) : nil;
+}
+
+inline NSDate * ChipEpochSecondsAsDate(uint32_t chipEpochSeconds)
+{
+    return [NSDate dateWithTimeIntervalSince1970:(chip::kChipEpochSecondsSinceUnixEpoch + (NSTimeInterval) chipEpochSeconds)];
 }
 
 NS_ASSUME_NONNULL_END

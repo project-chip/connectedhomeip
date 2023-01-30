@@ -25,12 +25,12 @@ import javax.annotation.Nullable;
 
 public class ChipStructs {
   public static class ScenesClusterAttributeValuePair {
-    public Optional<Long> attributeId;
+    public Optional<Long> attributeID;
     public ArrayList<Object> attributeValue;
 
     public ScenesClusterAttributeValuePair(
-        Optional<Long> attributeId, ArrayList<Object> attributeValue) {
-      this.attributeId = attributeId;
+        Optional<Long> attributeID, ArrayList<Object> attributeValue) {
+      this.attributeID = attributeID;
       this.attributeValue = attributeValue;
     }
 
@@ -38,8 +38,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("ScenesClusterAttributeValuePair {\n");
-      output.append("\tattributeId: ");
-      output.append(attributeId);
+      output.append("\tattributeID: ");
+      output.append(attributeID);
       output.append("\n");
       output.append("\tattributeValue: ");
       output.append(attributeValue);
@@ -50,12 +50,12 @@ public class ChipStructs {
   }
 
   public static class ScenesClusterExtensionFieldSet {
-    public Long clusterId;
+    public Long clusterID;
     public ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList;
 
     public ScenesClusterExtensionFieldSet(
-        Long clusterId, ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList) {
-      this.clusterId = clusterId;
+        Long clusterID, ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList) {
+      this.clusterID = clusterID;
       this.attributeValueList = attributeValueList;
     }
 
@@ -63,8 +63,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("ScenesClusterExtensionFieldSet {\n");
-      output.append("\tclusterId: ");
-      output.append(clusterId);
+      output.append("\tclusterID: ");
+      output.append(clusterID);
       output.append("\n");
       output.append("\tattributeValueList: ");
       output.append(attributeValueList);
@@ -1478,11 +1478,11 @@ public class ChipStructs {
     }
   }
 
-  public static class MediaPlaybackClusterPlaybackPosition {
+  public static class MediaPlaybackClusterPlaybackPositionStruct {
     public Long updatedAt;
     public @Nullable Long position;
 
-    public MediaPlaybackClusterPlaybackPosition(Long updatedAt, @Nullable Long position) {
+    public MediaPlaybackClusterPlaybackPositionStruct(Long updatedAt, @Nullable Long position) {
       this.updatedAt = updatedAt;
       this.position = position;
     }
@@ -1490,7 +1490,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("MediaPlaybackClusterPlaybackPosition {\n");
+      output.append("MediaPlaybackClusterPlaybackPositionStruct {\n");
       output.append("\tupdatedAt: ");
       output.append(updatedAt);
       output.append("\n");
@@ -1755,36 +1755,38 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationLauncherClusterApplication {
-    public Integer catalogVendorId;
-    public String applicationId;
+  public static class ApplicationLauncherClusterApplicationStruct {
+    public Integer catalogVendorID;
+    public String applicationID;
 
-    public ApplicationLauncherClusterApplication(Integer catalogVendorId, String applicationId) {
-      this.catalogVendorId = catalogVendorId;
-      this.applicationId = applicationId;
+    public ApplicationLauncherClusterApplicationStruct(
+        Integer catalogVendorID, String applicationID) {
+      this.catalogVendorID = catalogVendorID;
+      this.applicationID = applicationID;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplication {\n");
-      output.append("\tcatalogVendorId: ");
-      output.append(catalogVendorId);
+      output.append("ApplicationLauncherClusterApplicationStruct {\n");
+      output.append("\tcatalogVendorID: ");
+      output.append(catalogVendorID);
       output.append("\n");
-      output.append("\tapplicationId: ");
-      output.append(applicationId);
+      output.append("\tapplicationID: ");
+      output.append(applicationID);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class ApplicationLauncherClusterApplicationEP {
-    public ChipStructs.ApplicationLauncherClusterApplication application;
+  public static class ApplicationLauncherClusterApplicationEPStruct {
+    public ChipStructs.ApplicationLauncherClusterApplicationStruct application;
     public Optional<Integer> endpoint;
 
-    public ApplicationLauncherClusterApplicationEP(
-        ChipStructs.ApplicationLauncherClusterApplication application, Optional<Integer> endpoint) {
+    public ApplicationLauncherClusterApplicationEPStruct(
+        ChipStructs.ApplicationLauncherClusterApplicationStruct application,
+        Optional<Integer> endpoint) {
       this.application = application;
       this.endpoint = endpoint;
     }
@@ -1792,7 +1794,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplicationEP {\n");
+      output.append("ApplicationLauncherClusterApplicationEPStruct {\n");
       output.append("\tapplication: ");
       output.append(application);
       output.append("\n");
@@ -1804,25 +1806,24 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationBasicClusterApplicationBasicApplication {
-    public Integer catalogVendorId;
-    public String applicationId;
+  public static class ApplicationBasicClusterApplicationStruct {
+    public Integer catalogVendorID;
+    public String applicationID;
 
-    public ApplicationBasicClusterApplicationBasicApplication(
-        Integer catalogVendorId, String applicationId) {
-      this.catalogVendorId = catalogVendorId;
-      this.applicationId = applicationId;
+    public ApplicationBasicClusterApplicationStruct(Integer catalogVendorID, String applicationID) {
+      this.catalogVendorID = catalogVendorID;
+      this.applicationID = applicationID;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationBasicClusterApplicationBasicApplication {\n");
-      output.append("\tcatalogVendorId: ");
-      output.append(catalogVendorId);
+      output.append("ApplicationBasicClusterApplicationStruct {\n");
+      output.append("\tcatalogVendorID: ");
+      output.append(catalogVendorID);
       output.append("\n");
-      output.append("\tapplicationId: ");
-      output.append(applicationId);
+      output.append("\tapplicationID: ");
+      output.append(applicationID);
       output.append("\n");
       output.append("}\n");
       return output.toString();

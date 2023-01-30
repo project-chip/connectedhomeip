@@ -28,7 +28,11 @@
 
 #include <platform/ConfigurationManager.h>
 
+#ifdef CHIP_OPEN_IOT_SDK_USE_TFM
+#include "tfm_platform_api.h"
+#else
 #include "cmsis.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,8 +49,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
 
+    KVStoreConfig::Init();
+
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<OpenIoTSDKConfig>::Init();
+    err = Internal::GenericConfigurationManagerImpl<KVStoreConfig>::Init();
     SuccessOrExit(err);
 
 exit:
@@ -65,7 +71,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset(void)
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    CHIP_ERROR err = ReadConfigValue(key, value);
+    CHIP_ERROR err = KVStoreConfig::ReadConfigValueCounter(key, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -75,73 +81,73 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    return OpenIoTSDKConfig::WriteCounter(key, value);
+    return KVStoreConfig::WriteConfigValueCounter(key, value);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
-    return OpenIoTSDKConfig::ReadConfigValue(key, val);
+    return KVStoreConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
-    return OpenIoTSDKConfig::ReadConfigValue(key, val);
+    return KVStoreConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
-    return OpenIoTSDKConfig::ReadConfigValue(key, val);
+    return KVStoreConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return OpenIoTSDKConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return KVStoreConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return OpenIoTSDKConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return KVStoreConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
-    return OpenIoTSDKConfig::WriteConfigValue(key, val);
+    return KVStoreConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
-    return OpenIoTSDKConfig::WriteConfigValue(key, val);
+    return KVStoreConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
-    return OpenIoTSDKConfig::WriteConfigValue(key, val);
+    return KVStoreConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
-    return OpenIoTSDKConfig::WriteConfigValueStr(key, str);
+    return KVStoreConfig::WriteConfigValueStr(key, str);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return OpenIoTSDKConfig::WriteConfigValueStr(key, str, strLen);
+    return KVStoreConfig::WriteConfigValueStr(key, str, strLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return OpenIoTSDKConfig::WriteConfigValueBin(key, data, dataLen);
+    return KVStoreConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
-    OpenIoTSDKConfig::RunConfigUnitTest();
+    KVStoreConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-    const CHIP_ERROR err = OpenIoTSDKConfig::FactoryResetConfig();
+    const CHIP_ERROR err = KVStoreConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
@@ -149,7 +155,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
+#ifdef CHIP_OPEN_IOT_SDK_USE_TFM
+    tfm_platform_system_reset();
+#else
+    __disable_irq();
     NVIC_SystemReset();
+#endif
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

@@ -26,6 +26,8 @@
 
 #include <stdint.h>
 
+#include <ois/OpenIoTSDKConfig.h>
+
 // ==================== General Platform Adaptations ====================
 
 #define CHIP_CONFIG_EXPECTED_LOW_PROCESSING_TIME 10

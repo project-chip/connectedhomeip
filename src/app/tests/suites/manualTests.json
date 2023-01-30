@@ -227,17 +227,17 @@
         "Test_TC_SC_4_8",
         "Test_TC_SC_4_9",
         "Test_TC_SC_4_10",
-        "Test_TC_SC_5_1",
-        "Test_TC_SC_5_2",
         "Test_TC_SC_5_3",
         "Test_TC_SC_6_1"
     ],
     "SoftwareDiagnostics": [
         "Test_TC_DGSW_2_1",
         "Test_TC_DGSW_2_2",
-        "Test_TC_DGSW_2_3"
+        "Test_TC_DGSW_2_3",
+        "Test_TC_DGSW_3_2"
     ],
-    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
+    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_3_2"],
+    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2", "Test_TC_DGWIFI_3_2"],
     "WindowCovering": ["Test_TC_WNCV_6_1", "Test_TC_WNCV_7_1"],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "OccupancySensing": ["Test_TC_OCC_3_1"],
@@ -282,11 +282,7 @@
         "Test_TC_DGTHREAD_3_5"
     ],
     "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
-    "TimeFormatLocalization": [
-        "Test_TC_LTIME_1_1",
-        "Test_TC_LTIME_2_1",
-        "Test_TC_LTIME_3_1"
-    ],
+    "TimeFormatLocalization": ["Test_TC_LTIME_2_1", "Test_TC_LTIME_3_1"],
     "UnitLocalization": [],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
@@ -297,18 +293,13 @@
         "Test_TC_S_3_1"
     ],
     "PumpConfigurationControl": ["Test_TC_PCC_3_1"],
-    "AccessControl": [
-        "Test_TC_ACL_2_5",
-        "Test_TC_ACL_2_6",
-        "Test_TC_ACL_2_8",
-        "Test_TC_ACL_2_10"
-    ],
+    "AccessControl": ["Test_TC_ACL_2_5", "Test_TC_ACL_2_6"],
     "UserLabel": [],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"
     ],
-    "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_2"],
+    "AccessControlEnforcement": ["Test_TC_ACE_1_2"],
     "collection": [
         "DeviceDiscovery",
         "Groups",
@@ -318,6 +309,7 @@
         "DeviceManagement",
         "DiagnosticsLogs",
         "Descriptor",
+        "EthernetNetworkDiagnostics",
         "GeneralCommissioning",
         "GeneralDiagnostics",
         "Identify",

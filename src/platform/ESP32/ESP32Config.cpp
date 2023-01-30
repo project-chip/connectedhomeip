@@ -339,7 +339,7 @@ CHIP_ERROR ESP32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
         // Commit the value to the persistent store.
         ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", StringOrNullMarker(key.Namespace),
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %u)", StringOrNullMarker(key.Namespace),
                         StringOrNullMarker(key.Name), dataLen);
         return CHIP_NO_ERROR;
     }

@@ -20,47 +20,141 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Groups"
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
+    endpoint: 1
 
 tests:
-    - label: "Precondition"
-      verification: |
-          DUT and TH are commissioned.
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-          DUT and TH are part of a common group.- Run TC-SC-5.1 to establish this precondition
+    - label: "TH adds ACL Operate privileges for Group 0x0103"
+      cluster: "Access Control"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [0x0103],
+                      Targets: null,
+                  },
+              ]
 
-          DUT supports the Identify cluster
-      disabled: true
+    - label: "TH sends KeySetWrite command with TH key"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "0xd0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "0xd1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "0xd2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 2220002,
+                    }
 
-    - label: "TH writes ACL entry by setting AuthMode as Group to DUT"
-      verification: |
-          As this step is executed in the TC-SC-5.1, we can skip this step during execution.
-      disabled: true
+    - label: "TH binds GroupId to GroupKeySet"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
 
-    - label:
-          "TH sends a multicast Identify command with the IdentifyTime set to
-          0x0078 (120s) to DUT with GroupID and PIXIT.G.ENDPOINT"
-      PICS: I.S.C00.Rsp
-      verification: |
-          ./chip-tool identify identify 0x0078 0xffffffffffff0001 1
+    - label: "TH sends RemoveAllGroups command"
+      command: "RemoveAllGroups"
 
-          Verify Identify command on the TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+    - label: "TH sends AddGroup command"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: "Test Group"
 
+    - label: "TH sends ViewGroup command using group messaging"
+      PICS: G.S.F00
+      command: "ViewGroup"
+      groupId: 0x0103
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: "Test Group"
 
-          [1657785273.973231][1618:1623] CHIP:DL: HandlePlatformSpecificBLEEvent 32784[1657785273.973291][1618:1623] CHIP:TOO: Sending command to group 0x1
-          [1657785273.973316][1618:1623] CHIP:TOO: Sending cluster (0x00000003) command (0x00000000) on Group 1
-      disabled: true
+    - label: "TH sends ViewGroup command using group messaging"
+      PICS: "!(G.S.F00)"
+      command: "ViewGroup"
+      groupId: 0x0103
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: ""
 
-    - label:
-          "TH reads immediately IdentifyTime attribute from DUT on the
-          PIXIT.G.ENDPOINT set by DUT"
-      PICS: I.S.A0000
-      verification: |
-          ./chip-tool identify read identify-time 1 1
+    - label: "TH removes the GroupKeySet"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a3
 
-          Verify  Identify time is approximately equal to 0x0078 (120s),on the TH(chip-tool)  Log and below is the sample log provided for the raspi platform:
+    - label: "TH cleans up groups using RemoveAllGroups command"
+      command: "RemoveAllGroups"
 
-          [1657785288.647504][1624:1629] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1130139861
-          [1657785288.647621][1624:1629] CHIP:TOO:   identify time: 120
-      disabled: true
+    - label: "TH removes ACL Operate privileges for Group 0x0103"
+      cluster: "Access Control"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+              ]

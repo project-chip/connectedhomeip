@@ -108,9 +108,9 @@
     return self;
 }
 
-- (void)initApp:(AppParameters * _Nullable)appParameters
-             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-    initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler
+- (MatterError *)initializeApp:(AppParameters * _Nullable)appParameters
+                   clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+          initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().initApp() called");
 
@@ -128,7 +128,7 @@
         err = [ConversionUtils convertToCppAppParamsInfoFrom:_appParameters outAppParams:cppAppParams];
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "AppParameters conversion failed: %s", ErrorStr(err));
-            return;
+            return [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]];
         }
 
         // set fields in commissionableDataProvider
@@ -156,7 +156,7 @@
             setupDiscriminator);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "Failed to initialize CommissionableDataProvider: %s", ErrorStr(err));
-            return;
+            return [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]];
         }
 
         if (_appParameters.deviceAttestationCredentials != nil) {
@@ -219,13 +219,24 @@
     err = _serverInitParams->InitializeStaticResourcesBeforeServerInit();
     if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "InitializeStaticResourcesBeforeServerInit failed: %s", ErrorStr(err));
-        return;
+        return [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]];
+    }
+
+    AppParams appParam;
+    if (appParameters == nil) {
+        err = CastingServer::GetInstance()->PreInit();
+    } else if ((err = [ConversionUtils convertToCppAppParamsInfoFrom:appParameters outAppParams:appParam]) == CHIP_NO_ERROR) {
+        err = CastingServer::GetInstance()->PreInit(&appParam);
+    }
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "CastingServer PreInit failed: %s", ErrorStr(err));
+        return [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]];
     }
 
     err = chip::Server::GetInstance().Init(*_serverInitParams);
     if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
-        return;
+        return [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]];
     }
 
     _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
@@ -251,6 +262,9 @@
             initAppStatusHandler(initAppStatus);
         });
     });
+
+    return [[MatterError alloc] initWithCode:CHIP_NO_ERROR.AsInteger()
+                                     message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]];
 }
 
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
@@ -520,6 +534,17 @@
         CHIP_ERROR err = chip::Server::GetInstance().Init(*self->_serverInitParams);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
+            dispatch_async(clientQueue, ^{
+                startMatterServerCompletionCallback(
+                    [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
+            });
+            return;
+        }
+
+        // Initialize binding handlers
+        err = CastingServer::GetInstance()->InitBindingHandlers();
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "Binding init failed: %s", ErrorStr(err));
             dispatch_async(clientQueue, ^{
                 startMatterServerCompletionCallback(
                     [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
@@ -1493,9 +1518,9 @@
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_launchApp"];
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId = catalogVendorId;
-    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID = catalogVendorId;
+    application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
     dispatch_async(_chipWorkQueue, ^{
         TargetEndpointInfo endpoint;
@@ -1525,9 +1550,9 @@
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_stopApp"];
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId = catalogVendorId;
-    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID = catalogVendorId;
+    application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
     dispatch_async(_chipWorkQueue, ^{
         TargetEndpointInfo endpoint;
@@ -1556,9 +1581,9 @@
 
     [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_hideApp"];
 
-    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
-    application.catalogVendorId = catalogVendorId;
-    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
+    application.catalogVendorID = catalogVendorId;
+    application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
     dispatch_async(_chipWorkQueue, ^{
         TargetEndpointInfo endpoint;
@@ -2156,4 +2181,74 @@
     });
 }
 
+- (void)onOff_on:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().onOff_on() called on Content App with endpoint ID %d", contentApp.endpointId);
+
+    [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_on"];
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->OnOff_On(&endpoint, [](CHIP_ERROR err) {
+            void (^responseCallback)(bool) =
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_on"];
+            responseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)onOff_off:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(
+        AppServer, "CastingServerBridge().onOff_off() called on Content App with endpoint ID %d", contentApp.endpointId);
+
+    [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_off"];
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->OnOff_Off(&endpoint, [](CHIP_ERROR err) {
+            void (^responseCallback)(bool) =
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_off"];
+            responseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)onOff_toggle:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(
+        AppServer, "CastingServerBridge().onOff_toggle() called on Content App with endpoint ID %d", contentApp.endpointId);
+
+    [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_toggle"];
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->OnOff_Toggle(&endpoint, [](CHIP_ERROR err) {
+            void (^responseCallback)(bool) =
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_toggle"];
+            responseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
 @end

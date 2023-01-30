@@ -1,0 +1,121 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.2. [TC-DGWIFI-3.2]Command Generated [DUT as Client]
+
+PICS:
+    - DGWIFI.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Commission TH to DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT sends ResetCounts command to TH"
+      PICS: DGWIFI.S.C00.Rsp
+      verification: |
+          ./chip-tool wifinetworkdiagnostics reset-counts 1 0
+
+          verify the " success response" for ResetCounts command on the TH (all-cluster-app) log:
+
+          [1666959400.011236][6130:6130] CHIP:EM: Handling via exchange: 33250r, Delegate: 0xaaaad6e20288
+          [1666959400.011383][6130:6130] CHIP:DMG: InvokeRequestMessage =
+          [1666959400.011452][6130:6130] CHIP:DMG: {
+          [1666959400.011511][6130:6130] CHIP:DMG:         suppressResponse = false,
+          [1666959400.011579][6130:6130] CHIP:DMG:         timedRequest = false,
+          [1666959400.011641][6130:6130] CHIP:DMG:         InvokeRequests =
+          [1666959400.011720][6130:6130] CHIP:DMG:         [
+          [1666959400.011783][6130:6130] CHIP:DMG:                 CommandDataIB =
+          [1666959400.011853][6130:6130] CHIP:DMG:                 {
+          [1666959400.011984][6130:6130] CHIP:DMG:                         CommandPathIB =
+          [1666959400.012114][6130:6130] CHIP:DMG:                         {
+          [1666959400.012196][6130:6130] CHIP:DMG:                                 EndpointId = 0x0,
+          [1666959400.012334][6130:6130] CHIP:DMG:                                 ClusterId = 0x36,
+          [1666959400.012471][6130:6130] CHIP:DMG:                                 CommandId = 0x0,
+          [1666959400.012601][6130:6130] CHIP:DMG:                         },
+          [1666959400.012739][6130:6130] CHIP:DMG:
+          [1666959400.012810][6130:6130] CHIP:DMG:                         CommandFields =
+          [1666959400.012938][6130:6130] CHIP:DMG:                         {
+          [1666959400.013016][6130:6130] CHIP:DMG:                         },
+          [1666959400.013134][6130:6130] CHIP:DMG:                 },
+          [1666959400.013215][6130:6130] CHIP:DMG:
+          [1666959400.013277][6130:6130] CHIP:DMG:         ],
+          [1666959400.013353][6130:6130] CHIP:DMG:
+          [1666959400.013416][6130:6130] CHIP:DMG:         InteractionModelRevision = 1
+          [1666959400.013476][6130:6130] CHIP:DMG: },
+          [1666959400.013621][6130:6130] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0036 e=0 p=o
+          [1666959400.013704][6130:6130] CHIP:DMG: AccessControl: allowed
+          [1666959400.013774][6130:6130] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0036 Command=0x0000_0000
+          [1666959400.018281][6130:6130] CHIP:DL: Found the primary WiFi interface:wlan0
+          [1666959400.018419][6130:6130] CHIP:DMG: Command handler moving to [ Preparing]
+          [1666959400.018494][6130:6130] CHIP:DMG: Command handler moving to [AddingComm]
+          [1666959400.018562][6130:6130] CHIP:DMG: Command handler moving to [AddedComma]
+          [1666959400.018675][6130:6130] CHIP:DMG: Decreasing reference count for CommandHandler, remaining 0
+          [1666959400.019314][6130:6130] CHIP:EM: <<< [E:33250r M:63255960 (Ack:74829349)] (S) Msg TX to 1:000000000001B669 [C7F7] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1666959400.019427][6130:6130] CHIP:IN: (S) Sending msg 63255960 on secure session with LSID: 44736
+          [1666959400.020094][6130:6130] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0e:be37%eth0]:38143 | 63255960 | [Interaction Model  (1) / InvokeCommandResponse (0x09) / Session = 63986 / Exchange = 33250]
+          [1666959400.020191][6130:6130] CHIP:DMG: Header Flags =
+          [1666959400.020249][6130:6130] CHIP:DMG: {
+          [1666959400.020335][6130:6130] CHIP:DMG:     Exchange (0x06) =
+          [1666959400.020391][6130:6130] CHIP:DMG:     {
+          [1666959400.020451][6130:6130] CHIP:DMG:         AckMsg = 74829349
+          [1666959400.020507][6130:6130] CHIP:DMG:         NeedsAck = true
+          [1666959400.020574][6130:6130] CHIP:DMG:     }
+          [1666959400.020643][6130:6130] CHIP:DMG: }
+          [1666959400.020699][6130:6130] CHIP:DMG:
+          [1666959400.020767][6130:6130] CHIP:DMG: Encrypted Payload (67 bytes) =
+          [1666959400.020823][6130:6130] CHIP:DMG: {
+          [1666959400.020878][6130:6130] CHIP:DMG:     data = 00f2f9009835c50387f400a6ef13a28b3b46eb5a99745448df633531de072463f12d56a3f096824b82a3a409c494841c55a558a7ee3c8e94775c4495b700db3bc9f22a
+          [1666959400.020937][6130:6130] CHIP:DMG:     buffer_ptr = 187651201115584
+          [1666959400.020992][6130:6130] CHIP:DMG: }
+          [1666959400.021044][6130:6130] CHIP:DMG:
+          [1666959400.021196][6130:6130] CHIP:DMG: InvokeResponseMessage =
+          [1666959400.021264][6130:6130] CHIP:DMG: {
+          [1666959400.021323][6130:6130] CHIP:DMG:         suppressResponse = false,
+          [1666959400.021385][6130:6130] CHIP:DMG:         InvokeResponseIBs =
+          [1666959400.021463][6130:6130] CHIP:DMG:         [
+          [1666959400.021525][6130:6130] CHIP:DMG:                 InvokeResponseIB =
+          [1666959400.021769][6130:6130] CHIP:DMG:                 {
+          [1666959400.021841][6130:6130] CHIP:DMG:                         CommandStatusIB =
+          [1666959400.021930][6130:6130] CHIP:DMG:                         {
+          [1666959400.022009][6130:6130] CHIP:DMG:                                 CommandPathIB =
+          [1666959400.022091][6130:6130] CHIP:DMG:                                 {
+          [1666959400.022179][6130:6130] CHIP:DMG:                                         EndpointId = 0x0,
+          [1666959400.022270][6130:6130] CHIP:DMG:                                         ClusterId = 0x36,
+          [1666959400.022358][6130:6130] CHIP:DMG:                                         CommandId = 0x0,
+          [1666959400.022442][6130:6130] CHIP:DMG:                                 },
+          [1666959400.022535][6130:6130] CHIP:DMG:
+          [1666959400.022612][6130:6130] CHIP:DMG:                                 StatusIB =
+          [1666959400.022697][6130:6130] CHIP:DMG:                                 {
+          [1666959400.022843][6130:6130] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1666959400.022930][6130:6130] CHIP:DMG:                                 },
+          [1666959400.023016][6130:6130] CHIP:DMG:
+          [1666959400.023091][6130:6130] CHIP:DMG:                         },
+          [1666959400.023185][6130:6130] CHIP:DMG:
+          [1666959400.023256][6130:6130] CHIP:DMG:                 },
+          [1666959400.023338][6130:6130] CHIP:DMG:
+          [1666959400.023400][6130:6130] CHIP:DMG:         ],
+      disabled: true

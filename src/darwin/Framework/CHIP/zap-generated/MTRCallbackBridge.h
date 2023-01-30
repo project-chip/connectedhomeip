@@ -996,7 +996,8 @@ typedef void (*TargetNavigatorAcceptedCommandListListAttributeCallback)(
 typedef void (*TargetNavigatorAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*MediaPlaybackSampledPositionStructAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &);
+    void *,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType> &);
 typedef void (*MediaPlaybackGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*MediaPlaybackAcceptedCommandListListAttributeCallback)(
@@ -1045,7 +1046,7 @@ typedef void (*ApplicationLauncherCatalogListListAttributeCallback)(void * conte
                                                                     const chip::app::DataModel::DecodableList<uint16_t> & data);
 typedef void (*ApplicationLauncherCurrentAppStructAttributeCallback)(
     void *,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &);
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> &);
 typedef void (*ApplicationLauncherGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ApplicationLauncherAcceptedCommandListListAttributeCallback)(
@@ -1053,7 +1054,7 @@ typedef void (*ApplicationLauncherAcceptedCommandListListAttributeCallback)(
 typedef void (*ApplicationLauncherAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ApplicationBasicApplicationStructAttributeCallback)(
-    void *, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &);
+    void *, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType &);
 typedef void (*ApplicationBasicAllowedVendorListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & data);
 typedef void (*ApplicationBasicGeneratedCommandListListAttributeCallback)(
@@ -9001,7 +9002,8 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value);
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType> &
+            value);
 };
 
 class MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge
@@ -9753,10 +9755,9 @@ public:
                                                                   MTRActionBlock action) :
         MTRCallbackBridge<ApplicationLauncherCurrentAppStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<
+                                chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> & value);
 };
 
 class MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge
@@ -9888,9 +9889,8 @@ public:
                                                                 MTRActionBlock action) :
         MTRCallbackBridge<ApplicationBasicApplicationStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType & value);
 };
 
 class MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge

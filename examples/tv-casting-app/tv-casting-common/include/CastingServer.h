@@ -53,7 +53,9 @@ public:
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
+    CHIP_ERROR PreInit(AppParams * AppParams = nullptr);
     CHIP_ERROR Init(AppParams * AppParams = nullptr);
+    CHIP_ERROR InitBindingHandlers();
 
     CHIP_ERROR DiscoverCommissioners();
     const chip::Dnssd::DiscoveredNodeData *
@@ -246,13 +248,13 @@ public:
      * @brief Application Launcher cluster
      */
     CHIP_ERROR ApplicationLauncher_LaunchApp(TargetEndpointInfo * endpoint,
-                                             chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                             chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                              chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_StopApp(TargetEndpointInfo * endpoint,
-                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_HideApp(TargetEndpointInfo * endpoint,
-                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback);
 
     CHIP_ERROR
@@ -418,7 +420,8 @@ private:
     static CastingServer * castingServer_;
     CastingServer();
 
-    CHIP_ERROR InitBindingHandlers();
+    CHIP_ERROR SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteSpan> rotatingDeviceIdUniqueId);
+
     static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void ReadServerClusters(chip::EndpointId endpointId);
 

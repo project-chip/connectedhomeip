@@ -4,8 +4,5 @@ cd "{root}"
 # Generating openiotsdk-lock
 cmake -GNinja -S {root}/examples/lock-app/openiotsdk -B {out}/openiotsdk-lock --toolchain=toolchains/toolchain-arm-none-eabi-gcc.cmake -DCMAKE_SYSTEM_PROCESSOR=cortex-m55
 
-# Remove old artifacts openiotsdk-lock
-bash -c 'rm -rf {out}/openiotsdk-lock/chip-*'
-
 # Building openiotsdk-lock
 cmake --build {out}/openiotsdk-lock

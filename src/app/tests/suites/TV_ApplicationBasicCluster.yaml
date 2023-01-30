@@ -64,7 +64,7 @@ tests:
       command: "readAttribute"
       attribute: "Application"
       response:
-          value: { catalogVendorId: 123, applicationId: "applicationId" }
+          value: { CatalogVendorID: 123, ApplicationID: "applicationId" }
 
     # TODO(#14054): Support chars validation
     - label: "Read attribute application version"

@@ -49,9 +49,6 @@ limitations under the License.
     <item name="DecrementHue" value="0x00"/>
     <item name="IncrementHue" value="0x01"/>
   </enum>
-  <clusterExtension code="0x0000">
-    <attribute side="server" code="0x4000" define="SW_BUILD_ID" type="CHAR_STRING" length="16" writable="false" default="" optional="true" introducedIn="zll-1.0-11-0037-10">sw build id</attribute>
-  </clusterExtension>
   <clusterExtension code="0x0300">
     <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">EnhancedCurrentHue</attribute>
     <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="ENUM8" min="0x00" max="0xFF" writable="false" default="0x01">EnhancedColorMode</attribute>

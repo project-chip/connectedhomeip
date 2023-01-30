@@ -34,7 +34,7 @@ tests:
     - label: "TH reads Channel attribute value from DUT"
       PICS: DGTHREAD.S.A0000
       command: "readAttribute"
-      attribute: "channel"
+      attribute: "Channel"
       response:
           constraints:
               type: int16u
@@ -297,7 +297,7 @@ tests:
     - label: "TH reads Weighting attribute value from DUT"
       PICS: DGTHREAD.S.A000a
       command: "readAttribute"
-      attribute: "weighting"
+      attribute: "Weighting"
       response:
           constraints:
               type: int8u

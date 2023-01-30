@@ -102,17 +102,21 @@ server cluster Groups = 4 {
 }
 
 server cluster Scenes = 5 {
+  bitmap SceneFeatures : BITMAP32 {
+    kSceneNames = 0x1;
+  }
+
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
   }
 
   struct ExtensionFieldSet {
-    cluster_id clusterId = 0;
+    cluster_id clusterID = 0;
     AttributeValuePair attributeValueList[] = 1;
   }
 
   struct AttributeValuePair {
-    optional attrib_id attributeId = 0;
+    optional attrib_id attributeID = 0;
     int8u attributeValue[] = 1;
   }
 
@@ -125,52 +129,52 @@ server cluster Scenes = 5 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
     INT16U transitionTime = 2;
     CHAR_STRING sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
 
   request struct ViewSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RemoveSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RemoveAllScenesRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct StoreSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RecallSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
     optional nullable INT16U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
     optional CHAR_STRING sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
@@ -178,25 +182,25 @@ server cluster Scenes = 5 {
 
   response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
     nullable INT8U capacity = 1;
-    group_id groupId = 2;
+    group_id groupID = 2;
     optional INT8U sceneList[] = 3;
   }
 
@@ -237,10 +241,6 @@ client cluster OnOff = 6 {
 
   bitmap OnOffFeature : BITMAP32 {
     kLighting = 0x1;
-  }
-
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -298,10 +298,6 @@ server cluster OnOff = 6 {
 
   bitmap OnOffFeature : BITMAP32 {
     kLighting = 0x1;
-  }
-
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -574,6 +570,34 @@ server cluster LocalizationConfiguration = 43 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+server cluster TimeFormatLocalization = 44 {
+  enum CalendarType : ENUM8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+  }
+
+  enum HourFormat : ENUM8 {
+    k12hr = 0;
+    k24hr = 1;
+  }
+
+  attribute HourFormat hourFormat = 0;
+  attribute CalendarType activeCalendarType = 1;
+  readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 client cluster UnitLocalization = 45 {
   enum TempUnit : ENUM8 {
     kFahrenheit = 0;
@@ -614,7 +638,7 @@ server cluster PowerSourceConfiguration = 46 {
 
 server cluster PowerSource = 47 {
   enum BatChargeFault : ENUM8 {
-    kUnspecfied = 0;
+    kUnspecified = 0;
     kAmbientTooHot = 1;
     kAmbientTooCold = 2;
     kBatteryTooHot = 3;
@@ -654,7 +678,7 @@ server cluster PowerSource = 47 {
   }
 
   enum PowerSourceStatus : ENUM8 {
-    kUnspecfied = 0;
+    kUnspecified = 0;
     kActive = 1;
     kStandby = 2;
     kUnavailable = 3;
@@ -1131,6 +1155,11 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kAx = 5;
   }
 
+  bitmap WiFiNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+  }
+
   info event Disconnection = 0 {
     INT16U reasonCode = 0;
   }
@@ -1175,6 +1204,11 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate100G = 7;
     kRate200G = 8;
     kRate400G = 9;
+  }
+
+  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
   }
 
   readonly attribute nullable PHYRateEnum PHYRate = 0;
@@ -1862,9 +1896,9 @@ server cluster PumpConfigurationAndControl = 512 {
 
 server cluster Thermostat = 513 {
   enum SetpointAdjustMode : ENUM8 {
-    kHeatSetpoint = 0;
-    kCoolSetpoint = 1;
-    kHeatAndCoolSetpoints = 2;
+    kHeat = 0;
+    kCool = 1;
+    kBoth = 2;
   }
 
   enum ThermostatControlSequence : ENUM8 {
@@ -1887,9 +1921,11 @@ server cluster Thermostat = 513 {
     kAuto = 1;
     kCool = 3;
     kHeat = 4;
-    kEmergencyHeating = 5;
+    kEmergencyHeat = 5;
     kPrecooling = 6;
     kFanOnly = 7;
+    kDry = 8;
+    kSleep = 9;
   }
 
   bitmap DayOfWeek : BITMAP8 {
@@ -1900,21 +1936,21 @@ server cluster Thermostat = 513 {
     kThursday = 0x10;
     kFriday = 0x20;
     kSaturday = 0x40;
-    kAwayOrVacation = 0x80;
+    kAway = 0x80;
   }
 
   bitmap ModeForSequence : BITMAP8 {
-    kHeatSetpointFieldPresent = 0x1;
-    kCoolSetpointFieldPresent = 0x2;
+    kHeatSetpointPresent = 0x1;
+    kCoolSetpointPresent = 0x2;
   }
 
   bitmap ThermostatFeature : BITMAP32 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
-    kSchedule = 0x8;
+    kScheduleConfiguration = 0x8;
     kSetback = 0x10;
-    kAutomode = 0x20;
+    kAutoMode = 0x20;
   }
 
   struct ThermostatScheduleTransition {
@@ -2692,16 +2728,16 @@ client cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  struct ApplicationBasicApplication {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
+  struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
   }
 
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
-  readonly attribute ApplicationBasicApplication application = 4;
+  readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
@@ -2720,16 +2756,16 @@ server cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  struct ApplicationBasicApplication {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
+  struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
   }
 
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
-  readonly attribute ApplicationBasicApplication application = 4;
+  readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
@@ -2803,6 +2839,14 @@ endpoint 0 {
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    callback attribute hourFormat;
+    callback attribute activeCalendarType;
+    callback attribute supportedCalendarTypes;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

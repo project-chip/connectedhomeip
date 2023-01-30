@@ -47,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.34
+            image: connectedhomeip/chip-build:0.6.35
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -136,10 +136,12 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
+                      src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-input-cluster.xml \
@@ -173,11 +175,12 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
                       src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
+                      src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/silabs/general.xml \
                       src/app/zap-templates/zcl/data-model/silabs/ha-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/ha.xml \
                       src/app/zap-templates/zcl/data-model/silabs/lo-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/types.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/types-silabs.xml \
                       src/app/zap-templates/zcl/data-model/silabs/zll-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/zll.xml \
                     "
@@ -214,11 +217,10 @@ jobs:
                      --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
             - name: Run Tests using chip-repl
-              timeout-minutes: 5
+              timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
-                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --run-yamltests-with-chip-repl \
                      run \
                      --iterations 1 \
@@ -260,10 +262,6 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
-            # NOTE: Generally kept in sync within the repo using
-            #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.19-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -297,15 +295,6 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
-            - name: Install zap
-              run: |
-                 sudo mkdir -p $ZAP_INSTALL_PATH
-                 sudo chown `whoami` $ZAP_INSTALL_PATH
-                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
-                      --output $ZAP_INSTALL_PATH/zap-mac.zip
-                 cd $ZAP_INSTALL_PATH
-                 unzip zap-mac.zip zap-cli
-                 rm zap-mac.zip
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -383,7 +372,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.34
+            image: connectedhomeip/chip-build:0.6.35
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -428,6 +417,7 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_SC_3_6.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_DA_1_7.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --bool-arg allow_sdk_dac:true"'
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1 --enable-key 000102030405060708090a0b0c0d0e0f" --script "src/python_testing/TC_TestEventTrigger.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --bool-arg allow_sdk_dac:true"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_ACE_1_4.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --int-arg PIXIT.ACE.APPENDPOINT:1 PIXIT.ACE.APPDEVTYPEID:0x0100 --string-arg PIXIT.ACE.APPCLUSTER:OnOff PIXIT.ACE.APPATTRIBUTE:OnOff"'
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_ACE_1_3.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
             - name: Uploading core files
               uses: actions/upload-artifact@v3
@@ -458,7 +448,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.34
+            image: connectedhomeip/chip-build:0.6.35
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -545,10 +535,6 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
-            # NOTE: Generally kept in sync within the repo using
-            #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.19-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
 
         if: github.actor != 'restyled-io[bot]' && false
         runs-on: macos-latest
@@ -576,15 +562,6 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
-            - name: Install zap
-              run: |
-                 sudo mkdir -p $ZAP_INSTALL_PATH
-                 sudo chown `whoami` $ZAP_INSTALL_PATH
-                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
-                      --output $ZAP_INSTALL_PATH/zap-mac.zip
-                 cd $ZAP_INSTALL_PATH
-                 unzip zap-mac.zip zap-cli
-                 rm zap-mac.zip
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh

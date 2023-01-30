@@ -29,6 +29,11 @@ limitations under the License.
     <item name="Rate200G" value="0x08"/>
     <item name="Rate400G" value="0x09"/>                
   </enum>
+  <bitmap name="EthernetNetworkDiagnosticsFeature" type="BITMAP32">
+    <cluster code="0x0037"/>
+    <field name="PacketCounts" mask="0x1"/>
+    <field name="ErrorCounts" mask="0x2"/>
+  </bitmap>  
   <cluster>
     <domain>General</domain>
     <name>Ethernet Network Diagnostics</name>
@@ -48,8 +53,4 @@ limitations under the License.
       <description>Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0</description>
     </command>           
   </cluster>
-  <bitmap name="EthernetNetworkDiagnosticsFeature" type="BITMAP32">
-    <field name="PacketCounts" mask="0x1"/>
-    <field name="ErrorCounts" mask="0x2"/>
-  </bitmap>  
 </configurator>

@@ -41,7 +41,7 @@ public:
     CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class StopPlaybackCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type,
+class StopPlaybackCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Stop::Type,
                                                     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
 public:

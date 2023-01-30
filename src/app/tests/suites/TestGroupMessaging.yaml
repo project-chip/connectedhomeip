@@ -149,14 +149,14 @@ tests:
     # Test Pair 1 : Check initial value (ensure it's not the test value)
     - label: "Read initial Attribute value"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: ""
 
     # Test Pair 2 : Sends a Group Write Attribute
     - label: "Group Write Attribute"
       command: "writeAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       groupId: 0x0102
       arguments:
           value: "xyzzy"
@@ -174,14 +174,14 @@ tests:
       # Test Pair 2 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: "xyzzy"
 
     # Test Pair 3 : Sends a Group Write Attribute
     - label: "Restore initial Attribute value"
       command: "writeAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       groupId: 0x0102
       arguments:
           value: ""
@@ -199,7 +199,7 @@ tests:
     # Test Pair 3 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: ""
 
@@ -405,7 +405,7 @@ tests:
     - label: "Read initial Attribute value for gamma"
       identity: "gamma"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: ""
 
@@ -413,7 +413,7 @@ tests:
     - label: "Group Write Attribute for gamma"
       identity: "gamma"
       command: "writeAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       groupId: 0x0102
       arguments:
           value: "xyzzy"
@@ -433,7 +433,7 @@ tests:
     - label: "Read back Attribute for gamma"
       identity: "gamma"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: "xyzzy"
 
@@ -441,7 +441,7 @@ tests:
     - label: "Restore initial Attribute value for gamma"
       identity: "gamma"
       command: "writeAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       groupId: 0x0102
       arguments:
           value: ""
@@ -461,7 +461,7 @@ tests:
     - label: "Read back Attribute for gamma"
       identity: "gamma"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: ""
 

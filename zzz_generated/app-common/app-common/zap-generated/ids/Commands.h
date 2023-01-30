@@ -904,9 +904,9 @@ namespace Pause {
 static constexpr CommandId Id = 0x00000001;
 } // namespace Pause
 
-namespace StopPlayback {
+namespace Stop {
 static constexpr CommandId Id = 0x00000002;
-} // namespace StopPlayback
+} // namespace Stop
 
 namespace StartOver {
 static constexpr CommandId Id = 0x00000003;

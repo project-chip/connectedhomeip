@@ -102,17 +102,21 @@ server cluster Groups = 4 {
 }
 
 server cluster Scenes = 5 {
+  bitmap SceneFeatures : BITMAP32 {
+    kSceneNames = 0x1;
+  }
+
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
   }
 
   struct ExtensionFieldSet {
-    cluster_id clusterId = 0;
+    cluster_id clusterID = 0;
     AttributeValuePair attributeValueList[] = 1;
   }
 
   struct AttributeValuePair {
-    optional attrib_id attributeId = 0;
+    optional attrib_id attributeID = 0;
     int8u attributeValue[] = 1;
   }
 
@@ -125,52 +129,52 @@ server cluster Scenes = 5 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
     INT16U transitionTime = 2;
     CHAR_STRING sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
 
   request struct ViewSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RemoveSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RemoveAllScenesRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct StoreSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
   }
 
   request struct RecallSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
+    group_id groupID = 0;
+    INT8U sceneID = 1;
     optional nullable INT16U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
     optional CHAR_STRING sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
@@ -178,25 +182,25 @@ server cluster Scenes = 5 {
 
   response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
   }
 
   response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
     nullable INT8U capacity = 1;
-    group_id groupId = 2;
+    group_id groupID = 2;
     optional INT8U sceneList[] = 3;
   }
 
@@ -237,10 +241,6 @@ client cluster OnOff = 6 {
 
   bitmap OnOffFeature : BITMAP32 {
     kLighting = 0x1;
-  }
-
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -284,10 +284,6 @@ server cluster OnOff = 6 {
 
   bitmap OnOffFeature : BITMAP32 {
     kLighting = 0x1;
-  }
-
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -1326,6 +1322,11 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kAx = 5;
   }
 
+  bitmap WiFiNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+  }
+
   info event Disconnection = 0 {
     INT16U reasonCode = 0;
   }
@@ -1368,6 +1369,11 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate100G = 7;
     kRate200G = 8;
     kRate400G = 9;
+  }
+
+  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
   }
 
   readonly attribute nullable PHYRateEnum PHYRate = 0;
@@ -1785,7 +1791,7 @@ client cluster MediaPlayback = 1286 {
 
   command Play(): PlaybackResponse = 0;
   command Pause(): PlaybackResponse = 1;
-  command StopPlayback(): PlaybackResponse = 2;
+  command Stop(): PlaybackResponse = 2;
   command StartOver(): PlaybackResponse = 3;
   command Previous(): PlaybackResponse = 4;
   command Next(): PlaybackResponse = 5;
@@ -2094,25 +2100,25 @@ client cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  struct Application {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
+  struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
   }
 
   readonly attribute INT16U catalogList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
     optional OCTET_STRING data = 1;
   }
 
   request struct StopAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   request struct HideAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;

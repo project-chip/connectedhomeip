@@ -45,7 +45,7 @@ tests:
           value: 0
 
     - label: "Navigate Target Request Command"
-      command: "navigateTarget"
+      command: "NavigateTarget"
       arguments:
           values:
               - name: "Target"

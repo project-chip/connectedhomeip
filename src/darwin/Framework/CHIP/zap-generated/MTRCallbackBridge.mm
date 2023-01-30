@@ -8975,13 +8975,14 @@ void MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType> &
+        value)
 {
-    MTRMediaPlaybackClusterPlaybackPosition * _Nullable objCValue;
+    MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable objCValue;
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [MTRMediaPlaybackClusterPlaybackPosition new];
+        objCValue = [MTRMediaPlaybackClusterPlaybackPositionStruct new];
         objCValue.updatedAt = [NSNumber numberWithUnsignedLongLong:value.Value().updatedAt];
         if (value.Value().position.IsNull()) {
             objCValue.position = nil;
@@ -9857,17 +9858,18 @@ void MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::O
 }
 
 void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> &
+        value)
 {
-    MTRApplicationLauncherClusterApplicationEP * _Nullable objCValue;
+    MTRApplicationLauncherClusterApplicationEPStruct * _Nullable objCValue;
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [MTRApplicationLauncherClusterApplicationEP new];
-        objCValue.application = [MTRApplicationLauncherClusterApplication new];
-        objCValue.application.catalogVendorId = [NSNumber numberWithUnsignedShort:value.Value().application.catalogVendorId];
-        objCValue.application.applicationId = [[NSString alloc] initWithBytes:value.Value().application.applicationId.data()
-                                                                       length:value.Value().application.applicationId.size()
+        objCValue = [MTRApplicationLauncherClusterApplicationEPStruct new];
+        objCValue.application = [MTRApplicationLauncherClusterApplicationStruct new];
+        objCValue.application.catalogVendorID = [NSNumber numberWithUnsignedShort:value.Value().application.catalogVendorID];
+        objCValue.application.applicationID = [[NSString alloc] initWithBytes:value.Value().application.applicationID.data()
+                                                                       length:value.Value().application.applicationID.size()
                                                                      encoding:NSUTF8StringEncoding];
         if (value.Value().endpoint.HasValue()) {
             objCValue.endpoint = [NSNumber numberWithUnsignedShort:value.Value().endpoint.Value()];
@@ -10008,13 +10010,13 @@ void MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge:
 }
 
 void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value)
+    void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType & value)
 {
-    MTRApplicationBasicClusterApplicationBasicApplication * _Nonnull objCValue;
-    objCValue = [MTRApplicationBasicClusterApplicationBasicApplication new];
-    objCValue.catalogVendorId = [NSNumber numberWithUnsignedShort:value.catalogVendorId];
-    objCValue.applicationId = [[NSString alloc] initWithBytes:value.applicationId.data()
-                                                       length:value.applicationId.size()
+    MTRApplicationBasicClusterApplicationStruct * _Nonnull objCValue;
+    objCValue = [MTRApplicationBasicClusterApplicationStruct new];
+    objCValue.catalogVendorID = [NSNumber numberWithUnsignedShort:value.catalogVendorID];
+    objCValue.applicationID = [[NSString alloc] initWithBytes:value.applicationID.data()
+                                                       length:value.applicationID.size()
                                                      encoding:NSUTF8StringEncoding];
     DispatchSuccess(context, objCValue);
 };
@@ -11340,10 +11342,10 @@ void MTRScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     {
-        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
+        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
     }
     DispatchSuccess(context, response);
 };
@@ -11356,10 +11358,10 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     {
-        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
+        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
     }
     {
         if (data.transitionTime.HasValue()) {
@@ -11386,7 +11388,7 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
                     auto & entry_1 = iter_1.GetValue();
                     MTRScenesClusterExtensionFieldSet * newElement_1;
                     newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterId = [NSNumber numberWithUnsignedInt:entry_1.clusterId];
+                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
                         auto iter_3 = entry_1.attributeValueList.begin();
@@ -11394,10 +11396,10 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeId.HasValue()) {
-                                newElement_3.attributeId = [NSNumber numberWithUnsignedInt:entry_3.attributeId.Value()];
+                            if (entry_3.attributeID.HasValue()) {
+                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
                             } else {
-                                newElement_3.attributeId = nil;
+                                newElement_3.attributeID = nil;
                             }
                             { // Scope for our temporary variables
                                 auto * array_5 = [NSMutableArray new];
@@ -11448,10 +11450,10 @@ void MTRScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     {
-        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
+        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
     }
     DispatchSuccess(context, response);
 };
@@ -11464,7 +11466,7 @@ void MTRScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     DispatchSuccess(context, response);
 };
@@ -11477,10 +11479,10 @@ void MTRScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     {
-        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
+        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
     }
     DispatchSuccess(context, response);
 };
@@ -11500,7 +11502,7 @@ void MTRScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
         }
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     {
         if (data.sceneList.HasValue()) {
@@ -11535,10 +11537,10 @@ void MTRScenesClusterEnhancedAddSceneResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     {
-        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
+        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
     }
     DispatchSuccess(context, response);
 };
@@ -11551,10 +11553,10 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     {
-        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
+        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
     }
     {
         if (data.transitionTime.HasValue()) {
@@ -11581,7 +11583,7 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
                     auto & entry_1 = iter_1.GetValue();
                     MTRScenesClusterExtensionFieldSet * newElement_1;
                     newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterId = [NSNumber numberWithUnsignedInt:entry_1.clusterId];
+                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
                         auto iter_3 = entry_1.attributeValueList.begin();
@@ -11589,10 +11591,10 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeId.HasValue()) {
-                                newElement_3.attributeId = [NSNumber numberWithUnsignedInt:entry_3.attributeId.Value()];
+                            if (entry_3.attributeID.HasValue()) {
+                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
                             } else {
-                                newElement_3.attributeId = nil;
+                                newElement_3.attributeID = nil;
                             }
                             { // Scope for our temporary variables
                                 auto * array_5 = [NSMutableArray new];
@@ -11643,10 +11645,10 @@ void MTRScenesClusterCopySceneResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupIdFrom = [NSNumber numberWithUnsignedShort:data.groupIdFrom];
+        response.groupIdentifierFrom = [NSNumber numberWithUnsignedShort:data.groupIdentifierFrom];
     }
     {
-        response.sceneIdFrom = [NSNumber numberWithUnsignedChar:data.sceneIdFrom];
+        response.sceneIdentifierFrom = [NSNumber numberWithUnsignedChar:data.sceneIdentifierFrom];
     }
     DispatchSuccess(context, response);
 };
@@ -12468,7 +12470,11 @@ void MTRApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.data = [NSData dataWithBytes:data.data.data() length:data.data.size()];
+        if (data.data.HasValue()) {
+            response.data = [NSData dataWithBytes:data.data.Value().data() length:data.data.Value().size()];
+        } else {
+            response.data = nil;
+        }
     }
     DispatchSuccess(context, response);
 };

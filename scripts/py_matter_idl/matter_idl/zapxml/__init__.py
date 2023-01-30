@@ -15,12 +15,11 @@
 import logging
 import typing
 import xml.sax.handler
-
 from dataclasses import dataclass
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
-from matter_idl.zapxml.handlers import Context, ZapXmlHandler
 from matter_idl.matter_idl_types import Idl
+from matter_idl.zapxml.handlers import Context, ZapXmlHandler
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
@@ -49,6 +48,8 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         # single file)
         if self._include_meta_data:
             self._idl.parse_file_name = filename
+
+        self._context.file_name = filename
 
     def Finish(self) -> Idl:
         self._context.PostProcess(self._idl)

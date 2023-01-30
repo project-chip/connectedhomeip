@@ -238,7 +238,6 @@ limitations under the License.
         <!-- Conformance feature WDSCH - for now optional -->
         <command source="server" code="12" name="GetWeekDayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the weekly repeating schedule data for the specified schedule index.</description>
-            <access op="invoke" role="administer" />
             <arg name="WeekDayIndex" type="INT8U" />
             <arg name="UserIndex" type="INT16U" />
             <arg name="Status" type="DlStatus" />
@@ -274,7 +273,6 @@ limitations under the License.
         <!-- Conformance feature YDSCH - for now optional -->
         <command source="server" code="15" name="GetYearDayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
-            <access op="invoke" role="administer" />
             <arg name="YearDayIndex" type="INT8U" />
             <arg name="UserIndex" type="INT16U" />
             <arg name="Status" type="DlStatus" />
@@ -306,7 +304,6 @@ limitations under the License.
         <!-- Conformance feature HDSCH - for now optional -->
         <command source="server" code="18" name="GetHolidayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the Holiday Schedule Entry for the specified Holiday ID.</description>
-            <access op="invoke" role="administer" />
             <arg name="HolidayIndex" type="INT8U" />
             <arg name="Status" type="DlStatus" />
             <arg name="LocalStartTime" type="epoch_s" optional="true" />
@@ -340,7 +337,6 @@ limitations under the License.
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="28" name="GetUserResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the User for the specified UserIndex.</description>
-            <access op="invoke" role="administer" />
             <arg name="UserIndex" type="INT16U" />
             <arg name="UserName" type="CHAR_STRING" isNullable="true" />
             <arg name="UserUniqueID" type="INT32U" isNullable="true" />
@@ -372,7 +368,6 @@ limitations under the License.
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="35" name="SetCredentialResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the status for setting the specified credential.</description>
-            <access op="invoke" role="administer" />
             <arg name="Status" type="DlStatus" />
             <arg name="UserIndex" type="INT16U" isNullable="true" />
             <arg name="NextCredentialIndex" type="INT16U" isNullable="true" />
@@ -386,7 +381,6 @@ limitations under the License.
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="37" name="GetCredentialStatusResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the status for the specified credential.</description>
-            <access op="invoke" role="administer" />
             <arg name="CredentialExists" type="boolean" />
             <arg name="UserIndex" type="INT16U" isNullable="true" />
             <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />

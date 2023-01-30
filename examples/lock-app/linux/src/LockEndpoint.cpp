@@ -164,14 +164,20 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, CredentialTypeEnum cr
     ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%u,credentialType=%u]", mEndpointId,
                     credentialIndex, to_underlying(credentialType));
 
-    if (credentialIndex >= mLockCredentials.size() ||
+    if (to_underlying(credentialType) >= mLockCredentials.size())
+    {
+        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]", mEndpointId, credentialIndex);
+        return false;
+    }
+
+    if (credentialIndex >= mLockCredentials.at(to_underlying(credentialType)).size() ||
         (0 == credentialIndex && CredentialTypeEnum::kProgrammingPIN != credentialType))
     {
         ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]", mEndpointId, credentialIndex);
         return false;
     }
 
-    const auto & credentialInStorage = mLockCredentials[credentialIndex];
+    const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 
     credential.status = credentialInStorage.status;
     if (DlCredentialStatus::kAvailable == credential.status)
@@ -206,14 +212,21 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex cre
         mEndpointId, credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
         static_cast<unsigned int>(credentialData.size()), creator, modifier);
 
-    if (credentialIndex >= mLockCredentials.size() ||
+    if (to_underlying(credentialType) >= mLockCredentials.capacity())
+    {
+        ChipLogError(Zcl, "Cannot set the credential - type out of range [endpoint=%d,type=%d]", mEndpointId,
+                     to_underlying(credentialType));
+        return false;
+    }
+
+    if (credentialIndex >= mLockCredentials.at(to_underlying(credentialType)).size() ||
         (0 == credentialIndex && CredentialTypeEnum::kProgrammingPIN != credentialType))
     {
         ChipLogError(Zcl, "Cannot set the credential - index out of range [endpoint=%d,index=%d]", mEndpointId, credentialIndex);
         return false;
     }
 
-    auto & credentialInStorage = mLockCredentials[credentialIndex];
+    auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
     if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
     {
         ChipLogError(Zcl,
@@ -391,11 +404,12 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
     }
 
     // Find the credential so we can make sure it is not absent right away
-    auto credential = std::find_if(mLockCredentials.begin(), mLockCredentials.end(), [&pin](const LockCredentialInfo & c) {
-        return (c.credentialType == CredentialTypeEnum::kPin && c.status != DlCredentialStatus::kAvailable) &&
+    auto & pinCredentials = mLockCredentials[to_underlying(CredentialTypeEnum::kPin)];
+    auto credential       = std::find_if(pinCredentials.begin(), pinCredentials.end(), [&pin](const LockCredentialInfo & c) {
+        return (c.status != DlCredentialStatus::kAvailable) &&
             chip::ByteSpan{ c.credentialData, c.credentialDataSize }.data_equal(pin.Value());
     });
-    if (credential == mLockCredentials.end())
+    if (credential == pinCredentials.end())
     {
         ChipLogDetail(Zcl,
                       "Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
@@ -407,7 +421,7 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
     }
 
     // Find a user that correspond to this credential
-    auto credentialIndex = static_cast<unsigned>(credential - mLockCredentials.begin());
+    auto credentialIndex = static_cast<unsigned>(credential - pinCredentials.begin());
     auto user = std::find_if(mLockUsers.begin(), mLockUsers.end(), [credential, credentialIndex](const LockUserInfo & u) {
         return std::any_of(u.credentials.begin(), u.credentials.end(), [&credential, credentialIndex](const CredentialStruct & c) {
             return c.CredentialIndex == credentialIndex && c.CredentialType == to_underlying(credential->credentialType);

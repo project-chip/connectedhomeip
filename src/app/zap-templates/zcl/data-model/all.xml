@@ -26,9 +26,11 @@
    <xi:include href="chip/general-commissioning-cluster.xml" />
    <xi:include href="chip/general-diagnostics-cluster.xml" />
    <xi:include href="chip/global-attributes.xml" />
+   <xi:include href="chip/groups-cluster.xml" />
    <xi:include href="chip/group-key-mgmt-cluster.xml" />
    <xi:include href="chip/identify-cluster.xml" />
    <xi:include href="chip/illuminance-measurement-cluster.xml" />
+   <xi:include href="chip/level-control-cluster.xml" />
    <xi:include href="chip/keypad-input-cluster.xml" />
    <xi:include href="chip/localization-configuration-cluster.xml" />
    <xi:include href="chip/low-power-cluster.xml" />
@@ -68,7 +70,7 @@
    <xi:include href="silabs/ha-devices.xml" />
    <xi:include href="silabs/ha.xml" />
    <xi:include href="silabs/lo-devices.xml" />
-   <xi:include href="silabs/types.xml" />
+   <xi:include href="silabs/types-silabs.xml" />
    <xi:include href="silabs/zll-devices.xml" />
    <xi:include href="silabs/zll.xml" />
 </all>

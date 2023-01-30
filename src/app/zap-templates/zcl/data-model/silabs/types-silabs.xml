@@ -1,0 +1,572 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <bitmap name="ShadeClosureStatus" type="BITMAP8">
+    <field name="operational" mask="0x1"/>
+    <field name="adjusting" mask="0x2"/>
+    <field name="opening" mask="0x4"/>
+    <field name="motorOpening" mask="0x8"/>
+  </bitmap>
+  <bitmap name="AlarmMask" type="BITMAP8">
+    <field name="GeneralHwFault" mask="0x1"/>
+    <field name="GeneralSwFault" mask="0x2"/>
+  </bitmap>
+  <bitmap name="MainsAlarmMask" type="BITMAP8">
+    <field name="VoltageTooLow" mask="0x1"/>
+    <field name="VoltageTooHigh" mask="0x2"/>
+    <field name="MainsPowerSupplyLost" mask="0x4"/>
+  </bitmap>
+  <bitmap name="BatteryAlarmMask" type="BITMAP8">
+    <field name="VoltageTooLow" mask="0x1"/>
+  </bitmap>
+  <bitmap name="DeviceTempAlarmMask" type="BITMAP8">
+    <field name="TooLow" mask="0x1"/>
+    <field name="TooHigh" mask="0x2"/>
+  </bitmap>
+  <bitmap name="TimeStatusMask" type="BITMAP8">
+    <field name="MasterClock" mask="0x1"/>
+    <field name="Synchronized" mask="0x2"/>
+    <field name="MasterZoneDst" mask="0x4"/>
+    <field name="Superseding" mask="0x8"/>
+  </bitmap>
+  <bitmap name="BallastStatus" type="BITMAP8">
+    <field name="NonOperational" mask="0x1"/>
+    <field name="LampNotInSocket" mask="0x2"/>
+  </bitmap>
+  <bitmap name="LampAlarmMode" type="BITMAP8">
+    <field name="lampBurnHours" mask="0x1"/>
+  </bitmap>
+  <bitmap name="Occupancy" type="BITMAP8">
+    <field name="occupied" mask="0x1"/>
+  </bitmap>
+  <bitmap name="IasZoneStatus" type="BITMAP16">
+    <cluster code="0x0500"/>
+    <cluster code="0x0501"/>
+    <field name="alarm1" mask="0x1"/>
+    <field name="alarm2" mask="0x2"/>
+    <field name="tamper" mask="0x4"/>
+    <field name="battery" mask="0x8"/>
+    <field name="supervisionReports" mask="0x10"/>
+    <field name="restoreReports" mask="0x20"/>
+    <field name="trouble" mask="0x40"/>
+    <field name="AC" mask="0x80"/>
+    <field name="test" mask="0x100"/>
+    <field name="batteryDefect" mask="0x200"/>
+  </bitmap>
+  <bitmap name="WarningInfo" type="BITMAP8">
+    <cluster code="0x0502"/>
+    <field name="mode" mask="0xf0"/>
+    <field name="strobe" mask="0x0c"/>
+    <field name="sirenLevel" mask="0x03"/>
+  </bitmap>
+  <bitmap name="SquawkInfo" type="BITMAP8">
+    <cluster code="0x0502"/>
+    <field name="mode" mask="0xf0"/>
+    <field name="strobe" mask="0x08"/>
+    <field name="level" mask="0x03"/>
+  </bitmap>
+  <enum name="OperatingMode" type="ENUM8">
+    <item name="normal" value="0x0"/>
+    <item name="configure" value="0x1"/>
+  </enum>
+  <enum name="PowerSource" type="ENUM8">
+    <item name="Unknown" value="0x0"/>
+    <item name="SinglePhaseMains" value="0x1"/>
+    <item name="ThreePhaseMains" value="0x2"/>
+    <item name="Battery" value="0x3"/>
+    <item name="DcSource" value="0x4"/>
+    <item name="EmergencyMainsConstantPower" value="0x5"/>
+    <item name="EmergencyMainsTransferSwitch" value="0x6"/>
+    <item name="BatteryBackup" value="0x80"/>
+  </enum>
+  <enum name="PhysicalEnvironment" type="ENUM8">
+    <item name="Unspecified" value="0x0"/>
+    <item name="FirstProfileSpecifiedValue" value="0x1"/>
+    <item name="LastProfileSpecifiedValue" value="0x7f"/>
+    <item name="Unknown" value="0xff"/>
+  </enum>
+  <enum name="BatterySize" type="ENUM8">
+    <item name="NoBattery" value="0x0"/>
+    <item name="BuiltIn" value="0x1"/>
+    <item name="Other" value="0x2"/>
+    <item name="AA" value="0x3"/>
+    <item name="AAA" value="0x4"/>
+    <item name="C" value="0x5"/>
+    <item name="D" value="0x6"/>
+    <item name="Unknown" value="0xff"/>
+  </enum>
+  <enum name="SwitchType" type="ENUM8">
+    <item name="Toggle" value="0x00"/>
+    <item name="Momentary" value="0x01"/>
+    <item name="MultiFunction" value="0x02" introducedIn="ha-1.2-05-3520-29"/>
+  </enum>
+  <enum name="SwitchActions" type="ENUM8">
+    <item name="On" value="0x0"/>
+    <item name="Off" value="0x1"/>
+    <item name="Toggle" value="0x2"/>
+  </enum>
+  <enum name="FanMode" type="ENUM8">
+    <item name="off" value="0x0"/>
+    <item name="low" value="0x1"/>
+    <item name="medium" value="0x2"/>
+    <item name="high" value="0x3"/>
+    <item name="on" value="0x4"/>
+    <item name="auto" value="0x5"/>
+    <item name="smart" value="0x6"/>
+  </enum>
+  <enum name="FanModeSequence" type="ENUM8">
+    <item name="LowMedHigh" value="0x0"/>
+    <item name="lowHigh" value="0x1"/>
+    <item name="LowMedHighAuto" value="0x2"/>
+    <item name="lowHighAuto" value="0x3"/>
+    <item name="onAuto" value="0x4"/>
+  </enum>
+  <enum name="RelativeHumidityMode" type="ENUM8">
+    <item name="measureLocally" value="0x0"/>
+    <item name="updatedOverTheNetwork" value="0x1"/>
+  </enum>
+  <enum name="DehumidifcationLockout" type="ENUM8">
+    <item name="notAllowed" value="0x0"/>
+    <item name="allowed" value="0x1"/>
+  </enum>
+  <enum name="RelativeHumidityDisplay" type="ENUM8">
+    <item name="notDisplayed" value="0x0"/>
+    <item name="displayed" value="0x1"/>
+  </enum>
+  <enum name="TemperatureDisplayMode" type="ENUM8">
+    <item name="celsius" value="0x0"/>
+    <item name="fahrenheit" value="0x1"/>
+  </enum>
+  <enum name="KeypadLockout" type="ENUM8">
+    <item name="noLockout" value="0x0"/>
+    <item name="levelOneLockout" value="0x1"/>
+    <item name="levelTwoLockout" value="0x2"/>
+    <item name="levelThreeLockout" value="0x3"/>
+    <item name="levelFourLockout" value="0x4"/>
+    <item name="levelfiveLockout" value="0x5"/>
+  </enum>
+  <enum name="HueDirection" type="ENUM8">
+    <cluster code="0x0300"/>
+    <item name="ShortestDistance" value="0x0"/>
+    <item name="LongestDistance" value="0x1"/>
+    <item name="Up" value="0x2"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+  <enum name="HueMoveMode" type="ENUM8">
+    <cluster code="0x0300"/>
+    <item name="Stop" value="0x0"/>
+    <item name="Up" value="0x1"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+  <enum name="HueStepMode" type="ENUM8">
+    <cluster code="0x0300"/>
+    <item name="Up" value="0x1"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+  <enum name="SaturationMoveMode" type="ENUM8">
+    <cluster code="0x0300"/>
+    <item name="Stop" value="0x0"/>
+    <item name="Up" value="0x1"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+  <enum name="SaturationStepMode" type="ENUM8">
+    <cluster code="0x0300"/>
+    <item name="Up" value="0x1"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+  <enum name="ColorMode" type="ENUM8">
+    <cluster code="0x0300"/>
+    <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
+    <item name="CurrentXAndCurrentY" value="0x01"/>
+    <item name="ColorTemperature" value="0x02"/>
+  </enum>
+  <enum name="ColorControlOptions" type="BITMAP8">
+    <item name="ExecuteIfOff" value="0x1"/>
+  </enum>
+  <enum name="LevelStatus" type="ENUM8">
+    <item name="OnTarget" value="0x0"/>
+    <item name="BelowTarget" value="0x1"/>
+    <item name="AboveTarget" value="0x2"/>
+  </enum>
+  <enum name="OccupancySensorType" type="ENUM8">
+    <item name="PIR" value="0x0"/>
+    <item name="Ultrasonic" value="0x1"/>
+    <item name="pirAndUltrasonic" value="0x2"/>
+    <item name="physicalContact" value="0x3"/>
+  </enum>
+  <bitmap name="OccupancySensorTypeBitmap" type="BITMAP8">
+    <field name="Pir" mask="0x01"/>
+    <field name="Ultrasonic" mask="0x02"/>
+    <field name="PhysicalContact" mask="0x04"/>
+  </bitmap>
+  <enum name="WarningMode" type="ENUM8">
+    <item name="stop" value="0x0"/>
+    <item name="burglar" value="0x1"/>
+    <item name="fire" value="0x2"/>
+    <item name="emergency" value="0x3"/>
+    <item name="policePanic" value="0x4"/>
+    <item name="firePanic" value="0x5"/>
+    <item name="emergencyPanic" value="0x6"/>
+  </enum>
+  <enum name="WarningStobe" type="ENUM8">
+    <item name="noStrobe" value="0x0"/>
+    <item name="useStrobe" value="0x1"/>
+  </enum>
+  <enum name="SquawkMode" type="ENUM8">
+    <item name="systemIsArmed" value="0x0"/>
+    <item name="systemIsDisarmed" value="0x1"/>
+  </enum>
+  <enum name="SquawkStobe" type="ENUM8">
+    <item name="noStrobe" value="0x0"/>
+    <item name="useStrobe" value="0x1"/>
+  </enum>
+  <enum name="SquawkLevel" type="ENUM8">
+    <item name="lowLevel" value="0x0"/>
+    <item name="mediumLevel" value="0x1"/>
+    <item name="highLevel" value="0x2"/>
+    <item name="veryHighLevel" value="0x2"/>
+  </enum>
+  <enum name="AmiRegistrationState" type="ENUM8">
+    <item name="Unregistered" value="0x0"/>
+    <item name="JoiningNetwork" value="0x1"/>
+    <item name="JoinedNetwork" value="0x2"/>
+    <item name="SubmittedRegistrationRequest" value="0x3"/>
+    <item name="RegistrationRejected" value="0x4"/>
+    <item name="Registered" value="0x5"/>
+    <item name="RegistrationNotPossible" value="0x6"/>
+  </enum>
+  <enum name="AnonymousDataState" type="ENUM8">
+    <item name="NoSourceFound" value="0x0"/>
+    <item name="SourceFound" value="0x1"/>
+  </enum>
+  <enum name="AttributeWritePermission" type="ENUM8">
+    <item name="DenyWrite" value="0x00"/>
+    <item name="AllowWriteNormal" value="0x01"/>
+    <item name="AllowWriteOfReadOnly" value="0x02"/>
+    <item name="UnsupportedAttribute" value="0x86"/>
+    <item name="InvalidValue" value="0x87"/>
+    <item name="ReadOnly" value="0x88"/>
+    <item name="InvalidDataType" value="0x8D"/>
+  </enum>
+  <enum name="Status" type="ENUM8" description="Status codes used in the ZigBee Cluster Library">
+    <item name="SUCCESS" value="0x00"/>
+    <item name="FAILURE" value="0x01"/>
+    <item name="NOT_AUTHORIZED" value="0x7E"/>
+    <!-- item name="reserved" value="0x7F"/ -->
+    <item name="MALFORMED_COMMAND" value="0x80"/>
+    <item name="UNSUP_COMMAND" value="0x81"/>
+    <!-- renamed from UNSUP_CLUSTER_COMMAND -->
+    <item name="UNSUP_GENERAL_COMMAND" value="0x82"/>
+    <!-- DEPRECATED use UNSUP_COMMAND -->
+    <item name="UNSUP_MANUF_CLUSTER_COMMAND" value="0x83"/>
+    <!-- DEPRECATED use UNSUP_COMMAND -->
+    <item name="UNSUP_MANUF_GENERAL_COMMAND" value="0x84"/>
+    <!-- DEPRECATED use UNSUP_COMMAND -->
+    <item name="INVALID_FIELD" value="0x85"/>
+    <item name="UNSUPPORTED_ATTRIBUTE" value="0x86"/>
+    <item name="INVALID_VALUE" value="0x87"/>
+    <item name="READ_ONLY" value="0x88"/>
+    <item name="INSUFFICIENT_SPACE" value="0x89"/>
+    <item name="DUPLICATE_EXISTS" value="0x8A"/>
+    <!-- DEPRECATED use SUCCESS -->
+    <item name="NOT_FOUND" value="0x8B"/>
+    <item name="UNREPORTABLE_ATTRIBUTE" value="0x8C"/>
+    <item name="INVALID_DATA_TYPE" value="0x8D"/>
+    <item name="INVALID_SELECTOR" value="0x8E"/>
+    <item name="WRITE_ONLY" value="0x8F"/>
+    <!-- DEPRECATED use NOT_AUTHORIZED -->
+    <item name="INCONSISTENT_STARTUP_STATE" value="0x90"/>
+    <!-- DEPRECATED use FAILURE -->
+    <item name="DEFINED_OUT_OF_BAND" value="0x91"/>
+    <!-- DEPRECATED use FAILURE -->
+    <!-- item name="reserved" value="0x92"/ -->
+    <item name="ACTION_DENIED" value="0x93"/>
+    <!-- DEPRECATED use FAILURE -->
+    <item name="TIMEOUT" value="0x94"/>
+    <item name="ABORT" value="0x95"/>
+    <item name="INVALID_IMAGE" value="0x96"/>
+    <item name="WAIT_FOR_DATA" value="0x97"/>
+    <item name="NO_IMAGE_AVAILABLE" value="0x98"/>
+    <item name="REQUIRE_MORE_IMAGE" value="0x99"/>
+    <item name="NOTIFICATION_PENDING" value="0x9A"/>
+    <item name="HARDWARE_FAILURE" value="0xC0"/>
+    <!-- DEPRECATED use FAILURE -->
+    <item name="SOFTWARE_FAILURE" value="0xC1"/>
+    <!-- DEPRECATED use FAILURE -->
+    <!-- item name="reserved" value="0xC2"/ -->
+    <item name="UNSUPPORTED_CLUSTER" value="0xC3"/>
+    <item name="LIMIT_REACHED" value="0xC4"/>
+    <!-- DEPRECATED use SUCCESS -->
+  </enum>
+  <struct name="ReadAttributeStatusRecord">
+    <item name="attributeId" type="ATTRIB_ID"/>
+    <item name="status" type="Status"/>
+    <item name="attributeType" type="INT8U"/>
+    <item name="attributeLocation" type="NO_DATA"/>
+  </struct>
+  <struct name="WriteAttributeRecord">
+    <item name="attributeId" type="ATTRIB_ID"/>
+    <item name="attributeType" type="INT8U"/>
+    <item name="attributeLocation" type="NO_DATA"/>
+  </struct>
+  <struct name="WriteAttributeStatusRecord">
+    <item name="status" type="Status"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
+  </struct>
+  <struct name="ReadStructuredAttributeRecord">
+    <item name="attributeId" type="ATTRIB_ID"/>
+    <item name="indicator" type="INT8U"/>
+    <item name="indicies" type="INT16U" array="true"/>
+  </struct>
+  <struct name="WriteStructuredAttributeRecord">
+    <item name="attributeId" type="ATTRIB_ID"/>
+    <item name="indicator" type="INT8U"/>
+    <item name="indicies" type="INT16U" array="true"/>
+    <item name="attributeType" type="INT8U"/>
+    <item name="attributeLocation" type="NO_DATA"/>
+  </struct>
+  <struct name="WriteStructuredAttributeStatusRecord">
+    <item name="status" type="Status"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
+    <item name="indicator" type="INT8U"/>
+    <item name="indicies" type="INT16U" array="true"/>
+  </struct>
+  <struct name="Notification">
+    <item name="contentId" type="INT16U"/>
+    <item name="statusFeedback" type="ENUM8"/>
+  </struct>
+  <bitmap name="EnergyFormatting" type="BITMAP8">
+    <field name="NumberOfDigitsToTheRightOfTheDecimalPoint" mask="0x07"/>
+    <field name="NumberOfDigitsToTheLeftOfTheDecimalPoint" mask="0x78"/>
+    <field name="SuppressLeadingZeros" mask="0x80"/>
+  </bitmap>
+  <enum name="PowerProfileState" type="ENUM8">
+    <item name="PowerProfileWaitingToStart" value="0x01"/>
+    <item name="PowerProfileStarted" value="0x02"/>
+    <item name="EnergyPhaseRunning" value="0x03"/>
+    <item name="EnergyPhaseEnded" value="0x04"/>
+    <item name="EnergyPhaseWaitingToStart" value="0x05"/>
+    <item name="EnergyPhaseStarted" value="0x06"/>
+    <item name="PowerProfileEnded" value="0x07"/>
+    <item name="ProfileReadyForScheduling" value="0x08"/>
+    <item name="PowerProfileScheduled" value="0x09"/>
+  </enum>
+  <enum name="RemoteEnableFlags" type="ENUM8">
+    <item name="Disabled" value="0x00"/>
+    <item name="TemporarilyLockedDisabled" value="0x07"/>
+    <item name="EnabledRemoteControl" value="0x0F"/>
+    <item name="EnabledRemoteAndEnergyControl" value="0x01"/>
+  </enum>
+  <enum name="DeviceStatus2Structure" type="ENUM8">
+    <item name="IrisSymptomCode" value="0x20"/>
+  </enum>
+  <bitmap name="StartTime" type="BITMAP16">
+    <field name="Minutes" mask="0x003F"/>
+    <field name="TimeEncoding" mask="0x00C0"/>
+    <field name="Hours" mask="0xFF00"/>
+  </bitmap>
+  <enum name="TimeEncoding" type="ENUM8">
+    <item name="Relative" value="0x00"/>
+    <item name="Absolute" value="0x40"/>
+  </enum>
+  <enum name="DoorLockState" type="ENUM8">
+    <item name="NotFullyLocked" value="0x00"/>
+    <item name="Locked" value="0x01"/>
+    <item name="Unlocked" value="0x02"/>
+  </enum>
+  <enum name="DoorLockSoundVolume" type="ENUM8">
+    <item name="Silent" value="0x00"/>
+    <item name="Low" value="0x01"/>
+    <item name="High" value="0x02"/>
+  </enum>
+  <enum name="DoorLockType" type="ENUM8">
+    <item name="DeadBolt" value="0x00"/>
+    <item name="Magnetic" value="0x01"/>
+    <item name="Mortise" value="0x02"/>
+    <item name="Rim" value="0x03"/>
+    <item name="LatchBolt" value="0x04"/>
+    <item name="Cylindrical" value="0x05"/>
+    <item name="Tubular" value="0x06"/>
+    <item name="Interconnected" value="0x07"/>
+    <item name="DeadLatch" value="0x08"/>
+    <item name="Other" value="0x09"/>
+  </enum>
+  <enum name="DoorState" type="ENUM8">
+    <item name="Open" value="0x00"/>
+    <item name="Closed" value="0x01"/>
+    <item name="ErrorJammed" value="0x02"/>
+    <item name="ErrorForcedOpen" value="0x03"/>
+    <item name="ErrorUnspecified" value="0x04"/>
+  </enum>
+  <enum name="DoorLockOperatingMode" type="ENUM8">
+    <item name="NormalMode" value="0x00"/>
+    <item name="VacationMode" value="0x01"/>
+    <item name="PrivacyMode" value="0x02"/>
+    <item name="NoRfLockOrUnlock" value="0x03"/>
+    <item name="LocalProgrammingMode" value="0x04"/>
+    <item name="PassageMode" value="0x05"/>
+  </enum>
+  <enum name="DoorLockSecurityLevel" type="ENUM8">
+    <item name="NetworkSecurity" value="0x00"/>
+    <item name="ApsSecurity" value="0x01"/>
+  </enum>
+  <enum name="DoorLockUserStatus" type="ENUM8">
+    <cluster code="0x0101"/>
+    <item name="Available" value="0x00"/>
+    <item name="OccupiedEnabled" value="0x01"/>
+    <item name="OccupiedDisabled" value="0x03"/>
+    <item name="NotSupported" value="0xFF"/>
+  </enum>
+  <enum name="DoorLockUserType" type="ENUM8">
+    <cluster code="0x0101"/>
+    <item name="Unrestricted" value="0x00"/>
+    <item name="YearDayScheduleUser" value="0x01"/>
+    <item name="WeekDayScheduleUser" value="0x02"/>
+    <item name="MasterUser" value="0x03"/>
+    <item name="NonAccessUser" value="0x04"/>
+    <item name="NotSupported" value="0xFF"/>
+  </enum>
+  <bitmap name="DoorLockDayOfWeek" type="BITMAP8">
+    <cluster code="0x0101"/>
+    <field name="Sunday" mask="0x01"/>
+    <field name="Monday" mask="0x02"/>
+    <field name="Tuesday" mask="0x04"/>
+    <field name="Wednesday" mask="0x08"/>
+    <field name="Thursday" mask="0x10"/>
+    <field name="Friday" mask="0x20"/>
+    <field name="Saturday" mask="0x40"/>
+  </bitmap>
+  <enum name="DoorLockEventType" type="ENUM8">
+    <item name="Operation" value="0x00"/>
+    <item name="Programming" value="0x01"/>
+    <item name="Alarm" value="0x02"/>
+  </enum>
+  <enum name="DoorLockEventSource" type="ENUM8">
+    <item name="Keypad" value="0x00"/>
+    <item name="Rf" value="0x01"/>
+    <item name="Manual" value="0x02"/>
+    <item name="Rfid" value="0x03"/>
+    <item name="Indeterminate" value="0xFF"/>
+  </enum>
+  <enum name="DoorLockSetPinOrIdStatus" type="ENUM8">
+    <cluster code="0x0101"/>
+    <item name="Success" value="0x00"/>
+    <item name="GeneralFailure" value="0x01"/>
+    <item name="MemoryFull" value="0x02"/>
+    <item name="DuplicateCodeError" value="0x03"/>
+  </enum>
+  <enum name="DoorLockOperationEventCode" type="ENUM8">
+    <cluster code="0x0101"/>
+    <item name="UnknownOrMfgSpecific" value="0x00"/>
+    <item name="Lock" value="0x01"/>
+    <item name="Unlock" value="0x02"/>
+    <item name="LockInvalidPinOrId" value="0x03"/>
+    <item name="LockInvalidSchedule" value="0x04"/>
+    <item name="UnlockInvalidPinOrId" value="0x05"/>
+    <item name="UnlockInvalidSchedule" value="0x06"/>
+    <item name="OneTouchLock" value="0x07"/>
+    <item name="KeyLock" value="0x08"/>
+    <item name="KeyUnlock" value="0x09"/>
+    <item name="AutoLock" value="0x0A"/>
+    <item name="ScheduleLock" value="0x0B"/>
+    <item name="ScheduleUnlock" value="0x0C"/>
+    <item name="ManualLock" value="0x0D"/>
+    <item name="ManualUnlock" value="0x0E"/>
+  </enum>
+  <enum name="DoorLockProgrammingEventCode" type="ENUM8">
+    <cluster code="0x0101"/>
+    <item name="UnknownOrMfgSpecific" value="0x00"/>
+    <item name="MasterCodeChanged" value="0x01"/>
+    <item name="PinAdded" value="0x02"/>
+    <item name="PinDeleted" value="0x03"/>
+    <item name="PinChanged" value="0x04"/>
+    <item name="IdAdded" value="0x05"/>
+    <item name="IdDeleted" value="0x06"/>
+  </enum>
+  <enum name="ProductTypeId" type="ENUM16">
+    <item name="WhiteGoods" value="0x0000"/>
+    <item name="Dishwasher" value="0x5601"/>
+    <item name="TumbleDryer" value="0x5602"/>
+    <item name="WasherDryer" value="0x5603"/>
+    <item name="WashingMachine" value="0x5604"/>
+    <item name="Hobs" value="0x5E03"/>
+    <item name="InductionHobs" value="0x5E09"/>
+    <item name="Oven" value="0x5E01"/>
+    <item name="ElectricalOven" value="0x5E06"/>
+    <item name="RefrigeratorFreezer" value="0x6601"/>
+  </enum>
+  <enum name="CecedSpecificationVersion" type="ENUM8">
+    <item name="CompliantWithV10NotCertified" value="0x10"/>
+    <item name="CompliantWithV10Certified" value="0x1A"/>
+  </enum>
+  <enum name="MeterTypeId" type="ENUM16">
+    <item name="UtilityPrimaryMeter" value="0x0000"/>
+    <item name="UtilityProductionMeter" value="0x0001"/>
+    <item name="UtilitySecondaryMeter" value="0x0002"/>
+    <item name="PrivatePrimaryMeter" value="0x0100"/>
+    <item name="PrivateProductionMeter" value="0x0101"/>
+    <item name="PrivateSecondaryMeters" value="0x0102"/>
+    <item name="GenericMeter" value="0x0110"/>
+  </enum>
+  <enum name="DataQualityId" type="ENUM16">
+    <item name="AllDataCertified" value="0x0000"/>
+    <item name="OnlyInstantaneousPowerNotCertified" value="0x0001"/>
+    <item name="OnlyCumulatedConsumptionNotCertified" value="0x0002"/>
+    <item name="NotCertifiedData" value="0x0003"/>
+  </enum>
+  <!-- Lighting and Occupancy Types -->
+  <enum name="GenericDeviceType" type="ENUM8">
+    <item name="Incandescent" value="0x00"/>
+    <item name="SpotlightHalogen" value="0x01"/>
+    <item name="HalogenBulb" value="0x02"/>
+    <item name="CFL" value="0x03"/>
+    <item name="LinearFlourescent" value="0x04"/>
+    <item name="LedBulb" value="0x05"/>
+    <item name="SpotlightLed" value="0x06"/>
+    <item name="LedStrip" value="0x07"/>
+    <item name="LedTube" value="0x08"/>
+    <item name="GenericIndoorFixture" value="0x09"/>
+    <item name="GenericOutdoorFixture" value="0x0A"/>
+    <item name="PendantFixture" value="0x0B"/>
+    <item name="FloorStandingFixture" value="0x0C"/>
+    <!-- 0x0D-0xDF reserved -->
+    <item name="GenericController" value="0xE0"/>
+    <item name="WallSwitch" value="0xE1"/>
+    <item name="PortableRemoteController" value="0xE2"/>
+    <item name="MotionOrLightSensor" value="0xE3"/>
+    <!-- 0xE4-0xEF reserved -->
+    <item name="GenericActuator" value="0xF0"/>
+    <item name="PluginUnit" value="0xF1"/>
+    <item name="RetrofitActuator" value="0xF2"/>
+    <!-- 0xF5-0xFE reserved -->
+    <item name="Unspecified" value="0xFF"/>
+  </enum>
+  <enum name="ProductCode" type="ENUM8">
+    <item name="ManufacturerDefined" value="0x00"/>
+    <item name="IternationalArticleNumber" value="0x01"/>
+    <item name="GlobalTradeItemNumber" value="0x02"/>
+    <item name="UniversalProductCode" value="0x03"/>
+    <item name="StockKeepingUnit" value="0x04"/>
+    <!-- 0x05-0xFF reserved -->
+  </enum>
+  <enum name="StartUpOnOffValue" type="ENUM8">
+    <item name="SetToOff" value="0x00"/>
+    <item name="SetToOn" value="0x01"/>
+    <item name="SetToToggle" value="0x02"/>
+    <!-- 0x03-0xFF reserved -->
+  </enum>
+</configurator>

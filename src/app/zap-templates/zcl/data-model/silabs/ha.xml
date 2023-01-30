@@ -450,36 +450,6 @@ limitations under the License.
       <access op="write" role="manage"/>
     </attribute>
   </cluster>
-  <cluster>
-    <name>Barrier Control</name>
-    <domain>Closures</domain>
-    <description>This cluster provides control of a barrier (garage door).</description>
-    <code>0x0103</code>
-    <define>BARRIER_CONTROL_CLUSTER</define>
-    <client init="false" tick="false">true</client>
-    <server init="false" tick="false">true</server>
-    <attribute side="server" code="0x0001" define="BARRIER_MOVING_STATE" type="ENUM8" min="0x00" max="0xFF" writable="false" optional="false">barrier moving state</attribute>
-    <attribute side="server" code="0x0002" define="BARRIER_SAFETY_STATUS" type="BITMAP16" min="0x0000" max="0xFFFF" writable="false" optional="false">barrier safety status</attribute>
-    <attribute side="server" code="0x0003" define="BARRIER_CAPABILITIES" type="BITMAP8" min="0x00" max="0xFF" writable="false" optional="false">barrier capabilities</attribute>
-    <attribute side="server" code="0x0004" define="BARRIER_OPEN_EVENTS" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">barrier open events</attribute>
-    <attribute side="server" code="0x0005" define="BARRIER_CLOSE_EVENTS" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">barrier close events</attribute>
-    <attribute side="server" code="0x0006" define="BARRIER_COMMAND_OPEN_EVENTS" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">barrier command open events</attribute>
-    <attribute side="server" code="0x0007" define="BARRIER_COMMAND_CLOSE_EVENTS" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">barrier command close events</attribute>
-    <attribute side="server" code="0x0008" define="BARRIER_OPEN_PERIOD" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="true">barrier open period</attribute>
-    <attribute side="server" code="0x0009" define="BARRIER_CLOSE_PERIOD" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="true">barrier close period</attribute>
-    <attribute side="server" code="0x000A" define="BARRIER_POSITION" type="INT8U" min="0x0000" max="0xFF" writable="false" optional="false">barrier position</attribute>
-    <command source="client" code="0x00" name="BarrierControlGoToPercent" optional="false" cli="zcl barrier-control go-to-percent">
-      <description>
-        Command to instruct a barrier to go to a percent open state.
-      </description>
-      <arg name="percentOpen" type="INT8U"/>
-    </command>
-    <command source="client" code="0x01" name="BarrierControlStop" optional="false" cli="zcl barrier-control stop">
-      <description>
-        Command that instructs the barrier to stop moving.
-      </description>
-    </command>
-  </cluster>
   <cluster introducedIn="ha-1.2-05-3520-29">
     <name>Electrical Measurement</name>
     <domain>Home Automation</domain>

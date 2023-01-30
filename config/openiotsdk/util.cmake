@@ -137,16 +137,3 @@ function(convert_list_of_flags_to_string_of_flags ptr_list_of_flags string_of_fl
   # Set the output variable in the parent scope
   set(${string_of_flags} ${locally_scoped_string_of_flags} PARENT_SCOPE)
 endfunction()
-
-
-function (get_all_cmake_targets out_var current_dir)
-    get_property(targets DIRECTORY ${current_dir} PROPERTY BUILDSYSTEM_TARGETS)
-    get_property(subdirs DIRECTORY ${current_dir} PROPERTY SUBDIRECTORIES)
-
-    foreach(subdir ${subdirs})
-        get_all_cmake_targets(subdir_targets ${subdir})
-        list(APPEND targets ${subdir_targets})
-    endforeach()
-
-    set(${out_var} ${targets} PARENT_SCOPE)
-endfunction()

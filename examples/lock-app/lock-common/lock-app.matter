@@ -71,10 +71,6 @@ server cluster OnOff = 6 {
     kLighting = 0x1;
   }
 
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
-  }
-
   readonly attribute boolean onOff = 0;
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
@@ -391,7 +387,7 @@ server cluster PowerSourceConfiguration = 46 {
 
 server cluster PowerSource = 47 {
   enum BatChargeFault : ENUM8 {
-    kUnspecfied = 0;
+    kUnspecified = 0;
     kAmbientTooHot = 1;
     kAmbientTooCold = 2;
     kBatteryTooHot = 3;
@@ -431,7 +427,7 @@ server cluster PowerSource = 47 {
   }
 
   enum PowerSourceStatus : ENUM8 {
-    kUnspecfied = 0;
+    kUnspecified = 0;
     kActive = 1;
     kStandby = 2;
     kUnavailable = 3;
@@ -1025,6 +1021,11 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kAx = 5;
   }
 
+  bitmap WiFiNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+  }
+
   info event Disconnection = 0 {
     INT16U reasonCode = 0;
   }
@@ -1069,6 +1070,11 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate100G = 7;
     kRate200G = 8;
     kRate400G = 9;
+  }
+
+  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
   }
 
   readonly attribute nullable PHYRateEnum PHYRate = 0;
