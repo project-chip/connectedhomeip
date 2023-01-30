@@ -213,11 +213,6 @@ config("silabs-wifi-config") {
     defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
 
-  #TODO DO I NEED THIS HERE
-  if (use_wf200) {
-    include_dirs += wf200_plat_incs
-  }
-
   if (sl_wfx_config_softap) {
     defines += [ "SL_WFX_CONFIG_SOFTAP" ]
   }

@@ -90,6 +90,8 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4325A") {
   silabs_family = "SiWx917"
   silabs_mcu = "EFR32MG12P432F1024GL125"
+  disable_lcd = true
+  show_qr_code = false
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,
