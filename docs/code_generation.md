@@ -22,7 +22,7 @@ The selection of enabled clusters and files is done using
 [ZAP](https://github.com/project-chip/zap). You can download a recent release of
 zap from its [releases page](https://github.com/project-chip/zap/releases). It
 is recommended to download a release that is in sync with the currently in use
-version by the SDK (see `scripts/zap.json` and 
+version by the SDK (see `scripts/zap.json` and
 `scripts/tools/zap/zap_execution.py` for the minimum supported version).
 
 Beyond basic zap file selection, there are also `.json` zap settings that define
@@ -45,7 +45,7 @@ compiling on Raspberry PI.). In these cases one should checkout zap from source
 and set `$ZAP_DEVELOPMENT_PATH` as described below.
 
 When matter scripts need to invoke `zap-cli` (for code generation) or `zap` (to
-start the UI tool), they make use of the following environment variables to 
+start the UI tool), they make use of the following environment variables to
 figure out where the zap tool is located (in order of precedence):
 
 -   if `$ZAP_DEVELOPMENT_PATH` is set, code assumes you are running zap from
@@ -56,7 +56,7 @@ figure out where the zap tool is located (in order of precedence):
 -   if `$ZAP_INSTALL_PATH` is set, code assumes that `zap` or `zap-cli` is
     available in the given path. This is generally an unpacked release.
 
--   otherwise, scripts will assume `zap`/`zap-cli` is in `$PATH` (this is the 
+-   otherwise, scripts will assume `zap`/`zap-cli` is in `$PATH` (this is the
     case when running in a bootstrapped environment)
 
 ### Using a UI to edit `.zap` files
