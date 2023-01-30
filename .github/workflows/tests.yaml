@@ -177,7 +177,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
                       src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
                       src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/general.xml \
+                      src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml \
+                      src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/silabs/ha-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/ha.xml \
                       src/app/zap-templates/zcl/data-model/silabs/lo-devices.xml \

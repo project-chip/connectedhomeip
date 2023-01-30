@@ -67,7 +67,9 @@
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
    <xi:include href="chip/window-covering.xml" />
    <xi:include href="chip/matter-devices.xml" />
-   <xi:include href="silabs/general.xml" />
+   <xi:include href="draft/barrier-control.xml" />
+   <xi:include href="draft/input-output-value-clusters.xml" />
+   <xi:include href="draft/onoff-switch-configuration-cluster.xml" />
    <xi:include href="silabs/ha-devices.xml" />
    <xi:include href="silabs/ha.xml" />
    <xi:include href="silabs/lo-devices.xml" />

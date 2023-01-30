@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2008,2020 Silicon Labs.
+Copyright (c) 2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,36 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="General" spec="zcl-8.0-07-5123-08" certifiable="true">
-    <older spec="zcl-7.0-07-5123-07" certifiable="true"/>
-    <older spec="zcl6-errata-14-0129-15"/>
-    <older spec="zcl-6.0-15-02017-001"/>
-    <older spec="zcl-1.0-07-5123-03"/>
-  </domain>
-  <domain name="Lighting &amp; Occupancy" spec="l&amp;o-1.0-15-0014-04" certifiable="false"/>
-  <domain name="HA" spec="ha-1.2.1-05-3520-30" dependsOn="zcl-1.0-07-5123-03" certifiable="false">
-    <older spec="ha-1.2-05-3520-29" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
-    <older spec="ha-1.1-05-3520-27" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
-  </domain>
-  <cluster>
-    <name>On/off Switch Configuration</name>
-    <domain>General</domain>
-    <description>Attributes and commands for configuring On/Off switching devices.</description>
-    <code>0x0007</code>
-    <define>ON_OFF_SWITCH_CONFIGURATION_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="SWITCH_TYPE" type="ENUM8" min="0x00" max="0x01" writable="false" optional="false">switch type</attribute>
-    <attribute side="server" code="0x0010" define="SWITCH_ACTIONS" type="ENUM8" min="0x00" max="0x02" writable="true" default="0x00" optional="false">switch actions</attribute>
-  </cluster>
+  <domain name="General"/>
+
   <cluster>
     <name>Binary Input (Basic)</name>
     <domain>General</domain>
     <description>An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. </description>
     <code>0x000F</code>
     <define>BINARY_INPUT_BASIC_CLUSTER</define>
+
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
     <attribute side="server" code="0x0004" define="ACTIVE_TEXT" type="CHAR_STRING" length="16" writable="true" default="" optional="true">active text</attribute>
     <attribute side="server" code="0x001C" define="DESCRIPTION" type="CHAR_STRING" length="16" writable="true" default="" optional="true">description</attribute>
     <attribute side="server" code="0x002E" define="INACTIVE_TEXT" type="CHAR_STRING" length="16" writable="true" default="" optional="true">inactive text</attribute>
@@ -55,14 +37,4 @@ limitations under the License.
     <attribute side="server" code="0x006F" define="STATUS_FLAGS" type="BITMAP8" min="0x00" max="0x0F" writable="false" default="0x00" reportable="true" optional="false">status flags</attribute>
     <attribute side="server" code="0x0100" define="APPLICATION_TYPE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">application type</attribute>
   </cluster>
-  <bitmap name="LevelControlFeature" type="BITMAP32">
-      <cluster code="0x0008"/>
-      <field name="OnOff" mask="0x1"/>
-      <field name="Lighting" mask="0x2"/>
-      <field name="Frequency" mask="0x4"/>
-  </bitmap>  
-  <bitmap name="GroupClusterFeature" type="BITMAP32">
-      <cluster code="0x0004"/>
-      <field name="GroupNames" mask="0x1"/>
-  </bitmap>
 </configurator>
