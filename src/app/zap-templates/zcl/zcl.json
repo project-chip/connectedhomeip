@@ -29,6 +29,7 @@
         "channel-cluster.xml",
         "client-monitoring-cluster.xml",
         "clusters-extensions.xml",
+        "color-control-cluster.xml",
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
         "diagnostic-logs-cluster.xml",
@@ -84,7 +85,7 @@
         "ha.xml",
         "lo-devices.xml",
         "zll-devices.xml",
-        "zll.xml"
+        "types/color-control.xml"
     ],
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {

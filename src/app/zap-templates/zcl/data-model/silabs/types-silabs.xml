@@ -159,44 +159,6 @@ limitations under the License.
     <item name="levelFourLockout" value="0x4"/>
     <item name="levelfiveLockout" value="0x5"/>
   </enum>
-  <enum name="HueDirection" type="ENUM8">
-    <cluster code="0x0300"/>
-    <item name="ShortestDistance" value="0x0"/>
-    <item name="LongestDistance" value="0x1"/>
-    <item name="Up" value="0x2"/>
-    <item name="Down" value="0x3"/>
-  </enum>
-  <enum name="HueMoveMode" type="ENUM8">
-    <cluster code="0x0300"/>
-    <item name="Stop" value="0x0"/>
-    <item name="Up" value="0x1"/>
-    <item name="Down" value="0x3"/>
-  </enum>
-  <enum name="HueStepMode" type="ENUM8">
-    <cluster code="0x0300"/>
-    <item name="Up" value="0x1"/>
-    <item name="Down" value="0x3"/>
-  </enum>
-  <enum name="SaturationMoveMode" type="ENUM8">
-    <cluster code="0x0300"/>
-    <item name="Stop" value="0x0"/>
-    <item name="Up" value="0x1"/>
-    <item name="Down" value="0x3"/>
-  </enum>
-  <enum name="SaturationStepMode" type="ENUM8">
-    <cluster code="0x0300"/>
-    <item name="Up" value="0x1"/>
-    <item name="Down" value="0x3"/>
-  </enum>
-  <enum name="ColorMode" type="ENUM8">
-    <cluster code="0x0300"/>
-    <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
-    <item name="CurrentXAndCurrentY" value="0x01"/>
-    <item name="ColorTemperature" value="0x02"/>
-  </enum>
-  <enum name="ColorControlOptions" type="BITMAP8">
-    <item name="ExecuteIfOff" value="0x1"/>
-  </enum>
   <enum name="LevelStatus" type="ENUM8">
     <item name="OnTarget" value="0x0"/>
     <item name="BelowTarget" value="0x1"/>
