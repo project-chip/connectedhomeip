@@ -32,7 +32,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/ZclString.h>
 
 #include <app/InteractionModelEngine.h>
