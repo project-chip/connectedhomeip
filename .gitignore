@@ -74,3 +74,7 @@ examples/thermostat/ameba/build
 
 # Downloaded zap without a pigweed root (via zap_download.py)
 .zap
+
+# for idf component manager files
+examples/*/esp32/managed_components
+examples/*/esp32/dependencies.lock
