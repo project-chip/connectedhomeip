@@ -467,8 +467,21 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
     // Just treat this as a timeout error.  Don't bother delivering the partial
     // results we have queued up in the BrowseContext, if any.  In practice
     // there shouldn't be anything there long-term anyway.
-    auto browseCtx = static_cast<BrowseContext *>(ctx);
-    browseCtx->Finalize(kDNSServiceErr_Timeout);
+    //
+    // Make sure to time out all the resolves first, before we time out the
+    // browse (because after the latter the serviceRefs on the resolves will not
+    // really be usable).
+    std::vector<GenericContext *> resolves;
+    MdnsContexts::GetInstance().FindAllMatchingPredicate(
+        [ctx](GenericContext * item) { return item->type == ContextType::Resolve && item->serviceRef == ctx->serviceRef; },
+        resolves);
+
+    for (auto & resolve : resolves)
+    {
+        resolve->Finalize(kDNSServiceErr_Timeout);
+    }
+
+    ctx->Finalize(kDNSServiceErr_Timeout);
     return CHIP_NO_ERROR;
 }
 

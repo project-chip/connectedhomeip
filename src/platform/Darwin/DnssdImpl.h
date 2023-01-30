@@ -105,6 +105,23 @@ public:
 
     void Delete(GenericContext * context);
 
+    /**
+     * Fill the provided vector with all contexts for which the given predicate
+     * returns true.
+     */
+    template <typename F>
+    void FindAllMatchingPredicate(F predicate, std::vector<GenericContext *> & results)
+    {
+        results.clear();
+        for (auto & ctx : mContexts)
+        {
+            if (predicate(ctx))
+            {
+                results.push_back(ctx);
+            }
+        }
+    }
+
 private:
     MdnsContexts(){};
     static MdnsContexts sInstance;
