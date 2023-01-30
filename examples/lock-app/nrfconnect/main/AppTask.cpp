@@ -179,7 +179,7 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_MCUMGR_SMP_BT
     // Initialize DFU over SMP
-    GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+    GetDFUOverSMP().Init();
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
@@ -398,16 +398,6 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
 #endif
     }
 }
-
-#ifdef CONFIG_MCUMGR_SMP_BT
-void AppTask::RequestSMPAdvertisingStart(void)
-{
-    AppEvent event;
-    event.Type    = AppEventType::StartSMPAdvertising;
-    event.Handler = [](const AppEvent &) { GetDFUOverSMP().StartBLEAdvertising(); };
-    PostEvent(event);
-}
-#endif
 
 void AppTask::FunctionHandler(const AppEvent & event)
 {

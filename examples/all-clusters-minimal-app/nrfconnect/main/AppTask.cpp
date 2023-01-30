@@ -209,16 +209,6 @@ void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
     }
 }
 
-#ifdef CONFIG_MCUMGR_SMP_BT
-void AppTask::RequestSMPAdvertisingStart(void)
-{
-    AppEvent event;
-    event.Type    = AppEventType::StartSMPAdvertising;
-    event.Handler = [](const AppEvent &) { GetDFUOverSMP().StartBLEAdvertising(); };
-    PostEvent(event);
-}
-#endif
-
 void AppTask::FunctionTimerTimeoutCallback(k_timer * timer)
 {
     if (!timer)
