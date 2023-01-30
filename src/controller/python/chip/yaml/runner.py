@@ -278,10 +278,11 @@ class WaitForCommissioneeAction(BaseAction):
         args = test_step.arguments['values']
         request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
 
-        # When expireExistingSession is not provided it is true be default. This is because
-        # expireExistingSession argument was added later on to test a specific CASE situation
-        # where that specific test case did not want existing session to be expired. For more
-        # information see PR #20820.
+        # There's a chance the commissionee may have rebooted before this call here as part of a
+        # test flow or is just starting out fresh outright. Unless expireExistingSession is
+        # explicitly set, the default behaviour it so make sure we're not re-using any cached CASE
+        # sessions that will now be stale and mismatched with the peer, causing subsequent
+        # interactions to fail.
         self._expire_existing_session = request_data_as_dict.get('expireExistingSession', True)
         self._node_id = request_data_as_dict['nodeId']
         if 'timeout' in request_data_as_dict:
