@@ -1664,7 +1664,7 @@
                     while (iter.Next()) {
                         const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & targetInfo
                             = iter.GetValue();
-                        TargetNavigator_TargetInfoStruct * objCTargetInfo = [[TargetNavigator_TargetInfoStruct alloc]
+                        TargetNavigator_TargetInfoStruct * objCTargetInfoStruct = [[TargetNavigator_TargetInfoStruct alloc]
                             initWithIdentifier:@(targetInfo.identifier)
                                           name:[NSString stringWithUTF8String:targetInfo.name.data()]];
                         [objCTargetList addObject:objCTargetInfoStruct];

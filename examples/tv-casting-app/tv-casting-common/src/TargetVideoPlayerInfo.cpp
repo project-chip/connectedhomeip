@@ -17,6 +17,8 @@
  */
 #include "TargetVideoPlayerInfo.h"
 
+#include <app/server/Server.h>
+
 using namespace chip;
 
 CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
