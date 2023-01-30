@@ -217,8 +217,8 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
                                                     uint16_t maxReadLength)
 {
     using namespace BridgedDeviceBasicInformation::Attributes;
-
-    ChipLogProgress(DeviceLayer, "HandleReadBridgedDeviceBasicAttribute: attrId=%" PRIu32 ", maxReadLength=%u", attributeId, maxReadLength);
+    ChipLogProgress(DeviceLayer, "HandleReadBridgedDeviceBasicAttribute: attrId=%" PRIu32 ", maxReadLength=%u", attributeId,
+                    maxReadLength);
 
     if ((attributeId == Reachable::Id) && (maxReadLength == 1))
     {
