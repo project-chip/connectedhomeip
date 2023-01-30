@@ -562,10 +562,10 @@ private:
     Credentials::OperationalCertificateStore * mOpCertStore;
     app::FailSafeContext mFailSafeContext;
 
+    bool mIsDnssdReady = false;
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;
     Inet::InterfaceId mInterfaceId;
-    bool mIsDnssdReady = false;
 };
 
 } // namespace chip

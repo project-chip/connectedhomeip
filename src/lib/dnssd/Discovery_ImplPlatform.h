@@ -49,6 +49,7 @@ public:
     CHIP_ERROR UpdateCommissionableInstanceName() override;
 
     // Members that implement Resolver interface.
+    bool IsInitialized() override;
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
     {

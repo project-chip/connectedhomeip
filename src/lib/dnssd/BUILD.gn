@@ -14,30 +14,14 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
-
-import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("platform_header") {
   sources = [ "platform/Dnssd.h" ]
 }
 
-buildconfig_header("dnssd_buildconfig") {
-  header = "DnssdBuildConfig.h"
-  header_dir = "dnssd"
-
-  chip_dnssd_minimal = chip_mdns == "minimal"
-  chip_dnssd_platform = chip_mdns == "platform"
-
-  defines = [
-    "CHIP_DNSSD_MINIMAL=${chip_dnssd_minimal}",
-    "CHIP_DNSSD_PLATFORM=${chip_dnssd_platform}",
-  ]
-}
-
 static_library("dnssd") {
   public_deps = [
-    ":dnssd_buildconfig",
     ":platform_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
