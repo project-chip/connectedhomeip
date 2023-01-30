@@ -285,8 +285,8 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/third_party/freertos/timers.c",
 
       # USART
-      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
 
       # mbedtls
       "${chip_root}/third_party/mbedtls/repo/library/aes.c",
