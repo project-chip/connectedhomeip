@@ -19,11 +19,13 @@
 #include <string.h>
 #include <task.h>
 
+#ifndef BRD4325A
 #include "rail_types.h"
 
 #ifdef RAIL_ASSERT_DEBUG_STRING
 #include "rail_assert_error_codes.h"
 #endif
+#endif // BRD4325A
 
 #ifdef BRD4325A // For SiWx917 Platform only
 #include "core_cm4.h"
@@ -514,6 +516,7 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
+#ifndef BRD4325A
 extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode)
 {
 #ifdef RAIL_ASSERT_DEBUG_STRING
@@ -533,5 +536,6 @@ extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode
     while (1)
         ;
 }
+#endif // BRD4325A
 
 #endif // HARD_FAULT_LOG_ENABLE && SILABS_LOG_ENABLED
