@@ -99,7 +99,6 @@ def main(setup_code, yaml_path, node_id, pics_file):
 
                 # Some still-silabs clusters
                 _CLUSTER_XML_DIRECTORY_PATH + '/silabs/ha.xml',  # For fan control
-                _CLUSTER_XML_DIRECTORY_PATH + '/silabs/general.xml',  # For LevelControl cluster
             ])
 
             # Parsing YAML test and setting up chip-repl yamltests runner.

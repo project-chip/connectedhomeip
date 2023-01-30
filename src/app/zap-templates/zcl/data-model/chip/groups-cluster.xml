@@ -17,6 +17,11 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
+  <bitmap name="GroupClusterFeature" type="BITMAP32">
+      <cluster code="0x0004"/>
+      <field name="GroupNames" mask="0x1"/>
+  </bitmap>
+
   <cluster>
     <name>Groups</name>
     <domain>General</domain>
