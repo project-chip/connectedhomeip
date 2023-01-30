@@ -125,6 +125,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
+                      src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
@@ -182,7 +183,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/silabs/lo-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/types-silabs.xml \
                       src/app/zap-templates/zcl/data-model/silabs/zll-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/zll.xml \
                     "
             - name: Build Apps
               timeout-minutes: 60
