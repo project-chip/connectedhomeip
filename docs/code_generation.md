@@ -37,7 +37,7 @@ There are only two such files currently in use:
 ### Installing zap and environment variables
 
 ZAP is generally installed as a third-party tool via CIPD during the build
-environment bootstrap (see `scripts/zap.json`), which makes `zap-cli` vailable
+environment bootstrap (see `scripts/zap.json`), which makes `zap-cli` available
 in `$PATH` when running in a build environment.
 
 **NOTE**: zap packages are currently NOT available for `arm64` (like when
