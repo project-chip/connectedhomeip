@@ -211,7 +211,6 @@ def _GetManualTests() -> Set[ManualTest]:
     for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
         manualtests.add(item)
 
-
     return manualtests
 
 
