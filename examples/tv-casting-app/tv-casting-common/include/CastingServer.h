@@ -97,6 +97,7 @@ public:
                                            std::function<void(CHIP_ERROR)> onConnectionFailure,
                                            std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
 
+    void LogCachedVideoPlayers();
     CHIP_ERROR PurgeVideoPlayerCache();
 
     /**
