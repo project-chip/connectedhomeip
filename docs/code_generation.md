@@ -41,7 +41,7 @@ environment bootstrap (see `scripts/zap.json`), which makes `zap-cli` available
 in `$PATH` when running in a build environment.
 
 **NOTE**: zap packages are currently NOT available for `arm64` (like when
-compiling on Raspberry PI.). In these cases one should checkout zap from source
+compiling on Raspberry PI.). In these cases one should check out zap from source
 and set `$ZAP_DEVELOPMENT_PATH` as described below.
 
 When matter scripts need to invoke `zap-cli` (for code generation) or `zap` (to
