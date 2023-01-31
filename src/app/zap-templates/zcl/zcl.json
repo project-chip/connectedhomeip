@@ -29,6 +29,7 @@
         "channel-cluster.xml",
         "client-monitoring-cluster.xml",
         "clusters-extensions.xml",
+        "color-control-cluster.xml",
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
         "diagnostic-logs-cluster.xml",
@@ -44,6 +45,7 @@
         "group-key-mgmt-cluster.xml",
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
+        "input-output-value-clusters.xml",
         "keypad-input-cluster.xml",
         "level-control-cluster.xml",
         "localization-configuration-cluster.xml",
@@ -53,6 +55,7 @@
         "mode-select-cluster.xml",
         "network-commissioning-cluster.xml",
         "onoff-cluster.xml",
+        "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
@@ -79,12 +82,11 @@
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",
-        "general.xml",
         "ha-devices.xml",
         "ha.xml",
         "lo-devices.xml",
         "zll-devices.xml",
-        "zll.xml"
+        "types/color-control.xml"
     ],
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {

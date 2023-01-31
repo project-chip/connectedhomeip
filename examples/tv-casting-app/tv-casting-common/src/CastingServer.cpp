@@ -18,6 +18,8 @@
 
 #include "CastingServer.h"
 
+#include "app/clusters/bindings/BindingManager.h"
+
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;

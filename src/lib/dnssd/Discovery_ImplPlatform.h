@@ -64,6 +64,13 @@ public:
     static DiscoveryImplPlatform & GetInstance();
 
 private:
+    enum class State : uint8_t
+    {
+        kUninitialized,
+        kInitializing,
+        kInitialized
+    };
+
     DiscoveryImplPlatform();
 
     DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
@@ -83,16 +90,8 @@ private:
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                               DnssdServiceProtocol procotol, PeerId peerId);
 
-    OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionerNodeAdvertisingParams;
-    bool mIsOperationalNodePublishing    = false;
-    bool mIsCommissionableNodePublishing = false;
-    bool mIsCommissionerNodePublishing   = false;
+    State mState = State::kUninitialized;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
-
-    bool mDnssdInitialized = false;
-
     ResolverProxy mResolverProxy;
 
     static DiscoveryImplPlatform sManager;

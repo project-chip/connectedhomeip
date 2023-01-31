@@ -158,6 +158,7 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
+    "${chip_root}/examples/light-switch-app/silabs/common",
     "${chip_root}/src/platform/silabs/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
@@ -211,6 +212,8 @@ efr32_executable("light_switch_app") {
   defines = []
 
   sources = [
+    "${chip_root}/examples/light-switch-app/silabs/common/BindingHandler.cpp",
+    "${chip_root}/examples/light-switch-app/silabs/common/LightSwitchMgr.cpp",
     "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
@@ -218,7 +221,6 @@ efr32_executable("light_switch_app") {
     "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
     "src/ZclCallbacks.cpp",
-    "src/binding-handler.cpp",
     "src/main.cpp",
   ]
 
@@ -238,6 +240,12 @@ efr32_executable("light_switch_app") {
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
+
+  if (chip_build_libshell) {
+    sources += [
+      "${chip_root}/examples/light-switch-app/silabs/common/ShellCommands.cpp",
+    ]
+  }
 
   # OpenThread Settings
   if (chip_enable_openthread) {

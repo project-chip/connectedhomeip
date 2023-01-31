@@ -71,10 +71,6 @@ private:
     static void ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged);
     static void UpdateStatusLED();
 
-#ifdef CONFIG_MCUMGR_SMP_BT
-    static void RequestSMPAdvertisingStart(void);
-#endif
-
     FunctionEvent mFunction{ FunctionEvent::NoneSelected };
     OperationalState mMoveType{ OperationalState::MovingUpOrOpen };
     bool mFunctionTimerActive{ false };

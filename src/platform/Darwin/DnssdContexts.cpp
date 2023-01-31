@@ -381,6 +381,17 @@ void ResolveContext::DispatchSuccess()
 
 CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
 {
+    // If we don't have any information about this interfaceId, just ignore the
+    // address, since it won't be usable anyway without things like the port.
+    // This can happen if "local" is set up as a search domain in the DNS setup
+    // on the system, because the hostnames we are looking up all end in
+    // ".local".  In other words, we can get regular DNS results in here, not
+    // just DNS-SD ones.
+    if (interfaces.find(interfaceId) == interfaces.end())
+    {
+        return CHIP_NO_ERROR;
+    }
+
     chip::Inet::IPAddress ip;
     ReturnErrorOnFailure(chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip));
     interfaces[interfaceId].addresses.push_back(ip);

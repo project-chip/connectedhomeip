@@ -76,6 +76,12 @@ CHIP_ERROR AmebaUtils::EnableStationMode(void)
 CHIP_ERROR AmebaUtils::SetWiFiConfig(rtw_wifi_config_t * config)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    // don't store if ssid is null
+    if (config->ssid[0] == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     /* Store Wi-Fi Configurations in Storage */
     err = PersistedStorage::KeyValueStoreMgr().Put(kWiFiSSIDKeyName, config->ssid, sizeof(config->ssid));
     SuccessOrExit(err);
