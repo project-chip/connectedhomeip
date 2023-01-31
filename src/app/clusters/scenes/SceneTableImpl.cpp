@@ -273,6 +273,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBuffer
     bool Find(PersistentStorageDelegate * storage, const FabricSceneData & fabric,
               DefaultSceneTableImpl::SceneStorageId target_scene)
     {
+        CHIP_ERROR err;
         fabric_index = fabric.fabric_index;
         storageId    = fabric.first_scene;
         index        = 0;
@@ -280,8 +281,10 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBuffer
 
         while (index < fabric.scene_count)
         {
-            if (CHIP_NO_ERROR != Load(storage))
+            err = Load(storage);
+            if (err != CHIP_NO_ERROR)
             {
+                LogErrorOnFailure(err);
                 break;
             }
             if (storageId == target_scene)
@@ -351,7 +354,7 @@ CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, c
         ReturnErrorOnFailure(prev.Save(mStorage));
     }
 
-    ReturnErrorOnFailure(fabric.Save(mStorage));
+    LogErrorOnFailure(fabric.Save(mStorage));
 
     return scene.Save(mStorage);
 }
