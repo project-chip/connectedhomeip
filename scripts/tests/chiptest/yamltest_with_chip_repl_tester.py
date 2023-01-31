@@ -33,7 +33,7 @@ import click
 from chip.ChipStack import *
 from chip.yaml.runner import ReplTestRunner
 from matter_yamltests.definitions import SpecDefinitionsFromPaths
-from matter_yamltests.parser import TestParser, PostProcessCheckStatus
+from matter_yamltests.parser import PostProcessCheckStatus, TestParser
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))

@@ -25,8 +25,7 @@ from enum import Enum, IntEnum
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
 import stringcase
-from chip.ChipDeviceCtrl import discovery
-from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.ChipDeviceCtrl import ChipDeviceController, discovery
 from chip.clusters.Attribute import AttributeStatus, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
 from chip.exceptions import ChipStackError
 from chip.yaml.errors import ParsingError, UnexpectedParsingError
@@ -504,6 +503,7 @@ class CommissionerCommandAction(BaseAction):
         else:
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
 
+
 class DiscoveryCommandAction(BaseAction):
     """DiscoveryCommand::FindCommissionable implementation"""
 
@@ -537,9 +537,9 @@ class DiscoveryCommandAction(BaseAction):
 
         self.step = test_step
 
-
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        devices = dev_ctrl.DiscoverCommissionableNodes(filterType=self.filterType, filter=self.filter, stopOnFirst = True, timeoutSecond=5)
+        devices = dev_ctrl.DiscoverCommissionableNodes(
+            filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
 
         # Devices will be a list: [CommissionableNode(), ...]
         logging.info("Discovered devices: %r" % devices)
@@ -555,6 +555,7 @@ class DiscoveryCommandAction(BaseAction):
 
 class NotImplementedAction(BaseAction):
     """Raises a "NOT YET IMPLEMENTED" exception when run."""
+
     def __init__(self, test_step, cluster, command):
         super().__init__(test_step)
         self.cluster = cluster
@@ -562,7 +563,6 @@ class NotImplementedAction(BaseAction):
 
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         raise Exception(f"NOT YET IMPLEMENTED: {self.cluster}::{self.command}")
-
 
 
 class ReplTestRunner:
@@ -686,7 +686,7 @@ class ReplTestRunner:
         # cluster than that specified in 'config'.
 
         elif cluster == 'DiscoveryCommands':
-                return DiscoveryCommandAction(request)
+            return DiscoveryCommandAction(request)
         elif cluster == 'DelayCommands' and command == 'WaitForCommissionee':
             action = self._wait_for_commissionee_action_factory(request)
         elif command == 'writeAttribute':
