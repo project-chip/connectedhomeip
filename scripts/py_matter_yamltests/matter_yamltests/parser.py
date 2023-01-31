@@ -643,7 +643,7 @@ class TestStep:
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if expected_name not in received_value:
+                if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
                         name=expected_name))
                     continue
@@ -692,7 +692,7 @@ class TestStep:
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if expected_name not in received_value:
+                if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
                         name=expected_name))
                     continue
@@ -720,7 +720,7 @@ class TestStep:
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if expected_name not in received_value:
+                if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
                         name=expected_name))
                     continue
