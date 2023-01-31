@@ -438,6 +438,9 @@ def main():
     for timing in timings:
         tmpl = timing.template
 
+        if tmpl is None:
+            tmpl = '[DEFAULT/NONE]'
+
         if len(tmpl) > 50:
             # easier to distinguish paths ... shorten common in-fixes
             tmpl = tmpl.replace("/zap-templates/", "/../")
