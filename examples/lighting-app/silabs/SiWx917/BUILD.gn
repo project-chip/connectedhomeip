@@ -161,9 +161,10 @@ efr32_sdk("sdk") {
     ]
   }
 
-  if(siwx917_commissionable_data){
-    defines += ["SIWX917_USE_COMISSIONABLE_DATA=1",]
+  if (siwx917_commissionable_data) {
+    defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
   }
+
   # WiFi Settings
   if (chip_enable_wifi) {
     if (use_SiWx917) {

@@ -16,13 +16,13 @@
  */
 
 #include "SiWx917DeviceDataProvider.h"
-#include <platform/silabs/SilabsConfig.h>
-#include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/Base64.h>
-#include <setup_payload/Base38Encode.h>
-#include <setup_payload/SetupPayload.h>
 #include "DeviceConfig.h"
 #include "siwx917_utils.h"
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/Base64.h>
+#include <platform/silabs/SilabsConfig.h>
+#include <setup_payload/Base38Encode.h>
+#include <setup_payload/SetupPayload.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,15 +34,20 @@ using namespace std;
 using namespace chip::DeviceLayer::Internal;
 
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
-uint8_t SIWx917DeviceDataProvider::WriteBits(uint8_t * bits, uint8_t offset, uint64_t input, uint8_t numberOfBits, uint8_t totalPayloadInBits){
-    if((offset + numberOfBits) > totalPayloadInBits){
+uint8_t SIWx917DeviceDataProvider::WriteBits(uint8_t * bits, uint8_t offset, uint64_t input, uint8_t numberOfBits,
+                                             uint8_t totalPayloadInBits)
+{
+    if ((offset + numberOfBits) > totalPayloadInBits)
+    {
         return -1;
     }
     uint8_t index = offset;
     offset += numberOfBits;
-    while(input != 0){
-        if(input & 1){
-            bits[int(index/8)] |= (1 << (index % 8));
+    while (input != 0)
+    {
+        if (input & 1)
+        {
+            bits[int(index / 8)] |= (1 << (index % 8));
         }
         index++;
         input >>= 1;
@@ -51,116 +56,146 @@ uint8_t SIWx917DeviceDataProvider::WriteBits(uint8_t * bits, uint8_t offset, uin
 }
 
 // Generation of the payload using the details provided in the DeviceConfig.h
-void SIWx917DeviceDataProvider::generateQrCodeBitSet(uint8_t * payload){
-    uint8_t kVersionFieldLengthInBits =3;
-    uint8_t kVendorIDFieldLengthInBits = 16;
-    uint8_t kProductIDFieldLengthInBits = 16;
-    uint8_t kCommissioningFlowFieldLengthInBits = 2;
-    uint8_t kRendezvousInfoFieldLengthInBits = 8;
+void SIWx917DeviceDataProvider::generateQrCodeBitSet(uint8_t * payload)
+{
+    uint8_t kVersionFieldLengthInBits              = 3;
+    uint8_t kVendorIDFieldLengthInBits             = 16;
+    uint8_t kProductIDFieldLengthInBits            = 16;
+    uint8_t kCommissioningFlowFieldLengthInBits    = 2;
+    uint8_t kRendezvousInfoFieldLengthInBits       = 8;
     uint8_t kPayloadDiscriminatorFieldLengthInBits = 12;
-    uint8_t kSetupPINCodeFieldLengthInBits = 27;
-    uint8_t kPaddingFieldLengthInBits = 4;
+    uint8_t kSetupPINCodeFieldLengthInBits         = 27;
+    uint8_t kPaddingFieldLengthInBits              = 4;
 
-    uint8_t kTotalPayloadDataSizeInBits = (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits +
-                                       kCommissioningFlowFieldLengthInBits + kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits +
-                                       kSetupPINCodeFieldLengthInBits + kPaddingFieldLengthInBits);
+    uint8_t kTotalPayloadDataSizeInBits =
+        (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits +
+         kCommissioningFlowFieldLengthInBits + kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits +
+         kSetupPINCodeFieldLengthInBits + kPaddingFieldLengthInBits);
     uint8_t offset = 0;
     uint8_t * fillBits;
-    fillBits = (uint8_t *)malloc(sizeof(uint8_t)*11);
-    memset(fillBits,0,sizeof(fillBits)*11);
+    fillBits = (uint8_t *) malloc(sizeof(uint8_t) * 11);
+    memset(fillBits, 0, sizeof(fillBits) * 11);
 
     offset = WriteBits(fillBits, offset, 0, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t)vendorId, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t)productId, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t)commissionableFlow, kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t)rendezvousFlag, kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t)discriminatorValue, kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t)passcode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits);
+    offset = WriteBits(fillBits, offset, (uint64_t) vendorId, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
+    offset = WriteBits(fillBits, offset, (uint64_t) productId, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
+    offset = WriteBits(fillBits, offset, (uint64_t) commissionableFlow, kCommissioningFlowFieldLengthInBits,
+                       kTotalPayloadDataSizeInBits);
+    offset = WriteBits(fillBits, offset, (uint64_t) rendezvousFlag, kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits);
+    offset = WriteBits(fillBits, offset, (uint64_t) discriminatorValue, kPayloadDiscriminatorFieldLengthInBits,
+                       kTotalPayloadDataSizeInBits);
+    offset = WriteBits(fillBits, offset, (uint64_t) passcode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits);
     offset = WriteBits(fillBits, offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits);
 
-    for(uint8_t i = 0;i<kTotalPayloadDataSizeInBits/8;i++){
+    for (uint8_t i = 0; i < kTotalPayloadDataSizeInBits / 8; i++)
+    {
         payload[i] = fillBits[i];
     }
 }
 
 // writing to the flash based on the value given in the DeviceConfig.h
-CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData(){
+CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData()
+{
     // flashing the value to the nvm3 section of the flash
     // TODO: remove this once it is removed SiWx917 have the nvm3 simiplicity commander support
     CHIP_ERROR err;
     // Checking for the value of CM and flag
-    if((commissionableFlow > 3) || (rendezvousFlag > 7)){
+    if ((commissionableFlow > 3) || (rendezvousFlag > 7))
+    {
         return CHIP_ERROR_INTERNAL;
     }
-    if(discriminatorValue != 0){
-        err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_SetupDiscriminator, discriminatorValue);
-        if(err != CHIP_NO_ERROR){
+    if (discriminatorValue != 0)
+    {
+        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_SetupDiscriminator, discriminatorValue);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
     uint8_t payload[11];
     generateQrCodeBitSet(payload);
-    err = SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_SetupPayloadBitSet, payload, 11);
-    if(err != CHIP_NO_ERROR){
+    err = SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_SetupPayloadBitSet, payload, 11);
+    if (err != CHIP_NO_ERROR)
+    {
         return err;
     }
-    if(spake2Interation != 0){
-        err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_Spake2pIterationCount, spake2Interation);
-        if(err != CHIP_NO_ERROR){
+    if (spake2Interation != 0)
+    {
+        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Spake2pIterationCount, spake2Interation);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(spake2Salt != NULL){
-        err = SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_Spake2pSalt, spake2Salt);
-        if(err != CHIP_NO_ERROR){
+    if (spake2Salt != NULL)
+    {
+        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pSalt, spake2Salt);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(spake2Verifier != NULL){
-        err = SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_Spake2pVerifier, spake2Verifier);
-        if(err != CHIP_NO_ERROR){
+    if (spake2Verifier != NULL)
+    {
+        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pVerifier, spake2Verifier);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(productId != 0){
-        err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_ProductId, productId);
-        if(err != CHIP_NO_ERROR){
+    if (productId != 0)
+    {
+        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_ProductId, productId);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(vendorId != 0){
-        err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_VendorId, vendorId);
-        if(err != CHIP_NO_ERROR){
+    if (vendorId != 0)
+    {
+        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_VendorId, vendorId);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(strlen(productName) != 0){
-        err = SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_ProductName, productName);
-        if(err != CHIP_NO_ERROR){
+    if (strlen(productName) != 0)
+    {
+        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_ProductName, productName);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(strlen(vendorName) != 0){
-        err = SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_VendorName, vendorName);
-        if(err != CHIP_NO_ERROR){
+    if (strlen(vendorName) != 0)
+    {
+        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_VendorName, vendorName);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(strlen(hwVersionString) != 0){
-        err = SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_HardwareVersionString, hwVersionString);
-        if(err != CHIP_NO_ERROR){
+    if (strlen(hwVersionString) != 0)
+    {
+        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_HardwareVersionString, hwVersionString);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(rotatingId != 0){
-        err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_UniqueId, rotatingId);
-        if(err != CHIP_NO_ERROR){
+    if (rotatingId != 0)
+    {
+        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_UniqueId, rotatingId);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
-    if(commissionableFlow != 0){
-        err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_ProductName, commissionableFlow);
-        if(err != CHIP_NO_ERROR){
+    if (commissionableFlow != 0)
+    {
+        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_ProductName, commissionableFlow);
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }

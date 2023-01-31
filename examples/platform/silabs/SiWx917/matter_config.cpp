@@ -117,7 +117,8 @@ CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
 
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
     err = SIWx917::SIWx917DeviceDataProvider::GetDeviceDataProvider().FlashFactoryData();
-    if(err != CHIP_NO_ERROR){
+    if (err != CHIP_NO_ERROR)
+    {
         SILABS_LOG("Flashing to the device failed");
         return err;
     }

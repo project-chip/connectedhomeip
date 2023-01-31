@@ -22,18 +22,19 @@
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
 
 uint32_t discriminatorValue = 3455;
-uint64_t passcode = 20202121;
-uint32_t spake2Interation = 100;
-char spake2Salt[] = "U1BBS0UyUCBLZXkgU2FsdA==";
-char spake2Verifier[] = "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw==";
-char genSpake2Path[] = "";
-uint32_t productId = 32773;
-uint32_t vendorId = 65521;
-char productName[] = "";
-char vendorName[] = "";
+uint64_t passcode           = 20202121;
+uint32_t spake2Interation   = 100;
+char spake2Salt[]           = "U1BBS0UyUCBLZXkgU2FsdA==";
+char spake2Verifier[]       = "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/"
+                        "SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw==";
+char genSpake2Path[]   = "";
+uint32_t productId     = 32773;
+uint32_t vendorId      = 65521;
+char productName[]     = "";
+char vendorName[]      = "";
 char hwVersionString[] = "";
-uint32_t rotatingId; 
+uint32_t rotatingId;
 uint32_t commissionableFlow = 1;
-uint8_t rendezvousFlag = 2;
+uint8_t rendezvousFlag      = 2;
 
 #endif
