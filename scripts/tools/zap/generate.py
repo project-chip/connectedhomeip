@@ -112,7 +112,6 @@ def runArgumentsParser() -> CmdLineArgs:
     # All the rest of the files (app-templates.json) are generally built at
     # compile time.
     default_templates = 'src/app/zap-templates/matter-idl.json'
-    default_output_dir = os.path.abspath(os.path.join(CHIP_ROOT_DIR,'zzz_generated'))
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
@@ -140,14 +139,10 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.set_defaults(lock_file=None)
     args = parser.parse_args()
 
-    # By default, this script assumes that the global CHIP template is used with
-    # a default 'zap-generated/' output folder relative to APP_ROOT_DIR.
-    # If needed, the user may specify a specific template as a second argument. In
-    # this case the output folder is relative to CHIP_ROOT_DIR.
     if args.output_dir:
         output_dir = args.output_dir
     elif args.templates == default_templates:
-        output_dir = os.path.join(Path(args.zap).parent, default_output_dir)
+        output_dir = os.path.abspath(os.path.join(CHIP_ROOT_DIR,'zzz_generated'))
     else:
         output_dir = ''
 
