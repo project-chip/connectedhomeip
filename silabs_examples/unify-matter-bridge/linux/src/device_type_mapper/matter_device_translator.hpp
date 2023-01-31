@@ -47,6 +47,9 @@ namespace unify::matter_bridge {
 class device_translator
 {
 public:
+    // Constructor setting boolean variable if device translator should be spec compliant
+    device_translator(bool spec_compliant) : m_spec_compliant(spec_compliant) {}
+
     /**
      * @brief Given list of clustername find possible matching device types.
      *
@@ -123,12 +126,9 @@ public:
 
     virtual ~device_translator() = default;
 
-    static const device_translator & instance()
-    {
-        static device_translator me;
-        return me;
-    }
+    bool m_spec_compliant;
 };
+
 } // namespace unify::matter_bridge
 
 #endif // MATTER_DEVICE_TRANSLATOR_HPP

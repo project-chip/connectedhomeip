@@ -13,14 +13,14 @@
 
 #ifndef MOCK_CLUSTER_EMULATOR_HPP
 #define MOCK_CLUSTER_EMULATOR_HPP
+#include "cluster_emulator.hpp"
 namespace unify::matter_bridge {
 namespace Test {
 
-class MockClusterEmulator  : public ClusterEmulator
+class MockClusterEmulator : public ClusterEmulator
 {
-
 };
 
-}
-}
+} // namespace Test
+} // namespace unify::matter_bridge
 #endif

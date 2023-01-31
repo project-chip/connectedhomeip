@@ -11,11 +11,11 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
- #include <stdint.h>
+#include <stdint.h>
 
 struct attr_type_size {
-  uint8_t attrType;
-  uint8_t attrSize;
+    uint8_t attrType;
+    uint8_t attrSize;
 };
 
 attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_id);

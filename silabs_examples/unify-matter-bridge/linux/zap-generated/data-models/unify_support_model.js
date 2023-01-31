@@ -117,6 +117,7 @@ exports.model = {
           "TransitionTime",
           "SceneName",
           "ExtensionFieldSets",
+          "TransitionTime100ms",
         ],
       },
       1 : {
@@ -195,6 +196,7 @@ exports.model = {
       3 : "SceneValid",
       4 : "NameSupport",
       5 : "LastConfiguredBy",
+      3841 : "SceneTable",
     },
   },
   6 : {
@@ -1042,6 +1044,16 @@ exports.model = {
       18 : "MaxScaledValue",
       19 : "ScaledTolerance",
       20 : "Scale",
+    },
+  },
+  1028 : {
+    name : "FlowMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "Tolerance",
     },
   },
   1029 : {

@@ -36,6 +36,7 @@ typedef struct
 {
     const char * interface;
     const char * kvs_path;
+    bool spec_compliance;
     uint16_t vendor_id;
     uint16_t product_id;
     uint16_t discriminator;

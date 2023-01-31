@@ -14,11 +14,27 @@
 #include "app/data-model/NullObject.h"
 #include "zcl_global_types.hpp"
 
+template <typename T>
+struct is_nullable : std::false_type {};
+
+template <typename T>
+struct is_nullable<chip::app::DataModel::Nullable<T>> : std::true_type {};
+
+
 // Default translation
 template <typename T>
-std::optional<T> inline from_json(const nlohmann::json & value)
+std::optional<T> inline from_json(const nlohmann::json& value)
 {
-    return std::optional<T>(value);
+    if constexpr (is_nullable<T>::value) {
+        auto v =from_json<typename T::UnderlyingType>(value);
+        if( v.has_value()) {
+            return T(v.value());
+        } else {
+            return std::nullopt;
+        }
+    } else {
+        return std::optional<T>(value);
+    }
 }
 
 template<>

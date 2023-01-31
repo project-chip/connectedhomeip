@@ -19,8 +19,9 @@ namespace unify::matter_bridge {
 class GroupClusterAttributeTranslatorHelper : public attribute_translator_interface
 {
 public:
-    GroupClusterAttributeTranslatorHelper(matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt) :
-        attribute_translator_interface(node_state_monitor, unify_mqtt, chip::app::Clusters::Groups::Id,
+    GroupClusterAttributeTranslatorHelper(matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt,
+                                          device_translator & dev_translator) :
+        attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::Groups::Id,
                                        "group_cluster_attribute_handler_helper")
     {}
 
@@ -37,6 +38,6 @@ private:
     void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
                           const nlohmann::json & unify_value) override{};
 
-    std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "Groups" }); }    
+    std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "Groups" }); }
 };
 } // namespace unify::matter_bridge

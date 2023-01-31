@@ -33,6 +33,14 @@
 
 #include "TestHelpers.hpp"
 
+template <typename T>
+struct is_nullable : std::false_type {
+};
+
+template <typename T>
+struct is_nullable<chip::app::DataModel::Nullable<T>> : std::true_type {
+};
+
 namespace unify::matter_bridge {
 namespace Test {
 
@@ -86,7 +94,7 @@ public:
         auto * ctx = static_cast<ClusterContext *>(context);
 
         if (!ctx->mAttributeHandler)
-            ctx->mAttributeHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler);
+            ctx->mAttributeHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mDeviceTranslator);
 
         if (!ctx->mCommandHandler)
             ctx->mCommandHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mGroupTranslator);

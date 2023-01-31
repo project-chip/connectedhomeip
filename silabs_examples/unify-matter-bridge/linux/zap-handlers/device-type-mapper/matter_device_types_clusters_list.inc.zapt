@@ -26,9 +26,6 @@ typedef struct {
 typedef struct {
     std::vector<DeviceClusterData> clusters;
     const char* device_type_name;
-    bool conform_clusters_to_spec;
-    bool conform_attributes_to_spec;
-    bool conform_commands_to_spec;
 } DeviceTypeData;
 
 // Device type IDs mapping
@@ -37,7 +34,7 @@ static const std::map<chip::DeviceTypeId, DeviceTypeData> matter_device_type_vs_
  {{#if (supportedDeviceTypes label)}} { {{asHex code 4}}, { { {{#zcl_device_type_clusters}}{ "{{asUpperCamelCase clusterName}}", {{isMandatoryCluster}}, 
     { {{#zcl_device_type_cluster_commands}} {{#if (nameNotNull name)}}"{{asUpperCamelCase name}}"{{listComma this}}{{/if}} {{/zcl_device_type_cluster_commands}} }, 
     { {{#zcl_device_type_cluster_attributes}} {{#if (nameNotNull name)}}"{{asUpperCamelCase name}}"{{listComma this}}{{/if}} {{/zcl_device_type_cluster_attributes}} } } {{listComma this}} {{/zcl_device_type_clusters}} }, 
-    "{{cleanDeviceTypeName label}}", {{deviceTypeClusterSpecConformance label}}, {{deviceTypeAttributeSpecConformance label}}, {{deviceTypeCommandSpecConformance label}} } 
+    "{{cleanDeviceTypeName label}}" } 
     }{{listComma this}}
   {{/if}}
 {{/zcl_device_types}}

@@ -41,8 +41,8 @@ namespace unify::matter_bridge
 class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_interface
 {
   public:
-    {{asUpperCamelCase label}}AttributeAccess(matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt) : 
-    attribute_translator_interface(node_state_monitor, unify_mqtt, chip::app::Clusters::{{asUpperCamelCase label}}::Id, "attr_translator_{{asUpperCamelCase label}}"), m_unify_mqtt(unify_mqtt)
+    {{asUpperCamelCase label}}AttributeAccess(matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt, device_translator &dev_translator) : 
+    attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::{{asUpperCamelCase label}}::Id, "attr_translator_{{asUpperCamelCase label}}"), m_unify_mqtt(unify_mqtt), m_dev_translator(dev_translator)
     {}
     
 
@@ -59,7 +59,11 @@ class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_in
 
    std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "{{unifyClusterName code}}" });}
    UnifyMqtt &m_unify_mqtt;   
+   device_translator &m_dev_translator;
+
 };
+{{else}}
+//Skipping {{label}}
 {{/if}}
 {{/zcl_clusters}}
 }  // namespace unify::matter_bridge

@@ -36,6 +36,7 @@
 #define CONFIG_KEY_DISCRIMINATOR_ID "discriminator"
 #define CONFIG_KEY_PIN_ID "pin"
 #define CONFIG_KEY_INTERFACE "interface"
+#define CONFIG_KEY_SPEC_COMPLIANCE "spec_compliance"
 
 #ifdef __APPLE__
 #define DEFAULT_INTERFACE "en0"
@@ -47,14 +48,16 @@ static matter_bridge_config_t config;
 
 int matter_bridge_config_init()
 {
-    int32_t random_pin =0;
-    int32_t random_disc =0;
+    int32_t random_pin  = 0;
+    int32_t random_disc = 0;
 
-    //Choose random discriminators and pin numbers as default
-    if(CHIP_NO_ERROR != chip::Crypto::DRBG_get_bytes( reinterpret_cast<uint8_t*>(&random_pin), sizeof(random_pin))) {
+    // Choose random discriminators and pin numbers as default
+    if (CHIP_NO_ERROR != chip::Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&random_pin), sizeof(random_pin)))
+    {
         return CONFIG_STATUS_ERROR;
     }
-    if(CHIP_NO_ERROR != chip::Crypto::DRBG_get_bytes( reinterpret_cast<uint8_t*>(&random_disc), sizeof(random_disc))) {
+    if (CHIP_NO_ERROR != chip::Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&random_disc), sizeof(random_disc)))
+    {
         return CONFIG_STATUS_ERROR;
     }
 
@@ -64,6 +67,7 @@ int matter_bridge_config_init()
     int status = CONFIG_STATUS_OK;
     status |= config_add_string(CONFIG_KEY_INTERFACE, "Ethernet interface to use", DEFAULT_INTERFACE);
     status |= config_add_string(CONFIG_KEY_KVS_PATH, "Matter key value store path", "/var/chip_unify_bridge.kvs");
+    status |= config_add_bool(CONFIG_KEY_SPEC_COMPLIANCE, "Follow spec compliance in device mapping", true);
     status |= config_add_int(CONFIG_KEY_VENDOR_ID, "16 bit Vendor ID", 0xFFF1);
     status |= config_add_int(CONFIG_KEY_PRODUCT_ID, "16 bit Product ID", 0x8001);
     status |= config_add_int(CONFIG_KEY_DISCRIMINATOR_ID, "12 bit Discriminator ID", 0xFFE);
@@ -88,10 +92,11 @@ sl_status_t matter_bridge_config_fixt_setup()
     config_status_t status = CONFIG_STATUS_OK;
     config_get_as_string(CONFIG_KEY_INTERFACE, &config.interface);
     config_get_as_string(CONFIG_KEY_KVS_PATH, &config.kvs_path);
-    config.vendor_id  = config_get_int_safe(CONFIG_KEY_VENDOR_ID);
-    config.product_id = config_get_int_safe(CONFIG_KEY_PRODUCT_ID);
+    config_get_as_bool(CONFIG_KEY_SPEC_COMPLIANCE, &config.spec_compliance);
+    config.vendor_id     = config_get_int_safe(CONFIG_KEY_VENDOR_ID);
+    config.product_id    = config_get_int_safe(CONFIG_KEY_PRODUCT_ID);
     config.discriminator = config_get_int_safe(CONFIG_KEY_DISCRIMINATOR_ID) & 0xFFFFFF;
-    config.pin = config_get_int_safe(CONFIG_KEY_PIN_ID) & 0xFFF;
+    config.pin           = config_get_int_safe(CONFIG_KEY_PIN_ID) & 0xFFF;
     return status == CONFIG_STATUS_OK ? SL_STATUS_OK : SL_STATUS_FAIL;
 }
 

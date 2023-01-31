@@ -1,8 +1,10 @@
 
 // Match supportedMappedCluster but with codes instead of names
-function supportedMappedClusterCode(code) {
+function supportedMappedClusterCode(code)
+{
   switch (code) {
-    case 0: return true // Cluster Basic
+  case 0:
+    return true // Cluster Basic
     // case 1: return true // Cluster PowerConfiguration
     // case 2: return true // Cluster DeviceTemperatureConfiguration
     case 3: return true // Cluster Identify
@@ -31,7 +33,7 @@ function supportedMappedClusterCode(code) {
     // case 1025: return true // Cluster IlluminanceLevelSensing
     case 1026: return true // Cluster TemperatureMeasurement
     case 1027: return true // Cluster PressureMeasurement
-    // case 1028: return true // Cluster FlowMeasurement
+    case 1028: return true // Cluster FlowMeasurement
     case 1029: return true // Cluster RelativityHumidity
     case 1030: return true // Cluster OccupancySensing
     // case 1033: return true // Cluster PhMeasurement
@@ -42,10 +44,10 @@ function supportedMappedClusterCode(code) {
     // case 1281: return true // Cluster IASACE
     // case 1282: return true // Cluster IASWD
     case 2820: return true // Cluster ElectricalMeasurement
-    // case 2821: return true // Cluster Diagnostics
-    // case 4096: return true // Cluster TouchlinkCommissioning
+                           // case 2821: return true // Cluster Diagnostics
+                           // case 4096: return true // Cluster TouchlinkCommissioning
 
-    default: return false
+        default: return false
   }
 }
 

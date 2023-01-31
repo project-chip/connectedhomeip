@@ -19,20 +19,20 @@ using namespace unify::matter_bridge;
 #define TEST_LOG_TAG "AttributeTranslatorTest"
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
-static device_translator dev_translator    = device_translator();
+static device_translator dev_translator    = device_translator(false);
 static ClusterEmulator emulator;
 
 static void TestClusterTranslatorRevision(nlTestSuite * inSuite, void * aContext)
 {
-    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator,emulator, ember_interface);
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, emulator, ember_interface);
     Test::MockUnifyMqtt mqtt_publish_test;
     // testing Identify Cluster revision
-    IdentifyAttributeAccess test_identify_attribute_handler(test_matter_node_state_monitor, mqtt_publish_test);
+    IdentifyAttributeAccess test_identify_attribute_handler(test_matter_node_state_monitor, mqtt_publish_test, dev_translator);
     const uint16_t endpoint                             = 4;
     chip::app::ConcreteReadAttributePath test_attr_path = chip::app::ConcreteReadAttributePath(
         endpoint, chip::app::Clusters::Identify::Id, chip::app::Clusters::Identify::Attributes::ClusterRevision::Id);
 
-    chip::DataVersion dataVersion            = 0;
+    chip::DataVersion dataVersion = 0;
     const chip::app::AttributeValueEncoder::AttributeEncodeState & aState =
         chip::app::AttributeValueEncoder::AttributeEncodeState();
     chip::app::AttributeReportIBs::Builder builder;
@@ -45,13 +45,12 @@ static void TestClusterTranslatorRevision(nlTestSuite * inSuite, void * aContext
     writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, ignored);
     builder.Init(&writer, 1);
 
-    auto err                                 = test_identify_attribute_handler.Read(test_attr_path, encoder);
+    auto err = test_identify_attribute_handler.Read(test_attr_path, encoder);
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     writer.Finalize();
     writer.EndContainer(ignored);
-
 }
 
 class TestContext

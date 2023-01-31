@@ -18,60 +18,60 @@
 using namespace unify::matter_bridge;
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
-static device_translator dev_translator    = device_translator();
+static device_translator dev_translator    = device_translator(false);
 static ClusterEmulator emulator;
 
 /* uic stdin mocks start */
 static command_map_t commands;
 // The prompt string for the command line interface
 
-void uic_stdin_add_commands(
-  const std::map<std::string, std::pair<std::string, handler_func>>
-    &append_commands)
+void uic_stdin_add_commands(const std::map<std::string, std::pair<std::string, handler_func>> & append_commands)
 {
-  commands.insert(append_commands.begin(), append_commands.end());
+    commands.insert(append_commands.begin(), append_commands.end());
 }
-sl_status_t uic_stdin_handle_command(const char *command)
+sl_status_t uic_stdin_handle_command(const char * command)
 {
-  std::string command_str(command);
-  std::string cmd(command_str.substr(0, command_str.find(' ')));
-  auto iter = commands.find(cmd);
-  if (iter != commands.end()) {
-    handle_args_t args;
-    // add <command> as first arg
-    args.push_back(cmd);
-    // If there is a space after the command, look for "," seperated args
-    // e.g. <command> <arg1>,<arg2>,<arg3>
-    size_t pos = 0;
-    if ((pos = command_str.find(' ')) != std::string::npos) {
-      // erase "<command> " from the command_str.
-      command_str.erase(0, pos + 1);
-      const std::string delimiter(",");
-      // look for "," seperated args in command_str
-      while ((pos = command_str.find(delimiter)) != std::string::npos) {
-        args.push_back(command_str.substr(0, pos));
-        // erase <arg> from command_str
-        command_str.erase(0, pos + delimiter.length());
-      }
-      // add last argument as well
-      args.push_back(command_str);
+    std::string command_str(command);
+    std::string cmd(command_str.substr(0, command_str.find(' ')));
+    auto iter = commands.find(cmd);
+    if (iter != commands.end())
+    {
+        handle_args_t args;
+        // add <command> as first arg
+        args.push_back(cmd);
+        // If there is a space after the command, look for "," seperated args
+        // e.g. <command> <arg1>,<arg2>,<arg3>
+        size_t pos = 0;
+        if ((pos = command_str.find(' ')) != std::string::npos)
+        {
+            // erase "<command> " from the command_str.
+            command_str.erase(0, pos + 1);
+            const std::string delimiter(",");
+            // look for "," seperated args in command_str
+            while ((pos = command_str.find(delimiter)) != std::string::npos)
+            {
+                args.push_back(command_str.substr(0, pos));
+                // erase <arg> from command_str
+                command_str.erase(0, pos + delimiter.length());
+            }
+            // add last argument as well
+            args.push_back(command_str);
+        }
+        return iter->second.second(args);
     }
-    return iter->second.second(args);
-  }
 
-  return SL_STATUS_FAIL;
+    return SL_STATUS_FAIL;
 }
 /* uic stdin mocks end */
 static void TestCliSetMatterNodeStateMonitor(nlTestSuite * inSuite, void * aContext)
 {
-    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator,emulator, ember_interface);
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, emulator, ember_interface);
     matter_data_storage m_matter_data_storage;
     Test::MockGroupTranslator mGroupTranslator(m_matter_data_storage);
     set_mapping_display_instance(test_matter_node_state_monitor, mGroupTranslator);
     NL_TEST_ASSERT(inSuite, (uic_stdin_handle_command("epmap") == SL_STATUS_OK));
     NL_TEST_ASSERT(inSuite, (uic_stdin_handle_command("groups_map") == SL_STATUS_OK));
 }
-
 
 static void TestCliInit(nlTestSuite * inSuite, void * aContext)
 {

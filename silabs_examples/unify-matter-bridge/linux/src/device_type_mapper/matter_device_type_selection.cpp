@@ -30,14 +30,12 @@
 
 #define LOG_TAG "matter_device_type_selection"
 
-static unify::matter_bridge::device_translator dev_translator;
-
 static uint8_t compare_clusters(chip::ClusterId cluster_id, const std::vector<DeviceClusterData> & matter_device_clusters,
-                                bool only_count_required_clusters)
+                                bool only_count_required_clusters, const unify::matter_bridge::device_translator & dev_translator)
 {
     bool it_was_required_cluster_match = false;
     const auto it                      = std::find_if(matter_device_clusters.begin(), matter_device_clusters.end(),
-                                 [cluster_id, &it_was_required_cluster_match](const DeviceClusterData & cluster) {
+                                 [cluster_id, &it_was_required_cluster_match, dev_translator](const DeviceClusterData & cluster) {
                                      auto device_cluster_id = dev_translator.get_matter_cluster_id(cluster.cluster_name);
                                      if (!device_cluster_id.has_value())
                                      {
@@ -67,12 +65,13 @@ static uint8_t compare_clusters(chip::ClusterId cluster_id, const std::vector<De
 
 static uint8_t score_comparisons_of_cluster_lists(const std::vector<EmberAfCluster> & matter_clusters,
                                                   const std::vector<DeviceClusterData> & matter_device_clusters,
-                                                  bool only_count_required_clusters)
+                                                  bool only_count_required_clusters,
+                                                  const unify::matter_bridge::device_translator & dev_translator)
 {
     uint8_t count = 0;
     for (const auto & matter_cluster : matter_clusters)
     {
-        count += compare_clusters(matter_cluster.clusterId, matter_device_clusters, only_count_required_clusters);
+        count += compare_clusters(matter_cluster.clusterId, matter_device_clusters, only_count_required_clusters, dev_translator);
     }
     return count;
 }
@@ -90,13 +89,14 @@ static int8_t check_if_cluster_in_array_of_clusters(const chip::ClusterId matter
 }
 
 bool compare_attributes(const EmberAfAttributeMetadata * attributes, const uint16_t attribute_count,
-                        const std::string required_cluster_name, const std::vector<std::string> & required_attributes)
+                        const std::string required_cluster_name, const std::vector<std::string> & required_attributes,
+                        const unify::matter_bridge::device_translator & dev_translator)
 {
     for (const auto & required_attribute : required_attributes)
     {
         bool required_attribute_found = false;
-        auto attribute_id = dev_translator.get_matter_attribute_id(required_cluster_name, required_attribute);
-        
+        auto attribute_id             = dev_translator.get_matter_attribute_id(required_cluster_name, required_attribute);
+
         if (!attribute_id.has_value())
         {
             return false;
@@ -111,11 +111,10 @@ bool compare_attributes(const EmberAfAttributeMetadata * attributes, const uint1
             }
         }
 
-
         if (!required_attribute_found)
         {
             sl_log_debug(LOG_TAG, "Attribute %s not found in cluster %s", required_attribute.c_str(),
-                   required_cluster_name.c_str());
+                         required_cluster_name.c_str());
             return false;
         }
     }
@@ -123,7 +122,8 @@ bool compare_attributes(const EmberAfAttributeMetadata * attributes, const uint1
 }
 
 bool compare_commands(const chip::CommandId * commands, const std::string required_cluster_name,
-                      const std::vector<std::string> & required_commands)
+                      const std::vector<std::string> & required_commands,
+                      const unify::matter_bridge::device_translator & dev_translator)
 {
 
     uint8_t commands_count = sizeof(commands);
@@ -131,7 +131,7 @@ bool compare_commands(const chip::CommandId * commands, const std::string requir
     for (const auto & required_command : required_commands)
     {
         bool required_command_found = false;
-        auto command_id = dev_translator.get_matter_command_id(required_cluster_name, required_command);
+        auto command_id             = dev_translator.get_matter_command_id(required_cluster_name, required_command);
         if (!command_id.has_value())
         {
             return false;
@@ -152,8 +152,7 @@ bool compare_commands(const chip::CommandId * commands, const std::string requir
         }
         if (!required_command_found)
         {
-            sl_log_debug(LOG_TAG, "Command %s not found in cluster %s", required_command.c_str(),
-                   required_cluster_name.c_str());
+            sl_log_debug(LOG_TAG, "Command %s not found in cluster %s", required_command.c_str(), required_cluster_name.c_str());
             return false;
         }
     }
@@ -161,9 +160,8 @@ bool compare_commands(const chip::CommandId * commands, const std::string requir
 }
 
 bool matter_clusters_conform_to_device_type(const std::vector<EmberAfCluster> & matter_cluster_list,
-                                                   const std::vector<DeviceClusterData> & device_type_cluster_data,
-                                                   bool conform_to_spec_for_clusters, bool conform_to_spec_for_attributes,
-                                                   bool conform_to_spec_for_commands)
+                                            const std::vector<DeviceClusterData> & device_type_cluster_data,
+                                            const unify::matter_bridge::device_translator & dev_translator)
 {
     for (const auto & matter_device_cluster_data : device_type_cluster_data)
     {
@@ -177,7 +175,8 @@ bool matter_clusters_conform_to_device_type(const std::vector<EmberAfCluster> & 
                 return false;
             }
 
-            if (conform_to_spec_for_clusters)
+            // Agreed to not count scenes as a spec compliant cluster as Matter spec is not sure on how to implement it
+            if (dev_translator.m_spec_compliant && strcmp(matter_device_cluster_data.cluster_name, "Scenes") != 0)
             {
                 const int8_t matter_cluster_index =
                     check_if_cluster_in_array_of_clusters(device_cluster_type.value(), matter_cluster_list);
@@ -186,25 +185,19 @@ bool matter_clusters_conform_to_device_type(const std::vector<EmberAfCluster> & 
                     return false;
                 }
 
-                // Check mandatory attributes and commands for each cluster
-                if (conform_to_spec_for_attributes)
+                if (!compare_attributes(matter_cluster_list.at(matter_cluster_index).attributes,
+                                        matter_cluster_list.at(matter_cluster_index).attributeCount,
+                                        matter_device_cluster_data.cluster_name, matter_device_cluster_data.required_attributes,
+                                        dev_translator))
                 {
-                    if (!compare_attributes(matter_cluster_list.at(matter_cluster_index).attributes,
-                                            matter_cluster_list.at(matter_cluster_index).attributeCount,
-                                            matter_device_cluster_data.cluster_name,
-                                            matter_device_cluster_data.required_attributes))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
 
-                if (conform_to_spec_for_commands)
+                if (!compare_commands(matter_cluster_list.at(matter_cluster_index).acceptedCommandList,
+                                      matter_device_cluster_data.cluster_name, matter_device_cluster_data.required_commands,
+                                      dev_translator))
                 {
-                    if (!compare_commands(matter_cluster_list.at(matter_cluster_index).acceptedCommandList,
-                                          matter_device_cluster_data.cluster_name, matter_device_cluster_data.required_commands))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
         }
@@ -212,7 +205,8 @@ bool matter_clusters_conform_to_device_type(const std::vector<EmberAfCluster> & 
     return true;
 }
 
-std::vector<cluster_score> compute_device_type_match_score(const std::vector<EmberAfCluster> & matter_cluster_list)
+std::vector<cluster_score> compute_device_type_match_score(const std::vector<EmberAfCluster> & matter_cluster_list,
+                                                           const unify::matter_bridge::device_translator & dev_translator)
 {
 
     // contains scores that reflect if all list clusters present under a given
@@ -222,15 +216,16 @@ std::vector<cluster_score> compute_device_type_match_score(const std::vector<Emb
 
     for (const auto & [matter_device_type_id, matter_device] : matter_device_type_vs_clusters_map)
     {
-        bool device_conformance = matter_clusters_conform_to_device_type(
-            matter_cluster_list, matter_device.clusters, matter_device.conform_clusters_to_spec,
-            matter_device.conform_attributes_to_spec, matter_device.conform_commands_to_spec);
+        bool device_conformance =
+            matter_clusters_conform_to_device_type(matter_cluster_list, matter_device.clusters, dev_translator);
         if (!device_conformance)
         {
             continue;
         }
-        uint8_t clusters_matched          = score_comparisons_of_cluster_lists(matter_cluster_list, matter_device.clusters, false);
-        uint8_t required_clusters_matched = score_comparisons_of_cluster_lists(matter_cluster_list, matter_device.clusters, true);
+        uint8_t clusters_matched =
+            score_comparisons_of_cluster_lists(matter_cluster_list, matter_device.clusters, false, dev_translator);
+        uint8_t required_clusters_matched =
+            score_comparisons_of_cluster_lists(matter_cluster_list, matter_device.clusters, true, dev_translator);
 
         unsigned int addtional_matter_clusters = matter_cluster_list.size() - clusters_matched;
         unsigned int matter_device_miss_count  = matter_device.clusters.size() - clusters_matched;
@@ -269,9 +264,11 @@ std::vector<cluster_score> compute_device_type_match_score(const std::vector<Emb
     return device_type_match_score;
 }
 
-std::vector<chip::DeviceTypeId> select_possible_device_types_on_score(std::vector<EmberAfCluster> matter_clusters_to_match)
+std::vector<chip::DeviceTypeId>
+select_possible_device_types_on_score(std::vector<EmberAfCluster> matter_clusters_to_match,
+                                      const unify::matter_bridge::device_translator & dev_translator)
 {
-    std::vector<cluster_score> device_type_match_score = compute_device_type_match_score(matter_clusters_to_match);
+    std::vector<cluster_score> device_type_match_score = compute_device_type_match_score(matter_clusters_to_match, dev_translator);
 
     sl_log_debug(LOG_TAG, "Device cluster score length %d", device_type_match_score.size());
     sl_log_debug(LOG_TAG, "Selecting device types based on score");

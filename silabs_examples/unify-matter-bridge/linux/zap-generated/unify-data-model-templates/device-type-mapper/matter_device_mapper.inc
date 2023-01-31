@@ -48,6 +48,7 @@ namespace app {
             { "IlluminanceMeasurement", IlluminanceMeasurement::Id },
             { "TemperatureMeasurement", TemperatureMeasurement::Id },
             { "PressureMeasurement", PressureMeasurement::Id },
+            { "FlowMeasurement", FlowMeasurement::Id },
             { "RelativityHumidity", RelativeHumidityMeasurement::Id },
             { "OccupancySensing", OccupancySensing::Id },
             { "ElectricalMeasurement", ElectricalMeasurement::Id },
@@ -97,7 +98,7 @@ namespace app {
                     { "CurrentGroup", CurrentGroup::Id },
                     { "SceneValid", SceneValid::Id },
                     { "NameSupport", NameSupport::Id },
-                    { "LastConfiguredBy", LastConfiguredBy::Id }
+                    { "LastConfiguredBy", LastConfiguredBy::Id },
                 };
             } // namespace Attributes
         } // namespace Scenes
@@ -352,6 +353,16 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace PressureMeasurement
+        namespace FlowMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "Tolerance", Tolerance::Id }
+                };
+            } // namespace Attributes
+        } // namespace FlowMeasurement
         namespace RelativeHumidityMeasurement {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
@@ -530,6 +541,7 @@ namespace app {
             { "IlluminanceMeasurement", IlluminanceMeasurement::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "TemperatureMeasurement", TemperatureMeasurement::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "PressureMeasurement", PressureMeasurement::Attributes::unify_to_matter_attribute_id_cluster_map },
+            { "FlowMeasurement", FlowMeasurement::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "RelativityHumidity", RelativeHumidityMeasurement::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "OccupancySensing", OccupancySensing::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "ElectricalMeasurement", ElectricalMeasurement::Attributes::unify_to_matter_attribute_id_cluster_map },
@@ -719,6 +731,11 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace PressureMeasurement
+        namespace FlowMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace FlowMeasurement
         namespace RelativeHumidityMeasurement {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {};
@@ -757,6 +774,7 @@ namespace app {
             { "IlluminanceMeasurement", IlluminanceMeasurement::Commands::unify_to_matter_command_id_cluster_map },
             { "TemperatureMeasurement", TemperatureMeasurement::Commands::unify_to_matter_command_id_cluster_map },
             { "PressureMeasurement", PressureMeasurement::Commands::unify_to_matter_command_id_cluster_map },
+            { "FlowMeasurement", FlowMeasurement::Commands::unify_to_matter_command_id_cluster_map },
             { "RelativityHumidity", RelativeHumidityMeasurement::Commands::unify_to_matter_command_id_cluster_map },
             { "OccupancySensing", OccupancySensing::Commands::unify_to_matter_command_id_cluster_map },
             { "ElectricalMeasurement", ElectricalMeasurement::Commands::unify_to_matter_command_id_cluster_map },

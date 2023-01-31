@@ -21,18 +21,17 @@
 #include "app/server/Server.h"
 
 // Application library
-#include "bridged_device_basic_info_attribute_translator.hpp"
-#include "command_translator.hpp"
 #include "attribute_translator.hpp"
+#include "bridged_device_basic_info_attribute_translator.hpp"
+#include "cluster_emulator.hpp"
+#include "command_translator.hpp"
 #include "group_command_translator.hpp"
 #include "matter_bridge_cli.hpp"
 #include "matter_bridge_config.h"
 #include "matter_bridge_config_fixt.h"
+#include "matter_bridge_qrcode_publisher.hpp"
 #include "matter_device_translator.hpp"
 #include "matter_node_state_monitor.hpp"
-#include "matter_bridge_qrcode_publisher.hpp"
-#include "cluster_emulator.hpp"
-
 
 extern "C" {
 // Unify library
@@ -58,8 +57,6 @@ constexpr const char * LOG_TAG = "unify_matter_bridge";
 
 static bool matter_running;
 static std::mutex unify_mutex;
-
-
 
 static void call_unify_event_queue(intptr_t)
 {
@@ -101,7 +98,8 @@ int main(int argc, char * argv[])
                                                           { matter_bridge_cli_init, "Matter Bridge Command Line Interface" },
                                                           { NULL, "Terminator" } };
 
-    if(SL_STATUS_OK != uic_init(uic_fixt_setup_steps_list, argc, argv, CMAKE_PROJECT_VERSION)) {
+    if (SL_STATUS_OK != uic_init(uic_fixt_setup_steps_list, argc, argv, CMAKE_PROJECT_VERSION))
+    {
         return -1;
     }
 
@@ -114,13 +112,13 @@ int main(int argc, char * argv[])
     opt.payload.commissioningFlow = CommissioningFlow::kStandard;
     opt.payload.rendezvousInformation.Emplace().ClearAll();
     opt.payload.rendezvousInformation.Emplace().Set(RendezvousInformationFlag::kOnNetwork);
-    opt.mWiFi   = false;
-    opt.mThread = false;
-    opt.KVS               = cfg->kvs_path;
-    opt.payload.productID = cfg->product_id;
-    opt.payload.vendorID  = cfg->vendor_id;
+    opt.mWiFi                = false;
+    opt.mThread              = false;
+    opt.KVS                  = cfg->kvs_path;
+    opt.payload.productID    = cfg->product_id;
+    opt.payload.vendorID     = cfg->vendor_id;
     opt.payload.setUpPINCode = cfg->pin & 0xffffff;
-    opt.discriminator = chip::Optional<uint16_t>(cfg->discriminator & 0xfff);
+    opt.discriminator        = chip::Optional<uint16_t>(cfg->discriminator & 0xfff);
 
     if (CHIP_NO_ERROR != InterfaceId::InterfaceNameToId(cfg->interface, opt.interfaceId))
     {
@@ -129,7 +127,8 @@ int main(int argc, char * argv[])
     }
     VerifyOrDie(ChipLinuxAppInit(__argc__, const_cast<char **>(__argv__)) == 0);
 
-    device_translator matter_device_translator;
+    sl_log_info(LOG_TAG, "Starting Matter Bridge with spec compliance %s", cfg->spec_compliance ? "enabled" : "disabled");
+    device_translator matter_device_translator = device_translator(cfg->spec_compliance);
     UnifyEmberInterface ember_interface;
     ClusterEmulator emulator;
     matter_node_state_monitor node_state_monitor(matter_device_translator, emulator, ember_interface);
@@ -137,37 +136,29 @@ int main(int argc, char * argv[])
     group_translator m_group_translator(matter_data_storage::instance());
     set_mapping_display_instance(node_state_monitor, m_group_translator);
 
+#define INIT_ZAP_TRANSLATOR(a)                                                                                                     \
+    a##AttributeAccess a##_attribute_instance(node_state_monitor, unify_mqtt_handler, matter_device_translator);                   \
+    a##ClusterCommandHandler a##_command_instance(node_state_monitor, unify_mqtt_handler, m_group_translator);
+
     // Initializing Group cluster command handler
     GroupClusterCommandHandler group_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
 
     // Initializing Bridged Device Basic Info attributes update handler
-    BridgedDeviceBasicInfoAttributeAccess bridge_device_basic_handler(node_state_monitor, unify_mqtt_handler);
+    BridgedDeviceBasicInfoAttributeAccess bridge_device_basic_handler(node_state_monitor, unify_mqtt_handler,
+                                                                      matter_device_translator);
 
-    // Initializing OnOff command handler
-    OnOffClusterCommandHandler on_cmd_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
-    OnOffAttributeAccess on_off_attribute_handler(node_state_monitor, unify_mqtt_handler);
+    INIT_ZAP_TRANSLATOR(OnOff);
+    INIT_ZAP_TRANSLATOR(Identify);
+    INIT_ZAP_TRANSLATOR(LevelControl);
+    INIT_ZAP_TRANSLATOR(ColorControl);
 
-    // Initializing Identify Cluster Commands handler
-    IdentifyClusterCommandHandler identify_cluster_commands_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
-    IdentifyAttributeAccess identify_attribute_handler(node_state_monitor, unify_mqtt_handler);
-
-    // Initializing Level Cluster handler
-    LevelControlClusterCommandHandler level_cluster_commands_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
-    LevelControlAttributeAccess level_attribute_handler(node_state_monitor, unify_mqtt_handler);
-
-    // Initializing color controller cluster command handler
-    ColorControlClusterCommandHandler color_control_commands_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
-    ColorControlAttributeAccess color_control_attribute_handler(node_state_monitor, unify_mqtt_handler);
-
-    // Initializing OccupancySensing command handler
-    OccupancySensingClusterCommandHandler occupancy_sensing_command_handler(node_state_monitor, unify_mqtt_handler,
-                                                                            m_group_translator);
-    OccupancySensingAttributeAccess occupancy_sensing_attribute_access(node_state_monitor, unify_mqtt_handler);
-
-    // Initializing Temperature Measurement command handler
-    TemperatureMeasurementClusterCommandHandler temperature_measurement_command_handler(node_state_monitor, unify_mqtt_handler,
-                                                                                        m_group_translator);
-    TemperatureMeasurementAttributeAccess temperature_measurement_attribute_access(node_state_monitor, unify_mqtt_handler);
+    // Sensor clusters
+    INIT_ZAP_TRANSLATOR(IlluminanceMeasurement);
+    INIT_ZAP_TRANSLATOR(OccupancySensing);
+    INIT_ZAP_TRANSLATOR(TemperatureMeasurement);
+    INIT_ZAP_TRANSLATOR(PressureMeasurement);
+    INIT_ZAP_TRANSLATOR(FlowMeasurement);
+    INIT_ZAP_TRANSLATOR(RelativeHumidityMeasurement);
 
     QRCodePublisher qr_code_publisher(unify_mqtt_handler);
     set_qr_code_publisher(qr_code_publisher);

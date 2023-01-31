@@ -14,10 +14,10 @@
 #include "matter_device_translator.hpp"
 
 // Application library
-#include "matter_device_type_selection.hpp"
 #include "matter_device_mapper.inc"
-#include "matter_id_model.inc"
+#include "matter_device_type_selection.hpp"
 #include "matter_device_types_clusters_list.inc"
+#include "matter_id_model.inc"
 
 // Matter library
 #include "matter.h"
@@ -38,15 +38,18 @@ namespace unify::matter_bridge {
 /**
  * The API provides possible matched matter device types from list of clusters.
  */
-std::vector<chip::DeviceTypeId> device_translator::get_device_types(const std::vector<EmberAfCluster> & translated_matter_clusters) const
-{  
-    std::vector<chip::DeviceTypeId> possible_device_list = select_possible_device_types_on_score(translated_matter_clusters);
+std::vector<chip::DeviceTypeId>
+device_translator::get_device_types(const std::vector<EmberAfCluster> & translated_matter_clusters) const
+{
+    std::vector<chip::DeviceTypeId> possible_device_list = select_possible_device_types_on_score(translated_matter_clusters, *this);
     if (!possible_device_list.empty())
     {
         sl_log_info(LOG_TAG, "Prioritized Matter Device Type:'%s'",
-                       matter_device_type_vs_clusters_map.find(possible_device_list[0])->second.device_type_name);
+                    matter_device_type_vs_clusters_map.find(possible_device_list[0])->second.device_type_name);
         return possible_device_list;
-    } else {
+    }
+    else
+    {
         sl_log_warning(LOG_TAG, "No matching Matter Device Type found");
     }
 
@@ -117,7 +120,7 @@ std::optional<chip::ClusterId> device_translator::get_matter_cluster_id(const st
 }
 
 std::optional<chip::CommandId> device_translator::get_matter_command_id(const std::string & cluster_name,
-                                                                 const std::string & command_name) const
+                                                                        const std::string & command_name) const
 {
     const auto command_map = matter_command_id_map.find(cluster_name);
     if (command_map != matter_command_id_map.end())
@@ -132,7 +135,7 @@ std::optional<chip::CommandId> device_translator::get_matter_command_id(const st
 }
 
 std::optional<chip::AttributeId> device_translator::get_matter_attribute_id(const std::string & cluster_name,
-                                                                     const std::string & attribute_name) const
+                                                                            const std::string & attribute_name) const
 {
     const auto attribute_map = matter_attribute_id_map.find(cluster_name);
     if (attribute_map != matter_attribute_id_map.end())

@@ -152,7 +152,7 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
   namespace MN = chip::app::Clusters::{{asUpperCamelCase label}}::Attributes;
   namespace UN = unify::matter_bridge::{{asUpperCamelCase label}}::Attributes;
 
-  auto cluster_id = device_translator::instance().get_cluster_id(cluster);
+  auto cluster_id = m_dev_translator.get_cluster_id(cluster);
 
   if (!cluster_id.has_value() || (cluster_id.value() != Clusters::{{asUpperCamelCase label}}::Id)) {
     return;
@@ -160,7 +160,7 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
 
   // get attribute id
   auto attribute_id
-    = device_translator::instance().get_attribute_id(cluster, attribute);
+    = m_dev_translator.get_attribute_id(cluster, attribute);
 
   if (!attribute_id.has_value()) {
     return;

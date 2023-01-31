@@ -25,10 +25,10 @@
 #include <app/tests/AppTestContext.h>
 
 // Mocks
+#include "MockClusterEmulator.hpp"
 #include "MockGroupTranslator.hpp"
 #include "MockNodeStateMonitor.hpp"
 #include "MockUnifyMqtt.hpp"
-#include "MockClusterEmulator.hpp"
 
 // Third party library
 #include <nlunit-test.h>
@@ -49,7 +49,7 @@ class UnifyBridgeContext : public chip::Test::AppContext
 
 public:
     UnifyBridgeContext() :
-        mMqttHandler(), mNodeStateMonitor(mDeviceTranslator,mEmulator, mEmberInterface), mGroupTranslator(m_matter_data_storage)
+        mMqttHandler(), mNodeStateMonitor(mDeviceTranslator, mEmulator, mEmberInterface), mGroupTranslator(m_matter_data_storage)
     {}
 
     /// Initialize the underlying layers.
@@ -59,7 +59,7 @@ public:
     void Shutdown() override;
 
     UnifyEmberInterface mEmberInterface;
-    device_translator mDeviceTranslator;
+    device_translator mDeviceTranslator = device_translator(false);
     matter_data_storage m_matter_data_storage;
     Test::MockUnifyMqtt mMqttHandler;
     Test::MockNodeStateMonitor mNodeStateMonitor;
