@@ -176,10 +176,10 @@ Additionally, individual code regeneration can be done using
 ```
 
 The above will just generate a `<app>.matter` file along side the `.zap` file,
-as this is the only file that requires updates for applications. You can
-code generate other things by passing in the `-t/--templates` argument to
-generate.py. In those cases, you may also need to specify an output
-directory via `-o/--output-dir`.
+as this is the only file that requires updates for applications. You can code
+generate other things by passing in the `-t/--templates` argument to
+generate.py. In those cases, you may also need to specify an output directory
+via `-o/--output-dir`.
 
 #### Flow for updating an application zap file:
 
@@ -191,7 +191,6 @@ directory via `-o/--output-dir`.
 # directory is NOT used
 ./scripts/tools/zap/generate.py $PATH_TO_ZAP_FILE
 ```
-
 
 ### Compile-time code generation / pre-generated code
 
