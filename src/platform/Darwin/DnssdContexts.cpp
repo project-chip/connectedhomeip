@@ -145,7 +145,13 @@ MdnsContexts::~MdnsContexts()
 
 CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
 {
-    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(context != nullptr || sdRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (context == nullptr)
+    {
+        DNSServiceRefDeallocate(sdRef);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     if (sdRef == nullptr)
     {
