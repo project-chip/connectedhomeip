@@ -106,7 +106,12 @@ def detectZclFile(zapFile):
 
 
 def runArgumentsParser() -> CmdLineArgs:
-    default_templates = 'src/app/zap-templates/app-templates.json'
+    # By default generate the idl file only. This will get moved from the
+    # output directory into the zap file directory automatically.
+    #
+    # All the rest of the files (app-templates.json) are generally built at
+    # compile time.
+    default_templates = 'src/app/zap-templates/matter-idl.json'
     default_output_dir = 'zap-generated/'
 
     parser = argparse.ArgumentParser(
