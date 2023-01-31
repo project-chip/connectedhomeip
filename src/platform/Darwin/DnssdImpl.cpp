@@ -37,7 +37,7 @@ constexpr const char * kProtocolTcp = "._tcp";
 constexpr const char * kProtocolUdp = "._udp";
 
 constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
-constexpr DNSServiceFlags kBrowseFlags          = kDNSServiceFlagsShareConnection;
+constexpr DNSServiceFlags kBrowseFlags          = 0;
 constexpr DNSServiceFlags kGetAddrInfoFlags     = kDNSServiceFlagsTimeout | kDNSServiceFlagsShareConnection;
 constexpr DNSServiceFlags kResolveFlags         = kDNSServiceFlagsShareConnection;
 constexpr DNSServiceFlags kReconfirmRecordFlags = 0;
@@ -270,15 +270,11 @@ CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfa
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
     ChipLogProgress(Discovery, "Browsing for: %s", StringOrNullMarker(type));
-
-    auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
+    DNSServiceRef sdRef;
+    auto err = DNSServiceBrowse(&sdRef, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    auto sdRefCopy = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err            = DNSServiceBrowse(&sdRefCopy, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
-    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
-
-    ReturnErrorOnFailure(MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef));
+    ReturnErrorOnFailure(MdnsContexts::GetInstance().Add(sdCtx, sdRef));
     *browseIdentifier = reinterpret_cast<intptr_t>(sdCtx);
     return CHIP_NO_ERROR;
 }
@@ -364,22 +360,15 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
         counterHolder = std::make_shared<uint32_t>(0);
     }
 
-    auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, addressType, name, std::move(counterHolder));
+    auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, addressType, name,
+                                                     BrowseContext::sContextDispatchingSuccess, std::move(counterHolder));
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
-    if (BrowseContext::sContextDispatchingSuccess == nullptr)
-    {
-        auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
-        VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
-    }
-    else
-    {
-        // Share the connection of the browse.
-        sdCtx->ShareExistingConnection(BrowseContext::sContextDispatchingSuccess->serviceRef);
-    }
+    auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
+    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     auto sdRefCopy = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    auto err       = DNSServiceResolve(&sdRefCopy, kResolveFlags, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
+    err            = DNSServiceResolve(&sdRefCopy, kResolveFlags, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     CHIP_ERROR retval = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
@@ -469,11 +458,13 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
     // there shouldn't be anything there long-term anyway.
     //
     // Make sure to time out all the resolves first, before we time out the
-    // browse (because after the latter the serviceRefs on the resolves will not
-    // really be usable).
+    // browse (just to avoid dangling pointers in the resolves, even though we
+    // only use them for equality compares).
     std::vector<GenericContext *> resolves;
     MdnsContexts::GetInstance().FindAllMatchingPredicate(
-        [ctx](GenericContext * item) { return item->type == ContextType::Resolve && item->serviceRef == ctx->serviceRef; },
+        [ctx](GenericContext * item) {
+            return item->type == ContextType::Resolve && static_cast<ResolveContext *>(item)->browseThatCausedResolve == ctx;
+        },
         resolves);
 
     for (auto & resolve : resolves)

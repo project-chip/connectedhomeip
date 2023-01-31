@@ -42,20 +42,11 @@ struct GenericContext
     void * context;
     DNSServiceRef serviceRef;
 
-protected:
-    // Whether the serviceRef is owned by this context.  Some contexts share a
-    // service ref with other contexts, in which case serviceRefIsOwned will be
-    // false.
-    bool serviceRefIsOwned = true;
-
-public:
     virtual ~GenericContext() {}
 
     CHIP_ERROR Finalize(DNSServiceErrorType err = kDNSServiceErr_NoError);
     virtual void DispatchFailure(DNSServiceErrorType err) = 0;
     virtual void DispatchSuccess()                        = 0;
-
-    bool OwnsServiceRef() const { return serviceRefIsOwned; }
 };
 
 struct RegisterContext;
@@ -196,9 +187,12 @@ struct ResolveContext : public GenericContext
     DNSServiceProtocol protocol;
     std::string instanceName;
     std::shared_ptr<uint32_t> consumerCounter;
+    BrowseContext * const browseThatCausedResolve; // Can be null
 
+    // browseCausingResolve can be null.
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
-                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
+                   const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
+                   std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 
     void DispatchFailure(DNSServiceErrorType err) override;
@@ -212,8 +206,6 @@ struct ResolveContext : public GenericContext
                         const unsigned char * txtRecord);
     bool HasInterface();
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
-
-    void ShareExistingConnection(DNSServiceRef existingConnection);
 };
 
 } // namespace Dnssd

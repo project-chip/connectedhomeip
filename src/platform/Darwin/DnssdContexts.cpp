@@ -153,17 +153,14 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (context->OwnsServiceRef())
+    auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    if (kDNSServiceErr_NoError != err)
     {
-        auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
-        if (kDNSServiceErr_NoError != err)
-        {
-            // We can't just use our Delete to deallocate the service ref here,
-            // because our context may not have its serviceRef set yet.
-            DNSServiceRefDeallocate(sdRef);
-            chip::Platform::Delete(context);
-            return Error::ToChipError(err);
-        }
+        // We can't just use our Delete to deallocate the service ref here,
+        // because our context may not have its serviceRef set yet.
+        DNSServiceRefDeallocate(sdRef);
+        chip::Platform::Delete(context);
+        return Error::ToChipError(err);
     }
 
     context->serviceRef = sdRef;
@@ -223,7 +220,7 @@ CHIP_ERROR MdnsContexts::RemoveAllOfType(ContextType type)
 
 void MdnsContexts::Delete(GenericContext * context)
 {
-    if (context->serviceRef != nullptr && context->OwnsServiceRef())
+    if (context->serviceRef != nullptr)
     {
         DNSServiceRefDeallocate(context->serviceRef);
     }
@@ -336,7 +333,9 @@ void BrowseContext::DispatchPartialSuccess()
 }
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
-                               const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse)
+                               const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
+                               std::shared_ptr<uint32_t> && consumerCounterToUse) :
+    browseThatCausedResolve(browseCausingResolve)
 {
     type            = ContextType::Resolve;
     context         = cbContext;
@@ -500,12 +499,6 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
 bool ResolveContext::HasInterface()
 {
     return interfaces.size();
-}
-
-void ResolveContext::ShareExistingConnection(DNSServiceRef existingConnection)
-{
-    serviceRef        = existingConnection;
-    serviceRefIsOwned = false;
 }
 
 InterfaceInfo::InterfaceInfo()
