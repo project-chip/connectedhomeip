@@ -692,7 +692,6 @@ class TestStep:
             if not self.is_attribute:
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
-                    breakpoint()
                     # Since we did not get any value we are explicitly the only case where we want
                     # to proceed with the constraint check and not error out is if there is a
                     # constraint that is explicitly checking to see if there is not value provided.
