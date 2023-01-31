@@ -172,8 +172,24 @@ Additionally, individual code regeneration can be done using
 
 ```bash
 /scripts/tools/zap/generate.py                       \
-    examples/bridge-app/bridge-common/bridge-app.zap \
-    -o zzz_generated/bridge-app/zap-generated
+    examples/bridge-app/bridge-common/bridge-app.zap
+```
+
+The above will just generate a `<app>.matter` file along side the `.zap` file,
+as this is the only file that requires updates for applications. You can code
+generate other things by passing in the `-t/--templates` argument to
+generate.py. In those cases, you may also need to specify an output directory
+via `-o/--output-dir`.
+
+#### Flow for updating an application zap file:
+
+```
+# use zap UI to edit the file (or edit zap file in any other way)
+./scripts/tools/zap/run_zaptool.sh $PATH_TO_ZAP_FILE
+
+# re-generate .matter file. Note that for .matter file generation, output
+# directory is NOT used
+./scripts/tools/zap/generate.py $PATH_TO_ZAP_FILE
 ```
 
 ### Compile-time code generation / pre-generated code
