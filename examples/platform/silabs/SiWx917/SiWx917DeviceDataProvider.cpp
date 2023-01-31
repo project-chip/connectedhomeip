@@ -50,6 +50,7 @@ uint8_t SIWx917DeviceDataProvider::WriteBits(uint8_t * bits, uint8_t offset, uin
     return offset;
 }
 
+// Generation of the payload using the details provided in the DeviceConfig.h
 void SIWx917DeviceDataProvider::generateQrCodeBitSet(uint8_t * payload){
     uint8_t kVersionFieldLengthInBits =3;
     uint8_t kVendorIDFieldLengthInBits = 16;
@@ -82,6 +83,7 @@ void SIWx917DeviceDataProvider::generateQrCodeBitSet(uint8_t * payload){
     }
 }
 
+// writing to the flash based on the value given in the DeviceConfig.h
 CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData(){
     // flashing the value to the nvm3 section of the flash
     // TODO: remove this once it is removed SiWx917 have the nvm3 simiplicity commander support
@@ -90,7 +92,6 @@ CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData(){
     if((commissionableFlow > 3) || (rendezvousFlag > 7)){
         return CHIP_ERROR_INTERNAL;
     }
-    // writing to the flash based on the value given in the DeviceConfig.h
     if(discriminatorValue != 0){
         err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_SetupDiscriminator, discriminatorValue);
         if(err != CHIP_NO_ERROR){
