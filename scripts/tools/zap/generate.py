@@ -189,7 +189,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
         # multiple extensions. This is to work with existing codebase only
         raise Error("Unexpected input zap file  %s" % self.zap_config)
 
-    os.rename(idl_path, target_path)
+    shutil.move(idl_path, target_path)
 
 
 def runGeneration(cmdLineArgs):
