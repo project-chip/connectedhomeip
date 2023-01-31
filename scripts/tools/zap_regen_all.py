@@ -439,7 +439,7 @@ def main():
         tmpl = timing.template
 
         if tmpl is None:
-            tmpl = '[DEFAULT/NONE]'
+            tmpl = '[NONE (matter idl generation)]'
 
         if len(tmpl) > 50:
             # easier to distinguish paths ... shorten common in-fixes
