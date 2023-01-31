@@ -45,6 +45,11 @@ add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
 file(STRINGS testnames.txt TEST_NAMES_FROM_FILE)
 STRING(REGEX REPLACE "\n" ";" TEST_NAMES_FROM_FILE "${TEST_NAMES_FROM_FILE}")
 
+target_compile_definitions(openiotsdk-startup
+    PRIVATE
+        IOT_SDK_APP_MAIN_STACK_SIZE=20480
+)
+
 foreach(TEST_NAME IN LISTS TEST_NAMES_FROM_FILE)
     set(APP_TARGET ${TEST_NAME}_ns)
     add_executable(${APP_TARGET})
@@ -60,6 +65,7 @@ foreach(TEST_NAME IN LISTS TEST_NAMES_FROM_FILE)
     )
 
     target_link_libraries(${APP_TARGET}
+        openiotsdk-startup
         openiotsdk-app
     )
 

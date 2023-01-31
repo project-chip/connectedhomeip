@@ -141,7 +141,6 @@ if(TARGET cmsis-rtos-api)
         target_link_libraries(cmsis-rtos-api
             PUBLIC
                 freertos-cmsis-rtos
-                freertos-kernel-heap-3
         )
 
         target_compile_definitions(cmsis-rtos-api
