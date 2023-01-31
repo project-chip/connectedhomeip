@@ -77,17 +77,9 @@ template("k32w0_sdk") {
                chip_with_ot_cli == 0 && chip_with_se05x == 0),
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
-  assert(chip_with_low_power == 0 ||
-             (chip_logging == false &&
-                  (invoker.chip_detail_logging == false &&
-                       invoker.chip_progress_logging == false &&
-                       invoker.chip_automation_logging == false &&
-                       invoker.chip_error_logging == false)),
-         "Please disable all logs when low power is enabled!")
-
   assert(
-      use_custom_factory_provider == 0 || chip_with_factory_data == 1,
-      "Please set chip_with_factory_data=1 if using custom factory provider.")
+    use_custom_factory_provider == 0 || chip_with_factory_data == 1,
+    "Please set chip_with_factory_data=1 if using custom factory provider.")
 
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
@@ -134,6 +126,11 @@ template("k32w0_sdk") {
   print("FRO32k: ", use_fro_32k)
   print("low power: ", chip_with_low_power)
   print("OTA default processors: ", chip_enable_ota_default_processors)
+
+  if (chip_with_low_power == 1 && chip_logging == true) {
+    print("WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
+    print("WARNING: set chip_logging=false to disable logging.")
+  }
 
   if (chip_crypto == "platform") {
     print("ECC crypto lib: ", chip_crypto_flavor)
@@ -375,10 +372,20 @@ template("k32w0_sdk") {
         "DBG_PostStepTickAssess=0",
         "gPWR_FreqScalingWFI=0",
         "mAppUseTickLessMode_c=1",
-        "cPWR_DiscardRunningTimerForPowerDown=1",
-        "K32W_LOG_ENABLED=0",
-        "gUartDebugConsole_d=0",
+        "cPWR_DiscardRunningTimerForPowerDown=1"
       ]
+
+      if (chip_logging == false) {
+        defines += [
+          "K32W_LOG_ENABLED=0",
+          "gUartDebugConsole_d=0"
+        ]
+      } else {
+        defines += [
+          "K32W_LOG_ENABLED=1",
+          "gUartDebugConsole_d=1"
+        ]
+      }
     } else {
       defines += [
         "cPWR_UsePowerDownMode=0",
