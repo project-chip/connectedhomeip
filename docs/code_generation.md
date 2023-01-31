@@ -185,12 +185,12 @@ generate.py.
 
 ```
 # use zap UI to edit the file (or edit zap file in any other way)
-scripts/tools/zap/run_zaptool.sh $PATH_TO_ZAP_FILE
+./scripts/tools/zap/run_zaptool.sh $PATH_TO_ZAP_FILE
 
 # re-generate .matter file. Note that for .matter file generation, output
 # directory is NOT used, so just use a temporary one
 mkdir -p out
-/scripts/tools/zap/generate.py $PATH_TO_ZAP_FILE -o out
+./scripts/tools/zap/generate.py $PATH_TO_ZAP_FILE -o out
 
 ```
 
