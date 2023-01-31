@@ -90,6 +90,10 @@ exit:
     {
         ChipLogError(DeviceLayer, "Failed to update factory data. Error: %s", ErrorStr(error));
         error = Restore();
+        if (error == CHIP_NO_ERROR)
+        {
+            error = Write();
+        }
     }
     else
     {
@@ -214,8 +218,6 @@ CHIP_ERROR OTAFactoryDataProcessor::Restore()
     auto status =
         PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)mFactoryData, FactoryProvider::kFactoryDataSize, &bytesRead);
     ReturnErrorCodeIf(status != PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_READ_RECORD);
-
-    ReturnErrorOnFailure(Write());
 
     return CHIP_NO_ERROR;
 }
