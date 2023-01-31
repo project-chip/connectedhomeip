@@ -53,9 +53,15 @@ def try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value):
     JavaScript can not represent integers bigger than 9007199254740991. But some of the test may
     uses values that are bigger than this. The current way to workaround this limitation has
     been to write those numbers as strings by encapsulating them in "".
+    Conversion happens on a best effort basis. For example, the type of value can be a string
+    because a variable has been used, in which case, it would not convert to a proper int
+    and we would fail at runtime.
     '''
     if type(value) is str:
-        value = int(value)
+        try:
+            value = int(value)
+        except:
+            pass
     return value
 
 
