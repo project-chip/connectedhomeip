@@ -847,6 +847,9 @@ class TestParser:
         self.PICS = _value_or_none(data, 'PICS')
 
         self._parsing_config_variable_storage = data.get('config', {})
+
+        # These are a list of "KnownVariables". These are defaults the codegen used to use. This
+        # is added for legacy support of tests that expect to uses these "defaults".
         self.__populate_default_config_if_missing('nodeId', 0x12345)
         self.__populate_default_config_if_missing('endpoint', '')
         self.__populate_default_config_if_missing('cluster', '')
