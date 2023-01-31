@@ -41,7 +41,7 @@ tests:
       PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Sends a Seek command"
@@ -53,7 +53,7 @@ tests:
                 value: 10000
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label:
@@ -75,7 +75,7 @@ tests:
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: 10000
+          value: { "Position": 10000 }
 
     #Issue 10988
     - label: "TH reads the StartTime attribute from the DUT"
@@ -173,7 +173,7 @@ tests:
                 value: SeekPosition
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 5
 
     - label: "verify that the media has not moved."
