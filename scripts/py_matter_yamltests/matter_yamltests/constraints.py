@@ -53,7 +53,7 @@ class BaseConstraint(ABC):
         pass
 
 
-class _ConstraintHasValue(BaseConstraint):
+class ConstraintHasValue(BaseConstraint):
     def __init__(self, has_value):
         super().__init__(types=[])
         self._has_value = has_value
@@ -330,7 +330,7 @@ def get_constraints(constraints: dict) -> list[BaseConstraint]:
 
     for constraint, constraint_value in constraints.items():
         if 'hasValue' == constraint:
-            _constraints.append(_ConstraintHasValue(constraint_value))
+            _constraints.append(ConstraintHasValue(constraint_value))
         elif 'type' == constraint:
             _constraints.append(_ConstraintType(constraint_value))
         elif 'minLength' == constraint:

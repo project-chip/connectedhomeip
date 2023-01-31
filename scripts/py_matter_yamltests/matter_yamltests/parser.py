@@ -19,7 +19,7 @@ from enum import Enum, auto
 import yaml
 
 from . import fixes
-from .constraints import get_constraints, is_typed_constraint
+from .constraints import get_constraints, is_typed_constraint, ConstraintHasValue
 from .definitions import SpecDefinitions
 from .pics_checker import PICSChecker
 
@@ -682,24 +682,35 @@ class TestStep:
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
         error_success = 'Constraints check passed'
         error_failure = 'Constraints check failed'
-        error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
+        error_name_does_not_exist = 'Constraint check expected a value named "{name}" but it does not exists in the response."'
 
         for value in self.response['values']:
             if 'constraints' not in value:
                 continue
 
+            ensure_has_value_constraint_check = False
+            expected_name = 'value'
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
                     # It is possible we are checking for constraint where
                     # `hasValue: false`.
+                    ensure_has_value_constraint_check = True
                     received_value = None
                 else:
                     received_value = received_value.get(
                         expected_name) if received_value else None
 
             constraints = get_constraints(value['constraints'])
+
+            has_value_constraint_check = any(isinstance(
+                constraint, ConstraintHasValue) for constraint in constraints)
+            if ensure_has_value_constraint_check and not has_value_constraint_check:
+                result.error(check_type, error_name_does_not_exist.format(
+                    name=expected_name))
+                continue
+
             if all([constraint.is_met(received_value) for constraint in constraints]):
                 result.success(check_type, error_success)
             else:
