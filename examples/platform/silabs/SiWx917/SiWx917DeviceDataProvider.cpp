@@ -33,7 +33,7 @@ using namespace std;
 // using namespace chip::Credentials;
 using namespace chip::DeviceLayer::Internal;
 
-#ifdef SIWX917_USE_COMISSIONABLE_DATA 
+#ifdef SIWX917_USE_COMISSIONABLE_DATA
 uint8_t SIWx917DeviceDataProvider::WriteBits(uint8_t * bits, uint8_t offset, uint64_t input, uint8_t numberOfBits, uint8_t totalPayloadInBits){
     if((offset + numberOfBits) > totalPayloadInBits){
         return -1;
@@ -91,13 +91,13 @@ CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData(){
         return CHIP_ERROR_INTERNAL;
     }
     // writing to the flash based on the value given in the DeviceConfig.h
-    if(discriminatorValue != 0){    
+    if(discriminatorValue != 0){
         err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_SetupDiscriminator, discriminatorValue);
         if(err != CHIP_NO_ERROR){
             return err;
         }
     }
-    uint8_t payload[11];			
+    uint8_t payload[11];
     generateQrCodeBitSet(payload);
     err = SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_SetupPayloadBitSet, payload, 11);
     if(err != CHIP_NO_ERROR){
@@ -131,37 +131,37 @@ CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData(){
         err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_VendorId, vendorId);
         if(err != CHIP_NO_ERROR){
             return err;
-        }    
+        }
     }
     if(strlen(productName) != 0){
         err = SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_ProductName, productName);
         if(err != CHIP_NO_ERROR){
             return err;
-        }    
+        }
     }
     if(strlen(vendorName) != 0){
         err = SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_VendorName, vendorName);
         if(err != CHIP_NO_ERROR){
             return err;
-        }    
+        }
     }
     if(strlen(hwVersionString) != 0){
         err = SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_HardwareVersionString, hwVersionString);
         if(err != CHIP_NO_ERROR){
             return err;
-        }    
+        }
     }
     if(rotatingId != 0){
         err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_UniqueId, rotatingId);
         if(err != CHIP_NO_ERROR){
             return err;
-        }    
+        }
     }
     if(commissionableFlow != 0){
         err = SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_ProductName, commissionableFlow);
         if(err != CHIP_NO_ERROR){
             return err;
-        }    
+        }
     }
 }
 #endif
