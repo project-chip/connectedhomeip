@@ -45,13 +45,13 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
     memset(mDeviceName, '\0', sizeof(mDeviceName));
     if (deviceName != nullptr)
     {
-        chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, deviceName);
+        chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen, deviceName);
     }
 
     memset(mHostName, '\0', sizeof(mHostName));
     if (hostName != nullptr)
     {
-        chip::Platform::CopyString(mHostName, chip::Dnssd::kHostNameMaxLength + 1, hostName);
+        chip::Platform::CopyString(mHostName, chip::Dnssd::kHostNameMaxLength, hostName);
     }
 
     for (auto & endpointInfo : mEndpoints)
@@ -71,11 +71,14 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
 CHIP_ERROR TargetVideoPlayerInfo::FindOrEstablishCASESession(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                                              std::function<void(CHIP_ERROR)> onConnectionFailure)
 {
-    mOnConnectionSuccessClientCallback = onConnectionSuccess;
-    mOnConnectionFailureClientCallback = onConnectionFailure;
-    Server * server                    = &(chip::Server::GetInstance());
-    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mNodeId, mFabricIndex), &mOnConnectedCallback,
-                                                            &mOnConnectionFailureCallback);
+    ChipLogProgress(AppServer, "TargetVideoPlayerInfo::FindOrEstablishCASESession called");
+
+    VideoPlayerConnectionContext * connectionContext = new VideoPlayerConnectionContext(
+        this, HandleDeviceConnected, HandleDeviceConnectionFailure, onConnectionSuccess, onConnectionFailure);
+    Server * server = &(chip::Server::GetInstance());
+    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mNodeId, mFabricIndex),
+                                                            connectionContext->mOnConnectedCallback,
+                                                            connectionContext->mOnConnectionFailureCallback);
     return CHIP_NO_ERROR;
 }
 
@@ -128,8 +131,8 @@ bool TargetVideoPlayerInfo::HasEndpoint(EndpointId endpointId)
 
 void TargetVideoPlayerInfo::PrintInfo()
 {
-    ChipLogProgress(NotSpecified, " TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabric index=%d", ChipLogValueX64(mNodeId),
-                    mFabricIndex);
+    ChipLogProgress(NotSpecified, " TargetVideoPlayerInfo deviceName=%s nodeId=0x" ChipLogFormatX64 " fabric index=%d", mDeviceName,
+                    ChipLogValueX64(mNodeId), mFabricIndex);
     for (auto & endpointInfo : mEndpoints)
     {
         if (endpointInfo.IsInitialized())
