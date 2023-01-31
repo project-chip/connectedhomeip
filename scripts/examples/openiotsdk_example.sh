@@ -37,10 +37,16 @@ OIS_CONFIG="$CHIP_ROOT/config/openiotsdk"
 FVP_CONFIG_FILE="$OIS_CONFIG/fvp/cs300.conf"
 EXAMPLE_TEST_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/integration-tests"
 TELNET_TERMINAL_PORT=5000
+TELNET_CONNECTION_PORT=""
 FAILED_TESTS=0
 FVP_NETWORK="user"
 
 readarray -t TEST_NAMES <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/testnames.txt
+
+declare -a SUPPORTED_APP_NAMES
+SUPPORTED_APP_NAMES+=("shell")
+SUPPORTED_APP_NAMES+=("lock-app")
+SUPPORTED_APP_NAMES+=("unit-tests")
 
 function show_usage() {
     cat <<EOF
@@ -58,9 +64,13 @@ Options:
     -n,--network    <network_name>  FVP network interface name <network_name - default is "user" which means user network mode>
 
 Examples:
-    shell
-    lock-app
-    unit-tests
+EOF
+
+    for app in "${SUPPORTED_APP_NAMES[@]}"; do
+        echo "    $app"
+    done
+
+    cat <<EOF
 
 You can run individual test suites of unit tests by using their names [test_name] with the run command:
 
@@ -104,9 +114,6 @@ function build_with_cmake() {
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
     fi
 
-    # Activate Matter environment
-    source "$CHIP_ROOT"/scripts/activate.sh
-
     cmake -G Ninja -S "$EXAMPLE_PATH" -B "$BUILD_PATH" --toolchain="$TOOLCHAIN_PATH" "${BUILD_OPTIONS[@]}"
     cmake --build "$BUILD_PATH"
 }
@@ -133,6 +140,12 @@ function run_fvp() {
         exit 1
     fi
 
+    # Check if FVP GDB plugin file exists
+    if "$DEBUG" && ! [ -f "$GDB_PLUGIN" ]; then
+        echo "Error: $GDB_PLUGIN does not exist. Ensure Fast Model extensions are mounted." >&2
+        exit 1
+    fi
+
     RUN_OPTIONS=(-C mps3_board.telnetterminal0.start_port="$TELNET_TERMINAL_PORT")
     RUN_OPTIONS+=(--quantum=25)
 
@@ -148,34 +161,42 @@ function run_fvp() {
 
     echo "Running $EXAMPLE_EXE_PATH with options: ${RUN_OPTIONS[@]}"
 
-    "$FVP_BIN" "${RUN_OPTIONS[@]}" -f "$FVP_CONFIG_FILE" --application "$EXAMPLE_EXE_PATH" >/dev/null 2>&1 &
+    # Run the FVP
+    "$FVP_BIN" "${RUN_OPTIONS[@]}" -f "$FVP_CONFIG_FILE" --application "$EXAMPLE_EXE_PATH" 2>&1 >/tmp/FVP_run_$$ &
     FVP_PID=$!
-    sleep 1
 
-    if [[ $IS_TEST -eq 1 ]]; then
-        set +e
-        expect <<EOF
-        set timeout 1800
-        set retcode -1
-        spawn telnet localhost ${TELNET_TERMINAL_PORT}
-        expect -re {Test status: (-?\d+)} {
-            set retcode \$expect_out(1,string)
-        }
-        expect "Open IoT SDK unit-tests completed"
-        set retcode [expr -1*\$retcode]
-        exit \$retcode
-EOF
-        RETCODE=$?
-        FAILED_TESTS=$(expr "$FAILED_TESTS" + "$RETCODE")
-        echo "$(jq '. += {($testname): {failed: $result}}' --arg testname "$EXAMPLE" --arg result "$RETCODE" "$EXAMPLE_PATH"/test_report.json)" >"$EXAMPLE_PATH"/test_report.json
+    # Wait for FVP to start and exist the output file
+    timeout=0
+    while [ ! -e /tmp/FVP_run_$$ ]; do
+        timeout=$((timeout + 1))
+        if [ "$timeout" -ge 5 ]; then
+            echo "Error: FVP start failed" >&2
+            break
+        fi
+        sleep 1
+    done
+
+    while IFS= read -t 5 -r line; do
+        if [[ $line == *"Listening for serial connection on port"* ]]; then
+            TELNET_CONNECTION_PORT="${line##* }"
+            break
+        fi
+    done </tmp/FVP_run_$$
+
+    if [ -n "$TELNET_CONNECTION_PORT" ]; then
+        # Connect FVP via telnet client
+        telnet localhost "$TELNET_CONNECTION_PORT"
     else
-        telnet localhost "$TELNET_TERMINAL_PORT"
+        echo "Error: FVP start failed" >&2
     fi
 
-    # stop the fvp
-    kill -9 "$FVP_PID" || true
-    set -e
-    sleep 1
+    # Stop the FVP
+    kill -SIGTERM "$FVP_PID"
+    # Wait for the FVP stop
+    while kill -0 "$FVP_PID"; do
+        sleep 1
+    done
+    rm -rf /tmp/FVP_run_$$
 }
 
 function run_test() {
@@ -192,9 +213,6 @@ function run_test() {
         echo "Error: $FVP_BIN not installed." >&2
         exit 1
     fi
-
-    # Activate Matter environment with pytest
-    source "$CHIP_ROOT"/scripts/activate.sh
 
     # Check if pytest exists
     if ! [ -x "$(command -v pytest)" ]; then
@@ -278,16 +296,13 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-case "$1" in
-    shell | unit-tests | lock-app)
-        EXAMPLE=$1
-        ;;
-    *)
-        echo "Wrong example name"
-        show_usage
-        exit 2
-        ;;
-esac
+EXAMPLE=$1
+
+if [[ ! " ${SUPPORTED_APP_NAMES[@]} " =~ " ${EXAMPLE} " ]]; then
+    echo "Wrong example name"
+    show_usage
+    exit 2
+fi
 
 if [[ "$EXAMPLE" == "unit-tests" ]]; then
     if [ ! -z "$2" ]; then
@@ -336,6 +351,9 @@ fi
 if [ -z "$BUILD_PATH" ]; then
     BUILD_PATH="$EXAMPLE_PATH/build"
 fi
+
+# Activate Matter environment
+source "$CHIP_ROOT"/scripts/activate.sh
 
 if [[ "$COMMAND" == *"build"* ]]; then
     build_with_cmake

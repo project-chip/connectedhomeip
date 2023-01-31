@@ -183,6 +183,15 @@ if(TARGET mcu-driver-hal)
         INTERFACE
             DOMAIN_NS=$<IF:$<BOOL:${TFM_SUPPORT}>,1,0>
     )
+
+    # Fixing the optimization issue for mcu-driver-hal target in the no-debug build.
+    # The default -Og optimization causes performance issues for the application.
+    # We need to replace it with -O2 which is suitable for performance.
+    # This fix can be removed in the future when the issue will be fixed in SDK directly.
+    if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+        target_compile_options(mcu-driver-hal INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-O2>)
+        target_compile_options(mcu-driver-hal INTERFACE $<$<COMPILE_LANGUAGE:C>:-O2>)
+    endif()
 endif()
 
 # Mbedtls config
