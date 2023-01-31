@@ -22,8 +22,8 @@ The selection of enabled clusters and files is done using
 [ZAP](https://github.com/project-chip/zap). You can download a recent release of
 zap from its [releases page](https://github.com/project-chip/zap/releases). It
 is recommended to download a release that is in sync with the currently in use
-version by the SDK (see `integrations/docker/images/chip-build/Dockerfile` and
-check the `ZAP_VERSION` setting).
+version by the SDK (see `scripts/zap.json` and
+`scripts/tools/zap/zap_execution.py` for the minimum supported version).
 
 Beyond basic zap file selection, there are also `.json` zap settings that define
 additional cluster info: source XML files, sdk-access methods and data types.
@@ -36,9 +36,17 @@ There are only two such files currently in use:
 
 ### Installing zap and environment variables
 
-Matter scripts may need to invoke `zap-cli` (for code generation) or `zap` (to
-start the UI tool). For this, scrips need to know where to find the commands. In
-the following order, the scripts process these environment variables:
+ZAP is generally installed as a third-party tool via CIPD during the build
+environment bootstrap (see `scripts/zap.json`), which makes `zap-cli` available
+in `$PATH` when running in a build environment.
+
+**NOTE**: zap packages are currently NOT available for `arm64` (like when
+compiling on Raspberry PI.). In these cases one should check out zap from source
+and set `$ZAP_DEVELOPMENT_PATH` as described below.
+
+When matter scripts need to invoke `zap-cli` (for code generation) or `zap` (to
+start the UI tool), they make use of the following environment variables to
+figure out where the zap tool is located (in order of precedence):
 
 -   if `$ZAP_DEVELOPMENT_PATH` is set, code assumes you are running zap from
     source. Use this if you develop zap. Zap has to be bootstrapped (generally
@@ -48,7 +56,8 @@ the following order, the scripts process these environment variables:
 -   if `$ZAP_INSTALL_PATH` is set, code assumes that `zap` or `zap-cli` is
     available in the given path. This is generally an unpacked release.
 
--   otherwise, scripts will assume `zap`/`zap-cli` is in `$PATH`
+-   otherwise, scripts will assume `zap`/`zap-cli` is in `$PATH` (this is the
+    case when running in a bootstrapped environment)
 
 ### Using a UI to edit `.zap` files
 
