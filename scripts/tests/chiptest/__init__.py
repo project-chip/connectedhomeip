@@ -59,105 +59,47 @@ def _GetManualTests() -> Set[ManualTest]:
     # for this reason are marked as manual".
     #
     # We are working to get this list down to 0.
-    manualtests.add(ManualTest(
-        yaml="OTA_SuccessfulTransfer.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="OTA_SuccessfulTransfer.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACE_1_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACE_1_5.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACL_2_10.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACL_2_7.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACL_2_8.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACL_2_9.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_ACT_3_1_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_APBSC_9_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_BINFO_2_1.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_BINFO_2_3_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_BOOL_3_1_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_CC_6_2.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_CC_6_3.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_CC_8_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_CGEN_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_CHANNEL_5_3.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_DESC_2_2_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_DGETH_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_DGETH_2_2.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_DGETH_3_1_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_DGGEN_2_1.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_DGSW_3_1_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_DGWIFI_2_1.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_DGWIFI_3_1_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_DRLK_2_2.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_DRLK_2_3.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_DRLK_2_5.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_DRLK_2_7.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_FLABEL_3_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_FLW_3_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_G_3_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_I_3_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_LCFG_3_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_LOWPOWER_2_1.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_LTIME_1_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_LUNIT_1_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_LUNIT_2_1_Simulated.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_LOWPOWER_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_LUNIT_3_1.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_MEDIAINPUT_3_12.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_MEDIAPLAYBACK_6_1.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_MEDIAPLAYBACK_6_2.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_MEDIAPLAYBACK_6_3.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_MEDIAPLAYBACK_6_4.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_OCC_2_2_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_OCC_2_4_Simulated.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAINPUT_3_12.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_2.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_3.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_4.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_PCC_2_1.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_PRS_3_1_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_PS_2_1.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_PS_3_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_PSCFG_3_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_RH_3_1_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_SC_5_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_SC_5_2.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_SWTCH_3_1_Simulated.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_TSTAT_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_TSTAT_2_2.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_TSUIC_2_2.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_ULABEL_3_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_WAKEONLAN_4_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_WAKEONLAN_4_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_WNCV_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_WNCV_2_5.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="Test_TC_WNCV_5_1_Simulated.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="TestClusterMultiFabric.yaml", reason="TODO"))
-    manualtests.add(ManualTest(
-        yaml="TestCommissionerNodeId.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="TestClusterMultiFabric.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="TestCommissionerNodeId.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestDiscovery.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestEvents.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestGroupMessaging.yaml", reason="TODO"))
@@ -198,6 +140,13 @@ def _AllYamlTests():
     for path in yaml_test_suite_path.rglob("*.yaml"):
         if not path.is_file():
             continue
+
+        if path.name.endswith('_Simulated.yaml'):
+            # Simulated tests are not runnable by repl tests, need
+            # separate infrastructure. Exclude theml completely (they are
+            # not even manual)
+            continue
+
         yield path
 
 
