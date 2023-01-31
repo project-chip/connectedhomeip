@@ -19,7 +19,7 @@ from enum import Enum, auto
 import yaml
 
 from . import fixes
-from .constraints import get_constraints, is_typed_constraint, ConstraintHasValue
+from .constraints import ConstraintHasValue, get_constraints, is_typed_constraint
 from .definitions import SpecDefinitions
 from .pics_checker import PICSChecker
 
