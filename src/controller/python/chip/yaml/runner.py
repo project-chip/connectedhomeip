@@ -25,6 +25,7 @@ from enum import Enum, IntEnum
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
 import stringcase
+from chip.ChipDeviceCtrl import discovery
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import AttributeStatus, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
 from chip.exceptions import ChipStackError
@@ -503,26 +504,53 @@ class CommissionerCommandAction(BaseAction):
         else:
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
 
-class DiscoveryCommand_FindCommissionableAction(BaseAction):
+class DiscoveryCommandAction(BaseAction):
     """DiscoveryCommand::FindCommissionable implementation"""
 
     def __init__(self, test_step):
         super().__init__(test_step)
-        if test_step.command != 'FindCommissionable':
-            raise UnexpectedParsingError(f'Invalid command: {test_step.command}')
+
+        if test_step.command == 'FindCommissionable':
+            self.filterType = discovery.FilterType.NONE
+            self.filter = None
+        elif test_step.command == 'FindCommissionableByCommissioningMode':
+            # this is just a "_CM" subtype
+            self.filterType = discovery.FilterType.COMMISSIONING_MODE
+            self.filter = 0
+        else:
+            # specific filtered value find
+            args = test_step.arguments['values']
+            request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
+
+            self.filter = request_data_as_dict['value']
+
+            if test_step.command == 'FindCommissionableByDeviceType':
+                self.filterType = discovery.FilterType.DEVICE_TYPE
+            elif test_step.command == 'FindCommissionableByLongDiscriminator':
+                self.filterType = discovery.FilterType.LONG_DISCRIMINATOR
+            elif test_step.command == 'FindCommissionableByShortDiscriminator':
+                self.filterType = discovery.FilterType.SHORT_DISCRIMINATOR
+            elif test_step.command == 'FindCommissionableByVendorId':
+                self.filterType = discovery.FilterType.VENDOR_ID
+            else:
+                raise UnexpectedParsingError(f'Invalid command: {test_step.command}')
+
+        self.step = test_step
+
 
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        # Discover without any filter
-        devices = dev_ctrl.DiscoverCommissionableNodes()
+        devices = dev_ctrl.DiscoverCommissionableNodes(filterType=self.filterType, filter=self.filter, stopOnFirst = True, timeoutSecond=5)
 
         # Devices will be a list: [CommissionableNode(), ...]
         logging.info("Discovered devices: %r" % devices)
 
-        if len(devices) == 1:
-            return _ActionResult(status=_ActionStatus.SUCCESS, response=devices[0])
-        else:
-            logging.error("Commissionable discovery found multiple results!")
-            return _ActionResult(status=_ActionStatus.ERROR, response=devices)
+        if not devices:
+            logging.error("No devices found")
+            return _ActionResult(status=_ActionStatus.ERROR, response="NO DEVICES FOUND")
+        elif len(devices) > 1:
+            logging.warning("Commissionable discovery found multiple results!")
+
+        return _ActionResult(status=_ActionStatus.SUCCESS, response=devices[0])
 
 
 class NotImplementedAction(BaseAction):
@@ -658,16 +686,7 @@ class ReplTestRunner:
         # cluster than that specified in 'config'.
 
         elif cluster == 'DiscoveryCommands':
-            if command == 'FindCommissionable':
-                return DiscoveryCommand_FindCommissionableAction(request)
-            else:
-                # TODO: support commands:
-                #   1 FindCommissionableByCommissioningMode
-                #   1 FindCommissionableByDeviceType
-                #   1 FindCommissionableByLongDiscriminator
-                #   1 FindCommissionableByShortDiscriminator
-                #   1 FindCommissionableByVendorId
-                return NotImplementedAction(request, cluster, command)
+                return DiscoveryCommandAction(request)
         elif cluster == 'DelayCommands' and command == 'WaitForCommissionee':
             action = self._wait_for_commissionee_action_factory(request)
         elif command == 'writeAttribute':
@@ -746,6 +765,13 @@ class ReplTestRunner:
                 'mrpRetryIntervalActive': response.mrpRetryIntervalActive,
                 'supportsTcp': response.supportsTcp,
                 'addresses': response.addresses,
+
+                # TODO: NOT AVAILABLE
+                'rotatingIdLen': 0,
+
+                # derived values
+                'numIPs': len(response.addresses),
+
             }
 
             return decoded_response

@@ -100,7 +100,6 @@ def _GetManualTests() -> Set[ManualTest]:
     manualtests.add(ManualTest(yaml="Test_TC_WNCV_2_5.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestClusterMultiFabric.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestCommissionerNodeId.yaml", reason="TODO"))
-    manualtests.add(ManualTest(yaml="TestDiscovery.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestEvents.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestGroupMessaging.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestMultiAdmin.yaml", reason="TODO"))

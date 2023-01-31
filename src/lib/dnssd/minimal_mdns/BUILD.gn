@@ -32,7 +32,7 @@ declare_args() {
 
   # This enables verbose logging of sent/received mDNS messages. However, will incur extra RAM and
   # time.
-  chip_minmdns_high_verbosity = false
+  chip_minmdns_high_verbosity = true
 
   # MinMdns address policy to be compiled in.
   # Supported values:
