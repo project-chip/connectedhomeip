@@ -301,6 +301,7 @@ template("k32w0_sdk") {
       "gLogRingPlacementOffset_c=0xF000",
       "gSecLibUseSha256Alt_d=1",
       "gOTA_UseSecLibAes=1",
+      "gResetSystemReset_d=1"
     ]
 
     if (chip_crypto == "platform" &&
