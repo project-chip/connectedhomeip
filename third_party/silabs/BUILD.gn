@@ -87,6 +87,9 @@ if (use_silabs_thread_lib) {
       "${sl_ot_efr32_root}/platform-abstraction/efr32",
       "${sl_openthread_root}/src/",
     ]
+
+    # temporarily disable check until gsdk pulls in a more recent version
+    cflags = [ "-Wno-format-nonliteral" ]
   }
 
   source_set("openthread_core_config_efr32") {
