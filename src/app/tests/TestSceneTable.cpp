@@ -26,6 +26,7 @@ using SceneTableEntry = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
 using SceneTableImpl  = chip::scenes::DefaultSceneTableImpl;
 using SceneStorageId  = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
 using SceneData       = chip::scenes::DefaultSceneTableImpl::SceneData;
+using CharSpan        = chip::CharSpan;
 
 namespace {
 
@@ -48,18 +49,18 @@ static const SceneStorageId sceneId8(1, 0xEE, 0x101);
 static const SceneStorageId sceneId9(1, 0xAB, 0x101);
 
 // Scene data
-static const SceneData sceneData1("Scene #1");
-static const SceneData sceneData2("Scene #2", 2, 5);
-static const SceneData sceneData3("Scene #3", 25);
-static const SceneData sceneData4("Scene num4", 5);
-static const SceneData sceneData5(nullptr);
-static const SceneData sceneData6("Scene #6", 3, 15);
-static const SceneData sceneData7("Scene #7", 20, 5);
-static const SceneData sceneData8("Scene num8", 10);
-static const SceneData sceneData9("NAME TOO LOOONNG", 30, 15);
-static const SceneData sceneData10("Scene #10", 10, 1);
-static const SceneData sceneData11("Scene #11", 20, 10);
-static const SceneData sceneData12("Scene #12", 30, 5);
+static const SceneData sceneData1(CharSpan("Scene #1", sizeof("Scene #1")));
+static const SceneData sceneData2(CharSpan("Scene #2", sizeof("Scene #2")), 2, 5);
+static const SceneData sceneData3(CharSpan("Scene #3", sizeof("Scene #3")), 25);
+static const SceneData sceneData4(CharSpan("Scene num4", sizeof("Scene num4")), 5);
+static const SceneData sceneData5(CharSpan(), 10);
+static const SceneData sceneData6(CharSpan("Scene #6", sizeof("Scene #6")), 3, 15);
+static const SceneData sceneData7(CharSpan("Scene #7", sizeof("Scene #7")), 20, 5);
+static const SceneData sceneData8(CharSpan("NAME TOO LOOONNG", sizeof("Scene num4")), 10);
+static const SceneData sceneData9(CharSpan("Scene #9", sizeof("Scene #9")), 30, 15);
+static const SceneData sceneData10(CharSpan("Scene #10", sizeof("Scene #10")), 10, 1);
+static const SceneData sceneData11(CharSpan("Scene #11", sizeof("Scene #11")), 20, 10);
+static const SceneData sceneData12(CharSpan("Scene #12", sizeof("Scene #12")), 30, 5);
 
 // Scenes
 SceneTableEntry scene1(sceneId1, sceneData1);
@@ -105,7 +106,7 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_LIST_LENGTH == sceneTable->SetSceneTableEntry(kFabric1, scene9));
 
     // Not Found
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->SetSceneTableEntry(kFabric1, scene9));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId9, scene));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, scene == scene1);
@@ -194,7 +195,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     auto * iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 7);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
-    NL_TEST_ASSERT(aSuite, scene == scene1);
+    NL_TEST_ASSERT(aSuite, scene == scene10);
     iterator->Release();
 
     // Remove first
@@ -206,6 +207,10 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     // Remove Next
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene3.storageId));
+    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    NL_TEST_ASSERT(aSuite, iterator->Count() == 5);
+    NL_TEST_ASSERT(aSuite, iterator->Next(scene));
+    NL_TEST_ASSERT(aSuite, scene == scene2);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene4);
 
@@ -229,9 +234,9 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene7.storageId));
     iterator = sceneTable->IterateSceneEntry(kFabric1);
-    NL_TEST_ASSERT(aSuite, iterator->Count() == 2);
+    NL_TEST_ASSERT(aSuite, iterator->Count() == 1);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
-    NL_TEST_ASSERT(aSuite, scene == scene8);
+    NL_TEST_ASSERT(aSuite, scene == scene12);
 
     // Remove last
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene8.storageId));
@@ -243,7 +248,6 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 0);
-    auto * iterator = sceneTable->IterateSceneEntry(kFabric1);
 }
 
 void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
@@ -304,14 +308,32 @@ void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
 
 } // namespace
 
+/**
+ *  Tear down the test suite.
+ */
 int TestSetup(void * inContext)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
     VerifyOrReturnError(CHIP_NO_ERROR == sSceneTable.Init(&testStorage), FAILURE);
 
     SetSceneTable(&sSceneTable);
+
+    return SUCCESS;
 }
 
+/**
+ *  Tear down the test suite.
+ */
+int TestTeardown(void * inContext)
+{
+    SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
+    if (nullptr != sceneTable)
+    {
+        sceneTable->Finish();
+    }
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
 int TestSceneTable()
 {
     static nlTest sTests[] = {
@@ -323,9 +345,10 @@ int TestSceneTable()
     nlTestSuite theSuite = {
         "SceneTable",
         &sTests[0],
-        nullptr,
-        nullptr,
+        TestSetup,
+        TestTeardown,
     };
+
     nlTestRunner(&theSuite, nullptr);
     return (nlTestRunnerStats(&theSuite));
 }

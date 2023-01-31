@@ -21,6 +21,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/CommonPersistentData.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace scenes {
@@ -108,27 +109,30 @@ public:
         static constexpr TLV::Tag TagSceneTransitionTime100() { return TLV::ContextTag(3); }
 
         char name[kSceneNameMax]                = { 0 };
+        size_t nameLength                       = 0;
         SceneTransitionTime sceneTransitionTime = 0;
         ExtensionFieldsSets extentsionFieldsSets;
         TransitionTime100ms transitionTime100 = 0;
+        CharSpan nameSpan;
 
-        SceneData(const char * sceneName = nullptr, SceneTransitionTime time = 0, TransitionTime100ms time100ms = 0) :
+        SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0, TransitionTime100ms time100ms = 0) :
             sceneTransitionTime(time), transitionTime100(time100ms)
         {
-            SetName(sceneName);
+            this->SetName(sceneName);
         }
-        SceneData(ExtensionFieldsSets fields, const char * sceneName = nullptr, SceneTransitionTime time = 0,
+        SceneData(ExtensionFieldsSets fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
                   TransitionTime100ms time100ms = 0) :
             sceneTransitionTime(time),
             transitionTime100(time100ms)
         {
-            SetName(sceneName);
+            this->SetName(sceneName);
             extentsionFieldsSets = fields;
         }
-        SceneData(const SceneData & data) : sceneTransitionTime(data.sceneTransitionTime), transitionTime100(data.transitionTime100)
+        SceneData(const SceneData & other) :
+            sceneTransitionTime(other.sceneTransitionTime), transitionTime100(other.transitionTime100)
         {
-            SetName(data.name);
-            extentsionFieldsSets = data.extentsionFieldsSets;
+            this->SetName(other.nameSpan);
+            extentsionFieldsSets = other.extentsionFieldsSets;
         }
 
         CHIP_ERROR Serialize(TLV::TLVWriter & writer) const
@@ -136,11 +140,10 @@ public:
             TLV::TLVType container;
             ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
 
-            // assumes a 0 size means the name wasn't used so it doesn't get stored
-            if (this->name[0] != 0)
+            // A 0 size means the name wasn't used so it won't get stored
+            if (!this->nameSpan.empty())
             {
-                size_t name_size = strnlen(this->name, kSceneNameMax);
-                ReturnErrorOnFailure(writer.PutString(TagSceneName(), this->name, static_cast<uint32_t>(name_size)));
+                ReturnErrorOnFailure(writer.PutString(TagSceneName(), this->nameSpan));
             }
 
             ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime(), static_cast<uint16_t>(this->sceneTransitionTime)));
@@ -162,14 +165,13 @@ public:
             // If there was no error, a name is expected from the storage, if there was an unexpectec TLV element,
             if (currTag == TagSceneName())
             {
-                size_t name_size = reader.GetLength();
-                VerifyOrReturnError(name_size <= (kSceneNameMax - 1), CHIP_ERROR_BUFFER_TOO_SMALL);
-                ReturnErrorOnFailure(reader.GetString(this->name, name_size));
-                this->name[name_size] = 0;
+                ReturnErrorOnFailure(reader.Get(this->nameSpan));
+                this->SetName(this->nameSpan);
+
+                // Putting a null terminator
+                ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime()));
             }
 
-            // Putting a null terminator
-            ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime()));
             ReturnErrorOnFailure(reader.Get(this->sceneTransitionTime));
             ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime100()));
             ReturnErrorOnFailure(reader.Get(this->transitionTime100));
@@ -177,21 +179,25 @@ public:
 
             return reader.ExitContainer(container);
         }
-        void SetName(const char * sceneName)
+
+        void SetName(const CharSpan & sceneName)
         {
-            if (nullptr == sceneName)
+            if (nullptr == sceneName.data())
             {
-                name[0] = 0;
+                name[0]    = 0;
+                nameLength = 0;
             }
             else
             {
                 Platform::CopyString(name, sceneName);
+                nameLength = sceneName.size();
             }
+            nameSpan = CharSpan(name, nameLength);
         }
 
         void Clear()
         {
-            this->SetName(nullptr);
+            this->SetName(CharSpan());
             sceneTransitionTime = 0;
             transitionTime100   = 0;
             extentsionFieldsSets.Clear();
@@ -199,14 +205,14 @@ public:
 
         bool operator==(const SceneData & other)
         {
-            return (!strncmp(this->name, other.name, kSceneNameMax) && (this->sceneTransitionTime == other.sceneTransitionTime) &&
+            return (this->nameSpan.data_equal(other.nameSpan) && (this->sceneTransitionTime == other.sceneTransitionTime) &&
                     (this->transitionTime100 == other.transitionTime100) &&
                     (this->extentsionFieldsSets == other.extentsionFieldsSets));
         }
 
         void operator=(const SceneData & other)
         {
-            this->SetName(other.name);
+            this->SetName(other.nameSpan);
             this->extentsionFieldsSets = other.extentsionFieldsSets;
             this->sceneTransitionTime  = other.sceneTransitionTime;
             this->transitionTime100    = other.transitionTime100;

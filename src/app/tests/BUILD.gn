@@ -93,6 +93,7 @@ source_set("scenes-table-test-srcs") {
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
+  defines = [ "SCENES_TESTING_CONFIGURATION=1" ]
 }
 
 chip_test_suite("tests") {
