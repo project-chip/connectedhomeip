@@ -18,7 +18,6 @@
 
 # Build and/or run Open IoT SDK examples.
 
-IS_TEST=0
 NAME="$(basename "$0")"
 HERE="$(dirname "$0")"
 CHIP_ROOT="$(realpath "$HERE"/../..)"
@@ -39,6 +38,7 @@ EXAMPLE_TEST_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/integration-tests"
 TELNET_TERMINAL_PORT=5000
 TELNET_CONNECTION_PORT=""
 FAILED_TESTS=0
+IS_UNIT_TEST=0
 FVP_NETWORK="user"
 
 readarray -t TEST_NAMES <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/testnames.txt
@@ -72,15 +72,12 @@ EOF
 
     cat <<EOF
 
-You can run individual test suites of unit tests by using their names [test_name] with the run command:
+You run or test individual test suites of unit tests by using their names [test_name] with the specified command:
 
 EOF
     cat "$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/testnames.txt
-    echo ""
     cat <<EOF
-Or you can use all tests suites with <all> parameter as [test_name]
-
-The "test" command can be used for all supported examples expect the unit-tests.
+Use "test" command without a specific test name, runs all supported unit tests.
 
 EOF
 }
@@ -126,12 +123,6 @@ function run_fvp() {
     if ! [ -x "$(command -v "$FVP_BIN")" ]; then
         echo "Error: $FVP_BIN not installed." >&2
         exit 1
-    fi
-
-    if [[ $IS_TEST -eq 0 ]]; then
-        EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
-    else
-        EXAMPLE_EXE_PATH="$BUILD_PATH/$EXAMPLE.elf"
     fi
 
     # Check if executable file exists
@@ -201,7 +192,6 @@ function run_fvp() {
 
 function run_test() {
 
-    EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
     # Check if executable file exists
     if ! [ -f "$EXAMPLE_EXE_PATH" ]; then
         echo "Error: $EXAMPLE_EXE_PATH does not exist." >&2
@@ -226,19 +216,19 @@ function run_test() {
         TEST_OPTIONS+=(--networkInterface="$FVP_NETWORK")
     fi
 
-    if [[ -f $EXAMPLE_TEST_PATH/$EXAMPLE/test_report.json ]]; then
-        rm -rf "$EXAMPLE_TEST_PATH/$EXAMPLE"/test_report.json
+    if [[ -f $EXAMPLE_TEST_PATH/test_report_$EXAMPLE.json ]]; then
+        rm -rf "$EXAMPLE_TEST_PATH/test_report_$EXAMPLE".json
     fi
 
     set +e
-    pytest --json-report --json-report-summary --json-report-file="$EXAMPLE_TEST_PATH/$EXAMPLE"/test_report.json --binaryPath="$EXAMPLE_EXE_PATH" --fvp="$FVP_BIN" --fvpConfig="$FVP_CONFIG_FILE" "${TEST_OPTIONS[@]}" "$EXAMPLE_TEST_PATH/$EXAMPLE"/test_app.py
+    pytest --json-report --json-report-summary --json-report-file="$EXAMPLE_TEST_PATH"/test_report_"$EXAMPLE".json --binaryPath="$EXAMPLE_EXE_PATH" --fvp="$FVP_BIN" --fvpConfig="$FVP_CONFIG_FILE" "${TEST_OPTIONS[@]}" "$EXAMPLE_TEST_PATH"/test_app.py
     set -e
 
-    if [[ ! -f $EXAMPLE_TEST_PATH/$EXAMPLE/test_report.json ]]; then
+    if [[ ! -f $EXAMPLE_TEST_PATH/test_report_$EXAMPLE.json ]]; then
         exit 1
     else
-        if [[ $(jq '.summary | has("failed")' $EXAMPLE_TEST_PATH/$EXAMPLE/test_report.json) == true ]]; then
-            FAILED_TESTS=$(jq '.summary.failed' "$EXAMPLE_TEST_PATH/$EXAMPLE"/test_report.json)
+        if [[ $(jq '.summary | has("failed")' $EXAMPLE_TEST_PATH/test_report_$EXAMPLE.json) == true ]]; then
+            FAILED_TESTS=$((FAILED_TESTS + $(jq '.summary.failed' "$EXAMPLE_TEST_PATH"/test_report_"$EXAMPLE".json)))
         fi
     fi
 }
@@ -304,16 +294,20 @@ if [[ ! " ${SUPPORTED_APP_NAMES[@]} " =~ " ${EXAMPLE} " ]]; then
     exit 2
 fi
 
+case "$COMMAND" in
+    build | run | test | build-run) ;;
+    *)
+        echo "Wrong command definition"
+        show_usage
+        exit 2
+        ;;
+esac
+
 if [[ "$EXAMPLE" == "unit-tests" ]]; then
     if [ ! -z "$2" ]; then
         if [[ " ${TEST_NAMES[*]} " =~ " $2 " ]]; then
-            if [[ "$COMMAND" != *"run"* ]]; then
-                echo "Test suites can only accept --command run"
-                show_usage
-                exit 2
-            fi
             EXAMPLE=$2
-            echo "Run specific unit test $EXAMPLE"
+            echo "Use specific unit test $EXAMPLE"
         elif [[ "$2" == "all" ]]; then
             echo "Use all unit tests"
         else
@@ -324,29 +318,13 @@ if [[ "$EXAMPLE" == "unit-tests" ]]; then
     else
         echo "Use all unit tests"
     fi
-    IS_TEST=1
+    EXAMPLE_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/unit-tests"
+    IS_UNIT_TEST=1
+else
+    EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
 fi
-
-case "$COMMAND" in
-    build | run | test | build-run) ;;
-    *)
-        echo "Wrong command definition"
-        show_usage
-        exit 2
-        ;;
-esac
 
 TOOLCHAIN_PATH="toolchains/toolchain-$TOOLCHAIN.cmake"
-
-if [[ $IS_TEST -eq 0 ]]; then
-    EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
-else
-    EXAMPLE_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/unit-tests"
-    if [[ -f $EXAMPLE_PATH/test_report.json ]]; then
-        rm -rf "$EXAMPLE_PATH"/test_report.json
-    fi
-    echo "{}" >"$EXAMPLE_PATH"/test_report.json
-fi
 
 if [ -z "$BUILD_PATH" ]; then
     BUILD_PATH="$EXAMPLE_PATH/build"
@@ -355,26 +333,23 @@ fi
 # Activate Matter environment
 source "$CHIP_ROOT"/scripts/activate.sh
 
+if [[ $IS_UNIT_TEST -eq 0 ]]; then
+    EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
+    EXAMPLE_TEST_PATH+="/$EXAMPLE"
+else
+    EXAMPLE_EXE_PATH="$BUILD_PATH/$EXAMPLE.elf"
+    EXAMPLE_TEST_PATH+="/unit-tests"
+fi
+
 if [[ "$COMMAND" == *"build"* ]]; then
     build_with_cmake
 fi
 
 if [[ "$COMMAND" == *"run"* ]]; then
-    # If user wants to run unit-tests we need to loop through all test names
     if [[ "$EXAMPLE" == "unit-tests" ]]; then
-        if "$DEBUG"; then
-            echo "You have to specify the test suites to run in debug mode"
-            show_usage
-            exit 2
-        else
-            for NAME in "${TEST_NAMES[@]}"; do
-                EXAMPLE=$NAME
-                echo "$EXAMPLE_PATH"
-                echo "Run specific unit test $EXAMPLE"
-                run_fvp
-            done
-            echo "Failed tests total: $FAILED_TESTS"
-        fi
+        echo "You have to specify the test suites to run"
+        show_usage
+        exit 2
     else
         run_fvp
     fi
@@ -382,15 +357,16 @@ fi
 
 if [[ "$COMMAND" == *"test"* ]]; then
     if [[ "$EXAMPLE" == "unit-tests" ]]; then
-        echo "The test command can not be applied to the unit-tests example"
-        show_usage
-        exit 2
+        for NAME in "${TEST_NAMES[@]}"; do
+            EXAMPLE=$NAME
+            EXAMPLE_EXE_PATH="$BUILD_PATH/$EXAMPLE.elf"
+            echo "Test specific unit test $EXAMPLE"
+            run_test
+        done
+
     else
-        IS_TEST=1
         run_test
     fi
-fi
-
-if [[ $IS_TEST -eq 1 ]]; then
+    echo "Failed tests total: $FAILED_TESTS"
     exit "$FAILED_TESTS"
 fi
