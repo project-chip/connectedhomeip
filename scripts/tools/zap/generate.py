@@ -142,7 +142,7 @@ def runArgumentsParser() -> CmdLineArgs:
     if args.output_dir:
         output_dir = args.output_dir
     elif args.templates == default_templates:
-        output_dir = os.path.abspath(os.path.join(CHIP_ROOT_DIR,'zzz_generated'))
+        output_dir = os.path.abspath(os.path.join(CHIP_ROOT_DIR, 'zzz_generated'))
     else:
         output_dir = ''
 
