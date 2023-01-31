@@ -105,10 +105,6 @@ def _GetManualTests() -> Set[ManualTest]:
     manualtests.add(ManualTest(yaml="TestGroupMessaging.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestMultiAdmin.yaml", reason="TODO"))
 
-    # Flaky tests? these seem to pass though
-    manualtests.add(ManualTest(yaml="DL_Schedules.yaml", reason="Flaky"))
-    manualtests.add(ManualTest(yaml="Test_TC_LVL_2_1.yaml", reason="Flaky"))
-
     # Examples:
     #
     # Currently these are not in ciTests.json, however yaml logic currently
