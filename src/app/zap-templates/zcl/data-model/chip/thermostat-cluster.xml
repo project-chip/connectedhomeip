@@ -27,32 +27,6 @@ limitations under the License.
     <field name="AutoMode" mask="0x20"/>
   </bitmap>
 
-  <bitmap name="ThermostatOccupancy" type="BITMAP8">
-    <field name="occupied" mask="0x1"/>
-  </bitmap>
-
-  <bitmap name="ThermostatSensing" type="BITMAP8">
-    <field name="localTempSensedRemotely" mask="0x1"/>
-    <field name="outdoorTempSensedRemotely" mask="0x2"/>
-    <field name="occupancySensedRemotely" mask="0x4"/>
-  </bitmap>
-
-  <bitmap name="ThermostatAlarmMask" type="BITMAP8">
-    <field name="initializationFailure" mask="0x1"/>
-    <field name="hardwareFailure" mask="0x2"/>
-    <field name="selfcalibrationFailure" mask="0x4"/>
-  </bitmap>
-
-  <bitmap name="ThermostatRunningState" type="BITMAP16">
-    <field name="HeatStateOn" mask="0x0001"/>
-    <field name="CoolStateOn" mask="0x0002"/>
-    <field name="FanStateOn" mask="0x0004"/>
-    <field name="HeatSecondStageStateOn" mask="0x0008"/>
-    <field name="CoolSecondStageStateOn" mask="0x0010"/>
-    <field name="FanSecondStageStateOn" mask="0x0020"/>
-    <field name="FanThirdStageStateOn" mask="0x0040"/>
-  </bitmap>
-
   <bitmap name="DayOfWeek" type="BITMAP8">
     <cluster code="0x0201"/>
     <field name="Sunday" mask="0x01"/>
