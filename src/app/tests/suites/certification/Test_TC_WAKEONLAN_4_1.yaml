@@ -44,8 +44,6 @@ tests:
       PICS: LOWPOWER.S.C00.Rsp
       cluster: "Low Power"
       command: "Sleep"
-      response:
-          error: 0
 
     - label:
           "TH sends a Wake-On LAN magic packet containing the MAC address from

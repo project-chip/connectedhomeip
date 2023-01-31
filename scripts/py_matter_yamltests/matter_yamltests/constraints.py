@@ -24,11 +24,6 @@ class ConstraintParseError(Exception):
         super().__init__(message)
 
 
-class ConstraintValidationError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-
-
 class BaseConstraint(ABC):
     '''Constraint Interface'''
 
@@ -42,7 +37,13 @@ class BaseConstraint(ABC):
             return self._is_null_allowed
 
         response_type = type(value)
-        if self._types and response_type not in self._types:
+        type_matches = False if self._types else True
+        for expected_type in self._types:
+            if issubclass(response_type, expected_type):
+                type_matches = True
+                break
+
+        if not type_matches:
             return False
 
         return self.check_response(value)
@@ -57,9 +58,15 @@ class _ConstraintHasValue(BaseConstraint):
         super().__init__(types=[])
         self._has_value = has_value
 
+    def is_met(self, value):
+        # We are overriding the BaseConstraint of is_met since has value is a special case where
+        # we might not be expecting a value at all, but the basic null check in BaseConstraint
+        # is not what we want.
+        return self.check_response(value)
+
     def check_response(self, value) -> bool:
-        raise ConstraintValidationError(
-            'HasValue constraint currently not implemented')
+        has_value = value is not None
+        return self._has_value == has_value
 
 
 class _ConstraintType(BaseConstraint):
@@ -74,6 +81,8 @@ class _ConstraintType(BaseConstraint):
         elif self._type == 'list' and type(value) is list:
             success = True
         elif self._type == 'char_string' and type(value) is str:
+            success = True
+        elif self._type == 'long_char_string' and type(value) is str:
             success = True
         elif self._type == 'octet_string' and type(value) is bytes:
             success = True
@@ -105,9 +114,9 @@ class _ConstraintType(BaseConstraint):
             success = value >= 0 and value <= 0xFFFFFFFF
         elif self._type == 'bitmap64' and type(value) is int:
             success = value >= 0 and value <= 0xFFFFFFFFFFFFFFFF
-        elif self._type == 'enum8' and type(value) is int:
+        elif self._type == 'enum8' and isinstance(value, int):
             success = value >= 0 and value <= 0xFF
-        elif self._type == 'enum16' and type(value) is int:
+        elif self._type == 'enum16' and isinstance(value, int):
             success = value >= 0 and value <= 0xFFFF
         elif self._type == 'Percent' and type(value) is int:
             success = value >= 0 and value <= 0xFF
