@@ -82,7 +82,7 @@ To build and run the Python CHIP controller:
 
 ### Building using pregenerated zap files e.g. for Raspberry Pi 4
 
-1. Building for Arm based systems such as the Raspbery Pi 4 should use pregenerated files since there are currently no pre-built zap Arm Linux binaries. To understand about code generation and pregenerating code files see [Code generation](../code_generation.md#Pre-generation). To build and install the Python CHIP controller with pregenerated files use the --pregen_dir (-z) argument:
+1. Building for Arm based systems such as the Raspberry Pi 4 should use pregenerated files since there are currently no pre-built zap Arm Linux binaries. To understand about code generation and pregenerating code files see [Code generation](../code_generation.md#Pre-generation). To build and install the Python CHIP controller with pregenerated files use the --pregen_dir (-z) argument:
 
     ```
     scripts/build_python.sh -m platform -i separate -z "/some/pregen/dir"
