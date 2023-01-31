@@ -603,14 +603,13 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/sha512.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cache.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ciphersuites.c",
-
-      # "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cli.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_client.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cookie.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_msg.c",
-
-      # "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_srv.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ticket.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_tls.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_tls12_client.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_tls12_server.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_tls13_keys.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/threading.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/timing.c",
