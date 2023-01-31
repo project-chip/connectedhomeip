@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Lighting"/>
+
+  <cluster>
+    <name>Ballast Configuration</name>
+    <domain>Lighting</domain>
+    <description>Attributes and commands for configuring a lighting ballast.</description>
+    <code>0x0301</code>
+    <define>BALLAST_CONFIGURATION_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+
+    <!-- Ballast Configuration Attribute Set -->
+    <attribute side="server" code="0x0000" define="PHYSICAL_MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0x01" optional="false">PhysicalMinLevel</attribute>
+    <attribute side="server" code="0x0001" define="PHYSICAL_MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0xFE" optional="false">PhysicalMaxLevel</attribute>
+    <attribute side="server" code="0x0002" define="BALLAST_STATUS" type="BITMAP8" min="0x00" max="0x03" writable="false" default="0x00" optional="true">BallastStatus</attribute>
+    <!-- Ballast Settings Attribute Set -->
+    <attribute side="server" code="0x0010" define="MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="false">MinLevel</attribute>
+    <attribute side="server" code="0x0011" define="MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0xFE" optional="false">MaxLevel</attribute>
+    <!-- PowerOnLevel and PowerOnFadeTime are deprecated -->
+    <attribute side="server" code="0x0014" define="INTRINSIC_BALLAST_FACTOR" type="INT8U" writable="true" isNullable="true" optional="true">IntrinsicBallastFactor</attribute>
+    <attribute side="server" code="0x0015" define="BALLAST_FACTOR_ADJUSTMENT" type="INT8U" min="0x64" writable="true" default="0xFF" isNullable="true" optional="true">BallastFactorAdjustment</attribute>
+    <!-- Lamp Information Attribute Set -->
+    <attribute side="server" code="0x0020" define="LAMP_QUANTITY" type="INT8U" writable="false" optional="false">LampQuantity</attribute>
+    <!-- Lamp Settings Attribute Set -->
+    <attribute side="server" code="0x0030" define="LAMP_TYPE" type="CHAR_STRING" length="16" writable="true" optional="true">LampType</attribute>
+    <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" optional="true">LampManufacturer</attribute>
+    <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampRatedHours</attribute>
+    <attribute side="server" code="0x0033" define="LAMP_BURN_HOURS" type="INT24U" writable="true" default="0x000000" isNullable="true" optional="true">LampBurnHours</attribute>
+    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="BITMAP8" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LampAlarmMode</attribute>
+    <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampBurnHoursTripPoint</attribute>
+  </cluster>
+</configurator>

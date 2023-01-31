@@ -96,9 +96,6 @@ def main(setup_code, yaml_path, node_id, pics_file):
             # Creating Cluster definition.
             clusters_definitions = SpecDefinitionsFromPaths([
                 _CLUSTER_XML_DIRECTORY_PATH + '/chip/*.xml',
-
-                # Some still-silabs clusters
-                _CLUSTER_XML_DIRECTORY_PATH + '/silabs/ha.xml',  # For fan control
             ])
 
             # Parsing YAML test and setting up chip-repl yamltests runner.
