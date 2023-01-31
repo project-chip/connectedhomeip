@@ -65,3 +65,27 @@ CHIP_ERROR SkipBackwardCommand::Invoke(uint64_t deltaPositionMilliseconds, std::
     request.deltaPositionMilliseconds = deltaPositionMilliseconds;
     return MediaCommandBase::Invoke(request, responseCallback);
 }
+
+CHIP_ERROR PreviousCommand::Invoke(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    MediaPlayback::Commands::Previous::Type request;
+    return MediaCommandBase::Invoke(request, responseCallback);
+}
+
+CHIP_ERROR StartOverCommand::Invoke(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    MediaPlayback::Commands::StartOver::Type request;
+    return MediaCommandBase::Invoke(request, responseCallback);
+}
+
+CHIP_ERROR RewindCommand::Invoke(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    MediaPlayback::Commands::Rewind::Type request;
+    return MediaCommandBase::Invoke(request, responseCallback);
+}
+
+CHIP_ERROR FastForwardCommand::Invoke(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    MediaPlayback::Commands::FastForward::Type request;
+    return MediaCommandBase::Invoke(request, responseCallback);
+}
