@@ -81,6 +81,13 @@ class ZapDistinctOutput:
 
 
 class ZAPGenerateTarget:
+
+    @staticmethod
+    def MatterIdlTarget(zap_config):
+        # NOTE: this assumes `src/app/zap-templates/matter-idl.json` is the
+        #       DEFAULT generation target and it needs no output_dir
+        return ZAPGenerateTarget(zap_config, template=None, output_dir=None)
+
     def __init__(self, zap_config, template, output_dir=None):
         self.script = './scripts/tools/zap/generate.py'
         self.zap_config = str(zap_config)
@@ -93,7 +100,16 @@ class ZAPGenerateTarget:
             self.output_dir = None
 
     def distinct_output(self):
-        return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
+        if not self.template and not self.output_dir:
+            # Matter IDL templates have no template/output dir as they go with the
+            # default.
+            #
+            # output_directory is MIS-USED here because zap files may reside in the same
+            # directory (e.g. chef) so we claim the zap config is an output directory
+            # for uniqueness
+            return ZapDistinctOutput(input_template=None, output_directory=self.zap_config)
+        else:
+            return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
     def log_command(self):
         """Log the command that will get run for this target
@@ -246,10 +262,8 @@ def getGlobalTemplatesTargets():
                 'zzz_generated', 'placeholder', example_name, 'zap-generated')
             template = 'examples/placeholder/templates/templates.json'
 
-            targets.append(ZAPGenerateTarget(
-                filepath, output_dir=output_dir, template="src/app/zap-templates/matter-idl.json"))
-            targets.append(
-                ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
+            targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
+            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
             continue
 
         if example_name == "chef":
@@ -271,13 +285,9 @@ def getGlobalTemplatesTargets():
         # a name like <zap-generated/foo.h>
         output_dir = os.path.join(
             'zzz_generated', generate_subdir, 'zap-generated')
-        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir,
-                       template="src/app/zap-templates/matter-idl.json"))
+        targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
 
-    targets.append(ZAPGenerateTarget(
-        'src/controller/data_model/controller-clusters.zap',
-        template="src/app/zap-templates/matter-idl.json",
-        output_dir=os.path.join('zzz_generated/controller-clusters/zap-generated')))
+    targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap'))
 
     # This generates app headers for darwin only, for easier/clearer include
     # in .pbxproj files.
