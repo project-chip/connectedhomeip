@@ -21,7 +21,6 @@
 #include "WindowCoveringManager.h"
 #include "include/tv-callbacks.h"
 #include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>

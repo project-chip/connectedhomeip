@@ -181,11 +181,3 @@ jobs:
               if: always()
               run: |
                   git grep -n '0x%[0-9-]*" *PRI[^xX]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
-
-            # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we want to exclude this file,
-            # to avoid our grep regexp matching itself.
-            - name: Check for use of legacy non-namespaced attribute ids.
-              if: always()
-              run: |
-                  git grep -n '_ATTRIBUTE_ID' -- src ':(exclude)src/app/zap-templates/templates/app/attribute-id.zapt' && exit 1 || exit 0

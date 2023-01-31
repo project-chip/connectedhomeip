@@ -27,7 +27,6 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>

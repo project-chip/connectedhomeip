@@ -27,7 +27,6 @@
 
 #include <common/CHIPDeviceManager.h>
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
