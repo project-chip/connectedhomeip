@@ -53,7 +53,7 @@ class BaseConstraint(ABC):
         pass
 
 
-class ConstraintHasValue(BaseConstraint):
+class _ConstraintHasValue(BaseConstraint):
     def __init__(self, has_value):
         super().__init__(types=[])
         self._has_value = has_value
@@ -85,6 +85,8 @@ class _ConstraintType(BaseConstraint):
         elif self._type == 'long_char_string' and type(value) is str:
             success = True
         elif self._type == 'octet_string' and type(value) is bytes:
+            success = True
+        elif self._type == 'long_octet_string' and type(value) is bytes:
             success = True
         elif self._type == 'vendor_id' and type(value) is int:
             success = value >= 0 and value <= 0xFFFF
@@ -330,7 +332,7 @@ def get_constraints(constraints: dict) -> list[BaseConstraint]:
 
     for constraint, constraint_value in constraints.items():
         if 'hasValue' == constraint:
-            _constraints.append(ConstraintHasValue(constraint_value))
+            _constraints.append(_ConstraintHasValue(constraint_value))
         elif 'type' == constraint:
             _constraints.append(_ConstraintType(constraint_value))
         elif 'minLength' == constraint:
