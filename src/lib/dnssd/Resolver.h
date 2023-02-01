@@ -349,7 +349,7 @@ public:
     virtual CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
 
     /**
-     * Returns if the resolver has completed the initialization.
+     * Returns whether the resolver has completed the initialization.
      *
      * Returns true if the resolver is ready to take node resolution and discovery requests.
      */

@@ -353,7 +353,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         }
     }
 
-    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
+    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     PlatformMgr().HandleServerStarted();
 
     mIsDnssdReady = Dnssd::Resolver::Instance().IsInitialized();
@@ -405,9 +405,9 @@ void Server::CheckServerReadyEvent()
     }
 }
 
-void Server::OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+void Server::OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t server)
 {
-    Server::GetInstance().OnPlatformEvent(*event);
+    reinterpret_cast<Server *>(server)->OnPlatformEvent(*event);
 }
 
 void Server::RejoinExistingMulticastGroups()
