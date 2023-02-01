@@ -80,13 +80,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init()
     err            = sKeysStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS keys storage with id: %" PRIu16 ". Error: %s", kNvmId_KvsKeys, ErrorStr(err));
+        ChipLogProgress(DeviceLayer, "Cannot init KVS keys storage with id: %d. Error: %s", kNvmId_KvsKeys, ErrorStr(err));
     }
     err = sValuesStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS values storage with id: %" PRIu16 ". Error: %s", kNvmId_KvsValues,
-                        ErrorStr(err));
+        ChipLogProgress(DeviceLayer, "Cannot init KVS values storage with id: %d. Error: %s", kNvmId_KvsValues, ErrorStr(err));
     }
 
     return err;

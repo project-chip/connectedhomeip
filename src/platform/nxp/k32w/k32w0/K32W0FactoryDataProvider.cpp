@@ -172,8 +172,7 @@ CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *
         {
             if ((type >= K32W0FactoryDataProvider::kNumberOfIds) || (length > maxLengths[type]))
             {
-                ChipLogError(DeviceLayer, "Failed validity check for factory data with: id=%" PRIu8 ", length=%" PRIu16, type,
-                             length);
+                ChipLogError(DeviceLayer, "Failed validity check for factory data with: id=%d, length=%d", type, length);
                 break;
             }
 
