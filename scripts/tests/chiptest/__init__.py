@@ -59,8 +59,7 @@ def _GetManualTests() -> Set[ManualTest]:
     # for this reason are marked as manual".
     #
     # We are working to get this list down to 0.
-    manualtests.add(ManualTest(
-        yaml="OTA_SuccessfulTransfer.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="OTA_SuccessfulTransfer.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACE_1_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACE_1_5.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_ACL_2_10.yaml", reason="TODO"))
