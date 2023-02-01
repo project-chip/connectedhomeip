@@ -31,11 +31,14 @@ Please follow the instructions
 [here](./python_chip_controller_building.md#building-and-installing) to build
 the Python virtual environment.
 
-### Building using pregenerated matter code e.g. for Raspberry Pi 4
+### Building for `arm64` e.g. for Raspberry Pi
 
-Matter code relies on code generation for cluster-specific data types and callbacks. A subset of code generation (both codegen.py and zap-cli) is done at compile time. When compile-time code generation is not desirable, such as when building for Arm based systems such as the Raspberry Pi 4 that currently do not have pre-built zap Arm Linux binaries, then pre-generated output code can be used. To understand about code generation and pregenerating matter code see [Code generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Pre-generation). 
+Matter code relies on code generation for cluster-specific data types and callbacks. A subset of code generation is done at compile time by `zap-cli`. ZAP is generally installed as a third-party tool via CIPD during the build environment bootstrap. However, zap packages are currently NOT available for `arm64` (like when compiling on Raspberry PI.). In this case, you have 2 choices code:
 
-1. To build and install the Python CHIP controller with pregenerated files use the -z argument (--pregen_dir) that points to the directory of pregenerated code:
+1. You could check out zap from source as described in [Code Generation - Installing zap and environment variables](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Installing-zap-and-environment-variables) and proceed with the [instructions](./python_chip_controller_building.md#building-and-installing) to build
+the Python virtual environment.  
+
+2. When compile-time code generation is not desirable, then pre-generated output code can be used. To understand about code generation and pregenerating matter code see. [Code generation - Pregeneration](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Pre-generation). To build and install the Python CHIP controller with pregenerated files use the -z argument (--pregen_dir) that points to the directory of pregenerated code:
 
     ```
     scripts/build_python.sh -m platform -i separate -z "/some/pregen/dir"
