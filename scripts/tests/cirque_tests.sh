@@ -82,11 +82,7 @@ function __cirquetest_build_ot() {
 function __cirquetest_build_ot_lazy() {
     pushd .
     cd "$REPO_DIR"/third_party/openthread/repo
-    ([[ -f "$OT_SIMULATION_CACHE_STAMP_FILE" ]] &&
-        [[ "$(cat "$OT_SIMULATION_CACHE_STAMP_FILE")" = "$OPENTHREAD_CHECKOUT" ]] &&
-        [[ -f "$OT_SIMULATION_CACHE" ]] &&
-        tar zxf "$OT_SIMULATION_CACHE") ||
-        __cirquetest_build_ot
+    __cirquetest_build_ot
     popd
 }
 
