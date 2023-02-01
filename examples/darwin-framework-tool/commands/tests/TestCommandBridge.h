@@ -154,9 +154,6 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
-        if (controller.controllerNodeId != nil) {
-            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
-        }
 
         // Invalidate our existing CASE session; otherwise trying to work with
         // our device will just reuse it without establishing a new CASE
@@ -184,10 +181,6 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
-        if (controller.controllerNodeId != nil) {
-            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
-        }
-
         [controller setDeviceControllerDelegate:mDeviceControllerDelegate queue:mCallbackQueue];
         [mDeviceControllerDelegate setDeviceId:value.nodeId];
         [mDeviceControllerDelegate setActive:YES];
@@ -208,6 +201,26 @@ public:
         return MTRErrorToCHIPErrorCode(err);
     }
 
+    CHIP_ERROR GetCommissionerNodeId(const char * _Nullable identity,
+        const chip::app::Clusters::CommissionerCommands::Commands::GetCommissionerNodeId::Type & value,
+        void (^_Nonnull OnResponse)(const chip::GetCommissionerNodeIdResponse &))
+    {
+        auto * controller = GetCommissioner(identity);
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        auto id = [controller.controllerNodeId unsignedLongLongValue];
+        ChipLogProgress(chipTool, "Commissioner Node Id: %llu", id);
+
+        chip::GetCommissionerNodeIdResponse outValue;
+        outValue.nodeId = id;
+
+        dispatch_async(mCallbackQueue, ^{
+            OnResponse(outValue);
+        });
+
+        return CHIP_NO_ERROR;
+    }
+
     /////////// SystemCommands Interface /////////
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
     {
@@ -226,9 +239,6 @@ public:
         MTRDeviceController * controller = GetCommissioner(identity);
 
         SetIdentity(identity);
-        if (controller != nil && controller.controllerNodeId != nil) {
-            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
-        }
         return mConnectedDevices[identity];
     }
 
@@ -270,7 +280,6 @@ protected:
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<chip::EndpointId> mEndpointId;
     chip::Optional<uint16_t> mTimeout;
-    chip::Optional<chip::NodeId> mCommissionerNodeId;
 
     bool CheckConstraintStartsWith(
         const char * _Nonnull itemName, const NSString * _Nonnull current, const char * _Nonnull expected)
