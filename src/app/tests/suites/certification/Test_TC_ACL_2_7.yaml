@@ -144,16 +144,14 @@ tests:
       event: "AccessControlExtensionChanged"
       response:
           value:
-              [
-                  {
-                      AdminNodeID: TH1CommissionerNodeId,
-                      AdminPasscodeID: null,
-                      ChangeType: 1,
-                      LatestValue:
-                          { Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex },
-                  },
+              {
+                  AdminNodeID: TH1CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 1,
+                  LatestValue:
+                      { Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex },
                   FabricIndex: TH1FabricIndex,
-              ]
+              }
 
     - label:
           "Step 11:TH2 reads DUT Endpoint 0 AccessControl cluster
@@ -164,13 +162,11 @@ tests:
       event: "AccessControlExtensionChanged"
       response:
           value:
-              [
-                  {
-                      AdminNodeID: TH2CommissionerNodeId,
-                      AdminPasscodeID: null,
-                      ChangeType: 1,
-                      LatestValue:
-                          { Data: D_OK_SINGLE, FabricIndex: TH2FabricIndex },
-                  },
+              {
+                  AdminNodeID: TH2CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 1,
+                  LatestValue:
+                      { Data: D_OK_SINGLE, FabricIndex: TH2FabricIndex },
                   FabricIndex: TH2FabricIndex,
-              ]
+              }

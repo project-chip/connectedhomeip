@@ -112,15 +112,15 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH1CommissionerNodeId, 1111],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
                   },
                   {
-                      Privilege: "3",
-                      AuthMode: "3",
+                      Privilege: 3,
+                      AuthMode: 3,
                       Subjects: [3333],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
@@ -137,15 +137,15 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH2CommissionerNodeId, 2222],
                       Targets: null,
                       FabricIndex: TH2FabricIndex,
                   },
                   {
-                      Privilege: "3",
-                      AuthMode: "3",
+                      Privilege: 3,
+                      AuthMode: 3,
                       Subjects: [4444],
                       Targets: null,
                       FabricIndex: TH2FabricIndex,
@@ -217,15 +217,15 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH1CommissionerNodeId, 1111],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
                   },
                   {
-                      Privilege: "3",
-                      AuthMode: "3",
+                      Privilege: 3,
+                      AuthMode: 3,
                       Subjects: [3333],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
@@ -252,15 +252,15 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH2CommissionerNodeId, 2222],
                       Targets: null,
                       FabricIndex: TH2FabricIndex,
                   },
                   {
-                      Privilege: "3",
-                      AuthMode: "3",
+                      Privilege: 3,
+                      AuthMode: 3,
                       Subjects: [4444],
                       Targets: null,
                       FabricIndex: TH2FabricIndex,
@@ -311,15 +311,15 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH1CommissionerNodeId, 1111],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
                   },
                   {
-                      Privilege: "3",
-                      AuthMode: "3",
+                      Privilege: 3,
+                      AuthMode: 3,
                       Subjects: [3333],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
