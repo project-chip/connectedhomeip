@@ -702,11 +702,14 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
     {
         char productName[ConfigurationManager::kMaxProductNameLength + 1];
         err = deviceInstanceInfoProvider->GetProductName(productName, sizeof(productName));
-	if (CHIP_NO_ERROR == err) {
+        if (CHIP_NO_ERROR == err)
+        {
             ChipLogProgress(DeviceLayer, "  Product Name: %s", productName);
-        } else {
+        }
+        else
+        {
             char errorStr[160];
-	    errorStr[0] = 0;
+            errorStr[0] = 0;
             FormatCHIPError(errorStr, sizeof(errorStr), err);
             ChipLogError(DeviceLayer, "  Product Name: n/a (%s)", errorStr);
         }
