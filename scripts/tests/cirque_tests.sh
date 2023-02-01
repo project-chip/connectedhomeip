@@ -112,6 +112,11 @@ function cirquetest_bootstrap() {
 
     make NO_GRPC=1 install -j
 
+    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+        # Note: This script will be invoked in docker on CI, We should add CHIP repo to safe directory to silent git error messages.
+        git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
+    fi
+
     "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh
 
     __cirquetest_build_ot_lazy
