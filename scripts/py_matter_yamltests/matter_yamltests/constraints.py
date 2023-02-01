@@ -73,9 +73,9 @@ class _ConstraintType(BaseConstraint):
             success = True
         elif self._type == 'list' and type(value) is list:
             success = True
-        elif self._type == 'char_string' and type(value) is str:
+        elif (self._type == 'char_string' or self._type == 'long_char_string') and type(value) is str:
             success = True
-        elif self._type == 'octet_string' and type(value) is bytes:
+        elif (self._type == 'octet_string' or self._type == 'long_octet_string') and type(value) is bytes:
             success = True
         elif self._type == 'vendor_id' and type(value) is int:
             success = value >= 0 and value <= 0xFFFF
