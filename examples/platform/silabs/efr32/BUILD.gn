@@ -14,11 +14,59 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/silabs_board.gni")
+
+declare_args() {
+  enable_heap_monitoring = false
+
+  # OTA timeout in seconds
+  OTA_periodic_query_timeout = 86400
+
+  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
+  sl_wfx_config_softap = false
+  sl_wfx_config_scan = true
+
+  # Argument to Disable IPv4 for wifi(rs911)
+  chip_enable_wifi_ipv4 = false
+
+  # Argument to force enable WPA3 security on rs91x
+  rs91x_wpa3_only = false
+
+  #default WiFi SSID
+  chip_default_wifi_ssid = ""
+
+  #default Wifi Password
+  chip_default_wifi_psk = ""
+}
 
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
+
+import("${silabs_common_plat_dir}/efr32/args.gni")
+
+# Sanity check
+assert(!(chip_enable_wifi && chip_enable_openthread))
+assert(!(use_rs911x && chip_enable_openthread))
+assert(!(use_wf200 && chip_enable_openthread))
+
+if (chip_enable_wifi) {
+  assert(use_rs911x || use_wf200)
+  enable_openthread_cli = false
+  import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
+
+  if (use_rs911x) {
+    wiseconnect_sdk_root =
+        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+    import("rs911x/rs911x.gni")
+  }
+
+  if (use_wf200) {
+    import("wf200/wf200.gni")
+  }
+}
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -118,11 +166,162 @@ config("ICD-subscription-callback-config") {
 
 source_set("efr32-ICD-subscription-callback") {
   sources = [
-    "../ICDSubscriptionCallback.cpp",
-    "../ICDSubscriptionCallback.h",
+    "${silabs_common_plat_dir}/ICDSubscriptionCallback.cpp",
+    "${silabs_common_plat_dir}/ICDSubscriptionCallback.h",
   ]
 
   public_deps = [ "${chip_root}/src/app:app" ]
 
   public_configs = [ ":ICD-subscription-callback-config" ]
+}
+
+config("efr32-common-config") {
+  defines = [ "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}" ]
+
+  if (!disable_lcd) {
+    include_dirs = [ "display" ]
+
+    defines += [ "DISPLAY_ENABLED" ]
+  }
+
+  if (show_qr_code) {
+    defines += [ "QR_CODE_ENABLED" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    defines += [ "EFR32_OTA_ENABLED" ]
+  }
+
+  if (enable_heap_monitoring) {
+    defines += [ "HEAP_MONITORING" ]
+  }
+}
+
+config("silabs-wifi-config") {
+  defines = []
+  include_dirs = []
+
+  if (chip_default_wifi_ssid != "") {
+    defines += [
+      "CHIP_ONNETWORK_PAIRING=1",
+      "CHIP_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
+    ]
+  }
+  if (chip_default_wifi_psk != "") {
+    assert(chip_default_wifi_ssid != "",
+           "ssid can't be null if psk is provided")
+    defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
+  }
+
+  if (sl_wfx_config_softap) {
+    defines += [ "SL_WFX_CONFIG_SOFTAP" ]
+  }
+  if (sl_wfx_config_scan) {
+    defines += [ "SL_WFX_CONFIG_SCAN" ]
+  }
+
+  if (chip_enable_wifi_ipv4) {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
+  }
+
+  if (rs91x_wpa3_only) {
+    # TODO: Change this macro once WF200 support is provided
+    defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
+  }
+}
+
+source_set("efr32-common") {
+  deps = []
+  public_deps = []
+  public_configs = [ ":efr32-common-config" ]
+
+  include_dirs = [ "." ]
+
+  sources = [
+    "${silabs_common_plat_dir}/heap_4_silabs.c",
+    "efr32_utils.cpp",
+    "init_efrPlatform.cpp",
+    "matter_config.cpp",
+  ]
+
+  if (use_base_app) {
+    sources += [ "BaseApplication.cpp" ]
+  }
+
+  if (use_wstk_leds) {
+    sources += [ "LEDWidget.cpp" ]
+  }
+
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      use_wf200 || use_rs911x) {
+    sources += [ "uart.cpp" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [ "OTAConfig.cpp" ]
+  }
+
+  if (!disable_lcd) {
+    sources += [
+      "display/demo-ui.c",
+      "display/lcd.cpp",
+    ]
+
+    include_dirs += [ "display" ]
+    public_deps += [ "${chip_root}/examples/common/QRCode" ]
+  }
+
+  if (enable_heap_monitoring) {
+    sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
+  }
+
+  # OpenThread Settings
+  if (chip_enable_openthread) {
+    deps += [
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
+    ]
+  }
+
+  if (chip_enable_wifi) {
+    if (use_rs911x) {
+      sources += rs911x_src_plat
+
+      # All the stuff from wiseconnect
+      sources += rs911x_src_sapi
+      include_dirs += rs911x_inc_plat
+
+      #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
+      cflags = rs911x_cflags
+    } else if (use_wf200) {
+      sources += wf200_plat_src
+      include_dirs += wf200_plat_incs
+    }
+
+    public_configs += [ ":silabs-wifi-config" ]
+  }
+
+  if (chip_build_libshell) {
+    deps += [ "${examples_plat_dir}:efr-matter-shell" ]
+  }
+
+  # Attestation Credentials
+  if (chip_build_platform_attestation_credentials_provider) {
+    deps += [ ":efr32-attestation-credentials" ]
+  }
+
+  # Factory Data Provider
+  if (use_efr32_factory_data_provider) {
+    public_deps += [ ":efr32-factory-data-provider" ]
+  }
+
+  public_deps += [
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  if (app_data_model != "") {
+    public_deps += [ app_data_model ]
+  }
 }
