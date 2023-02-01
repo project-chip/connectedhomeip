@@ -1,4 +1,5 @@
-FROM ubuntu:focal
+ARG VERSION=latest
+FROM connectedhomeip/chip-build:${VERSION}
 
 ARG OT_BR_POSIX_CHECKOUT=master
 
