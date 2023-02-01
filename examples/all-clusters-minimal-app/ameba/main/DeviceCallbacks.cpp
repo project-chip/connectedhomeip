@@ -25,7 +25,7 @@
 #include "DeviceCallbacks.h"
 
 #include "CHIPDeviceManager.h"
-#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
@@ -116,7 +116,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
 
 void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id,
                  ChipLogError(DeviceLayer, TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2,
                  ChipLogError(DeviceLayer, TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -138,7 +138,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error
 
 void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == app::Clusters::Identify::Attributes::IdentifyTime::Id,
                  ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04x", TAG, attributeId));
     VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, "[%s] Unexpected EndPoint ID: `0x%02x'", TAG, endpointId));
 

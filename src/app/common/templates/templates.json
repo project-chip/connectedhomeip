@@ -43,11 +43,6 @@
             "output": "att-storage.h"
         },
         {
-            "path": "../../zap-templates/templates/app/attribute-id.zapt",
-            "name": "ZCL attribute-id header",
-            "output": "attribute-id.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/attribute-size.zapt",
             "name": "ZCL attribute-size header",
             "output": "attribute-size.h"
