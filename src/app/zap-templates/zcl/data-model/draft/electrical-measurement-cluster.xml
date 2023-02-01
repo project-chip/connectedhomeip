@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2008,2020 Silicon Labs.
+Copyright (c) 2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,197 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="Closures" spec="zcl-6.0-15-02018-001"/>
-  <domain name="HVAC" spec="zcl-6.0-15-02018-001"/>
-  <domain name="Lighting" spec="zcl6-errata-14-0129-15">
-    <older spec="zcl-6.0-15-02018-001" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
-  </domain>
-  <domain name="Measurement &amp; Sensing" spec="zcl-6.0-15-02018-001"/>
-  <domain name="Security &amp; Safety" spec="zcl-6.0-15-02018-001"/>
-  <domain name="HA" spec="ha-1.2.1-05-3520-30" dependsOn="zcl-1.0-07-5123-03" certifiable="true">
-    <older spec="ha-1.2-05-3520-29" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
-    <older spec="ha-1.1-05-3520-27" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
-  </domain>
-  <cluster>
-    <name>Fan Control</name>
-    <domain>HVAC</domain>
-    <description>An interface for controlling a fan in a heating/cooling system.</description>
-    <code>0x0202</code>
-    <define>FAN_CONTROL_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
-    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">FanModeSequence</attribute>
-    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
-    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
-    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">SpeedMax</attribute>
-    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">SpeedSetting</attribute>
-    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">SpeedCurrent</attribute>
-    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">RockSupport</attribute>
-    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">RockSetting</attribute>
-    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">WindSupport</attribute>
-    <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">WindSetting</attribute>
-  </cluster>
-  <!-- Fan Control Cluster data types -->
-  <enum name="FanModeType" type="ENUM8">
-    <cluster code="0x0202"/>
-    <item name="Off" value="0x00"/>
-    <item name="Low" value="0x01"/>
-    <item name="Medium" value="0x02"/>
-    <item name="High" value="0x03"/>
-    <item name="On" value="0x04"/>
-    <item name="Auto" value="0x05"/>
-    <item name="Smart" value="0x06"/>
-  </enum>
-  <enum name="FanModeSequenceType" type="ENUM8">
-    <cluster code="0x0202"/>
-    <item name="Off/Low/Med/High" value="0x00"/>
-    <item name="Off/Low/High" value="0x01"/>
-    <item name="Off/Low/Med/High/Auto" value="0x02"/>
-    <item name="Off/Low/High/Auto" value="0x03"/>
-    <item name="Off/On/Auto" value="0x04"/>
-    <item name="Off/On" value="0x05"/>
-  </enum>
-  <bitmap name="FanControlFeature" type="BITMAP32">
-    <cluster code="0x0202" />
-    <field name="Multi-Speed" mask="0x01" />
-    <field name="Auto" mask="0x02" />
-    <field name="Rocking" mask="0x04" />
-    <field name="Wind" mask="0x08" />
-  </bitmap>
-  <bitmap name="RockSupportMask" type="BITMAP8">
-    <cluster code="0x0202" />
-    <field name="RockLeftRight" mask="0x01" />
-    <field name="RockUpDown" mask="0x02" />
-    <field name="RockRound" mask="0x04" />
-  </bitmap>
-  <bitmap name="WindSupportMask" type="BITMAP8">
-    <cluster code="0x0202" />
-    <field name="Sleep Wind" mask="0x01" />
-    <field name="Natural Wind" mask="0x02" />
-  </bitmap>
-  <bitmap name="WindSettingMask" type="BITMAP8">
-    <cluster code="0x0202" />
-    <field name="Sleep Wind" mask="0x01" />
-    <field name="Natural Wind" mask="0x02" />
-  </bitmap>
-  <cluster>
-    <name>Thermostat User Interface Configuration</name>
-    <domain>HVAC</domain>
-    <description>An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).</description>
-    <code>0x0204</code>
-    <define>THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">TemperatureDisplayMode</attribute>
-    <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="false">
-      <description>KeypadLockout</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ENUM8" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>ScheduleProgrammingVisibility</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-  </cluster>
-  <cluster>
-    <name>Ballast Configuration</name>
-    <domain>Lighting</domain>
-    <description>Attributes and commands for configuring a lighting ballast.</description>
-    <code>0x0301</code>
-    <define>BALLAST_CONFIGURATION_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="4"/>
-    <!-- Ballast Configuration Attribute Set -->
-    <attribute side="server" code="0x0000" define="PHYSICAL_MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0x01" optional="false">PhysicalMinLevel</attribute>
-    <attribute side="server" code="0x0001" define="PHYSICAL_MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0xFE" optional="false">PhysicalMaxLevel</attribute>
-    <attribute side="server" code="0x0002" define="BALLAST_STATUS" type="BITMAP8" min="0x00" max="0x03" writable="false" default="0x00" optional="true">BallastStatus</attribute>
-    <!-- Ballast Settings Attribute Set -->
-    <attribute side="server" code="0x0010" define="MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="false">MinLevel</attribute>
-    <attribute side="server" code="0x0011" define="MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0xFE" optional="false">MaxLevel</attribute>
-    <!-- PowerOnLevel and PowerOnFadeTime are deprecated -->
-    <attribute side="server" code="0x0014" define="INTRINSIC_BALLAST_FACTOR" type="INT8U" writable="true" isNullable="true" optional="true">IntrinsicBallastFactor</attribute>
-    <attribute side="server" code="0x0015" define="BALLAST_FACTOR_ADJUSTMENT" type="INT8U" min="0x64" writable="true" default="0xFF" isNullable="true" optional="true">BallastFactorAdjustment</attribute>
-    <!-- Lamp Information Attribute Set -->
-    <attribute side="server" code="0x0020" define="LAMP_QUANTITY" type="INT8U" writable="false" optional="false">LampQuantity</attribute>
-    <!-- Lamp Settings Attribute Set -->
-    <attribute side="server" code="0x0030" define="LAMP_TYPE" type="CHAR_STRING" length="16" writable="true" optional="true">LampType</attribute>
-    <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" optional="true">LampManufacturer</attribute>
-    <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampRatedHours</attribute>
-    <attribute side="server" code="0x0033" define="LAMP_BURN_HOURS" type="INT24U" writable="true" default="0x000000" isNullable="true" optional="true">LampBurnHours</attribute>
-    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="BITMAP8" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LampAlarmMode</attribute>
-    <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampBurnHoursTripPoint</attribute>
-  </cluster>
-  <cluster>
-    <name>Occupancy Sensing</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring occupancy sensing, and reporting occupancy status.</description>
-    <code>0x0406</code>
-    <define>OCCUPANCY_SENSING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" reportable="true" optional="false">Occupancy</attribute>
-    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>
-    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="BITMAP8" min="0x00" max="0x07" writable="false" optional="false">OccupancySensorTypeBitmap</attribute>
-    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>PIROccupiedToUnoccupiedDelay</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>PIRUnoccupiedToOccupiedDelay</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>PIRUnoccupiedToOccupiedThreshold</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>UltrasonicOccupiedToUnoccupiedDelay</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>UltrasonicUnoccupiedToOccupiedDelay</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>UltrasonicUnoccupiedToOccupiedThreshold</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>PhysicalContactOccupiedToUnoccupiedDelay</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
-      <description>PhysicalContactUnoccupiedToOccupiedDelay</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>PhysicalContactUnoccupiedToOccupiedThreshold</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
-    </attribute>
-  </cluster>
+  <domain name="Home Automation"/>
+
   <cluster introducedIn="ha-1.2-05-3520-29">
     <name>Electrical Measurement</name>
     <domain>Home Automation</domain>
     <description>Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster..</description>
     <code>0x0B04</code>
     <define>ELECTRICAL_MEASUREMENT_CLUSTER</define>
+
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+
     <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASUREMENT_TYPE" type="BITMAP32" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x000000" optional="true">measurement type</attribute>
     <attribute side="server" code="0x0100" define="DC_VOLTAGE" type="INT16S" min="-32768" max="32767" writable="false" default="0x8000" optional="true">dc voltage</attribute>
     <attribute side="server" code="0x0101" define="DC_VOLTAGE_MIN" type="INT16S" min="-32768" max="32767" writable="false" default="0x8000" optional="true">dc voltage min</attribute>
@@ -334,6 +157,7 @@ limitations under the License.
     <attribute side="server" code="0x0A15" define="RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0x0000" optional="true">rms extreme under voltage period phase c</attribute>
     <attribute side="server" code="0x0A16" define="RMS_VOLTAGE_SAG_PERIOD_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0x0000" optional="true">rms voltage sag period phase c</attribute>
     <attribute side="server" code="0x0A17" define="RMS_VOLTAGE_SWELL_PERIOD_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0x0000" optional="true">rms voltage swell period phase c</attribute>
+
     <command source="server" code="0x00" name="GetProfileInfoResponseCommand" optional="true" disableDefaultResponse="true">
       <description>
         A function which returns the power profiling information requested in the GetProfileInfo command. The power profiling information consists of a list of attributes which are profiled along with the period used to profile them.
@@ -343,6 +167,7 @@ limitations under the License.
       <arg name="maxNumberOfIntervals" type="INT8U"/>
       <arg name="listOfAttributes" type="INT16U" array="true"/>
     </command>
+
     <command source="server" code="0x01" name="GetMeasurementProfileResponseCommand" optional="true" disableDefaultResponse="true">
       <description>
         A function which returns the electricity measurement profile. The electricity measurement profile includes information regarding the amount of time used to capture data related to the flow of electricity as well as the intervals thes
@@ -354,11 +179,13 @@ limitations under the License.
       <arg name="attributeId" type="INT16U"/>
       <arg name="intervals" type="INT8U" array="true"/>
     </command>
+
     <command source="client" code="0x00" name="GetProfileInfoCommand" optional="true">
       <description>
         A function which retrieves the power profiling information from the electrical measurement server.
       </description>
     </command>
+
     <command source="client" code="0x01" name="GetMeasurementProfileCommand" optional="true">
       <description>
         A function which retrieves an electricity measurement profile from the electricity measurement server for a specific attribute Id requested.
