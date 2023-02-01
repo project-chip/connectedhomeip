@@ -1457,6 +1457,15 @@ DlStatus DoorLockServer::credentialLengthWithinRange(chip::EndpointId endpointId
         statusMin = GetAttribute(endpointId, Attributes::MinRFIDCodeLength::Id, Attributes::MinRFIDCodeLength::Get, minLen);
         statusMax = GetAttribute(endpointId, Attributes::MaxRFIDCodeLength::Id, Attributes::MaxRFIDCodeLength::Get, maxLen);
         break;
+    case CredentialTypeEnum::kFingerprint:
+        statusMin = statusMax = emberAfPluginDoorLockGetFingerprintCredentialLengthConstraints(endpointId, minLen, maxLen);
+        break;
+    case CredentialTypeEnum::kFingerVein:
+        statusMin = statusMax = emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(endpointId, minLen, maxLen);
+        break;
+    case CredentialTypeEnum::kFace:
+        statusMin = statusMax = emberAfPluginDoorLockGetFaceCredentialLengthConstraints(endpointId, minLen, maxLen);
+        break;
     default:
         return DlStatus::kFailure;
     }
@@ -1495,6 +1504,15 @@ bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, Cred
         break;
     case CredentialTypeEnum::kRfid:
         status = GetNumberOfRFIDCredentialsSupported(endpointId, maxNumberOfCredentials);
+        break;
+    case CredentialTypeEnum::kFingerprint:
+        status = emberAfPluginDoorLockGetNumberOfFingerprintCredentialsSupported(endpointId, maxNumberOfCredentials);
+        break;
+    case CredentialTypeEnum::kFingerVein:
+        status = emberAfPluginDoorLockGetNumberOfFingerVeinCredentialsSupported(endpointId, maxNumberOfCredentials);
+        break;
+    case CredentialTypeEnum::kFace:
+        status = emberAfPluginDoorLockGetNumberOfFaceCredentialsSupported(endpointId, maxNumberOfCredentials);
         break;
     default:
         return false;
@@ -2391,6 +2409,11 @@ bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, Creden
         return SupportsPIN(endpointId);
     case CredentialTypeEnum::kRfid:
         return SupportsRFID(endpointId);
+    case CredentialTypeEnum::kFingerprint:
+    case CredentialTypeEnum::kFingerVein:
+        return SupportsFingers(endpointId);
+    case CredentialTypeEnum::kFace:
+        return SupportsFace(endpointId);
     default:
         return false;
     }
