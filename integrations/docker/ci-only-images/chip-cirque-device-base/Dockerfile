@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:22.04
 
 ARG OT_BR_POSIX_CHECKOUT=master
 
