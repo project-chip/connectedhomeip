@@ -105,8 +105,9 @@ def _GetManualTests() -> Set[ManualTest]:
     manualtests.add(ManualTest(yaml="TestMultiAdmin.yaml", reason="TODO"))
 
     # Failing, unclear why. Likely repl specific, used to pass however first
-    # failure point seems unrelated. May be just flaky (but why now?)
-    manualtests.add(ManualTest(yaml="Test_TC_OO_2_4.yaml", reason="Failing"))
+    # failure point seems unrelated. Historically this seems (very?) flaky
+    # in repl.
+    manualtests.add(ManualTest(yaml="Test_TC_OO_2_4.yaml", reason="Flaky"))
 
     # Examples:
     #
