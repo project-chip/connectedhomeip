@@ -38,7 +38,7 @@ Matter code relies on code generation for cluster-specific data types and callba
 1. You could check out zap from source as described in [Code Generation - Installing zap and environment variables](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Installing-zap-and-environment-variables) and proceed with the [instructions](./python_chip_controller_building.md#building-and-installing) to build
 the Python virtual environment.  
 
-2. When compile-time code generation is not desirable, then pre-generated output code can be used. To understand about code generation and pregenerating matter code see. [Code generation - Pregeneration](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Pre-generation). To build and install the Python CHIP controller with pregenerated files use the -z argument (--pregen_dir) that points to the directory of pregenerated code:
+2. When compile-time code generation is not desirable, then pre-generated output code can be used. To understand about code generation and pre-generating matter code see. [Code generation - Pre-generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Pre-generation). To build and install the Python CHIP controller with pre-generated files use the -z argument that points to the directory of pre-generated code:
 
     ```
     scripts/build_python.sh -m platform -i separate -z "/some/pregen/dir"
