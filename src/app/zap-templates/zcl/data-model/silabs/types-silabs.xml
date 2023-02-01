@@ -43,16 +43,6 @@ limitations under the License.
     <field name="MasterZoneDst" mask="0x4"/>
     <field name="Superseding" mask="0x8"/>
   </bitmap>
-  <bitmap name="BallastStatus" type="BITMAP8">
-    <field name="NonOperational" mask="0x1"/>
-    <field name="LampNotInSocket" mask="0x2"/>
-  </bitmap>
-  <bitmap name="LampAlarmMode" type="BITMAP8">
-    <field name="lampBurnHours" mask="0x1"/>
-  </bitmap>
-  <bitmap name="Occupancy" type="BITMAP8">
-    <field name="occupied" mask="0x1"/>
-  </bitmap>
   <bitmap name="IasZoneStatus" type="BITMAP16">
     <cluster code="0x0500"/>
     <cluster code="0x0501"/>
@@ -119,22 +109,6 @@ limitations under the License.
     <item name="Off" value="0x1"/>
     <item name="Toggle" value="0x2"/>
   </enum>
-  <enum name="FanMode" type="ENUM8">
-    <item name="off" value="0x0"/>
-    <item name="low" value="0x1"/>
-    <item name="medium" value="0x2"/>
-    <item name="high" value="0x3"/>
-    <item name="on" value="0x4"/>
-    <item name="auto" value="0x5"/>
-    <item name="smart" value="0x6"/>
-  </enum>
-  <enum name="FanModeSequence" type="ENUM8">
-    <item name="LowMedHigh" value="0x0"/>
-    <item name="lowHigh" value="0x1"/>
-    <item name="LowMedHighAuto" value="0x2"/>
-    <item name="lowHighAuto" value="0x3"/>
-    <item name="onAuto" value="0x4"/>
-  </enum>
   <enum name="RelativeHumidityMode" type="ENUM8">
     <item name="measureLocally" value="0x0"/>
     <item name="updatedOverTheNetwork" value="0x1"/>
@@ -147,34 +121,11 @@ limitations under the License.
     <item name="notDisplayed" value="0x0"/>
     <item name="displayed" value="0x1"/>
   </enum>
-  <enum name="TemperatureDisplayMode" type="ENUM8">
-    <item name="celsius" value="0x0"/>
-    <item name="fahrenheit" value="0x1"/>
-  </enum>
-  <enum name="KeypadLockout" type="ENUM8">
-    <item name="noLockout" value="0x0"/>
-    <item name="levelOneLockout" value="0x1"/>
-    <item name="levelTwoLockout" value="0x2"/>
-    <item name="levelThreeLockout" value="0x3"/>
-    <item name="levelFourLockout" value="0x4"/>
-    <item name="levelfiveLockout" value="0x5"/>
-  </enum>
   <enum name="LevelStatus" type="ENUM8">
     <item name="OnTarget" value="0x0"/>
     <item name="BelowTarget" value="0x1"/>
     <item name="AboveTarget" value="0x2"/>
   </enum>
-  <enum name="OccupancySensorType" type="ENUM8">
-    <item name="PIR" value="0x0"/>
-    <item name="Ultrasonic" value="0x1"/>
-    <item name="pirAndUltrasonic" value="0x2"/>
-    <item name="physicalContact" value="0x3"/>
-  </enum>
-  <bitmap name="OccupancySensorTypeBitmap" type="BITMAP8">
-    <field name="Pir" mask="0x01"/>
-    <field name="Ultrasonic" mask="0x02"/>
-    <field name="PhysicalContact" mask="0x04"/>
-  </bitmap>
   <enum name="WarningMode" type="ENUM8">
     <item name="stop" value="0x0"/>
     <item name="burglar" value="0x1"/>
