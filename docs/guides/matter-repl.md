@@ -25,64 +25,17 @@ You can find source files of the Python CHIP Controller tool in the
 The tool uses the generic CHIP Device Controller library, available in the
 `src/controller` directory.
 
-## Building and installing
+## Building
 
-Before you can use the Python controller, you must compile it from the source on
-Linux (amd64 / aarch64) or macOS.
+Please follow the instructions
+[here](./python_chip_controller_building.md#building-and-installing) to build
+the Python virtual environment.
 
-> To ensure compatibility, build the Python CHIP controller and the Matter
-> device from the same revision of the connectedhomeip repository.
+### Building using pregenerated matter code e.g. for Raspberry Pi 4
 
-To build and run the Python CHIP controller:
+Matter code relies on code generation for cluster-specific data types and callbacks. A subset of code generation (both codegen.py and zap-cli) is done at compile time. When compile-time code generation is not desirable, such as when building for Arm based systems such as the Raspberry Pi 4 that currently do not have pre-built zap Arm Linux binaries, then pre-generated output code can be used. To understand about code generation and pregenerating matter code see [Code generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Pre-generation). 
 
-1. Install all necessary packages and prepare the build system. For more
-   details, see the [Building Matter](BUILDING.md) documentation:
-
-    ```
-    sudo apt-get update
-    sudo apt-get upgrade
-
-    sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev bluez
-    ```
-
-    If the Python CHIP controller is built on a Raspberry Pi, install additional
-    packages and reboot the device:
-
-    ```
-    sudo apt-get install pi-bluetooth
-    sudo reboot
-    ```
-
-2. Clone the Project CHIP repository:
-
-    ```
-    git clone https://github.com/project-chip/connectedhomeip.git
-    ```
-
-3. Enter the `connectedhomeip` directory:
-
-    ```
-    cd connectedhomeip
-    ```
-
-4. Initialize the git submodules:
-
-    ```
-    git submodule update --init
-    ```
-
-5. Build and install the Python CHIP controller:
-
-    ```
-    scripts/build_python.sh -m platform -i separate
-    ```
-
-    > Note: To get more details about available build configurations, run the
-    > following command: `scripts/build_python.sh --help`
-
-### Building using pregenerated zap files e.g. for Raspberry Pi 4
-
-1. Building for Arm based systems such as the Raspberry Pi 4 should use pregenerated files since there are currently no pre-built zap Arm Linux binaries. To understand about code generation and pregenerating code files see [Code generation](../code_generation.md#Pre-generation). To build and install the Python CHIP controller with pregenerated files use the --pregen_dir (-z) argument:
+1. To build and install the Python CHIP controller with pregenerated files use the -z argument (--pregen_dir) that points to the directory of pregenerated code:
 
     ```
     scripts/build_python.sh -m platform -i separate -z "/some/pregen/dir"
