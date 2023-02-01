@@ -682,7 +682,6 @@ class TestStep:
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
         error_success = 'Constraints check passed'
         error_failure = 'Constraints check failed'
-        error_name_does_not_exist = 'Constraint check expected a value named "{name}" but it does not exist in the response."'
 
         for value in self.response['values']:
             if 'constraints' not in value:
