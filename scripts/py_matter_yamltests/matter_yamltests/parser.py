@@ -580,13 +580,7 @@ class TestStep:
 
         expected_error = self.response.get('error') if self.response else None
 
-        # Handle generic success/error
-        if type(response) is str and response == 'failure':
-            received_error = response
-        elif type(response) is str and response == 'success':
-            received_error = None
-        else:
-            received_error = response.get('error')
+        received_error = response.get('error')
 
         if expected_error and received_error and expected_error == received_error:
             result.success(check_type, error_success.format(
