@@ -27,7 +27,7 @@ set +xe
 SOURCE=${BASH_SOURCE[0]}
 cd "$(dirname "$SOURCE")"
 
-SOURCE_DIR=$(pwd)
+SOURCE_DIR=$PWD
 
 ORG=${DOCKER_BUILD_ORG:-connectedhomeip}
 
