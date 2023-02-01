@@ -15,6 +15,30 @@
 declare_args() {
   # EFR32 board used
   silabs_board = ""
+
+  # LCD is enabled by default
+  # Boards BRD4166A, BRD2601B, BRD2703A and BRD4319A do not have a LCD so they disable it explicitly
+  disable_lcd = false
+
+  # Enable Buttons by default
+  use_wstk_buttons = true
+
+  # Enable LEDs on development board by default
+  # Boards BRD4317A, BRD4316A and BRD4319A disable this explicitly
+  use_wstk_leds = true
+
+  # Boards BRD2703A and BRD4319A disable this explicitly
+  use_external_flash = true
+
+  # WIFI rcp boards options for wifi apps.
+  use_wf200 = false
+  use_rs911x = false
+  use_rs911x_sockets = false
+}
+
+declare_args() {
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = !disable_lcd
 }
 
 if (silabs_board == "") {
@@ -56,12 +80,18 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4166A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P332F1024GL125"
+
+  # ThunderBoards don't have a LCD
+  show_qr_code = false
+  disable_lcd = true
 } else if (silabs_board == "BRD4170A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P433F1024GM68"
 } else if (silabs_board == "BRD4325A") {
   silabs_family = "SiWx917"
   silabs_mcu = "EFR32MG12P432F1024GL125"
+  disable_lcd = true
+  show_qr_code = false
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,
@@ -81,26 +111,63 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD2601B") {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B310F1536IM48"
+
+  # ThunderBoards don't have a LCD,
+  show_qr_code = false
+  disable_lcd = true
 } else if (silabs_board == "BRD2703A") {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B020F1536IM48"
+
+  # Explorer Kits do not have an external flash nor a LCD
+  use_external_flash = false
+  show_qr_code = false
+  disable_lcd = true
 } else if (silabs_board == "BRD4316A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB22VNA"
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
 } else if (silabs_board == "BRD4317A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB32VNA"
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
 } else if (silabs_board == "BRD4319A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240L022RNF"
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
+
+  # MGM240L do not have an external flash or LCD
+  use_external_flash = false
+  show_qr_code = false
+  disable_lcd = true
 } else if (silabs_board == "BRD2704A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB32VNA"
+
+  # Explorer Kits do not have an external flash, buttons nor a LCD
+  use_wstk_buttons = false
+  use_external_flash = false
+  show_qr_code = false
+  disable_lcd = true
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"
+
+  use_wstk_leds = false
+  use_external_flash = false
+  show_qr_code = false
+  disable_lcd = true
 } else {
   print(
       "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A, BRD2704A)")
   assert(false, "The board ${silabs_board} is unsupported")
 }
+
+# qr code cannot be true if lcd is disabled
+assert(!(disable_lcd && show_qr_code))

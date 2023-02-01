@@ -6,6 +6,7 @@
    <xi:include href="chip/application-basic-cluster.xml" />
    <xi:include href="chip/application-launcher-cluster.xml" />
    <xi:include href="chip/audio-output-cluster.xml" />
+   <xi:include href="chip/ballast-configuration-cluster.xml" />
    <xi:include href="chip/basic-information-cluster.xml" />
    <xi:include href="chip/binding-cluster.xml" />
    <xi:include href="chip/boolean-state-cluster.xml" />
@@ -21,6 +22,7 @@
    <xi:include href="chip/diagnostic-logs-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
    <xi:include href="chip/ethernet-network-diagnostics-cluster.xml" />
+   <xi:include href="chip/fan-control-cluster.xml" />   
    <xi:include href="chip/fault-injection-cluster.xml" />   
    <xi:include href="chip/fixed-label-cluster.xml" />
    <xi:include href="chip/flow-measurement-cluster.xml" />
@@ -39,6 +41,7 @@
    <xi:include href="chip/media-playback-cluster.xml" />
    <xi:include href="chip/mode-select-cluster.xml" />
    <xi:include href="chip/network-commissioning-cluster.xml" />
+   <xi:include href="chip/occupancy-sensing-cluster.xml" />
    <xi:include href="chip/onoff-cluster.xml" />
    <xi:include href="chip/operational-credentials-cluster.xml" />
    <xi:include href="chip/pressure-measurement-cluster.xml" />
@@ -56,6 +59,7 @@
    <xi:include href="chip/target-navigator-cluster.xml" />
    <xi:include href="chip/temperature-measurement-cluster.xml" />
    <xi:include href="chip/test-cluster.xml" />
+   <xi:include href="chip/thermostat-user-interface-configuration-cluster.xml" />
    <xi:include href="chip/thermostat-cluster.xml" />
    <xi:include href="chip/thread-network-diagnostics-cluster.xml" />
    <xi:include href="chip/time-format-localization-cluster.xml" />
@@ -68,10 +72,10 @@
    <xi:include href="chip/window-covering.xml" />
    <xi:include href="chip/matter-devices.xml" />
    <xi:include href="draft/barrier-control.xml" />
+   <xi:include href="draft/electrical-measurement-cluster.xml" />
    <xi:include href="draft/input-output-value-clusters.xml" />
    <xi:include href="draft/onoff-switch-configuration-cluster.xml" />
    <xi:include href="silabs/ha-devices.xml" />
-   <xi:include href="silabs/ha.xml" />
    <xi:include href="silabs/lo-devices.xml" />
    <xi:include href="silabs/types-silabs.xml" />
    <xi:include href="silabs/zll-devices.xml" />
