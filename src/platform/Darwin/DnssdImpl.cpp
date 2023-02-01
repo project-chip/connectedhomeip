@@ -360,7 +360,8 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
         counterHolder = std::make_shared<uint32_t>(0);
     }
 
-    auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, addressType, name, std::move(counterHolder));
+    auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, addressType, name,
+                                                     BrowseContext::sContextDispatchingSuccess, std::move(counterHolder));
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
@@ -455,8 +456,23 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
     // Just treat this as a timeout error.  Don't bother delivering the partial
     // results we have queued up in the BrowseContext, if any.  In practice
     // there shouldn't be anything there long-term anyway.
-    auto browseCtx = static_cast<BrowseContext *>(ctx);
-    browseCtx->Finalize(kDNSServiceErr_Timeout);
+    //
+    // Make sure to time out all the resolves first, before we time out the
+    // browse (just to avoid dangling pointers in the resolves, even though we
+    // only use them for equality compares).
+    std::vector<GenericContext *> resolves;
+    MdnsContexts::GetInstance().FindAllMatchingPredicate(
+        [ctx](GenericContext * item) {
+            return item->type == ContextType::Resolve && static_cast<ResolveContext *>(item)->browseThatCausedResolve == ctx;
+        },
+        resolves);
+
+    for (auto & resolve : resolves)
+    {
+        resolve->Finalize(kDNSServiceErr_Timeout);
+    }
+
+    ctx->Finalize(kDNSServiceErr_Timeout);
     return CHIP_NO_ERROR;
 }
 

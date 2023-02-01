@@ -1,1 +1,1 @@
-0.6.36 Version bump reason: K32W0-SDK 2.6.9 update
+0.6.37 Version bump reason: removed ZAP from docker as CIPD now has it.

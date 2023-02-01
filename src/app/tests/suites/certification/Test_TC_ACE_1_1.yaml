@@ -53,7 +53,7 @@ tests:
       cluster: "Operational Credentials"
       command: "readAttribute"
       attribute: "NOCs"
-      returns:
+      response:
           constraints:
               minLength: 1
               maxLength: 1

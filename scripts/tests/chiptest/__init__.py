@@ -14,9 +14,12 @@
 #    limitations under the License.
 #
 
+import json
 import os
 import subprocess
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Iterator, Set
 
 from . import linux, runner
 from .test_definition import ApplicationPaths, TestDefinition, TestTarget
@@ -25,6 +28,102 @@ _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 _YAML_TEST_SUITE_PATH = os.path.abspath(
     os.path.join(_DEFAULT_CHIP_ROOT, "src/app/tests/suites"))
+
+
+@dataclass(eq=True, frozen=True)
+class ManualTest:
+    yaml: str
+    reason: str
+
+
+INVALID_TESTS = {
+    "tests.yaml",  # certification/tests.yaml is not a real test
+    "PICS.yaml",  # certification/PICS.yaml is not a real test
+}
+
+
+def _LoadManualTestsJson(json_file_path: str) -> Iterator[ManualTest]:
+    with open(json_file_path, 'rt') as f:
+        data = json.load(f)
+        for c in data["collection"]:
+            for name in data[c]:
+                yield ManualTest(yaml="%s.yaml" % name, reason=json_file_path)
+
+
+def _GetManualTests() -> Set[ManualTest]:
+    manualtests = set()
+
+    # TODO:
+    #
+    # These are NOT manual tests, but rather "tests that fail in yaml and
+    # for this reason are marked as manual".
+    #
+    # We are working to get this list down to 0.
+    manualtests.add(ManualTest(yaml="OTA_SuccessfulTransfer.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_ACE_1_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_ACE_1_5.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_ACL_2_10.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_ACL_2_7.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_ACL_2_8.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_ACL_2_9.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_APBSC_9_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_BINFO_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_CC_6_2.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_CC_6_3.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_CC_8_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_CGEN_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_CHANNEL_5_3.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_DGETH_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_DGETH_2_2.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_DGGEN_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_DGWIFI_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_DRLK_2_2.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_DRLK_2_3.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_DRLK_2_5.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_DRLK_2_7.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_LOWPOWER_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_LUNIT_3_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAINPUT_3_12.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_2.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_3.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_4.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_PCC_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_PS_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_SC_5_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_SC_5_2.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_TSTAT_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_TSTAT_2_2.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_TSUIC_2_2.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_WAKEONLAN_4_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_WNCV_2_1.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_WNCV_2_5.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="TestClusterMultiFabric.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="TestCommissionerNodeId.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="TestDiscovery.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="TestEvents.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="TestGroupMessaging.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="TestMultiAdmin.yaml", reason="TODO"))
+
+    # Examples:
+    #
+    # Currently these are not in ciTests.json, however yaml logic currently
+    # does NOT use allowlist json but rather finds all yaml files.
+    #
+    # This is on purpose for now to make it harder to orphan files, however
+    # we can reconsider as things evolve.
+    manualtests.add(ManualTest(yaml="Config_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(
+        yaml="Config_Variables_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(yaml="PICS_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(yaml="Response_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(yaml="Test_Example.yaml", reason="Example"))
+
+    # Flagged as manual from: src/app/tests/suites/manualTests.json
+    for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
+        manualtests.add(item)
+
+    return manualtests
 
 
 def _AllYamlTests():
@@ -37,6 +136,13 @@ def _AllYamlTests():
     for path in yaml_test_suite_path.rglob("*.yaml"):
         if not path.is_file():
             continue
+
+        if path.name.endswith('_Simulated.yaml'):
+            # Simulated tests are not runnable by repl tests, need
+            # separate infrastructure. Exclude theml completely (they are
+            # not even manual)
+            continue
+
         yield path
 
 
@@ -76,589 +182,19 @@ def tests_with_command(chip_tool: str, is_manual: bool):
 # TODO We will move away from hardcoded list of yamltests to run all file when yamltests
 # parser/runner reaches parity with the code gen version.
 def _hardcoded_python_yaml_tests():
-    currently_supported_yaml_tests = {
-        "DL_UsersAndCredentials.yaml",
-        "Test_TC_ACE_1_2.yaml",
-        "Test_TC_ACL_1_1.yaml",
-        "Test_TC_ACL_2_1.yaml",
-        "Test_TC_ACL_2_3.yaml",
-        "Test_TC_ACL_2_5.yaml",
-        "Test_TC_ACL_2_6.yaml",
-        "Test_TC_ACT_1_1.yaml",
-        "Test_TC_ACT_2_1.yaml",
-        "Test_TC_ACT_2_2.yaml",
-        "Test_TC_ACT_3_2.yaml",
-        "Test_TC_ALOGIN_12_1.yaml",
-        "Test_TC_ALOGIN_12_2.yaml",
-        "Test_TC_ALOGIN_1_12.yaml",
-        "Test_TC_APBSC_1_10.yaml",
-        "Test_TC_APPLAUNCHER_1_3.yaml",
-        "Test_TC_APPLAUNCHER_3_5.yaml",
-        "Test_TC_APPLAUNCHER_3_6.yaml",
-        "Test_TC_APPLAUNCHER_3_7.yaml",
-        "Test_TC_APPLAUNCHER_3_7_1.yaml",
-        "Test_TC_APPLAUNCHER_3_8_1.yaml",
-        "Test_TC_APPLAUNCHER_3_9_1.yaml",
-        "Test_TC_AUDIOOUTPUT_1_8.yaml",
-        "Test_TC_AUDIOOUTPUT_7_1.yaml",
-        "Test_TC_AUDIOOUTPUT_7_3.yaml",
-        "Test_TC_AUDIOOUTPUT_7_4.yaml",
-        "Test_TC_BDX_1_1.yaml",
-        "Test_TC_BDX_1_2.yaml",
-        "Test_TC_BDX_1_3.yaml",
-        "Test_TC_BDX_1_4.yaml",
-        "Test_TC_BDX_1_5.yaml",
-        "Test_TC_BDX_1_6.yaml",
-        "Test_TC_BDX_2_1.yaml",
-        "Test_TC_BDX_2_2.yaml",
-        "Test_TC_BDX_2_3.yaml",
-        "Test_TC_BDX_2_4.yaml",
-        "Test_TC_BDX_2_5.yaml",
-        "Test_TC_BIND_1_1.yaml",
-        "Test_TC_BIND_2_1.yaml",
-        "Test_TC_BIND_2_2.yaml",
-        "Test_TC_BIND_2_3.yaml",
-        "Test_TC_BINFO_1_1.yaml",
-        "Test_TC_BINFO_2_2.yaml",
-        "Test_TC_BINFO_2_4.yaml",
-        "Test_TC_BOOL_1_1.yaml",
-        "Test_TC_BOOL_2_1.yaml",
-        "Test_TC_BOOL_2_2.yaml",
-        "Test_TC_BR_1.yaml",
-        "Test_TC_BR_2.yaml",
-        "Test_TC_BR_3.yaml",
-        "Test_TC_BR_4.yaml",
-        "Test_TC_BRBINFO_1_1.yaml",
-        "Test_TC_BRBINFO_2_2.yaml",
-        "Test_TC_BRBINFO_2_3.yaml",
-        "Test_TC_CADMIN_1_1.yaml",
-        "Test_TC_CADMIN_1_12.yaml",
-        "Test_TC_CADMIN_1_14.yaml",
-        "Test_TC_CADMIN_1_17.yaml",
-        "Test_TC_CADMIN_1_18.yaml",
-        "Test_TC_CADMIN_1_19.yaml",
-        "Test_TC_CADMIN_1_2.yaml",
-        "Test_TC_CADMIN_1_20.yaml",
-        "Test_TC_CADMIN_1_7.yaml",
-        "Test_TC_CADMIN_1_8.yaml",
-        "Test_TC_CC_1_1.yaml",
-        "Test_TC_CC_2_2.yaml",
-        "Test_TC_CC_3_4.yaml",
-        "Test_TC_CC_4_5.yaml",
-        "Test_TC_CC_5_4.yaml",
-        "Test_TC_CC_6_4.yaml",
-        "Test_TC_CC_7_5.yaml",
-        "Test_TC_CC_9_4.yaml",
-        "Test_TC_CGEN_1_1.yaml",
-        "Test_TC_CGEN_2_2.yaml",
-        "Test_TC_CGEN_2_4.yaml",
-        "Test_TC_CHANNEL_1_6.yaml",
-        "Test_TC_CHANNEL_5_1.yaml",
-        "Test_TC_CHANNEL_5_4.yaml",
-        "Test_TC_CHANNEL_5_5.yaml",
-        "Test_TC_CHANNEL_5_6.yaml",
-        "Test_TC_CNET_1_3.yaml",
-        "Test_TC_CNET_4_1.yaml",
-        "Test_TC_CNET_4_10.yaml",
-        "Test_TC_CNET_4_11.yaml",
-        "Test_TC_CNET_4_12.yaml",
-        "Test_TC_CNET_4_13.yaml",
-        "Test_TC_CNET_4_14.yaml",
-        "Test_TC_CNET_4_15.yaml",
-        "Test_TC_CNET_4_16.yaml",
-        "Test_TC_CNET_4_17.yaml",
-        "Test_TC_CNET_4_18.yaml",
-        "Test_TC_CNET_4_19.yaml",
-        "Test_TC_CNET_4_2.yaml",
-        "Test_TC_CNET_4_20.yaml",
-        "Test_TC_CNET_4_21.yaml",
-        "Test_TC_CNET_4_22.yaml",
-        "Test_TC_CNET_4_3.yaml",
-        "Test_TC_CNET_4_4.yaml",
-        "Test_TC_CNET_4_5.yaml",
-        "Test_TC_CNET_4_6.yaml",
-        "Test_TC_CNET_4_9.yaml",
-        "Test_TC_CONTENTLAUNCHER_10_1.yaml",
-        "Test_TC_CONTENTLAUNCHER_10_3.yaml",
-        "Test_TC_CONTENTLAUNCHER_10_4.yaml",
-        "Test_TC_CONTENTLAUNCHER_10_5.yaml",
-        "Test_TC_CONTENTLAUNCHER_10_6.yaml",
-        "Test_TC_CONTENTLAUNCHER_10_7.yaml",
-        "Test_TC_CONTENTLAUNCHER_1_11.yaml",
-        "Test_TC_DA_1_1.yaml",
-        "Test_TC_DA_1_2.yaml",
-        "Test_TC_DA_1_3.yaml",
-        "Test_TC_DA_1_4.yaml",
-        "Test_TC_DA_1_5.yaml",
-        "Test_TC_DA_1_6.yaml",
-        "Test_TC_DD_1_10.yaml",
-        "Test_TC_DD_1_11.yaml",
-        "Test_TC_DD_1_12.yaml",
-        "Test_TC_DD_1_13.yaml",
-        "Test_TC_DD_1_14.yaml",
-        "Test_TC_DD_1_15.yaml",
-        "Test_TC_DD_1_5.yaml",
-        "Test_TC_DD_1_6.yaml",
-        "Test_TC_DD_1_7.yaml",
-        "Test_TC_DD_1_8.yaml",
-        "Test_TC_DD_1_9.yaml",
-        "Test_TC_DD_2_1.yaml",
-        "Test_TC_DD_2_2.yaml",
-        "Test_TC_DD_3_1.yaml",
-        "Test_TC_DD_3_10.yaml",
-        "Test_TC_DD_3_11.yaml",
-        "Test_TC_DD_3_12.yaml",
-        "Test_TC_DD_3_13.yaml",
-        "Test_TC_DD_3_14.yaml",
-        "Test_TC_DD_3_15.yaml",
-        "Test_TC_DD_3_16.yaml",
-        "Test_TC_DD_3_17.yaml",
-        "Test_TC_DD_3_18.yaml",
-        "Test_TC_DD_3_19.yaml",
-        "Test_TC_DD_3_2.yaml",
-        "Test_TC_DD_3_20.yaml",
-        "Test_TC_DD_3_21.yaml",
-        "Test_TC_DD_3_3.yaml",
-        "Test_TC_DD_3_4.yaml",
-        "Test_TC_DD_3_5.yaml",
-        "Test_TC_DD_3_6.yaml",
-        "Test_TC_DD_3_7.yaml",
-        "Test_TC_DD_3_8.yaml",
-        "Test_TC_DD_3_9.yaml",
-        "Test_TC_DESC_1_1.yaml",
-        "Test_TC_DESC_2_1.yaml",
-        "Test_TC_DGETH_1_1.yaml",
-        "Test_TC_DGETH_3_2.yaml",
-        "Test_TC_DGGEN_1_1.yaml",
-        "Test_TC_DGGEN_2_2.yaml",
-        "Test_TC_DGGEN_2_3.yaml",
-        "Test_TC_DGGEN_3_1.yaml",
-        "Test_TC_DGSW_1_1.yaml",
-        "Test_TC_DGSW_2_1.yaml",
-        "Test_TC_DGSW_2_2.yaml",
-        "Test_TC_DGSW_2_3.yaml",
-        "Test_TC_DGSW_3_2.yaml",
-        "Test_TC_DGTHREAD_1_1.yaml",
-        "Test_TC_DGTHREAD_2_2.yaml",
-        "Test_TC_DGTHREAD_2_4.yaml",
-        "Test_TC_DGTHREAD_2_5.yaml",
-        "Test_TC_DGTHREAD_3_1.yaml",
-        "Test_TC_DGTHREAD_3_2.yaml",
-        "Test_TC_DGTHREAD_3_3.yaml",
-        "Test_TC_DGTHREAD_3_4.yaml",
-        "Test_TC_DGTHREAD_3_5.yaml",
-        "Test_TC_DGWIFI_1_1.yaml",
-        "Test_TC_DGWIFI_2_2.yaml",
-        "Test_TC_DGWIFI_2_3.yaml",
-        "Test_TC_DGWIFI_3_2.yaml",
-        "Test_TC_DLOG_1_1.yaml",
-        "Test_TC_DLOG_2_1.yaml",
-        "Test_TC_DLOG_2_2.yaml",
-        "Test_TC_DLOG_3_1.yaml",
-        "Test_TC_DRLK_1_1.yaml",
-        "Test_TC_DRLK_2_1.yaml",
-        "Test_TC_DRLK_2_10.yaml",
-        "Test_TC_DRLK_2_6.yaml",
-        "Test_TC_DRLK_2_8.yaml",
-        "Test_TC_DRLK_3_1.yaml",
-        "Test_TC_DRLK_3_2.yaml",
-        "Test_TC_DRLK_3_3.yaml",
-        "Test_TC_FLABEL_1_1.yaml",
-        "Test_TC_FLW_1_1.yaml",
-        "Test_TC_FLW_2_1.yaml",
-        "Test_TC_G_1_1.yaml",
-        "Test_TC_G_2_1.yaml",
-        "Test_TC_G_2_2.yaml",
-        "Test_TC_G_2_3.yaml",
-        "Test_TC_G_3_2.yaml",
-        "Test_TC_I_1_1.yaml",
-        "Test_TC_I_2_1.yaml",
-        "Test_TC_I_3_2.yaml",
-        "Test_TC_IDM_1_1.yaml",
-        "Test_TC_IDM_1_2.yaml",
-        "Test_TC_IDM_2_1.yaml",
-        "Test_TC_IDM_2_2.yaml",
-        "Test_TC_IDM_3_1.yaml",
-        "Test_TC_IDM_3_2.yaml",
-        "Test_TC_IDM_4_1.yaml",
-        "Test_TC_IDM_4_2.yaml",
-        "Test_TC_IDM_4_3.yaml",
-        "Test_TC_IDM_5_1.yaml",
-        "Test_TC_IDM_5_2.yaml",
-        "Test_TC_IDM_6_1.yaml",
-        "Test_TC_IDM_6_2.yaml",
-        "Test_TC_IDM_6_3.yaml",
-        "Test_TC_IDM_6_4.yaml",
-        "Test_TC_IDM_7_1.yaml",
-        "Test_TC_IDM_8_1.yaml",
-        "Test_TC_ILL_1_1.yaml",
-        "Test_TC_ILL_2_1.yaml",
-        "Test_TC_ILL_3_1.yaml",
-        "Test_TC_KEYPADINPUT_1_2.yaml",
-        "Test_TC_KEYPADINPUT_3_1.yaml",
-        "Test_TC_KEYPADINPUT_3_2.yaml",
-        "Test_TC_KEYPADINPUT_3_3.yaml",
-        "Test_TC_LCFG_1_1.yaml",
-        "Test_TC_LCFG_2_1.yaml",
-        "Test_TC_LOWPOWER_1_1.yaml",
-        "Test_TC_LOWPOWER_2_2.yaml",
-        "Test_TC_LTIME_1_2.yaml",
-        "Test_TC_LTIME_2_1.yaml",
-        "Test_TC_LTIME_3_1.yaml",
-        "Test_TC_LUNIT_1_2.yaml",
-        "Test_TC_LVL_1_1.yaml",
-        "Test_TC_LVL_2_2.yaml",
-        "Test_TC_LVL_2_3.yaml",
-        "Test_TC_LVL_7_1.yaml",
-        "Test_TC_LVL_8_1.yaml",
-        "Test_TC_MC_11_1.yaml",
-        "Test_TC_MC_11_2.yaml",
-        "Test_TC_MEDIAINPUT_1_4.yaml",
-        "Test_TC_MEDIAINPUT_3_10.yaml",
-        "Test_TC_MEDIAINPUT_3_11.yaml",
-        "Test_TC_MEDIAINPUT_3_14.yaml",
-        "Test_TC_MEDIAINPUT_3_15.yaml",
-        "Test_TC_MEDIAINPUT_3_16.yaml",
-        "Test_TC_MEDIAINPUT_3_17.yaml",
-        "Test_TC_MEDIAPLAYBACK_1_7.yaml",
-        "Test_TC_MEDIAPLAYBACK_6_5.yaml",
-        "Test_TC_MEDIAPLAYBACK_6_7.yaml",
-        "Test_TC_MOD_1_1.yaml",
-        "Test_TC_MOD_1_2.yaml",
-        "Test_TC_MOD_1_3.yaml",
-        "Test_TC_MOD_2_1.yaml",
-        "Test_TC_MOD_2_2.yaml",
-        "Test_TC_MOD_3_1.yaml",
-        "Test_TC_MOD_3_2.yaml",
-        "Test_TC_MOD_3_3.yaml",
-        "Test_TC_MOD_3_4.yaml",
-        "Test_TC_OCC_1_1.yaml",
-        "Test_TC_OCC_2_1.yaml",
-        "Test_TC_OCC_2_3.yaml",
-        "Test_TC_OO_1_1.yaml",
-        "Test_TC_OO_2_1.yaml",
-        "Test_TC_OO_3_1.yaml",
-        "Test_TC_OO_3_2.yaml",
-        "Test_TC_OPCREDS_1_2.yaml",
-        "Test_TC_OPCREDS_3_1.yaml",
-        "Test_TC_OPCREDS_3_2.yaml",
-        "Test_TC_OPCREDS_3_3.yaml",
-        "Test_TC_OPCREDS_3_4.yaml",
-        "Test_TC_OPCREDS_3_5.yaml",
-        "Test_TC_PCC_1_1.yaml",
-        "Test_TC_PCC_2_2.yaml",
-        "Test_TC_PCC_2_3.yaml",
-        "Test_TC_PCC_2_4.yaml",
-        "Test_TC_PCC_3_1.yaml",
-        "Test_TC_PRS_1_1.yaml",
-        "Test_TC_PRS_2_1.yaml",
-        "Test_TC_PS_1_1.yaml",
-        "Test_TC_PS_2_2.yaml",
-        "Test_TC_PSCFG_1_1.yaml",
-        "Test_TC_PSCFG_2_1.yaml",
-        "Test_TC_PSCFG_2_2.yaml",
-        "Test_TC_RH_1_1.yaml",
-        "Test_TC_RH_2_1.yaml",
-        "Test_TC_S_1_1.yaml",
-        "Test_TC_S_2_1.yaml",
-        "Test_TC_S_2_2.yaml",
-        "Test_TC_S_2_3.yaml",
-        "Test_TC_S_3_1.yaml",
-        "Test_TC_SC_1_1.yaml",
-        "Test_TC_SC_1_2.yaml",
-        "Test_TC_SC_1_3.yaml",
-        "Test_TC_SC_1_4.yaml",
-        "Test_TC_SC_2_1.yaml",
-        "Test_TC_SC_2_2.yaml",
-        "Test_TC_SC_2_3.yaml",
-        "Test_TC_SC_2_4.yaml",
-        "Test_TC_SC_3_1.yaml",
-        "Test_TC_SC_3_2.yaml",
-        "Test_TC_SC_3_3.yaml",
-        "Test_TC_SC_3_4.yaml",
-        "Test_TC_SC_4_1.yaml",
-        "Test_TC_SC_4_10.yaml",
-        "Test_TC_SC_4_2.yaml",
-        "Test_TC_SC_4_3.yaml",
-        "Test_TC_SC_4_4.yaml",
-        "Test_TC_SC_4_5.yaml",
-        "Test_TC_SC_4_6.yaml",
-        "Test_TC_SC_4_7.yaml",
-        "Test_TC_SC_4_8.yaml",
-        "Test_TC_SC_4_9.yaml",
-        "Test_TC_SC_5_3.yaml",
-        "Test_TC_SC_6_1.yaml",
-        "Test_TC_SU_1_1.yaml",
-        "Test_TC_SU_2_1.yaml",
-        "Test_TC_SU_2_2.yaml",
-        "Test_TC_SU_2_3.yaml",
-        "Test_TC_SU_2_4.yaml",
-        "Test_TC_SU_2_5.yaml",
-        "Test_TC_SU_2_6.yaml",
-        "Test_TC_SU_2_7.yaml",
-        "Test_TC_SU_2_8.yaml",
-        "Test_TC_SU_3_1.yaml",
-        "Test_TC_SU_3_2.yaml",
-        "Test_TC_SU_3_3.yaml",
-        "Test_TC_SU_3_4.yaml",
-        "Test_TC_SU_4_1.yaml",
-        "Test_TC_SU_4_2.yaml",
-        "Test_TC_SWTCH_1_1.yaml",
-        "Test_TC_SWTCH_2_1.yaml",
-        "Test_TC_SWTCH_2_2.yaml",
-        "Test_TC_SWTCH_3_2.yaml",
-        "Test_TC_TGTNAV_1_9.yaml",
-        "Test_TC_TGTNAV_8_1.yaml",
-        "Test_TC_TGTNAV_8_2.yaml",
-        "Test_TC_TMP_1_1.yaml",
-        "Test_TC_TMP_2_1.yaml",
-        "Test_TC_TMP_3_1.yaml",
-        "Test_TC_TSTAT_1_1.yaml",
-        "Test_TC_TSTAT_3_1.yaml",
-        "Test_TC_TSTAT_3_2.yaml",
-        "Test_TC_TSUIC_1_1.yaml",
-        "Test_TC_TSUIC_2_1.yaml",
-        "Test_TC_TSUIC_3_1.yaml",
-        "Test_TC_ULABEL_1_1.yaml",
-        "Test_TC_ULABEL_2_1.yaml",
-        "Test_TC_ULABEL_2_2.yaml",
-        "Test_TC_ULABEL_2_3.yaml",
-        "Test_TC_ULABEL_2_4.yaml",
-        "Test_TC_WAKEONLAN_1_5.yaml",
-        "Test_TC_WNCV_1_1.yaml",
-        "Test_TC_WNCV_2_3.yaml",
-        "Test_TC_WNCV_4_3.yaml",
-        "Test_TC_WNCV_4_4.yaml",
-        "Test_TC_WNCV_6_1.yaml",
-        "Test_TC_WNCV_7_1.yaml",
-        "TestAccessControlCluster.yaml",
-        "TestAccessControlConstraints.yaml",
-        "TestBinding.yaml",
-        "TestClientMonitoringCluster.yaml",
-        "TestCluster.yaml",
-        "TestClusterComplexTypes.yaml",
-        "TestCommissioningWindow.yaml",
-        "TestConfigVariables.yaml",
-        "TestConstraints.yaml",
-        "TestDescriptorCluster.yaml",
-        "TestFabricRemovalWhileSubscribed.yaml",
-        "TestFanControl.yaml",
-        "TestGroupDemoConfig.yaml",
-        "TestGroupKeyManagementCluster.yaml",
-        "TestGroupsCluster.yaml",
-        "TestIdentifyCluster.yaml",
-        "TestOperationalCredentialsCluster.yaml",
-        "TestSaveAs.yaml",
-        "TestSelfFabricRemoval.yaml",
-        "TestSubscribe_AdministratorCommissioning.yaml",
-        "TestSubscribe_OnOff.yaml",
-        "TestUserLabelClusterConstraints.yaml",
-        "TV_AccountLoginCluster.yaml",
-        "TV_ApplicationBasicCluster.yaml",
-        "TV_ApplicationLauncherCluster.yaml",
-        "TV_AudioOutputCluster.yaml",
-        "TV_ChannelCluster.yaml",
-        "TV_ContentLauncherCluster.yaml",
-        "TV_KeypadInputCluster.yaml",
-        "TV_LowPowerCluster.yaml",
-        "TV_MediaInputCluster.yaml",
-        "TV_MediaPlaybackCluster.yaml",
-        "TV_TargetNavigatorCluster.yaml",
-        "TV_WakeOnLanCluster.yaml",
-        # "Config_Example.yaml",
-        # "Config_Variables_Example.yaml",
-        # "DL_LockUnlock.yaml",
-        # "DL_Schedules.yaml",
-        # "OTA_SuccessfulTransfer.yaml",
-        # "PICS_Example.yaml",
-        # "Response_Example.yaml",
-        # "Test_Example.yaml",
-        # "Test_Example_1.yaml",
-        # "Test_Example_2.yaml",
-        # "Test_Example_3.yaml",
-        # "Test_TC_ACE_1_1.yaml",
-        # "Test_TC_ACE_1_5.yaml",
-        # "Test_TC_ACL_2_10.yaml",
-        # "Test_TC_ACL_2_2.yaml",
-        # "Test_TC_ACL_2_4.yaml",
-        # "Test_TC_ACL_2_7.yaml",
-        # "Test_TC_ACL_2_8.yaml",
-        # "Test_TC_ACL_2_9.yaml",
-        # "Test_TC_ACT_3_1_Simulated.yaml",
-        # "Test_TC_APBSC_9_1.yaml",
-        # "Test_TC_APPLAUNCHER_3_8.yaml",
-        # "Test_TC_APPLAUNCHER_3_9.yaml",
-        # "Test_TC_AUDIOOUTPUT_7_2.yaml",
-        # "Test_TC_BINFO_2_1.yaml",
-        # "Test_TC_BINFO_2_3_Simulated.yaml",
-        # "Test_TC_BOOL_3_1_Simulated.yaml",
-        # "Test_TC_BRBINFO_2_1.yaml",
-        # "Test_TC_CADMIN_1_10.yaml",
-        # "Test_TC_CADMIN_1_11.yaml",
-        # "Test_TC_CADMIN_1_13.yaml",
-        # "Test_TC_CADMIN_1_15.yaml",
-        # "Test_TC_CADMIN_1_16.yaml",
-        # "Test_TC_CADMIN_1_21.yaml",
-        # "Test_TC_CADMIN_1_22.yaml",
-        # "Test_TC_CADMIN_1_23.yaml",
-        # "Test_TC_CADMIN_1_24.yaml",
-        # "Test_TC_CADMIN_1_3.yaml",
-        # "Test_TC_CADMIN_1_4.yaml",
-        # "Test_TC_CADMIN_1_5.yaml",
-        # "Test_TC_CADMIN_1_6.yaml",
-        # "Test_TC_CADMIN_1_9.yaml",
-        # "Test_TC_CC_2_1.yaml",
-        # "Test_TC_CC_3_1.yaml",
-        # "Test_TC_CC_3_2.yaml",
-        # "Test_TC_CC_3_3.yaml",
-        # "Test_TC_CC_4_1.yaml",
-        # "Test_TC_CC_4_2.yaml",
-        # "Test_TC_CC_4_3.yaml",
-        # "Test_TC_CC_4_4.yaml",
-        # "Test_TC_CC_5_1.yaml",
-        # "Test_TC_CC_5_2.yaml",
-        # "Test_TC_CC_5_3.yaml",
-        # "Test_TC_CC_6_1.yaml",
-        # "Test_TC_CC_6_2.yaml",
-        # "Test_TC_CC_6_3.yaml",
-        # "Test_TC_CC_7_1.yaml",
-        # "Test_TC_CC_7_2.yaml",
-        # "Test_TC_CC_7_3.yaml",
-        # "Test_TC_CC_7_4.yaml",
-        # "Test_TC_CC_8_1.yaml",
-        # "Test_TC_CC_9_1.yaml",
-        # "Test_TC_CC_9_2.yaml",
-        # "Test_TC_CC_9_3.yaml",
-        # "Test_TC_CGEN_2_1.yaml",
-        # "Test_TC_CHANNEL_5_2.yaml",
-        # "Test_TC_CHANNEL_5_3.yaml",
-        # "Test_TC_DESC_2_2_Simulated.yaml",
-        # "Test_TC_DGETH_2_1.yaml",
-        # "Test_TC_DGETH_2_2.yaml",
-        # "Test_TC_DGETH_3_1_Simulated.yaml",
-        # "Test_TC_DGGEN_2_1.yaml",
-        # "Test_TC_DGSW_3_1_Simulated.yaml",
-        # "Test_TC_DGTHREAD_2_1.yaml",
-        # "Test_TC_DGTHREAD_2_3.yaml",
-        # "Test_TC_DGWIFI_2_1.yaml",
-        # "Test_TC_DGWIFI_3_1_Simulated.yaml",
-        # "Test_TC_DRLK_2_2.yaml",
-        # "Test_TC_DRLK_2_3.yaml",
-        # "Test_TC_DRLK_2_4.yaml",
-        # "Test_TC_DRLK_2_5.yaml",
-        # "Test_TC_DRLK_2_7.yaml",
-        # "Test_TC_DRLK_2_9.yaml",
-        # "Test_TC_FLABEL_2_1.yaml",
-        # "Test_TC_FLABEL_3_1_Simulated.yaml",
-        # "Test_TC_FLW_2_2.yaml",
-        # "Test_TC_FLW_3_1_Simulated.yaml",
-        # "Test_TC_G_3_1_Simulated.yaml",
-        # "Test_TC_I_2_2.yaml",
-        # "Test_TC_I_2_3.yaml",
-        # "Test_TC_I_3_1_Simulated.yaml",
-        # "Test_TC_ILL_2_2.yaml",
-        # "Test_TC_LCFG_3_1_Simulated.yaml",
-        # "Test_TC_LOWPOWER_2_1.yaml",
-        # "Test_TC_LTIME_1_1_Simulated.yaml",
-        # "Test_TC_LUNIT_1_1_Simulated.yaml",
-        # "Test_TC_LUNIT_2_1_Simulated.yaml",
-        # "Test_TC_LUNIT_3_1.yaml",
-        # "Test_TC_LVL_2_1.yaml", # TODO: flaky
-        # "Test_TC_LVL_3_1.yaml",
-        # "Test_TC_LVL_4_1.yaml",
-        # "Test_TC_LVL_5_1.yaml",
-        # "Test_TC_LVL_6_1.yaml",
-        # "Test_TC_MEDIAINPUT_3_12.yaml",
-        # "Test_TC_MEDIAINPUT_3_13.yaml",
-        # "Test_TC_MEDIAPLAYBACK_6_1.yaml",
-        # "Test_TC_MEDIAPLAYBACK_6_2.yaml",
-        # "Test_TC_MEDIAPLAYBACK_6_3.yaml",
-        # "Test_TC_MEDIAPLAYBACK_6_4.yaml",
-        # "Test_TC_OCC_2_2_Simulated.yaml",
-        # "Test_TC_OCC_2_4_Simulated.yaml",
-        # "Test_TC_OCC_3_1.yaml",
-        # "Test_TC_OO_2_2.yaml",
-        # "Test_TC_OO_2_3.yaml",
-        # "Test_TC_OO_2_4.yaml",
-        # "Test_TC_PCC_2_1.yaml",
-        # "Test_TC_PRS_2_2.yaml",
-        # "Test_TC_PRS_3_1_Simulated.yaml",
-        # "Test_TC_PS_2_1.yaml",
-        # "Test_TC_PS_3_1_Simulated.yaml",
-        # "Test_TC_PSCFG_3_1_Simulated.yaml",
-        # "Test_TC_RH_2_2.yaml",
-        # "Test_TC_RH_3_1_Simulated.yaml",
-        # "Test_TC_SC_5_1.yaml",
-        # "Test_TC_SC_5_2.yaml",
-        # "Test_TC_SWTCH_3_1_Simulated.yaml",
-        # "Test_TC_TMP_2_2.yaml",
-        # "Test_TC_TSTAT_2_1.yaml",
-        # "Test_TC_TSTAT_2_2.yaml",
-        # "Test_TC_TSUIC_2_2.yaml",
-        # "Test_TC_ULABEL_3_1_Simulated.yaml",
-        # "Test_TC_WAKEONLAN_4_1.yaml",
-        # "Test_TC_WNCV_2_1.yaml",
-        # "Test_TC_WNCV_2_2.yaml",
-        # "Test_TC_WNCV_2_4.yaml",
-        # "Test_TC_WNCV_2_5.yaml",
-        # "Test_TC_WNCV_3_1.yaml",
-        # "Test_TC_WNCV_3_2.yaml",
-        # "Test_TC_WNCV_3_3.yaml",
-        # "Test_TC_WNCV_3_4.yaml",
-        # "Test_TC_WNCV_3_5.yaml",
-        # "Test_TC_WNCV_4_1.yaml",
-        # "Test_TC_WNCV_4_2.yaml",
-        # "Test_TC_WNCV_4_5.yaml",
-        # "Test_TC_WNCV_5_1_Simulated.yaml",
-        # "TestArmFailSafe.yaml",
-        # "TestBasicInformation.yaml",
-        # "TestCASERecovery.yaml",
-        # "TestClusterMultiFabric.yaml",
-        # "TestCommissionerNodeId.yaml",
-        # "TestDelayCommands.yaml",
-        # "TestDiscovery.yaml",
-        # "TestEvents.yaml",
-        # "TestGeneralCommissioning.yaml",
-        # "TestGroupDemoCommand.yaml",
-        # "TestGroupMessaging.yaml",
-        # "TestLevelControlWithOnOffDependency.yaml",
-        # "TestLogCommands.yaml",
-        # "TestModeSelectCluster.yaml",
-        # "TestMultiAdmin.yaml",
-        # "TestSystemCommands.yaml",
-        # "TestUserLabelCluster.yaml",
-    }
+    manual_tests = set([b.yaml for b in _GetManualTests()])
 
-    invalid_tests = {
-        "tests.yaml",  # src/app/tests/suites/certification/tests.yaml is not a real test
-        "PICS.yaml",  # src/app/tests/suites/certification/PICS.yaml is not a real test
-    }
-
-    # By default assume all yaml files are valid test cases, however only a
-    # smaller subset is known to pass, all the rest are marked "manual"
-    # For sanity check, all known supported tests MUST exist
-    found_supported_tests = set()
     for path in _AllYamlTests():
-        if path.name in invalid_tests:
+        if path.name in INVALID_TESTS:
             continue
 
-        is_supported = path.name in currently_supported_yaml_tests
-
-        if is_supported:
-            found_supported_tests.add(path.name)
-
-        file_path = str(path)
-
-        target = target_for_name(path.name)
-
-        # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
         yield TestDefinition(
-            run_name=file_path, name=path.stem, target=target, is_manual=not is_supported, use_chip_repl_yaml_tester=True
+            run_name=str(path),
+            name=path.stem,  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
+            target=target_for_name(path.name),
+            is_manual=path.name in manual_tests,
+            use_chip_repl_yaml_tester=True
         )
-
-    if found_supported_tests != currently_supported_yaml_tests:
-        raise Exception("Did not find YAMLs for all supported tests: %r" % (
-            currently_supported_yaml_tests - found_supported_tests))
 
 
 def AllTests(chip_tool: str, run_yamltests_with_chip_repl: bool):

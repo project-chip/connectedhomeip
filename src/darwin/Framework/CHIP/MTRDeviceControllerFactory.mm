@@ -44,6 +44,8 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
+#include <cstdlib>
+
 using namespace chip;
 using namespace chip::Controller;
 
@@ -57,6 +59,9 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
 static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
+
+static bool sExitHandlerRegistered = false;
+static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory]; }
 
 @interface MTRDeviceControllerFactory ()
 
@@ -382,7 +387,14 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         // This needs to happen after DeviceControllerFactory::Init,
         // because that creates (lazily, by calling functions with
         // static variables in them) some static-lifetime objects.
-        chip::HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
+        if (!sExitHandlerRegistered) {
+            int ret = atexit(ShutdownOnExit);
+            if (ret != 0) {
+                MTR_LOG_ERROR("Error registering exit handler: %d", ret);
+                return;
+            }
+        }
+        HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
 
         // Make sure we don't leave a system state running while we have no
         // controllers started.  This is working around the fact that a system

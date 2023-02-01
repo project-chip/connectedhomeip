@@ -145,7 +145,13 @@ MdnsContexts::~MdnsContexts()
 
 CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
 {
-    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(context != nullptr || sdRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (context == nullptr)
+    {
+        DNSServiceRefDeallocate(sdRef);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     if (sdRef == nullptr)
     {
@@ -156,6 +162,9 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
     auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
     if (kDNSServiceErr_NoError != err)
     {
+        // We can't just use our Delete to deallocate the service ref here,
+        // because our context may not have its serviceRef set yet.
+        DNSServiceRefDeallocate(sdRef);
         chip::Platform::Delete(context);
         return Error::ToChipError(err);
     }
@@ -297,6 +306,8 @@ void RegisterContext::DispatchSuccess()
     mHostNameRegistrar.Register();
 }
 
+BrowseContext * BrowseContext::sContextDispatchingSuccess = nullptr;
+
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
 {
     type     = ContextType::Browse;
@@ -314,18 +325,23 @@ void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 
 void BrowseContext::DispatchSuccess()
 {
-    callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
-    MdnsContexts::GetInstance().Remove(this);
+    // This should never be called: We either DispatchPartialSuccess or
+    // DispatchFailure.
+    VerifyOrDie(false);
 }
 
 void BrowseContext::DispatchPartialSuccess()
 {
+    sContextDispatchingSuccess = this;
     callback(context, services.data(), services.size(), false, CHIP_NO_ERROR);
+    sContextDispatchingSuccess = nullptr;
     services.clear();
 }
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
-                               const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse)
+                               const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
+                               std::shared_ptr<uint32_t> && consumerCounterToUse) :
+    browseThatCausedResolve(browseCausingResolve)
 {
     type            = ContextType::Resolve;
     context         = cbContext;
