@@ -692,16 +692,6 @@ class TestStep:
             if not self.is_attribute:
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
-                    # Since we did not get any value and we know that there are constraint(s) to
-                    # check we want to make sure that there is an explicit check for hasValue at
-                    # this point. Without having hasValue constraint check it is possible for a
-                    # constraint check like notValue to pass giving the test writer a false
-                    # sense that a response value was recieved and that constraints are passing.
-                    if 'hasValue' not in value['constraints']:
-                        result.error(check_type, error_name_does_not_exist.format(
-                            name=expected_name))
-                        continue
-
                     received_value = None
                 else:
                     received_value = received_value.get(

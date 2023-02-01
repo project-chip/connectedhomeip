@@ -37,14 +37,11 @@ class BaseConstraint(ABC):
             return self._is_null_allowed
 
         response_type = type(value)
-        type_matches = False if self._types else True
-        for expected_type in self._types:
-            if issubclass(response_type, expected_type):
-                type_matches = True
-                break
-
-        if not type_matches:
-            return False
+        if self._types:
+            found_type_match = any(
+                [issubclass(response_type, expected) for expected in self._types])
+            if not found_type_match:
+                return False
 
         return self.check_response(value)
 
