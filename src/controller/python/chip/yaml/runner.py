@@ -516,7 +516,7 @@ class DiscoveryCommandAction(BaseAction):
         elif test_step.command == 'FindCommissionableByCommissioningMode':
             # this is just a "_CM" subtype
             self.filterType = discovery.FilterType.COMMISSIONING_MODE
-            self.filter = 0
+            self.filter = None
         else:
             # specific filtered value find
             args = test_step.arguments['values']
