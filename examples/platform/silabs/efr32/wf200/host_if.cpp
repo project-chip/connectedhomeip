@@ -99,6 +99,12 @@ bool hasNotifiedWifiConnectivity = false;
 static uint8_t retryJoin         = 0;
 bool retryInProgress             = false;
 
+/* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
+bool is_wifi_disconnection_event = false;
+
+/* Declare a variable to hold connection time intervals */
+uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
+
 #ifdef SL_WFX_CONFIG_SCAN
 static struct scan_result_holder
 {
@@ -394,7 +400,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     }
     }
 
-    if ((status != WFM_STATUS_SUCCESS) && retryJoin < MAX_JOIN_RETRIES_COUNT)
+    if ((status != WFM_STATUS_SUCCESS) && (!is_wifi_disconnection_event ? (retryJoin < MAX_JOIN_RETRIES_COUNT) : true))
     {
         retryJoin += 1;
         retryInProgress = false;
@@ -417,7 +423,9 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
     SILABS_LOG("WFX Disconnected %d\r\n", reason);
     sl_wfx_context->state =
         static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
-    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_DISCONNECT);
+    retryInProgress             = false;
+    is_wifi_disconnection_event = true;
+    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
 }
 
 #ifdef SL_WFX_CONFIG_SOFTAP
@@ -534,9 +542,10 @@ static void wfx_events_task(void * p_arg)
         {
             if (!retryInProgress)
             {
+                retryInProgress = true;
+                wfx_retry_interval_handler(is_wifi_disconnection_event, retryJoin);
                 SILABS_LOG("WFX sending the connect command");
                 wfx_connect_to_ap();
-                retryInProgress = true;
             }
         }
 
@@ -589,6 +598,8 @@ static void wfx_events_task(void * p_arg)
             hasNotifiedWifiConnectivity = false;
             SILABS_LOG("WIFI: Connected to AP");
             wifi_extra |= WE_ST_STA_CONN;
+            retryJoin     = 0;
+            retryInterval = WLAN_MIN_RETRY_TIMER_MS;
             wfx_lwip_set_sta_link_up();
 #ifdef SLEEP_ENABLED
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
