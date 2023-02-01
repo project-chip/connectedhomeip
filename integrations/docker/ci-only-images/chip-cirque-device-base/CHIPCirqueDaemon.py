@@ -90,7 +90,7 @@ def CommandFactory(args):
 
 def ServerMain(args):
     extraOptions = {
-        "otbr-agent": ShellCommand(["otbr-agent", "-I", "wpan0", "spinel+hdlc+uart:///dev/ttyUSB0"])
+        "otbr-agent": ShellCommand(["otbr-agent", "-I", "wpan0", "-B", "eth0", "spinel+hdlc+uart:///dev/ttyUSB0"])
     }
 
     with Listener(SERVER_ADDRESS) as listener:
