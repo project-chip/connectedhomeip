@@ -15,8 +15,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# TODO: Implement the decode method
-
 CODES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
          'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
          'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
@@ -24,6 +22,7 @@ CODES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 RADIX = len(CODES)
 BASE38_CHARS_NEEDED_IN_CHUNK = [2, 4, 5]
 MAX_BYTES_IN_CHUNK = 3
+MAX_CHARS_IN_CHUNK = BASE38_CHARS_NEEDED_IN_CHUNK[MAX_BYTES_IN_CHUNK-1]
 
 
 def encode(bytes):
@@ -47,3 +46,25 @@ def encode(bytes):
             base38_chars_needed -= 1
 
     return qrcode
+
+
+def decode(qrcode):
+    total_chars = len(qrcode)
+    bytes = list()
+
+    for i in range(0, total_chars, MAX_CHARS_IN_CHUNK):
+        if (i + MAX_CHARS_IN_CHUNK) > total_chars:
+            chars_in_chunk = total_chars - i
+        else:
+            chars_in_chunk = MAX_CHARS_IN_CHUNK
+
+        value = 0
+        for j in range(i + chars_in_chunk - 1, i - 1, -1):
+            value = value * RADIX + CODES.index(qrcode[j])
+
+        bytes_in_chunk = BASE38_CHARS_NEEDED_IN_CHUNK.index(chars_in_chunk) + 1
+        for k in range(0, bytes_in_chunk):
+            bytes.append(value & 0xFF)
+            value = value >> 8
+
+    return bytes
