@@ -13,10 +13,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import filecmp
 import logging
+import os
+import subprocess
 import sys
 import threading
 from xmlrpc.server import SimpleXMLRPCServer
+
+_DEFAULT_CHIP_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 IP = '127.0.0.1'
 PORT = 9000
@@ -100,6 +106,26 @@ class AppsRegister:
             return accessory.waitForMessage(' '.join(message))
         return False
 
+    def createOtaImage(self, otaImageFilePath, rawImageFilePath, rawImageContent):
+        # Write the raw image content
+        with open(rawImageFilePath, 'w') as rawFile:
+            rawFile.write(rawImageContent)
+
+        # Add an OTA header to the raw file
+        otaImageTool = _DEFAULT_CHIP_ROOT + '/src/app/ota_image_tool.py'
+        cmd = [otaImageTool, 'create', '-v', '0xDEAD', '-p', '0xBEEF', '-vn', '2',
+               '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
+        s = subprocess.Popen(cmd)
+        s.wait()
+        if s.returncode != 0:
+            raise Exception('Cannot create OTA image file')
+        return True
+
+    def compareFiles(self, file1, file2):
+        if filecmp.cmp(file1, file2, shallow=False) is False:
+            raise Exception('Files %s and %s do not match' % (file1, file2))
+        return True
+
     def __startXMLRPCServer(self):
         self.server = SimpleXMLRPCServer((IP, PORT))
 
@@ -108,6 +134,8 @@ class AppsRegister:
         self.server.register_function(self.reboot, 'reboot')
         self.server.register_function(self.factoryReset, 'factoryReset')
         self.server.register_function(self.waitForMessage, 'waitForMessage')
+        self.server.register_function(self.compareFiles, 'compareFiles')
+        self.server.register_function(self.createOtaImage, 'createOtaImage')
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()

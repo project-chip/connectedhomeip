@@ -18,9 +18,8 @@
  */
 #include "ClusterManager.h"
 #include "Globals.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/basic-types.h>
@@ -83,7 +82,9 @@ Identify gIdentify1 = {
 
 void ClusterManager::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, PLAT_LOG("Unhandled Attribute ID: '0x%04x", attributeId));
+    using namespace app::Clusters::OnOff::Attributes;
+
+    VerifyOrExit(attributeId == OnOff::Id, PLAT_LOG("Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == ENDPOINT_ID_1 || endpointId == ENDPOINT_ID_2,
                  PLAT_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
 
@@ -97,11 +98,13 @@ exit:
 
 void ClusterManager::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
+    using namespace app::Clusters::LevelControl::Attributes;
+
     bool onOffState    = mEndpointOnOffState[endpointId - 1];
     uint8_t brightness = onOffState ? *value : 0;
 
     VerifyOrExit(brightness > 0, PLAT_LOG("Brightness set to 0, ignoring"));
-    VerifyOrExit(attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, PLAT_LOG("Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == CurrentLevel::Id, PLAT_LOG("Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == ENDPOINT_ID_1 || endpointId == ENDPOINT_ID_2,
                  PLAT_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
 
@@ -118,8 +121,9 @@ exit:
 
 void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID ||
-                     attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+    using namespace app::Clusters::ColorControl::Attributes;
+
+    VerifyOrExit(attributeId == CurrentHue::Id || attributeId == CurrentSaturation::Id,
                  PLAT_LOG("Unhandled AttributeId ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == ENDPOINT_ID_1 || endpointId == ENDPOINT_ID_2,
                  PLAT_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -127,17 +131,17 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
     if (endpointId == ENDPOINT_ID_1)
     {
         uint8_t hue, saturation;
-        if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+        if (attributeId == CurrentHue::Id)
         {
             hue = *value;
             /* Read Current Saturation value when Attribute change callback for HUE Attribute */
-            app::Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpointId, &saturation);
+            CurrentSaturation::Get(endpointId, &saturation);
         }
         else
         {
             saturation = *value;
             /* Read Current Hue value when Attribute change callback for SATURATION Attribute */
-            app::Clusters::ColorControl::Attributes::CurrentHue::Get(endpointId, &hue);
+            CurrentHue::Get(endpointId, &hue);
         }
         PLAT_LOG("Color Control triggered: Hue: %d Saturation: %d", hue, saturation);
     }

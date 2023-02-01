@@ -14,32 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import subprocess
 import sys
+import xmlrpc.client
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', '..', '..'))
+IP = '127.0.0.1'
+PORT = 9000
 
-otaImageFilePath = sys.argv[1]
-rawImageFilePath = sys.argv[2]
-rawImageContent = ' '.join(sys.argv[3:])
+if sys.platform == 'linux':
+    IP = '10.10.10.5'
 
+# Passing in sys.argv[2:] gets rid of the script name and key to the apps register. The remaining
+# values in the list are key-value pairs, e.g. [option1, value1, option2, value2, ...]
+with xmlrpc.client.ServerProxy('http://' + IP + ':' + str(PORT) + '/', allow_none=True) as proxy:
+    otaImageFilePath = sys.argv[1]
+    rawImageFilePath = sys.argv[2]
+    rawImageContent = ' '.join(sys.argv[3:])
 
-def main():
-    # Write the raw image content
-    with open(rawImageFilePath, 'w') as rawFile:
-        rawFile.write(rawImageContent)
-
-    # Add an OTA header to the raw file
-    otaImageTool = DEFAULT_CHIP_ROOT + '/src/app/ota_image_tool.py'
-    cmd = [otaImageTool, 'create', '-v', '0xDEAD', '-p', '0xBEEF', '-vn', '2',
-           '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
-    s = subprocess.Popen(cmd)
-    s.wait()
-    if s.returncode != 0:
-        raise Exception('Cannot create OTA image file')
-
-
-if __name__ == "__main__":
-    main()
+    proxy.createOtaImage(otaImageFilePath, rawImageFilePath, rawImageContent)

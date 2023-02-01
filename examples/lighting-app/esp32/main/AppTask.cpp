@@ -20,8 +20,6 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 #define APP_TASK_NAME "APP"

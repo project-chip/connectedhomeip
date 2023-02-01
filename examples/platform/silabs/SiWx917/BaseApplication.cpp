@@ -33,8 +33,6 @@
 #endif // DISPLAY_ENABLED
 
 #include "SiWx917DeviceDataProvider.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
