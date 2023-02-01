@@ -20,4 +20,3 @@ QRCode     : MT:Y.K9042C00KA0648G00
 For more details please refer Matter Specification
 
 ---
-
