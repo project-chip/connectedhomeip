@@ -70,6 +70,7 @@ template("efr32_sdk") {
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
       "${efr32_sdk_root}",
+      "${efr32_sdk_root}/util/plugin/security_manager/",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
       "${efr32_sdk_root}/app/common/util/app_assert/",
       "${efr32_sdk_root}/hardware/board/inc",
@@ -211,7 +212,7 @@ template("efr32_sdk") {
       }
 
       if (use_wf200 || !use_rs911x_sockets) {
-        import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
+        import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
         if (lwip_ipv4) {
@@ -454,8 +455,8 @@ template("efr32_sdk") {
     # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
     # edited.
     sources = [
-      "${chip_root}/src/platform/silabs/EFR32/efr32-chip-mbedtls-config.h",
-      "${chip_root}/src/platform/silabs/EFR32/psa_crypto_config.h",
+      "${chip_root}/src/platform/silabs/efr32/efr32-chip-mbedtls-config.h",
+      "${chip_root}/src/platform/silabs/efr32/psa_crypto_config.h",
     ]
 
     public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
@@ -544,6 +545,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_connection_config.c",
+      "${efr32_sdk_root}/util/plugin/security_manager/security_manager.c",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager/sl_malloc.c",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
