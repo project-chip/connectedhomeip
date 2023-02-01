@@ -7,7 +7,7 @@ ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
 # ZAP Development install, so that it runs on both x64 and arm64
 # Generally this should match with the ZAP version that is used for codegen within the
 # specified SHA
-ARG ZAP_VERSION=v2023.01.19-nightly
+ARG ZAP_VERSION=v2023.01.31-nightly
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \

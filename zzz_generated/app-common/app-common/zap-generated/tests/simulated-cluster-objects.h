@@ -109,6 +109,81 @@ struct UnpairCommand
     }
 };
 
+struct GetCommissionerNodeIdCommand
+{
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVType outer;
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+            {
+            default:
+                break;
+            }
+        }
+
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+struct GetCommissionerNodeIdResponse
+{
+    chip::NodeId nodeId;
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), nodeId));
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVType outer;
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+            {
+            case 0:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, nodeId));
+                break;
+            default:
+                break;
+            }
+        }
+
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 struct WaitForMsCommand
 {
     uint32_t ms;
@@ -1164,6 +1239,12 @@ using Type = struct PairWithCodeCommand;
 }
 namespace Unpair {
 using Type = struct UnpairCommand;
+}
+namespace GetCommissionerNodeId {
+using Type = struct GetCommissionerNodeIdCommand;
+}
+namespace GetCommissionerNodeIdResponse {
+using DecodableType = struct GetCommissionerNodeIdResponse;
 }
 } // namespace Commands
 } // namespace CommissionerCommands

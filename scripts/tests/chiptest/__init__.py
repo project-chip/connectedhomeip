@@ -88,6 +88,7 @@ def _GetManualTests() -> Set[ManualTest]:
     manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_2.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_3.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_4.yaml", reason="TODO"))
+    manualtests.add(ManualTest(yaml="Test_TC_OO_2_4.yaml", reason="Flaky"))
     manualtests.add(ManualTest(yaml="Test_TC_PCC_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_PS_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_SC_5_1.yaml", reason="TODO"))

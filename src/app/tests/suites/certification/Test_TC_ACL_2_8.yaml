@@ -172,8 +172,8 @@ tests:
                           ChangeType: 1,
                           LatestValue:
                               {
-                                  Privilege: "5",
-                                  AuthMode: "2",
+                                  Privilege: 5,
+                                  AuthMode: 2,
                                   Subjects: [TH1CommissionerNodeId],
                                   Targets: null,
                                   FabricIndex: TH1FabricIndex,
@@ -188,8 +188,8 @@ tests:
                           ChangeType: 2,
                           LatestValue:
                               {
-                                  Privilege: "5",
-                                  AuthMode: "2",
+                                  Privilege: 5,
+                                  AuthMode: 2,
                                   Subjects: [TH1CommissionerNodeId],
                                   Targets: null,
                                   FabricIndex: TH1FabricIndex,
@@ -204,8 +204,8 @@ tests:
                           ChangeType: 1,
                           LatestValue:
                               {
-                                  Privilege: "5",
-                                  AuthMode: "2",
+                                  Privilege: 5,
+                                  AuthMode: 2,
                                   Subjects: [TH1CommissionerNodeId, 1111],
                                   Targets: null,
                                   FabricIndex: TH1FabricIndex,
@@ -229,8 +229,8 @@ tests:
                           ChangeType: 1,
                           LatestValue:
                               {
-                                  Privilege: "5",
-                                  AuthMode: "2",
+                                  Privilege: 5,
+                                  AuthMode: 2,
                                   Subjects: [TH2CommissionerNodeId],
                                   Targets: null,
                                   FabricIndex: TH2FabricIndex,
@@ -245,8 +245,8 @@ tests:
                           ChangeType: 2,
                           LatestValue:
                               {
-                                  Privilege: "5",
-                                  AuthMode: "2",
+                                  Privilege: 5,
+                                  AuthMode: 2,
                                   Subjects: [TH2CommissionerNodeId],
                                   Targets: null,
                                   FabricIndex: TH2FabricIndex,
@@ -261,8 +261,8 @@ tests:
                           ChangeType: 1,
                           LatestValue:
                               {
-                                  Privilege: "5",
-                                  AuthMode: "2",
+                                  Privilege: 5,
+                                  AuthMode: 2,
                                   Subjects: [TH2CommissionerNodeId, 2222],
                                   Targets: null,
                                   FabricIndex: TH2FabricIndex,
