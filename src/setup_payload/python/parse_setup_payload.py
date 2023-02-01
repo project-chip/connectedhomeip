@@ -21,7 +21,6 @@ import sys
 from SetupPayload import SetupPayload
 
 
-
 def validate_args(args):
     if args.qrcode is not None:
         if len(args.qrcode.replace('MT:', '')) != 19:
@@ -34,10 +33,9 @@ def main():
     parser.add_argument('-q', '--qrcode',
                               help='The qrcode string for parsing')
     # parser.add_argument('-m', '--manualcode',
-                              # help='The manual code string for parsing')
+    # help='The manual code string for parsing')
     args = parser.parse_args()
     validate_args(args)
-
 
     payload = SetupPayload.parse_qrcode(args.qrcode)
     payload.print()
