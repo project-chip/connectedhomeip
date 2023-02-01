@@ -22,7 +22,7 @@
 # This script expects to find a Dockerfile next to $0, so symlink
 #  in an image name directory is the expected use case.
 
-set +xe
+set -xe
 
 SOURCE=${BASH_SOURCE[0]}
 cd "$(dirname "$SOURCE")"
@@ -40,6 +40,11 @@ VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
 
 REPO_DIR="$SOURCE_DIR/../../../../"
+
+if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+    # Note: This script will be invoked in docker on CI, We should ensure CHIP repo to safe directory to silent git error messages.
+    git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
+fi
 
 # The image build will clone its own ot-br-posix checkout due to limitations of git submodule.
 # Using the same ot-br-posix version as chip
