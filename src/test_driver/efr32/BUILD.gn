@@ -49,7 +49,7 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/silabs/EFR32",
+    "${chip_root}/src/platform/silabs/efr32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${examples_common_plat_dir}",
