@@ -204,7 +204,6 @@ void ConnectivityManagerImpl::_OnIpAcquired(intptr_t arg)
     event.Type = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
     PlatformMgr().PostEventOrDie(&event);
-    //chip::app::DnssdServer::Instance().StartServer();
 }
 
 void ConnectivityManagerImpl::OnStationConnected()

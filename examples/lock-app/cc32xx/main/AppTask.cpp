@@ -97,10 +97,6 @@ int AppTask::StartAppTask()
     return ret;
 }
 
-extern "C" {
-    bool gClearKVS = false;
-}
-
 int AppTask::Init()
 {
     CHIP_ERROR ret;
@@ -137,8 +133,6 @@ int AppTask::Init()
     buttonParams.longPressDuration = 1000U; // ms
     gButtonRightHandle             = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(gButtonRightHandle, ButtonRightEventHandler);
-
-    gClearKVS = GPIO_read(CONFIG_GPIO_BTN_RIGHT_INPUT);
 
     PLAT_LOG("Initialize Wi-Fi");
     WiFi_init();

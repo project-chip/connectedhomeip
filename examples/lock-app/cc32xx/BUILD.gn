@@ -73,8 +73,8 @@ source_set("lock_app_sdk") {
     ":sysconfig",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",  
-    ]
+    "${chip_root}/src/setup_payload",
+  ]
 }
 
 ti_simplelink_executable("lock_app") {
@@ -87,7 +87,8 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/CXXExceptionStubs.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
     "${project_dir}/main/DeviceCallbacks.cpp",
-    "${project_dir}/main/CHIPDeviceManager.cpp",  ]
+    "${project_dir}/main/CHIPDeviceManager.cpp",
+  ]
 
   deps = [
     ":lock_app_sdk",

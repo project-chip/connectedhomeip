@@ -111,7 +111,7 @@ public:
     /**
      * Use internally for registration of the ChipDeviceEvents
      */
-    static void CommonDeviceEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void DeviceEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
     CHIPDeviceManagerCallbacks * mCB = nullptr;
