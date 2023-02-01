@@ -28,6 +28,7 @@ class CodeGenerator(enum.Enum):
     JAVA = enum.auto()
     BRIDGE = enum.auto()
     CPP_APPLICATION = enum.auto()
+    CUSTOM = enum.auto()
 
     def Create(self, *args, **kargs):
         if self == CodeGenerator.JAVA:
@@ -36,6 +37,16 @@ class CodeGenerator(enum.Enum):
             return BridgeGenerator(*args, **kargs)
         elif self == CodeGenerator.CPP_APPLICATION:
             return CppApplicationGenerator(*args, **kargs)
+        elif self == CodeGenerator.CUSTOM:
+            # Use a package naming convention to find the custom generator:
+            # ./matter_idl_plugin/__init__.py defines a subclass of CodeGenerator named CustomGenerator.
+            # The current working directory is added to the python path so that the custom generator
+            # can be found.
+            import os
+            import sys
+            sys.path.append(os.getcwd())
+            from matter_idl_plugin import CustomGenerator
+            return CustomGenerator(*args, **kargs)
         else:
             raise NameError("Unknown code generator type")
 
@@ -56,4 +67,5 @@ GENERATORS = {
     'java': CodeGenerator.JAVA,
     'bridge': CodeGenerator.BRIDGE,
     'cpp-app': CodeGenerator.CPP_APPLICATION,
+    'custom': CodeGenerator.CUSTOM,
 }
