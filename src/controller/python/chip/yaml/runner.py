@@ -505,37 +505,44 @@ class CommissionerCommandAction(BaseAction):
 
 
 class DiscoveryCommandAction(BaseAction):
-    """DiscoveryCommand::FindCommissionable implementation"""
+    """DiscoveryCommand implementation (FindCommissionable* methods)."""
+
+    @staticmethod
+    def _filter_for_step(test_step) -> (discovery.FilterType, any):
+        """Given a test step, figure out the correct filters to give to
+           DiscoverCommissionableNodes.
+        """
+
+        if test_step.command == 'FindCommissionable':
+            return discovery.FilterType.NONE, None
+
+        if test_step.command == 'FindCommissionableByCommissioningMode':
+            # this is just a "_CM" subtype
+            return discovery.FilterType.COMMISSIONING_MODE, None
+
+        # all the items below require a "value" to use for filtering
+        args = test_step.arguments['values']
+        request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
+
+        filter = request_data_as_dict['value']
+
+        if test_step.command == 'FindCommissionableByDeviceType':
+            return discovery.FilterType.DEVICE_TYPE, filter
+
+        if test_step.command == 'FindCommissionableByLongDiscriminator':
+            return discovery.FilterType.LONG_DISCRIMINATOR, filter
+
+        if test_step.command == 'FindCommissionableByShortDiscriminator':
+            return discovery.FilterType.SHORT_DISCRIMINATOR, filter
+
+        if test_step.command == 'FindCommissionableByVendorId':
+            return discovery.FilterType.VENDOR_ID, filter
+
+        raise UnexpectedParsingError(f'Invalid command: {test_step.command}')
 
     def __init__(self, test_step):
         super().__init__(test_step)
-
-        if test_step.command == 'FindCommissionable':
-            self.filterType = discovery.FilterType.NONE
-            self.filter = None
-        elif test_step.command == 'FindCommissionableByCommissioningMode':
-            # this is just a "_CM" subtype
-            self.filterType = discovery.FilterType.COMMISSIONING_MODE
-            self.filter = None
-        else:
-            # specific filtered value find
-            args = test_step.arguments['values']
-            request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
-
-            self.filter = request_data_as_dict['value']
-
-            if test_step.command == 'FindCommissionableByDeviceType':
-                self.filterType = discovery.FilterType.DEVICE_TYPE
-            elif test_step.command == 'FindCommissionableByLongDiscriminator':
-                self.filterType = discovery.FilterType.LONG_DISCRIMINATOR
-            elif test_step.command == 'FindCommissionableByShortDiscriminator':
-                self.filterType = discovery.FilterType.SHORT_DISCRIMINATOR
-            elif test_step.command == 'FindCommissionableByVendorId':
-                self.filterType = discovery.FilterType.VENDOR_ID
-            else:
-                raise UnexpectedParsingError(f'Invalid command: {test_step.command}')
-
-        self.step = test_step
+        self.filterType, self.filter = DiscoveryCommandAction._filter_for_step(test_step)
 
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         devices = dev_ctrl.DiscoverCommissionableNodes(
