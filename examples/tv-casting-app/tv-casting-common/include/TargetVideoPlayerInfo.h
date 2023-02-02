@@ -41,10 +41,11 @@ public:
     chip::NodeId GetNodeId() const { return mNodeId; }
     chip::FabricIndex GetFabricIndex() const { return mFabricIndex; }
     const char * GetDeviceName() const { return mDeviceName; }
+    const char * GetHostName() const { return mHostName; }
     size_t GetNumIPs() const { return mNumIPs; }
     const chip::Inet::IPAddress * GetIpAddresses() const { return mIpAddress; }
     bool IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData);
-    bool IsSameAs(const char * deviceName, size_t numIPs, const chip::Inet::IPAddress * ipAddresses);
+    bool IsSameAs(const char * hostName, const char * deviceName, size_t numIPs, const chip::Inet::IPAddress * ipAddresses);
 
     chip::OperationalDeviceProxy * GetOperationalDeviceProxy()
     {
@@ -58,8 +59,8 @@ public:
     CHIP_ERROR Initialize(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
                           std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                           std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId = 0, uint16_t productId = 0,
-                          chip::DeviceTypeId deviceType = 0, const char * deviceName = {}, size_t numIPs = 0,
-                          chip::Inet::IPAddress * ipAddressList = nullptr);
+                          chip::DeviceTypeId deviceType = 0, const char * deviceName = {}, const char * hostName = {},
+                          size_t numIPs = 0, chip::Inet::IPAddress * ipAddressList = nullptr);
     CHIP_ERROR FindOrEstablishCASESession(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                           std::function<void(CHIP_ERROR)> onConnectionFailure);
     TargetEndpointInfo * GetOrAddEndpoint(chip::EndpointId endpointId);
@@ -110,6 +111,7 @@ private:
     uint16_t mProductId                                  = 0;
     chip::DeviceTypeId mDeviceType                       = 0;
     char mDeviceName[chip::Dnssd::kMaxDeviceNameLen + 1] = {};
+    char mHostName[chip::Dnssd::kHostNameMaxLength + 1]  = {};
     size_t mNumIPs                                       = 0; // number of valid IP addresses
     chip::Inet::IPAddress mIpAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
 

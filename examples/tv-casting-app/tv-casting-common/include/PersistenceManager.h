@@ -49,6 +49,7 @@ private:
         kVideoPlayerProductIdTag,
         kVideoPlayerDeviceTypeIdTag,
         kVideoPlayerDeviceNameTag,
+        kVideoPlayerHostNameTag,
         kVideoPlayerNumIPsTag,
         kVideoPlayerIPAddressTag,
         kIpAddressesContainerTag,

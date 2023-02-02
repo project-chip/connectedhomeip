@@ -162,6 +162,8 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::Discovered
     }
     chip::Platform::CopyString(mTargetVideoPlayerDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
                                selectedCommissioner->commissionData.deviceName);
+    chip::Platform::CopyString(mTargetVideoPlayerHostName, chip::Dnssd::kHostNameMaxLength + 1,
+                               selectedCommissioner->resolutionData.hostName);
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
@@ -412,7 +414,8 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
             CastingServer::GetInstance()->mOnConnectionFailureClientCallback,
             CastingServer::GetInstance()->mTargetVideoPlayerVendorId, CastingServer::GetInstance()->mTargetVideoPlayerProductId,
             CastingServer::GetInstance()->mTargetVideoPlayerDeviceType, CastingServer::GetInstance()->mTargetVideoPlayerDeviceName,
-            CastingServer::GetInstance()->mTargetVideoPlayerNumIPs, CastingServer::GetInstance()->mTargetVideoPlayerIpAddress);
+            CastingServer::GetInstance()->mTargetVideoPlayerHostName, CastingServer::GetInstance()->mTargetVideoPlayerNumIPs,
+            CastingServer::GetInstance()->mTargetVideoPlayerIpAddress);
 
         if (err != CHIP_NO_ERROR)
         {
