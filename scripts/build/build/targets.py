@@ -403,16 +403,18 @@ def Buildcc13x2x7_26x2x7Target():
 
     return target
 
+
 def Buildcc32xxTarget():
     target = BuildTarget('cc32xx', cc32xxBuilder)
-    
+
     # apps
     target.AppendFixedTargets([
         TargetPart('lock', app=cc32xxApp.LOCK),
-       
+
     ])
 
     return target
+
 
 def BuildCyw30739Target():
     target = BuildTarget('cyw30739', Cyw30739Builder)

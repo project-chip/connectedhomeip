@@ -20,7 +20,6 @@ from .gn import GnBuilder
 
 class cc32xxApp(Enum):
     LOCK = auto()
-    
 
     def ExampleName(self):
         if self == cc32xxApp.LOCK:
@@ -54,7 +53,6 @@ class cc32xxBuilder(GnBuilder):
         args = [
             'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT'],
         ]
-
 
         return args
 
