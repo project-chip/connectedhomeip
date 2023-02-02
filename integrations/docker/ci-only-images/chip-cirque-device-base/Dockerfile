@@ -39,7 +39,6 @@ RUN apt-get update \
   wpasupplicant \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
   && git clone https://github.com/openthread/ot-br-posix . \
-  && git checkout $OT_BR_POSIX_CHECKOUT \
   && git submodule update --init --depth=1 \
   && ./script/bootstrap \
   && ./script/setup \
