@@ -225,7 +225,7 @@ public:
     void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
 
 private:
-    enum class State
+    enum class State : uint8_t
     {
         Uninitialized,    // Error state: OperationalSessionSetup is useless
         NeedsAddress,     // No address known, lookup not started yet.
@@ -247,10 +247,6 @@ private:
 
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    void MoveToState(State aTargetState);
-
-    State mState = State::Uninitialized;
-
     SessionHolderWithDelegate mSecureSession;
 
     Callback::CallbackDeque mConnectionSuccess;
@@ -261,7 +257,11 @@ private:
     /// This is used when a node address is required.
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
+    State mState = State::Uninitialized;
+
     bool mPerformingAddressUpdate = false;
+
+    void MoveToState(State aTargetState);
 
     CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config);
 

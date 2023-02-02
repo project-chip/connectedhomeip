@@ -27,8 +27,10 @@ if (silabs_board == "BRD4325A") {  # CCP board
 declare_args() {
   # Build target to use for efr32 SDK. Use this to set global SDK defines.
   efr32_sdk_target = ""
-  sl_ot_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
-  sl_openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
+  sl_ot_efr32_root =
+      "${chip_root}/third_party/silabs/gecko_sdk/protocol/openthread"
+  sl_openthread_root =
+      "${chip_root}/third_party/silabs/gecko_sdk/util/third_party/openthread"
   use_thread_coap_lib = false
   sl_matter_version_str = ""
 }
@@ -82,15 +84,18 @@ if (use_silabs_thread_lib) {
     include_dirs = [
       "${chip_root}/examples/platform/silabs/efr32",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
-      "${sl_ot_efr32_root}/src/src",
+      "${sl_ot_efr32_root}/platform-abstraction/efr32",
       "${sl_openthread_root}/src/",
     ]
+
+    # temporarily disable check until gsdk pulls in a more recent version
+    cflags = [ "-Wno-format-nonliteral" ]
   }
 
   source_set("openthread_core_config_efr32") {
     sources = [
-      "${sl_ot_efr32_root}/src/src/openthread-core-efr32-config-check.h",
-      "${sl_ot_efr32_root}/src/src/openthread-core-efr32-config.h",
+      "${sl_ot_efr32_root}/platform-abstraction/efr32/openthread-core-efr32-config-check.h",
+      "${sl_ot_efr32_root}/platform-abstraction/efr32/openthread-core-efr32-config.h",
     ]
 
     public_deps = [

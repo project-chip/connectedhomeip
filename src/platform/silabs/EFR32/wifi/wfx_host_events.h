@@ -141,6 +141,12 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define MAX_JOIN_RETRIES_COUNT 5
 #endif
 
+// WLAN retry time intervals in milli seconds
+#define WLAN_MAX_RETRY_TIMER_MS 30000
+#define WLAN_MIN_RETRY_TIMER_MS 1000
+#define WLAN_RETRY_TIMER_MS 5000
+#define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
+
 // WLAN related Macros
 #define ETH_FRAME 0
 #define CMP_SUCCESS 0
@@ -370,6 +376,9 @@ sl_status_t get_all_counters(void);
 void sl_wfx_host_gpio_init(void);
 sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif
+
+void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
+
 #ifdef __cplusplus
 }
 #endif

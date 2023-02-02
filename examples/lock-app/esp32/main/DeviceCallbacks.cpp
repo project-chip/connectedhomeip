@@ -27,7 +27,6 @@
 #include <lock/AppConfig.h>
 #include <lock/BoltLockManager.h>
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 
 static const char * TAG = "lock-devicecallbacks";

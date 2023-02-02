@@ -53,37 +53,16 @@ USAGE_FILES_DEPENDING_ON_ZAP_VERSION = [
     'scripts/zap.json',
 ]
 
-# Note that chip-cert-bits is assumed USAGE on purpose (it compiles code)
-#
-# The chip-build image change will affect all other images as they extend
-# chip-build
-DOCKER_FILES_DEPENDING_ON_ZAP_VERSION = [
-    'integrations/docker/images/chip-build/Dockerfile',
-]
-
 
 class UpdateChoice(Flag):
     # Usage updates the CI, chip-cert and execution logic. Generally everything
     # that would make use of the updated zap version
     USAGE = auto()
 
-    # Docker updates just the chip-build (and as a side-effect underlying)
-    # image(s). This is a pre-requisite to be able to start using the new
-    # version.
-    DOCKER = auto()
-
 
 __UPDATE_CHOICES__ = {
-    'docker': UpdateChoice.DOCKER,
     'usage': UpdateChoice.USAGE,
-    'all': UpdateChoice.DOCKER | UpdateChoice.USAGE,
 }
-
-# NOTE: you likely need to also update
-#   integrations/docker/images/chip-build/version
-#
-# in PRs that update chip-build Dockerfiles. This update is not automated in
-# this script.
 
 # Apart from the above files which contain an exact ZAP version, the zap
 # execution script contains the mimimal zap execution version, which generally
@@ -106,9 +85,9 @@ CHIP_ROOT_DIR = os.path.abspath(os.path.join(
     help='Determines the verbosity of script output.')
 @click.option(
     '--update',
-    default='docker',
+    default='usage',
     type=click.Choice(__UPDATE_CHOICES__.keys(), case_sensitive=False),
-    help='What to update: docker, usage, all. Default is "docker".')
+    help='What to update: usage (only choice currently).')
 @click.option(
     '--new-version',
     default=None,
@@ -135,9 +114,6 @@ def version_update(log_level, update, new_version):
     files_to_update = []
     if UpdateChoice.USAGE in update:
         files_to_update += USAGE_FILES_DEPENDING_ON_ZAP_VERSION
-
-    if UpdateChoice.DOCKER in update:
-        files_to_update += DOCKER_FILES_DEPENDING_ON_ZAP_VERSION
 
     for name in files_to_update:
         with open(os.path.join(CHIP_ROOT_DIR, name), 'rt') as f:

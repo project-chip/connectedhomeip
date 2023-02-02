@@ -66,7 +66,7 @@ void initAntenna(void);
 void init_efrPlatform(void)
 {
     sl_system_init();
-
+    sl_mbedtls_init();
 #if CHIP_ENABLE_OPENTHREAD
 #ifdef MGM24
     sl_openthread_init();
