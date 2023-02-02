@@ -73,7 +73,7 @@ public:
 
     virtual chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() = 0;
 
-    virtual void SetCredentialIssuerCATValues(chip::CATValues cats) {}
+    virtual void SetCredentialIssuerCATValues(chip::CATValues cats) = 0;
 
     /**
      * @brief
