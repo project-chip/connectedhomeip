@@ -49,96 +49,7 @@ public abstract class PairingCommand extends MatterCommand
   private final StringBuffer mPassword = new StringBuffer();
   private final StringBuffer mOnboardingPayload = new StringBuffer();
   private final StringBuffer mDiscoveryFilterInstanceName = new StringBuffer();
-
   private static Logger logger = Logger.getLogger(PairingCommand.class.getName());
-
-  public long getNodeId() {
-    return mNodeId.get();
-  }
-
-  public int getSetupPINCode() {
-    return mSetupPINCode.get();
-  }
-
-  public int getDiscriminator() {
-    return mDiscriminator.get();
-  }
-
-  public long getTimeoutMillis() {
-    return mTimeoutMillis.get();
-  }
-
-  @Override
-  public void onConnectDeviceComplete() {
-    logger.log(Level.INFO, "onConnectDeviceComplete");
-  }
-
-  @Override
-  public void onStatusUpdate(int status) {
-    logger.log(Level.INFO, "onStatusUpdate with status: " + status);
-  }
-
-  @Override
-  public void onPairingComplete(int errorCode) {
-    logger.log(Level.INFO, "onPairingComplete with error code: " + errorCode);
-    if (errorCode != 0) {
-      setFailure("onPairingComplete failure");
-    }
-  }
-
-  @Override
-  public void onPairingDeleted(int errorCode) {
-    logger.log(Level.INFO, "onPairingDeleted with error code: " + errorCode);
-  }
-
-  @Override
-  public void onCommissioningComplete(long nodeId, int errorCode) {
-    logger.log(Level.INFO, "onCommissioningComplete with error code: " + errorCode);
-    if (errorCode == 0) {
-      setSuccess();
-    } else {
-      setFailure("onCommissioningComplete failure");
-    }
-  }
-
-  @Override
-  public void onReadCommissioningInfo(
-      int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
-    logger.log(Level.INFO, "onReadCommissioningInfo");
-  }
-
-  @Override
-  public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
-    logger.log(Level.INFO, "onCommissioningStatusUpdate");
-  }
-
-  @Override
-  public void onNotifyChipConnectionClosed() {
-    logger.log(Level.INFO, "onNotifyChipConnectionClosed");
-  }
-
-  @Override
-  public void onCloseBleComplete() {
-    logger.log(Level.INFO, "onCloseBleComplete");
-  }
-
-  @Override
-  public void onError(Throwable error) {
-    setFailure(error.toString());
-    logger.log(Level.INFO, "onError with error: " + error.toString());
-  }
-
-  @Override
-  public void onOpCSRGenerationComplete(byte[] csr) {
-    logger.log(Level.INFO, "onOpCSRGenerationComplete");
-    for (int i = 0; i < csr.length; i++) {
-      System.out.print(csr[i] + " ");
-    }
-  }
-
-  public IPAddress getRemoteAddr() {
-    return mRemoteAddr;
-  }
 
   public PairingCommand(
       ChipDeviceController controller,
@@ -241,5 +152,97 @@ public abstract class PairingCommand extends MatterCommand
     }
 
     addArgument("timeout", (long) 0, Long.MAX_VALUE, mTimeoutMillis, null, false);
+  }
+
+  public long getNodeId() {
+    return mNodeId.get();
+  }
+
+  public int getSetupPINCode() {
+    return mSetupPINCode.get();
+  }
+
+  public int getDiscriminator() {
+    return mDiscriminator.get();
+  }
+
+  public int getRemotePort() {
+    return mRemotePort.get();
+  }
+
+  public long getTimeoutMillis() {
+    return mTimeoutMillis.get();
+  }
+
+  public IPAddress getRemoteAddr() {
+    return mRemoteAddr;
+  }
+
+  @Override
+  public void onConnectDeviceComplete() {
+    logger.log(Level.INFO, "onConnectDeviceComplete");
+  }
+
+  @Override
+  public void onStatusUpdate(int status) {
+    logger.log(Level.INFO, "onStatusUpdate with status: " + status);
+  }
+
+  @Override
+  public void onPairingComplete(int errorCode) {
+    logger.log(Level.INFO, "onPairingComplete with error code: " + errorCode);
+    if (errorCode != 0) {
+      setFailure("onPairingComplete failure");
+    }
+  }
+
+  @Override
+  public void onPairingDeleted(int errorCode) {
+    logger.log(Level.INFO, "onPairingDeleted with error code: " + errorCode);
+  }
+
+  @Override
+  public void onCommissioningComplete(long nodeId, int errorCode) {
+    logger.log(Level.INFO, "onCommissioningComplete with error code: " + errorCode);
+    if (errorCode == 0) {
+      setSuccess();
+    } else {
+      setFailure("onCommissioningComplete failure");
+    }
+  }
+
+  @Override
+  public void onReadCommissioningInfo(
+      int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
+    logger.log(Level.INFO, "onReadCommissioningInfo");
+  }
+
+  @Override
+  public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
+    logger.log(Level.INFO, "onCommissioningStatusUpdate");
+  }
+
+  @Override
+  public void onNotifyChipConnectionClosed() {
+    logger.log(Level.INFO, "onNotifyChipConnectionClosed");
+  }
+
+  @Override
+  public void onCloseBleComplete() {
+    logger.log(Level.INFO, "onCloseBleComplete");
+  }
+
+  @Override
+  public void onError(Throwable error) {
+    setFailure(error.toString());
+    logger.log(Level.INFO, "onError with error: " + error.toString());
+  }
+
+  @Override
+  public void onOpCSRGenerationComplete(byte[] csr) {
+    logger.log(Level.INFO, "onOpCSRGenerationComplete");
+    for (int i = 0; i < csr.length; i++) {
+      System.out.print(csr[i] + " ");
+    }
   }
 }

@@ -10,5 +10,16 @@ public final class PairEthernetCommand extends PairingCommand {
   }
 
   @Override
-  protected void runCommand() {}
+  protected void runCommand() {
+    currentCommissioner()
+        .pairDeviceWithAddress(
+            getNodeId(),
+            getRemoteAddr().getHostAddress(),
+            getRemotePort(),
+            getDiscriminator(),
+            getSetupPINCode(),
+            null);
+    currentCommissioner().setCompletionListener(this);
+    waitCompleteMs(getTimeoutMillis());
+  }
 }
