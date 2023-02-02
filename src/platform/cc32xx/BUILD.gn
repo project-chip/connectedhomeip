@@ -43,7 +43,7 @@ static_library("cc32xx") {
 
     "SystemPlatformConfig.h",
   ]
-  
+
   public_deps = [
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",

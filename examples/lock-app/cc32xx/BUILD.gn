@@ -84,18 +84,18 @@ ti_simplelink_executable("lock_app") {
   sources = [
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/BoltLockManager.cpp",
-    "${project_dir}/main/CXXExceptionStubs.cpp",
-    "${project_dir}/main/ZclCallbacks.cpp",
-    "${project_dir}/main/DeviceCallbacks.cpp",
     "${project_dir}/main/CHIPDeviceManager.cpp",
+    "${project_dir}/main/CXXExceptionStubs.cpp",
+    "${project_dir}/main/DeviceCallbacks.cpp",
+    "${project_dir}/main/ZclCallbacks.cpp",
   ]
 
   deps = [
     ":lock_app_sdk",
     ":sdk",
     ":sysconfig",
-    "${chip_root}/examples/platform/cc32xx:cc32xx-attestation-credentials",
     "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/examples/platform/cc32xx:cc32xx-attestation-credentials",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
