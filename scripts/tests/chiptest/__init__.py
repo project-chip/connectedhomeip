@@ -57,7 +57,7 @@ def _IsValidYamlTest(name: str) -> bool:
     """
 
     # Simulated tests are not runnable by repl tests, need
-    # separate infrastructure. Exclude theml completely (they are
+    # separate infrastructure. Exclude them completely (they are
     # not even manual)
     if name.endswith('_Simulated.yaml'):
         return False
