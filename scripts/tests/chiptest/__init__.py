@@ -50,6 +50,21 @@ INVALID_TESTS = {
 }
 
 
+def _IsValidYamlTest(name: str) -> bool:
+    """Check if the given file name is a valid YAML test.
+
+    This returns invalid for examples, simulated and other specific tests.
+    """
+
+    # Simulated tests are not runnable by repl tests, need
+    # separate infrastructure. Exclude theml completely (they are
+    # not even manual)
+    if name.endswith('_Simulated.yaml'):
+        return False
+
+    return name not in INVALID_TESTS
+
+
 def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
     with open(json_file_path, 'rt') as f:
         data = json.load(f)
@@ -174,12 +189,6 @@ def _AllYamlTests():
         if not path.is_file():
             continue
 
-        if path.name.endswith('_Simulated.yaml'):
-            # Simulated tests are not runnable by repl tests, need
-            # separate infrastructure. Exclude theml completely (they are
-            # not even manual)
-            continue
-
         yield path
 
 
@@ -229,7 +238,7 @@ def _hardcoded_python_yaml_tests():
     in_development_tests = _GetInDevelopmentTests()
 
     for path in _AllYamlTests():
-        if path.name in INVALID_TESTS:
+        if not _IsValidYamlTest(path.name):
             continue
 
         tags = set()
