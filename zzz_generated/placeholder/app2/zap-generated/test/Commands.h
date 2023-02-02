@@ -198,7 +198,7 @@ private:
 class Test_TC_ACT_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_ACT_3_1_SimulatedSuite() : TestCommand("Test_TC_ACT_3_1_Simulated", 4)
+    Test_TC_ACT_3_1_SimulatedSuite() : TestCommand("Test_TC_ACT_3_1_Simulated", 5)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -227,6 +227,10 @@ private:
         switch (mTestIndex - 1)
         {
         case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -263,6 +267,19 @@ private:
             LogStep(3, "Read attribute: SetupURL");
             return WaitAttribute(GetEndpoint(0), Actions::Id, Actions::Attributes::SetupURL::Id);
         }
+        case 4: {
+            LogStep(4,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList.Commission "
+                    "DUT to TH again");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -271,7 +288,7 @@ private:
 class Test_TC_BOOL_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_BOOL_3_1_SimulatedSuite() : TestCommand("Test_TC_BOOL_3_1_Simulated", 2)
+    Test_TC_BOOL_3_1_SimulatedSuite() : TestCommand("Test_TC_BOOL_3_1_Simulated", 3)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -303,6 +320,10 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -327,6 +348,19 @@ private:
         case 1: {
             LogStep(1, "Read attribute: StateValue");
             return WaitAttribute(GetEndpoint(0), BooleanState::Id, BooleanState::Attributes::StateValue::Id);
+        }
+        case 2: {
+            LogStep(2,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList.Commission "
+                    "DUT to TH again");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -746,7 +780,7 @@ private:
 class Test_TC_FLW_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_FLW_3_1_SimulatedSuite() : TestCommand("Test_TC_FLW_3_1_Simulated", 5)
+    Test_TC_FLW_3_1_SimulatedSuite() : TestCommand("Test_TC_FLW_3_1_Simulated", 6)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -775,6 +809,10 @@ private:
         switch (mTestIndex - 1)
         {
         case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -814,6 +852,19 @@ private:
         case 4: {
             LogStep(4, "Read attribute: Tolerance");
             return WaitAttribute(GetEndpoint(0), FlowMeasurement::Id, FlowMeasurement::Attributes::Tolerance::Id);
+        }
+        case 5: {
+            LogStep(5,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList. Commission "
+                    "DUT to TH again.");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -889,7 +940,7 @@ private:
 class Test_TC_I_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_I_3_1_SimulatedSuite() : TestCommand("Test_TC_I_3_1_Simulated", 5)
+    Test_TC_I_3_1_SimulatedSuite() : TestCommand("Test_TC_I_3_1_Simulated", 6)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -918,6 +969,10 @@ private:
         switch (mTestIndex - 1)
         {
         case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -958,6 +1013,19 @@ private:
             LogStep(4, "Read attribute: identifytype");
             return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyType::Id);
         }
+        case 5: {
+            LogStep(5,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList.Commission "
+                    "DUT to TH again");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -966,7 +1034,7 @@ private:
 class Test_TC_PRS_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_PRS_3_1_SimulatedSuite() : TestCommand("Test_TC_PRS_3_1_Simulated", 10)
+    Test_TC_PRS_3_1_SimulatedSuite() : TestCommand("Test_TC_PRS_3_1_Simulated", 11)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -995,6 +1063,10 @@ private:
         switch (mTestIndex - 1)
         {
         case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -1054,6 +1126,19 @@ private:
         case 9: {
             LogStep(9, "Read attribute: Scale");
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::Scale::Id);
+        }
+        case 10: {
+            LogStep(10,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList.Commission "
+                    "DUT to TH again.");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -1248,7 +1333,7 @@ private:
 class Test_TC_PSCFG_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_PSCFG_3_1_SimulatedSuite() : TestCommand("Test_TC_PSCFG_3_1_Simulated", 2)
+    Test_TC_PSCFG_3_1_SimulatedSuite() : TestCommand("Test_TC_PSCFG_3_1_Simulated", 3)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -1280,6 +1365,10 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -1304,6 +1393,19 @@ private:
         case 1: {
             LogStep(1, "Read attribute: Sources");
             return WaitAttribute(GetEndpoint(0), PowerSourceConfiguration::Id, PowerSourceConfiguration::Attributes::Sources::Id);
+        }
+        case 2: {
+            LogStep(2,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList. Commission "
+                    "DUT to TH again.");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -1394,7 +1496,7 @@ private:
 class Test_TC_SWTCH_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_SWTCH_3_1_SimulatedSuite() : TestCommand("Test_TC_SWTCH_3_1_Simulated", 4)
+    Test_TC_SWTCH_3_1_SimulatedSuite() : TestCommand("Test_TC_SWTCH_3_1_Simulated", 5)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -1423,6 +1525,10 @@ private:
         switch (mTestIndex - 1)
         {
         case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -1458,6 +1564,19 @@ private:
         case 3: {
             LogStep(3, "Read MultiPressMax attribute");
             return WaitAttribute(GetEndpoint(0), Switch::Id, Switch::Attributes::MultiPressMax::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList. Commission "
+                    "DUT to TH again.");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
