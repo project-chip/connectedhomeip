@@ -87,6 +87,9 @@ K32W0FactoryDataProvider::K32W0FactoryDataProvider()
     maxLengths[FactoryDataId::kHardwareVersionId]    = sizeof(uint16_t);
     maxLengths[FactoryDataId::kHardwareVersionStrId] = ConfigurationManager::kMaxHardwareVersionStringLength;
     maxLengths[FactoryDataId::kUniqueId]             = ConfigurationManager::kMaxUniqueIDLength;
+    maxLengths[FactoryDataId::kPartNumber]           = ConfigurationManager::kMaxPartNumberLength;
+    maxLengths[FactoryDataId::kProductURL]           = ConfigurationManager::kMaxProductURLLength;
+    maxLengths[FactoryDataId::kProductLabel]         = ConfigurationManager::kMaxProductLabelLength;
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::Init()
@@ -345,17 +348,29 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductId(uint16_t & productId)
 
 CHIP_ERROR K32W0FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kPartNumber, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductURL, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductLabel, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
