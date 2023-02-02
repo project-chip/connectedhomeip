@@ -690,13 +690,20 @@ class TestStep:
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                response_type_name = self._test.response_mapping.get(
-                    expected_name)
                 if received_value is None or expected_name not in received_value:
                     received_value = None
                 else:
                     received_value = received_value.get(
                         expected_name) if received_value else None
+
+                if self._test.response_mapping:
+                    response_type_name = self._test.response_mapping.get(
+                        expected_name)
+                else:
+                    # We don't have a mapping for this type. This happens for pseduo clusters.
+                    # If there is a constraint check for the type it is likely an incorrect
+                    # constraint check by the test writter.
+                    response_type_name = None
 
             constraints = get_constraints(value['constraints'])
 
