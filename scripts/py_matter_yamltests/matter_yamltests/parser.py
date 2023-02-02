@@ -700,7 +700,7 @@ class TestStep:
                     response_type_name = self._test.response_mapping.get(
                         expected_name)
                 else:
-                    # We don't have a mapping for this type. This happens for pseduo clusters.
+                    # We don't have a mapping for this type. This happens for pseudo clusters.
                     # If there is a constraint check for the type it is likely an incorrect
                     # constraint check by the test writter.
                     response_type_name = None
