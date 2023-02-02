@@ -217,6 +217,34 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
     int argumentsPosition = isGlobalCommand ? 4 : 3;
     if (!command->InitArguments(argc - argumentsPosition, &argv[argumentsPosition]))
     {
+        if (interactive)
+        {
+            // Check for arguments with a starting '"' but no ending '"': those
+            // would indicate that people are using double-quoting, not single
+            // quoting, on arguments with spaces.
+            for (int curArg = argumentsPosition; curArg < argc - argumentsPosition; ++curArg)
+            {
+                char * arg = argv[curArg];
+                if (!arg)
+                {
+                    continue;
+                }
+
+                auto len = strlen(arg);
+                if (len == 0)
+                {
+                    continue;
+                }
+
+                if (arg[0] == '"' && arg[len - 1] != '"')
+                {
+                    ChipLogError(chipTool,
+                                 "Mismatched '\"' detected in argument: '%s'.  Use single quotes to delimit arguments with spaces "
+                                 "in them: 'x y', not \"x y\".",
+                                 arg);
+                }
+            }
+        }
         ShowCommand(argv[0], argv[1], command);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
