@@ -27,6 +27,8 @@ constexpr const char * kEventIdKey        = "eventId";
 constexpr const char * kCommandIdKey      = "commandId";
 constexpr const char * kErrorIdKey        = "error";
 constexpr const char * kClusterErrorIdKey = "clusterError";
+constexpr const char * kValueKey          = "value";
+constexpr const char * kNodeIdKey         = "nodeId";
 
 namespace {
 RemoteDataModelLoggerDelegate * gDelegate;
@@ -142,10 +144,24 @@ CHIP_ERROR LogErrorAsJSON(const chip::app::EventHeader & header, const chip::app
 
 CHIP_ERROR LogErrorAsJSON(const CHIP_ERROR & error)
 {
+    VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
+
     Json::Value value;
     chip::app::StatusIB status;
     status.InitFromChipError(error);
     return LogError(value, status);
+}
+
+CHIP_ERROR LogGetCommissionerNodeId(chip::NodeId value)
+{
+    VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
+
+    Json::Value rootValue;
+    rootValue[kValueKey]             = Json::Value();
+    rootValue[kValueKey][kNodeIdKey] = value;
+
+    auto valueStr = chip::JsonToString(rootValue);
+    return gDelegate->LogJSON(valueStr.c_str());
 }
 
 void SetDelegate(RemoteDataModelLoggerDelegate * delegate)

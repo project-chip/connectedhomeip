@@ -108,6 +108,8 @@ public:
         return mDelegate != nullptr ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
     }
 
+    bool IsInitialized() override { return Resolver::Instance().IsInitialized(); }
+
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override
     {
         if (mDelegate != nullptr)

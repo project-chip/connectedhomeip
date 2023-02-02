@@ -32,6 +32,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeId
+
     - label: "TP2 - Write ACL giving admin privilege on all EP0"
       command: "writeAttribute"
       attribute: "ACL"

@@ -19,3 +19,4 @@ chip_enable_openthread = false
 import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
 
 chip_enable_ota_requestor = true
+app_data_model = "${chip_root}/examples/light-switch-app/light-switch-common"

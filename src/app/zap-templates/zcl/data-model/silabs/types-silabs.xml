@@ -43,42 +43,6 @@ limitations under the License.
     <field name="MasterZoneDst" mask="0x4"/>
     <field name="Superseding" mask="0x8"/>
   </bitmap>
-  <bitmap name="BallastStatus" type="BITMAP8">
-    <field name="NonOperational" mask="0x1"/>
-    <field name="LampNotInSocket" mask="0x2"/>
-  </bitmap>
-  <bitmap name="LampAlarmMode" type="BITMAP8">
-    <field name="lampBurnHours" mask="0x1"/>
-  </bitmap>
-  <bitmap name="Occupancy" type="BITMAP8">
-    <field name="occupied" mask="0x1"/>
-  </bitmap>
-  <bitmap name="IasZoneStatus" type="BITMAP16">
-    <cluster code="0x0500"/>
-    <cluster code="0x0501"/>
-    <field name="alarm1" mask="0x1"/>
-    <field name="alarm2" mask="0x2"/>
-    <field name="tamper" mask="0x4"/>
-    <field name="battery" mask="0x8"/>
-    <field name="supervisionReports" mask="0x10"/>
-    <field name="restoreReports" mask="0x20"/>
-    <field name="trouble" mask="0x40"/>
-    <field name="AC" mask="0x80"/>
-    <field name="test" mask="0x100"/>
-    <field name="batteryDefect" mask="0x200"/>
-  </bitmap>
-  <bitmap name="WarningInfo" type="BITMAP8">
-    <cluster code="0x0502"/>
-    <field name="mode" mask="0xf0"/>
-    <field name="strobe" mask="0x0c"/>
-    <field name="sirenLevel" mask="0x03"/>
-  </bitmap>
-  <bitmap name="SquawkInfo" type="BITMAP8">
-    <cluster code="0x0502"/>
-    <field name="mode" mask="0xf0"/>
-    <field name="strobe" mask="0x08"/>
-    <field name="level" mask="0x03"/>
-  </bitmap>
   <enum name="OperatingMode" type="ENUM8">
     <item name="normal" value="0x0"/>
     <item name="configure" value="0x1"/>
@@ -119,22 +83,6 @@ limitations under the License.
     <item name="Off" value="0x1"/>
     <item name="Toggle" value="0x2"/>
   </enum>
-  <enum name="FanMode" type="ENUM8">
-    <item name="off" value="0x0"/>
-    <item name="low" value="0x1"/>
-    <item name="medium" value="0x2"/>
-    <item name="high" value="0x3"/>
-    <item name="on" value="0x4"/>
-    <item name="auto" value="0x5"/>
-    <item name="smart" value="0x6"/>
-  </enum>
-  <enum name="FanModeSequence" type="ENUM8">
-    <item name="LowMedHigh" value="0x0"/>
-    <item name="lowHigh" value="0x1"/>
-    <item name="LowMedHighAuto" value="0x2"/>
-    <item name="lowHighAuto" value="0x3"/>
-    <item name="onAuto" value="0x4"/>
-  </enum>
   <enum name="RelativeHumidityMode" type="ENUM8">
     <item name="measureLocally" value="0x0"/>
     <item name="updatedOverTheNetwork" value="0x1"/>
@@ -147,34 +95,11 @@ limitations under the License.
     <item name="notDisplayed" value="0x0"/>
     <item name="displayed" value="0x1"/>
   </enum>
-  <enum name="TemperatureDisplayMode" type="ENUM8">
-    <item name="celsius" value="0x0"/>
-    <item name="fahrenheit" value="0x1"/>
-  </enum>
-  <enum name="KeypadLockout" type="ENUM8">
-    <item name="noLockout" value="0x0"/>
-    <item name="levelOneLockout" value="0x1"/>
-    <item name="levelTwoLockout" value="0x2"/>
-    <item name="levelThreeLockout" value="0x3"/>
-    <item name="levelFourLockout" value="0x4"/>
-    <item name="levelfiveLockout" value="0x5"/>
-  </enum>
   <enum name="LevelStatus" type="ENUM8">
     <item name="OnTarget" value="0x0"/>
     <item name="BelowTarget" value="0x1"/>
     <item name="AboveTarget" value="0x2"/>
   </enum>
-  <enum name="OccupancySensorType" type="ENUM8">
-    <item name="PIR" value="0x0"/>
-    <item name="Ultrasonic" value="0x1"/>
-    <item name="pirAndUltrasonic" value="0x2"/>
-    <item name="physicalContact" value="0x3"/>
-  </enum>
-  <bitmap name="OccupancySensorTypeBitmap" type="BITMAP8">
-    <field name="Pir" mask="0x01"/>
-    <field name="Ultrasonic" mask="0x02"/>
-    <field name="PhysicalContact" mask="0x04"/>
-  </bitmap>
   <enum name="WarningMode" type="ENUM8">
     <item name="stop" value="0x0"/>
     <item name="burglar" value="0x1"/>
@@ -344,120 +269,6 @@ limitations under the License.
   <enum name="TimeEncoding" type="ENUM8">
     <item name="Relative" value="0x00"/>
     <item name="Absolute" value="0x40"/>
-  </enum>
-  <enum name="DoorLockState" type="ENUM8">
-    <item name="NotFullyLocked" value="0x00"/>
-    <item name="Locked" value="0x01"/>
-    <item name="Unlocked" value="0x02"/>
-  </enum>
-  <enum name="DoorLockSoundVolume" type="ENUM8">
-    <item name="Silent" value="0x00"/>
-    <item name="Low" value="0x01"/>
-    <item name="High" value="0x02"/>
-  </enum>
-  <enum name="DoorLockType" type="ENUM8">
-    <item name="DeadBolt" value="0x00"/>
-    <item name="Magnetic" value="0x01"/>
-    <item name="Mortise" value="0x02"/>
-    <item name="Rim" value="0x03"/>
-    <item name="LatchBolt" value="0x04"/>
-    <item name="Cylindrical" value="0x05"/>
-    <item name="Tubular" value="0x06"/>
-    <item name="Interconnected" value="0x07"/>
-    <item name="DeadLatch" value="0x08"/>
-    <item name="Other" value="0x09"/>
-  </enum>
-  <enum name="DoorState" type="ENUM8">
-    <item name="Open" value="0x00"/>
-    <item name="Closed" value="0x01"/>
-    <item name="ErrorJammed" value="0x02"/>
-    <item name="ErrorForcedOpen" value="0x03"/>
-    <item name="ErrorUnspecified" value="0x04"/>
-  </enum>
-  <enum name="DoorLockOperatingMode" type="ENUM8">
-    <item name="NormalMode" value="0x00"/>
-    <item name="VacationMode" value="0x01"/>
-    <item name="PrivacyMode" value="0x02"/>
-    <item name="NoRfLockOrUnlock" value="0x03"/>
-    <item name="LocalProgrammingMode" value="0x04"/>
-    <item name="PassageMode" value="0x05"/>
-  </enum>
-  <enum name="DoorLockSecurityLevel" type="ENUM8">
-    <item name="NetworkSecurity" value="0x00"/>
-    <item name="ApsSecurity" value="0x01"/>
-  </enum>
-  <enum name="DoorLockUserStatus" type="ENUM8">
-    <cluster code="0x0101"/>
-    <item name="Available" value="0x00"/>
-    <item name="OccupiedEnabled" value="0x01"/>
-    <item name="OccupiedDisabled" value="0x03"/>
-    <item name="NotSupported" value="0xFF"/>
-  </enum>
-  <enum name="DoorLockUserType" type="ENUM8">
-    <cluster code="0x0101"/>
-    <item name="Unrestricted" value="0x00"/>
-    <item name="YearDayScheduleUser" value="0x01"/>
-    <item name="WeekDayScheduleUser" value="0x02"/>
-    <item name="MasterUser" value="0x03"/>
-    <item name="NonAccessUser" value="0x04"/>
-    <item name="NotSupported" value="0xFF"/>
-  </enum>
-  <bitmap name="DoorLockDayOfWeek" type="BITMAP8">
-    <cluster code="0x0101"/>
-    <field name="Sunday" mask="0x01"/>
-    <field name="Monday" mask="0x02"/>
-    <field name="Tuesday" mask="0x04"/>
-    <field name="Wednesday" mask="0x08"/>
-    <field name="Thursday" mask="0x10"/>
-    <field name="Friday" mask="0x20"/>
-    <field name="Saturday" mask="0x40"/>
-  </bitmap>
-  <enum name="DoorLockEventType" type="ENUM8">
-    <item name="Operation" value="0x00"/>
-    <item name="Programming" value="0x01"/>
-    <item name="Alarm" value="0x02"/>
-  </enum>
-  <enum name="DoorLockEventSource" type="ENUM8">
-    <item name="Keypad" value="0x00"/>
-    <item name="Rf" value="0x01"/>
-    <item name="Manual" value="0x02"/>
-    <item name="Rfid" value="0x03"/>
-    <item name="Indeterminate" value="0xFF"/>
-  </enum>
-  <enum name="DoorLockSetPinOrIdStatus" type="ENUM8">
-    <cluster code="0x0101"/>
-    <item name="Success" value="0x00"/>
-    <item name="GeneralFailure" value="0x01"/>
-    <item name="MemoryFull" value="0x02"/>
-    <item name="DuplicateCodeError" value="0x03"/>
-  </enum>
-  <enum name="DoorLockOperationEventCode" type="ENUM8">
-    <cluster code="0x0101"/>
-    <item name="UnknownOrMfgSpecific" value="0x00"/>
-    <item name="Lock" value="0x01"/>
-    <item name="Unlock" value="0x02"/>
-    <item name="LockInvalidPinOrId" value="0x03"/>
-    <item name="LockInvalidSchedule" value="0x04"/>
-    <item name="UnlockInvalidPinOrId" value="0x05"/>
-    <item name="UnlockInvalidSchedule" value="0x06"/>
-    <item name="OneTouchLock" value="0x07"/>
-    <item name="KeyLock" value="0x08"/>
-    <item name="KeyUnlock" value="0x09"/>
-    <item name="AutoLock" value="0x0A"/>
-    <item name="ScheduleLock" value="0x0B"/>
-    <item name="ScheduleUnlock" value="0x0C"/>
-    <item name="ManualLock" value="0x0D"/>
-    <item name="ManualUnlock" value="0x0E"/>
-  </enum>
-  <enum name="DoorLockProgrammingEventCode" type="ENUM8">
-    <cluster code="0x0101"/>
-    <item name="UnknownOrMfgSpecific" value="0x00"/>
-    <item name="MasterCodeChanged" value="0x01"/>
-    <item name="PinAdded" value="0x02"/>
-    <item name="PinDeleted" value="0x03"/>
-    <item name="PinChanged" value="0x04"/>
-    <item name="IdAdded" value="0x05"/>
-    <item name="IdDeleted" value="0x06"/>
   </enum>
   <enum name="ProductTypeId" type="ENUM16">
     <item name="WhiteGoods" value="0x0000"/>

@@ -20,6 +20,9 @@ config:
     discriminator:
         type: int16u
         defaultValue: 3840
+    shortDiscriminator:
+        type: int16u
+        defaultValue: 15
     vendorId:
         type: int16u
         defaultValue: 65521
@@ -146,7 +149,7 @@ tests:
       arguments:
           values:
               - name: "value"
-                value: discriminator
+                value: shortDiscriminator
 
     - label: "Check Commissioning Mode (_CM)"
       cluster: "DiscoveryCommands"

@@ -34,7 +34,6 @@ declare_args() {
   enable_openthread_cli = true
 
   kvs_max_entries = 75
-  use_external_flash = true
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -42,20 +41,6 @@ declare_args() {
 
   # Enable Segger System View
   use_system_view = false
-}
-
-# Explorer Kit and MGM240L do not have external flash
-if (silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
-  use_external_flash = false
-}
-
-# Enable LEDs by default
-use_wstk_leds = true
-
-# Board does not support LEDs and Buttons at the same time
-if (silabs_board == "BRD4317A" || silabs_board == "BRD4316A" ||
-    silabs_board == "BRD4319A") {
-  use_wstk_leds = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")

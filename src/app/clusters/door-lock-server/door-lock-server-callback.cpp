@@ -195,3 +195,39 @@ emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayInd
 void __attribute__((weak))
 emberAfPluginDoorLockLockoutStarted(chip::EndpointId endpointId, chip::System::Clock::Timestamp lockoutEndTime)
 {}
+
+bool __attribute__((weak))
+emberAfPluginDoorLockGetNumberOfFingerprintCredentialsSupported(chip::EndpointId endpointId, uint16_t & maxNumberOfCredentials)
+{
+    return false;
+}
+
+bool __attribute__((weak))
+emberAfPluginDoorLockGetNumberOfFingerVeinCredentialsSupported(chip::EndpointId endpointId, uint16_t & maxNumberOfCredentials)
+{
+    return false;
+}
+
+bool __attribute__((weak))
+emberAfPluginDoorLockGetNumberOfFaceCredentialsSupported(chip::EndpointId endpointId, uint16_t & maxNumberOfCredentials)
+{
+    return false;
+}
+
+bool __attribute__((weak))
+emberAfPluginDoorLockGetFingerprintCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen)
+{
+    return false;
+}
+
+bool __attribute__((weak))
+emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen)
+{
+    return false;
+}
+
+bool __attribute__((weak))
+emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen)
+{
+    return false;
+}

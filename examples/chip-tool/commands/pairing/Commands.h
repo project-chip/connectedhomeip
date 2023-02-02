@@ -21,6 +21,7 @@
 #include "commands/common/Commands.h"
 #include "commands/pairing/CloseSessionCommand.h"
 #include "commands/pairing/CommissionedListCommand.h"
+#include "commands/pairing/GetCommissionerNodeIdCommand.h"
 #include "commands/pairing/OpenCommissioningWindowCommand.h"
 #include "commands/pairing/PairingCommand.h"
 
@@ -220,6 +221,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
         make_unique<CloseSessionCommand>(credsIssuerConfig),
+        make_unique<GetCommissionerNodeIdCommand>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);
