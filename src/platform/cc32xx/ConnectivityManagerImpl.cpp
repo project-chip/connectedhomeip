@@ -201,7 +201,7 @@ void ConnectivityManagerImpl::_OnIpAcquired(intptr_t arg)
 {
     cc32xxLog("ConnectivityManagerImpl::OnIpAcquired() : Start DNS Server");
     ChipDeviceEvent event;
-    event.Type = DeviceEventType::kInterfaceIpAddressChanged;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
     PlatformMgr().PostEventOrDie(&event);
 }

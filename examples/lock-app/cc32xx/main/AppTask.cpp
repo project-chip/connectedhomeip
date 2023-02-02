@@ -31,11 +31,11 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <examples/platform/cc32xx/CC32XXDeviceAttestationCreds.h>
 
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <CHIPDeviceManager.h>
-#include <DeviceCallbacks.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
