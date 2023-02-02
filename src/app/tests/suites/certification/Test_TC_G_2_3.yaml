@@ -336,7 +336,7 @@ tests:
       verification: |
           ./chip-tool groups get-group-membership [] 1 0
 
-          Verify the "grouplist" entries are in the inclusive range of 0x0001 - 0xffff and Capacity is in the inclusive range of 0 to 254 or null 
+          Verify the "grouplist" entries are in the inclusive range of 0x0001 - 0xffff and Capacity is in the inclusive range of 0 to 254 or null
           on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
 
@@ -357,7 +357,7 @@ tests:
           ./chip-tool groups get-group-membership [0002] 1 0
 
 
-          Verify the "grouplist" entry has one item 0x0002 and Capacity is in the inclusive range of 0 to 254 or null 
+          Verify the "grouplist" entry has one item 0x0002 and Capacity is in the inclusive range of 0 to 254 or null
           on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1653294426.515523][3638:3643] CHIP:TOO:   GetGroupMembershipResponse: {
@@ -375,7 +375,7 @@ tests:
       verification: |
           ./chip-tool groups get-group-membership [0002,0003] 1 0
 
-          Verify the "grouplist" entries has 2 items 0x0002 , 0x0003 and Capacity is in the inclusive range of 0 to 254 or null 
+          Verify the "grouplist" entries has 2 items 0x0002 , 0x0003 and Capacity is in the inclusive range of 0 to 254 or null
           on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1653294490.030740][3646:3651] CHIP:TOO:   GetGroupMembershipResponse: {
@@ -524,8 +524,8 @@ tests:
 
           ./chip-tool groups  add-group-if-identifying 0x0009 gp9 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
-                          
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
           [1674551849.597991][21000:21002] CHIP:DMG:                                 StatusIB =
           [1674551849.597995][21000:21002] CHIP:DMG:                                 {
           [1674551849.597998][21000:21002] CHIP:DMG:                                         status = 0x00 (SUCCESS),

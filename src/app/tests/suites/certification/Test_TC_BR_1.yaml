@@ -676,7 +676,7 @@ tests:
           which is an actuator (e.g. light, window covering)"
       PICS: MCORE.BRIDGE
       verification: |
-          From Step 5 output , choose one of the device type and identify the device from the device library. 
+          From Step 5 output , choose one of the device type and identify the device from the device library.
           For Ex: on-off cluster has been taken as example to run tfurther steps
       disabled: true
 
