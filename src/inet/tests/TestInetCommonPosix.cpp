@@ -447,9 +447,16 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         System::Clock::Milliseconds32(aSleepTimeMilliseconds), [](System::Layer *, void *) -> void {}, nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if 0
     gSystemLayer.PrepareEvents();
     gSystemLayer.WaitForEvents();
     gSystemLayer.HandleEvents();
+#else
+    // mlepage changing... need to call platform RunEventLoop, which already calls those 3 functions
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

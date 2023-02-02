@@ -1300,6 +1300,8 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     TLV::TLVReader decryptedDataTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ HandleSigma3a");
+
     const uint8_t * buf   = msg->Start();
     const uint16_t bufLen = msg->DataLength();
 
@@ -1463,6 +1465,8 @@ void CASESession::HandleSigma3b(Sigma3Work & work)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ HandleSigma3b");
+
     // Step 5/6
     // Validate initiator identity located in msg->Start()
     // Constructing responder identity
@@ -1511,6 +1515,8 @@ CHIP_ERROR CASESession::HandleSigma3c(Sigma3Work & work)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     bool ignoreFailure = true;
+
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ HandleSigma3c");
 
     // Special case: if for whatever reason not in expected state or sequence,
     // don't do anything, including sending a status report or aborting the

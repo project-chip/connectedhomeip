@@ -75,6 +75,8 @@ CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
     mReadFD  = fds[FD_READ];
     mWriteFD = fds[FD_WRITE];
 
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ WakeEvent::Open &systemLayer %p %d %d", &systemLayer, mReadFD, mWriteFD);
+
     ReturnErrorOnFailure(systemLayer.StartWatchingSocket(mReadFD, &mReadWatch));
     ReturnErrorOnFailure(systemLayer.SetCallback(mReadWatch, Confirm, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(systemLayer.RequestCallbackOnPendingRead(mReadWatch));
@@ -111,6 +113,8 @@ void WakeEvent::Confirm() const
 CHIP_ERROR WakeEvent::Notify() const
 {
     char byte = 1;
+
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ WakeEvent::Notify %d %d", mReadFD, mWriteFD);
 
     if (::write(mWriteFD, &byte, 1) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {

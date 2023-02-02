@@ -395,6 +395,8 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ SecurePairingHandshakeTestCommon &ctx.GetSystemLayer() %p", &ctx.GetSystemLayer());
+
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;

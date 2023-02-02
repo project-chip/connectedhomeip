@@ -32,6 +32,10 @@ CHIP_ERROR IOContext::Init()
     CHIP_ERROR err = Platform::MemoryInit();
     chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationMgrImpl());
 
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ IOContext::Init &GetSystemLayer() %p", &GetSystemLayer());
+    chip::DeviceLayer::SetSystemLayerForTesting(&gSystemLayer);
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ IOContext::Init &gSystemLayer %p", &gSystemLayer);
+
     gSystemLayer.Init();
 
     InitNetwork();
