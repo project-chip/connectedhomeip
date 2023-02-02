@@ -30,8 +30,7 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <src/platform/nxp/k32w/k32w0/DefaultTestEventTriggerDelegate.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
 
@@ -922,8 +921,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = !LightingMgr().IsTurnedOff();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
@@ -940,7 +938,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     bool onoffAttrValue = 0;
 
     /* get onoff attribute value */
-    (void) emberAfReadAttribute(1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoffAttrValue, 1);
+    (void) app::Clusters::OnOff::Attributes::OnOff::Get(1, &onoffAttrValue);
 
     /* set the device state */
     sLightLED.Set(onoffAttrValue);

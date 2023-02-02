@@ -62,6 +62,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -106,6 +107,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -132,6 +134,7 @@ tests:
               maxValue: 19660
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -158,6 +161,7 @@ tests:
               maxValue: 15073
 
     - label: "Wait 5s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -222,6 +226,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -271,6 +276,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -311,6 +317,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -351,6 +358,7 @@ tests:
                 value: 1
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -414,6 +422,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -463,6 +472,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -507,6 +517,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -547,6 +558,7 @@ tests:
                 value: 1
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

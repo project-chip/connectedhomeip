@@ -23,7 +23,10 @@ get_filename_component(SHELL_COMMON ${CHIP_ROOT}/examples/shell/shell_common REA
 
 list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 
-set(APP_TARGET chip-openiotsdk-shell-example)
+set(APP_TARGET chip-openiotsdk-shell-example_ns)
+
+set(TFM_SUPPORT YES)
+set(TFM_NS_APP_VERSION "0.0.1")
 
 # Toolchain files need to exist before first call to project
 include(toolchain)
@@ -64,7 +67,7 @@ target_include_directories(${APP_TARGET}
 
 target_sources(${APP_TARGET} 
     PRIVATE
-        main/main.cpp
+        main/main_ns.cpp
         ${SHELL_COMMON}/cmd_misc.cpp
         ${SHELL_COMMON}/globals.cpp
 )
@@ -75,3 +78,5 @@ target_link_libraries(${APP_TARGET}
 
 include(linker)
 set_target_link(${APP_TARGET})
+
+sdk_post_build(${APP_TARGET})

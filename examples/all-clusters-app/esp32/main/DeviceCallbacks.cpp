@@ -27,8 +27,8 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/basic-types.h>
@@ -124,7 +124,9 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 
 void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    using namespace app::Clusters::OnOff::Attributes;
+
+    VerifyOrExit(attributeId == OnOff::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
@@ -137,10 +139,12 @@ exit:
 
 void AppDeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
+    using namespace app::Clusters::LevelControl::Attributes;
+
     bool onOffState    = mEndpointOnOffState[endpointId - 1];
     uint8_t brightness = onOffState ? *value : 0;
 
-    VerifyOrExit(attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == CurrentLevel::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
@@ -155,24 +159,23 @@ exit:
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
 void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID ||
-                     attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+    using namespace app::Clusters::ColorControl::Attributes;
+
+    VerifyOrExit(attributeId == CurrentHue::Id || attributeId == CurrentSaturation::Id,
                  ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (endpointId == 1)
     {
         uint8_t hue, saturation;
-        if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+        if (attributeId == CurrentHue::Id)
         {
             hue = *value;
-            emberAfReadServerAttribute(endpointId, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                       &saturation, sizeof(uint8_t));
+            CurrentSaturation::Get(endpointId, &saturation);
         }
         else
         {
             saturation = *value;
-            emberAfReadServerAttribute(endpointId, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
-                                       sizeof(uint8_t));
+            CurrentHue::Get(endpointId, &hue);
         }
         statusLED1.SetColor(hue, saturation);
     }

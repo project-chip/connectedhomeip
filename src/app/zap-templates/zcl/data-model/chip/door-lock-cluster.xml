@@ -238,7 +238,6 @@ limitations under the License.
         <!-- Conformance feature WDSCH - for now optional -->
         <command source="server" code="12" name="GetWeekDayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the weekly repeating schedule data for the specified schedule index.</description>
-            <access op="invoke" role="administer" />
             <arg name="WeekDayIndex" type="INT8U" />
             <arg name="UserIndex" type="INT16U" />
             <arg name="Status" type="DlStatus" />
@@ -274,7 +273,6 @@ limitations under the License.
         <!-- Conformance feature YDSCH - for now optional -->
         <command source="server" code="15" name="GetYearDayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
-            <access op="invoke" role="administer" />
             <arg name="YearDayIndex" type="INT8U" />
             <arg name="UserIndex" type="INT16U" />
             <arg name="Status" type="DlStatus" />
@@ -306,7 +304,6 @@ limitations under the License.
         <!-- Conformance feature HDSCH - for now optional -->
         <command source="server" code="18" name="GetHolidayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the Holiday Schedule Entry for the specified Holiday ID.</description>
-            <access op="invoke" role="administer" />
             <arg name="HolidayIndex" type="INT8U" />
             <arg name="Status" type="DlStatus" />
             <arg name="LocalStartTime" type="epoch_s" optional="true" />
@@ -340,7 +337,6 @@ limitations under the License.
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="28" name="GetUserResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the User for the specified UserIndex.</description>
-            <access op="invoke" role="administer" />
             <arg name="UserIndex" type="INT16U" />
             <arg name="UserName" type="CHAR_STRING" isNullable="true" />
             <arg name="UserUniqueID" type="INT32U" isNullable="true" />
@@ -372,7 +368,6 @@ limitations under the License.
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="35" name="SetCredentialResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the status for setting the specified credential.</description>
-            <access op="invoke" role="administer" />
             <arg name="Status" type="DlStatus" />
             <arg name="UserIndex" type="INT16U" isNullable="true" />
             <arg name="NextCredentialIndex" type="INT16U" isNullable="true" />
@@ -386,7 +381,6 @@ limitations under the License.
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="37" name="GetCredentialStatusResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the status for the specified credential.</description>
-            <access op="invoke" role="administer" />
             <arg name="CredentialExists" type="boolean" />
             <arg name="UserIndex" type="INT16U" isNullable="true" />
             <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />
@@ -762,5 +756,72 @@ limitations under the License.
         <field name="Notification" mask="0x200" />
         <field name="Year Day Access Schedules" mask="0x400" />
         <field name="Holiday Schedules" mask="0x800" />
+    </bitmap>
+
+    <enum name="DoorLockSetPinOrIdStatus" type="ENUM8">
+        <cluster code="0x0101"/>
+        <item name="Success" value="0x00"/>
+        <item name="GeneralFailure" value="0x01"/>
+        <item name="MemoryFull" value="0x02"/>
+        <item name="DuplicateCodeError" value="0x03"/>
+    </enum>
+
+    <enum name="DoorLockOperationEventCode" type="ENUM8">
+        <cluster code="0x0101"/>
+        <item name="UnknownOrMfgSpecific" value="0x00"/>
+        <item name="Lock" value="0x01"/>
+        <item name="Unlock" value="0x02"/>
+        <item name="LockInvalidPinOrId" value="0x03"/>
+        <item name="LockInvalidSchedule" value="0x04"/>
+        <item name="UnlockInvalidPinOrId" value="0x05"/>
+        <item name="UnlockInvalidSchedule" value="0x06"/>
+        <item name="OneTouchLock" value="0x07"/>
+        <item name="KeyLock" value="0x08"/>
+        <item name="KeyUnlock" value="0x09"/>
+        <item name="AutoLock" value="0x0A"/>
+        <item name="ScheduleLock" value="0x0B"/>
+        <item name="ScheduleUnlock" value="0x0C"/>
+        <item name="ManualLock" value="0x0D"/>
+        <item name="ManualUnlock" value="0x0E"/>
+    </enum>
+
+    <enum name="DoorLockProgrammingEventCode" type="ENUM8">
+        <cluster code="0x0101"/>
+        <item name="UnknownOrMfgSpecific" value="0x00"/>
+        <item name="MasterCodeChanged" value="0x01"/>
+        <item name="PinAdded" value="0x02"/>
+        <item name="PinDeleted" value="0x03"/>
+        <item name="PinChanged" value="0x04"/>
+        <item name="IdAdded" value="0x05"/>
+        <item name="IdDeleted" value="0x06"/>
+    </enum>
+
+    <enum name="DoorLockUserStatus" type="ENUM8">
+        <cluster code="0x0101"/>
+        <item name="Available" value="0x00"/>
+        <item name="OccupiedEnabled" value="0x01"/>
+        <item name="OccupiedDisabled" value="0x03"/>
+        <item name="NotSupported" value="0xFF"/>
+    </enum>
+
+    <enum name="DoorLockUserType" type="ENUM8">
+        <cluster code="0x0101"/>
+        <item name="Unrestricted" value="0x00"/>
+        <item name="YearDayScheduleUser" value="0x01"/>
+        <item name="WeekDayScheduleUser" value="0x02"/>
+        <item name="MasterUser" value="0x03"/>
+        <item name="NonAccessUser" value="0x04"/>
+        <item name="NotSupported" value="0xFF"/>
+    </enum>
+
+    <bitmap name="DoorLockDayOfWeek" type="BITMAP8">
+        <cluster code="0x0101"/>
+        <field name="Sunday" mask="0x01"/>
+        <field name="Monday" mask="0x02"/>
+        <field name="Tuesday" mask="0x04"/>
+        <field name="Wednesday" mask="0x08"/>
+        <field name="Thursday" mask="0x10"/>
+        <field name="Friday" mask="0x20"/>
+        <field name="Saturday" mask="0x40"/>
     </bitmap>
 </configurator>

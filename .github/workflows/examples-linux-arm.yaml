@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-crosscompile:0.6.34
+            image: connectedhomeip/chip-build-crosscompile:0.6.35
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -73,7 +73,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-arm64-chip-cert \
+                        --target linux-arm64-chip-cert-clang \
                         --target linux-arm64-all-clusters-clang \
                         --target linux-arm64-chip-tool-ipv6only-clang \
                         --target linux-arm64-lock-clang \

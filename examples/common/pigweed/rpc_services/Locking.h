@@ -21,7 +21,6 @@
 #include "app/util/attribute-storage.h"
 #include "locking_service/locking_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/PlatformManager.h>
 

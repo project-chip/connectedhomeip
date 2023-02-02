@@ -496,9 +496,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = @(0);
 
@@ -515,8 +515,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterAddSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
@@ -529,11 +529,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-                  NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+                  NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterAddSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterAddSceneResponseParams
 - (instancetype)init
@@ -542,9 +565,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -555,8 +578,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterAddSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -564,20 +587,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterAddSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterViewSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -588,8 +634,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterViewSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -599,10 +645,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterViewSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterViewSceneResponseParams
 - (instancetype)init
@@ -611,9 +680,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = nil;
 
@@ -630,8 +699,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterViewSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
@@ -643,20 +712,43 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-        NSStringFromClass([self class]), _status, _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+        stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+        NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterViewSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterRemoveSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -667,8 +759,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterRemoveSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -678,10 +770,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRemoveSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterRemoveSceneResponseParams
 - (instancetype)init
@@ -690,9 +805,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -703,8 +818,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterRemoveSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -712,18 +827,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRemoveSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterRemoveAllScenesParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -734,7 +872,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterRemoveAllScenesParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -743,10 +881,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRemoveAllScenesParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterRemoveAllScenesResponseParams
 - (instancetype)init
@@ -755,7 +906,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -766,7 +917,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterRemoveAllScenesResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -775,19 +926,32 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRemoveAllScenesResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterStoreSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -798,8 +962,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterStoreSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -809,10 +973,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterStoreSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterStoreSceneResponseParams
 - (instancetype)init
@@ -821,9 +1008,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -834,8 +1021,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterStoreSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -843,20 +1030,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterStoreSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterRecallSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = nil;
         _timedInvokeTimeoutMs = nil;
@@ -869,8 +1079,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterRecallSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -880,18 +1090,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; >",
-                                             NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; >",
+                                             NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRecallSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterGetSceneMembershipParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -902,7 +1135,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterGetSceneMembershipParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -911,10 +1144,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterGetSceneMembershipParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterGetSceneMembershipResponseParams
 - (instancetype)init
@@ -925,7 +1171,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _capacity = nil;
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _sceneList = nil;
         _timedInvokeTimeoutMs = nil;
@@ -939,7 +1185,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.status = self.status;
     other.capacity = self.capacity;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.sceneList = self.sceneList;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -948,20 +1194,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupId:%@; sceneList:%@; >",
-                                             NSStringFromClass([self class]), _status, _capacity, _groupId, _sceneList];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupID:%@; sceneList:%@; >",
+                                             NSStringFromClass([self class]), _status, _capacity, _groupID, _sceneList];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterGetSceneMembershipResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterEnhancedAddSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = @(0);
 
@@ -978,8 +1237,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterEnhancedAddSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
@@ -992,11 +1251,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-                  NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+                  NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterEnhancedAddSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterEnhancedAddSceneResponseParams
 - (instancetype)init
@@ -1005,9 +1287,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -1018,8 +1300,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterEnhancedAddSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -1027,20 +1309,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterEnhancedAddSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterEnhancedViewSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -1051,8 +1356,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterEnhancedViewSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -1062,10 +1367,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterEnhancedViewSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterEnhancedViewSceneResponseParams
 - (instancetype)init
@@ -1074,9 +1402,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = nil;
 
@@ -1093,8 +1421,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterEnhancedViewSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
@@ -1106,11 +1434,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-        NSStringFromClass([self class]), _status, _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+        stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+        NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterEnhancedViewSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterCopySceneParams
 - (instancetype)init
@@ -1119,13 +1470,13 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mode = @(0);
 
-        _groupIdFrom = @(0);
+        _groupIdentifierFrom = @(0);
 
-        _sceneIdFrom = @(0);
+        _sceneIdentifierFrom = @(0);
 
-        _groupIdTo = @(0);
+        _groupIdentifierTo = @(0);
 
-        _sceneIdTo = @(0);
+        _sceneIdentifierTo = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -1137,10 +1488,10 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterCopySceneParams alloc] init];
 
     other.mode = self.mode;
-    other.groupIdFrom = self.groupIdFrom;
-    other.sceneIdFrom = self.sceneIdFrom;
-    other.groupIdTo = self.groupIdTo;
-    other.sceneIdTo = self.sceneIdTo;
+    other.groupIdentifierFrom = self.groupIdentifierFrom;
+    other.sceneIdentifierFrom = self.sceneIdentifierFrom;
+    other.groupIdentifierTo = self.groupIdentifierTo;
+    other.sceneIdentifierTo = self.sceneIdentifierTo;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -1149,12 +1500,56 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mode:%@; groupIdFrom:%@; sceneIdFrom:%@; groupIdTo:%@; sceneIdTo:%@; >",
-                  NSStringFromClass([self class]), _mode, _groupIdFrom, _sceneIdFrom, _groupIdTo, _sceneIdTo];
+    NSString * descriptionString = [NSString
+        stringWithFormat:
+            @"<%@: mode:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; groupIdentifierTo:%@; sceneIdentifierTo:%@; >",
+        NSStringFromClass([self class]), _mode, _groupIdentifierFrom, _sceneIdentifierFrom, _groupIdentifierTo, _sceneIdentifierTo];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterCopySceneParams (Deprecated)
+
+- (void)setGroupIdFrom:(NSNumber * _Nonnull)groupIdFrom
+{
+    self.groupIdentifierFrom = groupIdFrom;
+}
+
+- (NSNumber * _Nonnull)groupIdFrom
+{
+    return self.groupIdentifierFrom;
+}
+
+- (void)setSceneIdFrom:(NSNumber * _Nonnull)sceneIdFrom
+{
+    self.sceneIdentifierFrom = sceneIdFrom;
+}
+
+- (NSNumber * _Nonnull)sceneIdFrom
+{
+    return self.sceneIdentifierFrom;
+}
+
+- (void)setGroupIdTo:(NSNumber * _Nonnull)groupIdTo
+{
+    self.groupIdentifierTo = groupIdTo;
+}
+
+- (NSNumber * _Nonnull)groupIdTo
+{
+    return self.groupIdentifierTo;
+}
+
+- (void)setSceneIdTo:(NSNumber * _Nonnull)sceneIdTo
+{
+    self.sceneIdentifierTo = sceneIdTo;
+}
+
+- (NSNumber * _Nonnull)sceneIdTo
+{
+    return self.sceneIdentifierTo;
+}
 @end
 @implementation MTRScenesClusterCopySceneResponseParams
 - (instancetype)init
@@ -1163,9 +1558,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupIdFrom = @(0);
+        _groupIdentifierFrom = @(0);
 
-        _sceneIdFrom = @(0);
+        _sceneIdentifierFrom = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -1176,8 +1571,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterCopySceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupIdFrom = self.groupIdFrom;
-    other.sceneIdFrom = self.sceneIdFrom;
+    other.groupIdentifierFrom = self.groupIdentifierFrom;
+    other.sceneIdentifierFrom = self.sceneIdentifierFrom;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -1185,11 +1580,34 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdFrom:%@; sceneIdFrom:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupIdFrom, _sceneIdFrom];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupIdentifierFrom, _sceneIdentifierFrom];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterCopySceneResponseParams (Deprecated)
+
+- (void)setGroupIdFrom:(NSNumber * _Nonnull)groupIdFrom
+{
+    self.groupIdentifierFrom = groupIdFrom;
+}
+
+- (NSNumber * _Nonnull)groupIdFrom
+{
+    return self.groupIdentifierFrom;
+}
+
+- (void)setSceneIdFrom:(NSNumber * _Nonnull)sceneIdFrom
+{
+    self.sceneIdentifierFrom = sceneIdFrom;
+}
+
+- (NSNumber * _Nonnull)sceneIdFrom
+{
+    return self.sceneIdentifierFrom;
+}
 @end
 @implementation MTROnOffClusterOffParams
 - (instancetype)init

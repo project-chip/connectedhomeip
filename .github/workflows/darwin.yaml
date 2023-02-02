@@ -52,22 +52,6 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
-            - name: Install zap
-              run: |
-                 sudo mkdir -p $ZAP_INSTALL_PATH
-                 sudo chown `whoami` $ZAP_INSTALL_PATH
-                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
-                      --output $ZAP_INSTALL_PATH/zap-mac.zip
-                 cd $ZAP_INSTALL_PATH
-                 unzip zap-mac.zip zap-cli
-                 rm zap-mac.zip
-                 ./zap-cli --version
-              env:
-                  # NOTE: Generally kept in sync within the repo using
-                  #       scripts/tools/zap/version_update.py
-                  # This is scoped to only the steps that don't use xcodebuild.
-                  ZAP_VERSION: v2023.01.19-nightly
-                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -79,6 +63,12 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+            - name: Block zap-cli from being used
+              # xcodebuild is NOT expected to require zap-cli
+              run: scripts/run_in_build_env.sh 'mv $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli.moved'
+            - name: Validate zap-cli is NOT available
+              # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
+              run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
             - name: Run iOS Build Debug
               timeout-minutes: 50
               working-directory: src/darwin/Framework
@@ -118,36 +108,22 @@ jobs:
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
+            - name: Make zap-cli work again
+              run: scripts/run_in_build_env.sh 'mv $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli.moved $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli'
+            - name: Validate zap-cli is again available
+              run: scripts/run_in_build_env.sh 'zap-cli --version'
             - name: Build example All Clusters Server
               timeout-minutes: 15
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
-              env:
-                  # NOTE: Generally kept in sync within the repo using
-                  #       scripts/tools/zap/version_update.py
-                  # This is scoped to only the steps that don't use xcodebuild.
-                  ZAP_VERSION: v2023.01.19-nightly
-                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
             - name: Build example OTA Provider
               timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
-              env:
-                  # NOTE: Generally kept in sync within the repo using
-                  #       scripts/tools/zap/version_update.py
-                  # This is scoped to only the steps that don't use xcodebuild.
-                  ZAP_VERSION: v2023.01.19-nightly
-                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
             - name: Build example OTA Requestor
               timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false
-              env:
-                  # NOTE: Generally kept in sync within the repo using
-                  #       scripts/tools/zap/version_update.py
-                  # This is scoped to only the steps that don't use xcodebuild.
-                  ZAP_VERSION: v2023.01.19-nightly
-                  ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true

@@ -52,7 +52,8 @@ target_sources(app PRIVATE
                src/binding-handler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp)
+               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
+               ${TELINK_COMMON}/util/src/PWMDevice.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

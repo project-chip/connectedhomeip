@@ -139,6 +139,8 @@ executable("darwin-framework-tool") {
     "commands/common/MTRLogging.h",
     "commands/pairing/Commands.h",
     "commands/pairing/DeviceControllerDelegateBridge.mm",
+    "commands/pairing/GetCommissionerNodeIdCommand.h",
+    "commands/pairing/GetCommissionerNodeIdCommand.mm",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.mm",
     "commands/pairing/PairingCommandBridge.mm",

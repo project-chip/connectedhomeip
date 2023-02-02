@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "InteractiveServer.h"
 #include "Options.h"
 
 #include <app/ConcreteAttributePath.h>
@@ -55,6 +56,8 @@ TestCommand * GetTargetTest()
 void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
+    VerifyOrReturn(!InteractiveServer::GetInstance().Command(commandPath));
+
     auto test = GetTargetTest();
     VerifyOrReturn(test != nullptr && test->isRunning);
 
@@ -66,6 +69,8 @@ void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & co
 
 void MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
+    VerifyOrReturn(!InteractiveServer::GetInstance().ReadAttribute(attributePath));
+
     auto test = GetTargetTest();
     VerifyOrReturn(test != nullptr && test->isRunning);
 
@@ -77,6 +82,8 @@ void MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & at
 
 void MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
+    VerifyOrReturn(!InteractiveServer::GetInstance().WriteAttribute(attributePath));
+
     auto test = GetTargetTest();
     VerifyOrReturn(test != nullptr && test->isRunning);
 

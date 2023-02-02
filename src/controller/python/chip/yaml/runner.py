@@ -27,10 +27,16 @@ import chip.yaml.format_converter as Converter
 import stringcase
 from chip import ChipDeviceCtrl
 from chip.clusters.Attribute import AttributeStatus, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
+from chip.exceptions import ChipStackError
 from chip.yaml.errors import ParsingError, UnexpectedParsingError
+from matter_yamltests.pseudo_clusters.clusters.delay_commands import DelayCommands
+from matter_yamltests.pseudo_clusters.clusters.log_commands import LogCommands
+from matter_yamltests.pseudo_clusters.clusters.system_commands import SystemCommands
+from matter_yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters
 
 from .data_model_lookup import *
 
+_PSEUDO_CLUSTERS = PseudoClusters([DelayCommands(), LogCommands(), SystemCommands()])
 logger = logging.getLogger('YamlParser')
 
 
@@ -74,9 +80,10 @@ class _ExecutionContext:
 class BaseAction(ABC):
     '''Interface for a single YAML action that is to be executed.'''
 
-    def __init__(self, label, identity):
-        self._label = label
-        self._identity = identity
+    def __init__(self, test_step):
+        self._label = test_step.label
+        self._identity = test_step.identity
+        self._pics_enabled = test_step.is_pics_enabled
 
     @property
     def label(self):
@@ -86,9 +93,25 @@ class BaseAction(ABC):
     def identity(self):
         return self._identity
 
+    @property
+    def pics_enabled(self):
+        return self._pics_enabled
+
     @abstractmethod
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
         pass
+
+
+class DefaultPseudoCluster(BaseAction):
+    def __init__(self, test_step):
+        super().__init__(test_step)
+        self._test_step = test_step
+        if not _PSEUDO_CLUSTERS.supports(test_step):
+            raise ParsingError(f'Default cluster {test_step.cluster} {test_step.command}, not supported')
+
+    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+        resp = asyncio.run(_PSEUDO_CLUSTERS.execute(self._test_step))
+        return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
 
 
 class InvokeAction(BaseAction):
@@ -106,7 +129,7 @@ class InvokeAction(BaseAction):
             action to perform for this write attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._busy_wait_ms = test_step.busy_wait_ms
         self._command_name = stringcase.pascalcase(test_step.command)
         self._cluster = cluster
@@ -167,7 +190,7 @@ class ReadAttributeAction(BaseAction):
             action to perform for this read attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._cluster = cluster
         self._endpoint = test_step.endpoint
@@ -208,6 +231,13 @@ class ReadAttributeAction(BaseAction):
                                                           fabricFiltered=self._fabric_filtered))
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
+        except ChipStackError as error:
+            _CHIP_TIMEOUT_ERROR = 50
+            if error.err == _CHIP_TIMEOUT_ERROR:
+                return _ActionResult(status=_ActionStatus.ERROR, response=error)
+            # For now it is unsure if all ChipStackError are supposed to be intentional.
+            # As a result we simply re-raise the error.
+            raise error
 
         return self.parse_raw_response(raw_resp)
 
@@ -235,8 +265,7 @@ class WaitForCommissioneeAction(BaseAction):
     ''' Wait for commissionee action to be executed.'''
 
     def __init__(self, test_step):
-        super().__init__(test_step.label, test_step.identity)
-        self._node_id = test_step.node_id
+        super().__init__(test_step)
         self._expire_existing_session = False
         # This is the default when no timeout is provided.
         _DEFAULT_TIMEOUT_MS = 10 * 1000
@@ -249,7 +278,13 @@ class WaitForCommissioneeAction(BaseAction):
         args = test_step.arguments['values']
         request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
 
-        self._expire_existing_session = request_data_as_dict.get('expireExistingSession', False)
+        # There's a chance the commissionee may have rebooted before this call here as part of a
+        # test flow or is just starting out fresh outright. Unless expireExistingSession is
+        # explicitly set, the default behaviour it to make sure we're not re-using any cached CASE
+        # sessions that will now be stale and mismatched with the peer, causing subsequent
+        # interactions to fail.
+        self._expire_existing_session = request_data_as_dict.get('expireExistingSession', True)
+        self._node_id = request_data_as_dict['nodeId']
         if 'timeout' in request_data_as_dict:
             # Timeout is provided in seconds we need to conver to milliseconds.
             self._timeout_ms = request_data_as_dict['timeout'] * 1000
@@ -357,7 +392,7 @@ class WriteAttributeAction(BaseAction):
             action to perform for this write attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._busy_wait_ms = test_step.busy_wait_ms
         self._cluster = cluster
@@ -421,7 +456,7 @@ class WaitForReportAction(BaseAction):
         Raises:
           UnexpectedParsingError: Raised if the expected queue does not exist.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._output_queue = context.subscription_callback_result_queue.get(self._attribute_name,
                                                                             None)
@@ -451,7 +486,7 @@ class CommissionerCommandAction(BaseAction):
         Raises:
           UnexpectedParsingError: Raised if the expected queue does not exist.
         '''
-        super().__init__(test_step.label, test_step.identity)
+        super().__init__(test_step)
         if test_step.command != 'PairWithCode':
             raise UnexpectedParsingError(f'Unexpected CommisionerCommand {test_step.command}')
 
@@ -574,6 +609,12 @@ class ReplTestRunner:
         except ParsingError:
             return None
 
+    def _default_pseudo_cluster(self, test_step):
+        try:
+            return DefaultPseudoCluster(test_step)
+        except ParsingError:
+            return None
+
     def encode(self, request) -> BaseAction:
         action = None
         cluster = request.cluster.replace(' ', '').replace('/', '')
@@ -601,6 +642,10 @@ class ReplTestRunner:
             action = self._invoke_action_factory(request, cluster)
 
         if action is None:
+            # Now we try to create a default pseudo cluster.
+            action = self._default_pseudo_cluster(request)
+
+        if action is None:
             logger.warn(f"Failed to parse {request.label}")
         return action
 
@@ -609,8 +654,8 @@ class ReplTestRunner:
         if result.response is None:
             # TODO Once yamltest and idl python packages are properly packaged as a single module
             # the type we are returning will be formalized. For now TestStep.post_process_response
-            # expects this particular case to be sent as a string.
-            return 'success' if result.status == _ActionStatus.SUCCESS else 'failure'
+            # expects this particular case to be sent an empty dict or a dict with an error.
+            return {} if result.status == _ActionStatus.SUCCESS else {'error': 'FAILURE'}
 
         response = result.response
 
@@ -623,7 +668,14 @@ class ReplTestRunner:
             decoded_response['error'] = stringcase.snakecase(response.name).upper()
             return decoded_response
 
+        if isinstance(response, ChipStackError):
+            decoded_response['error'] = 'FAILURE'
+            return decoded_response
+
         cluster_name = self._test_spec_definition.get_cluster_name(response.cluster_id)
+        if cluster_name is None:
+            raise Exception("Cannot find cluster name for id 0x%0X / %d" % (response.cluster_id, response.cluster_id))
+
         decoded_response['clusterId'] = cluster_name
 
         if hasattr(response, 'command_id'):

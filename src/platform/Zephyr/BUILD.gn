@@ -24,6 +24,8 @@ assert(chip_device_platform == "zephyr")
 static_library("Zephyr") {
   sources = [
     "../SingletonConfigurationManager.cpp",
+    "BLEAdvertisingArbiter.cpp",
+    "BLEAdvertisingArbiter.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",

@@ -449,7 +449,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeF
     using EnumType = PowerSource::BatChargeFault;
     switch (val)
     {
-    case EnumType::kUnspecfied:
+    case EnumType::kUnspecified:
     case EnumType::kAmbientTooHot:
     case EnumType::kAmbientTooCold:
     case EnumType::kBatteryTooHot:
@@ -524,7 +524,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::PowerSourc
     using EnumType = PowerSource::PowerSourceStatus;
     switch (val)
     {
-    case EnumType::kUnspecfied:
+    case EnumType::kUnspecified:
     case EnumType::kActive:
     case EnumType::kStandby:
     case EnumType::kUnavailable:
@@ -1520,17 +1520,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointAdj
     using EnumType = Thermostat::SetpointAdjustMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EnumType::kHeatSetpoint:
-    case EnumType::kCoolSetpoint:
-    case EnumType::kHeatAndCoolSetpoints:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_SETPOINT:
-    case EMBER_ZCL_SETPOINT_ADJUST_MODE_COOL_SETPOINT:
-    case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+    case EnumType::kHeat:
+    case EnumType::kCool:
+    case EnumType::kBoth:
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -1574,9 +1566,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatS
     case EnumType::kAuto:
     case EnumType::kCool:
     case EnumType::kHeat:
-    case EnumType::kEmergencyHeating:
+    case EnumType::kEmergencyHeat:
     case EnumType::kPrecooling:
     case EnumType::kFanOnly:
+    case EnumType::kDry:
+    case EnumType::kSleep:
         return val;
     default:
         return static_cast<EnumType>(2);

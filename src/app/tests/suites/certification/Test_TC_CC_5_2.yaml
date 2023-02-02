@@ -62,6 +62,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -84,6 +85,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -110,6 +112,7 @@ tests:
               maxValue: 31100
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -136,6 +139,7 @@ tests:
               maxValue: 32200
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

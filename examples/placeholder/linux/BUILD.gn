@@ -31,6 +31,7 @@ chip_data_model("configuration") {
 config("includes") {
   include_dirs = [
     ".",
+    "${chip_root}/examples/common",
     "include",
   ]
 }
@@ -38,6 +39,7 @@ config("includes") {
 executable("chip-${chip_tests_zap_config}") {
   sources = [
     "AppOptions.cpp",
+    "InteractiveServer.cpp",
     "main.cpp",
     "src/bridged-actions-stub.cpp",
     "static-supported-modes-manager.cpp",
@@ -45,6 +47,7 @@ executable("chip-${chip_tests_zap_config}") {
 
   deps = [
     ":configuration",
+    "${chip_root}/examples/common/websocket-server",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app/tests/suites/commands/delay",
     "${chip_root}/src/app/tests/suites/commands/discovery",
@@ -54,9 +57,10 @@ executable("chip-${chip_tests_zap_config}") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:testing",  # For sleepMillis. TODO: this is
                                              # odd and should be fixed
+    "${chip_root}/third_party/jsoncpp",
   ]
 
-  include_dirs = [ "include" ]
+  public_configs = [ ":includes" ]
 
   cflags = [ "-Wconversion" ]
 

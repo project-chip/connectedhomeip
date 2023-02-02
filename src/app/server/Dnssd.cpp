@@ -46,13 +46,17 @@ namespace {
 
 void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
-    if (event->Type == DeviceLayer::DeviceEventType::kDnssdPlatformInitialized
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-        || event->Type == DeviceLayer::DeviceEventType::kSEDIntervalChange
-#endif
-    )
+    switch (event->Type)
     {
+    case DeviceLayer::DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    case DeviceLayer::DeviceEventType::kSEDIntervalChange:
+#endif
         app::DnssdServer::Instance().StartServer();
+        break;
+    default:
+        break;
     }
 }
 

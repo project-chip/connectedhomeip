@@ -25,7 +25,8 @@
 #pragma once
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <platform/openiotsdk/OpenIoTSDKConfig.h>
+
+#include CHIP_OPEN_IOT_SDK_KV_STORE_CONFIG_INCLUDE
 
 namespace chip {
 namespace DeviceLayer {
@@ -33,7 +34,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Zephyr platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::OpenIoTSDKConfig>
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<KVStoreConfig>
 {
 
 public:

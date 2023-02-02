@@ -85,6 +85,8 @@ public:
             return;
         }
 
+        ReturnOnFailure(RemoteDataModelLogger::LogEventAsJSON(eventHeader, data));
+
         CHIP_ERROR error = DataModelLogger::LogEvent(eventHeader, data);
         if (CHIP_NO_ERROR != error)
         {
