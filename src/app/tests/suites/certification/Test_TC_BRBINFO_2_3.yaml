@@ -37,12 +37,13 @@ tests:
     - label: "DUT reads VendorName from the TH"
       PICS: BRBINFO.C.A0001
       verification: |
-          ./chip-tool bridgeddevicebasic read vendor-name 1 3
+          ./chip-tool bridgeddevicebasicinformation read vendor-name 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
+
           Example Log:
-          [1663582949.056686][155023:155023] CHIP:DMG:
+          [1663582949.056686][155023:155023] CHIP:DMG:  
           [1663582949.056724][155023:155023] CHIP:DMG: ReportDataMessage =
           [1663582949.056734][155023:155023] CHIP:DMG: {
           [1663582949.056741][155023:155023] CHIP:DMG:         AttributeReportIBs =
@@ -57,22 +58,22 @@ tests:
           [1663582949.056832][155023:155023] CHIP:DMG:                                         Cluster = 0x39,
           [1663582949.056842][155023:155023] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1663582949.056852][155023:155023] CHIP:DMG:                                 }
-          [1663582949.056864][155023:155023] CHIP:DMG:
+          [1663582949.056864][155023:155023] CHIP:DMG:                                         
           [1663582949.056873][155023:155023] CHIP:DMG:                                 StatusIB =
           [1663582949.056883][155023:155023] CHIP:DMG:                                 {
           [1663582949.056893][155023:155023] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663582949.056903][155023:155023] CHIP:DMG:                                 },
-          [1663582949.056913][155023:155023] CHIP:DMG:
+          [1663582949.056913][155023:155023] CHIP:DMG:                                 
           [1663582949.056922][155023:155023] CHIP:DMG:                         },
-          [1663582949.056933][155023:155023] CHIP:DMG:
+          [1663582949.056933][155023:155023] CHIP:DMG:                         
           [1663582949.056942][155023:155023] CHIP:DMG:                 },
-          [1663582949.056972][155023:155023] CHIP:DMG:
+          [1663582949.056972][155023:155023] CHIP:DMG:                 
           [1663582949.056980][155023:155023] CHIP:DMG:         ],
-          [1663582949.056992][155023:155023] CHIP:DMG:
-          [1663582949.057001][155023:155023] CHIP:DMG:         SuppressResponse = true,
+          [1663582949.056992][155023:155023] CHIP:DMG:         
+          [1663582949.057001][155023:155023] CHIP:DMG:         SuppressResponse = true, 
           [1663582949.057009][155023:155023] CHIP:DMG:         InteractionModelRevision = 1
           [1663582949.057017][155023:155023] CHIP:DMG: }
-          [1663582949.057025][155023:155023] CHIP:DMG:
+          [1663582949.057025][155023:155023] CHIP:DMG:  
           [1663582949.057091][155023:155023] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663582949.057101][155023:155023] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663582949.057109][155023:155023] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -88,7 +89,7 @@ tests:
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
           Example Log:
-          [1663583057.303881][155023:155023] CHIP:DMG:
+          [1663583057.303881][155023:155023] CHIP:DMG:  
           [1663583057.303927][155023:155023] CHIP:DMG: ReportDataMessage =
           [1663583057.303941][155023:155023] CHIP:DMG: {
           [1663583057.303950][155023:155023] CHIP:DMG:         AttributeReportIBs =
@@ -103,22 +104,22 @@ tests:
           [1663583057.304084][155023:155023] CHIP:DMG:                                         Cluster = 0x39,
           [1663583057.304101][155023:155023] CHIP:DMG:                                         Attribute = 0x0000_0002,
           [1663583057.304115][155023:155023] CHIP:DMG:                                 }
-          [1663583057.304134][155023:155023] CHIP:DMG:
+          [1663583057.304134][155023:155023] CHIP:DMG:                                         
           [1663583057.304148][155023:155023] CHIP:DMG:                                 StatusIB =
           [1663583057.304161][155023:155023] CHIP:DMG:                                 {
           [1663583057.304172][155023:155023] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663583057.304184][155023:155023] CHIP:DMG:                                 },
-          [1663583057.304196][155023:155023] CHIP:DMG:
+          [1663583057.304196][155023:155023] CHIP:DMG:                                 
           [1663583057.304205][155023:155023] CHIP:DMG:                         },
-          [1663583057.304219][155023:155023] CHIP:DMG:
+          [1663583057.304219][155023:155023] CHIP:DMG:                         
           [1663583057.304228][155023:155023] CHIP:DMG:                 },
-          [1663583057.304242][155023:155023] CHIP:DMG:
+          [1663583057.304242][155023:155023] CHIP:DMG:                 
           [1663583057.304251][155023:155023] CHIP:DMG:         ],
-          [1663583057.304265][155023:155023] CHIP:DMG:
-          [1663583057.304276][155023:155023] CHIP:DMG:         SuppressResponse = true,
+          [1663583057.304265][155023:155023] CHIP:DMG:         
+          [1663583057.304276][155023:155023] CHIP:DMG:         SuppressResponse = true, 
           [1663583057.304286][155023:155023] CHIP:DMG:         InteractionModelRevision = 1
           [1663583057.304294][155023:155023] CHIP:DMG: }
-          [1663583057.304303][155023:155023] CHIP:DMG:
+          [1663583057.304303][155023:155023] CHIP:DMG:  
           [1663583057.304430][155023:155023] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663583057.304449][155023:155023] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663583057.304464][155023:155023] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -127,12 +128,12 @@ tests:
     - label: "DUT reads ProductName from the TH"
       PICS: BRBINFO.C.A0003
       verification: |
-          ./chip-tool bridgeddevicebasic read product-name 1 3
+          ./chip-tool bridgeddevicebasicinformation read product-name 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
           Example Log:
-          [1663583778.730981][155023:155023] CHIP:DMG:
+          [1663583778.730981][155023:155023] CHIP:DMG:  
           [1663583778.731005][155023:155023] CHIP:DMG: ReportDataMessage =
           [1663583778.731010][155023:155023] CHIP:DMG: {
           [1663583778.731015][155023:155023] CHIP:DMG:         AttributeReportIBs =
@@ -147,22 +148,22 @@ tests:
           [1663583778.731077][155023:155023] CHIP:DMG:                                         Cluster = 0x39,
           [1663583778.731083][155023:155023] CHIP:DMG:                                         Attribute = 0x0000_0003,
           [1663583778.731090][155023:155023] CHIP:DMG:                                 }
-          [1663583778.731098][155023:155023] CHIP:DMG:
+          [1663583778.731098][155023:155023] CHIP:DMG:                                         
           [1663583778.731104][155023:155023] CHIP:DMG:                                 StatusIB =
           [1663583778.731111][155023:155023] CHIP:DMG:                                 {
           [1663583778.731118][155023:155023] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663583778.731127][155023:155023] CHIP:DMG:                                 },
-          [1663583778.731136][155023:155023] CHIP:DMG:
+          [1663583778.731136][155023:155023] CHIP:DMG:                                 
           [1663583778.731143][155023:155023] CHIP:DMG:                         },
-          [1663583778.731153][155023:155023] CHIP:DMG:
+          [1663583778.731153][155023:155023] CHIP:DMG:                         
           [1663583778.731159][155023:155023] CHIP:DMG:                 },
-          [1663583778.731169][155023:155023] CHIP:DMG:
+          [1663583778.731169][155023:155023] CHIP:DMG:                 
           [1663583778.731175][155023:155023] CHIP:DMG:         ],
-          [1663583778.731185][155023:155023] CHIP:DMG:
-          [1663583778.731192][155023:155023] CHIP:DMG:         SuppressResponse = true,
+          [1663583778.731185][155023:155023] CHIP:DMG:         
+          [1663583778.731192][155023:155023] CHIP:DMG:         SuppressResponse = true, 
           [1663583778.731199][155023:155023] CHIP:DMG:         InteractionModelRevision = 1
           [1663583778.731205][155023:155023] CHIP:DMG: }
-          [1663583778.731212][155023:155023] CHIP:DMG:
+          [1663583778.731212][155023:155023] CHIP:DMG:  
           [1663583778.731259][155023:155023] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663583778.731268][155023:155023] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663583778.731276][155023:155023] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -177,7 +178,7 @@ tests:
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
           Example Log:
-          1663583922.989165][155023:155023] CHIP:DMG:
+          1663583922.989165][155023:155023] CHIP:DMG:  
           [1663583922.989197][155023:155023] CHIP:DMG: ReportDataMessage =
           [1663583922.989207][155023:155023] CHIP:DMG: {
           [1663583922.989214][155023:155023] CHIP:DMG:         AttributeReportIBs =
@@ -193,18 +194,18 @@ tests:
           [1663583922.989310][155023:155023] CHIP:DMG:                                         Cluster = 0x39,
           [1663583922.989320][155023:155023] CHIP:DMG:                                         Attribute = 0x0000_0005,
           [1663583922.989328][155023:155023] CHIP:DMG:                                 }
-          [1663583922.989338][155023:155023] CHIP:DMG:
-          [1663583922.989348][155023:155023] CHIP:DMG:                                 Data = "Light 1" (7 chars),
+          [1663583922.989338][155023:155023] CHIP:DMG:                                         
+          [1663583922.989348][155023:155023] CHIP:DMG:                                 Data = "Light 1" (7 chars), 
           [1663583922.989356][155023:155023] CHIP:DMG:                         },
-          [1663583922.989368][155023:155023] CHIP:DMG:
+          [1663583922.989368][155023:155023] CHIP:DMG:                         
           [1663583922.989375][155023:155023] CHIP:DMG:                 },
-          [1663583922.989385][155023:155023] CHIP:DMG:
+          [1663583922.989385][155023:155023] CHIP:DMG:                 
           [1663583922.989394][155023:155023] CHIP:DMG:         ],
-          [1663583922.989406][155023:155023] CHIP:DMG:
-          [1663583922.989413][155023:155023] CHIP:DMG:         SuppressResponse = true,
+          [1663583922.989406][155023:155023] CHIP:DMG:         
+          [1663583922.989413][155023:155023] CHIP:DMG:         SuppressResponse = true, 
           [1663583922.989421][155023:155023] CHIP:DMG:         InteractionModelRevision = 1
           [1663583922.989428][155023:155023] CHIP:DMG: }
-          [1663583922.989436][155023:155023] CHIP:DMG:
+          [1663583922.989436][155023:155023] CHIP:DMG:  
           [1663583922.989490][155023:155023] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663583922.989498][155023:155023] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663583922.989505][155023:155023] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -227,12 +228,12 @@ tests:
     - label: "DUT reads HardwareVersion from the TH"
       PICS: BRBINFO.C.A0007
       verification: |
-          ./chip-tool bridgeddevicebasic read  hardware-version 1 3
+          ./chip-tool bridgeddevicebasicinformation read  hardware-version 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
           Example Log:
-          11663584069.174840][155023:155023] CHIP:DMG:
+          11663584069.174840][155023:155023] CHIP:DMG:  
           [1663584069.174866][155023:155023] CHIP:DMG: ReportDataMessage =
           [1663584069.174872][155023:155023] CHIP:DMG: {
           [1663584069.174879][155023:155023] CHIP:DMG:         AttributeReportIBs =
@@ -247,22 +248,22 @@ tests:
           [1663584069.174954][155023:155023] CHIP:DMG:                                         Cluster = 0x39,
           [1663584069.174963][155023:155023] CHIP:DMG:                                         Attribute = 0x0000_0007,
           [1663584069.174969][155023:155023] CHIP:DMG:                                 }
-          [1663584069.174978][155023:155023] CHIP:DMG:
+          [1663584069.174978][155023:155023] CHIP:DMG:                                         
           [1663584069.174984][155023:155023] CHIP:DMG:                                 StatusIB =
           [1663584069.174991][155023:155023] CHIP:DMG:                                 {
           [1663584069.174997][155023:155023] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663584069.175004][155023:155023] CHIP:DMG:                                 },
-          [1663584069.175011][155023:155023] CHIP:DMG:
+          [1663584069.175011][155023:155023] CHIP:DMG:                                 
           [1663584069.175016][155023:155023] CHIP:DMG:                         },
-          [1663584069.175024][155023:155023] CHIP:DMG:
+          [1663584069.175024][155023:155023] CHIP:DMG:                         
           [1663584069.175030][155023:155023] CHIP:DMG:                 },
-          [1663584069.175038][155023:155023] CHIP:DMG:
+          [1663584069.175038][155023:155023] CHIP:DMG:                 
           [1663584069.175043][155023:155023] CHIP:DMG:         ],
-          [1663584069.175052][155023:155023] CHIP:DMG:
-          [1663584069.175057][155023:155023] CHIP:DMG:         SuppressResponse = true,
+          [1663584069.175052][155023:155023] CHIP:DMG:         
+          [1663584069.175057][155023:155023] CHIP:DMG:         SuppressResponse = true, 
           [1663584069.175063][155023:155023] CHIP:DMG:         InteractionModelRevision = 1
           [1663584069.175068][155023:155023] CHIP:DMG: }
-          [1663584069.175074][155023:155023] CHIP:DMG:
+          [1663584069.175074][155023:155023] CHIP:DMG:  
           [1663584069.175121][155023:155023] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663584069.175129][155023:155023] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663584069.175137][155023:155023] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -274,11 +275,11 @@ tests:
     - label: "DUT reads HardwareVersionString from the TH"
       PICS: BRBINFO.C.A0008
       verification: |
-          ./chip-tool bridgeddevicebasic read  hardware-version-string 1 3
+          ./chip-tool bridgeddevicebasicinformation read  hardware-version-string 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1663658796.268882][3274:3274] CHIP:DMG:
+          [1663658796.268882][3274:3274] CHIP:DMG:  
           [1663658796.268986][3274:3274] CHIP:DMG: ReportDataMessage =
           [1663658796.269021][3274:3274] CHIP:DMG: {
           [1663658796.269047][3274:3274] CHIP:DMG:         AttributeReportIBs =
@@ -293,22 +294,22 @@ tests:
           [1663658796.269392][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663658796.269438][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_0008,
           [1663658796.269481][3274:3274] CHIP:DMG:                                 }
-          [1663658796.269526][3274:3274] CHIP:DMG:
+          [1663658796.269526][3274:3274] CHIP:DMG:                                         
           [1663658796.269565][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663658796.269612][3274:3274] CHIP:DMG:                                 {
           [1663658796.269657][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663658796.269702][3274:3274] CHIP:DMG:                                 },
-          [1663658796.269734][3274:3274] CHIP:DMG:
+          [1663658796.269734][3274:3274] CHIP:DMG:                                 
           [1663658796.269762][3274:3274] CHIP:DMG:                         },
-          [1663658796.269809][3274:3274] CHIP:DMG:
+          [1663658796.269809][3274:3274] CHIP:DMG:                         
           [1663658796.269846][3274:3274] CHIP:DMG:                 },
-          [1663658796.269882][3274:3274] CHIP:DMG:
+          [1663658796.269882][3274:3274] CHIP:DMG:                 
           [1663658796.269909][3274:3274] CHIP:DMG:         ],
-          [1663658796.269943][3274:3274] CHIP:DMG:
-          [1663658796.269972][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663658796.269943][3274:3274] CHIP:DMG:         
+          [1663658796.269972][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663658796.270001][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663658796.270027][3274:3274] CHIP:DMG: }
-          [1663658796.270049][3274:3274] CHIP:DMG:
+          [1663658796.270049][3274:3274] CHIP:DMG:  
           [1663658796.270297][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663658796.270331][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663658796.270360][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -319,9 +320,10 @@ tests:
     - label: "DUT reads SoftwareVersion from the TH"
       PICS: BRBINFO.C.A0009
       verification: |
-          ./chip-tool bridgeddevicebasic read software-version 1 3
+          ./chip-tool bridgeddevicebasicinformation read software-version 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
+
 
           Example Log:
 
@@ -339,22 +341,22 @@ tests:
           [1663658830.077402][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663658830.077435][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_0009,
           [1663658830.077474][3274:3274] CHIP:DMG:                                 }
-          [1663658830.077512][3274:3274] CHIP:DMG:
+          [1663658830.077512][3274:3274] CHIP:DMG:                                         
           [1663658830.077549][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663658830.077582][3274:3274] CHIP:DMG:                                 {
           [1663658830.077613][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663658830.077651][3274:3274] CHIP:DMG:                                 },
-          [1663658830.077689][3274:3274] CHIP:DMG:
+          [1663658830.077689][3274:3274] CHIP:DMG:                                 
           [1663658830.077723][3274:3274] CHIP:DMG:                         },
-          [1663658830.077757][3274:3274] CHIP:DMG:
+          [1663658830.077757][3274:3274] CHIP:DMG:                         
           [1663658830.077784][3274:3274] CHIP:DMG:                 },
-          [1663658830.077816][3274:3274] CHIP:DMG:
+          [1663658830.077816][3274:3274] CHIP:DMG:                 
           [1663658830.077840][3274:3274] CHIP:DMG:         ],
-          [1663658830.077871][3274:3274] CHIP:DMG:
-          [1663658830.077896][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663658830.077871][3274:3274] CHIP:DMG:         
+          [1663658830.077896][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663658830.077919][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663658830.077943][3274:3274] CHIP:DMG: }
-          [1663658830.077964][3274:3274] CHIP:DMG:
+          [1663658830.077964][3274:3274] CHIP:DMG:  
           [1663658830.078210][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663658830.078247][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663658830.078273][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -385,22 +387,22 @@ tests:
           [1663658867.169633][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663658867.169682][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_000A,
           [1663658867.169713][3274:3274] CHIP:DMG:                                 }
-          [1663658867.169766][3274:3274] CHIP:DMG:
+          [1663658867.169766][3274:3274] CHIP:DMG:                                         
           [1663658867.169814][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663658867.169870][3274:3274] CHIP:DMG:                                 {
           [1663658867.169896][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663658867.169944][3274:3274] CHIP:DMG:                                 },
-          [1663658867.169974][3274:3274] CHIP:DMG:
+          [1663658867.169974][3274:3274] CHIP:DMG:                                 
           [1663658867.170022][3274:3274] CHIP:DMG:                         },
-          [1663658867.170071][3274:3274] CHIP:DMG:
+          [1663658867.170071][3274:3274] CHIP:DMG:                         
           [1663658867.170121][3274:3274] CHIP:DMG:                 },
-          [1663658867.170153][3274:3274] CHIP:DMG:
+          [1663658867.170153][3274:3274] CHIP:DMG:                 
           [1663658867.170175][3274:3274] CHIP:DMG:         ],
-          [1663658867.170201][3274:3274] CHIP:DMG:
-          [1663658867.170223][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663658867.170201][3274:3274] CHIP:DMG:         
+          [1663658867.170223][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663658867.170246][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663658867.170264][3274:3274] CHIP:DMG: }
-          [1663658867.170286][3274:3274] CHIP:DMG:
+          [1663658867.170286][3274:3274] CHIP:DMG:  
           [1663658867.170514][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663658867.170580][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663658867.170656][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -411,7 +413,7 @@ tests:
     - label: "DUT reads ManufacturingDate from the TH"
       PICS: BRBINFO.C.A000b
       verification: |
-          ./chip-tool bridgeddevicebasic read manufacturing-date  1 3
+          ./chip-tool bridgeddevicebasicinformation read manufacturing-date  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -429,22 +431,22 @@ tests:
           [1663658906.553884][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663658906.553931][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_000B,
           [1663658906.553973][3274:3274] CHIP:DMG:                                 }
-          [1663658906.554024][3274:3274] CHIP:DMG:
+          [1663658906.554024][3274:3274] CHIP:DMG:                                         
           [1663658906.554062][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663658906.554099][3274:3274] CHIP:DMG:                                 {
           [1663658906.554139][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663658906.554172][3274:3274] CHIP:DMG:                                 },
-          [1663658906.554210][3274:3274] CHIP:DMG:
+          [1663658906.554210][3274:3274] CHIP:DMG:                                 
           [1663658906.554249][3274:3274] CHIP:DMG:                         },
-          [1663658906.554293][3274:3274] CHIP:DMG:
+          [1663658906.554293][3274:3274] CHIP:DMG:                         
           [1663658906.554325][3274:3274] CHIP:DMG:                 },
-          [1663658906.554361][3274:3274] CHIP:DMG:
+          [1663658906.554361][3274:3274] CHIP:DMG:                 
           [1663658906.554387][3274:3274] CHIP:DMG:         ],
-          [1663658906.554494][3274:3274] CHIP:DMG:
-          [1663658906.554525][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663658906.554494][3274:3274] CHIP:DMG:         
+          [1663658906.554525][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663658906.554551][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663658906.554577][3274:3274] CHIP:DMG: }
-          [1663658906.554604][3274:3274] CHIP:DMG:
+          [1663658906.554604][3274:3274] CHIP:DMG:  
           [1663658906.554876][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663658906.554911][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663658906.554937][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -456,7 +458,7 @@ tests:
     - label: "DUT reads PartNumber from the TH"
       PICS: BRBINFO.C.A000c
       verification: |
-          ./chip-tool bridgeddevicebasic read part-number  1 3
+          ./chip-tool bridgeddevicebasicinformation read part-number  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -476,22 +478,22 @@ tests:
           [1663658944.254575][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663658944.254614][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_000C,
           [1663658944.254648][3274:3274] CHIP:DMG:                                 }
-          [1663658944.254690][3274:3274] CHIP:DMG:
+          [1663658944.254690][3274:3274] CHIP:DMG:                                         
           [1663658944.254723][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663658944.254762][3274:3274] CHIP:DMG:                                 {
           [1663658944.254835][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663658944.254876][3274:3274] CHIP:DMG:                                 },
-          [1663658944.254919][3274:3274] CHIP:DMG:
+          [1663658944.254919][3274:3274] CHIP:DMG:                                 
           [1663658944.254954][3274:3274] CHIP:DMG:                         },
-          [1663658944.254994][3274:3274] CHIP:DMG:
+          [1663658944.254994][3274:3274] CHIP:DMG:                         
           [1663658944.255019][3274:3274] CHIP:DMG:                 },
-          [1663658944.255055][3274:3274] CHIP:DMG:
+          [1663658944.255055][3274:3274] CHIP:DMG:                 
           [1663658944.255081][3274:3274] CHIP:DMG:         ],
-          [1663658944.255113][3274:3274] CHIP:DMG:
-          [1663658944.255141][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663658944.255113][3274:3274] CHIP:DMG:         
+          [1663658944.255141][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663658944.255170][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663658944.255196][3274:3274] CHIP:DMG: }
-          [1663658944.255222][3274:3274] CHIP:DMG:
+          [1663658944.255222][3274:3274] CHIP:DMG:  
           [1663658944.255463][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663658944.255543][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663658944.255573][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -502,12 +504,12 @@ tests:
     - label: "DUT reads ProductURL from the TH"
       PICS: BRBINFO.C.A000d
       verification: |
-          ./chip-tool bridgeddevicebasic read product-url  1 3
+          ./chip-tool bridgeddevicebasicinformation read product-url  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
           Example Log:
-          [1663658944.254117][3274:3274] CHIP:DMG:
+          [1663658944.254117][3274:3274] CHIP:DMG:  
           [1663658944.254195][3274:3274] CHIP:DMG: ReportDataMessage =
           [1663658944.254224][3274:3274] CHIP:DMG: {
           [1663658944.254248][3274:3274] CHIP:DMG:         AttributeReportIBs =
@@ -522,22 +524,22 @@ tests:
           [1663658944.254575][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663658944.254614][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_000C,
           [1663658944.254648][3274:3274] CHIP:DMG:                                 }
-          [1663658944.254690][3274:3274] CHIP:DMG:
+          [1663658944.254690][3274:3274] CHIP:DMG:                                         
           [1663658944.254723][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663658944.254762][3274:3274] CHIP:DMG:                                 {
           [1663658944.254835][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663658944.254876][3274:3274] CHIP:DMG:                                 },
-          [1663658944.254919][3274:3274] CHIP:DMG:
+          [1663658944.254919][3274:3274] CHIP:DMG:                                 
           [1663658944.254954][3274:3274] CHIP:DMG:                         },
-          [1663658944.254994][3274:3274] CHIP:DMG:
+          [1663658944.254994][3274:3274] CHIP:DMG:                         
           [1663658944.255019][3274:3274] CHIP:DMG:                 },
-          [1663658944.255055][3274:3274] CHIP:DMG:
+          [1663658944.255055][3274:3274] CHIP:DMG:                 
           [1663658944.255081][3274:3274] CHIP:DMG:         ],
-          [1663658944.255113][3274:3274] CHIP:DMG:
-          [1663658944.255141][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663658944.255113][3274:3274] CHIP:DMG:         
+          [1663658944.255141][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663658944.255170][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663658944.255196][3274:3274] CHIP:DMG: }
-          [1663658944.255222][3274:3274] CHIP:DMG:
+          [1663658944.255222][3274:3274] CHIP:DMG:  
           [1663658944.255463][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663658944.255543][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663658944.255573][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -548,13 +550,13 @@ tests:
     - label: "DUT reads ProductLabel from the TH"
       PICS: BRBINFO.C.A000e
       verification: |
-          ./chip-tool bridgeddevicebasic read product-label  1 3
+          ./chip-tool bridgeddevicebasicinformation read product-label  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
           Example Log:
 
-          [1663659038.416182][3274:3274] CHIP:DMG:
+          [1663659038.416182][3274:3274] CHIP:DMG:  
           [1663659038.416248][3274:3274] CHIP:DMG: ReportDataMessage =
           [1663659038.416273][3274:3274] CHIP:DMG: {
           [1663659038.416293][3274:3274] CHIP:DMG:         AttributeReportIBs =
@@ -569,22 +571,22 @@ tests:
           [1663659038.416559][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663659038.416594][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_000E,
           [1663659038.416619][3274:3274] CHIP:DMG:                                 }
-          [1663659038.416650][3274:3274] CHIP:DMG:
+          [1663659038.416650][3274:3274] CHIP:DMG:                                         
           [1663659038.416673][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663659038.416708][3274:3274] CHIP:DMG:                                 {
           [1663659038.416742][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663659038.416768][3274:3274] CHIP:DMG:                                 },
-          [1663659038.416799][3274:3274] CHIP:DMG:
+          [1663659038.416799][3274:3274] CHIP:DMG:                                 
           [1663659038.416827][3274:3274] CHIP:DMG:                         },
-          [1663659038.416860][3274:3274] CHIP:DMG:
+          [1663659038.416860][3274:3274] CHIP:DMG:                         
           [1663659038.416884][3274:3274] CHIP:DMG:                 },
-          [1663659038.416920][3274:3274] CHIP:DMG:
+          [1663659038.416920][3274:3274] CHIP:DMG:                 
           [1663659038.416995][3274:3274] CHIP:DMG:         ],
-          [1663659038.417028][3274:3274] CHIP:DMG:
-          [1663659038.417051][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663659038.417028][3274:3274] CHIP:DMG:         
+          [1663659038.417051][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663659038.417074][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663659038.417095][3274:3274] CHIP:DMG: }
-          [1663659038.417114][3274:3274] CHIP:DMG:
+          [1663659038.417114][3274:3274] CHIP:DMG:  
           [1663659038.417342][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663659038.417371][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663659038.417392][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -615,22 +617,22 @@ tests:
           [1663659070.779186][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663659070.779232][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_000F,
           [1663659070.779280][3274:3274] CHIP:DMG:                                 }
-          [1663659070.779320][3274:3274] CHIP:DMG:
+          [1663659070.779320][3274:3274] CHIP:DMG:                                         
           [1663659070.779357][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663659070.779400][3274:3274] CHIP:DMG:                                 {
           [1663659070.779449][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663659070.779489][3274:3274] CHIP:DMG:                                 },
-          [1663659070.779527][3274:3274] CHIP:DMG:
+          [1663659070.779527][3274:3274] CHIP:DMG:                                 
           [1663659070.779565][3274:3274] CHIP:DMG:                         },
-          [1663659070.779609][3274:3274] CHIP:DMG:
+          [1663659070.779609][3274:3274] CHIP:DMG:                         
           [1663659070.779644][3274:3274] CHIP:DMG:                 },
-          [1663659070.779682][3274:3274] CHIP:DMG:
+          [1663659070.779682][3274:3274] CHIP:DMG:                 
           [1663659070.779711][3274:3274] CHIP:DMG:         ],
-          [1663659070.779748][3274:3274] CHIP:DMG:
-          [1663659070.779781][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663659070.779748][3274:3274] CHIP:DMG:         
+          [1663659070.779781][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663659070.779813][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663659070.779841][3274:3274] CHIP:DMG: }
-          [1663659070.779869][3274:3274] CHIP:DMG:
+          [1663659070.779869][3274:3274] CHIP:DMG:  
           [1663659070.780127][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663659070.780163][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663659070.780197][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -641,10 +643,10 @@ tests:
     - label: "DUT reads Reachable from the TH"
       PICS: BRBINFO.C.A0011
       verification: |
-          ./chip-tool bridgeddevicebasic read reachable 1 3
+          ./chip-tool bridgeddevicebasicinformation read reachable 1 3
 
           Verify ReadRequestMessage is displayed on TH(bridge-app) Log
-          [1663659103.609502][3274:3274] CHIP:DMG:
+          [1663659103.609502][3274:3274] CHIP:DMG:  
           [1663659103.609572][3274:3274] CHIP:DMG: ReportDataMessage =
           [1663659103.609595][3274:3274] CHIP:DMG: {
           [1663659103.609615][3274:3274] CHIP:DMG:         AttributeReportIBs =
@@ -660,18 +662,18 @@ tests:
           [1663659103.609897][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663659103.609930][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_0011,
           [1663659103.609964][3274:3274] CHIP:DMG:                                 }
-          [1663659103.610001][3274:3274] CHIP:DMG:
-          [1663659103.610036][3274:3274] CHIP:DMG:                                 Data = true,
+          [1663659103.610001][3274:3274] CHIP:DMG:                                         
+          [1663659103.610036][3274:3274] CHIP:DMG:                                 Data = true, 
           [1663659103.610068][3274:3274] CHIP:DMG:                         },
-          [1663659103.610103][3274:3274] CHIP:DMG:
+          [1663659103.610103][3274:3274] CHIP:DMG:                         
           [1663659103.610126][3274:3274] CHIP:DMG:                 },
-          [1663659103.610155][3274:3274] CHIP:DMG:
+          [1663659103.610155][3274:3274] CHIP:DMG:                 
           [1663659103.610177][3274:3274] CHIP:DMG:         ],
-          [1663659103.610204][3274:3274] CHIP:DMG:
-          [1663659103.610227][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663659103.610204][3274:3274] CHIP:DMG:         
+          [1663659103.610227][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663659103.610248][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663659103.610267][3274:3274] CHIP:DMG: }
-          [1663659103.610288][3274:3274] CHIP:DMG:
+          [1663659103.610288][3274:3274] CHIP:DMG:  
           [1663659103.610502][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663659103.610529][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663659103.610548][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
@@ -682,12 +684,12 @@ tests:
     - label: "DUT reads UniqueID from the TH"
       PICS: BRBINFO.C.A0012
       verification: |
-          ./chip-tool bridgeddevicebasic read unique-id 1 3
+          ./chip-tool bridgeddevicebasicinformation read unique-id 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
           Example Log:
           [1663659154.048623][3274:3274] CHIP:DMG: }
-          [1663659154.048641][3274:3274] CHIP:DMG:
+          [1663659154.048641][3274:3274] CHIP:DMG:  
           [1663659154.048708][3274:3274] CHIP:DMG: ReportDataMessage =
           [1663659154.048731][3274:3274] CHIP:DMG: {
           [1663659154.048747][3274:3274] CHIP:DMG:         AttributeReportIBs =
@@ -702,22 +704,22 @@ tests:
           [1663659154.049036][3274:3274] CHIP:DMG:                                         Cluster = 0x39,
           [1663659154.049063][3274:3274] CHIP:DMG:                                         Attribute = 0x0000_0012,
           [1663659154.049097][3274:3274] CHIP:DMG:                                 }
-          [1663659154.049133][3274:3274] CHIP:DMG:
+          [1663659154.049133][3274:3274] CHIP:DMG:                                         
           [1663659154.049159][3274:3274] CHIP:DMG:                                 StatusIB =
           [1663659154.049196][3274:3274] CHIP:DMG:                                 {
           [1663659154.049231][3274:3274] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1663659154.049260][3274:3274] CHIP:DMG:                                 },
-          [1663659154.049294][3274:3274] CHIP:DMG:
+          [1663659154.049294][3274:3274] CHIP:DMG:                                 
           [1663659154.049321][3274:3274] CHIP:DMG:                         },
-          [1663659154.049353][3274:3274] CHIP:DMG:
+          [1663659154.049353][3274:3274] CHIP:DMG:                         
           [1663659154.049383][3274:3274] CHIP:DMG:                 },
-          [1663659154.049411][3274:3274] CHIP:DMG:
+          [1663659154.049411][3274:3274] CHIP:DMG:                 
           [1663659154.049433][3274:3274] CHIP:DMG:         ],
-          [1663659154.049461][3274:3274] CHIP:DMG:
-          [1663659154.049483][3274:3274] CHIP:DMG:         SuppressResponse = true,
+          [1663659154.049461][3274:3274] CHIP:DMG:         
+          [1663659154.049483][3274:3274] CHIP:DMG:         SuppressResponse = true, 
           [1663659154.049508][3274:3274] CHIP:DMG:         InteractionModelRevision = 1
           [1663659154.049529][3274:3274] CHIP:DMG: }
-          [1663659154.049550][3274:3274] CHIP:DMG:
+          [1663659154.049550][3274:3274] CHIP:DMG:  
           [1663659154.049765][3274:3274] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663659154.049798][3274:3274] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663659154.049820][3274:3274] CHIP:DMG: IM RH moving to [AwaitingDestruction]
