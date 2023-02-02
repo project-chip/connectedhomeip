@@ -992,3 +992,83 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
  * @param lockoutEndTime Monotonic time of when lockout ends.
  */
 void emberAfPluginDoorLockLockoutStarted(chip::EndpointId endpointId, chip::System::Clock::Timestamp lockoutEndTime);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the number of Fingerprint credentials supported, since there is no attribute
+ * that represents that value.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] maxNumberOfCredentials the number of Fingerprint credentials supported by the lock.
+ *
+ * @return false on failure, true on success.  On failure, the cluster
+ * implementation will assume that 0 Fingerprint credentials are supported.
+ */
+bool emberAfPluginDoorLockGetNumberOfFingerprintCredentialsSupported(chip::EndpointId endpointId,
+                                                                     uint16_t & maxNumberOfCredentials);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the number of FingerVein credentials supported, since there is no attribute
+ * that represents that value.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] maxNumberOfCredentials the number of FingerVein credentials supported by the lock.
+ *
+ * @return false on failure, true on success.  On failure, the cluster
+ * implementation will assume that 0 FingerVein credentials are supported.
+ */
+bool emberAfPluginDoorLockGetNumberOfFingerVeinCredentialsSupported(chip::EndpointId endpointId, uint16_t & maxNumberOfCredentials);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the number of Face credentials supported, since there is no attribute
+ * that represents that value.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] maxNumberOfCredentials the number of Face credentials supported by the lock.
+ *
+ * @return false on failure, true on success.  On failure, the cluster
+ * implementation will assume that 0 Face credentials are supported.
+ */
+bool emberAfPluginDoorLockGetNumberOfFaceCredentialsSupported(chip::EndpointId endpointId, uint16_t & maxNumberOfCredentials);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the min and max lengths of Fingerprint credentials supported, since there are no
+ * attributes that represents those values.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] minLen the minimal length, in bytes, of a Fingerprint credential supported by the lock.
+ * @param[out] maxLen the minimal length, in bytes, of a Fingerprint credential supported by the lock.
+ *
+ * @return false on failure, true on success.
+ */
+bool emberAfPluginDoorLockGetFingerprintCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen,
+                                                                    uint8_t & maxLen);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the min and max lengths of FingerVein credentials supported, since there are no
+ * attributes that represents those values.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] minLen the minimal length, in bytes, of a FingerVein credential supported by the lock.
+ * @param[out] maxLen the minimal length, in bytes, of a FingerVein credential supported by the lock.
+ *
+ * @return false on failure, true on success.
+ */
+bool emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the min and max lengths of Face credentials supported, since there are no
+ * attributes that represents those values.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] minLen the minimal length, in bytes, of a Face credential supported by the lock.
+ * @param[out] maxLen the minimal length, in bytes, of a Face credential supported by the lock.
+ *
+ * @return false on failure, true on success.
+ */
+bool emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen);
