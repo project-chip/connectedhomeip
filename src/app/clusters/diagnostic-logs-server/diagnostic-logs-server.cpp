@@ -20,15 +20,20 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/BytesCircularBuffer.h>
+#include <lib/support/ScopedBuffer.h>
 
 #include <array>
 
+// We store our times as millisecond times, to save space.
+using TimeInBufferType = chip::System::Clock::Milliseconds32::rep;
+
 CHIP_ERROR DiagnosticLogsCommandHandler::PushLog(const chip::ByteSpan & payload)
 {
-    chip::System::Clock::Milliseconds32 now = chip::System::SystemClock().GetMonotonicTimestamp();
-    uint32_t timeMs                         = now.count();
+    auto now = std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(chip::Server::GetInstance().TimeSinceInit());
+    TimeInBufferType timeMs = now.count();
     chip::ByteSpan payloadTime(reinterpret_cast<uint8_t *>(&timeMs), sizeof(timeMs));
     return mBuffer.Push(payloadTime, payload);
 }
@@ -56,12 +61,11 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 }
 
                 size_t logSize = mBuffer.GetFrontSize();
-                chip::System::Clock::Milliseconds32::rep timeMs;
-                VerifyOrDie(logSize > sizeof(timeMs));
+                TimeInBufferType timeFromBuffer;
+                VerifyOrDie(logSize > sizeof(timeFromBuffer));
 
-                std::unique_ptr<uint8_t, decltype(&chip::Platform::MemoryFree)> buf(
-                    reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(logSize)), &chip::Platform::MemoryFree);
-                if (!buf)
+                chip::Platform::ScopedMemoryBuffer<uint8_t> buf;
+                if (!buf.Calloc(logSize))
                 {
                     response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kBusy;
                     handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
@@ -69,14 +73,16 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 }
 
                 // The entry is | time (4 bytes) | content (var size) |
-                chip::MutableByteSpan entry(buf.get(), logSize);
+                chip::MutableByteSpan entry(buf.Get(), logSize);
                 CHIP_ERROR err = mBuffer.ReadFront(entry);
                 VerifyOrDie(err == CHIP_NO_ERROR);
-                timeMs = *reinterpret_cast<decltype(timeMs) *>(buf.get());
+                memcpy(&timeFromBuffer, buf.Get(), sizeof(timeFromBuffer));
 
-                response.status       = chip::app::Clusters::DiagnosticLogs::LogsStatus::kSuccess;
-                response.logContent   = chip::ByteSpan(buf.get() + sizeof(timeMs), logSize - sizeof(timeMs));
-                response.UTCTimeStamp = timeMs;
+                auto timestamp = chip::System::Clock::Milliseconds32(timeFromBuffer);
+
+                response.status     = chip::app::Clusters::DiagnosticLogs::LogsStatus::kSuccess;
+                response.logContent = chip::ByteSpan(buf.Get() + sizeof(timeFromBuffer), logSize - sizeof(timeFromBuffer));
+                response.timeSinceBoot.SetValue(chip::System::Clock::Microseconds64(timestamp).count());
                 handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;

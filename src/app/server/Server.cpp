@@ -108,6 +108,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     ChipLogProgress(AppServer, "Server initializing...");
     assertChipStackLockedByCurrentThread();
 
+    mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
+
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 

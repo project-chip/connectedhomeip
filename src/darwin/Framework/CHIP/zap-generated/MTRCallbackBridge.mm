@@ -14388,10 +14388,18 @@ void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
         response.logContent = [NSData dataWithBytes:data.logContent.data() length:data.logContent.size()];
     }
     {
-        response.utcTimeStamp = [NSNumber numberWithUnsignedInt:data.UTCTimeStamp];
+        if (data.UTCTimeStamp.HasValue()) {
+            response.utcTimeStamp = [NSNumber numberWithUnsignedLongLong:data.UTCTimeStamp.Value()];
+        } else {
+            response.utcTimeStamp = nil;
+        }
     }
     {
-        response.timeSinceBoot = [NSNumber numberWithUnsignedInt:data.timeSinceBoot];
+        if (data.timeSinceBoot.HasValue()) {
+            response.timeSinceBoot = [NSNumber numberWithUnsignedLongLong:data.timeSinceBoot.Value()];
+        } else {
+            response.timeSinceBoot = nil;
+        }
     }
     DispatchSuccess(context, response);
 };

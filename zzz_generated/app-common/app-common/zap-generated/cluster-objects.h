@@ -7774,8 +7774,8 @@ public:
 
     LogsStatus status = static_cast<LogsStatus>(0);
     chip::ByteSpan logContent;
-    uint32_t UTCTimeStamp  = static_cast<uint32_t>(0);
-    uint32_t timeSinceBoot = static_cast<uint32_t>(0);
+    Optional<uint64_t> UTCTimeStamp;
+    Optional<uint64_t> timeSinceBoot;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -7792,8 +7792,8 @@ public:
 
     LogsStatus status = static_cast<LogsStatus>(0);
     chip::ByteSpan logContent;
-    uint32_t UTCTimeStamp  = static_cast<uint32_t>(0);
-    uint32_t timeSinceBoot = static_cast<uint32_t>(0);
+    Optional<uint64_t> UTCTimeStamp;
+    Optional<uint64_t> timeSinceBoot;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RetrieveLogsResponse
