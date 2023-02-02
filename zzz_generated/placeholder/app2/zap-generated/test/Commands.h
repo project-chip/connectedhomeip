@@ -26,7 +26,7 @@
 class Test_TC_BINFO_2_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_BINFO_2_3_SimulatedSuite() : TestCommand("Test_TC_BINFO_2_3_Simulated", 21)
+    Test_TC_BINFO_2_3_SimulatedSuite() : TestCommand("Test_TC_BINFO_2_3_Simulated", 22)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -91,80 +91,104 @@ private:
             return Log(kIdentityAlpha, value);
         }
         case 2: {
-            LogStep(2, "Query Data Model Revision");
+            LogStep(2, "DUT reads DataModelRevision from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::DataModelRevision::Id);
         }
         case 3: {
-            LogStep(3, "Query Vendor Name");
+            LogStep(3, "DUT reads VendorName from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::VendorName::Id);
         }
         case 4: {
-            LogStep(4, "Query VendorID");
+            LogStep(4, "DUT reads VendorID from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::VendorID::Id);
         }
         case 5: {
-            LogStep(5, "Query Product Name");
+            LogStep(5, "DUT reads ProductName from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductName::Id);
         }
         case 6: {
-            LogStep(6, "Query ProductID");
+            LogStep(6, "DUT reads ProductID from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductID::Id);
         }
         case 7: {
-            LogStep(7, "Query Node Label");
+            LogStep(7, "DUT reads NodeLabel from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::NodeLabel::Id);
         }
         case 8: {
-            LogStep(8, "Query User Location");
+            LogStep(8, "DUT reads Location from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::Location::Id);
         }
         case 9: {
-            LogStep(9, "Query HardwareVersion");
+            LogStep(9, "DUT reads HardwareVersion from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::HardwareVersion::Id);
         }
         case 10: {
-            LogStep(10, "Query HardwareVersionString");
+            LogStep(10, "DUT reads HardwareVersionString from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::HardwareVersionString::Id);
         }
         case 11: {
-            LogStep(11, "Query SoftwareVersion");
+            LogStep(11, "DUT reads SoftwareVersion from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SoftwareVersion::Id);
         }
         case 12: {
-            LogStep(12, "Query SoftwareVersionString");
+            LogStep(12, "DUT reads SoftwareVersionString from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A000a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SoftwareVersionString::Id);
         }
         case 13: {
-            LogStep(13, "Query ManufacturingDate");
+            LogStep(13, "DUT reads ManufacturingDate from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A000b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ManufacturingDate::Id);
         }
         case 14: {
-            LogStep(14, "Query PartNumber");
+            LogStep(14, "DUT reads PartNumber from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A000c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::PartNumber::Id);
         }
         case 15: {
-            LogStep(15, "Query ProductURL");
+            LogStep(15, "DUT reads ProductURL from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A000d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductURL::Id);
         }
         case 16: {
-            LogStep(16, "Query ProductLabel");
+            LogStep(16, "DUT reads ProductLabel from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A000e"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductLabel::Id);
         }
         case 17: {
-            LogStep(17, "Query SerialNumber");
+            LogStep(17, "DUT reads SerialNumber from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A000f"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SerialNumber::Id);
         }
         case 18: {
-            LogStep(18, "Query LocalConfigDisabled");
+            LogStep(18, "DUT reads LocalConfigDisabled from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::LocalConfigDisabled::Id);
         }
         case 19: {
-            LogStep(19, "Query Reachable");
+            LogStep(19, "DUT reads Reachable from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::Reachable::Id);
         }
         case 20: {
-            LogStep(20, "Query UniqueID");
+            LogStep(20, "DUT reads UniqueID from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::UniqueID::Id);
+        }
+        case 21: {
+            LogStep(21, "DUT reads CapabilityMinima from the TH");
+            VerifyOrDo(!ShouldSkip("BINFO.C.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::CapabilityMinima::Id);
         }
         }
         return CHIP_NO_ERROR;
