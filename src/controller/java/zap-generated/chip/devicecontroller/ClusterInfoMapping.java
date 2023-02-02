@@ -11147,7 +11147,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo
         diagnosticLogsretrieveLogsRequesttransferFileDesignatorCommandParameterInfo =
-            new CommandParameterInfo("transferFileDesignator", byte[].class, byte[].class);
+            new CommandParameterInfo("transferFileDesignator", Optional.class, String.class);
     diagnosticLogsretrieveLogsRequestCommandParams.put(
         "transferFileDesignator",
         diagnosticLogsretrieveLogsRequesttransferFileDesignatorCommandParameterInfo);
@@ -11160,7 +11160,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.DiagnosticLogsCluster.RetrieveLogsResponseCallback) callback,
                       (Integer) commandArguments.get("intent"),
                       (Integer) commandArguments.get("requestedProtocol"),
-                      (byte[]) commandArguments.get("transferFileDesignator"));
+                      (Optional<String>) commandArguments.get("transferFileDesignator"));
             },
             () -> new DelegatedDiagnosticLogsClusterRetrieveLogsResponseCallback(),
             diagnosticLogsretrieveLogsRequestCommandParams);
