@@ -25,7 +25,7 @@ from enum import Enum, IntEnum
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
 import stringcase
-from chip import ChipDeviceCtrl
+from chip.ChipDeviceCtrl import ChipDeviceController, discovery
 from chip.clusters.Attribute import AttributeStatus, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
 from chip.exceptions import ChipStackError
 from chip.yaml.errors import ParsingError, UnexpectedParsingError
@@ -98,7 +98,7 @@ class BaseAction(ABC):
         return self._pics_enabled
 
     @abstractmethod
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         pass
 
 
@@ -109,7 +109,7 @@ class DefaultPseudoCluster(BaseAction):
         if not _PSEUDO_CLUSTERS.supports(test_step):
             raise ParsingError(f'Default cluster {test_step.cluster} {test_step.command}, not supported')
 
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         resp = asyncio.run(_PSEUDO_CLUSTERS.execute(self._test_step))
         return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
 
@@ -118,7 +118,7 @@ class InvokeAction(BaseAction):
     '''Single invoke action to be executed.'''
 
     def __init__(self, test_step, cluster: str, context: _ExecutionContext):
-        '''Converts 'test_step' to invoke command action that can execute with ChipDeviceCtrl.
+        '''Converts 'test_step' to invoke command action that can execute with ChipDeviceController.
 
         Args:
           'test_step': Step containing information required to run invoke command action.
@@ -162,7 +162,7 @@ class InvokeAction(BaseAction):
         else:
             self._request_object = command_object
 
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             resp = asyncio.run(dev_ctrl.SendCommand(
                 self._node_id, self._endpoint, self._request_object,
@@ -179,7 +179,7 @@ class ReadAttributeAction(BaseAction):
     '''Single read attribute action to be executed.'''
 
     def __init__(self, test_step, cluster: str, context: _ExecutionContext):
-        '''Converts 'test_step' to read attribute action that can execute with ChipDeviceCtrl.
+        '''Converts 'test_step' to read attribute action that can execute with ChipDeviceController.
 
         Args:
           'test_step': Step containing information required to run read attribute action.
@@ -224,7 +224,7 @@ class ReadAttributeAction(BaseAction):
             raise UnexpectedParsingError(
                 f'ReadAttribute doesnt have valid attribute_type. {self.label}')
 
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             raw_resp = asyncio.run(dev_ctrl.ReadAttribute(self._node_id,
                                                           [(self._endpoint, self._request_object)],
@@ -289,7 +289,7 @@ class WaitForCommissioneeAction(BaseAction):
             # Timeout is provided in seconds we need to conver to milliseconds.
             self._timeout_ms = request_data_as_dict['timeout'] * 1000
 
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             if self._expire_existing_session:
                 dev_ctrl.ExpireSessions(self._node_id)
@@ -326,7 +326,7 @@ class SubscribeAttributeAction(ReadAttributeAction):
     '''Single subscribe attribute action to be executed.'''
 
     def __init__(self, test_step, cluster: str, context: _ExecutionContext):
-        '''Converts 'test_step' to subscribe attribute action that can execute with ChipDeviceCtrl.
+        '''Converts 'test_step' to subscribe attribute action that can execute with ChipDeviceController.
 
         Args:
           'test_step': Step containing information required to run write attribute action.
@@ -349,7 +349,7 @@ class SubscribeAttributeAction(ReadAttributeAction):
                 f'SubscribeAttribute action does not have max_interval {self.label}')
         self._max_interval = test_step.max_interval
 
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             subscription = asyncio.run(
                 dev_ctrl.ReadAttribute(self._node_id, [(self._endpoint, self._request_object)],
@@ -381,7 +381,7 @@ class WriteAttributeAction(BaseAction):
     '''Single write attribute action to be executed.'''
 
     def __init__(self, test_step, cluster: str, context: _ExecutionContext):
-        '''Converts 'test_step' to write attribute action that can execute with ChipDeviceCtrl.
+        '''Converts 'test_step' to write attribute action that can execute with ChipDeviceController.
 
         Args:
           'test_step': Step containing information required to run write attribute action.
@@ -425,7 +425,7 @@ class WriteAttributeAction(BaseAction):
         # Create a cluster object for the request from the provided YAML data.
         self._request_object = attribute(request_data)
 
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             resp = asyncio.run(
                 dev_ctrl.WriteAttribute(self._node_id, [(self._endpoint, self._request_object)],
@@ -463,7 +463,7 @@ class WaitForReportAction(BaseAction):
         if self._output_queue is None:
             raise UnexpectedParsingError(f'Could not find output queue')
 
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             # While there should be a timeout here provided by the test, the current codegen version
             # of YAML tests doesn't have a per test step timeout, only a global timeout for the
@@ -495,7 +495,7 @@ class CommissionerCommandAction(BaseAction):
         self._setup_payload = request_data_as_dict['payload']
         self._node_id = request_data_as_dict['nodeId']
 
-    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         resp = dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
 
         if resp:
@@ -504,10 +504,78 @@ class CommissionerCommandAction(BaseAction):
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
 
 
+class DiscoveryCommandAction(BaseAction):
+    """DiscoveryCommand implementation (FindCommissionable* methods)."""
+
+    @staticmethod
+    def _filter_for_step(test_step) -> (discovery.FilterType, any):
+        """Given a test step, figure out the correct filters to give to
+           DiscoverCommissionableNodes.
+        """
+
+        if test_step.command == 'FindCommissionable':
+            return discovery.FilterType.NONE, None
+
+        if test_step.command == 'FindCommissionableByCommissioningMode':
+            # this is just a "_CM" subtype
+            return discovery.FilterType.COMMISSIONING_MODE, None
+
+        # all the items below require a "value" to use for filtering
+        args = test_step.arguments['values']
+        request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
+
+        filter = request_data_as_dict['value']
+
+        if test_step.command == 'FindCommissionableByDeviceType':
+            return discovery.FilterType.DEVICE_TYPE, filter
+
+        if test_step.command == 'FindCommissionableByLongDiscriminator':
+            return discovery.FilterType.LONG_DISCRIMINATOR, filter
+
+        if test_step.command == 'FindCommissionableByShortDiscriminator':
+            return discovery.FilterType.SHORT_DISCRIMINATOR, filter
+
+        if test_step.command == 'FindCommissionableByVendorId':
+            return discovery.FilterType.VENDOR_ID, filter
+
+        raise UnexpectedParsingError(f'Invalid command: {test_step.command}')
+
+    def __init__(self, test_step):
+        super().__init__(test_step)
+        self.filterType, self.filter = DiscoveryCommandAction._filter_for_step(test_step)
+
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+        devices = dev_ctrl.DiscoverCommissionableNodes(
+            filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
+
+        # Devices will be a list: [CommissionableNode(), ...]
+        logging.info("Discovered devices: %r" % devices)
+
+        if not devices:
+            logging.error("No devices found")
+            return _ActionResult(status=_ActionStatus.ERROR, response="NO DEVICES FOUND")
+        elif len(devices) > 1:
+            logging.warning("Commissionable discovery found multiple results!")
+
+        return _ActionResult(status=_ActionStatus.SUCCESS, response=devices[0])
+
+
+class NotImplementedAction(BaseAction):
+    """Raises a "NOT YET IMPLEMENTED" exception when run."""
+
+    def __init__(self, test_step, cluster, command):
+        super().__init__(test_step)
+        self.cluster = cluster
+        self.command = command
+
+    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+        raise Exception(f"NOT YET IMPLEMENTED: {self.cluster}::{self.command}")
+
+
 class ReplTestRunner:
     '''Test runner to encode/decode values from YAML test Parser for executing the TestStep.
 
-    Uses ChipDeviceCtrl from chip-repl to execute parsed YAML TestSteps.
+    Uses ChipDeviceController from chip-repl to execute parsed YAML TestSteps.
     '''
 
     def __init__(self, test_spec_definition, certificate_authority_manager, alpha_dev_ctrl):
@@ -624,7 +692,9 @@ class ReplTestRunner:
         # Some of the tests contain 'cluster over-rides' that refer to a different
         # cluster than that specified in 'config'.
 
-        if cluster == 'DelayCommands' and command == 'WaitForCommissionee':
+        elif cluster == 'DiscoveryCommands':
+            return DiscoveryCommandAction(request)
+        elif cluster == 'DelayCommands' and command == 'WaitForCommissionee':
             action = self._wait_for_commissionee_action_factory(request)
         elif command == 'writeAttribute':
             action = self._attribute_write_action_factory(request, cluster)
@@ -666,6 +736,51 @@ class ReplTestRunner:
 
         if isinstance(response, chip.interaction_model.Status):
             decoded_response['error'] = stringcase.snakecase(response.name).upper()
+            return decoded_response
+
+        if isinstance(response, chip.discovery.CommissionableNode):
+            # CommissionableNode(
+            #    instanceName='04DD55352DD2AC53',
+            #    hostName='E6A32C6DBA8D0000',
+            #    port=5540,
+            #    longDiscriminator=3840,
+            #    vendorId=65521,
+            #    productId=32769,
+            #    commissioningMode=1,
+            #    deviceType=0,
+            #    deviceName='',
+            #    pairingInstruction='',
+            #    pairingHint=36,
+            #    mrpRetryIntervalIdle=None,
+            #    mrpRetryIntervalActive=None,
+            #    supportsTcp=True,
+            #    addresses=['fd00:0:1:1::3', '10.10.10.1']
+            # ), ...
+            decoded_response['value'] = {
+                'instanceName': response.instanceName,
+                'hostName': response.hostName,
+                'port': response.port,
+                'longDiscriminator': response.longDiscriminator,
+                'vendorId': response.vendorId,
+                'productId': response.productId,
+                'commissioningMode': response.commissioningMode,
+                'deviceType': response.deviceType,
+                'deviceName': response.deviceName,
+                'pairingInstruction': response.pairingInstruction,
+                'pairingHint': response.pairingHint,
+                'mrpRetryIntervalIdle': response.mrpRetryIntervalIdle,
+                'mrpRetryIntervalActive': response.mrpRetryIntervalActive,
+                'supportsTcp': response.supportsTcp,
+                'addresses': response.addresses,
+
+                # TODO: NOT AVAILABLE
+                'rotatingIdLen': 0,
+
+                # derived values
+                'numIPs': len(response.addresses),
+
+            }
+
             return decoded_response
 
         if isinstance(response, ChipStackError):

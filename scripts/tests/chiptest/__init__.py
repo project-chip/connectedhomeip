@@ -88,7 +88,6 @@ def _GetManualTests() -> Set[ManualTest]:
     manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_2.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_3.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_MEDIAPLAYBACK_6_4.yaml", reason="TODO"))
-    manualtests.add(ManualTest(yaml="Test_TC_OO_2_4.yaml", reason="Flaky"))
     manualtests.add(ManualTest(yaml="Test_TC_PCC_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_PS_2_1.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="Test_TC_SC_5_1.yaml", reason="TODO"))
@@ -101,10 +100,14 @@ def _GetManualTests() -> Set[ManualTest]:
     manualtests.add(ManualTest(yaml="Test_TC_WNCV_2_5.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestClusterMultiFabric.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestCommissionerNodeId.yaml", reason="TODO"))
-    manualtests.add(ManualTest(yaml="TestDiscovery.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestEvents.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestGroupMessaging.yaml", reason="TODO"))
     manualtests.add(ManualTest(yaml="TestMultiAdmin.yaml", reason="TODO"))
+
+    # Failing, unclear why. Likely repl specific, used to pass however first
+    # failure point seems unrelated. Historically this seems (very?) flaky
+    # in repl.
+    manualtests.add(ManualTest(yaml="Test_TC_OO_2_4.yaml", reason="Flaky"))
 
     # Examples:
     #
@@ -114,8 +117,7 @@ def _GetManualTests() -> Set[ManualTest]:
     # This is on purpose for now to make it harder to orphan files, however
     # we can reconsider as things evolve.
     manualtests.add(ManualTest(yaml="Config_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(
-        yaml="Config_Variables_Example.yaml", reason="Example"))
+    manualtests.add(ManualTest(yaml="Config_Variables_Example.yaml", reason="Example"))
     manualtests.add(ManualTest(yaml="PICS_Example.yaml", reason="Example"))
     manualtests.add(ManualTest(yaml="Response_Example.yaml", reason="Example"))
     manualtests.add(ManualTest(yaml="Test_Example.yaml", reason="Example"))
