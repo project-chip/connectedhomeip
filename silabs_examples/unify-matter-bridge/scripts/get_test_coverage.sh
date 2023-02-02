@@ -9,7 +9,7 @@ do
 done
 
 if [ -z "$TARGET_ARCH" ]; then
-    TARGET_ARCH="arm"
+    TARGET_ARCH="arm64"
 fi
 
 if [ -z "$BUILD_DIR" ]

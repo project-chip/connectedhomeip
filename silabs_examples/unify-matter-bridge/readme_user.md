@@ -16,7 +16,7 @@ Once a protocol controller is running, the Matter Bridge can be started.
 The following documentation assumes that you have built the Unify Matter Bridge
 application by following the _[Build Guide](./readme_building.md)_ and have
 transferred the _`unify-matter-bridge`_ to your Raspberry Pi 4 (RPi4) running
-the 32-bit version of Raspberry Pi OS Buster.
+the 64-bit version of Raspberry Pi OS Bullseye.
 
 > **Note:**
 >
@@ -32,16 +32,16 @@ the 32-bit version of Raspberry Pi OS Buster.
 > This guide will use the CLI tool called _`chip-tool`_ for commissioning and
 > device control.
 
--   [Unify Matter Bridge User's Guide](#unify-matter-bridge-users-guide)
-    -   [Running the Matter Bridge](#running-the-matter-bridge)
-        -   [Important Configuration Settings](#important-configuration-settings)
-        -   [Starting the Matter Bridge](#starting-the-matter-bridge)
-    -   [Commissioning the Bridge to a Network](#commissioning-the-bridge-to-a-network)
-        -   [Using the chip-tool to Commission](#using-the-chip-tool-to-commission)
-        -   [Toggle an OnOff device](#toggle-an-onoff-device)
-    -   [Toggle a Group of OnOff Devices](#toggle-a-group-of-onoff-devices)
-    -   [Running the matter bridge in spec compliant mode](#running-the-matter-bridge-in-spec-compliant-mode)
-    -   [Command Line Arguments](#command-line-arguments)
+- [Unify Matter Bridge User's Guide](#unify-matter-bridge-users-guide)
+  - [Running the Matter Bridge](#running-the-matter-bridge)
+    - [Important Configuration Settings](#important-configuration-settings)
+    - [Starting the Matter Bridge](#starting-the-matter-bridge)
+  - [Commissioning the Bridge to a Network](#commissioning-the-bridge-to-a-network)
+    - [Using the chip-tool to Commission](#using-the-chip-tool-to-commission)
+    - [Toggle an OnOff device](#toggle-an-onoff-device)
+  - [Toggle a Group of OnOff Devices](#toggle-a-group-of-onoff-devices)
+  - [Running the matter bridge in none specification compliant mode](#running-the-matter-bridge-in-none-specification-compliant-mode)
+  - [Command Line Arguments](#command-line-arguments)
 
 ## Running the Matter Bridge
 

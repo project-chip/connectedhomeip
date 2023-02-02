@@ -11,8 +11,8 @@ done
 
 if [ -z "$TARGET_ARCH" ]
 then
-    echo "Compiling tests for the default target architecture armhf"
-    TARGET_ARCH="arm"
+    TARGET_ARCH="arm64"
+    echo "Compiling tests for the default target architecture ${TARGET_ARCH}"
 fi
 BUILD_DIR="out/${TARGET_ARCH}_test"
 

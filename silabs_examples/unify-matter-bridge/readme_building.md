@@ -1,6 +1,6 @@
 # Building the Unify Matter Bridge
 
-This build guide cross-compiles for armhf architecture to be run on Unify's reference platform - a Raspberry Pi 4 (RPi4) with the 32-bit version of Debian Buster.
+This build guide cross-compiles for arm64 architecture to be run on Unify's reference platform - a Raspberry Pi 4 (RPi4) with the 64-bit version of Debian Bullseye.
 
 > **Note:**
 > In the following subsections the commands should either be run on your local development machine or inside a running Docker container, as distinguished by the structure of the example.
@@ -16,7 +16,7 @@ This build guide cross-compiles for armhf architecture to be run on Unify's refe
 dev-machine:~$ git clone --depth 1 --branch external/matter-bridge-unstable https://github.com/SiliconLabs/UnifySDK.git --recursive ../uic-matter
 ```
 
-## Build the Docker Container (armhf compilation)
+## Build the Docker Container (arm64 compilation)
 
 ```bash
 dev-machine:~$ docker build -t unify-matter silabs_examples/unify-matter-bridge/docker/
@@ -35,17 +35,17 @@ The Unify Matter Bridge depends on the libunify library from the Unify project.
 This library must first be compiled for the target system, by changing directory to the `/uic` folder and running the following:
 
 ```bash
-root@docker:/uic$ cmake -DCMAKE_INSTALL_PREFIX=$PWD/stage -GNinja -DCMAKE_TOOLCHAIN_FILE=../cmake/armhf_debian.cmake  -B build_unify_armhf/ -S components
-root@docker:/uic$ cmake --build build_unify_armhf
-root@docker:/uic$ cmake --install build_unify_armhf
+root@docker:/uic$ cmake -DCMAKE_INSTALL_PREFIX=$PWD/stage -GNinja -DCMAKE_TOOLCHAIN_FILE=../cmake/arm64_debian.cmake  -B build_unify_arm64/ -S components -DBUILD_TESTING=OFF
+root@docker:/uic$ cmake --build build_unify_arm64
+root@docker:/uic$ cmake --install build_unify_arm64 --prefix $PWD/stage
 ```
 
 After cross-compiling the Unify library, set two paths in the PKG_CONFIG_PATH.
-The first path is for the staged Unify library and the second is for cross compiling to armhf.
+The first path is for the staged Unify library and the second is for cross compiling to arm64.
 
 ```bash
 root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$PWD/stage/share/pkgconfig
-root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/arm-linux-gnueabihf/pkgconfig
+root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/aarch64-linux-gnu/pkgconfig
 ```
 
 If you want to be able to use Zap to generate code from Unify XML files you need to export UCL_XML_PATH as well.
@@ -75,12 +75,12 @@ root@docker:/matter$ source ./scripts/activate.sh
 ```bash
 root@docker:/matter$ cd silabs_examples/unify-matter-bridge/linux/
 
-root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ gn gen out/armhf --args='target_cpu="arm"'
+root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ gn gen out/arm64 --args='target_cpu="arm64"'
 
-root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ ninja -C out/armhf
+root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ ninja -C out/arm64
 ```
 
-After building, the `unify-matter-bridge` binary is located at `/matter/silabs_examples/unify-matter-bridge/linux/out/armhf/obj/bin/unify-matter-bridge`.
+After building, the `unify-matter-bridge` binary is located at `/matter/silabs_examples/unify-matter-bridge/linux/out/arm64/obj/bin/unify-matter-bridge`.
 
 ## Compile the chip-tool
 
@@ -89,12 +89,12 @@ The `chip-tool` is a CLI tool that can be used to commission the bridge and to c
 ```bash
 root@docker:/matter$ cd examples/chip-tool
 
-root@docker:/matter/examples/chip-tool$ gn gen out/armhf --args='target_cpu="arm"'
+root@docker:/matter/examples/chip-tool$ gn gen out/arm64 --args='target_cpu="arm64"'
 
-root@docker:/matter/examples/chip-tool$ ninja -C out/armhf
+root@docker:/matter/examples/chip-tool$ ninja -C out/arm64
 ```
 
-After building, the chip-tool binary is located at `/matter/examples/chip-tool/out/armhf/obj/bin/chip-tool`.
+After building, the chip-tool binary is located at `/matter/examples/chip-tool/out/arm64/obj/bin/chip-tool`.
 
 ## Unit Testing
 
@@ -105,7 +105,7 @@ Unit testing is always a good idea for quality software. Documentation on writin
 
 1. If you do not source the `matter/scripts/activate.sh` as described above in [Set Up the Matter Build Environment](#set-up-the-matter-build-environment), `gn` and other common
    build tools will not be found.
-2. If you do not export the `pkgconfig` for the `arm-linux-gnueabihf` toolchain as described above in [Build libunify](#build-libunify)
+2. If you do not export the `pkgconfig` for the `aarch64-linux-gnu` toolchain as described above in [Build libunify](#build-libunify)
    you will get errors such as `G_STATIC_ASSERT(sizeof (unsigned long long) == sizeof (guint64));`
 3. If you are compiling unit tests, do not try to compile the Unify Matter Bridge at
    the same time. This will not work as when compiling unit tests you are also
