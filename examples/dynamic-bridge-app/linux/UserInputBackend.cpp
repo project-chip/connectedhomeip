@@ -2,6 +2,7 @@
 #include "DynamicDevice.h"
 #include "main.h"
 
+#include <app-common/zap-generated/attribute-type.h>
 #include <platform/PlatformManager.h>
 
 #include <algorithm>

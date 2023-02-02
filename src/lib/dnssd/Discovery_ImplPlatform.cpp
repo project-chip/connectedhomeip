@@ -603,6 +603,11 @@ CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
     return ChipDnssdFinalizeServiceUpdate();
 }
 
+bool DiscoveryImplPlatform::IsInitialized()
+{
+    return mState == State::kInitialized;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId)
 {
     ReturnErrorOnFailure(InitImpl());
