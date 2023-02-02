@@ -43,5 +43,3 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         }
     }
 }
-
-
