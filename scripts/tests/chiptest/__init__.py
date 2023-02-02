@@ -39,6 +39,14 @@ class ManualTest:
 INVALID_TESTS = {
     "tests.yaml",  # certification/tests.yaml is not a real test
     "PICS.yaml",  # certification/PICS.yaml is not a real test
+
+    # The items below are examples and will never work (likely)
+    # completely exclude them
+    "Config_Example.yaml",
+    "Config_Variables_Example.yaml",
+    "PICS_Example.yaml",
+    "Response_Example.yaml",
+    "Test_Example.yaml",
 }
 
 
@@ -56,19 +64,6 @@ def _GetManualTests() -> Set[str]:
     # Flagged as manual from: src/app/tests/suites/manualTests.json
     for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
         manualtests.add(item)
-
-    # Examples:
-    #
-    # Currently these are not in ciTests.json, however yaml logic currently
-    # does NOT use allowlist json but rather finds all yaml files.
-    #
-    # This is on purpose for now to make it harder to orphan files, however
-    # we can reconsider as things evolve.
-    manualtests.add("Config_Example.yaml")
-    manualtests.add("Config_Variables_Example.yaml")
-    manualtests.add("PICS_Example.yaml")
-    manualtests.add("Response_Example.yaml")
-    manualtests.add("Test_Example.yaml")
 
     return manualtests
 
