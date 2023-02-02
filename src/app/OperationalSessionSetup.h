@@ -36,6 +36,7 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
@@ -158,7 +159,6 @@ public:
         }
 
         mClientPool      = clientPool;
-        mSystemLayer     = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mPeerId          = peerId;
         mReleaseDelegate = releaseDelegate;
         mState           = State::NeedsAddress;
@@ -224,6 +224,11 @@ public:
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
     void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    // Update our remaining attempt count to be at least the given value.
+    void UpdateAttemptCount(uint8_t attemptCount);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
 private:
     enum class State : uint8_t
     {
@@ -237,7 +242,6 @@ private:
 
     CASEClientInitParams mInitParams;
     CASEClientPoolDelegate * mClientPool = nullptr;
-    System::Layer * mSystemLayer;
 
     // mCASEClient is only non-null if we are in State::Connecting or just
     // allocated it as part of an attempt to enter State::Connecting.
@@ -260,6 +264,11 @@ private:
     State mState = State::Uninitialized;
 
     bool mPerformingAddressUpdate = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    uint8_t mRemainingAttempts = 0;
+    uint8_t mAttemptsDone      = 0;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     void MoveToState(State aTargetState);
 
@@ -301,6 +310,18 @@ private:
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
     void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    /**
+     * Schedule a setup reattempt, if possible.
+     */
+    CHIP_ERROR ScheduleSessionSetupReattempt();
+
+    /**
+     * Helper for our backoff retry timer.
+     */
+    static void TrySetupAgain(System::Layer * systemLayer, void * state);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 };
 
 } // namespace chip

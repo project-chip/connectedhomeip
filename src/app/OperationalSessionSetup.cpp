@@ -36,6 +36,7 @@
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 
 using namespace chip::Callback;
@@ -49,7 +50,7 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
 {
     if (mState != aTargetState)
     {
-        ChipLogDetail(Controller, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: State change %d --> %d",
+        ChipLogDetail(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: State change %d --> %d",
                       mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
                       to_underlying(aTargetState));
         mState = aTargetState;
@@ -70,7 +71,7 @@ bool OperationalSessionSetup::AttachToExistingSecureSession()
     if (!sessionHandle.HasValue())
         return false;
 
-    ChipLogProgress(Controller, "Found an existing secure session to [%u:" ChipLogFormatX64 "]!", mPeerId.GetFabricIndex(),
+    ChipLogProgress(Discovery, "Found an existing secure session to [%u:" ChipLogFormatX64 "]!", mPeerId.GetFabricIndex(),
                     ChipLogValueX64(mPeerId.GetNodeId()));
 
     mDeviceAddress = sessionHandle.Value()->AsSecureSession()->GetPeerAddress();
@@ -214,7 +215,7 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
         return;
     }
 
-    ChipLogError(Controller, "Received UpdateDeviceData in incorrect state");
+    ChipLogError(Discovery, "Received UpdateDeviceData in incorrect state");
     DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -304,7 +305,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
 void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 {
     VerifyOrReturn(mState != State::Uninitialized && mState != State::NeedsAddress,
-                   ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
+                   ChipLogError(Discovery, "HandleCASEConnectionFailure was called while the device was not initialized"));
 
     if (CHIP_ERROR_TIMEOUT == error)
     {
@@ -313,6 +314,17 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
             MoveToState(State::ResolvingAddress);
             return;
         }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        if (mRemainingAttempts > 0)
+        {
+            CHIP_ERROR err = ScheduleSessionSetupReattempt();
+            if (err == CHIP_NO_ERROR)
+            {
+                return;
+            }
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     }
 
     DequeueConnectionCallbacks(error);
@@ -322,7 +334,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session)
 {
     VerifyOrReturn(mState != State::Uninitialized,
-                   ChipLogError(Controller, "HandleCASEConnected was called while the device was not initialized"));
+                   ChipLogError(Discovery, "HandleCASEConnected was called while the device was not initialized"));
 
     if (!mSecureSession.Grab(session))
         return; // Got an invalid session, do not change any state
@@ -377,6 +389,17 @@ OperationalSessionSetup::~OperationalSessionSetup()
 
 CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    if (mRemainingAttempts > 0)
+    {
+        --mRemainingAttempts;
+    }
+    if (mAttemptsDone < UINT8_MAX)
+    {
+        ++mAttemptsDone;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
     // NOTE: This is public API that can be used to update our stored peer
     // address even when we are in State::Connected, so we do not make any
     // MoveToState calls in this method.
@@ -418,7 +441,7 @@ void OperationalSessionSetup::PerformAddressUpdate()
     CHIP_ERROR err = LookupPeerAddress();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to look up peer address: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Discovery, "Failed to look up peer address: %" CHIP_ERROR_FORMAT, err.Format());
         DequeueConnectionCallbacks(err);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         return;
@@ -435,9 +458,93 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
     ChipLogError(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: operational discovery failed: %" CHIP_ERROR_FORMAT,
                  mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), reason.Format());
 
+    // Does it make sense to ScheduleSessionSetupReattempt() here?  DNS-SD
+    // resolution has its own retry/backoff mechanisms, so if it's failed we
+    // have already done a lot of that.
+
     // No need to modify any variables in `this` since call below releases `this`.
     DequeueConnectionCallbacks(reason);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+void OperationalSessionSetup::UpdateAttemptCount(uint8_t attemptCount)
+{
+    if (attemptCount == 0)
+    {
+        // Nothing to do.
+        return;
+    }
+
+    if (mState != State::NeedsAddress)
+    {
+        // We're in the middle of an attempt already, so decrement attemptCount
+        // by 1 to account for that.
+        --attemptCount;
+    }
+
+    if (attemptCount > mRemainingAttempts)
+    {
+        mRemainingAttempts = attemptCount;
+    }
+}
+
+CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt()
+{
+    VerifyOrDie(mRemainingAttempts > 0);
+    // Try again, but not if things are in shutdown such that we can't get
+    // to a system layer, and not if we've run out of attempts.
+    if (!mInitParams.exchangeMgr->GetSessionManager() || !mInitParams.exchangeMgr->GetSessionManager()->SystemLayer())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    MoveToState(State::NeedsAddress);
+    System::Clock::Seconds16 timerDelay;
+    // Stop exponential backoff before our delays get too large.
+    //
+    // Note that mAttemptsDone is always > 0 here, because we have
+    // just finished one attempt.
+    VerifyOrDie(mAttemptsDone > 0);
+    static_assert(UINT16_MAX / CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS >=
+                      (1 << CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF),
+                  "Our backoff calculation will overflow.");
+    timerDelay = System::Clock::Seconds16(
+        static_cast<uint16_t>(CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS
+                              << min((mAttemptsDone - 1), CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF)));
+    CHIP_ERROR err = mInitParams.exchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(timerDelay, TrySetupAgain, this);
+    // The cast on count() is needed because the type count() returns might not
+    // actually be uint16_t; on some platforms it's int.
+    ChipLogProgress(Discovery,
+                    "OperationalSessionSetup:attempts done: %u, attempts left: %u, retry delay %us, status %" CHIP_ERROR_FORMAT,
+                    mAttemptsDone, mRemainingAttempts, static_cast<unsigned>(timerDelay.count()), err.Format());
+    return err;
+}
+
+void OperationalSessionSetup::TrySetupAgain(System::Layer * systemLayer, void * state)
+{
+    auto * self = static_cast<OperationalSessionSetup *>(state);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (self->mState != State::NeedsAddress)
+    {
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+    else
+    {
+        self->MoveToState(State::ResolvingAddress);
+        err = self->LookupPeerAddress();
+        if (err == CHIP_NO_ERROR)
+        {
+            return;
+        }
+    }
+
+    // Give up; we're either in a bad state or could not start a lookup.
+    self->DequeueConnectionCallbacks(err);
+    // Do not touch `self` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
 } // namespace chip
