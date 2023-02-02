@@ -302,7 +302,7 @@ source_set("efr32-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ "${examples_plat_dir}:efr-matter-shell" ]
+    deps += [ ":efr-matter-shell" ]
   }
 
   # Attestation Credentials
