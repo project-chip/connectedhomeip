@@ -26,8 +26,8 @@ CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIndex,
                                              std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                              std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId,
-                                             uint16_t productId, DeviceTypeId deviceType, const char * deviceName, size_t numIPs,
-                                             chip::Inet::IPAddress * ipAddress)
+                                             uint16_t productId, chip::DeviceTypeId deviceType, const char * deviceName,
+                                             const char * hostName, size_t numIPs, chip::Inet::IPAddress * ipAddress)
 {
     ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(nodeId),
                     fabricIndex);
@@ -42,7 +42,18 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
         mIpAddress[i] = ipAddress[i];
     }
 
-    chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, deviceName);
+    memset(mDeviceName, '\0', sizeof(mDeviceName));
+    if (deviceName != nullptr)
+    {
+        chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, deviceName);
+    }
+
+    memset(mHostName, '\0', sizeof(mHostName));
+    if (hostName != nullptr)
+    {
+        chip::Platform::CopyString(mHostName, chip::Dnssd::kHostNameMaxLength + 1, hostName);
+    }
+
     for (auto & endpointInfo : mEndpoints)
     {
         endpointInfo.Reset();
@@ -128,8 +139,15 @@ void TargetVideoPlayerInfo::PrintInfo()
     }
 }
 
-bool TargetVideoPlayerInfo::IsSameAs(const char * deviceName, size_t numIPs, const chip::Inet::IPAddress * ipAddresses)
+bool TargetVideoPlayerInfo::IsSameAs(const char * hostName, const char * deviceName, size_t numIPs,
+                                     const chip::Inet::IPAddress * ipAddresses)
 {
+    // return true if the hostNames match
+    if (strcmp(mHostName, hostName) == 0)
+    {
+        return true;
+    }
+
     // return false because deviceNames are different
     if (strcmp(mDeviceName, deviceName) != 0)
     {
@@ -173,6 +191,6 @@ bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * dis
         return false;
     }
 
-    return IsSameAs(discoveredNodeData->commissionData.deviceName, discoveredNodeData->resolutionData.numIPs,
-                    discoveredNodeData->resolutionData.ipAddress);
+    return IsSameAs(discoveredNodeData->resolutionData.hostName, discoveredNodeData->commissionData.deviceName,
+                    discoveredNodeData->resolutionData.numIPs, discoveredNodeData->resolutionData.ipAddress);
 }
