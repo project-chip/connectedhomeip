@@ -33,6 +33,21 @@ using namespace ::chip::Controller;
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
+    // Clear the CATs in OperationalCredentialsIssuer
+    mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
+
+    if (mCASEAuthTags.HasValue() && mCASEAuthTags.Value().size() <= kMaxSubjectCATAttributeCount)
+    {
+        CATValues cats = kUndefinedCATs;
+        for (size_t index = 0; index < mCASEAuthTags.Value().size(); ++index)
+        {
+            cats.values[index] = mCASEAuthTags.Value()[index];
+        }
+        if (cats.AreValid())
+        {
+            mCredIssuerCmds->SetCredentialIssuerCATValues(cats);
+        }
+    }
     return RunInternal(mNodeId);
 }
 
