@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Iterator, Set
 
 from . import linux, runner
-from .test_definition import ApplicationPaths, TestDefinition, TestTarget, TestTag, TestRunTime
+from .test_definition import ApplicationPaths, TestDefinition, TestRunTime, TestTag, TestTarget
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -220,7 +220,6 @@ def tests_with_command(chip_tool: str, is_manual: bool):
 
         target = target_for_name(name)
 
-
         yield TestDefinition(
             run_name=name, name=name, target=target, tags=test_tags
         )
@@ -261,7 +260,7 @@ def _hardcoded_python_yaml_tests():
 
 def AllYamlTests():
     for test in _hardcoded_python_yaml_tests():
-       yield test
+        yield test
 
 
 def AllChipToolTests(chip_tool: str):

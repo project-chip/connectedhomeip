@@ -224,7 +224,7 @@ class TestTag(Enum):
 
 
 class TestRunTime(Enum):
-    CHIP_TOOL_BUILTIN = auto() # run via chip-tool built-in test commands
+    CHIP_TOOL_BUILTIN = auto()  # run via chip-tool built-in test commands
     PYTHON_YAML = auto()       # use the python yaml test runner
 
 
