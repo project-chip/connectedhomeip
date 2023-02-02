@@ -669,7 +669,6 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                       } else {
                           handler->AddResponse(cachedCommandPath, response);
                       }
-                      handler->AddResponse(cachedCommandPath, response);
                       handle.Release();
                       gOtaSender.ResetState();
                   }
