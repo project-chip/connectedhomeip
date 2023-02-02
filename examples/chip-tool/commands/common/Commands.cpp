@@ -72,6 +72,35 @@ std::vector<std::string> GetArgumentsFromJson(Command * command, Json::Value & v
     return args;
 };
 
+// Check for arguments with a starting '"' but no ending '"': those
+// would indicate that people are using double-quoting, not single
+// quoting, on arguments with spaces.
+static void DetectAndLogMismatchedDoubleQuotes(int argc, char ** argv)
+{
+    for (int curArg = 0; curArg < argc; ++curArg)
+    {
+        char * arg = argv[curArg];
+        if (!arg)
+        {
+            continue;
+        }
+
+        auto len = strlen(arg);
+        if (len == 0)
+        {
+            continue;
+        }
+
+        if (arg[0] == '"' && arg[len - 1] != '"')
+        {
+            ChipLogError(chipTool,
+                         "Mismatched '\"' detected in argument: '%s'.  Use single quotes to delimit arguments with spaces "
+                         "in them: 'x y', not \"x y\".",
+                         arg);
+        }
+    }
+}
+
 } // namespace
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
@@ -219,31 +248,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
     {
         if (interactive)
         {
-            // Check for arguments with a starting '"' but no ending '"': those
-            // would indicate that people are using double-quoting, not single
-            // quoting, on arguments with spaces.
-            for (int curArg = argumentsPosition; curArg < argc - argumentsPosition; ++curArg)
-            {
-                char * arg = argv[curArg];
-                if (!arg)
-                {
-                    continue;
-                }
-
-                auto len = strlen(arg);
-                if (len == 0)
-                {
-                    continue;
-                }
-
-                if (arg[0] == '"' && arg[len - 1] != '"')
-                {
-                    ChipLogError(chipTool,
-                                 "Mismatched '\"' detected in argument: '%s'.  Use single quotes to delimit arguments with spaces "
-                                 "in them: 'x y', not \"x y\".",
-                                 arg);
-                }
-            }
+            DetectAndLogMismatchedDoubleQuotes(argc - argumentsPosition, &argv[argumentsPosition]);
         }
         ShowCommand(argv[0], argv[1], command);
         return CHIP_ERROR_INVALID_ARGUMENT;
