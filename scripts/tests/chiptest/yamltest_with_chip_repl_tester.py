@@ -106,13 +106,13 @@ def main(setup_code, yaml_path, node_id, pics_file):
 
             # Executing and validating test
             for test_step in yaml.tests:
+                if not test_step.is_pics_enabled:
+                    continue
                 test_action = runner.encode(test_step)
                 # TODO if test_action is None we should see if it is a pseudo cluster.
                 if test_action is None:
                     raise Exception(
                         f'Failed to encode test step {test_step.label}')
-                if not test_action.pics_enabled:
-                    continue
 
                 response = runner.execute(test_action)
                 decoded_response = runner.decode(response)
