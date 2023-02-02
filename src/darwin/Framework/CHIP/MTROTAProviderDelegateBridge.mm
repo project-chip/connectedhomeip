@@ -664,7 +664,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                       if (!isBDXProtocolSupported) {
                           Commands::QueryImageResponse::Type protocolNotSupportedResponse;
                           protocolNotSupportedResponse.status
-                              = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
+                              = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
                           handler->AddResponse(cachedCommandPath, protocolNotSupportedResponse);
                       } else {
                           handler->AddResponse(cachedCommandPath, response);
