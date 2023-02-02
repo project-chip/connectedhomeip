@@ -98,7 +98,9 @@ Ninja to build the executable.
 
 ## Adding DAC Certificates
 
-To add custom DAC Certificates, the CC32XXDeviceAttestationCreds.cpp file in `examples/platform/cc32xx` can be modified. The private key, public key, DAC cert and PAI cert arrays all need to be replaced. 
+To add custom DAC Certificates, the CC32XXDeviceAttestationCreds.cpp file in
+`examples/platform/cc32xx` can be modified. The private key, public key, DAC
+cert and PAI cert arrays all need to be replaced.
 
 ## Programming
 
@@ -163,6 +165,7 @@ the device is connected to the local AP, commissioning can be triggered using
 #### Bluetooth LE Provisioning
 
 BLE provisioning is not supported currently.
+
 ## TI Support
 
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
