@@ -180,7 +180,7 @@ tests:
 
     - label: "Step 9: Reboot DUT"
       verification: |
-          Not implemented in YAML
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP

@@ -35,7 +35,7 @@ tests:
       wait: "readAttribute"
       attribute: "TemperatureUnit"
 
-    - label: "DUT writes 3 to TemperatureUnit attribute on TH"
+    - label: "DUT writes 2 to TemperatureUnit attribute on TH"
       PICS: LUNIT.C.A0000
       wait: "writeAttribute"
       attribute: "TemperatureUnit"

@@ -52,7 +52,7 @@ tests:
 
     - label: "Precondition: Reset Devices to factory defaults"
       verification: |
-          Not implemented in YAML
+          Reset Devices to factory defaults
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -301,8 +301,8 @@ tests:
           value:
               [
                   { Label: "", NodeID: nodeId },
-                  { Label: "", NodeID: nodeId2 },
                   { Label: "", NodeID: nodeId3 },
+                  { Label: "", NodeID: nodeId2 },
               ]
           constraints:
               type: list
@@ -403,8 +403,8 @@ tests:
           value:
               [
                   { Label: "", NodeID: nodeId },
-                  { Label: "", NodeID: nodeId2 },
                   { Label: "", NodeID: nodeId3 },
+                  { Label: "", NodeID: nodeId2 },
               ]
           constraints:
               type: list
