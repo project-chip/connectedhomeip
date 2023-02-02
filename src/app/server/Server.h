@@ -370,7 +370,10 @@ public:
 
     void ScheduleFactoryReset();
 
-    System::Clock::Microseconds64 TimeSinceInit() { return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp; }
+    System::Clock::Microseconds64 TimeSinceInit() const
+    {
+        return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
+    }
 
     static Server & GetInstance() { return sServer; }
 
