@@ -708,10 +708,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         }
         else
         {
-            char errorStr[160];
-            errorStr[0] = 0;
-            FormatCHIPError(errorStr, sizeof(errorStr), err);
-            ChipLogError(DeviceLayer, "  Product Name: n/a (%s)", errorStr);
+            ChipLogError(DeviceLayer, "  Product Name: n/a (%" CHIP_ERROR_FORMAT ")", err.Format())
         }
     }
 
