@@ -26,7 +26,6 @@ config:
     endpoint: 0
 
 tests:
-
     - label: "Precondition"
       verification: |
           Commission TH and DUT on Thread setup

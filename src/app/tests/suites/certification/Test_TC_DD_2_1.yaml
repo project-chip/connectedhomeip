@@ -314,8 +314,8 @@ tests:
 
     - label:
           "Optional Commissioning Subtypes: Send a browse request for
-          '_services._dns-sd._udp' using a DNS-SD records command-line test
-          tool (i.e. 'dns-sd -B _services._dns-sd._udp' or 'avahi-browse
+          '_services._dns-sd._udp' using a DNS-SD records command-line test tool
+          (i.e. 'dns-sd -B _services._dns-sd._udp' or 'avahi-browse
           _services._dns-sd._udp -r')"
       PICS: MCORE.DD.COMMISSIONING_SUBTYPE_V && MCORE.DD.COMMISSIONING_SUBTYPE_T
       verification: |

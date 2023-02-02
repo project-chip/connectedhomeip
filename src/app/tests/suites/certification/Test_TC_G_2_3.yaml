@@ -45,28 +45,33 @@ tests:
           [1674550919.106455][20702:20704] CHIP:TOO:   MaxGroupsPerFabric: 4
       disabled: true
 
-    - label:
-          "Pre-Conditions: If maxgroups>0, proceed with the following steps
+    - label: "Pre-Conditions: If maxgroups>0, proceed with the following steps
 
-           TH generates fabric-unique GroupID, GroupName, random key, EpochKey0 and GroupKeySetID.
+          TH generates fabric-unique GroupID, GroupName, random key, EpochKey0
+          and GroupKeySetID.
 
-           TH generates an EpochKey and saves as epoch_key_set1_epoch0
+          TH generates an EpochKey and saves as epoch_key_set1_epoch0
 
-           TH sends a KeySetWriteCommand to the Group Key Management cluster with the following fields set in the GroupKeySet struct:
+          TH sends a KeySetWriteCommand to the Group Key Management cluster with
+          the following fields set in the GroupKeySet struct:
 
-           GroupKeySetId is 1
+          GroupKeySetId is 1
 
-           EpochKey0 is epoch_key_set0_epoch0
+          EpochKey0 is epoch_key_set0_epoch0
 
-           GroupKeySecurityPolicy = TrustFirst (1)
+          GroupKeySecurityPolicy = TrustFirst (1)
 
-           GroupKeyMulticastPolicy = PerGroupID (0)
+          GroupKeyMulticastPolicy = PerGroupID (0)
 
-           EpochStartTime0 = 0
+          EpochStartTime0 = 0
 
-           TH binds GroupId(0x0002 to (maxgroups+1)) with GroupKeySetID in the GroupKeyMap attribute list on GroupKeyManagement cluster with the values provided in the above steps
+          TH binds GroupId(0x0002 to (maxgroups+1)) with GroupKeySetID in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster with the
+          values provided in the above steps
 
-           TH binds GroupId(0x0006 to (maxgroups+1)) with GroupKeySetID in the GroupKeyMap attribute list on GroupKeyManagement cluster with the values provided in the above steps"
+          TH binds GroupId(0x0006 to (maxgroups+1)) with GroupKeySetID in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster with the
+          values provided in the above steps"
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
