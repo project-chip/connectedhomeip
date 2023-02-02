@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,8 +25,6 @@
 #include <zephyr/kernel.h>
 
 #include <cstdint>
-
-// TODO: possibly move CONFIGs to AppConfig.h
 
 // Maximum number of credentials per user supported by lock
 #define CONFIG_LOCK_NUM_CREDENTIALS_PER_USER (2)

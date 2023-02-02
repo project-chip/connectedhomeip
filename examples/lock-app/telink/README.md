@@ -1,10 +1,10 @@
-# Matter Telink Light Switch Example Application
+# Matter Telink Lock Example Application
 
-The Telink Light Switch Example demonstrates how to remotely control a lighting
-devices such as light bulbs or LEDs. The application should be used together
-with the [lighting app example](../../lighting-app/telink/README.md). The light
-switch uses buttons to test changing the lighting application example LED state
-and works as a brightness dimmer. You can use this example as a reference for
+The Telink Lock Example demonstrates how to remotely control a lighting devices
+such as light bulbs or LEDs. The application should be used together with the
+[lighting app example](../../lighting-app/telink/README.md). The light switch
+uses buttons to test changing the lighting application example LED state and
+works as a brightness dimmer. You can use this example as a reference for
 creating your own application.
 
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)

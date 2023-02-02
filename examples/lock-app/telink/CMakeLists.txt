@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2023 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ add_definitions(
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/main.cpp
-               src/BoltLockManager.cpp
                src/ZclCallbacks.cpp
+               src/BoltLockManager.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -175,7 +174,7 @@ void BoltLockManager::ActuatorTimerEventHandler(k_timer * timer)
     event.Type               = AppEvent::kEventType_Timer; // Timer => kEventType_Timer
     event.TimerEvent.Context = static_cast<BoltLockManager *>(k_timer_user_data_get(timer));
     event.Handler            = BoltLockManager::ActuatorAppEventHandler;
-    AppTask::Instance().PostEvent(&event);
+    GetAppTask().PostEvent(&event);
 }
 
 void BoltLockManager::ActuatorAppEventHandler(const AppEvent & event)

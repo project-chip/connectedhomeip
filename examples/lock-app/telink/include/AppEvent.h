@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,32 +25,7 @@
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
-// From EventTypes.h :
-// struct AppEvent; // Needs to be implemented in the application code.
-// using EventHandler = void (*)(const AppEvent &);
-// ===================
 class LEDWidget;
-
-// enum class AppEventType : uint8_t
-// {
-//     None = 0,
-//     Button,
-//     ButtonPushed,
-//     ButtonReleased,
-//     Timer,
-//     UpdateLedState,
-//     IdentifyStart,
-//     IdentifyStop,
-//     StartSMPAdvertising
-// };
-
-// enum class FunctionEvent : uint8_t
-// {
-//     NoneSelected   = 0,
-//     SoftwareUpdate = 0,
-//     FactoryReset,
-//     AdvertisingStart
-// };
 
 struct AppEvent
 {
@@ -79,45 +54,9 @@ struct AppEvent
         } TimerEvent;
         struct
         {
-            uint8_t Action;
-            int32_t Actor;
-        } LightingEvent;
-//             uint8_t Action;
-//             int32_t Actor;
-//         } LockEvent;
-        struct
-        {
             LEDWidget * LedWidget;
         } UpdateLedStateEvent;
     };
 
     EventHandler Handler;
 };
-
-// struct AppEvent
-// {
-//     union
-//     {
-//         struct
-//         {
-//             uint8_t PinNo;
-//             uint8_t Action;
-//         } ButtonEvent;
-//         struct
-//         {
-//             void * Context;
-//         } TimerEvent;
-//         struct
-//         {
-//             uint8_t Action;
-//             int32_t Actor;
-//         } LockEvent;
-//         struct
-//         {
-//             LEDWidget * LedWidget;
-//         } UpdateLedStateEvent;
-//     };
-
-//     AppEventType Type{ AppEventType::None };
-//     EventHandler Handler;
-// };
