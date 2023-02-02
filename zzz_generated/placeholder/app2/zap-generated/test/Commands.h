@@ -1747,7 +1747,7 @@ private:
             return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::TemperatureUnit::Id);
         }
         case 2: {
-            LogStep(2, "DUT writes 3 to TemperatureUnit attribute on TH");
+            LogStep(2, "DUT writes 2 to TemperatureUnit attribute on TH");
             VerifyOrDo(!ShouldSkip("LUNIT.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::TemperatureUnit::Id);
         }
