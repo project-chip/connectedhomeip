@@ -168,9 +168,23 @@
     return self;
 }
 
+- (void)invalidate
+{
+    // Make sure we don't leak via handlers that close over us, as ours must.
+    // This is a bit odd, since these are supposed to be non-nullable
+    // properties, but it's the best we can do given our API surface, unless we
+    // assume that all consumers consistently use __weak refs to us inside their
+    // handlers.
+    //
+    // Setting the attributes to nil will not compile; set the ivars directly.
+    _readyHandler = nil;
+    _cancelHandler = nil;
+}
+
 - (void)endWork
 {
     [self.workQueue endWork:self];
+    [self invalidate];
 }
 
 - (void)retryWork
@@ -182,8 +196,13 @@
 - (void)callReadyHandlerWithContext:(id)context
 {
     dispatch_async(self.queue, ^{
-        self.readyHandler(context, self.retryCount);
-        self.retryCount++;
+        if (self.readyHandler == nil) {
+            // Nothing to do here.
+            [self endWork];
+        } else {
+            self.readyHandler(context, self.retryCount);
+            self.retryCount++;
+        }
     });
 }
 
@@ -191,7 +210,10 @@
 - (void)cancel
 {
     dispatch_async(self.queue, ^{
-        self.cancelHandler();
+        if (self.cancelHandler != nil) {
+            self.cancelHandler();
+        }
+        [self invalidate];
     });
 }
 @end

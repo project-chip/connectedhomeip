@@ -3801,8 +3801,19 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 
 void DoorLockServer::DoorLockOnAutoRelockCallback(chip::EndpointId endpointId)
 {
-    emberAfDoorLockClusterPrintln("Door Auto relock timer expired. Locking...");
     emberEventControlSetInactive(&DoorLockServer::Instance().AutolockEvent);
-    DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked, OperationSourceEnum::kAuto);
-    emberAfPluginDoorLockOnAutoRelock(endpointId);
+
+    Nullable<DlLockState> lockState;
+    if (Attributes::LockState::Get(endpointId, lockState) != EMBER_ZCL_STATUS_SUCCESS || lockState.IsNull() ||
+        lockState.Value() != DlLockState::kLocked)
+    {
+        emberAfDoorLockClusterPrintln("Door Auto relock timer expired. %s", "Locking...");
+
+        DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked, OperationSourceEnum::kAuto);
+        emberAfPluginDoorLockOnAutoRelock(endpointId);
+    }
+    else
+    {
+        emberAfDoorLockClusterPrintln("Door Auto relock timer expired. %s", "Already locked.");
+    }
 }
