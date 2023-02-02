@@ -143,7 +143,6 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
 
 else (CONFIG_ENABLE_PW_RPC)
 idf_component_register(PRIV_INCLUDE_DIRS
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lock-app/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"                      
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       SRC_DIRS
