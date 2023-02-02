@@ -42,6 +42,14 @@ using Protocols::InteractionModel::Status;
 // TODO Expose a method onto the delegate to make that configurable.
 constexpr uint32_t kMaxBdxBlockSize = 1024;
 constexpr uint32_t kMaxBDXURILen = 256;
+
+// Since the BDX timeout is 5 minutes and we are starting this after query image is available and before the BDX init comes,
+// we just double the timeout to give enough time for the BDX init to come in a reasonable amount of time.
+constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Seconds16(10 * 60);
+
+// Time in seconds after which the requestor should retry calling query image if busy status is receieved
+constexpr uint32_t kDelayedActionTime = 120;
+
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
 constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
@@ -89,12 +97,11 @@ public:
         VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
+        ResetState();
 
         mExchangeMgr = nullptr;
         mSystemLayer = nullptr;
         mDelegateNotificationQueue = nil;
-
-        ResetState();
 
         return CHIP_NO_ERROR;
     }
@@ -120,7 +127,39 @@ public:
         }
     }
 
+    void ResetState()
+    {
+        assertChipStackLockedByCurrentThread();
+        if (mSystemLayer) {
+            mSystemLayer->CancelTimer(HandleBdxInitReceivedTimeoutExpired, this);
+        }
+        // TODO: Check if this can be removed. It seems like we can close the exchange context and reset transfer regardless.
+        if (!mInitialized) {
+            return;
+        }
+        Responder::ResetTransfer();
+        ++mTransferGeneration;
+        mFabricIndex.ClearValue();
+        mNodeId.ClearValue();
+
+        if (mExchangeCtx != nullptr) {
+            mExchangeCtx->Close();
+            mExchangeCtx = nullptr;
+        }
+
+        mInitialized = false;
+    }
+
 private:
+    /**
+     * Timer callback called when we don't receive a BDX init within a reasonable time after a successful QueryImage response.
+     */
+    static void HandleBdxInitReceivedTimeoutExpired(chip::System::Layer * systemLayer, void * state)
+    {
+        VerifyOrReturn(state != nullptr);
+        static_cast<BdxOTASender *>(state)->ResetState();
+    }
+
     CHIP_ERROR OnMessageToSend(TransferSession::OutputEvent & event)
     {
         assertChipStackLockedByCurrentThread();
@@ -137,12 +176,41 @@ private:
         }
 
         auto & msgTypeData = event.msgTypeData;
-        return mExchangeCtx->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
+        // If there's an error sending the message, close the exchange and call ResetState.
+        // TODO: If we can remove the !mInitialized check in ResetState(), just calling ResetState() will suffice here.
+        CHIP_ERROR err
+            = mExchangeCtx->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
+        if (err != CHIP_NO_ERROR) {
+            mExchangeCtx->Close();
+            mExchangeCtx = nullptr;
+            ResetState();
+        }
+        // If we sent a status report and it was successful, set the Exchange context to null and call ResetState.
+        if (event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport) && err == CHIP_NO_ERROR) {
+            mExchangeCtx = nullptr;
+            ResetState();
+        }
+        return err;
+    }
+
+    bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err)
+    {
+        if (err == CHIP_ERROR_INCORRECT_STATE) {
+            return bdx::StatusCode::kUnexpectedMessage;
+        }
+        if (err == CHIP_ERROR_INVALID_ARGUMENT) {
+            return bdx::StatusCode::kBadMessageContents;
+        }
+        return bdx::StatusCode::kUnknown;
     }
 
     CHIP_ERROR OnTransferSessionBegin(TransferSession::OutputEvent & event)
     {
         assertChipStackLockedByCurrentThread();
+        // Once we receive the BDX init, cancel the BDX Init timeout and start the BDX session
+        if (mSystemLayer) {
+            mSystemLayer->CancelTimer(HandleBdxInitReceivedTimeoutExpired, this);
+        }
 
         VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -169,8 +237,9 @@ private:
                     }
 
                     if (error != nil) {
-                        LogErrorOnFailure([MTRError errorToCHIPErrorCode:error]);
-                        LogErrorOnFailure(mTransfer.AbortTransfer(bdx::StatusCode::kUnknown));
+                        CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
+                        LogErrorOnFailure(err);
+                        LogErrorOnFailure(mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
                         return;
                     }
 
@@ -328,6 +397,9 @@ private:
         switch (event.EventType) {
         case TransferSession::OutputEventType::kInitReceived:
             err = OnTransferSessionBegin(event);
+            if (err != CHIP_NO_ERROR) {
+                LogErrorOnFailure(mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
+            }
             break;
         case TransferSession::OutputEventType::kStatusReceived:
             ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
@@ -370,33 +442,16 @@ private:
             ResetState();
         }
 
+        // Start a timer to track whether we receive a BDX init after a successful query image in a reasonable amount of time
+        CHIP_ERROR err = mSystemLayer->StartTimer(kBdxInitReceivedTimeout, HandleBdxInitReceivedTimeoutExpired, this);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+
         mFabricIndex.SetValue(fabricIndex);
         mNodeId.SetValue(nodeId);
 
         mInitialized = true;
 
         return CHIP_NO_ERROR;
-    }
-
-    void ResetState()
-    {
-        assertChipStackLockedByCurrentThread();
-
-        if (!mInitialized) {
-            return;
-        }
-
-        Responder::ResetTransfer();
-        ++mTransferGeneration;
-        mFabricIndex.ClearValue();
-        mNodeId.ClearValue();
-
-        if (mExchangeCtx != nullptr) {
-            mExchangeCtx->Close();
-            mExchangeCtx = nullptr;
-        }
-
-        mInitialized = false;
     }
 
     bool mInitialized = false;
@@ -574,11 +629,19 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                           CHIP_ERROR err = gOtaSender.PrepareForTransfer(fabricIndex, nodeId);
                           if (CHIP_NO_ERROR != err) {
                               LogErrorOnFailure(err);
+                              if (err == CHIP_ERROR_BUSY) {
+                                  Commands::QueryImageResponse::Type busyResponse;
+                                  busyResponse.status = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
+                                  busyResponse.delayedActionTime.SetValue(response.delayedActionTime.ValueOr(kDelayedActionTime));
+                                  handler->AddResponse(cachedCommandPath, busyResponse);
+                                  handle.Release();
+                                  return;
+                              }
                               handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
                               handle.Release();
+                              gOtaSender.ResetState();
                               return;
                           }
-
                           auto targetNodeId
                               = handler->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
 
@@ -589,6 +652,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                               LogErrorOnFailure(err);
                               handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
                               handle.Release();
+                              gOtaSender.ResetState();
                               return;
                           }
 
@@ -597,9 +661,17 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                           handle.Release();
                           return;
                       }
-
+                      if (!isBDXProtocolSupported) {
+                          Commands::QueryImageResponse::Type protocolNotSupportedResponse;
+                          protocolNotSupportedResponse.status
+                              = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
+                          handler->AddResponse(cachedCommandPath, protocolNotSupportedResponse);
+                      } else {
+                          handler->AddResponse(cachedCommandPath, response);
+                      }
                       handler->AddResponse(cachedCommandPath, response);
                       handle.Release();
+                      gOtaSender.ResetState();
                   }
 
                                 errorHandler:^(NSError *) {
