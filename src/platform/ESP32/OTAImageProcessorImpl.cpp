@@ -173,7 +173,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
     imageProcessor->ReleaseBlock();
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%x", imageProcessor->mOTAUpdatePartition->address);
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%" PRIx32, imageProcessor->mOTAUpdatePartition->address);
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
 }
 
@@ -241,7 +241,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         PostOTAStateChangeEvent(DeviceLayer::kOtaApplyFailed);
         return;
     }
-    ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", imageProcessor->mOTAUpdatePartition->address);
+    ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%" PRIx32, imageProcessor->mOTAUpdatePartition->address);
 
     PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
 

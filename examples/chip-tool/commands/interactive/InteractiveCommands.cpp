@@ -276,3 +276,8 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     return true;
 }
+
+bool InteractiveCommand::NeedsOperationalAdvertising()
+{
+    return mAdvertiseOperational.ValueOr(true);
+}

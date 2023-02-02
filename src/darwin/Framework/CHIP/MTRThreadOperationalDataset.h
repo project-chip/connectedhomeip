@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,41 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRThreadOperationalDataset : NSObject
 
-/**
- * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
- */
-extern size_t const MTRSizeThreadNetworkName;
-extern size_t const MTRSizeThreadExtendedPanId MTR_NEWLY_DEPRECATED("Please use MTRSizeThreadExtendedPANID");
-extern size_t const MTRSizeThreadExtendedPANID MTR_NEWLY_AVAILABLE;
-extern size_t const MTRSizeThreadMasterKey;
-extern size_t const MTRSizeThreadPSKc;
-extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
-
-/**
- * The Thread Network name
- */
-@property (nonatomic, copy, readonly) NSString * networkName;
-/**
- * The Thread Network extendended PAN ID
- */
-@property (nonatomic, copy, readonly) NSData * extendedPANID;
-/**
- * The 16 byte Master Key
- */
-@property (nonatomic, copy, readonly) NSData * masterKey;
-/**
- * The Thread PSKc
- */
-@property (nonatomic, copy, readonly) NSData * PSKc;
-/**
- * The Thread network channel.  Always an unsigned 16-bit integer.
- */
-@property (nonatomic, copy, readonly) NSNumber * channelNumber MTR_NEWLY_AVAILABLE;
-/**
- * A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
- */
-@property (nonatomic, copy, readonly) NSData * panID;
-
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
@@ -85,13 +50,54 @@ extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
                                     masterKey:(NSData *)masterKey
                                          PSKc:(NSData *)PSKc
                                 channelNumber:(NSNumber *)channelNumber
-                                        panID:(NSData *)panID MTR_NEWLY_AVAILABLE;
+                                        panID:(NSData *)panID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create a Thread Operational Dataset object with a RCP formatted active operational dataset.
  * This initializer will return nil if the input data cannot be parsed correctly
  */
 - (instancetype _Nullable)initWithData:(NSData *)data;
+
+/**
+ * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
+ */
+extern size_t const MTRSizeThreadNetworkName;
+extern size_t const MTRSizeThreadExtendedPanId API_DEPRECATED(
+    "Please use MTRSizeThreadExtendedPANID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+extern size_t const MTRSizeThreadExtendedPANID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+extern size_t const MTRSizeThreadMasterKey;
+extern size_t const MTRSizeThreadPSKc;
+extern size_t const MTRSizeThreadPANID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * The Thread Network name
+ */
+@property (nonatomic, copy, readonly) NSString * networkName;
+
+/**
+ * The Thread Network extendended PAN ID
+ */
+@property (nonatomic, copy, readonly) NSData * extendedPANID;
+
+/**
+ * The 16 byte Master Key
+ */
+@property (nonatomic, copy, readonly) NSData * masterKey;
+
+/**
+ * The Thread PSKc
+ */
+@property (nonatomic, copy, readonly) NSData * PSKc;
+
+/**
+ * The Thread network channel.  Always an unsigned 16-bit integer.
+ */
+@property (nonatomic, copy, readonly) NSNumber * channelNumber API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
+ */
+@property (nonatomic, copy, readonly) NSData * panID;
 
 /**
  * Get the underlying data that represents the Thread Active Operational Dataset
@@ -103,7 +109,8 @@ extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
 
 @interface MTRThreadOperationalDataset (Deprecated)
 
-@property (nonatomic, readwrite) uint16_t channel MTR_NEWLY_DEPRECATED("Please use channelNumber");
+@property (nonatomic, readwrite) uint16_t channel API_DEPRECATED(
+    "Please use channelNumber", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (nullable instancetype)initWithNetworkName:(NSString *)networkName
                                extendedPANID:(NSData *)extendedPANID
@@ -111,7 +118,8 @@ extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
                                         PSKc:(NSData *)PSKc
                                      channel:(uint16_t)channel
                                        panID:(NSData *)panID
-    MTR_NEWLY_DEPRECATED("Please use initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID");
+    API_DEPRECATED("Please use initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 

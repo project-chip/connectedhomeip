@@ -190,7 +190,7 @@ extern uint32_t SystemCoreClock;
 //  <q> Use TrustZone Secure Side Only
 //  <i> This settings prevents FreeRTOS contex switch to Non-Secure side.
 //  <i> Enable this setting when FreeRTOS runs on the Secure side only.
-#define configRUN_FREERTOS_SECURE_ONLY 1
+#define configRUN_FREERTOS_SECURE_ONLY CONFIG_RUN_FREERTOS_SECURE_ONLY
 
 //  <q>Use TrustZone Security Extension
 //  <i> Using TrustZone affects context handling.

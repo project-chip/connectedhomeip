@@ -97,6 +97,15 @@ tests:
       response:
           saveAs: alphaIndex
 
+    - label: "Read the commissioner node ID from the alpha fabric"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdAlpha
+
     - label: "Read the fabric ID from the beta fabric"
       identity: "beta"
       cluster: "Operational Credentials"
@@ -105,6 +114,15 @@ tests:
       response:
           saveAs: betaIndex
 
+    - label: "Read the commissioner node ID from the beta fabric"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdBeta
+
     - label: "Read the fabric ID from the gamma fabric"
       identity: "gamma"
       cluster: "Operational Credentials"
@@ -112,6 +130,15 @@ tests:
       attribute: "CurrentFabricIndex"
       response:
           saveAs: gammaIndex
+
+    - label: "Read the commissioner node ID from the gamma fabric"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdGamma
 
     - label: "Read the ACL from alpha and check commissioner node id"
       identity: "alpha"
@@ -123,7 +150,7 @@ tests:
                       FabricIndex: alphaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
               ]
@@ -138,7 +165,7 @@ tests:
                       FabricIndex: betaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdBeta],
                       Targets: null,
                   },
               ]
@@ -153,7 +180,7 @@ tests:
                       FabricIndex: gammaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdGamma],
                       Targets: null,
                   },
               ]
@@ -168,7 +195,7 @@ tests:
                       FabricIndex: betaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdBeta],
                       Targets: null,
                   },
               ]
@@ -183,7 +210,7 @@ tests:
                       FabricIndex: gammaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdGamma],
                       Targets: null,
                   },
               ]
@@ -198,7 +225,7 @@ tests:
                       FabricIndex: betaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdBeta],
                       Targets: null,
                   },
               ]
@@ -213,7 +240,7 @@ tests:
                       FabricIndex: gammaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdGamma],
                       Targets: null,
                   },
               ]

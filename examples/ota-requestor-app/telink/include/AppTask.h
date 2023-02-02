@@ -20,6 +20,7 @@
 
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#include "PWMDevice.h"
 
 #include <zephyr/drivers/gpio.h>
 
@@ -28,11 +29,12 @@
 #include <cstdint>
 
 struct k_timer;
+struct Identify;
 
 class AppTask
 {
 public:
-    CHIP_ERROR StartApp();
+    CHIP_ERROR StartApp(void);
 
     enum Action_t : uint8_t
     {
@@ -45,18 +47,19 @@ public:
 
     void PostLightingActionRequest(Action_t aAction);
     void PostEvent(AppEvent * event);
+    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
 
 private:
     friend AppTask & GetAppTask(void);
-
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(void);
 
     static void ActionInitiated(AppTask::Action_t aAction, int32_t aActor);
     static void ActionCompleted(AppTask::Action_t aAction, int32_t aActor);
+    static void ActionIdentifyStateUpdateHandler(k_timer * timer);
 
     void DispatchEvent(AppEvent * event);
 
-    static void UpdateStatusLED();
+    static void UpdateStatusLED(void);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
     static void FactoryResetButtonEventHandler(void);
     static void StartThreadButtonEventHandler(void);
@@ -71,12 +74,14 @@ private:
     static void StartThreadHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
     static void UpdateLedStateEventHandler(AppEvent * aEvent);
+    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
 
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
+    PWMDevice mPwmIdentifyLed;
 };
 
 inline AppTask & GetAppTask(void)

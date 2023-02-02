@@ -283,7 +283,7 @@ class TestDefinition:
             elif self.use_chip_repl_yaml_tester:
                 chip_repl_yaml_tester_cmd = paths.chip_repl_yaml_tester_cmd
                 python_cmd = chip_repl_yaml_tester_cmd + \
-                    ['--setup-code', app.setupCode] + ['--yaml-path', self.run_name]
+                    ['--setup-code', app.setupCode] + ['--yaml-path', self.run_name] + ["--pics-file", pics_file]
                 runner.RunSubprocess(python_cmd, name='CHIP_REPL_YAML_TESTER',
                                      dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:

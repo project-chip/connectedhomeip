@@ -118,12 +118,16 @@ int Commands::RunInteractive(const char * command)
     char * argv[kInteractiveModeArgumentsMaxLength] = {};
     argv[argc++]                                    = kInteractiveModeName;
 
+    std::string commandStr;
     for (auto & arg : arguments)
     {
         argv[argc] = new char[arg.size() + 1];
         strcpy(argv[argc++], arg.c_str());
+        commandStr += arg;
+        commandStr += " ";
     }
 
+    ChipLogProgress(chipTool, "Command: %s", commandStr.c_str());
     auto err = RunCommand(argc, argv, true);
 
     // Do not delete arg[0]

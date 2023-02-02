@@ -65,6 +65,15 @@ simple_config_with_invalid_entry_6 = '''
 A.D=1=
 '''
 
+simple_real_config = '''
+# Color Control Cluster
+CC.S.F00=0
+CC.S.F01=1
+CC.S.F02=1
+CC.S.F03=1
+CC.S.F04=1
+'''
+
 
 class TestPICSChecker(unittest.TestCase):
     def test_no_file(self):
@@ -167,6 +176,13 @@ class TestPICSChecker(unittest.TestCase):
         with patch("builtins.open", mock_open(read_data=simple_config_with_invalid_entry_6)) as mock_file:
             self.assertRaises(InvalidPICSConfigurationError,
                               PICSChecker, mock_file)
+
+    @patch('builtins.open', mock_open(read_data=simple_real_config))
+    def test_simple_real_config(self):
+        pics_checker = PICSChecker('')
+        self.assertIsInstance(pics_checker, PICSChecker)
+        self.assertFalse(pics_checker.check(
+            '( !CC.S.F00 && !CC.S.F01 && !CC.S.F02 && !CC.S.F03 && !CC.S.F04 )'))
 
 
 if __name__ == '__main__':

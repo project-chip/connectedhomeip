@@ -17,7 +17,6 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>

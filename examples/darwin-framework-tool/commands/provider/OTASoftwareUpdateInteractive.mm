@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,8 +38,7 @@ MTROTAHeader * ParseOTAHeader(const char * otaFilePath)
         return nil;
     }
 
-    NSError * error;
-    return [MTROTAHeader headerFromData:[NSData dataWithBytes:buffer.data() length:buffer.size()] error:&error];
+    return [[MTROTAHeader alloc] initWithData:[NSData dataWithBytes:buffer.data() length:buffer.size()]];
 }
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters

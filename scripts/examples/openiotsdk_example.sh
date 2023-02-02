@@ -104,13 +104,8 @@ function build_with_cmake() {
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
     fi
 
-    # Remove old artifacts to force linking
-    rm -rf "$BUILD_PATH/chip-"*
-
     # Activate Matter environment
     source "$CHIP_ROOT"/scripts/activate.sh
-    # Remove access to ARM GCC toolchain from Matter environment, use higher version from OIS environment
-    PATH=$(echo "$PATH" | sed 's/:/\n/g' | grep -v "$PW_ARM_CIPD_INSTALL_DIR" | xargs | tr ' ' ':')
 
     cmake -G Ninja -S "$EXAMPLE_PATH" -B "$BUILD_PATH" --toolchain="$TOOLCHAIN_PATH" "${BUILD_OPTIONS[@]}"
     cmake --build "$BUILD_PATH"
@@ -230,8 +225,8 @@ function run_test() {
     fi
 }
 
-SHORT=C:,p:,d:.n:,c,s,h
-LONG=command:,path:,debug:.network:,clean,scratch,help
+SHORT=C:,p:,d:,n:,c,s,h
+LONG=command:,path:,debug:,network:,clean,scratch,help
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"

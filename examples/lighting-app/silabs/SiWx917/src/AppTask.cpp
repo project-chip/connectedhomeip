@@ -21,8 +21,6 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>

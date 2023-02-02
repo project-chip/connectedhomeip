@@ -33,7 +33,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen:0.6.34
+            image: connectedhomeip/chip-build-tizen:0.6.35
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
@@ -61,9 +61,9 @@ jobs:
                         --enable-flashbundle \
                         --target tizen-arm-all-clusters \
                         --target tizen-arm-all-clusters-minimal-no-wifi \
-                        --target chip-tool-ubsan \
-                        --target light \
-                        --target light-no-ble-no-wifi \
+                        --target tizen-arm-chip-tool-ubsan \
+                        --target tizen-arm-light \
+                        --target tizen-arm-light-no-ble-no-wifi \
                         build \
                         --copy-artifacts-to out/artifacts \
                     "

@@ -21,7 +21,9 @@
 
 #include "AppConfig.h"
 #include "init_efrPlatform.h"
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_simple_button_instances.h"
+#endif
 #include "sl_system_kernel.h"
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
@@ -78,7 +80,9 @@ int main(void)
     appError(CHIP_ERROR_INTERNAL);
 }
 
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void sl_button_on_change(const sl_button_t * handle)
 {
     AppTask::GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
 }
+#endif

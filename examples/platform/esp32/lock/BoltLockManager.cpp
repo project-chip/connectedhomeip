@@ -330,7 +330,7 @@ void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
             lock->mAutoLockTimerArmed = true;
 
-            ESP_LOGI(TAG, "Auto Re-lock enabled. Will be triggered in %u seconds", lock->mAutoLockDuration);
+            ESP_LOGI(TAG, "Auto Re-lock enabled. Will be triggered in %" PRIu32 " seconds", lock->mAutoLockDuration);
         }
     }
 }

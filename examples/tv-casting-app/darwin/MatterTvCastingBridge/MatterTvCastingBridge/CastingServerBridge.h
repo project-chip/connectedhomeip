@@ -33,9 +33,9 @@
 
 + (CastingServerBridge * _Nullable)getSharedInstance;
 
-- (void)initApp:(AppParameters * _Nullable)appParameters
-             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-    initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler;
+- (MatterError * _Nonnull)initializeApp:(AppParameters * _Nullable)appParameters
+                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                   initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler;
 
 /*!
  @brief Browse for on-network commissioner TVs

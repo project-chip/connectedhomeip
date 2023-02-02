@@ -22,7 +22,7 @@ limitations under the License.
 
   <struct name="AttributeValuePair">
     <cluster code="0x0005"/>
-    <item name="AttributeId" type="attrib_id" optional="true"/>
+    <item name="AttributeID" type="attrib_id" optional="true"/>
     <!-- TODO Need a new type that can support variable attribute types and size  -->
     <!-- One suggestion from Boris is a Type that maps to a TLVReader place in the riight elements -->
     <item name="AttributeValue" type="INT8U" array="true"/>
@@ -30,7 +30,7 @@ limitations under the License.
 
   <struct name="ExtensionFieldSet">
     <cluster code="0x0005"/>
-    <item name="ClusterId" type="cluster_id"/>
+    <item name="ClusterID" type="cluster_id"/>
     <item name="AttributeValueList" type="AttributeValuePair" array="true"/>
   </struct>
 
@@ -56,8 +56,8 @@ limitations under the License.
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'
       </description>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U"/>
       <arg name="SceneName" type="CHAR_STRING"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true"/>
@@ -68,16 +68,16 @@ limitations under the License.
       <description>
         Retrieves the requested scene entry from its Scene table.
       </description>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
     </command>
    
     <command source="client" code="0x02" name="RemoveScene" response="RemoveSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes remove">
       <description>
         Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table
       </description>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
       <access op="invoke" role="manage"/>
     </command>
     
@@ -85,7 +85,7 @@ limitations under the License.
       <description>
         Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table
       </description>
-      <arg name="GroupId" type="group_id"/>
+      <arg name="GroupID" type="group_id"/>
       <access op="invoke" role="manage"/>
     </command>
     
@@ -93,8 +93,8 @@ limitations under the License.
       <description>
         Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint
       </description>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
       <access op="invoke" role="manage"/>
     </command>
     
@@ -102,8 +102,8 @@ limitations under the License.
       <description>
         Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table
       </description>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U" optional="true" isNullable="true"/>
     </command>
    
@@ -111,15 +111,15 @@ limitations under the License.
       <description>
         Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group 
       </description>
-      <arg name="GroupId" type="group_id"/>
+      <arg name="GroupID" type="group_id"/>
     </command>
 
     <command source="client" code="0x40" name="EnhancedAddScene" response="EnhancedAddSceneResponse" isFabricScoped="true" optional="true" cli="chip scenes eadd">
       <description>
         Allows a scene to be added using a finer scene transition time than the AddScene command.
       </description>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U"/>
       <arg name="SceneName" type="CHAR_STRING"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true"/>
@@ -128,18 +128,18 @@ limitations under the License.
       <description>
         Allows a scene to be retrieved using a finer scene transition time than the ViewScene command
       </description>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
     </command>
     <command source="client" code="0x42" name="CopyScene" response="CopySceneResponse" isFabricScoped="true" optional="true" cli="chip scenes copy">
       <description>
         Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair.
       </description>
       <arg name="Mode" type="ScenesCopyMode"/>
-      <arg name="GroupIdFrom" type="group_id"/>
-      <arg name="SceneIdFrom" type="INT8U"/>
-      <arg name="GroupIdTo" type="group_id"/>
-      <arg name="SceneIdTo" type="INT8U"/>
+      <arg name="GroupIdentifierFrom" type="group_id"/>
+      <arg name="SceneIdentifierFrom" type="INT8U"/>
+      <arg name="GroupIdentifierTo" type="group_id"/>
+      <arg name="SceneIdentifierTo" type="INT8U"/>
     </command>
     
     <command source="server" code="0x00" name="AddSceneResponse" optional="false" disableDefaultResponse="true">
@@ -147,8 +147,8 @@ limitations under the License.
         The command is generated in response to a received unicast AddScene command,
       </description>
       <arg name="Status" type="ENUM8"/>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
     </command>
     
     <command source="server" code="0x01" name="ViewSceneResponse" optional="false" disableDefaultResponse="true">
@@ -156,8 +156,8 @@ limitations under the License.
         The command is generated in response to a received unicast ViewScene command 
       </description>
       <arg name="Status" type="ENUM8"/>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U" optional="true"/>
       <arg name="SceneName" type="CHAR_STRING" optional="true"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true" optional="true"/>
@@ -168,8 +168,8 @@ limitations under the License.
         The command is generated in response to a received unicast RemoveScene command
       </description>
       <arg name="Status" type="ENUM8"/>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
     </command>
     
     <command source="server" code="0x03" name="RemoveAllScenesResponse" optional="false" disableDefaultResponse="true">
@@ -177,7 +177,7 @@ limitations under the License.
         The command is generated in response to a received unicast RemoveAllScenes command
       </description>
       <arg name="Status" type="ENUM8"/>
-      <arg name="GroupId" type="group_id"/>
+      <arg name="GroupID" type="group_id"/>
     </command>
     
     <command source="server" code="0x04" name="StoreSceneResponse" optional="false" disableDefaultResponse="true">
@@ -185,8 +185,8 @@ limitations under the License.
         The command is generated in response to a received unicast StoreScene command
       </description>
       <arg name="Status" type="ENUM8"/>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
     </command>
     
     <command source="server" code="0x06" name="GetSceneMembershipResponse" optional="false" disableDefaultResponse="true">
@@ -195,7 +195,7 @@ limitations under the License.
       </description>
       <arg name="Status" type="ENUM8"/>
       <arg name="Capacity" type="INT8U" isNullable="true"/>
-      <arg name="GroupId" type="group_id"/>
+      <arg name="GroupID" type="group_id"/>
       <arg name="SceneList" type="INT8U" array="true" optional="true"/>
     </command>
 
@@ -204,8 +204,8 @@ limitations under the License.
         The command is generated in response to a received unicast EnhancedAddScene command
       </description>
       <arg name="Status" type="ENUM8"/>
-      <arg name="GroupId" type="group_id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="SceneID" type="INT8U"/>
     </command>
 
     <command source="server" code="0x41" name="EnhancedViewSceneResponse" optional="true" disableDefaultResponse="true">
@@ -213,8 +213,8 @@ limitations under the License.
         The command is generated in response to a received unicast EnhancedViewScene command
       </description>
       <arg name="Status" type="ENUM8"/>
-      <arg name="GroupId" type="group_Id"/>
-      <arg name="SceneId" type="INT8U"/>
+      <arg name="GroupID" type="group_Id"/>
+      <arg name="SceneID" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U"  optional="true"/>
       <arg name="SceneName" type="CHAR_STRING"  optional="true"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true" optional="true"/>
@@ -225,13 +225,13 @@ limitations under the License.
         The command is generated in response to a received unicast CopyScene command
       </description>
       <arg name="Status" type="ENUM8"/>
-      <arg name="GroupIdFrom" type="group_Id"/>
-      <arg name="SceneIdFrom" type="INT8U"/>
+      <arg name="GroupIdentifierFrom" type="group_Id"/>
+      <arg name="SceneIdentifierFrom" type="INT8U"/>
     </command>
   </cluster>
 
   <bitmap name="SceneFeatures" type="BITMAP32">
-    <cluster code="0x0006" />
+    <cluster code="0x0005" />
     <field name="SceneNames" mask="0x01" />
   </bitmap>
 </configurator>

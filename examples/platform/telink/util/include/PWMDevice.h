@@ -44,27 +44,53 @@ public:
         kState_Off,
     };
 
-    using PWMCallback_fn = void (*)(Action_t, int32_t);
+    enum BreatheType_t : uint8_t
+    {
+        kBreatheType_Invalid = 0,
+        kBreatheType_Rising,
+        kBreatheType_Falling,
+        kBreatheType_Both,
+    };
+
+    using PWMCallback_fn      = void (*)(Action_t, int32_t);
+    using PWMTimerCallback_fn = void (*)(k_timer *);
 
     CHIP_ERROR Init(const pwm_dt_spec * pwmDevice, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel = 0);
     void Set(bool aOn);
-    bool IsTurnedOn() const { return mState == kState_On; }
-    uint8_t GetLevel() const { return mLevel; }
-    uint8_t GetMinLevel() const { return mMinLevel; }
-    uint8_t GetMaxLevel() const { return mMaxLevel; }
+    bool IsTurnedOn(void) const { return mState == kState_On; }
+    uint8_t GetLevel(void) const { return mLevel; }
+    uint8_t GetMinLevel(void) const { return mMinLevel; }
+    uint8_t GetMaxLevel(void) const { return mMaxLevel; }
+    void SetCallbacks(PWMCallback_fn aActionInitiated_CB, PWMCallback_fn aActionCompleted_CB,
+                      PWMTimerCallback_fn aActionBlinkStateUpdate_CB);
     bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t * value);
-    void SetCallbacks(PWMCallback_fn aActionInitiated_CB, PWMCallback_fn aActionCompleted_CB);
+    void InitiateBlinkAction(uint32_t onTimeMS, uint32_t offTimeMS);
+    void InitiateBreatheAction(BreatheType_t type, uint32_t cycleTimeMS);
+    void StopAction(void);
+    void UpdateAction(void);
 
 private:
     State_t mState;
     uint8_t mMinLevel;
     uint8_t mMaxLevel;
     uint8_t mLevel;
+    uint8_t mBreatheStepLevel;
+    uint8_t mBreatheStepCntr;
+    bool mBreatheBothDirection;
+    BreatheType_t mBreatheType;
+    uint32_t mBreatheStepNumb;
+    uint32_t mBlinkOnTimeMS;
+    uint32_t mBlinkOffTimeMS;
+    k_timer mPwmLedTimer;
     const pwm_dt_spec * mPwmDevice;
 
     PWMCallback_fn mActionInitiated_CB;
     PWMCallback_fn mActionCompleted_CB;
 
     void SetLevel(uint8_t aLevel);
-    void UpdateLight();
+    void UpdateLight(void);
+    void StartBlinkTimer(void);
+    void StartBreatheTimer(uint32_t stepTimeMS);
+    void ClearAction(void);
+    static void PwmLedTimerHandler(k_timer * timer);
 };

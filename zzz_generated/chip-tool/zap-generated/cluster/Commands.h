@@ -433,8 +433,8 @@ public:
     ScenesAddScene(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-scene", credsIssuerConfig), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("SceneName", &mRequest.sceneName);
         AddArgument("ExtensionFieldSets", &mComplex_ExtensionFieldSets);
@@ -469,8 +469,8 @@ class ScenesViewScene : public ClusterCommand
 public:
     ScenesViewScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("view-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         ClusterCommand::AddArguments();
     }
 
@@ -500,8 +500,8 @@ class ScenesRemoveScene : public ClusterCommand
 public:
     ScenesRemoveScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         ClusterCommand::AddArguments();
     }
 
@@ -531,7 +531,7 @@ class ScenesRemoveAllScenes : public ClusterCommand
 public:
     ScenesRemoveAllScenes(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-all-scenes", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -561,8 +561,8 @@ class ScenesStoreScene : public ClusterCommand
 public:
     ScenesStoreScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("store-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         ClusterCommand::AddArguments();
     }
 
@@ -592,8 +592,8 @@ class ScenesRecallScene : public ClusterCommand
 public:
     ScenesRecallScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("recall-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         ClusterCommand::AddArguments();
     }
@@ -625,7 +625,7 @@ public:
     ScenesGetSceneMembership(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("get-scene-membership", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -656,8 +656,8 @@ public:
     ScenesEnhancedAddScene(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("enhanced-add-scene", credsIssuerConfig), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("SceneName", &mRequest.sceneName);
         AddArgument("ExtensionFieldSets", &mComplex_ExtensionFieldSets);
@@ -692,8 +692,8 @@ class ScenesEnhancedViewScene : public ClusterCommand
 public:
     ScenesEnhancedViewScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("enhanced-view-scene", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         ClusterCommand::AddArguments();
     }
 
@@ -724,10 +724,10 @@ public:
     ScenesCopyScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("copy-scene", credsIssuerConfig)
     {
         AddArgument("Mode", 0, UINT8_MAX, &mRequest.mode);
-        AddArgument("GroupIdFrom", 0, UINT16_MAX, &mRequest.groupIdFrom);
-        AddArgument("SceneIdFrom", 0, UINT8_MAX, &mRequest.sceneIdFrom);
-        AddArgument("GroupIdTo", 0, UINT16_MAX, &mRequest.groupIdTo);
-        AddArgument("SceneIdTo", 0, UINT8_MAX, &mRequest.sceneIdTo);
+        AddArgument("GroupIdentifierFrom", 0, UINT16_MAX, &mRequest.groupIdentifierFrom);
+        AddArgument("SceneIdentifierFrom", 0, UINT8_MAX, &mRequest.sceneIdentifierFrom);
+        AddArgument("GroupIdentifierTo", 0, UINT16_MAX, &mRequest.groupIdentifierTo);
+        AddArgument("SceneIdentifierTo", 0, UINT8_MAX, &mRequest.sceneIdentifierTo);
         ClusterCommand::AddArguments();
     }
 

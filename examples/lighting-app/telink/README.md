@@ -67,16 +67,55 @@ The following buttons are available on **tlsr9518adk80d** board:
 
 ### LEDs
 
-**Red** LED indicates current state of Thread network. It ables to be in
+#### Indicate current state of Thread network
+
+**Red** LED indicates current state of Thread network. It is able to be in
 following states:
 
 | State                       | Description                                                                  |
 | :-------------------------- | :--------------------------------------------------------------------------- |
 | Blinks with short pulses    | Device is not commissioned to Thread, Thread is disabled                     |
-| Blinls with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
-| Blinks with whde pulses     | Device commissioned and joined to thread network as CHILD                    |
+| Blinks with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
+| Blinks with wide pulses     | Device commissioned and joined to thread network as CHILD                    |
 
-**Blue** LED shows current state of lightbulb
+#### Indicate identify of device
+
+**Green** LED used to identify the device. The LED starts blinking when the
+Identify command of the Identify cluster is received. The command's argument can
+be used to specify the the effect. It is able to be in following effects:
+
+| Effect                          | Description                                                          |
+| :------------------------------ | :------------------------------------------------------------------- |
+| Blinks (200 ms on/200 ms off)   | Blink (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)                   |
+| Breathe (during 1000 ms)        | Breathe (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)               |
+| Blinks (50 ms on/950 ms off)    | Okay (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)                     |
+| Blinks (1000 ms on/1000 ms off) | Channel Change (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE) |
+| Blinks (950 ms on/50 ms off)    | Finish (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT)          |
+| LED off                         | Stop (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)              |
+
+#### Indicate current state of lightbulb
+
+By default, only **Blue** LED is used to show current state of lightbulb (only
+for lightning-app).
+
+To enable RGB functionality in Your application set this config:
+
+In Matter examples/lighting-app/telink/include/**AppConfig.h**, set the define
+`USE_RGB_PWM`:
+
+```bash
+    define USE_RGB_PWM 1
+```
+
+To get current state of lightbulb in RGB mode, connect 3-color LED module to
+following pins:
+
+| Name  |         Pin         |
+| :---: | :-----------------: |
+|  Red  | PE2 (pin 8 of J34)  |
+| Green | PE0 (pin 5 of J34)  |
+| Blue  | PB4 (pin 20 of J34) |
+|  GND  | GND (pin 24 of J50) |
 
 ### CHIP tool commands
 

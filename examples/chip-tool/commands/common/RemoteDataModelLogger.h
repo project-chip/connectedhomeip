@@ -38,5 +38,6 @@ CHIP_ERROR LogErrorAsJSON(const chip::app::ConcreteCommandPath & path, const chi
 CHIP_ERROR LogEventAsJSON(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
 CHIP_ERROR LogErrorAsJSON(const chip::app::EventHeader & header, const chip::app::StatusIB & status);
 CHIP_ERROR LogErrorAsJSON(const CHIP_ERROR & error);
+CHIP_ERROR LogGetCommissionerNodeId(chip::NodeId value);
 void SetDelegate(RemoteDataModelLoggerDelegate * delegate);
 }; // namespace RemoteDataModelLogger
