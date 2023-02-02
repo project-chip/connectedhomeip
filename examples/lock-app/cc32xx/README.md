@@ -96,6 +96,10 @@ Ninja to build the executable.
     $ ninja -C out/debug
     ```
 
+## Adding DAC Certificates
+
+To add custom DAC Certificates, the CC32XXDeviceAttestationCreds.cpp file in `examples/platform/cc32xx` can be modified. The private key, public key, DAC cert and PAI cert arrays all need to be replaced. 
+
 ## Programming
 
 Loading the built image onto a LaunchPad is supported through Code Composer
