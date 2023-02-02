@@ -98,7 +98,7 @@ Ninja to build the executable.
 
 ## Adding DAC Certificates
 
-To add custom DAC Certificates, the CC32XXDeviceAttestationCreds.cpp file in
+To add custom DAC Certificates, the `CC32XXDeviceAttestationCreds.cpp` file in
 `examples/platform/cc32xx` can be modified. The private key, public key, DAC
 cert and PAI cert arrays all need to be replaced.
 
