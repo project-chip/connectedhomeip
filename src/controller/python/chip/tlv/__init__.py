@@ -32,6 +32,8 @@ from collections import OrderedDict
 from collections.abc import Mapping, Sequence
 from enum import Enum
 
+from .tlvlist import TLVList
+
 TLV_TYPE_SIGNED_INTEGER = 0x00
 TLV_TYPE_UNSIGNED_INTEGER = 0x04
 TLV_TYPE_BOOLEAN = 0x08
@@ -221,6 +223,11 @@ class TLVWriter(object):
                            key=lambda item: tlvTagToSortKey(item[0]))
                 )
             for containedTag, containedVal in val.items():
+                self.put(containedTag, containedVal)
+            self.endContainer()
+        elif isinstance(val, TLVList):
+            self.startPath(tag)
+            for containedTag, containedVal in val:
                 self.put(containedTag, containedVal)
             self.endContainer()
         elif isinstance(val, Sequence):
@@ -576,7 +583,7 @@ class TLVReader(object):
             decoding["Array"] = []
             self._get(tlv, decoding["Array"], decoding["value"])
         elif decoding["type"] == "Path":
-            decoding["value"] = []
+            decoding["value"] = TLVList()
             decoding["Path"] = []
             self._get(tlv, decoding["Path"], decoding["value"])
         elif decoding["type"] == "Null":
@@ -682,6 +689,9 @@ class TLVReader(object):
                     if isinstance(out, Mapping):
                         tag = decoding["tag"] if decoding["tag"] is not None else "Any"
                         out[tag] = decoding["value"]
+                    elif isinstance(out, TLVList):
+                        tag = decoding["tag"] if decoding["tag"] is not None else None
+                        out.append(tag, decoding["value"])
                     else:
                         out.append(decoding["value"])
                 else:
