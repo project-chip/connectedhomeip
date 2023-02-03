@@ -68,6 +68,7 @@ class RunContext:
     in_unshare: bool
     chip_tool: str
     dry_run: bool
+    runtime: TestRunTime
 
     # If not empty, include only the specified test tags
     include_tags: set(TestTag) = field(default_factory={})
@@ -203,6 +204,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
                              chip_tool=chip_tool, dry_run=dry_run,
+                             runtime=TestRunTime.PYTHON_YAML if run_yamltests_with_chip_repl else TestRunTime.CHIP_TOOL_BUILTIN,
                              include_tags=include_tags,
                              exclude_tags=exclude_tags)
 
@@ -310,10 +312,6 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     apps_register = AppsRegister()
     apps_register.init()
 
-    runtime = TestRunTime.CHIP_TOOL_BUILTIN
-    if chip_repl_yaml_tester:
-        runtime = TestRunTime.PYTHON_YAML
-
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
@@ -336,7 +334,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 logging.info('%-20s - Starting test' % (test.name))
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                    test_runtime=runtime)
+                    test_runtime=context.obj.runtime)
                 test_end = time.monotonic()
                 logging.info('%-30s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
