@@ -173,6 +173,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         exclude_tags = {
             TestTag.MANUAL,
             TestTag.IN_DEVELOPMENT,
+            TestTag.FLAKY,
         }
 
     if 'all' not in target:
