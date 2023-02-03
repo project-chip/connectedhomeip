@@ -131,19 +131,19 @@ def _GetInDevelopmentTests() -> Set[str]:
        Goal is for this set to become empty.
     """
     return {
-      "Test_TC_ACL_2_10.yaml",
-      "Test_TC_ACL_2_7.yaml",
-      "Test_TC_ACL_2_8.yaml",
-      "Test_TC_ACL_2_9.yaml",
-      "TestEvents.yaml",
-      "Test_TC_ACE_1_1.yaml",
-      "Test_TC_ACE_1_5.yaml",
-      "Test_TC_SC_5_1.yaml",
-      "Test_TC_SC_5_2.yaml",
-      "TestCommissionerNodeId.yaml",
-      "TestClusterMultiFabric.yaml",
-      "TestGroupMessaging.yaml",
-      "TestMultiAdmin.yaml",
+        "Test_TC_ACL_2_10.yaml",
+        "Test_TC_ACL_2_7.yaml",
+        "Test_TC_ACL_2_8.yaml",
+        "Test_TC_ACL_2_9.yaml",
+        "TestEvents.yaml",
+        "Test_TC_ACE_1_1.yaml",
+        "Test_TC_ACE_1_5.yaml",
+        "Test_TC_SC_5_1.yaml",
+        "Test_TC_SC_5_2.yaml",
+        "TestCommissionerNodeId.yaml",
+        "TestClusterMultiFabric.yaml",
+        "TestGroupMessaging.yaml",
+        "TestMultiAdmin.yaml",
     }
 
 
