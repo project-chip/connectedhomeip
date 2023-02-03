@@ -68,7 +68,7 @@ void OnOffServer::timerCallback(System::Layer *, void * callbackContext)
 void OnOffServer::schedule(EmberEventControl * control, uint32_t delayMs)
 {
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
-                                                           reinterpret_cast<void *>(control));
+                                                           control);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -82,7 +82,7 @@ void OnOffServer::deactivate(EmberEventControl * control)
     {
         control->status = EMBER_EVENT_INACTIVE;
     }
-    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(control));
+    DeviceLayer::SystemLayer().CancelTimer(timerCallback, control);
 }
 
 void OnOffServer::deactivate(EndpointId endpoint)

@@ -43,8 +43,7 @@ void ColorControlServer::timerCallback(System::Layer *, void * callbackContext)
 
 void ColorControlServer::schedule(EmberEventControl * control, uint32_t delayMs)
 {
-    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
-                                                           reinterpret_cast<void *>(control));
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback, control);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -58,7 +57,7 @@ void ColorControlServer::deactivate(EmberEventControl * control)
     {
         control->status = EMBER_EVENT_INACTIVE;
     }
-    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(control));
+    DeviceLayer::SystemLayer().CancelTimer(timerCallback, control);
 }
 
 void ColorControlServer::deactivate(EndpointId endpoint)
