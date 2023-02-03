@@ -1218,8 +1218,8 @@ extern "C" {
 #include "sl_se_manager.h"
 #include "sl_se_manager_key_derivation.h"
 #include "sl_se_manager_util.h"
-#include "sli_se_manager_internal.h"
 #include "sli_se_driver_key_management.h"
+#include "sli_se_manager_internal.h"
 }
 #endif /* SEMAILBOX_PRESENT */
 
@@ -1228,76 +1228,77 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
 #if defined(SEMAILBOX_PRESENT)
-    psa_status_t status = PSA_SUCCESS;
+    psa_status_t status                = PSA_SUCCESS;
     uint8_t point[2 * kP256_FE_Length] = { 0 };
-    uint8_t scalar[kP256_FE_Length] = { 0 };
+    uint8_t scalar[kP256_FE_Length]    = { 0 };
 
     // This inlined implementation only supports P256, but check assumptions
-    if (context->curve.id != MBEDTLS_ECP_DP_SECP256R1) {
+    if (context->curve.id != MBEDTLS_ECP_DP_SECP256R1)
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     /* pull out key info from mbedtls structures */
     status = mbedtls_mpi_write_binary((const mbedtls_mpi *) fe1, scalar, sizeof(scalar));
-    if ( status != PSA_SUCCESS ) {
+    if (status != PSA_SUCCESS)
+    {
         return CHIP_ERROR_INTERNAL;
     }
 
     status = mbedtls_mpi_write_binary(&((const mbedtls_ecp_point *) P1)->MBEDTLS_PRIVATE(X), point, kP256_FE_Length);
-    if ( status != PSA_SUCCESS ) {
+    if (status != PSA_SUCCESS)
+    {
         return CHIP_ERROR_INTERNAL;
     }
 
-    status = mbedtls_mpi_write_binary(&((const mbedtls_ecp_point *) P1)->MBEDTLS_PRIVATE(Y), point + kP256_FE_Length, kP256_FE_Length);
-    if ( status != PSA_SUCCESS ) {
+    status =
+        mbedtls_mpi_write_binary(&((const mbedtls_ecp_point *) P1)->MBEDTLS_PRIVATE(Y), point + kP256_FE_Length, kP256_FE_Length);
+    if (status != PSA_SUCCESS)
+    {
         return CHIP_ERROR_INTERNAL;
     }
 
     {
-        sl_se_key_descriptor_t priv_desc = { 0 };
-        sl_se_key_descriptor_t pub_desc = { 0 };
+        sl_se_key_descriptor_t priv_desc   = { 0 };
+        sl_se_key_descriptor_t pub_desc    = { 0 };
         sl_se_key_descriptor_t shared_desc = { 0 };
-        sl_se_command_context_t cmd_ctx = SL_SE_COMMAND_CONTEXT_INIT;
-        sl_status_t sl_status = SL_STATUS_FAIL;
+        sl_se_command_context_t cmd_ctx    = SL_SE_COMMAND_CONTEXT_INIT;
+        sl_status_t sl_status              = SL_STATUS_FAIL;
 
         // Set private key to scalar
         priv_desc.type = SL_SE_KEY_TYPE_ECC_P256;
         priv_desc.flags |= SL_SE_KEY_FLAG_ASYMMETRIC_BUFFER_HAS_PRIVATE_KEY;
-        sli_se_key_descriptor_set_plaintext(&priv_desc,
-                                            scalar,
-                                            sizeof(scalar));
+        sli_se_key_descriptor_set_plaintext(&priv_desc, scalar, sizeof(scalar));
 
         // Set public key to point
         pub_desc.type = SL_SE_KEY_TYPE_ECC_P256;
         pub_desc.flags |= SL_SE_KEY_FLAG_ASYMMETRIC_BUFFER_HAS_PUBLIC_KEY;
-        sli_se_key_descriptor_set_plaintext(&pub_desc,
-                                            point,
-                                            sizeof(point));
+        sli_se_key_descriptor_set_plaintext(&pub_desc, point, sizeof(point));
 
         // Set output to point
         shared_desc.type = SL_SE_KEY_TYPE_SYMMETRIC;
         shared_desc.size = sizeof(point);
-        sli_se_key_descriptor_set_plaintext(&shared_desc,
-                                            point,
-                                            sizeof(point));
+        sli_se_key_descriptor_set_plaintext(&shared_desc, point, sizeof(point));
 
         // Re-init SE command context.
         sl_status = sl_se_init_command_context(&cmd_ctx);
-        if (sl_status != SL_STATUS_OK) {
+        if (sl_status != SL_STATUS_OK)
+        {
             return CHIP_ERROR_INTERNAL;
         }
 
         // Perform key agreement algorithm (ECDH).
-        sl_status = sl_se_ecdh_compute_shared_secret(&cmd_ctx,
-                                                     &priv_desc,
-                                                     &pub_desc,
-                                                     &shared_desc);
-        if (sl_status != SL_STATUS_OK) {
+        sl_status = sl_se_ecdh_compute_shared_secret(&cmd_ctx, &priv_desc, &pub_desc, &shared_desc);
+        if (sl_status != SL_STATUS_OK)
+        {
             ChipLogError(Crypto, "ECDH SL failure %lx", sl_status);
-            if (sl_status == SL_STATUS_COMMAND_IS_INVALID) {
+            if (sl_status == SL_STATUS_COMMAND_IS_INVALID)
+            {
                 // This error will be returned if the key type isn't supported.
                 return CHIP_ERROR_NOT_IMPLEMENTED;
-            } else {
+            }
+            else
+            {
                 // If the ECDH operation failed, this is most likely due to the peer key
                 // being an invalid elliptic curve point. Other sources for failure should
                 // hopefully have been caught during parameter validation.
@@ -1307,20 +1308,23 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
     }
 
     status = mbedtls_mpi_read_binary(&((mbedtls_ecp_point *) R)->MBEDTLS_PRIVATE(X), point, kP256_FE_Length);
-    if ( status != PSA_SUCCESS ) {
+    if (status != PSA_SUCCESS)
+    {
         return CHIP_ERROR_INTERNAL;
     }
 
     status = mbedtls_mpi_read_binary(&((mbedtls_ecp_point *) R)->MBEDTLS_PRIVATE(Y), point + kP256_FE_Length, kP256_FE_Length);
-    if ( status != PSA_SUCCESS ) {
+    if (status != PSA_SUCCESS)
+    {
         return CHIP_ERROR_INTERNAL;
     }
 
-    status = mbedtls_mpi_lset( &((mbedtls_ecp_point *) R)->MBEDTLS_PRIVATE(Z), 1 );
-    if ( status != PSA_SUCCESS ) {
+    status = mbedtls_mpi_lset(&((mbedtls_ecp_point *) R)->MBEDTLS_PRIVATE(Z), 1);
+    if (status != PSA_SUCCESS)
+    {
         return CHIP_ERROR_INTERNAL;
     }
-#else /* SEMAILBOX_PRESENT */
+#else  /* SEMAILBOX_PRESENT */
     if (mbedtls_ecp_mul(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
                         CryptoRNG, nullptr) != 0)
     {
@@ -1356,7 +1360,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
     mbedtls_mpi_free(&one);
     mbedtls_ecp_point_free(&fe1P1);
     mbedtls_ecp_point_free(&fe2P2);
-#else /* SEMAILBOX_PRESENT */
+#else  /* SEMAILBOX_PRESENT */
     if (mbedtls_ecp_muladd(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
                            (const mbedtls_mpi *) fe2, (const mbedtls_ecp_point *) P2) != 0)
     {
@@ -1386,8 +1390,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    int result                = 0;
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
     mbedtls_mpi w1_bn;
@@ -1405,17 +1409,19 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
 #if defined(SEMAILBOX_PRESENT)
     // Do the point multiplication using hardware acceleration via ECDH primitive
     error = PointMul(&Ltemp, &context->curve.G, &w1_bn);
-    if (error != CHIP_NO_ERROR) {
+    if (error != CHIP_NO_ERROR)
+    {
         goto exit;
     }
-#else /* SEMAILBOX_PRESENT */
+#else  /* SEMAILBOX_PRESENT */
     result = mbedtls_ecp_mul(&context->curve, &Ltemp, &w1_bn, &context->curve.G, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 #endif /* SEMAILBOX_PRESENT */
 
     memset(Lout, 0, *L_len);
 
-    result = mbedtls_ecp_point_write_binary(&context->curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Uint8::to_uchar(Lout), *L_len);
+    result =
+        mbedtls_ecp_point_write_binary(&context->curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Uint8::to_uchar(Lout), *L_len);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
