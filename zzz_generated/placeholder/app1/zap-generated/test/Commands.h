@@ -1971,7 +1971,7 @@ private:
             return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorType::Id);
         }
         case 3: {
-            LogStep(3, "DUT reads from the TH the (0x0002) OccupancySensorType attribute");
+            LogStep(3, "DUT reads from the TH the (0x0002) OccupancySensorTypeBitmap attribute");
             VerifyOrDo(!ShouldSkip("OCC.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id);
         }
