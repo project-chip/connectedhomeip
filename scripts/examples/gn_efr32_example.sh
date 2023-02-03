@@ -112,6 +112,9 @@ if [ "$#" == "0" ]; then
         --no-version
             Skip the silabs formating for the Matter software version string
             Currently : v1.0-<branchName>-<ShortCommitSha>
+        --release
+            Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
+
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -178,6 +181,10 @@ else
             #    ;;
             --no-version)
                 USE_GIT_SHA_FOR_VERSION=false
+                shift
+                ;;
+            --release)
+                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
                 shift
                 ;;
             *)
