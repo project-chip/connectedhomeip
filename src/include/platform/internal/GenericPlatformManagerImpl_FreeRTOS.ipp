@@ -325,7 +325,6 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunBackgroundEventLoop(voi
         auto eventReceived = xQueueReceive(mBackgroundEventQueue, &event, portMAX_DELAY) == pdTRUE;
         while (eventReceived)
         {
-            ChipLogError(DeviceLayer, "@@@@@@@@@@ DISPATCHING BACKGROUND EVENT");
             Impl()->DispatchEvent(&event);
             eventReceived = xQueueReceive(mBackgroundEventQueue, &event, portMAX_DELAY) == pdTRUE;
         }

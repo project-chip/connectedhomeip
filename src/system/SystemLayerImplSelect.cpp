@@ -42,7 +42,6 @@ constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64(60 * 60 * 2
 
 CHIP_ERROR LayerImplSelect::Init()
 {
-    ChipLogError(DeviceLayer, "@@@@@@@@@@ LayerImplSelect::Init mLayerState %d", (int)mLayerState.GetState());
     if (mLayerState.IsInitialized())
     {
         // TEMP TestMessagingLayer already initialized the system layer?

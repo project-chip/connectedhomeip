@@ -38,7 +38,6 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     ReturnErrorOnFailure(PlatformMemoryUser::Init());
 
-    ChipLogError(DeviceLayer, "@@@@@@@@@@ MessagingContext::Init &GetSystemLayer() %p", &GetSystemLayer());
     chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
 
     ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
