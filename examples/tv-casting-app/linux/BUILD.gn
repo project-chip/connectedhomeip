@@ -54,3 +54,7 @@ executable("chip-tv-casting-app") {
 group("linux") {
   deps = [ ":chip-tv-casting-app" ]
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}
