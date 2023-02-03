@@ -85,12 +85,15 @@ void TestMatterDeviceScore(nlTestSuite * inSuite, void * aContext)
         {
             sl_log_debug(LOG_TAG, "Device DoorLock, matter_miss_count: %d, matter_extra: %d", score.matter_miss_count,
                          score.extra_matter_clusters_count);
-            // Clusters for DoorLock is [Binding, Descriptor, DoorLock, Identify, TimeSynchronization] we only provide 3
+            // Clusters for DoorLock is [Binding, Descriptor, DoorLock,
+            // Identify, TimeSynchronization] we only provide 3
             NL_TEST_ASSERT(inSuite, score.matter_miss_count == 2);
-            // By default FixedLabel and BridgedDeviceBasic is enabled, so we have two extra clusters.
-            NL_TEST_ASSERT(inSuite, score.extra_matter_clusters_count == 2);
-            // We have 3 clusters that matches, so we have 3 points
-            NL_TEST_ASSERT(inSuite, score.required_matter_clusters_count == 3);
+            // By default FixedLabel and BridgedDeviceBasic is enabled, so we
+            // have two extra clusters. In addition, we do ignore the Descriptor
+            // cluster as a spec compliant cluster.
+            NL_TEST_ASSERT(inSuite, score.extra_matter_clusters_count == 3);
+            // We have 2 clusters that matches
+            NL_TEST_ASSERT(inSuite, score.required_matter_clusters_count == 2);
         }
     }
 }
