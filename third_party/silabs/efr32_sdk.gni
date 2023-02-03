@@ -200,6 +200,18 @@ template("efr32_sdk") {
           "RSI_SPI_INTERFACE",
           "RSI_WITH_OS",
         ]
+      } else if (use_rs9117) {
+        defines += [
+          "SL_HEAP_SIZE=32768",
+          "SL_WIFI=1",
+          "SL_WFX_USE_SPI",
+          "EFX32_RS911X=1",
+          "RS911X_WIFI",
+          "RS9117_WIFI",
+          "RSI_WLAN_ENABLE",
+          "RSI_SPI_INTERFACE",
+          "RSI_WITH_OS",
+        ]
       } else if (use_wf200) {
         defines += [
           "SL_HEAP_SIZE=24576",
