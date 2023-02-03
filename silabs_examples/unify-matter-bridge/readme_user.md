@@ -261,3 +261,76 @@ the command line take precedence over the options and values in the config file.
                                        Set the MQTT client ID of the
                                        application.
 ```
+## Running chip-tool tests on Unify Matter Bridge endpoints 
+
+For e.g. OnOff Cluster chip-tool test Test_TC_OO_2_3 can be ran on Unify Matter
+Bridge endpoint 2 for node 1 as follows.
+
+```
+./chip-tool tests Test_TC_OO_2_3 --nodeId 1 --endpoint 2 --delayInMs 1400
+```
+
+Mapping of Matter Endpoint to Unify Node IDs can be seen by giving
+"epmap" command to Unify matter bridge command prompt as follows
+
+```
+Unify>epmap
+Unify Unid |Unify Endpoint |Matter Endpoint
+zw-CE7F3772-0008|         |         2
+```
+
+Note: Endpoint 0(Root) and Endpoint 1(Aggregator) are Bridge itself. They are
+not shown in the epmap. But these endpoints support some clusters as well. For
+e.g. Identify. Where you might want to run chip-tool tests on those endpoints
+
+Note: epmap does not show any bridged endpoints?
+Refer to the '`--spec-compliance`' flag documentation 
+
+For further information on chip-tool tests, refer to the [test suite's README](../../src/app/tests/suites/README.md)
+
+### Troubleshooting
+
+- Time sensitive chip-tool tests might fail because of the latencies in Unify
+Matter Bridge. The '` --delayInMs <number of mili seconds>`' command line option to chip-tool
+can be helpful in such cases.
+
+
+- The Unify Matter Bridge needs to be commissioned to the Matter fabric before
+running the tests. Or you will see following message on the chip-tool tests
+
+```
+***** Test Step 0 : 1: Wait for the commissioned device to be retrieved
+```
+
+- To run all the tests without exiting on a failed one, '`--continueOnFailure true`'
+can be used.
+
+
+- Every cluster command sent by chip-tool can be seen on Unify Matter bridge
+as MQTT topic publish as follows
+
+for .e.g if chip-tool sends OnOff On command on zw-CE7F3772-0008 Unify end node(Matter Endpoint 2). 
+Then Unify Matter bridge publishes following MQTT payload and topic
+ 
+```
+2023-Jan-30 10:36:43.803360 <d> [command_translator_interface] --- send_unify_mqtt_cmd ucl/by-unid/zw-CE7F3772-0008/ep0/OnOff/Commands/On -> {} ---
+```
+
+The above MQTT debug message can also be traced in Unify logs.
+
+- Every attribute read sent by chip-tool will only get correct value, if Unify Matter
+Bridge publishes MQTT payload and topic like following, before chip-tool sends the attribute
+read command.
+
+For e.g. if chip-tool tries to read OnOff attribute of OnOff cluster on 
+zw-CE7F3772-0008 Unify end node(Matter Endpoint 2) Unify Matter Bridge must 
+have received following kind of MQTT message before the correct attribute value
+will be reflected in Unify Matter Bridge.
+
+```
+2023-Jan-30 10:36:44.515748 <d> [mqtt_client] mqtt_client::on_message: ucl/by-unid/zw-CE7F3772-0008/ep0/OnOff/Attributes/OnOff/Reported, {"value":true}, 0
+```
+The above MQTT debug messages can also be traced in Unify logs.
+
+- Alternatively to disable a particular command or disable reading particular
+attributes from the test refer to PICS Usage from [README](../../src/app/tests/suites/README.md)
