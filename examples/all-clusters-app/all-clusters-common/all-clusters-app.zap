@@ -1,5 +1,5 @@
 {
-  "featureLevel": 89,
+  "featureLevel": 90,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1136,6 +1136,22 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "AccessControlEntryChanged",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "AccessControlExtensionChanged",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -1524,6 +1540,36 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "StartUp",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ShutDown",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "Leave",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ReachableChanged",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -1809,6 +1855,29 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "StateTransition",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "VersionApplied",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "DownloadError",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -3574,6 +3643,36 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "HardwareFaultChange",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "RadioFaultChange",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "NetworkFaultChange",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "BootReason",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -3715,6 +3814,15 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "SoftwareFault",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -4784,6 +4892,22 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "ConnectionStatus",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "NetworkFaultChange",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -5069,6 +5193,29 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "Disconnection",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "AssociationFailure",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ConnectionStatus",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -10606,6 +10753,22 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "StateChanged",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ActionFailed",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -11722,6 +11885,29 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "WiredFaultChange",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "BatFaultChange",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "BatChargeFaultChange",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -12246,6 +12432,57 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "SwitchLatched",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "InitialPress",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LongPress",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ShortRelease",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LongRelease",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "MultiPressOngoing",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "MultiPressComplete",
+              "code": 6,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -12563,6 +12800,15 @@
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "StateChange",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -13633,6 +13879,43 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "DoorLockAlarm",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "DoorStateChange",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LockOperation",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LockOperationError",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LockUserChange",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -14745,6 +15028,92 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "SupplyVoltageLow",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "SupplyVoltageHigh",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "PowerMissingPhase",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "SystemPressureLow",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "SystemPressureHigh",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "DryRunning",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "MotorTemperatureHigh",
+              "code": 6,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "PumpMotorFatalFailure",
+              "code": 7,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ElectronicTemperatureHigh",
+              "code": 8,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "PumpBlocked",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "SensorFailure",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ElectronicNonFatalFailure",
+              "code": 11,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -21334,6 +21703,22 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "TestEvent",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "TestFabricScopedEvent",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         }
       ]
@@ -25310,5 +25695,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ]
+  ],
+  "log": []
 }

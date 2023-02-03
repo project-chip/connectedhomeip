@@ -1,5 +1,5 @@
 {
-  "featureLevel": 89,
+  "featureLevel": 90,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -18,17 +18,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -1098,6 +1098,22 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "AccessControlEntryChanged",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "AccessControlExtensionChanged",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -1550,6 +1566,36 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "StartUp",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ShutDown",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "Leave",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ReachableChanged",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -1815,6 +1861,29 @@
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "StateTransition",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "VersionApplied",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "DownloadError",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -3208,6 +3277,36 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "HardwareFaultChange",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "RadioFaultChange",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "NetworkFaultChange",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "BootReason",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -4531,6 +4630,22 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "ConnectionStatus",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "NetworkFaultChange",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -6742,5 +6857,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 772
     }
-  ]
+  ],
+  "log": []
 }
