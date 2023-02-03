@@ -122,7 +122,6 @@ if (chip_enable_wifi) {
     efr32_lwip_defs += [ "LWIP_IPV6=0" ]
   }
 
-  wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
   import("${examples_plat_dir}/SiWx917/rs911x.gni")
 }
 
