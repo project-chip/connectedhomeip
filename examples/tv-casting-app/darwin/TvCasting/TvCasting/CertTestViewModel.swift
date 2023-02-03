@@ -254,6 +254,57 @@ class CertTestViewModel: ObservableObject {
                     }
                 )
 
+                runCertTest(testCaseName: "mediaPlayback_seek",
+                    test: { (callbackHelper: CallbackHelper) -> () in
+                        castingServerBridge.mediaPlayback_seek(targetContentApp!,
+                            position: 10000,
+                            responseCallback:callbackHelper.responseCallback,
+                            clientQueue: DispatchQueue.main,
+                            requestSentHandler:callbackHelper.requestSentHandler
+                        )
+                    }
+                )
+
+                runCertTest(testCaseName: "mediaPlayback_previous",
+                    test: { (callbackHelper: CallbackHelper) -> () in
+                        castingServerBridge.mediaPlayback_previous(targetContentApp!,
+                            responseCallback:callbackHelper.responseCallback,
+                            clientQueue: DispatchQueue.main,
+                            requestSentHandler:callbackHelper.requestSentHandler
+                        )
+                    }
+                )
+
+                runCertTest(testCaseName: "mediaPlayback_rewind",
+                    test: { (callbackHelper: CallbackHelper) -> () in
+                        castingServerBridge.mediaPlayback_rewind(targetContentApp!,
+                            responseCallback:callbackHelper.responseCallback,
+                            clientQueue: DispatchQueue.main,
+                            requestSentHandler:callbackHelper.requestSentHandler
+                        )
+                    }
+                )
+
+                runCertTest(testCaseName: "mediaPlayback_fastForward",
+                    test: { (callbackHelper: CallbackHelper) -> () in
+                        castingServerBridge.mediaPlayback_fastForward(targetContentApp!,
+                            responseCallback:callbackHelper.responseCallback,
+                            clientQueue: DispatchQueue.main,
+                            requestSentHandler:callbackHelper.requestSentHandler
+                        )
+                    }
+                )
+
+                runCertTest(testCaseName: "mediaPlayback_startOver",
+                    test: { (callbackHelper: CallbackHelper) -> () in
+                        castingServerBridge.mediaPlayback_startOver(targetContentApp!,
+                            responseCallback:callbackHelper.responseCallback,
+                            clientQueue: DispatchQueue.main,
+                            requestSentHandler:callbackHelper.requestSentHandler
+                        )
+                    }
+                )
+
                 runCertTest(testCaseName: "onOff_on",
                     test: { (callbackHelper: CallbackHelper) -> () in
                     castingServerBridge.onOff_(on: deviceEndpoint!,
@@ -338,6 +389,27 @@ class CertTestViewModel: ObservableObject {
                         )
                     }
                 )
+
+                runCertTest(testCaseName: "mediaPlayback_subscribeCurrentState",
+                    test: { (callbackHelper: CallbackHelper) -> () in
+                    castingServerBridge.mediaPlayback_subscribeCurrentState(targetContentApp!,
+                            minInterval: 0, maxInterval: 2, clientQueue: DispatchQueue.main,
+                            requestSentHandler: callbackHelper.requestSentHandlerError,
+                            successCallback: {(state : MediaPlayback_PlaybackState) -> () in},
+                            failureCallback: callbackHelper.failureCallback,
+                            subscriptionEstablishedCallback: {() -> () in}
+                        )
+                    }
+                )
+                
+                runCertTest(testCaseName: "shutdownAllSubscriptions",
+                    test: { (callbackHelper: CallbackHelper) -> () in
+                    castingServerBridge.shutdownAllSubscriptions(DispatchQueue.main,
+                            requestSentHandler: {() -> () in}
+                        )
+                    }
+                )
+                
             }
         }
         else

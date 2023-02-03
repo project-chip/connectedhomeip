@@ -47,7 +47,9 @@ chip_build_tests = false
 # examples/platform/silabs/efr32/EFR32DeviceDataProvider is now used.
 chip_use_transitional_commissionable_data_provider = false
 
-openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
+openthread_root =
+    "${chip_root}/third_party/silabs/gecko_sdk/util/third_party/openthread"
+
 openthread_core_config_platform_check_file =
     "openthread-core-efr32-config-check.h"
 openthread_project_core_config_file = "OpenThreadConfig.h"

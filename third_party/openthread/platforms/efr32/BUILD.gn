@@ -16,10 +16,11 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/openthread.gni")
 
+import("//build_overrides/openthread.gni")
+import("//build_overrides/ot_efr32.gni")
+
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 import("${efr32_sdk_build_root}/silabs_board.gni")
-
-openthread_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
 
 config("openthread_efr32_config") {
   defines = [
@@ -31,15 +32,18 @@ config("openthread_efr32_config") {
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
     "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
-    "${openthread_efr32_root}/src/src",
+    "${openthread_efr32_root}",
   ]
+
+  # temporarily disable check until gsdk pulls in a more recent version of openthread
+  cflags = [ "-Wno-format-nonliteral" ]
 }
 
 source_set("openthread_core_config_efr32") {
   sources = [
-    "${openthread_efr32_root}/openthread/src/cli/cli_config.h",
-    "${openthread_efr32_root}/src/src/openthread-core-efr32-config-check.h",
-    "${openthread_efr32_root}/src/src/openthread-core-efr32-config.h",
+    "${openthread_efr32_root}/openthread-core-efr32-config-check.h",
+    "${openthread_efr32_root}/openthread-core-efr32-config.h",
+    "${openthread_root}/src/cli/cli_config.h",
   ]
 
   public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
@@ -49,21 +53,21 @@ source_set("openthread_core_config_efr32") {
 
 source_set("libopenthread-efr32") {
   sources = [
-    "${openthread_efr32_root}/openthread/examples/apps/cli/cli_uart.cpp",
-    "${openthread_efr32_root}/src/src/alarm.c",
-    "${openthread_efr32_root}/src/src/crypto.c",
-    "${openthread_efr32_root}/src/src/entropy.c",
-    "${openthread_efr32_root}/src/src/flash.c",
-    "${openthread_efr32_root}/src/src/misc.c",
-    "${openthread_efr32_root}/src/src/radio.c",
-    "${openthread_efr32_root}/src/src/security_manager.c",
-    "${openthread_efr32_root}/src/src/sleep.c",
-    "${openthread_efr32_root}/src/src/system.c",
+    "${openthread_efr32_root}/alarm.c",
+    "${openthread_efr32_root}/crypto.c",
+    "${openthread_efr32_root}/entropy.c",
+    "${openthread_efr32_root}/flash.c",
+    "${openthread_efr32_root}/ieee802154-packet-utils.cpp",
+    "${openthread_efr32_root}/misc.c",
+    "${openthread_efr32_root}/radio.c",
+    "${openthread_efr32_root}/sleep.c",
+    "${openthread_efr32_root}/system.c",
+    "${openthread_root}/examples/apps/cli/cli_uart.cpp",
   ]
 
   public_deps = [
     ":openthread_core_config_efr32",
-    "${openthread_efr32_root}/openthread/src/core:libopenthread_core_headers",
+    "${openthread_root}/src/core:libopenthread_core_headers",
     "..:libopenthread-platform",
     "..:libopenthread-platform-utils",
   ]

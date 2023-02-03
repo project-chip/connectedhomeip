@@ -158,7 +158,7 @@ RUN set -x \
     "if [[ -x /mnt/chip/runner.sh ]]; then\n" \
     "  echo '### RUNNER START ###'\n" \
     "  /mnt/chip/runner.sh\n" \
-    "  echo '### RUNNER STOP:' $?\n" \
+    "  echo '### RUNNER STOP:' \$?\n" \
     "else\n" \
     "  read -r -t 5 -p 'Press ENTER to access root shell...' && exit || echo ' timeout.'\n" \
     "fi\n" \

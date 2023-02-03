@@ -384,7 +384,7 @@ void ResolveContext::DispatchSuccess()
             continue;
         }
 
-        ChipLogDetail(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
+        ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
         callback(context, &interface.second.service, Span<Inet::IPAddress>(ips.data(), ips.size()), CHIP_NO_ERROR);
         break;
     }
@@ -412,11 +412,11 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
     ReturnErrorOnFailure(chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip));
     interfaces[interfaceId].addresses.push_back(ip);
 
-#ifdef CHIP_DETAIL_LOGGING
+#ifdef CHIP_PROGRESS_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
     ip.ToString(addrStr, sizeof(addrStr));
-    ChipLogDetail(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
-#endif // CHIP_DETAIL_LOGGING
+    ChipLogProgress(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
+#endif // CHIP_PROGRESS_LOGGING
 
     return CHIP_NO_ERROR;
 }
@@ -449,7 +449,7 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
     std::string txtString;
     auto txtRecordIter  = txtRecord;
     size_t remainingLen = txtLen;
@@ -480,9 +480,9 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
         txtRecordIter += len;
         remainingLen -= len;
     }
-#endif // CHIP_DETAIL_LOGGING
-    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
-                  hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
+                    hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);

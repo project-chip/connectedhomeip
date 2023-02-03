@@ -116,7 +116,6 @@ efr32_executable("thermostat_app") {
 
   if (!disable_lcd) {
     sources += [ "src/ThermostatUI.cpp" ]
-    defines += [ "IS_DEMO_THERMOSTAT=1" ]
   }
 
   deps = [
