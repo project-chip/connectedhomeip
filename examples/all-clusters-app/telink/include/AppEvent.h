@@ -32,6 +32,8 @@ struct AppEvent
         kEventType_Button = 0,
         kEventType_Timer,
         kEventType_UpdateLedState,
+        kEventType_IdentifyStart,
+        kEventType_IdentifyStop,
     };
 
     uint16_t Type;

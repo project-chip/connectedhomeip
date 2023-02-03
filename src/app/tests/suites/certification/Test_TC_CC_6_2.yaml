@@ -96,6 +96,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -127,6 +128,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -144,6 +146,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 10s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -161,6 +164,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 5s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -202,6 +206,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -219,6 +224,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 10s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -236,6 +242,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 5s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -277,6 +284,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -317,6 +325,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 2s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

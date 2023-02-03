@@ -548,6 +548,11 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kAx = 5;
   }
 
+  bitmap WiFiNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+  }
+
   info event Disconnection = 0 {
     INT16U reasonCode = 0;
   }
@@ -590,6 +595,11 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate100G = 7;
     kRate200G = 8;
     kRate400G = 9;
+  }
+
+  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
   }
 
   readonly attribute nullable PHYRateEnum PHYRate = 0;

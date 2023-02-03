@@ -984,8 +984,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
-                request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupID = params.groupID.unsignedShortValue;
+                request.sceneID = params.sceneID.unsignedCharValue;
                 request.transitionTime = params.transitionTime.unsignedShortValue;
                 request.sceneName = [self asCharSpan:params.sceneName];
                 {
@@ -1003,7 +1003,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
                             auto element_0 = (MTRScenesClusterExtensionFieldSet *) params.extensionFieldSets[i_0];
-                            listHolder_0->mList[i_0].clusterId = element_0.clusterId.unsignedIntValue;
+                            listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
                             {
                                 using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
                                 using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
@@ -1020,9 +1020,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
                                         auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                        if (element_2.attributeId != nil) {
-                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeId.Emplace();
-                                            definedValue_4 = element_2.attributeId.unsignedIntValue;
+                                        if (element_2.attributeID != nil) {
+                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
+                                            definedValue_4 = element_2.attributeID.unsignedIntValue;
                                         }
                                         {
                                             using ListType_4
@@ -1130,8 +1130,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
-                request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupID = params.groupID.unsignedShortValue;
+                request.sceneID = params.sceneID.unsignedCharValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -1201,8 +1201,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
-                request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupID = params.groupID.unsignedShortValue;
+                request.sceneID = params.sceneID.unsignedCharValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -1272,7 +1272,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -1341,8 +1341,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
-                request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupID = params.groupID.unsignedShortValue;
+                request.sceneID = params.sceneID.unsignedCharValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -1410,8 +1410,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
-                request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupID = params.groupID.unsignedShortValue;
+                request.sceneID = params.sceneID.unsignedCharValue;
                 if (params.transitionTime != nil) {
                     auto & definedValue_0 = request.transitionTime.Emplace();
                     if (params.transitionTime == nil) {
@@ -1490,7 +1490,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -1560,8 +1560,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
-                request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupID = params.groupID.unsignedShortValue;
+                request.sceneID = params.sceneID.unsignedCharValue;
                 request.transitionTime = params.transitionTime.unsignedShortValue;
                 request.sceneName = [self asCharSpan:params.sceneName];
                 {
@@ -1579,7 +1579,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
                             auto element_0 = (MTRScenesClusterExtensionFieldSet *) params.extensionFieldSets[i_0];
-                            listHolder_0->mList[i_0].clusterId = element_0.clusterId.unsignedIntValue;
+                            listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
                             {
                                 using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
                                 using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
@@ -1596,9 +1596,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
                                         auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                        if (element_2.attributeId != nil) {
-                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeId.Emplace();
-                                            definedValue_4 = element_2.attributeId.unsignedIntValue;
+                                        if (element_2.attributeID != nil) {
+                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
+                                            definedValue_4 = element_2.attributeID.unsignedIntValue;
                                         }
                                         {
                                             using ListType_4
@@ -1707,8 +1707,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.groupId = params.groupId.unsignedShortValue;
-                request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupID = params.groupID.unsignedShortValue;
+                request.sceneID = params.sceneID.unsignedCharValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -1778,10 +1778,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     }
                 }
                 request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
-                request.groupIdFrom = params.groupIdFrom.unsignedShortValue;
-                request.sceneIdFrom = params.sceneIdFrom.unsignedCharValue;
-                request.groupIdTo = params.groupIdTo.unsignedShortValue;
-                request.sceneIdTo = params.sceneIdTo.unsignedCharValue;
+                request.groupIdentifierFrom = params.groupIdentifierFrom.unsignedShortValue;
+                request.sceneIdentifierFrom = params.sceneIdentifierFrom.unsignedCharValue;
+                request.groupIdentifierTo = params.groupIdentifierTo.unsignedShortValue;
+                request.sceneIdentifierTo = params.sceneIdentifierTo.unsignedCharValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);

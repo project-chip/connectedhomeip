@@ -188,11 +188,11 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "AddScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                         "transitionTime": "int",
                         "sceneName": "str",
-                        "clusterId": "int",
+                        "clusterID": "int",
                         "attributeValueList": "",
                     },
                 },
@@ -200,39 +200,39 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "ViewScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
                     "commandName": "RemoveScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                     },
                 },
             0x00000003: {
                     "commandId": 0x00000003,
                     "commandName": "RemoveAllScenes",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             0x00000004: {
                     "commandId": 0x00000004,
                     "commandName": "StoreScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                     },
                 },
             0x00000005: {
                     "commandId": 0x00000005,
                     "commandName": "RecallScene",
                     "args": {
-                        "groupId": "int",
-                        "sceneId": "int",
+                        "groupID": "int",
+                        "sceneID": "int",
                         "transitionTime": "int",
                     },
                 },
@@ -240,7 +240,7 @@ class ChipClusters:
                     "commandId": 0x00000006,
                     "commandName": "GetSceneMembership",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             },

@@ -35,7 +35,7 @@ tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
-          "1. Provision the device using TH_CR1 - chip tool(use above instructions) ,"
+          "1. Provision the device using TH_CR1 -chip tool(use above instructions) , "
 
           ./chip-tool operationalcredentials read supported-fabrics 1 0
 
@@ -118,7 +118,7 @@ tests:
       disabled: true
 
     - label:
-          "THn starts a commissioning process and opens a commissioning window
+          "THn_1 starts a commissioning process and opens a commissioning window
           with DUT_CE"
       PICS: CADMIN.S.C01.Rsp
       verification: |

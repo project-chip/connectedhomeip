@@ -31,10 +31,10 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQURIE_COMPONENTS freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash)
+set(CHIP_REQUIRE_COMPONENTS freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
 if((NOT "${IDF_TARGET}" STREQUAL "esp32h2") AND (NOT "${IDF_TARGET}" STREQUAL "esp32c2"))
-    list(APPEND CHIP_REQURIE_COMPONENTS mdns)
+    list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
 endif()
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
@@ -49,7 +49,7 @@ if (NOT CMAKE_BUILD_EARLY_EXPANSION)
 endif()
 
 idf_component_register(SRCS chip.c chip.cpp
-                       PRIV_REQUIRES ${CHIP_REQURIE_COMPONENTS})
+                       PRIV_REQUIRES ${CHIP_REQUIRE_COMPONENTS})
 
 # Prepare initial args file (lacking compile flags)
 # This will be saved as args.gn.in

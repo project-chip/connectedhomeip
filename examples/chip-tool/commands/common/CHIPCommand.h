@@ -123,6 +123,11 @@ protected:
     // use member values that Shutdown will normally reset.
     virtual bool DeferInteractiveCleanup() { return false; }
 
+    // If true, the controller will be created with server capabilities enabled,
+    // such as advertising operational nodes over DNS-SD and accepting incoming
+    // CASE sessions.
+    virtual bool NeedsOperationalAdvertising() { return false; }
+
     // Execute any deferred cleanups.  Used when exiting interactive mode.
     static void ExecuteDeferredCleanups(intptr_t ignored);
 
@@ -139,7 +144,7 @@ protected:
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
-    CHIP_ERROR GetCommissionerNodeId(std::string identity, chip::NodeId * nodeId);
+    CHIP_ERROR GetIdentityNodeId(std::string identity, chip::NodeId * nodeId);
     void SetIdentity(const char * name);
 
     // This method returns the commissioner instance to be used for running the command.

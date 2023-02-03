@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
 
         id<MTRDeviceAttestationDelegate> strongDelegate = mDeviceAttestationDelegate;
         if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:
-                                                                                          device:attestationDeviceInfo:error:)]
+                                                                              opaqueDeviceHandle:attestationDeviceInfo:error:)]
             || [strongDelegate respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
             MTRDeviceController * strongController = mDeviceController;
             if (strongController) {
@@ -48,9 +48,9 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
                     ? nil
                     : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
                 if ([strongDelegate respondsToSelector:@selector
-                                    (deviceAttestationCompletedForController:device:attestationDeviceInfo:error:)]) {
+                                    (deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]) {
                     [strongDelegate deviceAttestationCompletedForController:mDeviceController
-                                                                     device:device
+                                                         opaqueDeviceHandle:device
                                                       attestationDeviceInfo:deviceInfo
                                                                       error:error];
                 } else {
@@ -61,14 +61,14 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
                 }
             }
         } else if ((attestationResult != chip::Credentials::AttestationVerificationResult::kSuccess)
-            && ([strongDelegate respondsToSelector:@selector(deviceAttestationFailedForController:device:error:)] ||
+            && ([strongDelegate respondsToSelector:@selector(deviceAttestationFailedForController:opaqueDeviceHandle:error:)] ||
                 [strongDelegate respondsToSelector:@selector(deviceAttestation:failedForDevice:error:)])) {
 
             MTRDeviceController * strongController = mDeviceController;
             if (strongController) {
                 NSError * error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
-                if ([strongDelegate respondsToSelector:@selector(deviceAttestationFailedForController:device:error:)]) {
-                    [strongDelegate deviceAttestationFailedForController:mDeviceController device:device error:error];
+                if ([strongDelegate respondsToSelector:@selector(deviceAttestationFailedForController:opaqueDeviceHandle:error:)]) {
+                    [strongDelegate deviceAttestationFailedForController:mDeviceController opaqueDeviceHandle:device error:error];
                 } else {
                     [strongDelegate deviceAttestation:mDeviceController failedForDevice:device error:error];
                 }

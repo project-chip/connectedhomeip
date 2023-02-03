@@ -51,7 +51,7 @@ tests:
 
     - label: "Reboot target device(DUT)"
       verification: |
-          Not implemented in chip-tool
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -92,7 +92,7 @@ tests:
 
     - label: "Reboot target device(DUT)"
       verification: |
-          Not implemented in chip-tool
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -133,7 +133,7 @@ tests:
 
     - label: "Reboot target device(DUT)"
       verification: |
-          Not implemented in chip-tool
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -167,7 +167,7 @@ tests:
 
     - label: "Reboot target device(DUT)"
       verification: |
-          Not implemented in chip-tool
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -208,7 +208,7 @@ tests:
 
     - label: "Reboot target device(DUT)"
       verification: |
-          Not implemented in chip-tool
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -246,7 +246,7 @@ tests:
 
     - label: "Reboot target device(DUT)"
       verification: |
-          Not implemented in YAML
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP

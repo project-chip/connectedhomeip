@@ -125,6 +125,6 @@ tests:
     - label: "Reads the attribute: EffectiveControlMode"
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: PCC.S.F02 && PCC.S.A0012
+      PICS: PCC.S.F05 && PCC.S.A0012
       response:
           value: 7

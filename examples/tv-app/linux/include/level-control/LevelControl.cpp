@@ -19,8 +19,6 @@
 #include <app/util/af.h>
 
 #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 

@@ -31,6 +31,35 @@ Please follow the instructions
 [here](./python_chip_controller_building.md#building-and-installing) to build
 the Python virtual environment.
 
+### Building for `arm64` e.g. for Raspberry Pi
+
+Matter code relies on code generation for cluster-specific data types and
+callbacks. A subset of code generation is done at compile time by `zap-cli`. ZAP
+is generally installed as a third-party tool via CIPD during the build
+environment bootstrap. However, zap packages are currently NOT available for
+`arm64` (like when compiling on Raspberry PI.). In this case, you have 2
+choices.
+
+1. You could check out zap from source as described in
+   [Code Generation - Installing zap and environment variables](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Installing-zap-and-environment-variables)
+   and proceed with the
+   [instructions](./python_chip_controller_building.md#building-and-installing)
+   to build the Python virtual environment.
+
+2. When compile-time code generation is not desirable, then pre-generated output
+   code can be used. To understand about code generation and pre-generating
+   matter code see.
+   [Code generation - Pre-generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Pre-generation).
+   To build and install the Python CHIP controller with pre-generated files use
+   the -z argument that points to the directory of pre-generated code:
+
+    ```
+    scripts/build_python.sh -m platform -i separate -z "/some/pregen/dir"
+    ```
+
+    > Note: To get more details about available build configurations, run the
+    > following command: `scripts/build_python.sh --help`
+
 ## Launching the REPL
 
 1. Activate the Python virtual environment:
@@ -154,13 +183,13 @@ launched into the playground:
 
 ## Guides
 
-[REPL Basics](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20REPL%20Intro.ipynb)
+[REPL Basics](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_REPL_Intro.ipynb)
 
-[Using the IM](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Basic%20Interactions.ipynb)
+[Using the IM](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Basic_Interactions.ipynb)
 
-[Multi Fabric Commissioning](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Multi%20Fabric%20Commissioning.ipynb)
+[Multi Fabric Commissioning](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Multi_Fabric_Commissioning.ipynb)
 
-[Access Control](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Access%20Control.ipynb)
+[Access Control](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Access_Control.ipynb)
 
 ## Testing
 

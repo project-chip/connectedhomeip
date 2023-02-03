@@ -275,6 +275,7 @@ public:
     static void TestReadHandler_SubscriptionReportingIntervalsTest9(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
+    static void TestReadSubscribeAttributeResponseWithVersionOnlyCache(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOldestSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_ParallelReads(nlTestSuite * apSuite, void * apContext);
@@ -1411,6 +1412,79 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
             uint8_t receivedAttribute4[256];
             reader.GetBytes(receivedAttribute4, 256);
             NL_TEST_ASSERT(apSuite, memcmp(receivedAttribute4, expectedAttribute4, 256));
+        }
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadSubscribeAttributeResponseWithVersionOnlyCache(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    responseDirective = kSendDataResponse;
+
+    MockInteractionModelApp delegate;
+    chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
+
+    chip::app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    // read of E2C2A* and E3C2A2. Expect cache E2C2 version
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams.mAttributePathParamsListSize = 2;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) != CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) != CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) != CHIP_NO_ERROR);
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -4572,6 +4646,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest7", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest8", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest8),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest9", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9),
+        NL_TEST_DEF("TestReadSubscribeAttributeResponseWithVersionOnlyCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithVersionOnlyCache),
     NL_TEST_DEF("TestReadSubscribeAttributeResponseWithCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithCache),
     NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),
     NL_TEST_DEF("TestReadHandler_KillOldestSubscriptions", TestReadInteraction::TestReadHandler_KillOldestSubscriptions),

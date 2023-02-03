@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ using namespace chip::Credentials;
                                             operationalPublicKey:(SecKeyRef)operationalPublicKey
                                                         fabricID:(NSNumber *)fabricID
                                                           nodeID:(NSNumber *)nodeID
-                                           caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                           caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
     MTR_LOG_DEFAULT("Generating operational certificate");
@@ -196,7 +196,7 @@ using namespace chip::Credentials;
     chip::MutableByteSpan chipCertBytes(chipCertBuffer);
 
     CHIP_ERROR errorCode = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes, chipCertBytes);
-    MTR_LOG_ERROR("ConvertX509CertToChipCert: %s", chip::ErrorStr(errorCode));
+    MTR_LOG_ERROR("convertX509Certificate: %s", chip::ErrorStr(errorCode));
 
     if (errorCode != CHIP_NO_ERROR)
         return nil;
@@ -214,21 +214,21 @@ using namespace chip::Credentials;
     CHIP_ERROR errorCode = chip::Credentials::ConvertChipCertToX509Cert(tlvCertBytes, derCertBytes);
 
     if (errorCode != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("ConvertChipCertToX509Cert: %s", chip::ErrorStr(errorCode));
+        MTR_LOG_ERROR("convertMatterCertificate: %s", chip::ErrorStr(errorCode));
         return nil;
     }
 
     return AsData(derCertBytes);
 }
 
-+ (NSData * _Nullable)extractPublicKeyFromCertificateSigningRequest:(MTRCSRDERBytes)certificateSigningRequest
-                                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
++ (NSData * _Nullable)publicKeyFromCSR:(MTRCSRDERBytes)certificateSigningRequest
+                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
     auto requestSpan = AsByteSpan(certificateSigningRequest);
     P256PublicKey publicKey;
     CHIP_ERROR err = VerifyCertificateSigningRequest(requestSpan.data(), requestSpan.size(), publicKey);
     if (err != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("extractPublicKeyFromCertificateSigningRequest: %s", chip::ErrorStr(err));
+        MTR_LOG_ERROR("publicKeyFromCSR: %s", chip::ErrorStr(err));
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:err];
         }
@@ -274,12 +274,16 @@ using namespace chip::Credentials;
                               caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
+    NSSet<NSNumber *> * tags = nil;
+    if (caseAuthenticatedTags != nil) {
+        tags = [NSSet setWithArray:caseAuthenticatedTags];
+    }
     return [MTRCertificates createOperationalCertificate:signingKeypair
                                       signingCertificate:signingCertificate
                                     operationalPublicKey:operationalPublicKey
                                                 fabricID:fabricId
                                                   nodeID:nodeId
-                                   caseAuthenticatedTags:caseAuthenticatedTags
+                                   caseAuthenticatedTags:tags
                                                    error:error];
 }
 

@@ -95,7 +95,7 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install \
+    && pip3 install --no-cache-dir \
     attrs \
     click \
     coloredlogs \
@@ -109,8 +109,6 @@ RUN set -x \
     pygit \
     PyGithub \
     tabulate \
-    # Cleanup
-    && pip3 cache purge \
     && : # last line
 
 # build and install gn
@@ -151,7 +149,7 @@ RUN set -x \
     # Save clang-12 files, so we can restore them after build dependencies cleanup
     && tar -cf clang-12-files.tar $(dpkg -L libclang-common-12-dev |grep /include) /usr/lib/llvm-12/lib/libLLVM-12.so.1 \
     # Cleanup build dependencies
-    && apt autoremove -fy clang-12 libclang-12-dev \
+    && apt autopurge -fy clang-12 libclang-12-dev \
     && rm -rf /var/lib/apt/lists/ \
     # Restore clang-12 files
     && tar -xf clang-12-files.tar -C / \
@@ -168,30 +166,13 @@ RUN set -x \
 ENV LD_LIBRARY_PATH_TSAN=/usr/lib/x86_64-linux-gnu-tsan
 RUN set -x \
     && mkdir -p $LD_LIBRARY_PATH_TSAN \
+    && export CCACHE_DISABLE=1 PYTHONDONTWRITEBYTECODE=1 \
     && GLIB_VERSION=$(pkg-config --modversion glib-2.0) \
     && git clone --depth=1 --branch=$GLIB_VERSION https://github.com/GNOME/glib.git \
     && CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib \
     && DESTDIR=../build-image ninja -C glib/build install \
     && mv glib/build-image/usr/local/lib/x86_64-linux-gnu/lib* $LD_LIBRARY_PATH_TSAN \
     && rm -rf glib \
-    && : # last line
-
-# Install a known ZAP release
-# Only keep the cli version, since `zap` is 143MB and not usable (UI)
-#
-# NOTE: zap version occurs in several files (CI and docker)
-#       for a uniform update, a separate update script exists:
-#
-#       scripts/tools/zap/version_update.py
-ENV ZAP_VERSION=v2023.01.19-nightly
-RUN set -x \
-    && mkdir -p /opt/zap-${ZAP_VERSION} \
-    && cd /opt/zap-${ZAP_VERSION} \
-    && wget https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux.zip \
-    && unzip zap-linux.zip \
-    && rm zap-linux.zip \
-    && rm zap \
-    && ln -s /opt/zap-${ZAP_VERSION}/zap-cli /usr/bin/ \
     && : # last line
 
 # NodeJS: install a newer version than what apt-get would read

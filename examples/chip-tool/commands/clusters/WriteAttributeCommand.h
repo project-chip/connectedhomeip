@@ -23,12 +23,22 @@
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
 
+constexpr const char * kWriteCommandKey      = "write";
+constexpr const char * kWriteByIdCommandKey  = "write-by-id";
+constexpr const char * kForceWriteCommandKey = "force-write";
+
+enum class WriteCommandType
+{
+    kWrite,      // regular, writable attributes
+    kForceWrite, // forced writes, send a write command on something expected to fail
+};
+
 template <class T = std::vector<CustomArgument *>>
 class WriteAttribute : public InteractionModelWriter, public ModelCommand, public chip::app::WriteClient::Callback
 {
 public:
     WriteAttribute(CredentialIssuerCommands * credsIssuerConfig) :
-        InteractionModelWriter(this), ModelCommand("write-by-id", credsIssuerConfig)
+        InteractionModelWriter(this), ModelCommand(kWriteByIdCommandKey, credsIssuerConfig)
     {
         AddArgumentClusterIds();
         AddArgumentAttributeIds();
@@ -37,7 +47,7 @@ public:
     }
 
     WriteAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractionModelWriter(this), ModelCommand("write-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
+        InteractionModelWriter(this), ModelCommand(kWriteByIdCommandKey, credsIssuerConfig), mClusterIds(1, clusterId)
     {
         AddArgumentAttributeIds();
         AddArgumentAttributeValues();
@@ -46,8 +56,8 @@ public:
 
     template <typename minType, typename maxType>
     WriteAttribute(chip::ClusterId clusterId, const char * attributeName, minType minValue, maxType maxValue,
-                   chip::AttributeId attributeId, CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute(clusterId, attributeId, credsIssuerConfig)
+                   chip::AttributeId attributeId, WriteCommandType commandType, CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute(clusterId, attributeId, commandType, credsIssuerConfig)
     {
         AddArgumentAttributeName(attributeName);
         AddArgumentAttributeValues(static_cast<int64_t>(minValue), static_cast<uint64_t>(maxValue));
@@ -55,8 +65,8 @@ public:
     }
 
     WriteAttribute(chip::ClusterId clusterId, const char * attributeName, float minValue, float maxValue,
-                   chip::AttributeId attributeId, CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute(clusterId, attributeId, credsIssuerConfig)
+                   chip::AttributeId attributeId, WriteCommandType commandType, CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute(clusterId, attributeId, commandType, credsIssuerConfig)
     {
         AddArgumentAttributeName(attributeName);
         AddArgumentAttributeValues(minValue, maxValue);
@@ -64,8 +74,8 @@ public:
     }
 
     WriteAttribute(chip::ClusterId clusterId, const char * attributeName, double minValue, double maxValue,
-                   chip::AttributeId attributeId, CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute(clusterId, attributeId, credsIssuerConfig)
+                   chip::AttributeId attributeId, WriteCommandType commandType, CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute(clusterId, attributeId, commandType, credsIssuerConfig)
     {
         AddArgumentAttributeName(attributeName);
         AddArgumentAttributeValues(minValue, maxValue);
@@ -73,8 +83,8 @@ public:
     }
 
     WriteAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId,
-                   CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute(clusterId, attributeId, credsIssuerConfig)
+                   WriteCommandType commandType, CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute(clusterId, attributeId, commandType, credsIssuerConfig)
     {
         AddArgumentAttributeName(attributeName);
         AddArgumentAttributeValues();
@@ -82,8 +92,9 @@ public:
     }
 
     WriteAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId,
-                   TypedComplexArgument<T> & attributeParser, CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute(clusterId, attributeId, credsIssuerConfig)
+                   TypedComplexArgument<T> & attributeParser, WriteCommandType commandType,
+                   CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute(clusterId, attributeId, commandType, credsIssuerConfig)
     {
         AddArgumentAttributeName(attributeName);
         AddArgumentAttributeValues(attributeParser);
@@ -159,7 +170,7 @@ public:
 
 protected:
     WriteAttribute(const char * attributeName, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractionModelWriter(this), ModelCommand("write", credsIssuerConfig)
+        InteractionModelWriter(this), ModelCommand(kWriteCommandKey, credsIssuerConfig)
     {
         // Subclasses are responsible for calling AddArguments.
     }
@@ -244,9 +255,11 @@ protected:
 
 private:
     // This constructor is private as it is not intended to be used from outside the class.
-    WriteAttribute(chip::ClusterId clusterId, chip::AttributeId attributeId, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractionModelWriter(this), ModelCommand("write", credsIssuerConfig), mClusterIds(1, clusterId),
-        mAttributeIds(1, attributeId)
+    WriteAttribute(chip::ClusterId clusterId, chip::AttributeId attributeId, WriteCommandType commandType,
+                   CredentialIssuerCommands * credsIssuerConfig) :
+        InteractionModelWriter(this),
+        ModelCommand(commandType == WriteCommandType::kWrite ? kWriteCommandKey : kForceWriteCommandKey, credsIssuerConfig),
+        mClusterIds(1, clusterId), mAttributeIds(1, attributeId)
     {}
 
     std::vector<chip::ClusterId> mClusterIds;
@@ -261,8 +274,8 @@ class WriteAttributeAsComplex : public WriteAttribute<T>
 {
 public:
     WriteAttributeAsComplex(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId,
-                            CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute<T>(clusterId, attributeName, attributeId, mAttributeParser, credsIssuerConfig)
+                            WriteCommandType commandType, CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute<T>(clusterId, attributeName, attributeId, mAttributeParser, commandType, credsIssuerConfig)
     {}
 
 private:

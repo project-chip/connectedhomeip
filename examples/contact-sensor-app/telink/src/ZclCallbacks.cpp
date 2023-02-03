@@ -26,6 +26,8 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {

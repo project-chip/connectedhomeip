@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,7 +41,8 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * way
  */
 + (MTRDeviceController *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
-                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock MTR_NEWLY_AVAILABLE;
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Returns an encoded values object to send over XPC for read, write and command interactions
@@ -87,7 +88,8 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Gets device controller ID corresponding to a specific fabric ID
  */
 - (void)getDeviceControllerWithFabricId:(uint64_t)fabricId
-                             completion:(MTRDeviceControllerGetterHandler)completion MTR_NEWLY_DEPRECATED("This never called.");
+                             completion:(MTRDeviceControllerGetterHandler)completion
+    API_DEPRECATED("This never called.", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @required
 /**
@@ -192,7 +194,8 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 
 + (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerID
                                 xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
-    MTR_NEWLY_DEPRECATED("Please use sharedControllerWithID:xpcConnectBlock:");
+    API_DEPRECATED("Please use sharedControllerWithID:xpcConnectBlock:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+        tvos(16.1, 16.4));
 
 @end
 

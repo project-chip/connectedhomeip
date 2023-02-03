@@ -15,7 +15,7 @@ Listed are the Current SHAs:
 -   iOS/iPadOS/tvOS 16.1:
     [`33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7`](https://github.com/project-chip/connectedhomeip/commits/33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7)
 
--   iOS/iPadOS/tvOS 16.2 Developer Preview:
+-   iOS/iPadOS/tvOS 16.2 and 16.3:
     [`c279578c5bc37f117335aa96cec6c5552f070cc0`](https://github.com/project-chip/connectedhomeip/commits/c279578c5bc37f117335aa96cec6c5552f070cc0)
 
 ## Supported Platforms for Matter Device Testing

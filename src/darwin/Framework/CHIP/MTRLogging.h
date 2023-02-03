@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +38,7 @@ typedef void (^MTRLogCallback)(MTRLogType type, NSString * moduleName, NSString 
  * It SHALL NOT call back directly or indirectly into any Matter APIs,
  * nor block the calling thread for a non-trivial amount of time.
  */
-MTR_EXTERN MTR_NEWLY_AVAILABLE void MTRSetLogCallback(MTRLogType logTypeThreshold, MTRLogCallback _Nullable callback);
+MTR_EXTERN API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) void MTRSetLogCallback(
+    MTRLogType logTypeThreshold, MTRLogCallback _Nullable callback);
 
 NS_ASSUME_NONNULL_END

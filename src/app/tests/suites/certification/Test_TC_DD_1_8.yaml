@@ -104,7 +104,7 @@ tests:
       verification: |
           ./chip-tool pairing code 1 MT:-24J042C00KA0648G00
           No applicable TH logs.
-          Verify in DUT as commissioner side:
+          Verify in DUT(CHIP-TOOL)
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           CHIP:CTL: Received CommissioningComplete response, errorCode=0
           CHIP:CTL: Successfully finished commissioning step "SendComplete"
@@ -121,26 +121,9 @@ tests:
           MT:-24J029Q00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          ./chip-tool pairing code 1 MT:-24J042C00KA0648G00
-          No applicable TH logs.
-          Verify in DUT(CHIP-TOOL)
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          CHIP:CTL: Performing next commissioning step 'Cleanup'
-          CHIP:CTL: Successfully finished commissioning step 'Cleanup'
-          CHIP:TOO: Device commissioning completed with success
-          CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
-
-    - label:
-          "Using the DUT, parse the THs QR code to onboard the TH Device onto
-          the Matter network."
-      verification: |
           1. Launch the TH commissionee app and get QR code from TH side
           Verify in TH (ALL-CLUSTER-APP)
-          ./chip-all-clusters-app
+           ./chip-all-clusters-app
           ...
           [1667807422.508516][12415:12415] CHIP:DL:   Manufacturing Date: (not set)
           [1667807422.508536][12415:12415] CHIP:DL:   Device Type: 65535 (0xFFFF)
@@ -148,9 +131,24 @@ tests:
           [1667807422.508591][12415:12415] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
           [1667807422.508608][12415:12415] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
 
-          2. Build TLV Data into TH's QR code using chip-tool's generate-qrcode command
-          ./chip-tool payload generate-qrcode --existing-payload MT:-24J042C00KA0648G00 --tlvBytes hex:152C000A3132333435363738393018
+          2. Build TLV Data into TH"s QR code using chip-tool"s generate-qrcode command
+           ./chip-tool payload generate-qrcode --existing-payload MT:-24J042C00KA0648G00 --tlvBytes hex:152C000A3132333435363738393018
           [1667807462.804398][10254:10254] CHIP:TOO: QR Code: MT:-24J042C00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40
+      disabled: true
+
+    - label:
+          "Using the DUT, parse the THs QR code to onboard the TH Device onto
+          the Matter network."
+      verification: |
+          ./chip-tool pairing code 1 MT:-24J042C00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40
+
+          Verify in DUT(CHIP-TOOL)
+          [1657210956708] [28601:16575811] CHIP: [CTL] Received CommissioningComplete response, errorCode=0
+          [1657210956708] [28601:16575811] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1657210956708] [28601:16575811] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1657210956708] [28601:16575811] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1657210956708] [28601:16575811] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1657210956709] [28601:16575811] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
@@ -166,7 +164,7 @@ tests:
           No applicable TH logs.
 
           1. Launch the TH commissionee app and get QR code from TH side
-          ./chip-all-clusters-app
+           ./chip-all-clusters-app
 
           [1667807539.277170][12433:12433] CHIP:DL:   Manufacturing Date: (not set)
           [1667807539.277189][12433:12433] CHIP:DL:   Device Type: 65535 (0xFFFF)
@@ -174,7 +172,8 @@ tests:
           [1667807539.277244][12433:12433] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
           [1667807539.277261][12433:12433] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
 
-          2.  Build TLV Data into TH's QR code using chip-tool's generate-qrcode command. To generate the QR code containing the 1000-byte TLV data, use the following command and piece together the 2 log lines of output.
+
+          2.  Build TLV Data into TH's QR code using chip-tool"s generate-qrcode command. To generate the QR code containing the 1000-byte TLV data, use the following command and piece together the 2 log lines of output.
           NOTE: The finished QR code is in the verification step already.
 
           ./chip-tool payload generate-qrcode --existing-payload MT:-24J042C00KA0648G00  --tlvBytes hex:152d82e8033132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393031323334353637383930313233343536373839303132333435363738393018

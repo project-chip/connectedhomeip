@@ -17,7 +17,12 @@
  */
 package com.chip.casting;
 
+import android.util.Log;
+import java.math.BigInteger;
+import java.util.Arrays;
+
 public class AppParameters {
+  private static final String TAG = AppParameters.class.getSimpleName();
   public static final int MIN_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH = 16;
   private static final int TEST_SETUP_PASSCODE = 20202021;
   private static final int TEST_DISCRIMINATOR = 0xF00;
@@ -32,11 +37,20 @@ public class AppParameters {
   private int discriminator = TEST_DISCRIMINATOR;
 
   public void setRotatingDeviceIdUniqueId(byte[] rotatingDeviceIdUniqueId) {
-    this.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueId;
+    Log.d(
+        TAG,
+        "AppParameters.setRotatingDeviceIdUniqueId called with "
+            + new BigInteger(1, rotatingDeviceIdUniqueId).toString(16));
+    this.rotatingDeviceIdUniqueId =
+        Arrays.copyOf(rotatingDeviceIdUniqueId, rotatingDeviceIdUniqueId.length);
   }
 
   public byte[] getRotatingDeviceIdUniqueId() {
-    return rotatingDeviceIdUniqueId;
+    Log.d(
+        TAG,
+        "AppParameters.getRotatingDeviceIdUniqueId returning copyOf "
+            + new BigInteger(1, rotatingDeviceIdUniqueId).toString(16));
+    return Arrays.copyOf(rotatingDeviceIdUniqueId, rotatingDeviceIdUniqueId.length);
   }
 
   public DACProvider getDacProvider() {

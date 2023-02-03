@@ -322,7 +322,11 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     const EmberAfCluster * cluster = emberAfFindServerCluster(attributePath.mEndpointId, attributePath.mClusterId);
     if (cluster == nullptr)
     {
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        if (!emberAfEndpointIsEnabled(attributePath.mEndpointId))
+        {
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+        }
+        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
     }
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -591,23 +595,27 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                             }
                         }
                     }
+
+                    // Attribute is not in the cluster.
+                    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
                 }
-                else
-                { // Not the cluster we are looking for
-                    attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + cluster->clusterSize);
-                }
+
+                // Not the cluster we are looking for
+                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + cluster->clusterSize);
             }
+
+            // Cluster is not in the endpoint.
+            return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
         }
-        else
-        { // Not the endpoint we are looking for
-            // Dynamic endpoints are external and don't factor into storage size
-            if (!isDynamicEndpoint)
-            {
-                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
-            }
+
+        // Not the endpoint we are looking for
+        // Dynamic endpoints are external and don't factor into storage size
+        if (!isDynamicEndpoint)
+        {
+            attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
         }
     }
-    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
+    return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT; // Sorry, endpoint was not found.
 }
 
 const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)
