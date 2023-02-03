@@ -21,6 +21,7 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCluster.h"
+#import "MTRClusterConstants.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -110,6 +111,11 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
 
 NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
 {
+    // Note: The event timestamp value as written in the spec is in microseconds, but the released 1.0 SDK implemented it in
+    // milliseconds. The following issue was filed to address the inconsistency:
+    //    https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6236
+    // For consistency with the released behavior, calculations here will be done in milliseconds.
+
     // First convert the event timestamp value (in milliseconds) to NSTimeInterval - to minimize potential loss of precision
     // of uint64 => NSTimeInterval (double), convert whole seconds and remainder separately and then combine
     NSTimeInterval eventTimestampValueSeconds = (NSTimeInterval)(timeValue / chip::kMillisecondsPerSecond);
@@ -118,6 +124,23 @@ NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
     NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
 
     return eventTimestampValue;
+}
+
+BOOL MTRPriorityLevelIsValid(chip::app::PriorityLevel priorityLevel)
+{
+    return (priorityLevel >= chip::app::PriorityLevel::Debug) && (priorityLevel <= chip::app::PriorityLevel::Critical);
+}
+
+MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel priorityLevel)
+{
+    switch (priorityLevel) {
+    case chip::app::PriorityLevel::Debug:
+        return MTREventPriorityDebug;
+    case chip::app::PriorityLevel::Info:
+        return MTREventPriorityInfo;
+    default:
+        return MTREventPriorityCritical;
+    }
 }
 
 #pragma mark - SubscriptionCallback class declaration
@@ -365,9 +388,17 @@ private:
 {
     os_unfair_lock_lock(&self->_lock);
 
-    // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
     NSDate * oldEstimatedStartTime = _estimatedStartTime;
     for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+        // Whenever a StartUp event is received, reset the estimated start time
+        MTREventPath * eventPath = eventDict[MTREventPathKey];
+        BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
+            && (eventPath.event.unsignedLongValue == MTRClusterBasicEventStartUpID);
+        if (isStartUpEvent) {
+            _estimatedStartTime = nil;
+        }
+
+        // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
         NSNumber * eventTimeTypeNumber = eventDict[MTREventTimeTypeKey];
         if (!eventTimeTypeNumber) {
             MTR_LOG_ERROR("Event %@ missing event time type", eventDict);
@@ -1014,11 +1045,17 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
                 return;
             }
 
+            if (!MTRPriorityLevelIsValid(aEventHeader.mPriorityLevel)) {
+                MTR_LOG_INFO("%@ Unsupported event priority %u - ignoring", eventPath, (unsigned int) aEventHeader.mPriorityLevel);
+                ReportError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+                return;
+            }
+
             [mEventReports addObject:@{
                 MTREventPathKey : eventPath,
                 MTRDataKey : value,
                 MTREventNumberKey : @(aEventHeader.mEventNumber),
-                MTREventPriorityKey : @((uint8_t) aEventHeader.mPriorityLevel),
+                MTREventPriorityKey : @(MTREventPriorityForValidPriorityLevel(aEventHeader.mPriorityLevel)),
                 MTREventTimeTypeKey : eventTimeType,
                 timestampKey : timestampValue
             }];

@@ -65,10 +65,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 /**
  * The estimated device system start time.
  *
- * A device can reports its events with either calendar time or time since system start time. When events are reported with time
+ * A device can report its events with either calendar time or time since system start time. When events are reported with time
  * since system start time, this property will return an estimation of the device system start time. Because a device may report
- * timestamp this way due to the lack of a wall clock, system start time can only be estimated based on event receive time and the
- * timestamp value, and this estimation may change over time, but only toward an earlier date.
+ * timestamps this way due to the lack of a wall clock, system start time can only be estimated based on event receive time and the
+ * timestamp value, and this estimation may change over time.
+ *
+ * Device reboots may also cause the estimated device start time to jump forward.
  *
  * If events are always reported with calendar time, then this property will return nil.
  */
@@ -208,14 +210,13 @@ extern NSString * const MTREventTimestampDateKey MTR_NEWLY_AVAILABLE;
  *                In addition to the MTREventPathKey and MTRDataKey containing the path and event values, eventReport also contains
  * these keys:
  *
- *                MTREventNumberKey : NSNumber-wrapped uint64_t value.
- *                MTREventPriorityKey : NSNumber-wrapped uint8_t value.
- *                MTREventTimeTypeKey : NSNumber-wrapped MTREventTimeType value.
- *                MTREventSystemUpTimeKey : NSNumber-wrapped NSTimeInterval value.
- *                MTREventTimestampDateKey : NSDate object.
+ *                MTREventNumberKey : NSNumber-wrapped uint64_t value. Monotonically increasing, but consecutive events may not have
+ * consecutive numbers. MTREventPriorityKey : NSNumber-wrapped MTREventPriority value. MTREventTimeTypeKey : NSNumber-wrapped
+ * MTREventTimeType value. MTREventSystemUpTimeKey : NSNumber-wrapped NSTimeInterval value. MTREventTimestampDateKey : NSDate
+ * object.
  *
  *                Only one of MTREventTimestampDateKey and MTREventSystemUpTimeKey will be present, depending on the value for
- * MTREvenTimeTypeKey.
+ * MTREventTimeTypeKey.
  */
 - (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 

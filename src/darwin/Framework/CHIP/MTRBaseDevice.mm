@@ -2050,24 +2050,25 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 @implementation MTREventReport
 - (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
                  eventNumber:(NSNumber *)eventNumber
-                    priority:(NSNumber *)priority
-               timestampType:(NSNumber *)timestampType
-              timestampValue:(NSNumber *)timestampValue
+                    priority:(PriorityLevel)priority
+                   timestamp:(const Timestamp &)timestamp
                        value:(id _Nullable)value
-                       error:(NSError * _Nullable)error;
+                       error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
         _path = [[MTREventPath alloc] initWithPath:path];
         _eventNumber = eventNumber;
-        _priority = priority;
-        _timestampValue = timestampValue;
-        if ((Timestamp::Type) timestampType.unsignedIntegerValue == Timestamp::Type::kSystem) {
+        if (!MTRPriorityLevelIsValid(priority)) {
+            return nil;
+        }
+        _priority = @(MTREventPriorityForValidPriorityLevel(priority));
+        _timestampValue = @(timestamp.mValue);
+        if (timestamp.IsSystem()) {
             _eventTimeType = MTREventTimeTypeSystemUpTime;
-            _systemUpTime = MTRTimeIntervalForEventTimestampValue(timestampValue.unsignedLongLongValue);
-        } else if ((Timestamp::Type) timestampType.unsignedIntegerValue == Timestamp::Type::kSystem) {
+            _systemUpTime = MTRTimeIntervalForEventTimestampValue(timestamp.mValue);
+        } else if (timestamp.IsEpoch()) {
             _eventTimeType = MTREventTimeTypeTimestampDate;
-            _timestampDate =
-                [NSDate dateWithTimeIntervalSince1970:MTRTimeIntervalForEventTimestampValue(timestampValue.unsignedLongLongValue)];
+            _timestampDate = [NSDate dateWithTimeIntervalSince1970:MTRTimeIntervalForEventTimestampValue(timestamp.mValue)];
         } else {
             return nil;
         }
@@ -2116,9 +2117,8 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
 
     [mEventReports addObject:[[MTREventReport alloc] initWithPath:aEventHeader.mPath
                                                       eventNumber:@(aEventHeader.mEventNumber)
-                                                         priority:@((uint8_t) aEventHeader.mPriorityLevel)
-                                                    timestampType:@((NSUInteger) aEventHeader.mTimestamp.mType)
-                                                   timestampValue:@(aEventHeader.mTimestamp.mValue)
+                                                         priority:aEventHeader.mPriorityLevel
+                                                        timestamp:aEventHeader.mTimestamp
                                                             value:value
                                                             error:error]];
 }
