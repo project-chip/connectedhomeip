@@ -104,8 +104,6 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath& aPath
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -117,8 +115,7 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath& aPath
 
         Attributes::IdentifyTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "IdentifyTime";
+        jsn["IdentifyTime"] = to_json(value);
         break;
     }
         // identify type is not supported by UCL
@@ -129,10 +126,9 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath& aPath
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Identify/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Identify/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -238,8 +234,6 @@ CHIP_ERROR GroupsAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -255,10 +249,9 @@ CHIP_ERROR GroupsAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Groups/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Groups/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -389,8 +382,6 @@ CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -411,10 +402,9 @@ CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Scenes/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Scenes/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -600,8 +590,6 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath& aPath, A
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -615,24 +603,21 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath& aPath, A
 
         Attributes::OnTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OnTime";
+        jsn["OnTime"] = to_json(value);
         break;
     }
     case Attributes::OffWaitTime::Id: {
 
         Attributes::OffWaitTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OffWaitTime";
+        jsn["OffWaitTime"] = to_json(value);
         break;
     }
     case Attributes::StartUpOnOff::Id: {
 
         Attributes::StartUpOnOff::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "StartUpOnOff";
+        jsn["StartUpOnOff"] = to_json(value);
         break;
     }
         // GeneratedCommandList is not supported by UCL
@@ -642,10 +627,9 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath& aPath, A
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/OnOff/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/OnOff/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -864,8 +848,6 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath& a
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -884,56 +866,49 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath& a
 
         Attributes::Options::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "Options";
+        jsn["Options"] = to_json(value);
         break;
     }
     case Attributes::OnOffTransitionTime::Id: {
 
         Attributes::OnOffTransitionTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OnOffTransitionTime";
+        jsn["OnOffTransitionTime"] = to_json(value);
         break;
     }
     case Attributes::OnLevel::Id: {
 
         Attributes::OnLevel::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OnLevel";
+        jsn["OnLevel"] = to_json(value);
         break;
     }
     case Attributes::OnTransitionTime::Id: {
 
         Attributes::OnTransitionTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OnTransitionTime";
+        jsn["OnTransitionTime"] = to_json(value);
         break;
     }
     case Attributes::OffTransitionTime::Id: {
 
         Attributes::OffTransitionTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OffTransitionTime";
+        jsn["OffTransitionTime"] = to_json(value);
         break;
     }
     case Attributes::DefaultMoveRate::Id: {
 
         Attributes::DefaultMoveRate::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "DefaultMoveRate";
+        jsn["DefaultMoveRate"] = to_json(value);
         break;
     }
     case Attributes::StartUpCurrentLevel::Id: {
 
         Attributes::StartUpCurrentLevel::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "StartUpCurrentLevel";
+        jsn["StartUpCurrentLevel"] = to_json(value);
         break;
     }
         // GeneratedCommandList is not supported by UCL
@@ -943,10 +918,9 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath& a
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Level/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Level/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -1383,8 +1357,6 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -1400,24 +1372,21 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
 
         Attributes::DoorOpenEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "DoorOpenEvents";
+        jsn["DoorOpenEvents"] = to_json(value);
         break;
     }
     case Attributes::DoorClosedEvents::Id: {
 
         Attributes::DoorClosedEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "DoorClosedEvents";
+        jsn["DoorClosedEvents"] = to_json(value);
         break;
     }
     case Attributes::OpenPeriod::Id: {
 
         Attributes::OpenPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OpenPeriod";
+        jsn["OpenPeriod"] = to_json(value);
         break;
     }
     // NumberOfTotalUsersSupported is not supported by UCL
@@ -1436,40 +1405,35 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
 
         Attributes::Language::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "Language";
+        jsn["Language"] = to_json(value);
         break;
     }
     case Attributes::LEDSettings::Id: {
 
         Attributes::LEDSettings::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "LEDSettings";
+        jsn["LEDSettings"] = to_json(value);
         break;
     }
     case Attributes::AutoRelockTime::Id: {
 
         Attributes::AutoRelockTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "AutoRelockTime";
+        jsn["AutoRelockTime"] = to_json(value);
         break;
     }
     case Attributes::SoundVolume::Id: {
 
         Attributes::SoundVolume::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "SoundVolume";
+        jsn["SoundVolume"] = to_json(value);
         break;
     }
     case Attributes::OperatingMode::Id: {
 
         Attributes::OperatingMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OperatingMode";
+        jsn["OperatingMode"] = to_json(value);
         break;
     }
     // SupportedOperatingModes is not supported by UCL
@@ -1478,64 +1442,56 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
 
         Attributes::EnableLocalProgramming::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "EnableLocalProgramming";
+        jsn["EnableLocalProgramming"] = to_json(value);
         break;
     }
     case Attributes::EnableOneTouchLocking::Id: {
 
         Attributes::EnableOneTouchLocking::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "EnableOneTouchLocking";
+        jsn["EnableOneTouchLocking"] = to_json(value);
         break;
     }
     case Attributes::EnableInsideStatusLED::Id: {
 
         Attributes::EnableInsideStatusLED::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "EnableInsideStatusLED";
+        jsn["EnableInsideStatusLED"] = to_json(value);
         break;
     }
     case Attributes::EnablePrivacyModeButton::Id: {
 
         Attributes::EnablePrivacyModeButton::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "EnablePrivacyModeButton";
+        jsn["EnablePrivacyModeButton"] = to_json(value);
         break;
     }
     case Attributes::WrongCodeEntryLimit::Id: {
 
         Attributes::WrongCodeEntryLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "WrongCodeEntryLimit";
+        jsn["WrongCodeEntryLimit"] = to_json(value);
         break;
     }
     case Attributes::UserCodeTemporaryDisableTime::Id: {
 
         Attributes::UserCodeTemporaryDisableTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "UserCodeTemporaryDisableTime";
+        jsn["UserCodeTemporaryDisableTime"] = to_json(value);
         break;
     }
     case Attributes::SendPINOverTheAir::Id: {
 
         Attributes::SendPINOverTheAir::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "SendPINOverTheAir";
+        jsn["SendPINOverTheAir"] = to_json(value);
         break;
     }
     case Attributes::RequirePINforRemoteOperation::Id: {
 
         Attributes::RequirePINforRemoteOperation::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "RequirePINforRFOperation";
+        jsn["RequirePINforRFOperation"] = to_json(value);
         break;
     }
         // GeneratedCommandList is not supported by UCL
@@ -1545,10 +1501,9 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/DoorLock/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/DoorLock/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -2079,8 +2034,6 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath&
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -2095,48 +2048,42 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath&
 
         Attributes::BarrierOpenEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OpenEvents";
+        jsn["OpenEvents"] = to_json(value);
         break;
     }
     case Attributes::BarrierCloseEvents::Id: {
 
         Attributes::BarrierCloseEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "CloseEvents";
+        jsn["CloseEvents"] = to_json(value);
         break;
     }
     case Attributes::BarrierCommandOpenEvents::Id: {
 
         Attributes::BarrierCommandOpenEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "CommandOpenEvents";
+        jsn["CommandOpenEvents"] = to_json(value);
         break;
     }
     case Attributes::BarrierCommandCloseEvents::Id: {
 
         Attributes::BarrierCommandCloseEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "CommandCloseEvents";
+        jsn["CommandCloseEvents"] = to_json(value);
         break;
     }
     case Attributes::BarrierOpenPeriod::Id: {
 
         Attributes::BarrierOpenPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OpenPeriod";
+        jsn["OpenPeriod"] = to_json(value);
         break;
     }
     case Attributes::BarrierClosePeriod::Id: {
 
         Attributes::BarrierClosePeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ClosePeriod";
+        jsn["ClosePeriod"] = to_json(value);
         break;
     }
         // barrier position is not supported by UCL
@@ -2147,10 +2094,9 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath&
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/BarrierControl/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/BarrierControl/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -2606,8 +2552,6 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -2628,112 +2572,98 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
         Attributes::HVACSystemTypeConfiguration::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "HVACSystemTypeConfiguration";
+        jsn["HVACSystemTypeConfiguration"] = to_json(value);
         break;
     }
     case Attributes::LocalTemperatureCalibration::Id: {
 
         Attributes::LocalTemperatureCalibration::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "LocalTemperatureCalibration";
+        jsn["LocalTemperatureCalibration"] = to_json(value);
         break;
     }
     case Attributes::OccupiedCoolingSetpoint::Id: {
 
         Attributes::OccupiedCoolingSetpoint::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OccupiedCoolingSetpoint";
+        jsn["OccupiedCoolingSetpoint"] = to_json(value);
         break;
     }
     case Attributes::OccupiedHeatingSetpoint::Id: {
 
         Attributes::OccupiedHeatingSetpoint::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OccupiedHeatingSetpoint";
+        jsn["OccupiedHeatingSetpoint"] = to_json(value);
         break;
     }
     case Attributes::UnoccupiedCoolingSetpoint::Id: {
 
         Attributes::UnoccupiedCoolingSetpoint::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "UnoccupiedCoolingSetpoint";
+        jsn["UnoccupiedCoolingSetpoint"] = to_json(value);
         break;
     }
     case Attributes::UnoccupiedHeatingSetpoint::Id: {
 
         Attributes::UnoccupiedHeatingSetpoint::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "UnoccupiedHeatingSetpoint";
+        jsn["UnoccupiedHeatingSetpoint"] = to_json(value);
         break;
     }
     case Attributes::MinHeatSetpointLimit::Id: {
 
         Attributes::MinHeatSetpointLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "MinHeatSetpointLimit";
+        jsn["MinHeatSetpointLimit"] = to_json(value);
         break;
     }
     case Attributes::MaxHeatSetpointLimit::Id: {
 
         Attributes::MaxHeatSetpointLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "MaxHeatSetpointLimit";
+        jsn["MaxHeatSetpointLimit"] = to_json(value);
         break;
     }
     case Attributes::MinCoolSetpointLimit::Id: {
 
         Attributes::MinCoolSetpointLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "MinCoolSetpointLimit";
+        jsn["MinCoolSetpointLimit"] = to_json(value);
         break;
     }
     case Attributes::MaxCoolSetpointLimit::Id: {
 
         Attributes::MaxCoolSetpointLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "MaxCoolSetpointLimit";
+        jsn["MaxCoolSetpointLimit"] = to_json(value);
         break;
     }
     case Attributes::MinSetpointDeadBand::Id: {
 
         Attributes::MinSetpointDeadBand::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "MinSetpointDeadBand";
+        jsn["MinSetpointDeadBand"] = to_json(value);
         break;
     }
     case Attributes::RemoteSensing::Id: {
 
         Attributes::RemoteSensing::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "RemoteSensing";
+        jsn["RemoteSensing"] = to_json(value);
         break;
     }
     case Attributes::ControlSequenceOfOperation::Id: {
 
         Attributes::ControlSequenceOfOperation::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ControlSequenceOfOperation";
+        jsn["ControlSequenceOfOperation"] = to_json(value);
         break;
     }
     case Attributes::SystemMode::Id: {
 
         Attributes::SystemMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "SystemMode";
+        jsn["SystemMode"] = to_json(value);
         break;
     }
     // ThermostatRunningMode is not supported by UCL
@@ -2744,24 +2674,21 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
         Attributes::TemperatureSetpointHold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "TemperatureSetpointHold";
+        jsn["TemperatureSetpointHold"] = to_json(value);
         break;
     }
     case Attributes::TemperatureSetpointHoldDuration::Id: {
 
         Attributes::TemperatureSetpointHoldDuration::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "TemperatureSetpointHoldDuration";
+        jsn["TemperatureSetpointHoldDuration"] = to_json(value);
         break;
     }
     case Attributes::ThermostatProgrammingOperationMode::Id: {
 
         Attributes::ThermostatProgrammingOperationMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ThermostatProgrammingOperationMode";
+        jsn["ThermostatProgrammingOperationMode"] = to_json(value);
         break;
     }
     // ThermostatRunningState is not supported by UCL
@@ -2772,8 +2699,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
         Attributes::OccupiedSetback::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "OccupiedSetback";
+        jsn["OccupiedSetback"] = to_json(value);
         break;
     }
     // OccupiedSetbackMin is not supported by UCL
@@ -2782,8 +2708,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
         Attributes::UnoccupiedSetback::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "UnoccupiedSetback";
+        jsn["UnoccupiedSetback"] = to_json(value);
         break;
     }
     // UnoccupiedSetbackMin is not supported by UCL
@@ -2792,56 +2717,49 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
         Attributes::EmergencyHeatDelta::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "EmergencyHeatDelta";
+        jsn["EmergencyHeatDelta"] = to_json(value);
         break;
     }
     case Attributes::ACType::Id: {
 
         Attributes::ACType::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ACType";
+        jsn["ACType"] = to_json(value);
         break;
     }
     case Attributes::ACCapacity::Id: {
 
         Attributes::ACCapacity::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ACCapacity";
+        jsn["ACCapacity"] = to_json(value);
         break;
     }
     case Attributes::ACRefrigerantType::Id: {
 
         Attributes::ACRefrigerantType::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ACRefrigerantType";
+        jsn["ACRefrigerantType"] = to_json(value);
         break;
     }
     case Attributes::ACCompressorType::Id: {
 
         Attributes::ACCompressorType::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ACCompressorType";
+        jsn["ACCompressorType"] = to_json(value);
         break;
     }
     case Attributes::ACErrorCode::Id: {
 
         Attributes::ACErrorCode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ACErrorCode";
+        jsn["ACErrorCode"] = to_json(value);
         break;
     }
     case Attributes::ACLouverPosition::Id: {
 
         Attributes::ACLouverPosition::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ACLouverPosition";
+        jsn["ACLouverPosition"] = to_json(value);
         break;
     }
     // ACCoilTemperature is not supported by UCL
@@ -2849,8 +2767,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
         Attributes::ACCapacityformat::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ACCapacityFormat";
+        jsn["ACCapacityFormat"] = to_json(value);
         break;
     }
         // GeneratedCommandList is not supported by UCL
@@ -2860,10 +2777,9 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Thermostat/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Thermostat/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -3605,8 +3521,6 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath& aPa
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -3618,16 +3532,14 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
         Attributes::FanMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "FanMode";
+        jsn["FanMode"] = to_json(value);
         break;
     }
     case Attributes::FanModeSequence::Id: {
 
         Attributes::FanModeSequence::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "FanModeSequence";
+        jsn["FanModeSequence"] = to_json(value);
         break;
     }
         // percent current is not supported by UCL
@@ -3642,10 +3554,9 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath& aPa
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/FanControl/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/FanControl/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -3774,8 +3685,6 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -3787,24 +3696,21 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
 
         Attributes::TemperatureDisplayMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "TemperatureDisplayMode";
+        jsn["TemperatureDisplayMode"] = to_json(value);
         break;
     }
     case Attributes::KeypadLockout::Id: {
 
         Attributes::KeypadLockout::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "KeypadLockout";
+        jsn["KeypadLockout"] = to_json(value);
         break;
     }
     case Attributes::ScheduleProgrammingVisibility::Id: {
 
         Attributes::ScheduleProgrammingVisibility::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ScheduleProgrammingVisibility";
+        jsn["ScheduleProgrammingVisibility"] = to_json(value);
         break;
     }
         // GeneratedCommandList is not supported by UCL
@@ -3814,10 +3720,9 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ThermostatUserInterfaceConfiguration/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ThermostatUserInterfaceConfiguration/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -4206,8 +4111,6 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& a
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -4228,8 +4131,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& a
 
         Attributes::Options::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "Options";
+        jsn["Options"] = to_json(value);
         break;
     }
     // NumberOfPrimaries is not supported by UCL
@@ -4255,88 +4157,77 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& a
 
         Attributes::WhitePointX::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "WhitePointX";
+        jsn["WhitePointX"] = to_json(value);
         break;
     }
     case Attributes::WhitePointY::Id: {
 
         Attributes::WhitePointY::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "WhitePointY";
+        jsn["WhitePointY"] = to_json(value);
         break;
     }
     case Attributes::ColorPointRX::Id: {
 
         Attributes::ColorPointRX::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointRX";
+        jsn["ColorPointRX"] = to_json(value);
         break;
     }
     case Attributes::ColorPointRY::Id: {
 
         Attributes::ColorPointRY::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointRY";
+        jsn["ColorPointRY"] = to_json(value);
         break;
     }
     case Attributes::ColorPointRIntensity::Id: {
 
         Attributes::ColorPointRIntensity::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointRIntensity";
+        jsn["ColorPointRIntensity"] = to_json(value);
         break;
     }
     case Attributes::ColorPointGX::Id: {
 
         Attributes::ColorPointGX::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointGX";
+        jsn["ColorPointGX"] = to_json(value);
         break;
     }
     case Attributes::ColorPointGY::Id: {
 
         Attributes::ColorPointGY::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointGY";
+        jsn["ColorPointGY"] = to_json(value);
         break;
     }
     case Attributes::ColorPointGIntensity::Id: {
 
         Attributes::ColorPointGIntensity::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointGIntensity";
+        jsn["ColorPointGIntensity"] = to_json(value);
         break;
     }
     case Attributes::ColorPointBX::Id: {
 
         Attributes::ColorPointBX::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointBX";
+        jsn["ColorPointBX"] = to_json(value);
         break;
     }
     case Attributes::ColorPointBY::Id: {
 
         Attributes::ColorPointBY::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointBY";
+        jsn["ColorPointBY"] = to_json(value);
         break;
     }
     case Attributes::ColorPointBIntensity::Id: {
 
         Attributes::ColorPointBIntensity::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ColorPointBIntensity";
+        jsn["ColorPointBIntensity"] = to_json(value);
         break;
     }
     // EnhancedCurrentHue is not supported by UCL
@@ -4354,8 +4245,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& a
 
         Attributes::StartUpColorTemperatureMireds::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "StartUpColorTemperatureMireds";
+        jsn["StartUpColorTemperatureMireds"] = to_json(value);
         break;
     }
         // GeneratedCommandList is not supported by UCL
@@ -4365,10 +4255,9 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& a
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ColorControl/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ColorControl/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -5113,8 +5002,6 @@ CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttrib
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -5134,10 +5021,9 @@ CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttrib
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/IlluminanceMeasurement/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/IlluminanceMeasurement/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -5310,8 +5196,6 @@ CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttrib
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -5330,10 +5214,9 @@ CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttrib
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/TemperatureMeasurement/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/TemperatureMeasurement/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -5518,8 +5401,6 @@ CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttribute
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -5543,10 +5424,9 @@ CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttribute
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/PressureMeasurement/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/PressureMeasurement/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -5766,8 +5646,6 @@ CHIP_ERROR FlowMeasurementAttributeAccess::Write(const ConcreteDataAttributePath
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -5786,10 +5664,9 @@ CHIP_ERROR FlowMeasurementAttributeAccess::Write(const ConcreteDataAttributePath
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/FlowMeasurement/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/FlowMeasurement/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -5947,8 +5824,6 @@ CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataA
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -5967,10 +5842,9 @@ CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataA
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/RelativityHumidity/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/RelativityHumidity/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -6171,8 +6045,6 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -6187,72 +6059,63 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "PIROccupiedToUnoccupiedDelay";
+        jsn["PIROccupiedToUnoccupiedDelay"] = to_json(value);
         break;
     }
     case Attributes::PirUnoccupiedToOccupiedDelay::Id: {
 
         Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "PIRUnoccupiedToOccupiedDelay";
+        jsn["PIRUnoccupiedToOccupiedDelay"] = to_json(value);
         break;
     }
     case Attributes::PirUnoccupiedToOccupiedThreshold::Id: {
 
         Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "PIRUnoccupiedToOccupiedThreshold";
+        jsn["PIRUnoccupiedToOccupiedThreshold"] = to_json(value);
         break;
     }
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id: {
 
         Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "UltrasonicOccupiedToUnoccupiedDelay";
+        jsn["UltrasonicOccupiedToUnoccupiedDelay"] = to_json(value);
         break;
     }
     case Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id: {
 
         Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "UltrasonicUnoccupiedToOccupiedDelay";
+        jsn["UltrasonicUnoccupiedToOccupiedDelay"] = to_json(value);
         break;
     }
     case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id: {
 
         Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "UltrasonicUnoccupiedToOccupiedThreshold";
+        jsn["UltrasonicUnoccupiedToOccupiedThreshold"] = to_json(value);
         break;
     }
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
 
         Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "PhysicalContactOccupiedToUnoccupiedDelay";
+        jsn["PhysicalContactOccupiedToUnoccupiedDelay"] = to_json(value);
         break;
     }
     case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id: {
 
         Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "PhysicalContactUnoccupiedToOccupiedDelay";
+        jsn["PhysicalContactUnoccupiedToOccupiedDelay"] = to_json(value);
         break;
     }
     case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id: {
 
         Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "PhysicalContactUnoccupiedToOccupiedThreshold";
+        jsn["PhysicalContactUnoccupiedToOccupiedThreshold"] = to_json(value);
         break;
     }
         // GeneratedCommandList is not supported by UCL
@@ -6262,10 +6125,9 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/OccupancySensing/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/OccupancySensing/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }
@@ -7149,8 +7011,6 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
     if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
-
-    std::string attribute_name;
     nlohmann::json jsn;
 
     if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
@@ -7220,48 +7080,42 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "AverageRMSVoltageMeasurementPeriod";
+        jsn["AverageRMSVoltageMeasurementPeriod"] = to_json(value);
         break;
     }
     case Attributes::AverageRmsUnderVoltageCounter::Id: {
 
         Attributes::AverageRmsUnderVoltageCounter::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "AverageRMSUnderVoltageCounter";
+        jsn["AverageRMSUnderVoltageCounter"] = to_json(value);
         break;
     }
     case Attributes::RmsExtremeOverVoltagePeriod::Id: {
 
         Attributes::RmsExtremeOverVoltagePeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "RMSExtremeOverVoltagePeriod";
+        jsn["RMSExtremeOverVoltagePeriod"] = to_json(value);
         break;
     }
     case Attributes::RmsExtremeUnderVoltagePeriod::Id: {
 
         Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "RMSExtremeUnderVoltagePeriod";
+        jsn["RMSExtremeUnderVoltagePeriod"] = to_json(value);
         break;
     }
     case Attributes::RmsVoltageSagPeriod::Id: {
 
         Attributes::RmsVoltageSagPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "RMSVoltageSagPeriod";
+        jsn["RMSVoltageSagPeriod"] = to_json(value);
         break;
     }
     case Attributes::RmsVoltageSwellPeriod::Id: {
 
         Attributes::RmsVoltageSwellPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "RMSVoltageSwellPeriod";
+        jsn["RMSVoltageSwellPeriod"] = to_json(value);
         break;
     }
     // ac voltage multiplier is not supported by UCL
@@ -7274,8 +7128,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::OverloadAlarmsMask::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "DCOverloadAlarmsMask";
+        jsn["DCOverloadAlarmsMask"] = to_json(value);
         break;
     }
     // voltage overload is not supported by UCL
@@ -7284,8 +7137,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::AcOverloadAlarmsMask::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"] = to_json(value);
-        attribute_name = "ACAlarmsMask";
+        jsn["ACAlarmsMask"] = to_json(value);
         break;
     }
         // ac voltage overload is not supported by UCL
@@ -7349,10 +7201,9 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty()) {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ElectricalMeasurement/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
+    if (!jsn.empty()) {
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ElectricalMeasurement/Commands/WriteAttributes";
+        std::string payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
     }

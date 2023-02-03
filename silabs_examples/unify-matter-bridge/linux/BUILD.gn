@@ -12,10 +12,10 @@
 # ******************************************************************************
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/build/chip/tests.gni")
-import("${chip_root}/build/config/linux/pkg_config.gni")
+import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/build/config/compiler/compiler.gni")
+import("${chip_root}/build/config/linux/pkg_config.gni")
 
 assert(chip_build_tools)
 
@@ -35,26 +35,26 @@ config("unify-config") {
     "zap-generated/data_model_translator",
     "zap-generated/data_model_translator/device-type-mapper",
     "zap-generated/unify-data-model-templates/device-type-mapper",
-    "zap-generated/device_spec_compliance/device-type-mapper"
+    "zap-generated/device_spec_compliance/device-type-mapper",
   ]
-  ldflags = [ "-lboost_system" ] 
-  cflags = ["-Wno-unused-const-variable"]
+  ldflags = [ "-lboost_system" ]
+  cflags = [ "-Wno-unused-const-variable" ]
 }
 
 config("coverage") {
-  cflags = [ "-fprofile-arcs", "-ftest-coverage" ]
-  
+  cflags = [
+    "-fprofile-arcs",
+    "-ftest-coverage",
+  ]
 }
 
 static_library("unify-matter-bridge-lib") {
-
   sources = [
     "src/attribute_state_cache.cpp",
     "src/cluster_translator/bridged_device_basic_info_attribute_translator.cpp",
+    "src/cluster_translator/cluster_emulator.cpp",
     "src/cluster_translator/group_command_translator.cpp",
     "src/cluster_translator/group_translator.cpp",
-    "src/cluster_translator/cluster_emulator.cpp",
-    "src/cluster_translator/emulations/emulate_identify.cpp",
     "src/demo_uic_cli.cpp",
     "src/device_type_mapper/matter_device_translator.cpp",
     "src/device_type_mapper/matter_device_type_selection.cpp",
@@ -62,8 +62,8 @@ static_library("unify-matter-bridge-lib") {
     "src/dummy.cpp",
     "src/matter_bridge_cli.cpp",
     "src/matter_bridge_config.cpp",
-    "src/matter_data_storage.cpp",
     "src/matter_bridge_qrcode_publisher.cpp",
+    "src/matter_data_storage.cpp",
     "src/matter_node_state_monitor/matter_cluster_interactor.cpp",
     "src/matter_node_state_monitor/matter_endpoint_builder.cpp",
     "src/matter_node_state_monitor/matter_node_state_monitor.cpp",
@@ -78,10 +78,13 @@ static_library("unify-matter-bridge-lib") {
     "${chip_root}/examples/platform/linux:app-main",
     "//../unify-matter-bridge-common",
   ]
-   
+
   output_dir = root_out_dir
 
-  public_configs = [ ":unify-config" , ":unify" ]
+  public_configs = [
+    ":unify-config",
+    ":unify",
+  ]
 
   if (use_coverage) {
     configs += [ ":coverage" ]
@@ -89,24 +92,17 @@ static_library("unify-matter-bridge-lib") {
 }
 
 executable("unify-matter-bridge") {
-  sources = [
-    "src/matter_bridge_main.cpp",
-  ]
+  sources = [ "src/matter_bridge_main.cpp" ]
 
-  deps = [
-    ":unify-matter-bridge-lib"
-  ]
+  deps = [ ":unify-matter-bridge-lib" ]
 }
 
 group("linux") {
   deps = [ ":unify-matter-bridge" ]
 }
 
-
 if (chip_build_tests) {
   group("check") {
-    deps = [
-      "//src/tests",
-    ]
+    deps = [ "//src/tests" ]
   }
 }

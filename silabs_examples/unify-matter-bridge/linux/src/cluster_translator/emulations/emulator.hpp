@@ -29,18 +29,43 @@ public:
     virtual ~EmulatorInterface() = default;
 
     /**
+     * @brief Matter clusterId for which this emualtor applies
+     *
+     * @return chip::ClusterId
+     */
+    virtual chip::ClusterId emulated_cluster() const = 0;
+
+    /**
+     * @brief Unify Cluster name for this emulator
+     *
+     * @return const char*
+     */
+    virtual const char * emulated_cluster_name() const = 0;
+
+    /**
+     * @brief List of attributes which this emulator handles
+     *
+     * @return std::vector<chip::AttributeId>
+     */
+    virtual std::vector<chip::AttributeId> emulated_attributes() const { return {}; }
+
+    /**
+     * @brief List of commands which this emulator handles
+     *
+     * @return std::vector<chip::CommandId>
+     */
+    virtual std::vector<chip::CommandId> emulated_commands() const { return {}; }
+
+    /**
      * @brief Emulate attributes and commands for a cluster
      *
      * @param unify_cluster
      * @param cluster_builder Matter cluster which contains already mapped attributes and commands
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR
-    emulate(const node_state_monitor::cluster & unify_cluster, matter_cluster_builder & cluster_builder,
-            std::map<chip::ClusterId, std::map<chip::AttributeId, EmulatorInterface *>> & emulation_attribute_handler_map,
-            std::map<chip::ClusterId, std::map<chip::CommandId, EmulatorInterface *>> & emulation_command_handler)
+    virtual CHIP_ERROR emulate(const node_state_monitor::cluster & unify_cluster, matter_cluster_builder & cluster_builder)
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return CHIP_NO_ERROR;
     }
 
     /**

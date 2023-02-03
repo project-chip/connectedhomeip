@@ -16,6 +16,10 @@
 #include "sl_log.h"
 #include <attribute_state_cache.hpp>
 
+#include "emulate_identify.hpp"
+#include "emulate_level.hpp"
+#include "emulate_groups.hpp"
+
 #define LOG_TAG "cluster_emulator"
 
 namespace unify::matter_bridge {
@@ -26,6 +30,29 @@ namespace unify::matter_bridge {
 
 using namespace chip::app;
 using namespace chip::app::Clusters;
+
+ClusterEmulator::ClusterEmulator()
+{
+    std::vector<std::shared_ptr<EmulatorInterface>> emulators = { std::make_shared<EmulateIdentify>(),
+                                                                  std::make_shared<EmulateLevelControl>(),
+                                                                  std::make_shared<EmulateGroups>() };
+    for (auto e : emulators)
+    {
+        cluster_emulators_string_map.insert(std::make_pair(e->emulated_cluster_name(), e));
+        for (auto a : e->emulated_commands())
+        {
+            auto key = std::make_pair(e->emulated_cluster(), a);
+            cluster_emulators_command_id_map.insert(std::make_pair(key, e));
+            ;
+        }
+        for (auto a : e->emulated_attributes())
+        {
+            auto key = std::make_pair(e->emulated_cluster(), a);
+            cluster_emulators_attribute_id_map.insert(std::make_pair(key, e));
+            ;
+        }
+    }
+};
 
 uint32_t ClusterEmulator::read_cluster_revision(const ConcreteReadAttributePath & aPath) const
 {
@@ -72,9 +99,8 @@ uint32_t ClusterEmulator::read_feature_map_revision(const ConcreteReadAttributeP
     return 0;
 }
 
-void ClusterEmulator::add_emulated_commands_and_attributes(
-    const node_state_monitor::cluster & unify_cluster,
-    matter_cluster_builder & cluster_builder)
+void ClusterEmulator::add_emulated_commands_and_attributes(const node_state_monitor::cluster & unify_cluster,
+                                                           matter_cluster_builder & cluster_builder)
 {
     // We always need to add the feature map and cluster
     cluster_builder.attributes.push_back(EmberAfAttributeMetadata{ ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, ZCL_BITMAP32_ATTRIBUTE_TYPE,
@@ -82,25 +108,27 @@ void ClusterEmulator::add_emulated_commands_and_attributes(
     cluster_builder.attributes.push_back(EmberAfAttributeMetadata{ ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID,
                                                                    ZCL_INT16U_ATTRIBUTE_TYPE, 2,
                                                                    ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() });
-    
+
     // Add emulation for commands and attributes for the cluster
     auto it = cluster_emulators_string_map.find(unify_cluster.cluster_name);
-    if (it != cluster_emulators_string_map.end()) {
-        auto emulated_result = it->second->emulate(unify_cluster, cluster_builder, cluster_emulators_attribute_id_map, cluster_emulators_command_id_map);
-        if (emulated_result != CHIP_NO_ERROR) {
-            sl_log_error(LOG_TAG, "Failed to add emulated commands and attributes for cluster %s", unify_cluster.cluster_name.c_str());
+    if (it != cluster_emulators_string_map.end())
+    {
+        sl_log_debug(LOG_TAG, "%s emualtor is updateing the desciptor ", it->second->emulated_cluster_name());
+
+        auto emulated_result = it->second->emulate(unify_cluster, cluster_builder);
+
+        if (emulated_result != CHIP_NO_ERROR)
+        {
+            sl_log_error(LOG_TAG, "Failed to add emulated commands and attributes for cluster %s",
+                         unify_cluster.cluster_name.c_str());
         }
     }
 }
 
 bool ClusterEmulator::is_command_emulated(const ConcreteCommandPath & cPath) const
-{   
-    auto it = cluster_emulators_command_id_map.find(cPath.mClusterId);
-    if (it != cluster_emulators_command_id_map.end())
-    {
-        return it->second.find(cPath.mCommandId) != it->second.end();
-    }
-    return false;
+{
+    auto it = cluster_emulators_command_id_map.find(std::make_pair(cPath.mClusterId, cPath.mCommandId));
+    return (it != cluster_emulators_command_id_map.end());
 }
 
 bool ClusterEmulator::is_attribute_emulated(const ConcreteAttributePath & aPath) const
@@ -116,20 +144,20 @@ bool ClusterEmulator::is_attribute_emulated(const ConcreteAttributePath & aPath)
         ;
     }
 
-    auto it = cluster_emulators_attribute_id_map.find(aPath.mClusterId);
-    if (it != cluster_emulators_attribute_id_map.end())
-    {
-        return it->second.find(aPath.mAttributeId) != it->second.end();
-    }
-
-    return false;
+    auto it = cluster_emulators_attribute_id_map.find(std::make_pair(aPath.mClusterId, aPath.mAttributeId));
+    return (it != cluster_emulators_attribute_id_map.end());
 }
 
 CHIP_ERROR ClusterEmulator::invoke_command(CommandHandlerInterface::HandlerContext & handlerContext) const
 {
     if (is_command_emulated(handlerContext.mRequestPath))
     {
-        return cluster_emulators_command_id_map.at(handlerContext.mRequestPath.mClusterId).at(handlerContext.mRequestPath.mCommandId)->command(handlerContext);
+        auto e = cluster_emulators_command_id_map.at(
+            std::make_pair(handlerContext.mRequestPath.mClusterId, handlerContext.mRequestPath.mCommandId));
+
+        sl_log_debug(LOG_TAG, "%s emualtor is emulating command 0x%04x ", e->emulated_cluster_name(),
+                     handlerContext.mRequestPath.mCommandId);
+        return e->command(handlerContext);
     }
 
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -149,11 +177,14 @@ CHIP_ERROR ClusterEmulator::read_attribute(const ConcreteReadAttributePath & aPa
     default:;
         ;
     }
-    
-    sl_log_debug(LOG_TAG, "Cluster specific attribute emulation attribute id %d for cluster id", aPath.mAttributeId, aPath.mClusterId);
+
+    sl_log_debug(LOG_TAG, "Cluster specific attribute emulation attribute id %d for cluster id", aPath.mAttributeId,
+                 aPath.mClusterId);
     if (is_attribute_emulated(aPath))
     {
-        return cluster_emulators_attribute_id_map.at(aPath.mClusterId).at(aPath.mAttributeId)->read_attribute(aPath, aEncoder);
+        auto e = cluster_emulators_attribute_id_map.at(std::make_pair(aPath.mClusterId, aPath.mAttributeId));
+        sl_log_debug(LOG_TAG, "%s emualtor is emulating attribute 0x%04x", e->emulated_cluster_name(), aPath.mAttributeId);
+        return e->read_attribute(aPath, aEncoder);
     }
 
     return CHIP_ERROR_INVALID_ARGUMENT;
@@ -163,7 +194,8 @@ CHIP_ERROR ClusterEmulator::write_attribute(const ConcreteDataAttributePath & aP
 {
     if (is_attribute_emulated(aPath))
     {
-        return cluster_emulators_attribute_id_map.at(aPath.mClusterId).at(aPath.mAttributeId)->write_attribute(aPath, aDecoder);
+        return cluster_emulators_attribute_id_map.at(std::make_pair(aPath.mClusterId, aPath.mAttributeId))
+            ->write_attribute(aPath, aDecoder);
     }
 
     return CHIP_ERROR_NOT_IMPLEMENTED;

@@ -25,6 +25,12 @@ using namespace chip::app::Clusters;
 class EmulateIdentify : public EmulatorInterface
 {
 public:
+    const char * emulated_cluster_name() const override { return "Identify"; }
+
+    chip::ClusterId emulated_cluster() const override { return Identify::Id; };
+
+    std::vector<chip::AttributeId> emulated_attributes() const override { return { Identify::Attributes::IdentifyType::Id }; }
+
     /**
      * @brief Emulate Identify cluster this will emulate defined commands and
      * attributes
@@ -35,18 +41,26 @@ public:
      * @return CHIP_ERROR
      */
     CHIP_ERROR
-    emulate(const node_state_monitor::cluster & unify_cluster, matter_cluster_builder & cluster_builder,
-            std::map<chip::ClusterId, std::map<chip::AttributeId, EmulatorInterface *>> & emulation_attribute_handler_map,
-            std::map<chip::ClusterId, std::map<chip::CommandId, EmulatorInterface *>> & emulation_command_handler) override;
+    emulate(const node_state_monitor::cluster & unify_cluster, matter_cluster_builder & cluster_builder) override
+    {
+        // Add IdentifyType attribute to the matter cluster
+        cluster_builder.attributes.push_back(EmberAfAttributeMetadata{ Identify::Attributes::IdentifyType::Id,
+                                                                       ZCL_ENUM8_ATTRIBUTE_ID, 1,
+                                                                       ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() });
 
-    /**
-     * @brief Read the emulated IdentifyType attribute
-     *
-     * @param aPath
-     * @param aEncoder
-     * @return CHIP_ERROR
-     */
-    CHIP_ERROR read_attribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR read_attribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
+    {
+        // IdentifyType is a mandatory attribute we default it to None
+        if (aPath.mAttributeId == Identify::Attributes::IdentifyType::Id)
+        {
+            return aEncoder.Encode(Identify::IdentifyIdentifyType::EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE);
+        }
+
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    };
 };
 
 } // namespace unify::matter_bridge

@@ -102,8 +102,6 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
   if (!unify_node) {
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
   }
-
-  std::string attribute_name;
   nlohmann::json jsn;
 
   if( m_node_state_monitor.emulator().is_attribute_emulated(aPath) ) {
@@ -118,8 +116,7 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
 
       Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType value;
       aDecoder.Decode(value);
-      jsn["value"]   = to_json(value);
-      attribute_name = "{{unifyClusterAttributeName parent.code code}}";
+      jsn["{{unifyClusterAttributeName parent.code code}}"]   = to_json(value);
       break;
   }
   {{/if}}
@@ -129,15 +126,12 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
   {{/zcl_attributes_server}}
   }
 
-  if (!attribute_name.empty()) {
-    std::string payload_str;
+  if (!jsn.empty()) {
     std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep"
                   + std::to_string(unify_node->unify_endpoint)
-                  + "/{{unifyClusterName code}}/Attributes/" + attribute_name + "/Desired";
-    payload_str = jsn.dump();
-    m_unify_mqtt.Publish(topic,
-                        payload_str,
-                        true);
+                  + "/{{unifyClusterName code}}/Commands/WriteAttributes";
+    std::string payload_str = jsn.dump();
+    m_unify_mqtt.Publish(topic, payload_str, true);
     return CHIP_NO_ERROR;
   }
 

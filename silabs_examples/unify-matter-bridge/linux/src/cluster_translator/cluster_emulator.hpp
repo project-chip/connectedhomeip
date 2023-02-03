@@ -20,8 +20,6 @@
 
 // Emulation of commands and attributes
 #include "emulator.hpp"
-#include "emulate_identify.hpp"
-
 
 namespace unify::matter_bridge {
 
@@ -34,9 +32,7 @@ namespace unify::matter_bridge {
 class ClusterEmulator
 {
 public:
-    ClusterEmulator() {
-        cluster_emulators_string_map["Identify"] = new EmulateIdentify();
-    };
+    ClusterEmulator();
 
     /**
      * @brief Add command and attributes to the clusters on the endpoint
@@ -83,8 +79,7 @@ public:
      *  - CHIP_ERROR_READ_FAILED if the value of the attribute is not known.
      *  - CHIP_ERROR_NOT_IMPLEMENTED If the attribute is not emulated
      */
-    CHIP_ERROR read_attribute(const chip::app::ConcreteReadAttributePath & aPath,
-                              chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR read_attribute(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder);
 
     /**
      * @brief Write an emulated attribute
@@ -104,9 +99,9 @@ private:
     uint32_t read_feature_map_revision(const ConcreteReadAttributePath & aPath) const;
     uint32_t read_cluster_revision(const ConcreteReadAttributePath & aPath) const;
 
-    std::map<chip::ClusterId, std::map<chip::AttributeId, EmulatorInterface *>> cluster_emulators_attribute_id_map;
-    std::map<chip::ClusterId, std::map<chip::CommandId, EmulatorInterface *>> cluster_emulators_command_id_map;
-    std::map<std::string, EmulatorInterface *> cluster_emulators_string_map;
+    std::map<std::pair<chip::ClusterId, chip::AttributeId>, std::shared_ptr<EmulatorInterface>> cluster_emulators_attribute_id_map;
+    std::map<std::pair<chip::ClusterId, chip::CommandId>, std::shared_ptr<EmulatorInterface>> cluster_emulators_command_id_map;
+    std::map<std::string, std::shared_ptr<EmulatorInterface>> cluster_emulators_string_map;
 };
 
 } // namespace unify::matter_bridge
