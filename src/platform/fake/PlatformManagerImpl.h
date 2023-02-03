@@ -51,7 +51,7 @@ private:
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
     void _HandleServerStarted() {}
     void _HandleServerShuttingDown() {}
-    void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) {}
+    CHIP_ERROR _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     void _RunEventLoop()
     {
@@ -97,6 +97,12 @@ private:
             break;
         }
     }
+
+    CHIP_ERROR _ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _PostBackgroundEvent(const ChipDeviceEvent * event) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    void _RunBackgroundEventLoop(void) {}
+    CHIP_ERROR _StartBackgroundEventLoopTask(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _StopBackgroundEventLoopTask() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
