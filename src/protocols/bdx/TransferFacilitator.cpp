@@ -102,6 +102,7 @@ CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole rol
 
     mPollFreq    = pollFreq;
     mSystemLayer = layer;
+    mStopPolling = false;
 
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
 
