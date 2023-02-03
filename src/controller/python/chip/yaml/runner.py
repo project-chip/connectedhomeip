@@ -52,6 +52,11 @@ class _TestFabricId(IntEnum):
 
 
 @dataclass
+class _GetCommissionerNodeIdResult:
+    node_id: int
+
+
+@dataclass
 class _ActionResult:
     status: _ActionStatus
     response: object
@@ -487,17 +492,23 @@ class CommissionerCommandAction(BaseAction):
           UnexpectedParsingError: Raised if the expected queue does not exist.
         '''
         super().__init__(test_step)
-        if test_step.command != 'PairWithCode':
+        self._command = test_step.command
+        if test_step.command == 'GetCommissionerNodeId':
+            # Just setting the self._command is enough for run_action below.
+            pass
+        elif test_step.command == 'PairWithCode':
+            args = test_step.arguments['values']
+            request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
+            self._setup_payload = request_data_as_dict['payload']
+            self._node_id = request_data_as_dict['nodeId']
+        else:
             raise UnexpectedParsingError(f'Unexpected CommisionerCommand {test_step.command}')
 
-        args = test_step.arguments['values']
-        request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
-        self._setup_payload = request_data_as_dict['payload']
-        self._node_id = request_data_as_dict['nodeId']
-
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        resp = dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+        if self._command == 'GetCommissionerNodeId':
+            return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
+        resp = dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
         if resp:
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
         else:
@@ -738,6 +749,10 @@ class ReplTestRunner:
             decoded_response['error'] = stringcase.snakecase(response.name).upper()
             return decoded_response
 
+        if isinstance(response, _GetCommissionerNodeIdResult):
+            decoded_response['value'] = {'nodeId': response.node_id}
+            return decoded_response
+
         if isinstance(response, chip.discovery.CommissionableNode):
             # CommissionableNode(
             #    instanceName='04DD55352DD2AC53',
@@ -780,7 +795,6 @@ class ReplTestRunner:
                 'numIPs': len(response.addresses),
 
             }
-
             return decoded_response
 
         if isinstance(response, ChipStackError):
