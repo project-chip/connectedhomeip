@@ -15,6 +15,8 @@ import com.chip.casting.ContentLauncherTypes;
 import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterCallbackHandler;
 import com.chip.casting.MatterError;
+import com.chip.casting.MediaPlaybackTypes;
+import com.chip.casting.SubscriptionEstablishedCallback;
 import com.chip.casting.SuccessCallback;
 import com.chip.casting.TvCastingApp;
 import java.util.ArrayList;
@@ -197,6 +199,46 @@ public class CertTestFragment extends Fragment {
           tvCastingApp.mediaPlayback_stopPlayback(kContentApp, callback);
         });
 
+    runAndWait(
+        "mediaPlayback_previous",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_previous(kContentApp, callback);
+        });
+
+    runAndWait(
+        "mediaPlayback_rewind",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_rewind(kContentApp, callback);
+        });
+
+    runAndWait(
+        "mediaPlayback_fastForward",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_fastForward(kContentApp, callback);
+        });
+
+    runAndWait(
+        "mediaPlayback_startOver",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_startOver(kContentApp, callback);
+        });
+
+    runAndWait(
+        "mediaPlayback_seek",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_seek(kContentApp, 10000, callback);
+        });
+
     // Additional Tests
     // Mandatory
     // OnOff cluster
@@ -262,6 +304,45 @@ public class CertTestFragment extends Fragment {
               kContentApp, successFailureCallbackInteger, successFailureCallbackInteger);
         });
 
+    runAndWait(
+        "mediaPlayback_subscribeToCurrentState",
+        successFailureCallback,
+        () -> {
+          tvCastingApp.mediaPlayback_subscribeToCurrentState(
+              kContentApp,
+              new SuccessCallback<MediaPlaybackTypes.PlaybackStateEnum>() {
+                @Override
+                public void handle(MediaPlaybackTypes.PlaybackStateEnum response) {
+                  // Lets wait for the timeout to avoid the race condition issue in the SDK with
+                  // ReadClient::Close()
+                  // successFailureCallback.handle(MatterError.NO_ERROR);
+                  addCertTestStatus(
+                      activity, MatterError.NO_ERROR, "mediaPlayback_subscribeToCurrentState");
+                }
+              },
+              successFailureCallback,
+              0,
+              20,
+              new SubscriptionEstablishedCallback() {
+                @Override
+                public void handle() {
+                  // Lets wait for the timeout to avoid the race condition issue in the SDK with
+                  // ReadClient::Close()
+                  // successFailureCallback.handle(MatterError.NO_ERROR);
+                  addCertTestStatus(
+                      activity, MatterError.NO_ERROR, "mediaPlayback_subscribeToCurrentState");
+                }
+              });
+        });
+
+    runAndWait(
+        "shutdownAllSubscriptions",
+        successFailureCallback,
+        () -> {
+          tvCastingApp.shutdownAllSubscriptions();
+          successFailureCallback.handle(MatterError.NO_ERROR);
+        });
+
     // Unsupported & Optional
     // 3.2.2. [TC-LOWPOWER-2.2] Low Power Mode Verification (DUT as Client)
     // 3.5.5. [TC-MEDIAINPUT-3.14] Select Input Verification (DUT as Client)
@@ -304,7 +385,7 @@ public class CertTestFragment extends Fragment {
     callback.setCountDownLatch(cdl);
     runnable.run();
     try {
-      if (!cdl.await(10, TimeUnit.SECONDS)) {
+      if (!cdl.await(5, TimeUnit.SECONDS)) {
         Log.d(TAG, "Timed out for test to finish : " + testMethod);
       }
     } catch (InterruptedException e) {
