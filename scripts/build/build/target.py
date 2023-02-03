@@ -195,40 +195,23 @@ class BuildTarget:
         #   - esp32-devkitc-light is OK
         #   - esp32-light is NOT ok
         #   - esp32-m5stack is NOT ok
-        self.board: List[TargetPart] = []
-        self.apps: List[TargetPart] = []
-        self.tests: List[TargetPart] = []
+        self.fixed_targets: List[List[TargetPart]] = []
 
         # a list of all available modifiers for this build target
         # Modifiers can be combined in any way
         self.modifiers: List[TargetPart] = []
 
-    def AppendBoard(self, parts: List[TargetPart]):
-        """Append a list of potential board-targets/variants.
+    def AppendFixedTargets(self, parts: List[TargetPart]):
+        """Append a list of potential targets/variants.
 
         Example:
 
             target = BuildTarget('linux', LinuxBuilder)
-            target.AppendBoard([
+            target.AppendFixedTargets([
                 TargetPart(name='x64', board=HostBoard.X64),
                 TargetPart(name='x86', board=HostBoard.X86),
                 TargetPart(name='arm64', board=HostBoard.ARM64),
             ])
-
-        The above will accept:
-           linux-x64-{Apps}
-           linux-x86-{Apps}
-           linux-arm64-{Apps}
-           linux-x64-{Tests}
-           linux-x86-{Tests}
-           linux-arm64-{Tests}
-        """
-        self.board.append(parts)
-
-    def AppendAppsTargets(self, parts: List[TargetPart]):
-        """Append a list of potential targets/variants.
-
-        Example:
 
             target.AppendFixedTargets([
                 TargetPart(name='light', app=HostApp.LIGHT),
@@ -237,35 +220,15 @@ class BuildTarget:
             ])
 
         The above will accept:
-           linux-(Boards)-light
-           linux-(Boards)-lock
-           linux-(Boards)-shell
-           linux-light
-           linux-lock
-           linux-shell
+           linux-x64-light
+           linux-x86-light
+           linux-arm64-light
+           linux-x64-lock
+           linux-x86-lock
+           linux-x64-shell
+           linux-arm64-shell
         """
-        self.apps.append(parts)
-
-    def AppendTestsTargets(self, parts: List[TargetPart]):
-        """Append a list of potential testing-targets/variants.
-
-        Example:
-
-            target.AppendTestsTargets([
-                TargetPart(name='qemu', app=HostApp.LIGHT),
-                TargetPart(name='unity', app=HostApp.LIGHT).ExceptIfRe("-arm64-"),
-                TargetPart(name='raw', app=HostApp.LIGHT).OnlyIfRe("-(x64|arm64)-"),
-            ])
-
-        The above will accept:
-           linux-(Boards)-qemu
-           linux-(Boards)-unity
-           linux-(Boards)-raw
-           linux-qemu
-           linux-unity
-           linux-raw
-        """
-        self.tests.append(parts)
+        self.fixed_targets.append(parts)
 
     def AppendModifier(self, name: str, **kargs):
         """Appends a specific modifier to a build target. For example:
@@ -290,13 +253,7 @@ class BuildTarget:
            foo-bar-{a,b,c}[-m1][-m2]
         """
         result = self.name
-        for fixed in self.board:
-            if len(fixed) > 1:
-                result += '-(' + ",".join(map(lambda x: x.name, fixed)) + ')'
-            else:
-                result += '-' + fixed[0].name
-
-        for fixed in self.apps:
+        for fixed in self.fixed_targets:
             if len(fixed) > 1:
                 result += '-{' + ",".join(map(lambda x: x.name, fixed)) + '}'
             else:
@@ -306,43 +263,6 @@ class BuildTarget:
             result += f"[-{modifier.name}]"
 
         return result
-
-    def HumanStringTestingTargets(self):
-        result = self.name
-        if not self.tests:
-            return None
-
-        for fixed in self.board:
-            if len(fixed) > 1:
-                result += '-(' + ",".join(map(lambda x: x.name, fixed)) + ')'
-            else:
-                result += '-' + fixed[0].name
-
-        for fixed in self.tests:
-            if len(fixed) > 1:
-                result += '-{' + ",".join(map(lambda x: x.name, fixed)) + '}'
-            else:
-                result += '-' + fixed[0].name
-
-        for modifier in self.modifiers:
-            result += f"[-{modifier.name}]"
-
-        return result
-
-    def GetFixedTargets(self) -> List[List[TargetPart]]:
-        fixed_targets: List[List[TargetPart]] = []
-        len_fixed_targets = len(fixed_targets)
-
-        for fixed in [self.board, self.apps]:
-            fixed_targets.extend(fixed)
-
-        if len(fixed_targets) <= 1:
-            fixed_targets.extend(self.tests)
-        else:
-            for test in self.tests:
-                fixed_targets[len(fixed_targets) - 1].extend(test)
-
-        return fixed_targets
 
     def AllVariants(self) -> Iterable[str]:
         """Returns all possible accepted variants by this target.
@@ -366,13 +286,12 @@ class BuildTarget:
         #   - a valid combination of "fixed parts"
         #   - a combination of modifiers
 
-        fixed_targets = self.GetFixedTargets()
-        fixed_indices = [0]*len(fixed_targets)
+        fixed_indices = [0]*len(self.fixed_targets)
 
         while True:
 
             prefix = "-".join(map(
-                lambda p: fixed_targets[p[0]][p[1]].name, enumerate(fixed_indices)
+                lambda p: self.fixed_targets[p[0]][p[1]].name, enumerate(fixed_indices)
             ))
 
             for n in range(len(self.modifiers) + 1):
@@ -382,13 +301,13 @@ class BuildTarget:
                         suffix += "-" + m.name
                     option = f"{self.name}-{prefix}{suffix}"
 
-                    if self.StringIntoTargetParts(option , fixed_targets) is not None:
+                    if self.StringIntoTargetParts(option) is not None:
                         yield option
 
             # Move to the next index in fixed_indices or exit loop if we cannot move
             move_idx = len(fixed_indices) - 1
             while move_idx >= 0:
-                if fixed_indices[move_idx] + 1 < len(fixed_targets[move_idx]):
+                if fixed_indices[move_idx] + 1 < len(self.fixed_targets[move_idx]):
                     fixed_indices[move_idx] += 1
                     break
 
@@ -400,7 +319,7 @@ class BuildTarget:
                 # done iterating through all
                 return
 
-    def StringIntoTargetParts(self, value: str, fixed_targets: List[List[TargetPart]]):
+    def StringIntoTargetParts(self, value: str):
         """Given an input string, process through all the input rules and return
            the underlying list of target parts for the input.
         """
@@ -408,13 +327,13 @@ class BuildTarget:
         if not suffix:
             return None
 
-        return _StringIntoParts(value, suffix, fixed_targets, self.modifiers)
+        return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
     def Create(self, name: str, runner, repository_path: str, output_prefix: str,
                builder_options: BuilderOptions):
 
-        fixed_targets = self.GetFixedTargets()
-        parts = self.StringIntoTargetParts(name, fixed_targets)
+        parts = self.StringIntoTargetParts(name)
+
         if not parts:
             return None
 

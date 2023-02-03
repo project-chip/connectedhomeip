@@ -180,25 +180,17 @@ def cmd_generate(context):
     help=('List the targets that would be generated/built given '
           'the input arguments'))
 @click.option(
-    '--testing',
-    default=False,
-    is_flag=True,
-    help='Show list available testing targets')
-@click.option(
     '--expand',
     default=False,
     is_flag=True,
     help='Expand all possible targets rather than the shorthand string')
 @click.pass_context
-def cmd_targets(context, expand, testing):
+def cmd_targets(context, expand):
     for target in build.targets.BUILD_TARGETS:
         if expand:
             build.target.report_rejected_parts = False
             for s in target.AllVariants():
                 print(s)
-        elif testing:
-            if target.HumanStringTestingTargets() is not None:
-                print(target.HumanStringTestingTargets())
         else:
             print(target.HumanString())
 
