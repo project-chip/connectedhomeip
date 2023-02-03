@@ -183,13 +183,13 @@ launched into the playground:
 
 ## Guides
 
-[REPL Basics](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20REPL%20Intro.ipynb)
+[REPL Basics](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_REPL_Intro.ipynb)
 
-[Using the IM](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Basic%20Interactions.ipynb)
+[Using the IM](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Basic_Interactions.ipynb)
 
-[Multi Fabric Commissioning](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Multi%20Fabric%20Commissioning.ipynb)
+[Multi Fabric Commissioning](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Multi_Fabric_Commissioning.ipynb)
 
-[Access Control](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Access%20Control.ipynb)
+[Access Control](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Access_Control.ipynb)
 
 ## Testing
 
