@@ -25,12 +25,6 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-// #include <app/ConcreteAttributePath.h>
-// #include <app/util/basic-types.h>
-// #include <lib/support/CHIPMem.h>
-// #include <lib/support/CodeUtils.h>
-// #include <lib/support/ErrorStr.h>
-// #include <setup_payload/SetupPayload.h>
 
 using namespace ::chip;
 
@@ -49,9 +43,6 @@ void CHIPDeviceManager::DeviceEventHandler(const ChipDeviceEvent * event, intptr
     }
 }
 
-/**
- *
- */
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     mCB = cb;
