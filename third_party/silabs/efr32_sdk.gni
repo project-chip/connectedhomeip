@@ -70,6 +70,7 @@ template("efr32_sdk") {
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
       "${efr32_sdk_root}",
+      "${efr32_sdk_root}/util/plugin/security_manager/",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
       "${efr32_sdk_root}/app/common/util/app_assert/",
       "${efr32_sdk_root}/hardware/board/inc",
@@ -544,6 +545,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_connection_config.c",
+      "${efr32_sdk_root}/util/plugin/security_manager/security_manager.c",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager/sl_malloc.c",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
