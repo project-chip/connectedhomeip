@@ -132,15 +132,17 @@ else
         case $1 in
             --wifi)
                 if [ -z "$2" ]; then
-                    echo "--wifi requires rs911x or wf200"
+                    echo "--wifi requires rs911x or rs9117 or wf200"
                     exit 1
                 fi
                 if [ "$2" = "rs911x" ]; then
                     optArgs+="use_rs911x=true "
+                elif [ "$2" = "rs9117" ]; then
+                    optArgs+="use_rs9117=true "
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi rs911x|wf200"
+                    echo "Wifi usage: --wifi rs911x|rs9117|wf200"
                     exit 1
                 fi
                 USE_WIFI=true
@@ -181,7 +183,7 @@ else
                 shift
                 ;;
             *)
-                if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_rs9117=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
 
