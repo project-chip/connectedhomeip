@@ -17,85 +17,22 @@
 
 #pragma once
 
-#include <app/util/config.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
 #include <lib/core/TLV.h>
 
 namespace chip {
 namespace scenes {
 
-typedef struct
-{
-
-#ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
-    bool onOff;
-#endif
-
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-    uint8_t currentLevel;
-    uint16_t currentFrequency;
-#endif
-
-#ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
-    uint8_t currentMode;
-#endif
-
-#ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-    uint8_t currentSaturation;
-    uint16_t currentX;
-    uint16_t currentY;
-    uint16_t colorTemperatureMireds;
-    uint16_t enhancedCurrentHue;
-    uint8_t enhancedColorMode;
-    uint8_t colorLoopActive;
-    uint8_t colorLoopDirection;
-    uint16_t colorLoopTime;
-#endif
-
-#ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-    uint16_t occupiedCoolingSetpoint;
-    uint16_t occupiedHeatingSetpoint;
-    uint8_t systemMode;
-#endif
-
-#ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-    uint8_t lockState;
-#endif
-
-#ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-    uint8_t currentPositionLiftPercentage;
-    uint8_t currentPositionTiltPercentage;
-    uint8_t targetPositionLiftPercent100ths;
-    uint8_t targetPositionTiltPercent100ths;
-#endif
-} FieldSets;
-
 class ExtensionFieldsSets
 {
 public:
-    static constexpr size_t kExtensionFieldsSetsSize = sizeof(FieldSets);
-    static constexpr TLV::Tag TagEnabledFielsSets() { return TLV::ContextTag(1); }
-    FieldSets enabledFieldSets;
-    bool empty = false;
+    ExtensionFieldsSets(){};
+    virtual ~ExtensionFieldsSets() = default;
 
-    ExtensionFieldsSets();
-    ~ExtensionFieldsSets(){};
-
-    CHIP_ERROR Serialize(TLV::TLVWriter & writer) const;
-    CHIP_ERROR Deserialize(TLV::TLVReader & reader);
-
-    void Clear();
-
-    bool operator==(const ExtensionFieldsSets & other)
-    {
-        return (!memcmp(&this->enabledFieldSets, &other.enabledFieldSets, kExtensionFieldsSetsSize));
-    }
-
-    void operator=(const ExtensionFieldsSets & other)
-    {
-        memcpy(&this->enabledFieldSets, &other.enabledFieldSets, kExtensionFieldsSetsSize);
-    }
+    virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
+    virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
+    virtual void Clear()                                        = 0;
+    virtual bool is_empty() const                               = 0;
 };
 } // namespace scenes
 } // namespace chip

@@ -25,6 +25,90 @@
 namespace chip {
 namespace scenes {
 
+using clusterId = chip::ClusterId;
+
+typedef CHIP_ERROR (*clusterFieldsHandle)(ExtensionFieldsSet & fields);
+
+/// @brief Class to allow extension field sets to be handled by the scene table without any knowledge of the cluster or its
+/// implementation
+class SceneHandler
+{
+public:
+    SceneHandler(ClusterId Id = kInvalidClusterId, clusterFieldsHandle getClusterEFS = nullptr,
+                 clusterFieldsHandle setClusterEFS = nullptr)
+    {
+        if (getClusterEFS != nullptr && setClusterEFS != nullptr && Id != kInvalidClusterId)
+        {
+            getEFS      = getClusterEFS;
+            setEFS      = setClusterEFS;
+            cID         = Id;
+            initialized = true;
+        }
+    };
+    ~SceneHandler(){};
+
+    void initSceneHandler(ClusterId Id, clusterFieldsHandle getClusterEFS, clusterFieldsHandle setClusterEFS)
+    {
+        if (getClusterEFS != nullptr && setClusterEFS != nullptr && Id != kInvalidClusterId)
+        {
+            getEFS      = getClusterEFS;
+            setEFS      = setClusterEFS;
+            cID         = Id;
+            initialized = true;
+        }
+    }
+
+    void clearSceneHandler()
+    {
+        getEFS      = nullptr;
+        setEFS      = nullptr;
+        cID         = kInvalidClusterId;
+        initialized = false;
+    }
+
+    CHIP_ERROR getClusterEFS(ExtensionFieldsSet & clusterFields)
+    {
+        if (this->isInitialized())
+        {
+            ReturnErrorOnFailure(getEFS(clusterFields));
+        }
+
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR setClusterEFS(ExtensionFieldsSet & clusterFields)
+    {
+        if (this->isInitialized())
+        {
+            ReturnErrorOnFailure(setEFS(clusterFields));
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    bool isInitialized() const { return this->initialized; }
+
+    ClusterId getID() { return cID; }
+
+    bool operator==(const SceneHandler & other)
+    {
+        return (this->getEFS == other.getEFS && this->setEFS == other.setEFS && this->cID == other.cID &&
+                initialized == other.initialized);
+    }
+    void operator=(const SceneHandler & other)
+    {
+        this->getEFS      = other.getEFS;
+        this->setEFS      = other.setEFS;
+        this->cID         = other.cID;
+        this->initialized = true;
+    }
+
+protected:
+    clusterFieldsHandle getEFS = nullptr;
+    clusterFieldsHandle setEFS = nullptr;
+    ClusterId cID              = kInvalidClusterId;
+    bool initialized           = false;
+};
+
 /**
  * @brief Implementation of a storage in nonvolatile storage of the scene table.
  *
@@ -43,21 +127,29 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
     void Finish() override;
 
-    //
-    // Scene Data
-    //
-
-    // By id
+    // Scene access by Id
     CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry) override;
     CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id,
                                   SceneTableEntry & entry) override;
     CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id) override;
 
-    // Iterators
-    SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) override;
+    // SceneHandlers
+    CHIP_ERROR registerHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function);
+    CHIP_ERROR unregisterHandler(uint8_t position);
+
+    // Extension field sets operation
+    CHIP_ERROR EFSValuesFromCluster(ExtensionFieldsSetsImpl & fieldSets);
+    CHIP_ERROR EFSValuesToCluster(ExtensionFieldsSetsImpl & fieldSets);
 
     // Fabrics
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
+
+    // Iterators
+    SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) override;
+
+    bool handlerListEmpty() { return (handlerNum == 0); }
+    bool handlerListFull() { return (handlerNum >= CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES); }
+    uint8_t getHandlerNum() { return this->handlerNum; }
 
 protected:
     class SceneEntryIteratorImpl : public SceneEntryIterator
@@ -79,6 +171,8 @@ protected:
 
     chip::PersistentStorageDelegate * mStorage = nullptr;
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
+    SceneHandler handlers[CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES];
+    uint8_t handlerNum = 0;
 }; // class DefaultSceneTableImpl
 
 /**

@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/scenes/ExtensionFieldsSets.h>
+#include <app/clusters/scenes/ExtensionFieldsSetsImpl.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/CommonPersistentData.h>
@@ -111,7 +111,7 @@ public:
         char name[kSceneNameMax]                = { 0 };
         size_t nameLength                       = 0;
         SceneTransitionTime sceneTransitionTime = 0;
-        ExtensionFieldsSets extentsionFieldsSets;
+        ExtensionFieldsSetsImpl extentsionFieldsSets;
         TransitionTime100ms transitionTime100 = 0;
         CharSpan nameSpan;
 
@@ -120,7 +120,7 @@ public:
         {
             this->SetName(sceneName);
         }
-        SceneData(ExtensionFieldsSets fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
+        SceneData(ExtensionFieldsSetsImpl fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
                   TransitionTime100ms time100ms = 0) :
             sceneTransitionTime(time),
             transitionTime100(time100ms)
@@ -134,6 +134,7 @@ public:
             this->SetName(other.nameSpan);
             extentsionFieldsSets = other.extentsionFieldsSets;
         }
+        ~SceneData(){};
 
         CHIP_ERROR Serialize(TLV::TLVWriter & writer) const
         {
@@ -167,8 +168,6 @@ public:
             {
                 ReturnErrorOnFailure(reader.Get(this->nameSpan));
                 this->SetName(this->nameSpan);
-
-                // Putting a null terminator
                 ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime()));
             }
 

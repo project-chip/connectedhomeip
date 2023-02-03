@@ -21,12 +21,13 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
-using FabricIndex     = chip::FabricIndex;
-using SceneTableEntry = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
-using SceneTableImpl  = chip::scenes::DefaultSceneTableImpl;
-using SceneStorageId  = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
-using SceneData       = chip::scenes::DefaultSceneTableImpl::SceneData;
-using CharSpan        = chip::CharSpan;
+using FabricIndex        = chip::FabricIndex;
+using SceneTableEntry    = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
+using SceneTableImpl     = chip::scenes::DefaultSceneTableImpl;
+using SceneStorageId     = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
+using SceneData          = chip::scenes::DefaultSceneTableImpl::SceneData;
+using CharSpan           = chip::CharSpan;
+using ExtensionFieldsSet = chip::scenes::ExtensionFieldsSet;
 
 namespace {
 
@@ -76,6 +77,82 @@ SceneTableEntry scene10(sceneId1, sceneData10);
 SceneTableEntry scene11(sceneId5, sceneData11);
 SceneTableEntry scene12(sceneId8, sceneData12);
 
+// EFS
+static const ExtensionFieldsSet onOffEFS1        = ExtensionFieldsSet(0x0006, (uint8_t *) "1", 1);
+static const ExtensionFieldsSet onOffEFS2        = ExtensionFieldsSet(0x0006, (uint8_t *) "0", 1);
+static const ExtensionFieldsSet levelControlEFS1 = ExtensionFieldsSet(0x0008, (uint8_t *) "511", 3);
+static const ExtensionFieldsSet levelControlEFS2 = ExtensionFieldsSet(0x0008, (uint8_t *) "222", 3);
+static const ExtensionFieldsSet colorControlEFS1 = ExtensionFieldsSet(0x0303, (uint8_t *) "123456789abcde", 14);
+static const ExtensionFieldsSet colorControlEFS2 = ExtensionFieldsSet(0x0303, (uint8_t *) "abcdefghi12345", 14);
+
+// Simulation of clusters callbacks (sate #1)
+CHIP_ERROR test_on_off_from_cluster_callback1(ExtensionFieldsSet & fields)
+{
+    ReturnErrorOnFailure(fields = onOffEFS1);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR test_on_off_to_cluster_callback1(ExtensionFieldsSet & fields)
+{
+    VerifyOrReturnError(fields == onOffEFS1, CHIP_ERROR_WRITE_FAILED);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR test_level_control_from_cluster_callback1(ExtensionFieldsSet & fields)
+{
+    ReturnErrorOnFailure(fields = levelControlEFS1);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR test_level_control_to_cluster_callback1(ExtensionFieldsSet & fields)
+{
+    VerifyOrReturnError(fields == levelControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR test_color_control_from_cluster_callback1(ExtensionFieldsSet & fields)
+{
+    ReturnErrorOnFailure(fields = colorControlEFS1);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR test_color_control_to_cluster_callback1(ExtensionFieldsSet & fields)
+{
+    VerifyOrReturnError(fields == colorControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    return CHIP_NO_ERROR;
+}
+
+// Simulation of clusters callbacks (sate #2)
+CHIP_ERROR test_on_off_from_cluster_callback2(ExtensionFieldsSet & fields)
+{
+    ReturnErrorOnFailure(fields = onOffEFS1);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR test_on_off_to_cluster_callback2(ExtensionFieldsSet & fields)
+{
+    VerifyOrReturnError(fields == onOffEFS1, CHIP_ERROR_WRITE_FAILED);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR test_level_control_from_cluster_callback2(ExtensionFieldsSet & fields)
+{
+    ReturnErrorOnFailure(fields = levelControlEFS1);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR test_level_control_to_cluster_callback2(ExtensionFieldsSet & fields)
+{
+    VerifyOrReturnError(fields == levelControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR test_color_control_from_cluster_callback2(ExtensionFieldsSet & fields)
+{
+    ReturnErrorOnFailure(fields = colorControlEFS1);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR test_color_control_to_cluster_callback2(ExtensionFieldsSet & fields)
+{
+    VerifyOrReturnError(fields == colorControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    return CHIP_NO_ERROR;
+}
+
 void ResetSceneTable(SceneTableImpl * sceneTable)
 {
     sceneTable->RemoveFabric(kFabric1);
@@ -89,6 +166,26 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 
     // Reset test
     ResetSceneTable(sceneTable);
+
+    // Test SceneHandlers
+    NL_TEST_ASSERT(
+        aSuite,
+        CHIP_NO_ERROR ==
+            sceneTable->registerHandler(onOffEFS1.ID, &test_on_off_from_cluster_callback1, &test_on_off_to_cluster_callback1));
+    NL_TEST_ASSERT(aSuite,
+                   CHIP_NO_ERROR ==
+                       sceneTable->registerHandler(levelControlEFS1.ID, &test_level_control_from_cluster_callback1,
+                                                   &test_level_control_to_cluster_callback1));
+    NL_TEST_ASSERT(aSuite,
+                   CHIP_NO_ERROR ==
+                       sceneTable->registerHandler(colorControlEFS1.ID, &test_color_control_from_cluster_callback1,
+                                                   &test_color_control_to_cluster_callback1));
+
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene1.storageData.extentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene2.storageData.extentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene3.storageData.extentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene4.storageData.extentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene5.storageData.extentsionFieldsSets));
 
     SceneTableEntry scene;
 
@@ -110,14 +207,24 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, scene == scene1);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
     NL_TEST_ASSERT(aSuite, scene == scene2);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
     NL_TEST_ASSERT(aSuite, scene == scene3);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId4, scene));
     NL_TEST_ASSERT(aSuite, scene == scene4);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
     NL_TEST_ASSERT(aSuite, scene == scene5);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
     NL_TEST_ASSERT(aSuite, scene == scene6);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
@@ -131,6 +238,27 @@ void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
     SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
     NL_TEST_ASSERT(aSuite, sceneTable);
 
+    // Test SceneHandlers overwrite
+    NL_TEST_ASSERT(
+        aSuite,
+        CHIP_NO_ERROR ==
+            sceneTable->registerHandler(onOffEFS2.ID, &test_on_off_from_cluster_callback2, &test_on_off_to_cluster_callback2));
+    NL_TEST_ASSERT(aSuite,
+                   CHIP_NO_ERROR ==
+                       sceneTable->registerHandler(levelControlEFS2.ID, &test_level_control_from_cluster_callback2,
+                                                   &test_level_control_to_cluster_callback2));
+    NL_TEST_ASSERT(aSuite,
+                   CHIP_NO_ERROR ==
+                       sceneTable->registerHandler(colorControlEFS2.ID, &test_color_control_from_cluster_callback2,
+                                                   &test_color_control_to_cluster_callback2));
+
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene10.storageData.extentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene11.storageData.extentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene12.storageData.extentsionFieldsSets));
+
+    // Verfies the overwrite hasn't changed the handlers number
+    NL_TEST_ASSERT(aSuite, sceneTable->getHandlerNum() == 3);
+
     SceneTableEntry scene;
     // Overwriting the first entry
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene10));
@@ -142,10 +270,15 @@ void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
     // Scene 10 has the same sceneId as scene 1, Get->sceneId1 should thus return scene 10, etc.
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, scene == scene10);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
     NL_TEST_ASSERT(aSuite, scene == scene11);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId8, scene));
     NL_TEST_ASSERT(aSuite, scene == scene12);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
 }
 
 void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
