@@ -26,6 +26,7 @@
 		3CCB8742286A593700771BAD /* ConversionUtils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB873C286A593700771BAD /* ConversionUtils.hpp */; };
 		3CCB8743286A593700771BAD /* CastingServerBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CCB873D286A593700771BAD /* CastingServerBridge.mm */; };
 		3CCB8744286A593700771BAD /* ConversionUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CCB873E286A593700771BAD /* ConversionUtils.mm */; };
+		3CD6D01A298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD6D019298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h */; };
 		3CE868F42946D76200FCB92B /* CommissionableDataProviderImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */; };
 		3CF8532728E37F1000F07B9F /* MatterError.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CF8532628E37F1000F07B9F /* MatterError.mm */; };
 /* End PBXBuildFile section */
@@ -60,6 +61,7 @@
 		3CCB873C286A593700771BAD /* ConversionUtils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ConversionUtils.hpp; sourceTree = "<group>"; };
 		3CCB873D286A593700771BAD /* CastingServerBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CastingServerBridge.mm; sourceTree = "<group>"; };
 		3CCB873E286A593700771BAD /* ConversionUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConversionUtils.mm; sourceTree = "<group>"; };
+		3CD6D019298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommissionerDiscoveryDelegateImpl.h; sourceTree = "<group>"; };
 		3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CommissionableDataProviderImpl.mm; sourceTree = "<group>"; };
 		3CF8532528E37ED800F07B9F /* MatterError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MatterError.h; sourceTree = "<group>"; };
 		3CF8532628E37F1000F07B9F /* MatterError.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MatterError.mm; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 				3C26AC8F2927008900BA6881 /* DeviceAttestationCredentialsProviderImpl.mm */,
 				3C0D9CDF2920A30C00D3332B /* CommissionableDataProviderImpl.hpp */,
 				3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */,
+				3CD6D019298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h */,
 			);
 			path = MatterTvCastingBridge;
 			sourceTree = "<group>";
@@ -139,6 +142,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3CD6D01A298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h in Headers */,
 				3C26AC8C2926FE0C00BA6881 /* DeviceAttestationCredentialsProviderImpl.hpp in Headers */,
 				3CCB8740286A593700771BAD /* CastingServerBridge.h in Headers */,
 				3CCB8742286A593700771BAD /* ConversionUtils.hpp in Headers */,
