@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.AttestationInfo
+import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.DeviceAttestationDelegate
 import chip.devicecontroller.NetworkCredentials
 import com.google.chip.chiptool.NetworkCredentialsParcelable
@@ -56,6 +57,8 @@ class DeviceProvisioningFragment : Fragment() {
   private val networkCredentialsParcelable: NetworkCredentialsParcelable?
     get() = arguments?.getParcelable(ARG_NETWORK_CREDENTIALS)
 
+  private lateinit var deviceController: ChipDeviceController
+
   private lateinit var scope: CoroutineScope
 
   override fun onCreateView(
@@ -65,6 +68,8 @@ class DeviceProvisioningFragment : Fragment() {
   ): View {
     scope = viewLifecycleOwner.lifecycleScope
     deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
+    deviceController = ChipClient.getDeviceController(requireContext())
+    
     return inflater.inflate(R.layout.single_fragment_container, container, false).apply {
       if (savedInstanceState == null) {
         if (deviceInfo.ipAddress != null) {
@@ -81,45 +86,59 @@ class DeviceProvisioningFragment : Fragment() {
     gatt = null
   }
 
-  private fun pairDeviceWithAddress() {
-    // IANA CHIP port
-    val port = 5540
-    val id = DeviceIdUtil.getNextAvailableId(requireContext())
-    val deviceController = ChipClient.getDeviceController(requireContext())
+  override fun onDestroy() {
+    super.onDestroy()
+    deviceController.close()
+    deviceController.setDeviceAttestationDelegate(0, EmptyAttestationDelegate())
+  }
 
-    DeviceIdUtil.setNextAvailableId(requireContext(), id + 1)
-    deviceController.setCompletionListener(ConnectionCallback())
+  private class EmptyAttestationDelegate : DeviceAttestationDelegate {
+    override fun onDeviceAttestationCompleted(
+      devicePtr: Long,
+      attestationInfo: AttestationInfo,
+      errorCode: Int) {}
+  }
 
-    deviceController.setDeviceAttestationDelegate(DEVICE_ATTESTATION_FAILED_TIMEOUT,
-    { devicePtr, attestationInfo, errorCode ->
+  private fun setAttestationDelegate() {
+    deviceController.setDeviceAttestationDelegate(DEVICE_ATTESTATION_FAILED_TIMEOUT
+    ) { devicePtr, attestationInfo, errorCode ->
       Log.i(TAG, "Device attestation errorCode: $errorCode, " +
               "Look at 'src/credentials/attestation_verifier/DeviceAttestationVerifier.h' " +
               "AttestationVerificationResult enum to understand the errors")
 
-      if (errorCode != STATUS_PAIRING_SUCCESS) {
-        requireActivity().runOnUiThread(Runnable {
-          val alertDialog: AlertDialog? = activity?.let {
-            val builder = AlertDialog.Builder(it)
-            builder.apply {
-              setPositiveButton("Continue",
-                DialogInterface.OnClickListener { dialog, id ->
-                  deviceController.continueCommissioning(devicePtr, true)
-                })
-              setNegativeButton("No",
-                DialogInterface.OnClickListener { dialog, id ->
-                  deviceController.continueCommissioning(devicePtr, false)
-                })
-            }
-            builder.setTitle("Device Attestation")
-            builder.setMessage("Device Attestation failed for device under commissioning. Do you wish to continue pairing?")
-            // Create the AlertDialog
-            builder.create()
-          }
-          alertDialog?.show()
-        })
-      }
-    })
-          
+      if (errorCode == STATUS_PAIRING_SUCCESS)
+        return@setDeviceAttestationDelegate
+
+      val activity = requireActivity()
+      activity.runOnUiThread(Runnable {
+        val dialog = AlertDialog.Builder(activity)
+          .setPositiveButton("Continue",
+              DialogInterface.OnClickListener { dialog, id ->
+                deviceController.continueCommissioning(devicePtr, true)
+              })
+          .setNegativeButton("No",
+              DialogInterface.OnClickListener { dialog, id ->
+                deviceController.continueCommissioning(devicePtr, false)
+              })
+          .setTitle("Device Attestation")
+          .setMessage("Device Attestation failed for device under commissioning. Do you wish to continue pairing?")
+          .create()
+
+        dialog.show()
+      })
+    }
+  }
+
+  private fun pairDeviceWithAddress() {
+    // IANA CHIP port
+    val port = 5540
+    val id = DeviceIdUtil.getNextAvailableId(requireContext())
+
+    DeviceIdUtil.setNextAvailableId(requireContext(), id + 1)
+    deviceController.setCompletionListener(ConnectionCallback())
+
+    setAttestationDelegate()
+
     deviceController.pairDeviceWithAddress(
       id,
       deviceInfo.ipAddress,
@@ -134,9 +153,7 @@ class DeviceProvisioningFragment : Fragment() {
     if (gatt != null) {
       return
     }
-    Log.i(TAG, "yujuan:startConnectingToDevice")
     scope.launch {
-      val deviceController = ChipClient.getDeviceController(requireContext())
       val bluetoothManager = BluetoothManager()
 
       showMessage(
@@ -172,35 +189,7 @@ class DeviceProvisioningFragment : Fragment() {
         network = NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(thread.operationalDataset))
       }
 
-      deviceController.setDeviceAttestationDelegate(DEVICE_ATTESTATION_FAILED_TIMEOUT,
-      { devicePtr, attestationInfo, errorCode ->
-        Log.i(TAG, "Device attestation errorCode: $errorCode, " +
-                "Look at 'src/credentials/attestation_verifier/DeviceAttestationVerifier.h' " +
-                "AttestationVerificationResult enum to understand the errors")
-
-        if (errorCode != STATUS_PAIRING_SUCCESS) {
-          requireActivity().runOnUiThread(Runnable {
-            val alertDialog: AlertDialog? = activity?.let {
-              val builder = AlertDialog.Builder(it)
-              builder.apply {
-                setPositiveButton("Continue",
-                  DialogInterface.OnClickListener { dialog, id ->
-                    deviceController.continueCommissioning(devicePtr, true)
-                  })
-                setNegativeButton("No",
-                  DialogInterface.OnClickListener { dialog, id ->
-                    deviceController.continueCommissioning(devicePtr, false)
-                  })
-              }
-              builder.setTitle("Device Attestation")
-              builder.setMessage("Device Attestation failed for device under commissioning. Do you wish to continue pairing?")
-              // Create the AlertDialog
-              builder.create()
-            }
-            alertDialog?.show()
-          })
-        }
-      })
+      setAttestationDelegate()
 
       deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, network)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
