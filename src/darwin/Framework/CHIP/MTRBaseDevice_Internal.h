@@ -100,7 +100,8 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 - (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
                  eventNumber:(NSNumber *)eventNumber
                     priority:(NSNumber *)priority
-                   timestamp:(NSNumber *)timestamp
+               timestampType:(NSNumber *)timestampType
+              timestampValue:(NSNumber *)timestampValue
                        value:(id _Nullable)value
                        error:(NSError * _Nullable)error;
 @end

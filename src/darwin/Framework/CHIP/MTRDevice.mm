@@ -37,6 +37,12 @@
 #include <app/InteractionModelEngine.h>
 #include <platform/PlatformManager.h>
 
+NSString * const MTREventNumberKey = @"eventNumber";
+NSString * const MTREventPriorityKey = @"eventPriority";
+NSString * const MTREventTimeTypeKey = @"eventTimeType";
+NSString * const MTREventSystemUpTimeKey = @"eventSystemUpTime";
+NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
+
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
 // Consider moving utility classes to their own file
@@ -100,6 +106,18 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
         return max;
     }
     return aNumber;
+}
+
+NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
+{
+    // First convert the event timestamp value (in milliseconds) to NSTimeInterval - to minimize potential loss of precision
+    // of uint64 => NSTimeInterval (double), convert whole seconds and remainder separately and then combine
+    NSTimeInterval eventTimestampValueSeconds = (NSTimeInterval)(timeValue / chip::kMillisecondsPerSecond);
+    NSTimeInterval eventTimestampValueRemainder
+        = ((NSTimeInterval)(timeValue % chip::kMillisecondsPerSecond)) / chip::kMillisecondsPerSecond;
+    NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
+
+    return eventTimestampValue;
 }
 
 #pragma mark - SubscriptionCallback class declaration
@@ -347,7 +365,33 @@ private:
 {
     os_unfair_lock_lock(&self->_lock);
 
-    // first combine with previous unreported events, if they exist
+    // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
+    NSDate * oldEstimatedStartTime = _estimatedStartTime;
+    for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+        NSNumber * eventTimeTypeNumber = eventDict[MTREventTimeTypeKey];
+        if (!eventTimeTypeNumber) {
+            MTR_LOG_ERROR("Event %@ missing event time type", eventDict);
+            continue;
+        }
+        MTREventTimeType eventTimeType = (MTREventTimeType) eventTimeTypeNumber.unsignedIntegerValue;
+        if (eventTimeType == MTREventTimeTypeSystemUpTime) {
+            NSNumber * eventTimeValueNumber = eventDict[MTREventSystemUpTimeKey];
+            if (!eventTimeValueNumber) {
+                MTR_LOG_ERROR("Event %@ missing event time value", eventDict);
+                continue;
+            }
+            NSTimeInterval eventTimeValue = eventTimeValueNumber.doubleValue;
+            NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-eventTimeValue];
+            if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
+                _estimatedStartTime = potentialSystemStartTime;
+            }
+        }
+    }
+    if (oldEstimatedStartTime != _estimatedStartTime) {
+        MTR_LOG_INFO("%@ updated estimated start time to %@", self, _estimatedStartTime);
+    }
+
+    // Combine with previous unreported events, if they exist
     if (_unreportedEvents) {
         eventReport = [_unreportedEvents arrayByAddingObjectsFromArray:eventReport];
         _unreportedEvents = nil;
@@ -950,7 +994,34 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     } else {
         id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
         if (value) {
-            [mEventReports addObject:@ { MTREventPathKey : eventPath, MTRDataKey : value }];
+            // Construct the right type, and key/value depending on the type
+            NSNumber * eventTimeType;
+            NSString * timestampKey;
+            id timestampValue;
+            if (aEventHeader.mTimestamp.mType == Timestamp::Type::kSystem) {
+                eventTimeType = @(MTREventTimeTypeSystemUpTime);
+                timestampKey = MTREventSystemUpTimeKey;
+                timestampValue = @(MTRTimeIntervalForEventTimestampValue(aEventHeader.mTimestamp.mValue));
+            } else if (aEventHeader.mTimestamp.mType == Timestamp::Type::kEpoch) {
+                eventTimeType = @(MTREventTimeTypeTimestampDate);
+                timestampKey = MTREventTimestampDateKey;
+                timestampValue =
+                    [NSDate dateWithTimeIntervalSince1970:MTRTimeIntervalForEventTimestampValue(aEventHeader.mTimestamp.mValue)];
+            } else {
+                MTR_LOG_INFO(
+                    "%@ Unsupported event timestamp type %u - ignoring", eventPath, (unsigned int) aEventHeader.mTimestamp.mType);
+                ReportError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+                return;
+            }
+
+            [mEventReports addObject:@{
+                MTREventPathKey : eventPath,
+                MTRDataKey : value,
+                MTREventNumberKey : @(aEventHeader.mEventNumber),
+                MTREventPriorityKey : @((uint8_t) aEventHeader.mPriorityLevel),
+                MTREventTimeTypeKey : eventTimeType,
+                timestampKey : timestampValue
+            }];
         }
     }
 }

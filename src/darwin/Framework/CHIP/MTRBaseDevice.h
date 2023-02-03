@@ -429,11 +429,21 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, readonly, copy, nullable) NSError * error;
 @end
 
+typedef NS_ENUM(NSUInteger, MTREventTimeType) { MTREventTimeTypeSystemUpTime = 0, MTREventTimeTypeTimestampDate };
+
 @interface MTREventReport : NSObject
 @property (nonatomic, readonly, copy) MTREventPath * path;
 @property (nonatomic, readonly, copy) NSNumber * eventNumber; // EventNumber type (uint64_t)
 @property (nonatomic, readonly, copy) NSNumber * priority; // PriorityLevel type (uint8_t)
-@property (nonatomic, readonly, copy) NSNumber * timestamp; // Timestamp type (uint64_t)
+
+// Either systemUpTime or timestampDate will be valid depending on eventTimeType
+@property (nonatomic, readonly) MTREventTimeType eventTimeType;
+MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly) NSTimeInterval systemUpTime;
+MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, copy, nullable) NSDate * timestampDate;
+MTR_NEWLY_AVAILABLE;
+
 // An instance of one of the event payload interfaces.
 @property (nonatomic, readonly, copy) id value;
 
@@ -541,6 +551,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     API_DEPRECATED("Please use commandPathWithEndpointID:clusterID:commandID:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 
+@end
+
+@interface MTREventReport (Deprecated)
+@property (nonatomic, readonly, copy) NSNumber * timestamp;
+MTR_NEWLY_DEPRECATED("Please use timestampDate and systemUpTime")
 @end
 
 NS_ASSUME_NONNULL_END
