@@ -184,7 +184,7 @@ private:
             mExchangeCtx->Close();
             mExchangeCtx = nullptr;
             ResetState();
-        } else if (event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport) {
+        } else if (event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport)) {
             // If the send was successful for a status report, since we are not expecting a response the exchange context is
             // already closed. We need to null out the reference to avoid having a dangling pointer.
             mExchangeCtx = nullptr;
@@ -444,6 +444,7 @@ private:
 
         // Start a timer to track whether we receive a BDX init after a successful query image in a reasonable amount of time
         CHIP_ERROR err = mSystemLayer->StartTimer(kBdxInitReceivedTimeout, HandleBdxInitReceivedTimeoutExpired, this);
+        LogErrorOnFailure(err);
 
         // The caller of this method maps CHIP_ERROR to specific BDX Status Codes (see GetBdxStatusCodeFromChipError)
         // and those are used by the BDX session to prepare the status report.
@@ -664,13 +665,15 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     handle.Release();
                     return;
                 }
-                if (!isBDXProtocolSupported) {
+                if (!hasUpdate) {
+                    // Send whatever error response our delegate decided on.
+                    handler->AddResponse(cachedCommandPath, response);
+                } else {
+                    // We must have isBDXProtocolSupported false.  Send the corresponding error status.
                     Commands::QueryImageResponse::Type protocolNotSupportedResponse;
                     protocolNotSupportedResponse.status
                         = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
                     handler->AddResponse(cachedCommandPath, protocolNotSupportedResponse);
-                } else {
-                    handler->AddResponse(cachedCommandPath, response);
                 }
                 handle.Release();
                 gOtaSender.ResetState();
