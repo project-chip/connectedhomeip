@@ -1256,37 +1256,32 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
+    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    mbedtls_ecp_group curve;
     mbedtls_mpi w1_bn;
     mbedtls_ecp_point Ltemp;
 
-    mbedtls_ecp_group_init(&curve);
     mbedtls_mpi_init(&w1_bn);
     mbedtls_ecp_point_init(&Ltemp);
-
-    result = mbedtls_ecp_group_load(&curve, MBEDTLS_ECP_DP_SECP256R1);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1in), w1in_len);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &curve.N);
+    result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &context->curve.N);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecp_mul(&curve, &Ltemp, &w1_bn, &curve.G, CryptoRNG, nullptr);
+    result = mbedtls_ecp_mul(&context->curve, &Ltemp, &w1_bn, &context->curve.G, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     memset(Lout, 0, *L_len);
 
-    result = mbedtls_ecp_point_write_binary(&curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Uint8::to_uchar(Lout), *L_len);
+    result = mbedtls_ecp_point_write_binary(&context->curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Uint8::to_uchar(Lout), *L_len);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
     _log_mbedTLS_error(result);
     mbedtls_ecp_point_free(&Ltemp);
     mbedtls_mpi_free(&w1_bn);
-    mbedtls_ecp_group_free(&curve);
 
     return error;
 }
