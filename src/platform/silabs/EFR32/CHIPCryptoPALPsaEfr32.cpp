@@ -1402,8 +1402,16 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &context->curve.N);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
+#if defined(SEMAILBOX_PRESENT)
+    // Do the point multiplication using hardware acceleration via ECDH primitive
+    error = PointMul(&Ltemp, &context->curve.G, &w1_bn);
+    if (error != CHIP_NO_ERROR) {
+        goto exit;
+    }
+#else /* SEMAILBOX_PRESENT */
     result = mbedtls_ecp_mul(&context->curve, &Ltemp, &w1_bn, &context->curve.G, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+#endif /* SEMAILBOX_PRESENT */
 
     memset(Lout, 0, *L_len);
 
