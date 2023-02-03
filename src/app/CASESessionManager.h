@@ -77,9 +77,17 @@ public:
      *
      * The `onFailure` callback may be called before the FindOrEstablishSession
      * call returns, for error cases that are detected synchronously.
+     *
+     * attemptCount can be used to automatically retry multiple times if session
+     * setup is not successful.
      */
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+                                Callback::Callback<OnDeviceConnectionFailure> * onFailure
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                ,
+                                uint8_t attemptCount = 1
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    );
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 

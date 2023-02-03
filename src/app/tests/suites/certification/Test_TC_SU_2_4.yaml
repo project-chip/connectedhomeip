@@ -27,15 +27,15 @@ config:
 
 tests:
     - label:
-          "DUT sends a QueryImage command to the TH/OTA-P + TH/OTA-P sends a
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
           QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable.
-          Set ImageURI to the location where the image is located.After the DUT
+          Set ImageURI to the location where the image is located. After the DUT
           transfers the image, the DUT should send ApplyUpdateRequest to the
           OTA-P."
       verification: |
-          Verify that the OTA Provider show ApplyUpdateRequest message received from DUT in the logs
+          Verify that the ApplyUpdateRequest message received on the OTA Provider with UpdateToken and NewVersion fields from DUT
 
-          [1645743059327] [97806:20280748] CHIP: [ZCL] OTA Provider received ApplyUpdateRequest
-          [1645743059327] [97806:20280748] CHIP: [ZCL]   Update Token: 32
-          [1645743059327] [97806:20280748] CHIP: [ZCL]   New Version: 1
+          [1673956343.962557][17737:17737] CHIP:ZCL: OTA Provider received ApplyUpdateRequest
+          [1673956343.962601][17737:17737] CHIP:ZCL:   Update Token: 32
+          [1673956343.962639][17737:17737] CHIP:ZCL:   New Version: 2
       disabled: true

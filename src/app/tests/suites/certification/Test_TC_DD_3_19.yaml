@@ -31,6 +31,10 @@ tests:
       verification: |
           1 - Commissioner is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
           2 - 5.1.3 - QR code is printed on the Commissionee device or in additional provided materials (ex: manual).
+
+          To put the DUT into commissionable state and verify commissionable state.
+          This step is same in couple of other cases (like DD) so use the same verification method here too i.e. if your DUT is discoverable over mDNS then use 'chiptool discover commissionables'  to discover mDNS adv and provision the device using 'chip-tool pairing code node-id payload'.
+          otherwise if your DUT is advertising over BLE , pls use the '/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1' command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
       disabled: true
 
     - label:

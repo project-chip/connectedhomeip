@@ -181,3 +181,10 @@ jobs:
               if: always()
               run: |
                   git grep -n '0x%[0-9-]*" *PRI[^xX]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.
+            - name: Check for use of NSLog instead of Matter logging in Matter framework
+              if: always()
+              run: |
+                  git grep -n 'NSLog(' -- src/darwin/Framework/CHIP && exit 1 || exit 0

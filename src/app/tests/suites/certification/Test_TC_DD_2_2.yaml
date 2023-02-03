@@ -214,14 +214,14 @@ tests:
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
 
-          Verify in TH as commissionee side:
-          $  ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
+          Verify in TH (CHIP-TOOL):
+            ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
           [1651743342.299897][3461:3464] CHIP:BLE: New device scanned: E4:5F:01:0F:1A:02
           [1651743342.299951][3461:3464] CHIP:BLE: Device discriminator match. Attempting to connect.
           [1651743342.303783][3461:3464] CHIP:BLE: Scan complete notification without an active scan.
           [1651743346.244175][3461:3464] CHIP:DL: ConnectDevice complete
 
-          Verify in DUT as commissioner side:
+          Verify in DUT (ALL-CLUSTER-APP):
           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
           [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
@@ -298,7 +298,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT must find TH and provide onboarding data for validation, Pass
+          "DUT must find TH and provide onboarding data for validation.Pass
           Criteria: DUT is able to report the Onboarding payload as set on TH"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |

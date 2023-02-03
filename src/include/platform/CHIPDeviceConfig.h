@@ -1282,6 +1282,38 @@
 #define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION ""
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+ *
+ * If 1, enable support for automatic CASE establishment retries.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+#define CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+/**
+ * CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS
+ *
+ * The initial retry delay, in seconds, for our automatic CASE retries.
+ */
+#ifndef CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS
+#define CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF
+ *
+ * The maximum number of times we back off, by a factor of 2 each time, from our
+ * initial CASE retry interval before we plateau.
+ */
+#ifndef CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF
+#define CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF 5
+#endif
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
 // -------------------- App Platform Configuration --------------------
 
 /**

@@ -20,6 +20,7 @@ import("${build_root}/config/tizen/config.gni")
 
 tizen_dev_certificate = get_path_info("tizen_dev_certificate.py", "abspath")
 tizen_manifest_parser = get_path_info("tizen_manifest_parser.py", "abspath")
+tizen_qemu = get_path_info("tizen_qemu.py", "abspath")
 
 # Run Tizen Studio CLI as a project builder.
 #
@@ -159,5 +160,75 @@ template("tizen_sdk_package") {
       "--",
       tizen_package_out_dir,
     ]
+  }
+}
+
+# Create ISO image for Tizen QEMU.
+#
+# Parameters:
+#   runner: Path to the Tizen QEMU runner script.
+#   assets: List of assets to copy to the ISO image.
+template("tizen_qemu_mkisofs") {
+  # This target shall only be used for testing purposes.
+  testonly = true
+
+  assert(defined(invoker.runner), "It is required to specify runner script.")
+  assert(get_path_info(invoker.runner, "file") == "runner.sh",
+         "Runner script must be named 'runner.sh'")
+
+  image_file = "${target_gen_dir}/${target_name}.iso"
+
+  action(target_name) {
+    forward_variables_from(invoker, [ "deps" ])
+    inputs = [ invoker.runner ]
+    outputs = [ image_file ]
+
+    args = [
+      "mkisofs",
+      "-input-charset=default",
+      "-VCHIP",  # Volume ID = CHIP
+      "-JRU",  # Joliet + Rock Ridge with untranslated filenames
+      "-o",
+      rebase_path(image_file),
+      rebase_path(invoker.runner, root_build_dir),
+    ]
+    if (defined(invoker.assets)) {
+      args += invoker.assets
+      inputs += invoker.assets
+    }
+
+    script = "${build_root}/gn_run_binary.py"
+  }
+}
+
+# Run Tizen in QEMU.
+#
+# Parameters:
+#   iso_image: The path to ISO image with the runner script.
+#   virtio_net: Enable external network access.
+template("tizen_qemu_run") {
+  # This target shall only be used for testing purposes.
+  testonly = true
+
+  assert(defined(invoker.iso_image),
+         "It is required to specify ISO runner image.")
+
+  # Store QEMU output in a dedicated log file.
+  output_log_file = "${root_build_dir}/tizen-qemu-" + target_name + ".log"
+
+  action(target_name) {
+    forward_variables_from(invoker, [ "deps" ])
+    inputs = [ invoker.iso_image ]
+    outputs = [ output_log_file ]
+
+    args = [
+      "--image-iso=" + invoker.iso_image,
+      "--output=" + rebase_path(output_log_file),
+    ]
+    if (defined(invoker.virtio_net)) {
+      args += [ "--virtio-net" ]
+    }
+
+    script = tizen_qemu
   }
 }

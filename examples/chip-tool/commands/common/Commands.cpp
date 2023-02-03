@@ -72,6 +72,35 @@ std::vector<std::string> GetArgumentsFromJson(Command * command, Json::Value & v
     return args;
 };
 
+// Check for arguments with a starting '"' but no ending '"': those
+// would indicate that people are using double-quoting, not single
+// quoting, on arguments with spaces.
+static void DetectAndLogMismatchedDoubleQuotes(int argc, char ** argv)
+{
+    for (int curArg = 0; curArg < argc; ++curArg)
+    {
+        char * arg = argv[curArg];
+        if (!arg)
+        {
+            continue;
+        }
+
+        auto len = strlen(arg);
+        if (len == 0)
+        {
+            continue;
+        }
+
+        if (arg[0] == '"' && arg[len - 1] != '"')
+        {
+            ChipLogError(chipTool,
+                         "Mismatched '\"' detected in argument: '%s'.  Use single quotes to delimit arguments with spaces "
+                         "in them: 'x y', not \"x y\".",
+                         arg);
+        }
+    }
+}
+
 } // namespace
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
@@ -217,6 +246,10 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
     int argumentsPosition = isGlobalCommand ? 4 : 3;
     if (!command->InitArguments(argc - argumentsPosition, &argv[argumentsPosition]))
     {
+        if (interactive)
+        {
+            DetectAndLogMismatchedDoubleQuotes(argc - argumentsPosition, &argv[argumentsPosition]);
+        }
         ShowCommand(argv[0], argv[1], command);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -267,7 +300,8 @@ Command * Commands::GetGlobalCommand(CommandsVector & commands, std::string comm
 
 bool Commands::IsAttributeCommand(std::string commandName) const
 {
-    return commandName.compare("read") == 0 || commandName.compare("write") == 0 || commandName.compare("subscribe") == 0;
+    return commandName.compare("read") == 0 || commandName.compare("write") == 0 || commandName.compare("force-write") == 0 ||
+        commandName.compare("subscribe") == 0;
 }
 
 bool Commands::IsEventCommand(std::string commandName) const
@@ -308,6 +342,7 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     bool readCommand           = false;
     bool writeCommand          = false;
+    bool writeOverrideCommand  = false;
     bool subscribeCommand      = false;
     bool readEventCommand      = false;
     bool subscribeEventCommand = false;
@@ -324,6 +359,10 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
             else if (strcmp(command->GetName(), "write") == 0 && !writeCommand)
             {
                 writeCommand = true;
+            }
+            else if (strcmp(command->GetName(), "force-write") == 0 && !writeOverrideCommand)
+            {
+                writeOverrideCommand = true;
             }
             else if (strcmp(command->GetName(), "subscribe") == 0 && !subscribeCommand)
             {

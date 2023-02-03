@@ -2441,7 +2441,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
-                                                               &mOnDeviceConnectionFailureCallback);
+                                                               &mOnDeviceConnectionFailureCallback
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                               ,
+                                                               /* attemptCount = */ 3
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        );
     }
     break;
     case CommissioningStage::kSendComplete: {

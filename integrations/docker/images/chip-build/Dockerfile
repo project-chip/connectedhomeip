@@ -95,7 +95,7 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install \
+    && pip3 install --no-cache-dir \
     attrs \
     click \
     coloredlogs \
@@ -109,8 +109,6 @@ RUN set -x \
     pygit \
     PyGithub \
     tabulate \
-    # Cleanup
-    && pip3 cache purge \
     && : # last line
 
 # build and install gn
@@ -151,7 +149,7 @@ RUN set -x \
     # Save clang-12 files, so we can restore them after build dependencies cleanup
     && tar -cf clang-12-files.tar $(dpkg -L libclang-common-12-dev |grep /include) /usr/lib/llvm-12/lib/libLLVM-12.so.1 \
     # Cleanup build dependencies
-    && apt autoremove -fy clang-12 libclang-12-dev \
+    && apt autopurge -fy clang-12 libclang-12-dev \
     && rm -rf /var/lib/apt/lists/ \
     # Restore clang-12 files
     && tar -xf clang-12-files.tar -C / \
@@ -168,6 +166,7 @@ RUN set -x \
 ENV LD_LIBRARY_PATH_TSAN=/usr/lib/x86_64-linux-gnu-tsan
 RUN set -x \
     && mkdir -p $LD_LIBRARY_PATH_TSAN \
+    && export CCACHE_DISABLE=1 PYTHONDONTWRITEBYTECODE=1 \
     && GLIB_VERSION=$(pkg-config --modversion glib-2.0) \
     && git clone --depth=1 --branch=$GLIB_VERSION https://github.com/GNOME/glib.git \
     && CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib \
