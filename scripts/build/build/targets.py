@@ -542,6 +542,7 @@ def BuildTelinkTarget():
         TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
         TargetPart('light', app=TelinkApp.LIGHT),
         TargetPart('light-switch', app=TelinkApp.SWITCH),
+        TargetPart('lock', app=TelinkApp.LOCK),
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
     ])

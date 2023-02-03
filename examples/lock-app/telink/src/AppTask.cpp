@@ -216,7 +216,7 @@ CHIP_ERROR AppTask::Init(void)
     // Disable auto-relock time feature.
     DoorLockServer::Instance().SetAutoRelockTime(kLockEndpointId, 0);
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkLock");
+    err = ConnectivityMgr().SetBLEDeviceName("Telink Lock");
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");

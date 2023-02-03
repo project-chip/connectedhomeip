@@ -25,6 +25,7 @@ class TelinkApp(Enum):
     ALL_CLUSTERS_MINIMAL = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
+    LOCK = auto()
     SWITCH = auto()
     OTA_REQUESTOR = auto()
     THERMOSTAT = auto()
@@ -40,6 +41,8 @@ class TelinkApp(Enum):
             return 'lighting-app'
         elif self == TelinkApp.SWITCH:
             return 'light-switch-app'
+        elif self == TelinkApp.LOCK:
+            return 'lock-app'
         elif self == TelinkApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
         elif self == TelinkApp.THERMOSTAT:
@@ -58,6 +61,8 @@ class TelinkApp(Enum):
             return 'chip-telink-lighting-example'
         elif self == TelinkApp.SWITCH:
             return 'chip-telink-light-switch-example'
+        elif self == TelinkApp.LOCK:
+            return 'chip-telink-lock-example'
         elif self == TelinkApp.OTA_REQUESTOR:
             return 'chip-telink-ota-requestor-example'
         elif self == TelinkApp.THERMOSTAT:

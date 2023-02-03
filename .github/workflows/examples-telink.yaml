@@ -84,6 +84,15 @@ jobs:
                     out/telink-tlsr9518adk80d-contact-sensor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: Build example Telink Lock App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-lock-app' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d lock-app \
+                    out/telink-tlsr9518adk80d-lock-app/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
             - name: Build example Telink Lighting App
               run: |
                   ./scripts/run_in_build_env.sh \
