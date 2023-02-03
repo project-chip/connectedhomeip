@@ -93,10 +93,6 @@ efr32_executable("lighting_app") {
     app_data_model,
   ]
 
-  if (!disable_lcd) {
-    defines += [ "IS_DEMO_LIGHT=1" ]
-  }
-
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",

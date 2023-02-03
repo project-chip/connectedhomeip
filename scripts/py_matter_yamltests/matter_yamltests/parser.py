@@ -233,6 +233,7 @@ class _TestStepWithPlaceholders:
 
         argument_mapping = None
         response_mapping = None
+        response_mapping_name = None
 
         if self.is_attribute:
             attribute = definitions.get_attribute_by_name(
@@ -242,6 +243,7 @@ class _TestStepWithPlaceholders:
                                                      attribute.definition.data_type.name)
                 argument_mapping = attribute_mapping
                 response_mapping = attribute_mapping
+                response_mapping_name = attribute.definition.data_type.name
         else:
             command = definitions.get_command_by_name(
                 self.cluster, self.command)
@@ -250,9 +252,11 @@ class _TestStepWithPlaceholders:
                     definitions, self.cluster, command.input_param)
                 response_mapping = self._as_mapping(
                     definitions, self.cluster, command.output_param)
+                response_mapping_name = command.output_param
 
         self.argument_mapping = argument_mapping
         self.response_mapping = response_mapping
+        self.response_mapping_name = response_mapping_name
         self.update_arguments(self.arguments_with_placeholders)
         self.update_response(self.response_with_placeholders)
 
@@ -401,12 +405,13 @@ class TestStep:
         self._runtime_config_variable_storage = runtime_config_variable_storage
         self.arguments = copy.deepcopy(test.arguments_with_placeholders)
         self.response = copy.deepcopy(test.response_with_placeholders)
-        self._update_placeholder_values(self.arguments)
-        self._update_placeholder_values(self.response)
-        self._test.node_id = self._config_variable_substitution(
-            self._test.node_id)
-        test.update_arguments(self.arguments)
-        test.update_response(self.response)
+        if test.is_pics_enabled:
+            self._update_placeholder_values(self.arguments)
+            self._update_placeholder_values(self.response)
+            self._test.node_id = self._config_variable_substitution(
+                self._test.node_id)
+            test.update_arguments(self.arguments)
+            test.update_response(self.response)
 
     @property
     def is_enabled(self):
@@ -677,6 +682,7 @@ class TestStep:
         error_success = 'Constraints check passed'
         error_failure = 'Constraints check failed'
 
+        response_type_name = self._test.response_mapping_name
         for value in self.response['values']:
             if 'constraints' not in value:
                 continue
@@ -690,9 +696,18 @@ class TestStep:
                     received_value = received_value.get(
                         expected_name) if received_value else None
 
+                if self._test.response_mapping:
+                    response_type_name = self._test.response_mapping.get(
+                        expected_name)
+                else:
+                    # We don't have a mapping for this type. This happens for pseudo clusters.
+                    # If there is a constraint check for the type it is likely an incorrect
+                    # constraint check by the test writter.
+                    response_type_name = None
+
             constraints = get_constraints(value['constraints'])
 
-            if all([constraint.is_met(received_value) for constraint in constraints]):
+            if all([constraint.is_met(received_value, response_type_name) for constraint in constraints]):
                 result.success(check_type, error_success)
             else:
                 # TODO would be helpful to be more verbose here

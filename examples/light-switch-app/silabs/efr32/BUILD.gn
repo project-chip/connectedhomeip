@@ -97,10 +97,6 @@ efr32_executable("light_switch_app") {
     ]
   }
 
-  if (!disable_lcd) {
-    defines += [ "IS_DEMO_SWITCH=1" ]
-  }
-
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",

@@ -346,7 +346,14 @@ public:
      * The method must be called before other methods of this class.
      * If the resolver has already been initialized, the method exits immediately with no error.
      */
-    virtual CHIP_ERROR Init(chip::Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
+    virtual CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
+
+    /**
+     * Returns whether the resolver has completed the initialization.
+     *
+     * Returns true if the resolver is ready to take node resolution and discovery requests.
+     */
+    virtual bool IsInitialized() = 0;
 
     /**
      * Shuts down the resolver if it has been initialized before.

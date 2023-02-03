@@ -275,6 +275,7 @@ public:
 
     ///// Resolver implementation
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
+    bool IsInitialized() override;
     void Shutdown() override;
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
@@ -438,6 +439,11 @@ CHIP_ERROR MinMdnsResolver::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndP
     }
 
     return GlobalMinimalMdnsServer::Instance().StartServer(udpEndPointManager, kMdnsPort);
+}
+
+bool MinMdnsResolver::IsInitialized()
+{
+    return GlobalMinimalMdnsServer::Server().IsListening();
 }
 
 void MinMdnsResolver::Shutdown()

@@ -1,1 +1,1 @@
-0.6.37 Version bump reason: removed ZAP from docker as CIPD now has it.
+0.6.39 Version bump reason: [Tizen] Fixup for QEMU docker image

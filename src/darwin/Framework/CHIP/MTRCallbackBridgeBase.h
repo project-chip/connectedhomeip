@@ -35,6 +35,92 @@ NS_ASSUME_NONNULL_BEGIN
  * know.
  */
 class MTRCallbackBridgeBase {
+public:
+    /**
+     * Run the given MTRActionBlock on the Matter thread, after getting a CASE
+     * session (possibly pre-existing) to the given node ID on the fabric
+     * represented by the given MTRDeviceController.  On success, convert the
+     * success value to whatever type it needs to be to call the callback type
+     * we're templated over.  Once this function has been called, on a callback
+     * bridge allocated with `new`, the bridge object must not be accessed by
+     * the caller.  The action block will handle deleting the bridge.
+     */
+    void DispatchAction(chip::NodeId nodeID, MTRDeviceController * controller) && { ActionWithNodeID(nodeID, controller); }
+
+    /**
+     * Run the given MTRActionBlock on the Matter thread after getting a secure
+     * session corresponding to the given MTRBaseDevice.  On success, convert
+     * the success value to whatever type it needs to be to call the callback
+     * type we're templated over.  Once this function has been called, on a callback
+     * bridge allocated with `new`, the bridge object must not be accessed by
+     * the caller.  The action block will handle deleting the bridge.
+     */
+    void DispatchAction(MTRBaseDevice * device) &&
+    {
+        if (device.isPASEDevice) {
+            ActionWithPASEDevice(device);
+        } else {
+            ActionWithNodeID(device.nodeID, device.deviceController);
+        }
+    }
+
+protected:
+    MTRCallbackBridgeBase(dispatch_queue_t queue)
+        : mQueue(queue)
+    {
+    }
+
+    virtual ~MTRCallbackBridgeBase() {};
+
+    virtual void MaybeDoAction(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+        const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error)
+        = 0;
+    virtual void LogRequestStart() = 0;
+
+    void ActionWithPASEDevice(MTRBaseDevice * device)
+    {
+        LogRequestStart();
+
+        [device.deviceController getSessionForCommissioneeDevice:device.nodeID
+                                                      completion:^(chip::Messaging::ExchangeManager * exchangeManager,
+                                                          const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                                                          MaybeDoAction(exchangeManager, session, error);
+                                                      }];
+    }
+
+    void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController * controller)
+    {
+        LogRequestStart();
+
+        [controller getSessionForNode:nodeID
+                           completion:^(chip::Messaging::ExchangeManager * exchangeManager,
+                               const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                               MaybeDoAction(exchangeManager, session, error);
+                           }];
+    }
+
+    // OnDone and KeepAliveOnCallback really only make sense for subscription
+    // bridges, but we put them here to avoid many copies of this code in
+    // generated bits.
+    void OnDone()
+    {
+        if (!mQueue) {
+            delete this;
+            return;
+        }
+
+        // Delete ourselves async, so that any error/data reports we
+        // queued up before getting OnDone have a chance to run.
+        auto * self = this;
+        dispatch_async(mQueue, ^{
+            delete self;
+        });
+    }
+
+    void KeepAliveOnCallback() { mKeepAlive = true; }
+
+    dispatch_queue_t mQueue;
+    bool mKeepAlive = false;
 };
 
 typedef void (^MTRResponseHandler)(id _Nullable value, NSError * _Nullable error);
@@ -72,7 +158,7 @@ public:
      * on it.
      */
     MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, T OnSuccessFn)
-        : mQueue(queue)
+        : MTRCallbackBridgeBase(queue)
         , mHandler(handler)
         , mSuccess(OnSuccessFn)
         , mFailure(OnFailureFn)
@@ -84,40 +170,12 @@ public:
      * on it.
      */
     MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, MTRActionBlock _Nonnull action, T OnSuccessFn)
-        : mQueue(queue)
+        : MTRCallbackBridgeBase(queue)
         , mHandler(handler)
         , mAction(action)
         , mSuccess(OnSuccessFn)
         , mFailure(OnFailureFn)
     {
-    }
-
-    /**
-     * Run the given MTRActionBlock on the Matter thread, after getting a CASE
-     * session (possibly pre-existing) to the given node ID on the fabric
-     * represented by the given MTRDeviceController.  On success, convert the
-     * success value to whatever type it needs to be to call the callback type
-     * we're templated over.  Once this function has been called, on a callback
-     * bridge allocated with `new`, the bridge object must not be accessed by
-     * the caller.  The action block will handle deleting the bridge.
-     */
-    void DispatchAction(chip::NodeId nodeID, MTRDeviceController * controller) && { ActionWithNodeID(nodeID, controller); }
-
-    /**
-     * Run the given MTRActionBlock on the Matter thread after getting a secure
-     * session corresponding to the given MTRBaseDevice.  On success, convert
-     * the success value to whatever type it needs to be to call the callback
-     * type we're templated over.  Once this function has been called, on a callback
-     * bridge allocated with `new`, the bridge object must not be accessed by
-     * the caller.  The action block will handle deleting the bridge.
-     */
-    void DispatchAction(MTRBaseDevice * device) &&
-    {
-        if (device.isPASEDevice) {
-            ActionWithPASEDevice(device);
-        } else {
-            ActionWithNodeID(device.nodeID, device.deviceController);
-        }
     }
 
     /**
@@ -142,8 +200,8 @@ public:
             asyncDispatchToMatterQueue:^() {
                 CHIP_ERROR err = action(mSuccess, mFailure);
                 if (err != CHIP_NO_ERROR) {
-                    NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
-                        chip::ErrorStr(err));
+                    ChipLogError(Controller, "Failure performing action. C++-mangled success callback type: '%s', error: %s",
+                        typeid(T).name(), chip::ErrorStr(err));
 
                     // Take the normal async error-reporting codepath.  This will also
                     // handle cleaning us up properly.
@@ -155,29 +213,7 @@ public:
             }];
     }
 
-    void ActionWithPASEDevice(MTRBaseDevice * device)
-    {
-        LogRequestStart();
-
-        [device.deviceController getSessionForCommissioneeDevice:device.nodeID
-                                                      completion:^(chip::Messaging::ExchangeManager * exchangeManager,
-                                                          const chip::Optional<chip::SessionHandle> & session, NSError * error) {
-                                                          MaybeDoAction(exchangeManager, session, error);
-                                                      }];
-    }
-
-    void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController * controller)
-    {
-        LogRequestStart();
-
-        [controller getSessionForNode:nodeID
-                           completion:^(chip::Messaging::ExchangeManager * exchangeManager,
-                               const chip::Optional<chip::SessionHandle> & session, NSError * error) {
-                               MaybeDoAction(exchangeManager, session, error);
-                           }];
-    }
-
-    void LogRequestStart()
+    void LogRequestStart() override
     {
         mRequestTime = [NSDate date];
         // Generate a unique cookie to track this operation
@@ -186,7 +222,7 @@ public:
     }
 
     void MaybeDoAction(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-        const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error)
+        const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) override
     {
         // Make sure we don't hold on to our action longer than we have to.
         auto action = mAction;
@@ -198,8 +234,8 @@ public:
 
         CHIP_ERROR err = action(*exchangeManager, session.Value(), mSuccess, mFailure, this);
         if (err != CHIP_NO_ERROR) {
-            NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
-                chip::ErrorStr(err));
+            ChipLogError(Controller, "Failure performing action. C++-mangled success callback type: '%s', error: %s",
+                typeid(T).name(), chip::ErrorStr(err));
 
             // Take the normal async error-reporting codepath.  This will also
             // handle cleaning us up properly.
@@ -209,34 +245,12 @@ public:
 
     virtual ~MTRCallbackBridge() {};
 
+protected:
     static void OnFailureFn(void * context, CHIP_ERROR error) { DispatchFailure(context, [MTRError errorForCHIPErrorCode:error]); }
 
     static void DispatchSuccess(void * context, id _Nullable value) { DispatchCallbackResult(context, nil, value); }
 
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
-
-protected:
-    // OnDone and KeepAliveOnCallback really only make sense for subscription
-    // bridges, but we put them here to avoid many copies of this code in
-    // generated bits.
-    void OnDone()
-    {
-        if (!mQueue) {
-            delete this;
-            return;
-        }
-
-        // Delete ourselves async, so that any error/data reports we
-        // queued up before getting OnDone have a chance to run.
-        auto * self = this;
-        dispatch_async(mQueue, ^{
-            delete self;
-        });
-    }
-
-    void KeepAliveOnCallback() { mKeepAlive = true; }
-
-    dispatch_queue_t mQueue;
 
 private:
     static void DispatchCallbackResult(void * context, NSError * _Nullable error, id _Nullable value)
@@ -266,7 +280,9 @@ private:
 
     MTRResponseHandler mHandler;
     MTRActionBlock _Nullable mAction;
-    bool mKeepAlive = false;
+    // Keep our subclasses from accessing mKeepAlive directly, by putting this
+    // "using" in our private section.
+    using MTRCallbackBridgeBase::mKeepAlive;
 
     T mSuccess;
     MTRErrorCallback mFailure;
