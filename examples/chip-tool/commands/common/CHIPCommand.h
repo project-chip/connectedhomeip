@@ -144,7 +144,7 @@ protected:
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
-    CHIP_ERROR GetCommissionerNodeId(std::string identity, chip::NodeId * nodeId);
+    CHIP_ERROR GetIdentityNodeId(std::string identity, chip::NodeId * nodeId);
     void SetIdentity(const char * name);
 
     // This method returns the commissioner instance to be used for running the command.

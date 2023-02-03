@@ -18,6 +18,7 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
@@ -29,6 +30,19 @@ if (chip_enable_openthread) {
 
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
+}
+
+config("efr32-platform-wifi-config") {
+  include_dirs = [ "wifi" ]
+  defines = []
+
+  if (use_rs911x && use_rs911x_sockets) {
+    include_dirs += [ "wifi/rsi-sockets" ]
+    defines += [
+      "RS911X_SOCKETS",
+      "RSI_IPV6_ENABLE",
+    ]
+  }
 }
 
 static_library("EFR32") {
@@ -110,6 +124,21 @@ static_library("EFR32") {
       "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
+      "wifi/wfx_host_events.h",
+      "wifi/wfx_msgs.h",
+      "wifi/wifi_config.h",
     ]
+
+    if (use_wf200 || !use_rs911x_sockets) {
+      sources += [
+        "wifi/dhcp_client.cpp",
+        "wifi/dhcp_client.h",
+        "wifi/ethernetif.cpp",
+        "wifi/ethernetif.h",
+        "wifi/lwip_netif.cpp",
+      ]
+    }
+
+    public_configs = [ ":efr32-platform-wifi-config" ]
   }
 }

@@ -157,8 +157,6 @@ tests:
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
-      response:
-          error: 0x00
 
     - label: "TH sends the unlock Door command to the DUT with valid PINCode"
       PICS: DRLK.S.C01.Rsp

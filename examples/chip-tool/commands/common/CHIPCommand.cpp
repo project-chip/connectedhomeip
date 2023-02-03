@@ -178,7 +178,7 @@ void CHIPCommand::MaybeTearDownStack()
 CHIP_ERROR CHIPCommand::EnsureCommissionerForIdentity(std::string identity)
 {
     chip::NodeId nodeId;
-    ReturnErrorOnFailure(GetCommissionerNodeId(identity, &nodeId));
+    ReturnErrorOnFailure(GetIdentityNodeId(identity, &nodeId));
     CommissionerIdentity lookupKey{ identity, nodeId };
     if (mCommissioners.find(lookupKey) != mCommissioners.end())
     {
@@ -310,7 +310,7 @@ std::string CHIPCommand::GetIdentity()
     return name;
 }
 
-CHIP_ERROR CHIPCommand::GetCommissionerNodeId(std::string identity, chip::NodeId * nodeId)
+CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * nodeId)
 {
     if (mCommissionerNodeId.HasValue())
     {
@@ -374,7 +374,7 @@ chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(std::string 
     VerifyOrDie(EnsureCommissionerForIdentity(identity) == CHIP_NO_ERROR);
 
     chip::NodeId nodeId;
-    VerifyOrDie(GetCommissionerNodeId(identity, &nodeId) == CHIP_NO_ERROR);
+    VerifyOrDie(GetIdentityNodeId(identity, &nodeId) == CHIP_NO_ERROR);
     CommissionerIdentity lookupKey{ identity, nodeId };
     auto item = mCommissioners.find(lookupKey);
     VerifyOrDie(item != mCommissioners.end());

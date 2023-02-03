@@ -76,6 +76,15 @@ tests:
       response:
           saveAs: th2FabricIndex
 
+    - label: "Read the commissioner node ID from the alpha fabric"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdAlpha
+
     - label: "TH1 writes ACL giving view privilege for descriptor cluster"
       command: "writeAttribute"
       attribute: "ACL"
@@ -85,7 +94,7 @@ tests:
                       FabricIndex: th1FabricIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets:
                           [{ Cluster: 0x001f, Endpoint: 0, DeviceType: null }],
                   },
@@ -99,6 +108,15 @@ tests:
                   },
               ]
 
+    - label: "Read the commissioner node ID from the beta fabric"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdBeta
+
     - label: "TH2 writes ACL giving view privilge for basic cluster"
       identity: beta
       command: "writeAttribute"
@@ -109,7 +127,7 @@ tests:
                       FabricIndex: th2FabricIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdBeta],
                       Targets:
                           [{ Cluster: 0x001f, Endpoint: 0, DeviceType: null }],
                   },
@@ -158,7 +176,7 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [commissionerNodeId],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
               ]

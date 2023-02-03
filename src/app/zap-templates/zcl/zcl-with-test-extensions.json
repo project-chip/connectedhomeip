@@ -93,6 +93,7 @@
         "lo-devices.xml",
         "zll-devices.xml",
         "types/color-control.xml",
+        "types/door-lock.xml",
         "types/occupancy-sensing.xml",
         "types/thermostat-user-interface-configuration.xml"
     ],

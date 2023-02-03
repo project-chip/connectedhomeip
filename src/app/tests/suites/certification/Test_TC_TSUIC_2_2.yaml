@@ -53,7 +53,7 @@ tests:
       PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "TemperatureDisplayMode"
-      arguments:
+      response:
           value: 0
 
     - label: "Writes a value of 1 to TemperatureDisplayMode attribute of DUT"

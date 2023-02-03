@@ -36,6 +36,9 @@ public:
     CHIP_ERROR PairWithCode(const char * identity,
                             const chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type & value);
     CHIP_ERROR Unpair(const char * identity, const chip::app::Clusters::CommissionerCommands::Commands::Unpair::Type & value);
+    CHIP_ERROR
+    GetCommissionerNodeId(const char * identity,
+                          const chip::app::Clusters::CommissionerCommands::Commands::GetCommissionerNodeId::Type & value);
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;

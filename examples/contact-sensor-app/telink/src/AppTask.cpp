@@ -25,8 +25,7 @@
 #include "ThreadUtil.h"
 
 #include <DeviceInfoProviderImpl.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -357,8 +356,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     ChipLogProgress(NotSpecified, "emberAfWriteAttribute : %d", newValue);
 
     // write the new boolean state value
-    EmberAfStatus status = emberAfWriteAttribute(1, Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *) &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating boolean status value %x", status);
@@ -581,7 +579,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     bool stateValueAttrValue = 0;
 
     /* get boolean state attribute value */
-    (void) emberAfReadAttribute(1, Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *) &stateValueAttrValue, 1);
+    (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
 
     ChipLogProgress(NotSpecified, "emberAfReadAttribute : %d", stateValueAttrValue);
     sContactSensorLED.Set(stateValueAttrValue);
