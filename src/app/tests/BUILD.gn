@@ -81,8 +81,9 @@ source_set("ota-requestor-test-srcs") {
 
 source_set("scenes-table-test-srcs") {
   sources = [
-    "${chip_root}/src/app/clusters/scenes/ExtensionFieldsSets.cpp",
     "${chip_root}/src/app/clusters/scenes/ExtensionFieldsSets.h",
+    "${chip_root}/src/app/clusters/scenes/ExtensionFieldsSetsImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes/ExtensionFieldsSetsImpl.h",
     "${chip_root}/src/app/clusters/scenes/SceneTable.h",
     "${chip_root}/src/app/clusters/scenes/SceneTableImpl.cpp",
     "${chip_root}/src/app/clusters/scenes/SceneTableImpl.h",
@@ -93,7 +94,6 @@ source_set("scenes-table-test-srcs") {
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
-  defines = [ "SCENES_TESTING_CONFIGURATION=1" ]
 }
 
 chip_test_suite("tests") {

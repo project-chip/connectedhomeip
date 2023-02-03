@@ -403,6 +403,115 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index
     return CHIP_NO_ERROR;
 }
 
+/// @brief Registers handle to get extension fields set for a specific cluster. If the handler is already present in the handler
+/// array, it will be overwritten
+/// @param ID ID of the cluster used to fill the extension fields set
+/// @param get_function pointer to function to call to get the extension fiels set from the cluster
+/// @param set_function pointer to function to call send an extension field to the cluster
+/// @return CHIP_ERROR_BUFFER_TO_SMALL if couldn't insert the handler, otherwise CHIP_NO_ERROR
+CHIP_ERROR DefaultSceneTableImpl::registerHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function)
+{
+    uint8_t idPosition = 0xff, fisrtEmptyPosition = 0xff;
+    for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+    {
+        if (this->handlers[i].getID() == ID)
+        {
+            idPosition = i;
+            break;
+        }
+        if (!this->handlers[i].isInitialized() && fisrtEmptyPosition == 0xff)
+        {
+            fisrtEmptyPosition = i;
+        }
+    }
+
+    // if found, insert at found position, otherwise at first free possition, otherwise return error
+    if (idPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+    {
+        this->handlers[idPosition].initSceneHandler(ID, get_function, set_function);
+        return CHIP_NO_ERROR;
+    }
+    else if (fisrtEmptyPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+    {
+        this->handlers[fisrtEmptyPosition].initSceneHandler(ID, get_function, set_function);
+        this->handlerNum++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    return CHIP_ERROR_BUFFER_TOO_SMALL;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::unregisterHandler(uint8_t position)
+{
+    if (!handlerListEmpty())
+    {
+        if (position < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+        {
+            if (this->handlers[position].isInitialized())
+            {
+                this->handlers[position].clearSceneHandler();
+                this->handlerNum--;
+            }
+        }
+        else
+        {
+            return CHIP_ERROR_ACCESS_DENIED;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::EFSValuesFromCluster(ExtensionFieldsSetsImpl & fieldSets)
+{
+    ExtensionFieldsSet EFS;
+    if (!this->handlerListEmpty())
+    {
+        for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+        {
+            if (this->handlers[i].isInitialized())
+            {
+                ReturnErrorOnFailure(this->handlers[i].getClusterEFS(EFS));
+                ReturnErrorOnFailure(fieldSets.insertField(EFS));
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::EFSValuesToCluster(ExtensionFieldsSetsImpl & fieldSets)
+{
+    ExtensionFieldsSet EFS;
+    if (!this->handlerListEmpty())
+    {
+        for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+        {
+            fieldSets.getFieldAtPosition(EFS, i);
+
+            if (!EFS.is_empty())
+            {
+                if (!this->handlerListEmpty())
+                {
+                    for (uint8_t j = 0; j < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; j++)
+                    {
+                        if (EFS.ID == this->handlers[j].getID())
+                        {
+                            ReturnErrorOnFailure(this->handlers[j].setClusterEFS(EFS));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
     FabricSceneData fabric(fabric_index);
