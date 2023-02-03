@@ -51,6 +51,8 @@ group("efr32_sdk") {
 if (use_silabs_thread_lib) {
   config("libopenthread-platform_config") {
     include_dirs = [ "${sl_openthread_root}/examples/platforms" ]
+
+    defines = [ "SL_CONFIG_OPENTHREAD_LIB=1" ]
   }
 
   copy("copy_openthread_system") {

@@ -57,6 +57,7 @@ source_set("libopenthread-efr32") {
     "${openthread_efr32_root}/crypto.c",
     "${openthread_efr32_root}/entropy.c",
     "${openthread_efr32_root}/flash.c",
+    "${openthread_efr32_root}/ieee802154-packet-utils.cpp",
     "${openthread_efr32_root}/misc.c",
     "${openthread_efr32_root}/radio.c",
     "${openthread_efr32_root}/sleep.c",
