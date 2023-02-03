@@ -23,10 +23,17 @@
 #include "LEDWidget.h"
 #include "ScreenManager.h"
 #include "driver/gpio.h"
+#include "esp_idf_version.h"
 #include "esp_log.h"
-#include "esp_spi_flash.h"
 #include "freertos/FreeRTOS.h"
 #include <app/server/OnboardingCodesUtil.h>
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "esp_spi_flash.h"
+#else
+#include "esp_chip_info.h"
+#include "esp_flash.h"
+#endif
 
 #define APP_TASK_NAME "APP"
 #define APP_EVENT_QUEUE_SIZE 10
@@ -63,10 +70,20 @@ CHIP_ERROR AppTask::Init()
     /* Print chip information */
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
+    uint32_t flash_size = 0;
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+    flash_size = spi_flash_get_chip_size();
+#else
+    if (esp_flash_get_size(NULL, &flash_size) != ESP_OK)
+    {
+        ESP_LOGW(TAG, "Failed to get flash size");
+    }
+#endif
     ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
              (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
     ESP_LOGI(TAG, "silicon revision %d, ", chip_info.revision);
-    ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
+    ESP_LOGI(TAG, "%" PRIu32 " MB %s flash\n", flash_size / (1024 * 1024),
              (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
