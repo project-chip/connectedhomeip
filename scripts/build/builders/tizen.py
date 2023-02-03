@@ -20,9 +20,16 @@ from xml.etree import ElementTree as ET
 
 from .gn import GnBuilder
 
+Board = namedtuple('Board', ['target_cpu'])
 App = namedtuple('App', ['name', 'source', 'outputs'])
 Tool = namedtuple('Tool', ['name', 'source', 'outputs'])
-Board = namedtuple('Board', ['target_cpu'])
+TestDriver = namedtuple('TestDriver', ['name', 'source'])
+
+
+class TizenBoard(Enum):
+
+    ARM = Board('arm')
+    QEMU = Board('arm')
 
 
 class TizenApp(Enum):
@@ -49,6 +56,10 @@ class TizenApp(Enum):
         ('chip-tool',
          'chip-tool.map'))
 
+    TESTS = TestDriver(
+        'tests',
+        'src/test_driver/tizen')
+
     @property
     def is_tpk(self):
         """If True, this app is a TPK."""
@@ -64,11 +75,6 @@ class TizenApp(Enum):
 
     def parse_manifest(self, manifest: str):
         self.manifest = ET.parse(manifest).getroot()
-
-
-class TizenBoard(Enum):
-
-    ARM = Board('arm')
 
 
 class TizenBuilder(GnBuilder):
