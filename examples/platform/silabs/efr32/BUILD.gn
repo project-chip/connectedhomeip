@@ -272,7 +272,7 @@ source_set("efr32-common") {
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
+    sources += [ "MemMonitoring.cpp" ]
   }
 
   # OpenThread Settings
@@ -302,7 +302,7 @@ source_set("efr32-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ "${examples_plat_dir}:efr-matter-shell" ]
+    deps += [ ":efr-matter-shell" ]
   }
 
   # Attestation Credentials
