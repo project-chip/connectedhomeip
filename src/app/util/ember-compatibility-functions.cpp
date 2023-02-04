@@ -385,7 +385,7 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
                 // We are relying on GlobalAttributesNotInMetadata not having
                 // any gaps in their ids here.
                 static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata) - 1,
-                              "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
+                              "Ids in GlobalAttributesNotInMetadata not consecutive");
                 if (!addedExtraGlobals && id > lastGlobalId)
                 {
                     for (const auto & globalId : GlobalAttributesNotInMetadata)
