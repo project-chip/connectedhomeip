@@ -413,7 +413,6 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             }
             return CHIP_NO_ERROR;
         });
-        return CHIP_NO_ERROR;
     case AcceptedCommandList::Id:
         return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateAcceptedCommands,
                                  mCluster->acceptedCommandList);
