@@ -394,7 +394,7 @@ private:
         // Whenever a StartUp event is received, reset the estimated start time
         MTREventPath * eventPath = eventDict[MTREventPathKey];
         BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
-            && (eventPath.event.unsignedLongValue == MTRClusterBasicEventStartUpID);
+            && (eventPath.event.unsignedLongValue == MTREventIDTypeClusterBasicInformationEventStartUpID);
         if (isStartUpEvent) {
             _estimatedStartTime = nil;
         }
