@@ -82,7 +82,7 @@ GENERATED_FUNCTION_ARRAYS
 constexpr const chip::CommandId generatedCommands[] = GENERATED_COMMANDS;
 #endif // GENERATED_COMMANDS
 
-#ifdef GENERATED_EVENTS
+#if (defined(GENERATED_EVENTS) && (GENERATED_EVENT_COUNT > 0))
 constexpr const chip::EventId generatedEvents[] = GENERATED_EVENTS;
 #endif // GENERATED_EVENTS
 
