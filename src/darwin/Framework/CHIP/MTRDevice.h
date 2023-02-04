@@ -211,9 +211,11 @@ extern NSString * const MTREventTimestampDateKey MTR_NEWLY_AVAILABLE;
  * these keys:
  *
  *                MTREventNumberKey : NSNumber-wrapped uint64_t value. Monotonically increasing, but consecutive events may not have
- * consecutive numbers. MTREventPriorityKey : NSNumber-wrapped MTREventPriority value. MTREventTimeTypeKey : NSNumber-wrapped
- * MTREventTimeType value. MTREventSystemUpTimeKey : NSNumber-wrapped NSTimeInterval value. MTREventTimestampDateKey : NSDate
- * object.
+ * consecutive numbers.
+ *                MTREventPriorityKey : NSNumber-wrapped MTREventPriority value.
+ *                MTREventTimeTypeKey : NSNumber-wrapped MTREventTimeType value.
+ *                MTREventSystemUpTimeKey : NSNumber-wrapped NSTimeInterval value.
+ *                MTREventTimestampDateKey : NSDate object.
  *
  *                Only one of MTREventTimestampDateKey and MTREventSystemUpTimeKey will be present, depending on the value for
  * MTREventTimeTypeKey.
