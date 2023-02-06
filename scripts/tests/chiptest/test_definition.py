@@ -19,7 +19,7 @@ import sys
 import threading
 import time
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
 from random import randrange
@@ -210,15 +210,48 @@ class ExecutionCapture:
         logging.error('================ CAPTURED LOG END ====================')
 
 
+class TestTag(Enum):
+    MANUAL = auto()          # requires manual input. Generally not run automatically
+    SLOW = auto()            # test uses Sleep and is generally slow (>=10s is a typical threshold)
+    FLAKY = auto()           # test is considered flaky (usually a bug/time dependent issue)
+    IN_DEVELOPMENT = auto()  # test may not pass or undergoes changes
+
+    def to_s(self):
+        for (k, v) in TestTag.__members__.items():
+            if self == v:
+                return k
+        raise Exception("Unknown tag: %r" % self)
+
+
+class TestRunTime(Enum):
+    CHIP_TOOL_BUILTIN = auto()  # run via chip-tool built-in test commands
+    PYTHON_YAML = auto()       # use the python yaml test runner
+
+
 @dataclass
 class TestDefinition:
     name: str
     run_name: str
     target: TestTarget
-    is_manual: bool
-    use_chip_repl_yaml_tester: bool = False
+    tags: typing.Set[TestTag] = field(default_factory=set)
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int], dry_run=False):
+    @property
+    def is_manual(self) -> bool:
+        return TestTag.MANUAL in self.tags
+
+    @property
+    def is_slow(self) -> bool:
+        return TestTag.SLOW in self.tags
+
+    @property
+    def is_flaky(self) -> bool:
+        return TestTag.FLAKY in self.tags
+
+    def tags_str(self) -> str:
+        """Get a human readable list of tags applied to this test"""
+        return ", ".join([t.to_s() for t in self.tags])
+
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int], dry_run=False, test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_BUILTIN):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -280,7 +313,7 @@ class TestDefinition:
             if dry_run:
                 logging.info(" ".join(pairing_cmd))
                 logging.info(" ".join(test_cmd))
-            elif self.use_chip_repl_yaml_tester:
+            elif test_runtime == TestRunTime.PYTHON_YAML:
                 chip_repl_yaml_tester_cmd = paths.chip_repl_yaml_tester_cmd
                 python_cmd = chip_repl_yaml_tester_cmd + \
                     ['--setup-code', app.setupCode] + ['--yaml-path', self.run_name] + ["--pics-file", pics_file]
