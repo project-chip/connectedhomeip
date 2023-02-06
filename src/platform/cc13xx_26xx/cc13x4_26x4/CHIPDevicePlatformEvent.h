@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Texas Instruments Incorporated
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,28 +16,26 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *          Defines platform-specific event types and data for the chip
+ *          for the Texas Instruments CC1352 platform.
+ *
+ * NOTE: currently a bare-bones implementation to allow for building.
+ */
+
 #pragma once
 
-#include <platform/internal/GenericDeviceNetworkProvisioningDelegateImpl.h>
+#include <platform/CHIPDeviceEvent.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-
-template <class ImplClass>
-class GenericDeviceNetworkProvisioningDelegateImpl;
-
-} // namespace Internal
-
-class DeviceNetworkProvisioningDelegateImpl final
-    : public Internal::GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>
+/**
+ * Represents platform-specific event information
+ */
+struct ChipDevicePlatformEvent final
 {
-    friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
-
-private:
-    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _ProvisionThreadNetwork(ByteSpan threadData);
 };
 
 } // namespace DeviceLayer

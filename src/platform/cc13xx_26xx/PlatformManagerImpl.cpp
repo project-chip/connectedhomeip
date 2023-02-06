@@ -27,7 +27,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
-#include <platform/cc13x2_26x2/DiagnosticDataProviderImpl.h>
+#include <platform/cc13xx_26xx/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
@@ -64,7 +64,7 @@ static int app_get_random(uint8_t * aOutput, size_t aLen)
     rtn = TRNG_generateEntropy(TRNG_handle_app, &entropyKey);
     if (rtn != TRNG_STATUS_SUCCESS)
     {
-        while (1)
+        while (true)
             ;
     }
     return 0;
@@ -84,7 +84,7 @@ static void app_random_init(void)
     TRNG_handle_app = TRNG_open(CONFIG_TRNG_APP, &TRNGParams);
     if (TRNG_handle_app == NULL)
     {
-        while (1)
+        while (true)
             ;
     }
 
@@ -105,7 +105,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     // Initialize the configuration system.
-    err = Internal::CC13X2_26X2Config::Init();
+    err = Internal::CC13XX_26XXConfig::Init();
     SuccessOrExit(err);
 
     // DMM Addition

@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,30 +16,25 @@
  *    limitations under the License.
  */
 
-#include "DeviceNetworkProvisioningDelegateImpl.h"
+/**
+ *    @file
+ *          Platform-specific configuration overrides for the CHIP System
+ *          Layer
+ *
+ */
 
-#if CHIP_ENABLE_OPENTHREAD
-#include <platform/ThreadStackManager.h>
-#endif
+#pragma once
+
+#include <stdint.h>
 
 namespace chip {
 namespace DeviceLayer {
-
-CHIP_ERROR
-DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(ByteSpan threadData)
-{
-#if CHIP_ENABLE_OPENTHREAD
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    SuccessOrExit(error = ThreadStackMgr().SetThreadEnabled(false));
-    SuccessOrExit(error = ThreadStackMgr().SetThreadProvision(threadData));
-    SuccessOrExit(error = ThreadStackMgr().SetThreadEnabled(true));
-exit:
-    return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_OPENTHREAD
-}
-
+struct ChipDeviceEvent;
 } // namespace DeviceLayer
 } // namespace chip
+
+// ==================== Platform Adaptations ====================
+#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
+#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
+
+// ========== Platform-specific Configuration Overrides =========

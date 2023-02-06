@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Source implementation of an input / output stream for cc13x2_26x2 targets
+ *      Source implementation of an input / output stream for cc13xx_26xx targets
  */
 
 #include "streamer.h"
@@ -37,13 +37,13 @@ namespace Shell {
 
 UART2_Handle sStreamUartHandle = NULL;
 
-#if !MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED
-extern "C" int cc13x2_26x2LogInit(void)
+#if !MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED
+extern "C" int cc13xx_26xxLogInit(void)
 {
     return 0;
 }
 
-extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
+extern "C" void cc13xx_26xxVLog(const char * msg, va_list v)
 {
     if (NULL != sStreamUartHandle)
     {
@@ -62,9 +62,9 @@ extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
         }
     }
 }
-#endif // !MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED
+#endif // !MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED
 
-int streamer_cc13x2_26x2_init(streamer_t * streamer)
+int streamer_cc13xx_26xx_init(streamer_t * streamer)
 {
     UART2_Params uartParams;
 
@@ -76,7 +76,7 @@ int streamer_cc13x2_26x2_init(streamer_t * streamer)
     return 0;
 }
 
-ssize_t streamer_cc13x2_26x2_read(streamer_t * streamer, char * buf, size_t len)
+ssize_t streamer_cc13xx_26xx_read(streamer_t * streamer, char * buf, size_t len)
 {
     (void) streamer;
     size_t ret;
@@ -86,13 +86,13 @@ ssize_t streamer_cc13x2_26x2_read(streamer_t * streamer, char * buf, size_t len)
     return ret;
 }
 
-ssize_t streamer_cc13x2_26x2_write(streamer_t * streamer, const char * buf, size_t len)
+ssize_t streamer_cc13xx_26xx_write(streamer_t * streamer, const char * buf, size_t len)
 {
     (void) streamer;
     return UART2_write(sStreamUartHandle, buf, len, NULL);
 }
 
-static streamer_t streamer_cc13x2_26x2 = {
+static streamer_t streamer_cc13xx_26xx = {
     .init_cb  = streamer_cc13x2_26x2_init,
     .read_cb  = streamer_cc13x2_26x2_read,
     .write_cb = streamer_cc13x2_26x2_write,
@@ -100,7 +100,7 @@ static streamer_t streamer_cc13x2_26x2 = {
 
 streamer_t * streamer_get()
 {
-    return &streamer_cc13x2_26x2;
+    return &streamer_cc13xx_26xx;
 }
 
 #endif //#ifndef SHELL_STREAMER_APP_SPECIFIC

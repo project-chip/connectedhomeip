@@ -13,19 +13,12 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/ti_simplelink_sdk.gni")
 
-# ARM architecture flags will be set based on Device Family
-arm_platform_config =
-    "${ti_simplelink_sdk_build_root}/ti_simplelink_arm_platform_config.gni"
+config("chip_examples_project_config") {
+  include_dirs = [ "project_include" ]
+}
 
-chip_device_platform = "cc13x2_26x2"
-
-mbedtls_target = "${chip_root}/third_party/ti_simplelink_sdk:mbedtls"
-openthread_external_mbedtls = mbedtls_target
-
-lwip_platform = "cc13x2_26x2"
-
-chip_inet_config_enable_ipv4 = false
-
-chip_build_tests = false
+source_set("openthread_core_config_cc13x4_26x4_chip_examples") {
+  sources = [ "project_include/OpenThreadConfig.h" ]
+  public_configs = [ ":chip_examples_project_config" ]
+}

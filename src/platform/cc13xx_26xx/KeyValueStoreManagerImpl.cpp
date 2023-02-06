@@ -28,7 +28,7 @@
 
 #include <platform/KeyValueStoreManager.h>
 
-#include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
+#include <platform/cc13xx_26xx/CC13XX_26XXConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -49,7 +49,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    err = CC13X2_26X2Config::ReadKVS(key, value, value_size, read_bytes_size, offset_bytes);
+    err = CC13XX_26XXConfig::ReadKVS(key, value, value_size, read_bytes_size, offset_bytes);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -62,12 +62,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
 
-    return CC13X2_26X2Config::WriteKVS(key, value, value_size);
+    return CC13XX_26XXConfig::WriteKVS(key, value, value_size);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    return CC13X2_26X2Config::ClearKVS(key);
+    return CC13XX_26XXConfig::ClearKVS(key);
 }
 
 } // namespace PersistedStorage

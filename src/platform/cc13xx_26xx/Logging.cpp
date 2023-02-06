@@ -18,8 +18,8 @@
 UART2_Handle sDebugUartHandle;
 char sDebugUartBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
-#if MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED
-extern "C" int cc13x2_26x2LogInit(void)
+#if MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED
+extern "C" int cc13xx_26xxLogInit(void)
 {
     UART2_Params uartParams;
 
@@ -31,9 +31,11 @@ extern "C" int cc13x2_26x2LogInit(void)
     return 0;
 }
 
-extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
+extern "C" void cc13xx_26xxVLog(const char * msg, va_list v)
 {
     int ret;
+
+    size_t bytesWritten = 0;
 
     ret = vsnprintf(sDebugUartBuffer, sizeof(sDebugUartBuffer), msg, v);
     if (0 < ret)
@@ -43,17 +45,17 @@ extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
         sDebugUartBuffer[len - 2] = '\r';
         sDebugUartBuffer[len - 1] = '\n';
 
-        UART2_write(sDebugUartHandle, sDebugUartBuffer, len, NULL);
+        UART2_write(sDebugUartHandle, sDebugUartBuffer, len, &bytesWritten);
     }
 }
 
 #else
 
 /* log functins defined somewhere else */
-extern "C" int cc13x2_26x2LogInit(void);
-extern "C" void cc13x2_26x2VLog(const char * msg, va_list v);
+extern "C" int cc13xx_26xxLogInit(void);
+extern "C" void cc13xx_26xxVLog(const char * msg, va_list v);
 
-#endif // MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED
+#endif // MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED
 
 namespace chip {
 namespace DeviceLayer {
@@ -77,7 +79,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     (void) module;
     (void) category;
 
-    cc13x2_26x2VLog(msg, v);
+    cc13xx_26xxVLog(msg, v);
 
     chip::DeviceLayer::OnLogOutput();
 }
@@ -96,7 +98,7 @@ extern "C" void LwIPLog(const char * msg, ...)
 
     va_start(v, msg);
 
-    cc13x2_26x2VLog(msg, v);
+    cc13xx_26xxVLog(msg, v);
 
     chip::DeviceLayer::OnLogOutput();
     va_end(v);
@@ -106,13 +108,13 @@ extern "C" void LwIPLog(const char * msg, ...)
 /**
  * Platform log output function.
  */
-extern "C" void cc13x2_26x2Log(const char * msg, ...)
+extern "C" void cc13xx_26xxLog(const char * msg, ...)
 {
     va_list v;
 
     va_start(v, msg);
 
-    cc13x2_26x2VLog(msg, v);
+    cc13xx_26xxVLog(msg, v);
 
     chip::DeviceLayer::OnLogOutput();
     va_end(v);
@@ -128,7 +130,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     va_start(v, aFormat);
 
-    cc13x2_26x2VLog(aFormat, v);
+    cc13xx_26xxVLog(aFormat, v);
 
     chip::DeviceLayer::OnLogOutput();
     va_end(v);

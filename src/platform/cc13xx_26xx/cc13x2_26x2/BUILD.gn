@@ -24,29 +24,27 @@ if (chip_enable_openthread) {
 
 static_library("cc13x2_26x2") {
   sources = [
-    "../FreeRTOS/SystemTimeSupport.cpp",
-    "../SingletonConfigurationManager.cpp",
-    "BlePlatformConfig.h",
-    "CC13X2_26X2Config.cpp",
-    "CC13X2_26X2Config.h",
-    "CHIPDevicePlatformConfig.h",
-    "CHIPDevicePlatformConfig.h",
-    "CHIPDevicePlatformEvent.h",
-    "ConfigurationManagerImpl.cpp",
-    "ConnectivityManagerImpl.cpp",
-    "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
-    "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
-    "InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
-    "PlatformManagerImpl.cpp",
-    "PlatformManagerImpl.h",
-    "Random.c",
-    "SystemPlatformConfig.h",
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
+    "../BlePlatformConfig.h",
+    "../CC13XX_26XXConfig.cpp",
+    "../CC13XX_26XXConfig.h",
+    "../CHIPDevicePlatformConfig.h",
+    "../CHIPDevicePlatformConfig.h",
+    "../CHIPDevicePlatformEvent.h",
+    "../ConfigurationManagerImpl.cpp",
+    "../ConnectivityManagerImpl.cpp",
+    "../ConnectivityManagerImpl.h",
+    "../DiagnosticDataProviderImpl.cpp",
+    "../DiagnosticDataProviderImpl.h",
+    "../InetPlatformConfig.h",
+    "../KeyValueStoreManagerImpl.cpp",
+    "../KeyValueStoreManagerImpl.h",
+    "../Logging.cpp",
+    "../PlatformManagerImpl.cpp",
+    "../PlatformManagerImpl.h",
+    "../Random.c",
+    "../SystemPlatformConfig.h",
   ]
 
   deps = []
@@ -60,8 +58,8 @@ static_library("cc13x2_26x2") {
 
   if (chip_enable_ble) {
     sources += [
-      "BLEManagerImpl.cpp",
-      "BLEManagerImpl.h",
+      "../BLEManagerImpl.cpp",
+      "../BLEManagerImpl.h",
     ]
   }
 
@@ -70,8 +68,8 @@ static_library("cc13x2_26x2") {
       # this needs to be in the final link to place the data correctly
       # see ${chip_root}/third_party/ti_simplelink_sdk/ti_simplelink_executable.gni
       #"oad_image_header.c",
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
+      "../OTAImageProcessorImpl.cpp",
+      "../OTAImageProcessorImpl.h",
     ]
   }
 
@@ -80,10 +78,10 @@ static_library("cc13x2_26x2") {
     import("//build_overrides/ti_simplelink_sdk.gni")
     import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
     public_deps += [
-      "${chip_root}/third_party/openthread/platforms/cc13x2_26x2:libopenthread-cc13x2_cc26x2",
       "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+      "${chip_root}/third_party/openthread/platforms/cc13x2_26x2:libopenthread-cc13x2_cc26x2",
     ]
 
     if (chip_openthread_ftd) {
@@ -95,13 +93,13 @@ static_library("cc13x2_26x2") {
     }
 
     sources += [
-      "../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
-      "ThreadStackManagerImpl.h",
+      "../../OpenThread/OpenThreadUtils.cpp",
+      "../ThreadStackManagerImpl.cpp",
+      "../ThreadStackManagerImpl.h",
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../OpenThread/DnssdImpl.cpp" ]
+      sources += [ "../../OpenThread/DnssdImpl.cpp" ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }

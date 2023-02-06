@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
+#include <platform/cc13xx_26xx/CC13XX_26XXConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 namespace chip {
@@ -33,7 +33,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the CC13X2_26X2 platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::CC13X2_26X2Config>
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::CC13XX_26XXConfig>
 {
 public:
     // This returns an instance of this class.

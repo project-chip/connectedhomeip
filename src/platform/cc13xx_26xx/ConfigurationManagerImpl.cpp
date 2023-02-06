@@ -30,7 +30,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
+#include <platform/cc13xx_26xx/CC13XX_26XXConfig.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -65,7 +65,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<CC13X2_26X2Config>::Init();
+    err = Internal::GenericConfigurationManagerImpl<CC13XX_26XXConfig>::Init();
     SuccessOrExit(err);
 
     IncreaseBootCount();
@@ -86,7 +86,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return ReadConfigValue(CC13X2_26X2Config::kConfigKey_BootCount, rebootCount);
+    return ReadConfigValue(CC13XX_26XXConfig::kConfigKey_BootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
@@ -94,11 +94,11 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
     CHIP_ERROR ret;
     uint32_t bootCount = 0;
 
-    ret = ReadConfigValue(CC13X2_26X2Config::kConfigKey_BootCount, bootCount);
+    ret = ReadConfigValue(CC13XX_26XXConfig::kConfigKey_BootCount, bootCount);
 
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == ret || CHIP_NO_ERROR == ret)
     {
-        ret = WriteConfigValue(CC13X2_26X2Config::kConfigKey_BootCount, bootCount + 1);
+        ret = WriteConfigValue(CC13XX_26XXConfig::kConfigKey_BootCount, bootCount + 1);
     }
 
     return ret;
@@ -108,7 +108,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOp
 {
     CHIP_ERROR ret;
 
-    ret = ReadConfigValue(CC13X2_26X2Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
+    ret = ReadConfigValue(CC13XX_26XXConfig::kConfigKey_TotalOperationalHours, totalOperationalHours);
 
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == ret)
     {
@@ -121,12 +121,12 @@ CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOp
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return WriteConfigValue(CC13X2_26X2Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
+    return WriteConfigValue(CC13XX_26XXConfig::kConfigKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    CC13X2_26X2Config::Key configKey{ { CC13X2_26X2Config::kCC13X2_26X2ChipCounters_Sysid, key } };
+    CC13XX_26XXConfig::Key configKey{ { CC13XX_26XXConfig::kCC13XX_26XXMatter_SysID, key } };
 
     CHIP_ERROR err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -138,68 +138,68 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    CC13X2_26X2Config::Key configKey{ { CC13X2_26X2Config::kCC13X2_26X2ChipCounters_Sysid, key } };
+    CC13XX_26XXConfig::Key configKey{ { CC13XX_26XXConfig::kCC13XX_26XXMatter_SysID, key } };
     return WriteConfigValue(configKey, value);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
-    return CC13X2_26X2Config::ReadConfigValue(key, val);
+    return CC13XX_26XXConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
-    return CC13X2_26X2Config::ReadConfigValue(key, val);
+    return CC13XX_26XXConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
-    return CC13X2_26X2Config::ReadConfigValue(key, val);
+    return CC13XX_26XXConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return CC13X2_26X2Config::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return CC13XX_26XXConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return CC13X2_26X2Config::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return CC13XX_26XXConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
-    return CC13X2_26X2Config::WriteConfigValue(key, val);
+    return CC13XX_26XXConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
-    return CC13X2_26X2Config::WriteConfigValue(key, val);
+    return CC13XX_26XXConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
-    return CC13X2_26X2Config::WriteConfigValue(key, val);
+    return CC13XX_26XXConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
-    return CC13X2_26X2Config::WriteConfigValueStr(key, str);
+    return CC13XX_26XXConfig::WriteConfigValueStr(key, str);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return CC13X2_26X2Config::WriteConfigValueStr(key, str, strLen);
+    return CC13XX_26XXConfig::WriteConfigValueStr(key, str, strLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return CC13X2_26X2Config::WriteConfigValueBin(key, data, dataLen);
+    return CC13XX_26XXConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
-    CC13X2_26X2Config::RunConfigUnitTest();
+    CC13XX_26XXConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -208,7 +208,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = CC13X2_26X2Config::FactoryResetConfig();
+    err = CC13XX_26XXConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));

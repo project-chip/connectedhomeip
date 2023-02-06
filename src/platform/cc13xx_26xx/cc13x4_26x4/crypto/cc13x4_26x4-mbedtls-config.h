@@ -18,14 +18,14 @@
 
 /*
  *
- * @file cc13x2_26x2-mbedtls-config.h.h
+ * @file cc13x4_26x4-mbedtls-config.h.h
  *
  * @brief MbedTLS configuration header for CHIP
  *
  */
 
-#ifndef CC13X2_26X2_MBEDTLS_CONFIG_H
-#define CC13X2_26X2_MBEDTLS_CONFIG_H
+#ifndef CC13X4_26X4_MBEDTLS_CONFIG_H
+#define CC13X4_26X4_MBEDTLS_CONFIG_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,10 +42,10 @@
 //#define MBEDTLS_AES_ALT
 //#define MBEDTLS_ECDH_COMPUTE_SHARED_ALT
 //#define MBEDTLS_ECDH_GEN_PUBLIC_ALT
-#define MBEDTLS_ECDSA_SIGN_ALT
-#define MBEDTLS_ECDSA_VERIFY_ALT
-#define MBEDTLS_ENTROPY_HARDWARE_ALT
-#define MBEDTLS_SHA256_ALT
+//#define MBEDTLS_ECDSA_SIGN_ALT
+//#define MBEDTLS_ECDSA_VERIFY_ALT
+//#define MBEDTLS_ENTROPY_HARDWARE_ALT
+//#define MBEDTLS_SHA256_ALT
 
 // Thread Joining disabled
 //#define MBEDTLS_ECJPAKE_ALT
@@ -117,6 +117,7 @@
 #define MBEDTLS_X509_CRT_PARSE_C
 #define MBEDTLS_PKCS5_C
 
+
 #define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
 #define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
 #define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
@@ -132,4 +133,4 @@
 
 #include "mbedtls/check_config.h"
 
-#endif // CC13X2_26X2_MBEDTLS_CONFIG_H
+#endif // CC13X4_26X4_MBEDTLS_CONFIG_H
