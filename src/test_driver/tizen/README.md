@@ -1,88 +1,61 @@
 # CHIP Tests on QEMU
 
-An application that runs CHIP's unit tests on QEMU.
+Tizen runs mostly on ARM architecture. In order to run tests on Tizen, we need
+to use QEMU. This document describes how to build and run CHIP tests on QEMU.
 
----
+## Obtaining Tizen QEMU Docker Image
 
-- [CHIP Tests on QEMU](#chip-tests-on-qemu)
-  - [Building the Docker Image](#building-the-docker-image)
-    - [Run the Docker Image](#run-the-docker-image)
-      - [Clone connectedhomeip repository](#clone-connectedhomeip-repository)
-    - [Building the Application](#building-the-application)
-    - [Run tests using qemu](#run-tests-using-qemu)
-
----
-
-## Building the Docker Image
-
-Building and testing the application requires the use of tizen SDK. The easiest
-way is doing this in a dedicated Tizen docker container. In order to build tizen-qemu
-docker image, use this command in the root of the project directory:
+All tools and dependencies required to build and run tests on Tizen on QEMU are
+included in the `chip-build-tizen-qemu` docker image. One can pull the docker
+image from hub.docker.com or build it locally using the provided Dockerfile in
+`integrations/docker/images/chip-build-tizen-qemu` directory.
 
 ```sh
-./integrations/docker/images/chip-build-tizen-qemu/build.sh
+# Pull the image from hub.docker.com
+docker pull connectedhomeip/chip-build-tizen-qemu:latest
 ```
 
-### Run the Docker Image
+## Building and Running Tests on QEMU
 
-Best way is to do every next step inside a docker container. Run and go to
-container you can use this command.
+All steps described below should be done inside the docker container.
 
 ```sh
-docker run -it --rm --name tizen-qemu \
+docker run -it --rm --name chip-tizen-qemu \
     connectedhomeip/chip-build-tizen-qemu:latest /bin/bash
 ```
 
-Optional you can mount your local repository in the container. This will allow you
-to edit files on your host machine and build them inside the container. To do this
-use this command instead of the previous one:
-
-```sh
-docker run -it --rm --name tizen-qemu -v "$PWD":/home/tizen/connectedhomeip \
-    connectedhomeip/chip-build-tizen-qemu:latest /bin/bash
-```
-
-#### Clone connectedhomeip repository
-
-You can skip this step if you use docker with mount volume.
+### Clone the connectedhomeip repository
 
 ```sh
 git clone https://github.com/project-chip/connectedhomeip.git
 ```
 
-### Building the Application
-
-All these steps should be done inside the docker container.
-
-Activate the environment:
+### Activate the environment
 
 ```sh
 cd connectedhomeip
 source scripts/activate.sh
 ```
 
-Build testing target application. Target list:
-tizen-arm-qemu-tests- | no-ble | enable-wifi | use-asan
+### Build application variants that you would like to test
 
 ```sh
-./scripts/build/build_examples.py --target tizen-arm-qemu-tests-no-ble --enable-flashbundle build
-```
-
-This test uses chip-tool, so you need build this target as well:
-
-```sh
+# Build chip-tool without BLE support (BLE is not supported on QEMU)
 ./scripts/build/build_examples.py --target tizen-arm-chip-tool-no-ble build
+# Build lighting-app without BLE and WiFi support
+./scripts/build/build_examples.py --target tizen-arm-light-no-ble-no-wifi \
+    --enable-flashbundle build
 ```
 
-### Run tests using qemu
-
-The default target in the runner script is set to tizen-arm-qemu-tests-no-ble. You
-can use the `--target` flag to set other target for your test. Also, you can set
-target for chip-tool using `--chip-tool-target`.
+### Generate and run test target
 
 ```sh
-./src/test_driver/tizen/run_qemu_test.py --verbose
+# Generate test target
+gn gen --check --fail-on-unused-args -root="$PWD/src/test_driver/tizen" --args="
+    target_os=\"tizen\" target_cpu=\"arm\"
+    tizen_chip_tool=\"$PWD/out/tizen-arm-chip-tool-no-ble/chip-tool\"
+    tizen_lighting_app_tpk=\"$PWD/out/tizen-arm-light-no-ble-no-wifi/package/out/org.tizen.matter.example.lighting-1.0.0.tpk\"
+" out/tizen-check
+# Run Time QEMU-based tests
+ninja -C out/tizen-check check
 ```
-
-The `--verbose` flag is optional. It will print the output of the test to the
-console.
