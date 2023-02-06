@@ -70,10 +70,10 @@ limitations under the License.
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
       <field id="0" name="SoftwareVersion" type="INT32U"/>
     </event>
-    <event side="server" code="0x01" name="ShutDown" priority="critical" optional="false">
+    <event side="server" code="0x01" name="ShutDown" priority="critical" optional="true">
       <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
     </event>
-    <event side="server" code="0x02" name="Leave" priority="info" optional="false">
+    <event side="server" code="0x02" name="Leave" priority="info" optional="true">
       <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
       <field id="0" name="FabricIndex" type="fabric_idx"/>
     </event>
