@@ -50,11 +50,11 @@ import("${silabs_common_plat_dir}/efr32/args.gni")
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
 assert(!(use_rs9116 && chip_enable_openthread))
-assert(!(use_rs9117 && chip_enable_openthread))
+assert(!(use_SiWx917 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 
 if (chip_enable_wifi) {
-  assert(use_rs9116 || use_wf200 || use_rs9117)
+  assert(use_rs9116 || use_wf200 || use_SiWx917)
   enable_openthread_cli = false
   import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
@@ -62,7 +62,7 @@ if (chip_enable_wifi) {
     wiseconnect_sdk_root =
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
     import("rs911x/rs911x.gni")
-  } else if (use_rs9117) {
+  } else if (use_SiWx917) {
     wisemcu_sdk_root =
         "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
     import("rs911x/rs9117.gni")
@@ -297,7 +297,7 @@ source_set("efr32-common") {
 
       #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
       cflags = rs911x_cflags
-    } else if (use_rs9117){
+    } else if (use_SiWx917){
       sources += rs911x_src_plat
 
       # All the stuff from wiseconnect

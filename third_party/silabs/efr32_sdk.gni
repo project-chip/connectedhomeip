@@ -201,7 +201,7 @@ template("efr32_sdk") {
           "RSI_SPI_INTERFACE",
           "RSI_WITH_OS",
         ]
-      } else if (use_rs9117) {
+      } else if (use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",
           "SL_WIFI=1",

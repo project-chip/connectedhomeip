@@ -33,7 +33,7 @@ declare_args() {
   # WIFI rcp boards options for wifi apps.
   use_wf200 = false
   use_rs9116 = false
-  use_rs9117 = false
+  use_SiWx917 = false
   use_rs911x_sockets = false
 }
 
