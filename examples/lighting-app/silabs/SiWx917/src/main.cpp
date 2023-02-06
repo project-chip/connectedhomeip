@@ -33,6 +33,9 @@
 #endif
 
 #define BLE_DEV_NAME "SiLabs-Light"
+
+extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction);
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -79,4 +82,9 @@ int main(void)
     chip::Platform::MemoryShutdown();
     SILABS_LOG("vTaskStartScheduler() failed");
     appError(CHIP_ERROR_INTERNAL);
+}
+
+void sl_button_on_change(uint8_t btn, uint8_t btnAction)
+{
+    AppTask::GetAppTask().ButtonEventHandler(btn, btnAction);
 }
