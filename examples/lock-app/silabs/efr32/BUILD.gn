@@ -56,6 +56,12 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
+  if (use_rs911x) {
+    include_dirs += [
+      "${chip_root}/src/platform/silabs/EFR32/rs911x",
+    ]
+  }
+
   if (use_wf200) {
     # TODO efr32_sdk should not need a header from this location
     include_dirs += [ "${examples_plat_dir}/wf200" ]

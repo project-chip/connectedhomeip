@@ -15,9 +15,11 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
-
+import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
@@ -66,11 +68,22 @@ static_library("EFR32") {
     "${silabs_platform_dir}/SystemPlatformConfig.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
+#    "BLEManagerImpl.cpp",
     "ConfigurationManagerImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
   ]
+
+  if (chip_enable_ble_rs911x) {
+    sources += [
+        "rs911x/BLEManagerImpl.cpp",
+        "rs911x/wfx_sl_ble_init.h",
+        "rs911x/wfx_sl_ble_init.c",
+        "rs911x/rsi_ble_config.h",
+      ]
+    } else {
+    sources += [ "BLEManagerImpl.cpp" ]
+  }
 
   if (chip_enable_ota_requestor) {
     sources += [

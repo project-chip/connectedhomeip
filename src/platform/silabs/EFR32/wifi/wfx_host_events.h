@@ -138,6 +138,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #else /* WF200 */
 #define WLAN_TASK_STACK_SIZE 1024
 #define WLAN_TASK_PRIORITY 1
+#define BLE_TASK_PRIORITY 1
 #define MAX_JOIN_RETRIES_COUNT 5
 #endif
 

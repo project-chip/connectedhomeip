@@ -57,6 +57,7 @@ struct wfx_rsi
     EventGroupHandle_t events;
     TaskHandle_t drv_task;
     TaskHandle_t wlan_task;
+    TaskHandle_t ble_task;
     uint16_t dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
     wfx_wifi_provision_t sec;
