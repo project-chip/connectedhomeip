@@ -1,5 +1,5 @@
 {
-  "featureLevel": 90,
+  "featureLevel": 71,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -18,17 +18,15 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/zcl/zcl.json",
-      "type": "zcl-properties",
-      "category": "matter",
-      "version": 1,
-      "description": "Matter SDK ZCL data"
+      "path": "../../../src/app/zap-templates/zcl/zcl.json",
+      "version": "ZCL Test Data",
+      "type": "zcl-properties"
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "version": "chip-v1",
+      "type": "gen-templates-json"
     }
   ],
   "endpointTypes": [
@@ -83,7 +81,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "IdentifyTime",
+              "name": "identify time",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -1130,22 +1128,6 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
-          ],
-          "events": [
-            {
-              "name": "AccessControlEntryChanged",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "AccessControlExtensionChanged",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            }
           ]
         },
         {
@@ -1534,36 +1516,6 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "events": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "ReachableChanged",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            }
           ]
         },
         {
@@ -1849,29 +1801,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "events": [
-            {
-              "name": "StateTransition",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "VersionApplied",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "DownloadError",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
             }
           ]
         },
@@ -2728,11 +2657,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BootReason",
+              "name": "BootReasons",
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "BootReasonEnum",
+              "type": "enum8",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2822,36 +2751,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "events": [
-            {
-              "name": "HardwareFaultChange",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "RadioFaultChange",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "NetworkFaultChange",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "BootReason",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
             }
           ]
         },
@@ -2995,15 +2894,6 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "events": [
-            {
-              "name": "SoftwareFault",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            }
           ]
         },
         {
@@ -3051,7 +2941,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "Channel",
+              "name": "channel",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3163,7 +3053,7 @@
               "reportableChange": 0
             },
             {
-              "name": "NeighborTable",
+              "name": "NeighborTableList",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -3179,7 +3069,7 @@
               "reportableChange": 0
             },
             {
-              "name": "RouteTable",
+              "name": "RouteTableList",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -3211,7 +3101,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Weighting",
+              "name": "weighting",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -4090,22 +3980,6 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "events": [
-            {
-              "name": "ConnectionStatus",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "NetworkFaultChange",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            }
           ]
         },
         {
@@ -4153,7 +4027,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "BSSID",
+              "name": "bssid",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -4217,7 +4091,7 @@
               "reportableChange": 0
             },
             {
-              "name": "RSSI",
+              "name": "Rssi",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -4392,29 +4266,6 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "events": [
-            {
-              "name": "Disconnection",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "AssociationFailure",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "ConnectionStatus",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            }
           ]
         },
         {
@@ -4466,7 +4317,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "PHYRateEnum",
+              "type": "PHYRateType",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4687,61 +4538,10 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
-          ],
-          "events": [
-            {
-              "name": "SwitchLatched",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "InitialPress",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "LongPress",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "ShortRelease",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "LongRelease",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "MultiPressOngoing",
-              "code": 5,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "MultiPressComplete",
-              "code": 6,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            }
           ]
         },
         {
-          "name": "Administrator Commissioning",
+          "name": "AdministratorCommissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -4793,7 +4593,7 @@
           ]
         },
         {
-          "name": "Administrator Commissioning",
+          "name": "AdministratorCommissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -4805,7 +4605,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "CommissioningWindowStatusEnum",
+              "type": "CommissioningWindowStatus",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -5329,7 +5129,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "LabelList",
+              "name": "label list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5395,7 +5195,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "LabelList",
+              "name": "label list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5505,7 +5305,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "IdentifyTime",
+              "name": "identify time",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5521,7 +5321,7 @@
               "reportableChange": 0
             },
             {
-              "name": "IdentifyType",
+              "name": "identify type",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7735,7 +7535,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "Occupancy",
+              "name": "occupancy",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -7751,7 +7551,7 @@
               "reportableChange": 0
             },
             {
-              "name": "OccupancySensorType",
+              "name": "occupancy sensor type",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7767,7 +7567,7 @@
               "reportableChange": 0
             },
             {
-              "name": "OccupancySensorTypeBitmap",
+              "name": "occupancy sensor type bitmap",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -7838,6 +7638,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 257
     }
-  ],
-  "log": []
+  ]
 }
