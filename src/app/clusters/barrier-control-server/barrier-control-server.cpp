@@ -249,7 +249,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
     {
         emAfPluginBarrierControlServerSetBarrierPosition(endpoint, state.currentPosition);
         setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
-        deactivate(endpoint);
+        deactivateEndpointTimerCallback(endpoint);
     }
     else
     {
@@ -277,7 +277,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
         setMovingState(
             endpoint,
             (state.increasing ? EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING : EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING));
-        scheduleTimerCallackMs(endpoint, state.delayMs);
+        scheduleTimerCallbackMs(endpoint, state.delayMs);
     }
 }
 
@@ -321,7 +321,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         state.delayMs         = calculateDelayMs(endpoint, state.targetPosition, &state.increasing);
         emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
                                             state.targetPosition, state.delayMs);
-        scheduleTimerCallackMs(endpoint, state.delayMs);
+        scheduleTimerCallbackMs(endpoint, state.delayMs);
 
         if (state.currentPosition < state.targetPosition)
         {
@@ -343,7 +343,7 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
                                                             const Commands::BarrierControlStop::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    deactivate(endpoint);
+    deactivateEndpointTimerCallback(endpoint);
     setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
     sendDefaultResponse(commandObj, commandPath, Status::Success);
     return true;
