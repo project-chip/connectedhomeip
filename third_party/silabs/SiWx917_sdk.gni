@@ -211,8 +211,8 @@ template("efr32_sdk") {
       cflags += [ "-mcmse" ]
     }
 
-    if (defined(invoker.use_rs9117)) {
-      if (invoker.use_rs9117 == true) {
+    if (defined(invoker.use_SiWx917)) {
+      if (invoker.use_SiWx917 == true) {
         #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
         cflags += invoker.rs911x_cflags
       }
