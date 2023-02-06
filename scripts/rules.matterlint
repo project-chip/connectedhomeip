@@ -92,7 +92,7 @@ endpoint 0 {
   // Identifiers for clusters are loaded from XML files
   // The required clusters are from the spec for RootNode (section 2.1.5 at the moment):
 
-  require server cluster Basic;
+  require server cluster BasicInformation;
   require server cluster AccessControl;
   require server cluster GroupKeyManagement;
   require server cluster GeneralCommissioning;

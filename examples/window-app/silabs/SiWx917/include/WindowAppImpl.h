@@ -21,7 +21,6 @@
 
 #ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
 #endif // ENABLE_WSTK_LEDS
 
 #include <WindowApp.h>

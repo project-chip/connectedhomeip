@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Iterator, Set
 
 from . import linux, runner
-from .test_definition import ApplicationPaths, TestDefinition, TestTarget
+from .test_definition import ApplicationPaths, TestDefinition, TestRunTime, TestTag, TestTarget
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -39,65 +39,116 @@ class ManualTest:
 INVALID_TESTS = {
     "tests.yaml",  # certification/tests.yaml is not a real test
     "PICS.yaml",  # certification/PICS.yaml is not a real test
+
+    # The items below are examples and will never work (likely)
+    # completely exclude them
+    "Config_Example.yaml",
+    "Config_Variables_Example.yaml",
+    "PICS_Example.yaml",
+    "Response_Example.yaml",
+    "Test_Example.yaml",
 }
 
 
-def _LoadManualTestsJson(json_file_path: str) -> Iterator[ManualTest]:
+def _IsValidYamlTest(name: str) -> bool:
+    """Check if the given file name is a valid YAML test.
+
+    This returns invalid for examples, simulated and other specific tests.
+    """
+
+    # Simulated tests are not runnable by repl tests, need
+    # separate infrastructure. Exclude them completely (they are
+    # not even manual)
+    if name.endswith('_Simulated.yaml'):
+        return False
+
+    return name not in INVALID_TESTS
+
+
+def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
     with open(json_file_path, 'rt') as f:
         data = json.load(f)
         for c in data["collection"]:
             for name in data[c]:
-                yield ManualTest(yaml="%s.yaml" % name, reason=json_file_path)
+                yield f"{name}.yaml"
 
 
-def _GetManualTests() -> Set[ManualTest]:
+def _GetManualTests() -> Set[str]:
     manualtests = set()
-
-    # TODO:
-    #
-    # These are NOT manual tests, but rather "tests that fail in yaml and
-    # for this reason are marked as manual".
-    #
-    # We are working to get this list down to 0.
-    manualtests.add(ManualTest(yaml="Test_TC_ACL_2_10.yaml", reason="TODO Event Not Supported Yet"))
-    manualtests.add(ManualTest(yaml="Test_TC_ACL_2_7.yaml", reason="TODO Event Not Supported Yet"))
-    manualtests.add(ManualTest(yaml="Test_TC_ACL_2_8.yaml", reason="TODO Event Not Supported Yet"))
-    manualtests.add(ManualTest(yaml="Test_TC_ACL_2_9.yaml", reason="TODO Event Not Supported Yet"))
-    manualtests.add(ManualTest(yaml="TestEvents.yaml", reason="TODO Event Not Supported Yet"))
-
-    manualtests.add(ManualTest(yaml="Test_TC_ACE_1_1.yaml", reason="TODO GetCommissionerNodeId Not Supported Yet"))
-    manualtests.add(ManualTest(yaml="Test_TC_ACE_1_5.yaml", reason="TODO GetCommissionerNodeId Not Supported Yet"))
-    manualtests.add(ManualTest(yaml="Test_TC_SC_5_1.yaml", reason="TODO GetCommissionerNodeId Not Supported Yet"))
-    manualtests.add(ManualTest(yaml="Test_TC_SC_5_2.yaml", reason="TODO GetCommissionerNodeId Not Supported Yet"))
-    manualtests.add(ManualTest(yaml="TestCommissionerNodeId.yaml", reason="TODO GetCommissionerNodeId Not Supported Yet"))
-
-    manualtests.add(ManualTest(yaml="TestClusterMultiFabric.yaml", reason="TODO Enum Mismatch"))
-    manualtests.add(ManualTest(yaml="TestGroupMessaging.yaml", reason="TODO Group Message Not Supported in chip-repl yet"))
-    manualtests.add(ManualTest(yaml="TestMultiAdmin.yaml", reason="TODO chip-repl hangs on command expected to fail"))
-
-    # Failing, unclear why. Likely repl specific, used to pass however first
-    # failure point seems unrelated. Historically this seems (very?) flaky
-    # in repl.
-    manualtests.add(ManualTest(yaml="Test_TC_OO_2_4.yaml", reason="Flaky"))
-
-    # Examples:
-    #
-    # Currently these are not in ciTests.json, however yaml logic currently
-    # does NOT use allowlist json but rather finds all yaml files.
-    #
-    # This is on purpose for now to make it harder to orphan files, however
-    # we can reconsider as things evolve.
-    manualtests.add(ManualTest(yaml="Config_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(yaml="Config_Variables_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(yaml="PICS_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(yaml="Response_Example.yaml", reason="Example"))
-    manualtests.add(ManualTest(yaml="Test_Example.yaml", reason="Example"))
 
     # Flagged as manual from: src/app/tests/suites/manualTests.json
     for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
         manualtests.add(item)
 
     return manualtests
+
+
+def _GetFlakyTests() -> Set[str]:
+    """List of flaky tests, ideally this list should become empty."""
+    return {
+        "Test_TC_OO_2_4.yaml"
+    }
+
+
+def _GetSlowTests() -> Set[str]:
+    """Generally tests using sleep() a bit too freely.
+
+       10s seems like a good threshold to consider something slow
+    """
+    return {
+        "DL_LockUnlock.yaml",                             # ~ 10 seconds
+        "TestSubscribe_AdministratorCommissioning.yaml",  # ~ 15 seconds
+        "Test_TC_CC_5_1.yaml",                            # ~ 30 seconds
+        "Test_TC_CC_5_2.yaml",                            # ~ 30 seconds
+        "Test_TC_CC_5_3.yaml",                            # ~ 25 seconds
+        "Test_TC_CC_6_1.yaml",                            # ~ 35 seconds
+        "Test_TC_CC_6_2.yaml",                            # ~ 60 seconds
+        "Test_TC_CC_6_3.yaml",                            # ~ 50 seconds
+        "Test_TC_CC_7_2.yaml",                            # ~ 65 seconds
+        "Test_TC_CC_7_3.yaml",                            # ~ 70 seconds
+        "Test_TC_CC_7_4.yaml",                            # ~ 25 seconds
+        "Test_TC_CC_8_1.yaml",                            # ~ 60 seconds
+        "Test_TC_DRLK_2_4.yaml",                          # ~ 60 seconds
+        "Test_TC_I_2_2.yaml",                             # ~ 15 seconds
+        "Test_TC_LVL_3_1.yaml",                           # ~ 35 seconds
+        "Test_TC_LVL_4_1.yaml",                           # ~ 55 seconds
+        "Test_TC_LVL_5_1.yaml",                           # ~ 35 seconds
+        "Test_TC_LVL_6_1.yaml",                           # ~ 10 seconds
+        "Test_TC_WNCV_3_1.yaml",                          # ~ 20 seconds
+        "Test_TC_WNCV_3_2.yaml",                          # ~ 20 seconds
+        "Test_TC_WNCV_3_3.yaml",                          # ~ 15 seconds
+        "Test_TC_WNCV_3_4.yaml",                          # ~ 10 seconds
+        "Test_TC_WNCV_3_5.yaml",                          # ~ 10 seconds
+        "Test_TC_WNCV_4_1.yaml",                          # ~ 20 seconds
+        "Test_TC_WNCV_4_2.yaml",                          # ~ 20 seconds
+        "Test_TC_WNCV_4_5.yaml",                          # ~ 12 seconds
+    }
+
+
+def _GetInDevelopmentTests() -> Set[str]:
+    """Tests that fail in YAML for some reason.
+
+       Goal is for this set to become empty.
+    """
+    return {
+        # TODO: Event not yet supported:
+        "Test_TC_ACL_2_10.yaml",
+        "Test_TC_ACL_2_7.yaml",
+        "Test_TC_ACL_2_8.yaml",
+        "Test_TC_ACL_2_9.yaml",
+        "TestEvents.yaml",
+
+        # TODO: CommissionerNodeId not yet supported:
+        "Test_TC_ACE_1_1.yaml",
+        "Test_TC_ACE_1_5.yaml",
+        "Test_TC_SC_5_1.yaml",
+        "Test_TC_SC_5_2.yaml",
+        "TestCommissionerNodeId.yaml",
+
+        "TestClusterMultiFabric.yaml",  # Enum mismatch
+        "TestGroupMessaging.yaml",     # Needs group support in repl
+        "TestMultiAdmin.yaml",         # chip-repl hang on command expeted to fail
+    }
 
 
 def _AllYamlTests():
@@ -109,12 +160,6 @@ def _AllYamlTests():
 
     for path in yaml_test_suite_path.rglob("*.yaml"):
         if not path.is_file():
-            continue
-
-        if path.name.endswith('_Simulated.yaml'):
-            # Simulated tests are not runnable by repl tests, need
-            # separate infrastructure. Exclude theml completely (they are
-            # not even manual)
             continue
 
         yield path
@@ -142,6 +187,10 @@ def tests_with_command(chip_tool: str, is_manual: bool):
 
     result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
 
+    test_tags = set()
+    if is_manual:
+        test_tags.add(TestTag.MANUAL)
+
     for name in result.stdout.decode("utf8").split("\n"):
         if not name:
             continue
@@ -149,34 +198,49 @@ def tests_with_command(chip_tool: str, is_manual: bool):
         target = target_for_name(name)
 
         yield TestDefinition(
-            run_name=name, name=name, target=target, is_manual=is_manual
+            run_name=name, name=name, target=target, tags=test_tags
         )
 
 
 # TODO We will move away from hardcoded list of yamltests to run all file when yamltests
 # parser/runner reaches parity with the code gen version.
 def _hardcoded_python_yaml_tests():
-    manual_tests = set([b.yaml for b in _GetManualTests()])
+    manual_tests = _GetManualTests()
+    flaky_tests = _GetFlakyTests()
+    slow_tests = _GetSlowTests()
+    in_development_tests = _GetInDevelopmentTests()
 
     for path in _AllYamlTests():
-        if path.name in INVALID_TESTS:
+        if not _IsValidYamlTest(path.name):
             continue
+
+        tags = set()
+        if path.name in manual_tests:
+            tags.add(TestTag.MANUAL)
+
+        if path.name in flaky_tests:
+            tags.add(TestTag.FLAKY)
+
+        if path.name in slow_tests:
+            tags.add(TestTag.SLOW)
+
+        if path.name in in_development_tests:
+            tags.add(TestTag.IN_DEVELOPMENT)
 
         yield TestDefinition(
             run_name=str(path),
             name=path.stem,  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
             target=target_for_name(path.name),
-            is_manual=path.name in manual_tests,
-            use_chip_repl_yaml_tester=True
+            tags=tags,
         )
 
 
-def AllTests(chip_tool: str, run_yamltests_with_chip_repl: bool):
-    if run_yamltests_with_chip_repl:
-        for test in _hardcoded_python_yaml_tests():
-            yield test
-        return
+def AllYamlTests():
+    for test in _hardcoded_python_yaml_tests():
+        yield test
 
+
+def AllChipToolTests(chip_tool: str):
     for test in tests_with_command(chip_tool, is_manual=False):
         yield test
 

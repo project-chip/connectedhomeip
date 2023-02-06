@@ -55,7 +55,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
-  import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
+  import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
   if (use_rs911x) {
     wiseconnect_sdk_root =

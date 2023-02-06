@@ -20,7 +20,7 @@ import os
 import sys
 import time
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import chiptest
@@ -28,6 +28,7 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
+from chiptest.test_definition import TestRunTime, TestTag
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -67,7 +68,13 @@ class RunContext:
     in_unshare: bool
     chip_tool: str
     dry_run: bool
-    manual_handling: ManualHandling
+    runtime: TestRunTime
+
+    # If not empty, include only the specified test tags
+    include_tags: set(TestTag) = field(default_factory={})
+
+    # If not empty, exclude tests tagged with these tags
+    exclude_tags: set(TestTag) = field(default_factory={})
 
 
 @click.group(chain=True)
@@ -114,11 +121,16 @@ class RunContext:
     help='Internal flag for running inside a unshared environment'
 )
 @click.option(
-    '--manual',
-    type=click.Choice(['skip', 'only', 'include'], case_sensitive=False),
-    default='skip',
-    show_default=True,
-    help='Internal flag to determine how to handle manual tests. ONLY for "all" test choice.',
+    '--include-tags',
+    type=click.Choice(TestTag.__members__.keys(), case_sensitive=False),
+    multiple=True,
+    help='What test tags to include when running. Equivalent to "exlcude all except these" for priority purpuses.',
+)
+@click.option(
+    '--exclude-tags',
+    type=click.Choice(TestTag.__members__.keys(), case_sensitive=False),
+    multiple=True,
+    help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
     '--run-yamltests-with-chip-repl',
@@ -130,7 +142,7 @@ class RunContext:
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, manual, run_yamltests_with_chip_repl, chip_tool):
+         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, run_yamltests_with_chip_repl, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -141,21 +153,28 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         # non yaml tests REQUIRE chip-tool. Yaml tests should not require chip-tool
         chip_tool = FindBinaryPath('chip-tool')
 
+    if include_tags:
+        include_tags = set([TestTag.__members__[t] for t in include_tags])
+
+    if exclude_tags:
+        exclude_tags = set([TestTag.__members__[t] for t in exclude_tags])
+
     # Figures out selected test that match the given name(s)
-    all_tests = [test for test in chiptest.AllTests(chip_tool, run_yamltests_with_chip_repl)]
+    if run_yamltests_with_chip_repl:
+        all_tests = [test for test in chiptest.AllYamlTests()]
+    else:
+        all_tests = [test for test in chiptest.AllChipToolTests(chip_tool)]
 
     tests = all_tests
 
-    # Default to only non-manual tests unless explicit targets are specified.
-    if 'all' in target:
-        if manual == 'skip':
-            manual_handling = ManualHandling.SKIP
-        elif manual == 'only':
-            manual_handling = ManualHandling.ONLY
-        else:
-            manual_handling = ManualHandling.INCLUDE
-    else:
-        manual_handling = ManualHandling.INCLUDE
+    # If just defaults specified, do not run manual and in development
+    # Specific target basically includes everything
+    if 'all' in target and not include_tags:
+        exclude_tags = {
+            TestTag.MANUAL,
+            TestTag.IN_DEVELOPMENT,
+            TestTag.FLAKY,
+        }
 
     if 'all' not in target:
         tests = []
@@ -186,7 +205,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
                              chip_tool=chip_tool, dry_run=dry_run,
-                             manual_handling=manual_handling)
+                             runtime=TestRunTime.PYTHON_YAML if run_yamltests_with_chip_repl else TestRunTime.CHIP_TOOL_BUILTIN,
+                             include_tags=include_tags,
+                             exclude_tags=exclude_tags)
 
 
 @main.command(
@@ -194,10 +215,11 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 @click.pass_context
 def cmd_list(context):
     for test in context.obj.tests:
-        if test.is_manual:
-            print("%s (MANUAL TEST)" % test.name)
-        else:
-            print(test.name)
+        tags = test.tags_str()
+        if tags:
+            tags = f" ({tags})"
+
+        print("%s%s" % (test.name, tags))
 
 
 @main.command(
@@ -294,11 +316,14 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
-            if test.is_manual:
-                if context.obj.manual_handling == ManualHandling.SKIP:
+            if context.obj.include_tags:
+                if not (test.tags & context.obj.include_tags):
+                    logging.debug("Test %s not included" % test.name)
                     continue
-            else:
-                if context.obj.manual_handling == ManualHandling.ONLY:
+
+            if context.obj.exclude_tags:
+                if test.tags & context.obj.exclude_tags:
+                    logging.debug("Test %s excluded" % test.name)
                     continue
 
             test_start = time.monotonic()
@@ -308,7 +333,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                     continue
 
                 logging.info('%-20s - Starting test' % (test.name))
-                test.Run(runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run)
+                test.Run(
+                    runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
+                    test_runtime=context.obj.runtime)
                 test_end = time.monotonic()
                 logging.info('%-30s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))

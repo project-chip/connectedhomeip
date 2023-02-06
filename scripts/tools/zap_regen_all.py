@@ -374,7 +374,7 @@ def getTargets(type, test_target):
     targets = []
 
     if type & TargetType.TESTS:
-        targets.extend(getTestsTemplatesTargets('all'))
+        targets.extend(getTestsTemplatesTargets(test_target))
 
     if type & TargetType.GLOBAL:
         targets.extend(getGlobalTemplatesTargets())

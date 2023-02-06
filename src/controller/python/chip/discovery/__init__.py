@@ -19,7 +19,7 @@ import logging
 import threading
 import time
 from dataclasses import dataclass
-from typing import Callable, List, Set
+from typing import Callable, List, Optional, Set
 
 from chip.discovery.library_handle import _GetDiscoveryLibraryHandle
 from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
@@ -87,6 +87,7 @@ class CommissionableNode():
     mrpRetryIntervalActive: int = None
     supportsTcp: bool = None
     addresses: List[str] = None
+    rotatingId: Optional[str] = None
 
 
 # Milliseconds to wait for additional results onece a single result has

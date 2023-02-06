@@ -14,9 +14,9 @@ rs911x_src_plat = [
 
   "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_timer.c",
   "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_platform_init.c",
+  "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_m4.c",
 
   "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_bootup_config.c",
-  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4.c",
   "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4_rom.c",
   "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_interrupt.c",
 ]

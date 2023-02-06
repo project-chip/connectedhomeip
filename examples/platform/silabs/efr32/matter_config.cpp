@@ -49,7 +49,7 @@ using namespace ::chip::DeviceLayer;
 // If building with the EFR32-provided crypto backend, we can use the
 // opaque keystore
 #if CHIP_CRYPTO_PLATFORM
-#include <platform/silabs/EFR32/Efr32PsaOperationalKeystore.h>
+#include <platform/silabs/efr32/Efr32PsaOperationalKeystore.h>
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
