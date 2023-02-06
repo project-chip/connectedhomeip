@@ -61,6 +61,11 @@ class DeviceProvisioningFragment : Fragment() {
 
   private lateinit var scope: CoroutineScope
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    deviceController = ChipClient.getDeviceController(requireContext())
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -68,7 +73,6 @@ class DeviceProvisioningFragment : Fragment() {
   ): View {
     scope = viewLifecycleOwner.lifecycleScope
     deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
-    deviceController = ChipClient.getDeviceController(requireContext())
     
     return inflater.inflate(R.layout.single_fragment_container, container, false).apply {
       if (savedInstanceState == null) {
@@ -106,10 +110,16 @@ class DeviceProvisioningFragment : Fragment() {
               "Look at 'src/credentials/attestation_verifier/DeviceAttestationVerifier.h' " +
               "AttestationVerificationResult enum to understand the errors")
 
-      if (errorCode == STATUS_PAIRING_SUCCESS)
-        return@setDeviceAttestationDelegate
-
       val activity = requireActivity()
+
+      if (errorCode == STATUS_PAIRING_SUCCESS) {       
+        activity.runOnUiThread(Runnable {
+          deviceController.continueCommissioning(devicePtr, true)
+        })
+
+        return@setDeviceAttestationDelegate
+      }
+
       activity.runOnUiThread(Runnable {
         val dialog = AlertDialog.Builder(activity)
           .setPositiveButton("Continue",
