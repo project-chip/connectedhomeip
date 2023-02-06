@@ -41,21 +41,27 @@ constexpr const char * kJsonCommandKey              = "command";
 constexpr const char * kJsonCommandSpecifierKey     = "command_specifier";
 constexpr const char * kJsonArgumentsKey            = "arguments";
 
-std::vector<std::string> GetArgumentsFromJson(Command * command, Json::Value & value, bool optional)
+bool GetArgumentsFromJson(Command * command, Json::Value & value, bool optional, std::vector<std::string> & outArgs)
 {
+    auto memberNames = value.getMemberNames();
+
     std::vector<std::string> args;
     for (size_t i = 0; i < command->GetArgumentsCount(); i++)
     {
-        auto argName = command->GetArgumentName(i);
-        for (auto const & memberName : value.getMemberNames())
+        auto argName             = command->GetArgumentName(i);
+        auto memberNamesIterator = memberNames.begin();
+        while (memberNamesIterator != memberNames.end())
         {
+            auto memberName = *memberNamesIterator;
             if (strcasecmp(argName, memberName.c_str()) != 0)
             {
+                memberNamesIterator++;
                 continue;
             }
 
             if (command->GetArgumentIsOptional(i) != optional)
             {
+                memberNamesIterator = memberNames.erase(memberNamesIterator);
                 continue;
             }
 
@@ -66,10 +72,20 @@ std::vector<std::string> GetArgumentsFromJson(Command * command, Json::Value & v
 
             auto argValue = value[memberName].asString();
             args.push_back(std::move(argValue));
+            memberNamesIterator = memberNames.erase(memberNamesIterator);
             break;
         }
     }
-    return args;
+
+    if (memberNames.size())
+    {
+        auto memberName = memberNames.front();
+        ChipLogError(chipTool, "The argument \"\%s\" is not supported.", memberName.c_str());
+        return false;
+    }
+
+    outArgs = args;
+    return true;
 };
 
 // Check for arguments with a starting '"' but no ending '"': those
@@ -542,8 +558,10 @@ bool Commands::DecodeArgumentsFromBase64EncodedJson(const char * json, std::vect
     VerifyOrReturnValue(parsedArguments, false, ChipLogError(chipTool, "Error while parsing json."));
     VerifyOrReturnValue(jsonArguments.isObject(), false, ChipLogError(chipTool, "Unexpected json type, expects and object."));
 
-    auto mandatoryArguments = GetArgumentsFromJson(command, jsonArguments, false /* addOptional */);
-    auto optionalArguments  = GetArgumentsFromJson(command, jsonArguments, true /* addOptional */);
+    std::vector<std::string> mandatoryArguments;
+    std::vector<std::string> optionalArguments;
+    VerifyOrReturnValue(GetArgumentsFromJson(command, jsonArguments, false /* addOptional */, mandatoryArguments), false);
+    VerifyOrReturnValue(GetArgumentsFromJson(command, jsonArguments, true /* addOptional */, optionalArguments), false);
 
     args.push_back(std::move(clusterName));
     args.push_back(std::move(commandName));
