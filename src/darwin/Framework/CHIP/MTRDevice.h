@@ -210,8 +210,8 @@ extern NSString * const MTREventTimestampDateKey MTR_NEWLY_AVAILABLE;
  *                In addition to the MTREventPathKey and MTRDataKey containing the path and event values, eventReport also contains
  *                these keys:
  *
- *                MTREventNumberKey : NSNumber-wrapped uint64_t value. Monotonically increasing, but consecutive events may not
- *                                    have consecutive numbers.
+ *                MTREventNumberKey : NSNumber-wrapped uint64_t value. Monotonically increasing, and consecutive event reports
+ *                                    should have consecutive numbers unless device reboots, or if events are lost.
  *                MTREventPriorityKey : NSNumber-wrapped MTREventPriority value.
  *                MTREventTimeTypeKey : NSNumber-wrapped MTREventTimeType value.
  *                MTREventSystemUpTimeKey : NSNumber-wrapped NSTimeInterval value.
