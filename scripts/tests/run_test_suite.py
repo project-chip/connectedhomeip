@@ -73,7 +73,7 @@ class RunContext:
     # If not empty, include only the specified test tags
     include_tags: set(TestTag) = field(default_factory={})
 
-    # If not empty, exclude tests tagged with these tagsexclude tests tagged with these tags
+    # If not empty, exclude tests tagged with these tags
     exclude_tags: set(TestTag) = field(default_factory={})
 
 
@@ -124,13 +124,13 @@ class RunContext:
     '--include-tags',
     type=click.Choice(TestTag.__members__.keys(), case_sensitive=False),
     multiple=True,
-    help='What test tags to include when running.',
+    help='What test tags to include when running. Equivalent to "exlcude all except these" for priority purpuses.',
 )
 @click.option(
     '--exclude-tags',
     type=click.Choice(TestTag.__members__.keys(), case_sensitive=False),
     multiple=True,
-    help='What test tags to exclude when running.',
+    help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
     '--run-yamltests-with-chip-repl',
