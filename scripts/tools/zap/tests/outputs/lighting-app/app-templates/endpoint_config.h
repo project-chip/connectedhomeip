@@ -549,7 +549,7 @@
 #define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 
 // clang-format off
-#define GENERATED_EVENT_COUNT 26
+#define GENERATED_EVENT_COUNT 19
 #define GENERATED_EVENTS { \
   /* Endpoint: 0, Cluster: Access Control (server) */ \
   /* EventList (index=0) */ \
@@ -584,15 +584,6 @@
   0x00000000, /* Disconnection */ \
   0x00000001, /* AssociationFailure */ \
   0x00000002, /* ConnectionStatus */ \
-  /* Endpoint: 0, Cluster: Switch (server) */ \
-  /* EventList (index=19) */ \
-  0x00000000, /* SwitchLatched */ \
-  0x00000001, /* InitialPress */ \
-  0x00000002, /* LongPress */ \
-  0x00000003, /* ShortRelease */ \
-  0x00000004, /* LongRelease */ \
-  0x00000005, /* MultiPressOngoing */ \
-  0x00000006, /* MultiPressComplete */ \
 }
 
 // clang-format on
@@ -1025,8 +1016,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 19 ), \
-      .eventCount = 7, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Administrator Commissioning (server) */ \

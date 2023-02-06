@@ -1492,7 +1492,7 @@
 #define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 
 // clang-format off
-#define GENERATED_EVENT_COUNT 51
+#define GENERATED_EVENT_COUNT 42
 #define GENERATED_EVENTS { \
   /* Endpoint: 0, Cluster: Access Control (server) */ \
   /* EventList (index=0) */ \
@@ -1533,30 +1533,21 @@
   0x00000001, /* ActionFailed */ \
   /* Endpoint: 1, Cluster: Power Source (server) */ \
   /* EventList (index=21) */ \
-  0x00000000, /* WiredFaultChange */ \
   0x00000001, /* BatFaultChange */ \
-  0x00000002, /* BatChargeFaultChange */ \
   /* Endpoint: 1, Cluster: Switch (server) */ \
-  /* EventList (index=24) */ \
+  /* EventList (index=22) */ \
   0x00000000, /* SwitchLatched */ \
-  0x00000001, /* InitialPress */ \
-  0x00000002, /* LongPress */ \
-  0x00000003, /* ShortRelease */ \
-  0x00000004, /* LongRelease */ \
-  0x00000005, /* MultiPressOngoing */ \
-  0x00000006, /* MultiPressComplete */ \
   /* Endpoint: 1, Cluster: Boolean State (server) */ \
-  /* EventList (index=31) */ \
+  /* EventList (index=23) */ \
   0x00000000, /* StateChange */ \
   /* Endpoint: 1, Cluster: Door Lock (server) */ \
-  /* EventList (index=32) */ \
+  /* EventList (index=24) */ \
   0x00000000, /* DoorLockAlarm */ \
-  0x00000001, /* DoorStateChange */ \
   0x00000002, /* LockOperation */ \
   0x00000003, /* LockOperationError */ \
   0x00000004, /* LockUserChange */ \
   /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */ \
-  /* EventList (index=37) */ \
+  /* EventList (index=28) */ \
   0x00000000, /* SupplyVoltageLow */ \
   0x00000001, /* SupplyVoltageHigh */ \
   0x00000002, /* PowerMissingPhase */ \
@@ -1570,7 +1561,7 @@
   0x0000000A, /* SensorFailure */ \
   0x0000000B, /* ElectronicNonFatalFailure */ \
   /* Endpoint: 1, Cluster: Unit Testing (server) */ \
-  /* EventList (index=49) */ \
+  /* EventList (index=40) */ \
   0x00000001, /* TestEvent */ \
   0x00000002, /* TestFabricScopedEvent */ \
 }
@@ -2489,7 +2480,7 @@
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 21 ), \
-      .eventCount = 3, \
+      .eventCount = 1, \
     },\
   { \
       /* Endpoint: 1, Cluster: Switch (server) */ \
@@ -2501,8 +2492,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 24 ), \
-      .eventCount = 7, \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 22 ), \
+      .eventCount = 1, \
     },\
   { \
       /* Endpoint: 1, Cluster: Fixed Label (server) */ \
@@ -2540,7 +2531,7 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 31 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 23 ), \
       .eventCount = 1, \
     },\
   { \
@@ -2566,8 +2557,8 @@
       .functions = chipFuncArrayDoorLockServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 127 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 142 ) ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 32 ), \
-      .eventCount = 5, \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 24 ), \
+      .eventCount = 4, \
     },\
   { \
       /* Endpoint: 1, Cluster: Window Covering (server) */ \
@@ -2605,7 +2596,7 @@
       .functions = chipFuncArrayPumpConfigurationAndControlServer, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 37 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 28 ), \
       .eventCount = 12, \
     },\
   { \
@@ -2917,7 +2908,7 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 196 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 215 ) ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 49 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 40 ), \
       .eventCount = 2, \
     },\
   { \
