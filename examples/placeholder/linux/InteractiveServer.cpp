@@ -19,7 +19,9 @@
 #include "InteractiveServer.h"
 
 #include <json/json.h>
+#include <lib/support/Base64.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/logging/LogV.h>
 
 using namespace chip::DeviceLayer;
 
@@ -32,6 +34,126 @@ constexpr const char * kAttributeWriteKey           = "writeAttribute";
 constexpr const char * kAttributeReadKey            = "readAttribute";
 constexpr const char * kCommandIdKey                = "commandId";
 constexpr const char * kWaitForCommissioningCommand = "WaitForCommissioning";
+constexpr const char * kCategoryError               = "Error";
+constexpr const char * kCategoryProgress            = "Info";
+constexpr const char * kCategoryDetail              = "Debug";
+constexpr const char * kCategoryAutomation          = "Automation";
+
+struct InteractiveServerResultLog
+{
+    std::string module;
+    std::string message;
+    std::string messageType;
+};
+
+struct InteractiveServerResult
+{
+    bool mEnabled = false;
+    std::vector<std::string> mResults;
+    std::vector<InteractiveServerResultLog> mLogs;
+
+    void Setup() { mEnabled = true; }
+
+    void Reset()
+    {
+        mEnabled = false;
+        mResults.clear();
+        mLogs.clear();
+    }
+
+    void MaybeAddLog(const char * module, uint8_t category, const char * base64Message)
+    {
+        VerifyOrReturn(mEnabled);
+
+        const char * messageType = nullptr;
+        switch (category)
+        {
+        case chip::Logging::kLogCategory_Error:
+            messageType = kCategoryError;
+            break;
+        case chip::Logging::kLogCategory_Progress:
+            messageType = kCategoryProgress;
+            break;
+        case chip::Logging::kLogCategory_Detail:
+            messageType = kCategoryDetail;
+            break;
+        case chip::Logging::kLogCategory_Automation:
+            messageType = kCategoryAutomation;
+            break;
+        default:
+            chipDie();
+            break;
+        }
+
+        mLogs.push_back(InteractiveServerResultLog({ module, base64Message, messageType }));
+    }
+
+    void MaybeAddResult(const char * result)
+    {
+        VerifyOrReturn(mEnabled);
+        mResults.push_back(result);
+    }
+
+    std::string AsJsonString() const
+    {
+        std::string resultsStr;
+        if (mResults.size())
+        {
+            for (const auto & result : mResults)
+            {
+                resultsStr = resultsStr + result + ",";
+            }
+
+            // Remove last comma.
+            resultsStr.pop_back();
+        }
+
+        std::string logsStr;
+        if (mLogs.size())
+        {
+            // Log messages are encoded in base64 already, so it is safe to append the message
+            // between double quotes, even if the original log message contains some.
+            for (const auto & log : mLogs)
+            {
+                logsStr = logsStr + "{";
+                logsStr = logsStr + "  \"module\": \"" + log.module + "\",";
+                logsStr = logsStr + "  \"category\": \"" + log.messageType + "\",";
+                logsStr = logsStr + "  \"message\": \"" + log.message + "\"";
+                logsStr = logsStr + "},";
+            }
+
+            // Remove last comma.
+            logsStr.pop_back();
+        }
+
+        std::string jsonLog;
+        jsonLog = jsonLog + "{";
+        jsonLog = jsonLog + "  \"results\": [" + resultsStr + "],";
+        jsonLog = jsonLog + "  \"logs\": [" + logsStr + "]";
+        jsonLog = jsonLog + "}";
+
+        return jsonLog;
+    }
+};
+
+InteractiveServerResult gInteractiveServerResult;
+
+void ENFORCE_FORMAT(3, 0) InteractiveServerLoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
+{
+    va_list args_copy;
+    va_copy(args_copy, args);
+
+    chip::Logging::Platform::LogV(module, category, msg, args);
+
+    char message[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    vsnprintf(message, sizeof(message), msg, args_copy);
+    va_end(args_copy);
+
+    char base64Message[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE * 2] = {};
+    chip::Base64Encode(chip::Uint8::from_char(message), static_cast<uint16_t>(strlen(message)), base64Message);
+
+    gInteractiveServerResult.MaybeAddLog(module, category, base64Message);
+}
 
 std::string JsonToString(Json::Value & json)
 {
@@ -73,11 +195,14 @@ void InteractiveServer::Run(const chip::Optional<uint16_t> port)
 {
     mIsReady = false;
     wsThread = std::thread(&WebSocketServer::Run, &mWebSocketServer, port, this);
+
+    chip::Logging::SetLogRedirectCallback(InteractiveServerLoggingCallback);
 }
 
 bool InteractiveServer::OnWebSocketMessageReceived(char * msg)
 {
     ChipLogError(chipTool, "Receive message: %s", msg);
+    gInteractiveServerResult.Setup();
     if (strcmp(msg, kWaitForCommissioningCommand) == 0)
     {
         mIsReady = false;
@@ -100,7 +225,9 @@ bool InteractiveServer::Command(const chip::app::ConcreteCommandPath & path)
     value[kCommandIdKey]  = path.mCommandId;
 
     auto valueStr = JsonToString(value);
-    LogErrorOnFailure(mWebSocketServer.Send(valueStr.c_str()));
+    gInteractiveServerResult.MaybeAddResult(valueStr.c_str());
+    LogErrorOnFailure(mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str()));
+    gInteractiveServerResult.Reset();
     return mIsReady;
 }
 
@@ -115,7 +242,9 @@ bool InteractiveServer::ReadAttribute(const chip::app::ConcreteAttributePath & p
     value[kWaitTypeKey]    = kAttributeReadKey;
 
     auto valueStr = JsonToString(value);
-    LogErrorOnFailure(mWebSocketServer.Send(valueStr.c_str()));
+    gInteractiveServerResult.MaybeAddResult(valueStr.c_str());
+    LogErrorOnFailure(mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str()));
+    gInteractiveServerResult.Reset();
     return mIsReady;
 }
 
@@ -130,7 +259,9 @@ bool InteractiveServer::WriteAttribute(const chip::app::ConcreteAttributePath & 
     value[kWaitTypeKey]    = kAttributeWriteKey;
 
     auto valueStr = JsonToString(value);
-    LogErrorOnFailure(mWebSocketServer.Send(valueStr.c_str()));
+    gInteractiveServerResult.MaybeAddResult(valueStr.c_str());
+    LogErrorOnFailure(mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str()));
+    gInteractiveServerResult.Reset();
     return mIsReady;
 }
 
@@ -141,5 +272,7 @@ void InteractiveServer::CommissioningComplete()
 
     Json::Value value = Json::objectValue;
     auto valueStr     = JsonToString(value);
-    LogErrorOnFailure(mWebSocketServer.Send(valueStr.c_str()));
+    gInteractiveServerResult.MaybeAddResult(valueStr.c_str());
+    LogErrorOnFailure(mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str()));
+    gInteractiveServerResult.Reset();
 }
