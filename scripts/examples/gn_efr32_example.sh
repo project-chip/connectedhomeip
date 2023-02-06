@@ -86,8 +86,10 @@ if [ "$#" == "0" ]; then
             Set a Matter sotfware version string for the Silabs examples
             Used and formatted by default in this script.
             To skip that formatting or use your own version string use --no-version
-        use_rs911x
-            Build wifi example with extension board rs911x. (Default false)
+        use_rs9116
+            Build wifi example with extension board rs9116. (Default false)
+        use_rs9117
+            Build wifi example with extension board rs9117. (Default false)
         use_wf200
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
@@ -103,7 +105,7 @@ if [ "$#" == "0" ]; then
         --low-power
             disables all power consuming features for the most power efficient build
             This flag is to be used with --sed
-        --wifi <wf200 | rs911x>
+        --wifi <wf200 | rs9116>
             build wifi example variant for given exansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
@@ -142,7 +144,7 @@ else
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi rs911x|rs9117|wf200"
+                    echo "Wifi usage: --wifi rs9116|rs9117|wf200"
                     exit 1
                 fi
                 USE_WIFI=true
