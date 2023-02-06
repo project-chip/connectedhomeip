@@ -297,7 +297,7 @@ template("efr32_sdk") {
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) ||
-        show_qr_code || disable_lcd || use_external_flash) {
+        show_qr_code || !disable_lcd || use_external_flash) {
       defines += [ "CONFIG_ENABLE_UART" ]
 
       if (use_external_flash) {
