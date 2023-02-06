@@ -45,7 +45,7 @@ config("efr32-platform-wifi-config") {
   }
 }
 
-static_library("EFR32") {
+static_library("efr32") {
   sources = [
     "${silabs_platform_dir}/BLEManagerImpl.h",
     "${silabs_platform_dir}/BlePlatformConfig.h",
