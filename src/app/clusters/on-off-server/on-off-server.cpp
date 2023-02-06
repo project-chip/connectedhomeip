@@ -67,8 +67,7 @@ void OnOffServer::timerCallback(System::Layer *, void * callbackContext)
 
 void OnOffServer::scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs)
 {
-    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
-                                                           control);
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback, control);
 
     if (err != CHIP_NO_ERROR)
     {
