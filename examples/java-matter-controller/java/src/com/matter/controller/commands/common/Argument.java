@@ -150,8 +150,9 @@ public final class Argument {
         try {
           IPAddress ipAddress = (IPAddress) mValue;
           ipAddress.setAddress(InetAddress.getByName(value));
-        } catch (UnknownHostException e) {
           isValidArgument = true;
+        } catch (UnknownHostException e) {
+          isValidArgument = false;
         }
         break;
     }
