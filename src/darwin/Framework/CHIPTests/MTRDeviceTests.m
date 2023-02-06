@@ -1457,6 +1457,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // with data versions) during the resubscribe.
     XCTAssertEqual(attributeReportsReceived, 0);
     XCTAssertEqual(eventReportsReceived, 0);
+
+    // Check that device resets start time on subscription drop
+    XCTAssertNil(device.estimatedStartTime);
 }
 
 - (void)test018_SubscriptionErrorWhenNotResubscribing

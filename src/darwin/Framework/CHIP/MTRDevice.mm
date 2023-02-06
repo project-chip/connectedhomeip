@@ -259,11 +259,16 @@ private:
 {
     MTRDeviceState lastState = _state;
     _state = state;
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate && (lastState != state)) {
-        dispatch_async(_delegateQueue, ^{
-            [delegate device:self stateChanged:state];
-        });
+    if (lastState != state) {
+        if (state != MTRDeviceStateReachable) {
+            _estimatedStartTime = nil;
+        }
+        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+        if (delegate) {
+            dispatch_async(_delegateQueue, ^{
+                [delegate device:self stateChanged:state];
+            });
+        }
     }
 }
 
