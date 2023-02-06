@@ -226,8 +226,8 @@ CHIP_ERROR InitCredentialSets()
         P256SerializedKeypair opKeysSerialized;
 
         // TODO: Rename gCommissioner* to gInitiator*
-        memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
-        memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
+        memcpy(opKeysSerialized.Bytes(), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
+        memcpy(opKeysSerialized.Bytes() + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
                sTestCert_Node01_02_PrivateKey_Len);
 
         ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey_Len + sTestCert_Node01_02_PrivateKey_Len));
@@ -254,8 +254,8 @@ CHIP_ERROR InitCredentialSets()
         P256SerializedKeypair opKeysSerialized;
 
         auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
-        memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-        memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+        memcpy(opKeysSerialized.Bytes(), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+        memcpy(opKeysSerialized.Bytes() + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
                sTestCert_Node01_01_PrivateKey_Len);
 
         ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));

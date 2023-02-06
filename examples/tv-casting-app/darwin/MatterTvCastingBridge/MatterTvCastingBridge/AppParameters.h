@@ -31,9 +31,9 @@
 
 @property uint32_t spake2pIterationCount;
 
-@property NSData * spake2pSalt;
+@property NSData * spake2pSaltBase64;
 
-@property NSData * spake2pVerifier;
+@property NSData * spake2pVerifierBase64;
 
 @property DeviceAttestationCredentialsHolder * deviceAttestationCredentials;
 

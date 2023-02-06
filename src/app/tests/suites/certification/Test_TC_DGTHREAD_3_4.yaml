@@ -26,7 +26,7 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
     - label: "Commission TH to DUT"
@@ -38,7 +38,7 @@ tests:
       PICS: DGTHREAD.C.C00.Tx
       verification: |
           ./chip-tool threadnetworkdiagnostics reset-counts 54 0
-          Verify "success response"  on the TH(All-cluster-app) Log:
+          Verify "ResetCounts response"  on the TH(All-cluster-app) Log:
 
           D: 6932849 [SC]Allocated SecureSession (0x20002f50) - waiting for Sigma1 msg
           I: 6932856 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:25984238 on exchanr

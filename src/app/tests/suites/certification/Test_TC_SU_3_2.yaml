@@ -35,7 +35,15 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs receives QueryImageResponse
+          Verify on the OTA Requestor logs receives QueryImageResponse which contains the following
+          Status - UpdateAvailable
+          DelayedActionTime if present should be of type uint32.
+          ImageURI - contain a URI where the OTA Requestor SHOULD download a Software Image
+          SoftwareVersion is the same as the new software image version.
+          SoftwareVersionString - This is the string type of the Software version.
+          UpdateToken - verify it is within 8-32 bytes.
+
+
 
           [1651265462659] [21768:35233106] CHIP: [SWU] QueryImageResponse:
           [1651265462659] [21768:35233106] CHIP: [SWU]   status: 0
@@ -60,7 +68,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs receives QueryImageResponse
+          Verify on the OTA Requestor logs receives QueryImageResponse with the Status as Not Available
 
           [1645819644181] [21592:21187907] CHIP: [SWU] QueryImageResponse:
           [1645819644181] [21592:21187907] CHIP: [SWU]   status: 2
@@ -116,7 +124,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs receives QueryImageResponse
+          Verify on the OTA Requestor logs receives QueryImageResponse with Status as busy and DelayedActionTime as 3 minutes
 
           [1651265271074] [21764:35230537] CHIP: [SWU] QueryImageResponse:
           [1651265271074] [21764:35230537] CHIP: [SWU]   status: 1

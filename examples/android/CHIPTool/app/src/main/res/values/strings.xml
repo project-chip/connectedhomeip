@@ -174,4 +174,6 @@
     <string name="select_a_cluster">Select a cluster</string>
     <string name="endpoint_name">Endpoint: </string>
     <string name="wifi_connect_btn_text">Connect</string>
+
+    <string name="unpair_device_btn_text">Unpair</string>
 </resources>

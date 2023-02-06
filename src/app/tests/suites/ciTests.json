@@ -4,8 +4,14 @@
         "Test_TC_ACL_1_1",
         "Test_TC_ACL_2_1",
         "Test_TC_ACL_2_2",
-        "Test_TC_ACL_2_3"
+        "Test_TC_ACL_2_3",
+        "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_7",
+        "Test_TC_ACL_2_8",
+        "Test_TC_ACL_2_9",
+        "Test_TC_ACL_2_10"
     ],
+    "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_5"],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
     "BridgedDeviceBasicInformation": [
@@ -61,7 +67,11 @@
         "Test_TC_ILL_2_1",
         "Test_TC_ILL_2_2"
     ],
-    "OccupancySensing": ["Test_TC_OCC_1_1", "Test_TC_OCC_2_1"],
+    "OccupancySensing": [
+        "Test_TC_OCC_1_1",
+        "Test_TC_OCC_2_1",
+        "Test_TC_OCC_2_3"
+    ],
     "LevelControl": [
         "Test_TC_LVL_1_1",
         "Test_TC_LVL_2_1",
@@ -73,7 +83,7 @@
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_1_1"],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
-    "UnitLocalization": ["Test_TC_LUNIT_1_2"],
+    "UnitLocalization": ["Test_TC_LUNIT_1_2", "Test_TC_LUNIT_3_1"],
     "UserLabel": [
         "Test_TC_ULABEL_1_1",
         "Test_TC_ULABEL_2_1",
@@ -146,7 +156,7 @@
     ],
     "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
-    "SecureChannel": [],
+    "SecureChannel": ["Test_TC_SC_5_1", "Test_TC_SC_5_2"],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": [
@@ -230,7 +240,9 @@
         "TestFanControl",
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
-        "TestCommissioningWindow"
+        "TestCommissioningWindow",
+        "TestCommissionerNodeId",
+        "TestClientMonitoringCluster"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
@@ -249,7 +261,8 @@
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9"
+        "Test_TC_DRLK_2_9",
+        "Test_TC_DRLK_2_11"
     ],
     "Groups": [
         "TestGroupMessaging",
@@ -260,6 +273,7 @@
     ],
     "collection": [
         "AccessControl",
+        "AccessControlEnforcement",
         "BooleanState",
         "BridgedDeviceBasicInformation",
         "Actions",

@@ -1,10 +1,8 @@
 import unittest
+
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from rich.pretty import pprint
-from rich.console import Console
-from chip.clusters.Types import Nullable, NullValue
-import logging
-from rich.logging import RichHandler
 
 '''
 This file contains tests for validating the generated cluster objects by running encoding and decoding

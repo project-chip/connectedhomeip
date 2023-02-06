@@ -20,6 +20,9 @@ virtualenv
 # TI
 -r requirements.ti.txt
 
+# Telink
+-r requirements.telink.txt
+
 # cirque tests
 requests>=2.24.0
 
@@ -66,8 +69,9 @@ tabulate
 # scripts/build
 click
 
-# scripts/idl
+# scripts/py_matter_idl/matter_idl
 lark
+# scripts/py_matter_idl/matter_idl and scripts/py_matter_yamtests/matter_yamltests
 stringcase
 
 cryptography

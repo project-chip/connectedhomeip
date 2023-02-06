@@ -45,6 +45,46 @@ CHIP_ERROR CommissionerCommands::Unpair(const char * identity,
     return GetCommissioner(identity).UnpairDevice(value.nodeId);
 }
 
+CHIP_ERROR CommissionerCommands::GetCommissionerNodeId(
+    const char * identity, const chip::app::Clusters::CommissionerCommands::Commands::GetCommissionerNodeId::Type & value)
+{
+    chip::GetCommissionerNodeIdResponse data;
+    data.nodeId = GetCommissioner(identity).GetNodeId();
+
+    chip::app::StatusIB status;
+    status.mStatus = chip::Protocols::InteractionModel::Status::Success;
+
+    constexpr uint32_t kMaxDataLen = 128;
+    uint8_t * buffer               = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), kMaxDataLen));
+    if (buffer == nullptr)
+    {
+        ChipLogError(chipTool, "Can not allocate commissioner node id data: %s", chip::ErrorStr(CHIP_ERROR_NO_MEMORY));
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::TLV::TLVWriter writer;
+    writer.Init(buffer, kMaxDataLen);
+    CHIP_ERROR err = data.Encode(writer, chip::TLV::AnonymousTag());
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(chipTool, "Can not encode commissioner node id data: %s", chip::ErrorStr(err));
+        return err;
+    }
+
+    uint32_t dataLen = writer.GetLengthWritten();
+    writer.Finalize();
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer, dataLen);
+    reader.Next();
+
+    OnResponse(status, &reader);
+
+    chip::Platform::MemoryFree(buffer);
+
+    return CHIP_NO_ERROR;
+}
+
 chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
 {
     using chip::app::StatusIB;
@@ -54,23 +94,23 @@ chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
 
     if (CHIP_ERROR_INVALID_PUBLIC_KEY == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidPublicKey));
     }
     if (CHIP_ERROR_WRONG_NODE_ID == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNodeOpId));
     }
     if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNOC));
     }
     if (CHIP_ERROR_FABRIC_EXISTS == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kFabricConflict));
     }
     if (CHIP_ERROR_INVALID_FABRIC_INDEX == err)
     {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidFabricIndex));
     }
 
     return StatusIB(err);

@@ -52,10 +52,10 @@
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
+#include <utils_log.h>
 
 extern "C" {
 #include <bflb_platform.h>
-#include <blog.h>
 };
 
 #if CHIP_CONFIG_MEMORY_MGMT_PLATFORM

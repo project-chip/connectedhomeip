@@ -19,7 +19,8 @@
 #pragma once
 
 #include "TargetEndpointInfo.h"
-#include "app/clusters/bindings/BindingManager.h"
+
+#include <app/OperationalSessionSetup.h>
 #include <platform/CHIPDeviceLayer.h>
 
 constexpr size_t kMaxNumberOfEndpoints = 5;
@@ -43,6 +44,7 @@ public:
     size_t GetNumIPs() const { return mNumIPs; }
     const chip::Inet::IPAddress * GetIpAddresses() const { return mIpAddress; }
     bool IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData);
+    bool IsSameAs(const char * deviceName, size_t numIPs, const chip::Inet::IPAddress * ipAddresses);
 
     chip::OperationalDeviceProxy * GetOperationalDeviceProxy()
     {
@@ -68,7 +70,7 @@ public:
 
 private:
     static void HandleDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
-                                      chip::SessionHandle & sessionHandle)
+                                      const chip::SessionHandle & sessionHandle)
     {
         TargetVideoPlayerInfo * _this = static_cast<TargetVideoPlayerInfo *>(context);
         _this->mDeviceProxy           = chip::OperationalDeviceProxy(&exchangeMgr, sessionHandle);

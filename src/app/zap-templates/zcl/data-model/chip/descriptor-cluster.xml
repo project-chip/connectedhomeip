@@ -19,8 +19,8 @@ limitations under the License.
 
   <struct name="DeviceTypeStruct">
     <cluster code="0x001d"/>
-    <item name="type" type="DEVTYPE_ID"/>
-    <item name="revision" type="INT16U"/>
+    <item name="DeviceType" type="DEVTYPE_ID"/>
+    <item name="Revision" type="INT16U"/>
   </struct>
 
   <cluster>

@@ -21,35 +21,61 @@
 #error "DFUOverSMP requires MCUMGR module configs enabled"
 #endif
 
-#include <img_mgmt/img_mgmt.h>
-#include <os_mgmt/os_mgmt.h>
-#include <zephyr/dfu/mcuboot.h>
-#include <zephyr/mgmt/mcumgr/smp_bt.h>
+#include "OTAUtil.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "OTAUtil.h"
+#include <img_mgmt/img_mgmt.h>
+#include <os_mgmt/os_mgmt.h>
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/dfu/mcuboot.h>
+#include <zephyr/mgmt/mcumgr/smp_bt.h>
 
+using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-constexpr uint16_t kAdvertisingIntervalMinMs = 400;
-constexpr uint16_t kAdvertisingIntervalMaxMs = 500;
+constexpr uint8_t kAdvertisingPriority     = UINT8_MAX;
+constexpr uint32_t kAdvertisingOptions     = BT_LE_ADV_OPT_CONNECTABLE;
+constexpr uint16_t kAdvertisingIntervalMin = 400;
+constexpr uint16_t kAdvertisingIntervalMax = 500;
+constexpr uint8_t kAdvertisingFlags        = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
 
 DFUOverSMP DFUOverSMP::sDFUOverSMP;
 
-void DFUOverSMP::Init(DFUOverSMPRestartAdvertisingHandler startAdvertisingCb)
+void DFUOverSMP::Init()
 {
+    const char * name = bt_get_name();
+
+    mAdvertisingItems[0] = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    mAdvertisingItems[1] = BT_DATA(BT_DATA_NAME_COMPLETE, name, static_cast<uint8_t>(strlen(name)));
+
+    mAdvertisingRequest.priority        = kAdvertisingPriority;
+    mAdvertisingRequest.options         = kAdvertisingOptions;
+    mAdvertisingRequest.minInterval     = kAdvertisingIntervalMin;
+    mAdvertisingRequest.maxInterval     = kAdvertisingIntervalMax;
+    mAdvertisingRequest.advertisingData = Span<bt_data>(mAdvertisingItems);
+
+    mAdvertisingRequest.onStarted = [](int rc) {
+        if (rc == 0)
+        {
+            ChipLogProgress(SoftwareUpdate, "SMP BLE advertising started");
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "Failed to start SMP BLE advertising: %d", rc);
+        }
+    };
+
     os_mgmt_register_group();
     img_mgmt_register_group();
-    img_mgmt_set_upload_cb(UploadConfirmHandler);
 
-    memset(&mBleConnCallbacks, 0, sizeof(mBleConnCallbacks));
-    mBleConnCallbacks.connected    = nullptr;
-    mBleConnCallbacks.disconnected = OnBleDisconnect;
-
-    bt_conn_cb_register(&mBleConnCallbacks);
+    img_mgmt_set_upload_cb([](const img_mgmt_upload_req req, const img_mgmt_upload_action action) {
+        ChipLogProgress(SoftwareUpdate, "DFU over SMP progress: %u/%u B of image %u", static_cast<unsigned>(req.off),
+                        static_cast<unsigned>(action.size), static_cast<unsigned>(req.image));
+        return 0;
+    });
 
     mgmt_register_evt_cb([](uint8_t opcode, uint16_t group, uint8_t id, void * arg) {
         switch (opcode)
@@ -64,127 +90,34 @@ void DFUOverSMP::Init(DFUOverSMPRestartAdvertisingHandler startAdvertisingCb)
             break;
         }
     });
-
-    restartAdvertisingCallback = startAdvertisingCb;
-
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 }
 
 void DFUOverSMP::ConfirmNewImage()
 {
     // Check if the image is run in the REVERT mode and eventually
     // confirm it to prevent reverting on the next boot.
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+    VerifyOrReturn(mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT);
+
+    if (boot_write_img_confirmed())
     {
-        if (boot_write_img_confirmed())
-        {
-            ChipLogError(DeviceLayer, "Confirming firmware image failed, it will be reverted on the next boot.");
-        }
-        else
-        {
-            ChipLogProgress(DeviceLayer, "New firmware image confirmed.");
-        }
+        ChipLogError(SoftwareUpdate, "Confirming firmware image failed, it will be reverted on the next boot");
     }
-}
-
-int DFUOverSMP::UploadConfirmHandler(const struct img_mgmt_upload_req req, const struct img_mgmt_upload_action action)
-{
-    // For now just print update progress and confirm data chunk without any additional checks.
-    ChipLogProgress(DeviceLayer, "Software update progress of image %u: %u B / %u B", static_cast<unsigned>(req.image),
-                    static_cast<unsigned>(req.off), static_cast<unsigned>(action.size));
-
-    return 0;
+    else
+    {
+        ChipLogProgress(SoftwareUpdate, "New firmware image confirmed");
+    }
 }
 
 void DFUOverSMP::StartServer()
 {
-    if (!mIsEnabled)
-    {
-        mIsEnabled = true;
-        smp_bt_register();
+    VerifyOrReturn(!mIsStarted, ChipLogProgress(SoftwareUpdate, "DFU over SMP was already started"));
+    smp_bt_register();
 
-        ChipLogProgress(DeviceLayer, "Enabled software update");
-
-        // Start SMP advertising only in case CHIPoBLE advertising is not working.
-        if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
-            StartBLEAdvertising();
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "Software update is already enabled");
-    }
-}
-
-void DFUOverSMP::StartBLEAdvertising()
-{
-    if (!mIsEnabled && !mIsAdvertisingEnabled)
-        return;
-
-    const char * deviceName = bt_get_name();
-    const uint8_t advFlags  = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
-
-    bt_data ad[] = { BT_DATA(BT_DATA_FLAGS, &advFlags, sizeof(advFlags)),
-                     BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, static_cast<uint8_t>(strlen(deviceName))) };
-
-    int rc;
-    bt_le_adv_param advParams = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, kAdvertisingIntervalMinMs,
-                                                     kAdvertisingIntervalMaxMs, nullptr);
-
-    rc = bt_le_adv_stop();
-    if (rc)
-    {
-        ChipLogError(DeviceLayer, "SMP advertising stop failed (rc %d)", rc);
-    }
-
-    rc = bt_le_adv_start(&advParams, ad, ARRAY_SIZE(ad), NULL, 0);
-    if (rc)
-    {
-        ChipLogError(DeviceLayer, "SMP advertising start failed (rc %d)", rc);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "Started SMP service BLE advertising");
-        mIsAdvertisingEnabled = true;
-    }
-}
-
-void DFUOverSMP::OnBleDisconnect(struct bt_conn * conId, uint8_t reason)
-{
+    // Synchronize access to the advertising arbiter that normally runs on the CHIP thread.
     PlatformMgr().LockChipStack();
-
-    // After BLE disconnect SMP advertising needs to be restarted. Before making it ensure that BLE disconnect was not triggered
-    // by closing CHIPoBLE service connection (in that case CHIPoBLE advertising needs to be restarted).
-    if (!ConnectivityMgr().IsBLEAdvertisingEnabled() && (ConnectivityMgr().NumBLEConnections() == 0))
-    {
-        sDFUOverSMP.restartAdvertisingCallback();
-    }
-
+    BLEAdvertisingArbiter::InsertRequest(mAdvertisingRequest);
     PlatformMgr().UnlockChipStack();
-}
 
-void DFUOverSMP::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
-{
-    if (!GetDFUOverSMP().IsEnabled())
-        return;
-
-    switch (event->Type)
-    {
-    case DeviceEventType::kCHIPoBLEAdvertisingChange:
-        if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
-        {
-            // Check if CHIPoBLE advertising was stopped permanently or it just a matter of opened BLE connection.
-            if (ConnectivityMgr().NumBLEConnections() == 0)
-                sDFUOverSMP.restartAdvertisingCallback();
-        }
-        break;
-    case DeviceEventType::kCHIPoBLEConnectionClosed:
-        // Check if after closing CHIPoBLE connection advertising is working, if no start SMP advertising.
-        if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
-        {
-            sDFUOverSMP.restartAdvertisingCallback();
-        }
-        break;
-    default:
-        break;
-    }
+    mIsStarted = true;
+    ChipLogProgress(DeviceLayer, "DFU over SMP started");
 }

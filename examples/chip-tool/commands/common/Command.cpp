@@ -18,6 +18,7 @@
 
 #include "Command.h"
 #include "CustomStringPrefix.h"
+#include "HexConversion.h"
 #include "platform/PlatformManager.h"
 
 #include <functional>
@@ -330,19 +331,6 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         return true;
     }
 
-    case ArgumentType::Attribute: {
-        if (arg.isOptional() || arg.isNullable())
-        {
-            isValidArgument = false;
-        }
-        else
-        {
-            char * value    = reinterpret_cast<char *>(arg.value);
-            isValidArgument = (strcmp(argValue, value) == 0);
-        }
-        break;
-    }
-
     case ArgumentType::String: {
         isValidArgument = HandleNullableOptional<char *>(arg, argValue, [&](auto * value) {
             *value = argValue;
@@ -377,14 +365,16 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
                 // representation is always longer than the octet string it encodes,
                 // so we have enough space in argValue for the decoded version.
                 chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-                if (!buffer.Calloc(argLen)) // Bigger than needed, but it's fine.
-                {
-                    return false;
-                }
 
-                size_t octetCount =
-                    chip::Encoding::HexToBytes(argValue + kHexStringPrefixLen, argLen - kHexStringPrefixLen, buffer.Get(), argLen);
-                if (octetCount == 0)
+                size_t octetCount;
+                CHIP_ERROR err = HexToBytes(
+                    chip::CharSpan(argValue + kHexStringPrefixLen, argLen - kHexStringPrefixLen),
+                    [&buffer](size_t allocSize) {
+                        buffer.Calloc(allocSize);
+                        return buffer.Get();
+                    },
+                    &octetCount);
+                if (err != CHIP_NO_ERROR)
                 {
                     return false;
                 }
@@ -600,16 +590,14 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     return isValidArgument;
 }
 
-size_t Command::AddArgument(const char * name, const char * value, const char * desc, uint8_t flags)
+void Command::AddArgument(const char * name, const char * value, const char * desc)
 {
-    Argument arg;
-    arg.type  = ArgumentType::Attribute;
+    ReadOnlyGlobalCommandArgument arg;
     arg.name  = name;
-    arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
-    arg.flags = flags;
+    arg.value = value;
     arg.desc  = desc;
 
-    return AddArgumentToList(std::move(arg));
+    mReadOnlyGlobalCommandArgument.SetValue(arg);
 }
 
 size_t Command::AddArgument(const char * name, char ** value, const char * desc, uint8_t flags)
@@ -829,16 +817,26 @@ const char * Command::GetArgumentDescription(size_t index) const
     return nullptr;
 }
 
+const char * Command::GetReadOnlyGlobalCommandArgument() const
+{
+    if (GetAttribute())
+    {
+        return GetAttribute();
+    }
+
+    if (GetEvent())
+    {
+        return GetEvent();
+    }
+
+    return nullptr;
+}
+
 const char * Command::GetAttribute() const
 {
-    size_t argsCount = mArgs.size();
-    for (size_t i = 0; i < argsCount; i++)
+    if (mReadOnlyGlobalCommandArgument.HasValue())
     {
-        Argument arg = mArgs.at(i);
-        if (arg.type == ArgumentType::Attribute)
-        {
-            return reinterpret_cast<const char *>(arg.value);
-        }
+        return mReadOnlyGlobalCommandArgument.Value().value;
     }
 
     return nullptr;
@@ -846,14 +844,9 @@ const char * Command::GetAttribute() const
 
 const char * Command::GetEvent() const
 {
-    size_t argsCount = mArgs.size();
-    for (size_t i = 0; i < argsCount; i++)
+    if (mReadOnlyGlobalCommandArgument.HasValue())
     {
-        Argument arg = mArgs.at(i);
-        if (arg.type == ArgumentType::Attribute)
-        {
-            return reinterpret_cast<const char *>(arg.value);
-        }
+        return mReadOnlyGlobalCommandArgument.Value().value;
     }
 
     return nullptr;
@@ -937,11 +930,6 @@ void Command::ResetArguments()
             }
             case ArgumentType::VectorCustom: {
                 // No optional VectorCustom arguments so far.
-                VerifyOrDie(false);
-                break;
-            }
-            case ArgumentType::Attribute: {
-                // No optional Attribute arguments so far.
                 VerifyOrDie(false);
                 break;
             }

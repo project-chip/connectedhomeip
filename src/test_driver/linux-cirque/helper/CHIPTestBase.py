@@ -20,14 +20,14 @@ import json
 import logging
 import os
 import re
-from typing import Union, List
-
-import requests
 import sys
 import time
 import traceback
 from enum import IntEnum
+from typing import List, Union
 from urllib.parse import urljoin
+
+import requests
 
 
 class TestResult(IntEnum):

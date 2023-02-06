@@ -22,16 +22,16 @@
 #
 
 from __future__ import absolute_import
-from datetime import datetime
-from setuptools import setup
-from wheel.bdist_wheel import bdist_wheel
 
 import argparse
 import json
 import os
 import platform
 import shutil
+from datetime import datetime
 
+from setuptools import setup
+from wheel.bdist_wheel import bdist_wheel
 
 parser = argparse.ArgumentParser(
     description='build the pip package for chip using chip components generated during the build and python source code')

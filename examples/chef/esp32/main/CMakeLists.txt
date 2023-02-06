@@ -109,6 +109,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
 chip_app_component_codegen("${CHEF}/devices/${SAMPLE_NAME}.matter")
+chip_app_component_zapgen("${CHEF}/devices/${SAMPLE_NAME}.zap")
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")

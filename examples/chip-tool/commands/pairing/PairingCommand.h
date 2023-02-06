@@ -20,6 +20,7 @@
 
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
+#include <controller/CurrentFabricRemover.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
@@ -47,7 +48,8 @@ enum class PairingNetworkType
 
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
-                       public chip::Controller::DeviceDiscoveryDelegate
+                       public chip::Controller::DeviceDiscoveryDelegate,
+                       public chip::Credentials::DeviceAttestationDelegate
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -55,9 +57,14 @@ public:
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType),
-        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }
+        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
+        mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("bypass-attestation-verifier", 0, 1, &mBypassAttestationVerifier,
+                    "Bypass the attestation verifier. If not provided or false, the attestation verifier is not bypassed."
+                    " If true, the commissioning will continue in case of attestation verification failure.");
+        AddArgument("case-auth-tags", 1, UINT32_MAX, &mCASEAuthTags, "The CATs to be encoded in the NOC sent to the commissionee");
 
         switch (networkType)
         {
@@ -156,6 +163,12 @@ public:
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
     bool IsDiscoverOnce() { return mDiscoverOnce.ValueOr(false); }
 
+    /////////// DeviceAttestationDelegate /////////
+    chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
+    void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
+                                      const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
+                                      chip::Credentials::AttestationVerificationResult attestationResult) override;
+
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
@@ -175,6 +188,8 @@ private:
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
     chip::Optional<bool> mPaseOnly;
     chip::Optional<bool> mSkipCommissioningComplete;
+    chip::Optional<bool> mBypassAttestationVerifier;
+    chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
@@ -184,4 +199,10 @@ private:
     char * mOnboardingPayload;
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
+
+    // For unpair
+    chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
+    chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
+
+    static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
 };

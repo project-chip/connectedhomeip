@@ -18,12 +18,10 @@
 import io
 import os
 
-import pandas as pd  # type: ignore
-
 import memdf.util.subprocess
-
-from memdf.collector.util import simplify_source
+import pandas as pd  # type: ignore
 from memdf import Config, ConfigDescription, DFs, SymbolDF
+from memdf.collector.util import simplify_source
 
 CONFIG: ConfigDescription = {
     'tool.bloaty': {

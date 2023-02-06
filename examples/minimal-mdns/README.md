@@ -1,3 +1,8 @@
+# Minimal mDNS example
+
+This example demonstrates the multicast DNS (mDNS) protocol functionality in
+Matter.
+
 ## Example server
 
 The file `server.cpp` contains an example of a mdns server that can listen on

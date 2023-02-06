@@ -45,16 +45,16 @@ limitations under the License.
         <server tick="false" init="false">true</server>
         <command source="client" code="0x00" name="RetrieveLogsRequest" response="RetrieveLogsResponse" optional="false" cli="chip logs retrieve">
             <description>Retrieving diagnostic logs from a Node</description>
-            <arg name="intent" type="LogsIntent"/>
-            <arg name="requestedProtocol" type="LogsTransferProtocol"/>
-            <arg name="transferFileDesignator" type="OCTET_STRING" length="32"/>
+            <arg name="Intent" type="LogsIntent"/>
+            <arg name="RequestedProtocol" type="LogsTransferProtocol"/>
+            <arg name="TransferFileDesignator" type="OCTET_STRING" length="32"/>
         </command>
         <command source="server" code="0x01" name="RetrieveLogsResponse" optional="false" cli="chip logs response">
             <description>Response to the RetrieveLogsRequest</description>
-            <arg name="status" type="LogsStatus"/>
-            <arg name="content" type="OCTET_STRING"/>
-            <arg name="timeStamp" type="epoch_s"/>
-            <arg name="timeSinceBoot" type="INT32U"/>
+            <arg name="Status" type="LogsStatus"/>
+            <arg name="LogContent" type="OCTET_STRING"/>
+            <arg name="UTCTimeStamp" type="epoch_s"/>
+            <arg name="TimeSinceBoot" type="INT32U"/>
         </command>
     </cluster>
 </configurator>

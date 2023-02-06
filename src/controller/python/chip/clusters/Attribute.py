@@ -17,27 +17,26 @@
 
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
-from asyncio import events
 
-from asyncio.futures import Future
+import builtins
 import ctypes
+import inspect
+import logging
+import sys
+from asyncio.futures import Future
+from ctypes import CFUNCTYPE, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
 from dataclasses import dataclass, field
-from typing import Tuple, Type, Union, List, Any, Callable, Dict, Set, Optional
-from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint64, c_uint32,  c_uint16, c_uint8, py_object, c_uint64
-import construct
-from rich.pretty import pprint
+from enum import Enum, unique
+from typing import Any, Callable, Dict, List, Optional, Union
 
-from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
-from chip.native import PyChipError
-from enum import Enum, unique
-import inspect
-import sys
-import logging
-import threading
-import builtins
+import construct
+from chip.native import ErrorSDKPart, PyChipError
+from rich.pretty import pprint
+
+from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 
 
 @unique
@@ -811,7 +810,11 @@ class AsyncWriteTransaction:
         # move on, possibly invalidating the provided _event_loop.
         #
         if self._resultError is not None:
-            self._future.set_exception(self._resultError.to_exception())
+            if self._resultError.sdk_part is ErrorSDKPart.IM_GLOBAL_STATUS:
+                im_status = chip.interaction_model.Status(self._resultError.sdk_code)
+                self._future.set_exception(chip.interaction_model.InteractionModelError(im_status))
+            else:
+                self._future.set_exception(self._resultError.to_exception())
         else:
             self._future.set_result(self._resultData)
 
@@ -911,14 +914,13 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None) -> PyChipError:
+def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
 
     writeargs = []
     for attr in attributes:
         if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
-            raise ValueError(
-                f"Attribute {attr.__class__} must use timed write, please specify a valid timedRequestTimeoutMs value.")
+            raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
         path = chip.interaction_model.AttributePathIBstruct.parse(
             b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
         path.EndpointId = attr.EndpointId
@@ -936,7 +938,12 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = builtins.chipStack.Call(
         lambda: handle.pychip_WriteClient_WriteAttributes(
-            ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs))
+            ctypes.py_object(transaction), device,
+            ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs),
+            ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs),
+            ctypes.c_uint16(0 if busyWaitMs is None else busyWaitMs),
+            ctypes.c_size_t(len(attributes)), *writeargs)
+    )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res

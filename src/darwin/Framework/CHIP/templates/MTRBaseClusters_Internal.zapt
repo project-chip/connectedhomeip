@@ -5,13 +5,15 @@
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice.h"
 
-#include <controller-clusters/zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClusters.h>
 
 {{#chip_client_clusters includeAll=true}}
 
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
+{{/unless}}
 
 {{/chip_client_clusters}}

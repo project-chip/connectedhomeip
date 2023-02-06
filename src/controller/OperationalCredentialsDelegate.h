@@ -30,7 +30,8 @@ namespace chip {
 namespace Controller {
 
 typedef void (*OnNOCChainGeneration)(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                     const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
+                                     const ByteSpan & rcac, Optional<Crypto::IdentityProtectionKeySpan> ipk,
+                                     Optional<NodeId> adminSubject);
 
 constexpr uint32_t kMaxCHIPDERCertLength = 600;
 constexpr size_t kCSRNonceLength         = 32;

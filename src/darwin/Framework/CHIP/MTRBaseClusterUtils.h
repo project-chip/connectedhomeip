@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@
 #include <app/CommandSender.h>
 #include <app/ReadClient.h>
 #include <app/data-model/NullObject.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
+#include <system/SystemClock.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -201,7 +202,7 @@ CHIP_ERROR MTRStartSubscribeInteraction(BridgeType * _Nonnull bridge, MTRSubscri
     VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err;
-    if (params.resubscribeIfLost) {
+    if (params.resubscribeAutomatically) {
         readPaths.release();
 
         err = readClient->SendAutoResubscribeRequest(std::move(readPrepareParams));
@@ -378,11 +379,18 @@ protected:
     bool mCalledCallback = false;
 };
 
+/**
+ * timedInvokeTimeoutMs, if provided, is how long the server will wait for us to
+ * send the invoke after we sent the Timed Request message.
+ *
+ * invokeTimeout, if provided, will have possible MRP latency added to it and
+ * the result is how long we will wait for the server to respond.
+ */
 template <typename BridgeType, typename RequestDataType>
 CHIP_ERROR MTRStartInvokeInteraction(BridgeType * _Nonnull bridge, const RequestDataType & requestData,
     chip::Messaging::ExchangeManager & exchangeManager, const chip::SessionHandle & session,
     typename BridgeType::SuccessCallbackType successCb, MTRErrorCallback failureCb, chip::EndpointId endpoint,
-    chip::Optional<uint16_t> timedInvokeTimeoutMs)
+    chip::Optional<uint16_t> timedInvokeTimeoutMs, chip::Optional<chip::System::Clock::Timeout> invokeTimeout)
 {
     auto callback = chip::Platform::MakeUnique<MTRInvokeCallback<BridgeType, typename RequestDataType::ResponseType>>(
         bridge, successCb, failureCb);
@@ -395,7 +403,11 @@ CHIP_ERROR MTRStartInvokeInteraction(BridgeType * _Nonnull bridge, const Request
     chip::app::CommandPathParams commandPath(endpoint, 0, RequestDataType::GetClusterId(), RequestDataType::GetCommandId(),
         chip::app::CommandPathFlags::kEndpointIdValid);
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestData, timedInvokeTimeoutMs));
-    ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
+
+    if (invokeTimeout.HasValue()) {
+        invokeTimeout.SetValue(session->ComputeRoundTripTimeout(invokeTimeout.Value()));
+    }
+    ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 
     callback->AdoptCommandSender(std::move(commandSender));
     callback.release();

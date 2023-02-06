@@ -19,8 +19,8 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <logging/log.h>
-#include <settings/settings.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/settings/settings.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;

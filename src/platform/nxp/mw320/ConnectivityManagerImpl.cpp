@@ -244,7 +244,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
 {
-    wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
     ChipLogProgress(DeviceLayer, "GetWiFiVersion: %u", wiFiVersion);
     return CHIP_NO_ERROR;
 }

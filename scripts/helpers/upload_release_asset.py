@@ -17,11 +17,12 @@
 #
 
 import argparse
-import coloredlogs
 import logging
-import tarfile
-import github
 import os
+import tarfile
+
+import coloredlogs
+import github
 
 
 class BundleBuilder:

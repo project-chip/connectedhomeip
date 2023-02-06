@@ -43,7 +43,7 @@ limitations under the License.
     <bitmap name="WiFiSecurity" type="BITMAP8">
         <cluster code="0x0031"/>
         <field name="Unencrypted" mask="0x1"/>
-        <field name="WEP-PERSONAL" mask="0x2"/>
+        <field name="WEP" mask="0x2"/>
         <field name="WPA-PERSONAL" mask="0x4"/>
         <field name="WPA2-PERSONAL" mask="0x8"/>
         <field name="WPA3-PERSONAL" mask="0x10"/>
@@ -171,8 +171,8 @@ limitations under the License.
     </cluster>
     <bitmap name="NetworkCommissioningFeature" type="BITMAP32">
         <cluster code="0x0031"/>
-        <field name="WiFiNetworkInterface" mask="0x1"/>
-        <field name="ThreadNetworkInterface" mask="0x2"/>
-        <field name="EthernetNetworkInterface" mask="0x4"/>
+        <field name="Wi-Fi network interface" mask="0x1"/>
+        <field name="Thread network interface" mask="0x2"/>
+        <field name="Ethernet network interface" mask="0x4"/>
     </bitmap>
 </configurator>

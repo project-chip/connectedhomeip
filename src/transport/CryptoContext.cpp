@@ -129,7 +129,7 @@ CHIP_ERROR CryptoContext::InitFromKeyPair(const Crypto::P256Keypair & local_keyp
     P256ECDHDerivedSecret secret;
     ReturnErrorOnFailure(local_keypair.ECDH_derive_secret(remote_public_key, secret));
 
-    return InitFromSecret(ByteSpan(secret, secret.Length()), salt, infoType, role);
+    return InitFromSecret(secret.Span(), salt, infoType, role);
 }
 
 CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uint32_t messageCounter, NodeId nodeId)

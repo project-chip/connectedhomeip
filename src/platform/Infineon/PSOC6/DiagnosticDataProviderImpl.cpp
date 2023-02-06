@@ -161,7 +161,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         /* Update Network Interface list */
         ifp->name                            = CharSpan::fromCharString(net_interface->name);
         ifp->isOperational                   = net_interface->flags & NETIF_FLAG_LINK_UP;
-        ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
         ifp->offPremiseServicesReachableIPv4 = mipv4_offpremise;
         ifp->offPremiseServicesReachableIPv6 = mipv6_offpremise;
         ifp->hardwareAddress                 = ByteSpan(net_interface->hwaddr, net_interface->hwaddr_len);
@@ -260,17 +260,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     /* VHT Capable */
     if (bss_info.vht_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_AC;
     }
     /* HT Capable */
     else if (bss_info.n_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
     }
     /* 11g Capable */
     else
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11G;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_G;
     }
 
 exit:

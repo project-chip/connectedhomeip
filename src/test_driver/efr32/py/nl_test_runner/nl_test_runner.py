@@ -17,16 +17,16 @@
 
 import argparse
 import logging
-from pw_hdlc.rpc import HdlcRpcClient, default_channels, write_to_file
-from pw_status import Status
-import serial  # type: ignore
 import subprocess
 import sys
 import time
 from typing import Any
 
+import serial  # type: ignore
+from pw_hdlc.rpc import HdlcRpcClient, default_channels, write_to_file
+
 # RPC Protos
-from nl_test_service import nl_test_pb2
+from nl_test_service import nl_test_pb2  # isort:skip
 
 PW_LOG = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ def runner(client) -> int:
                 colors.HEADER + streamed_data.test_suite_start.suite_name) + colors.ENDC)
         if streamed_data.HasField("test_case_run"):
             print("\t{}: {}".format(streamed_data.test_case_run.test_case_name,
-                  FAIL_STRING if streamed_data.test_case_run.failed else PASS_STRING))
+                                    FAIL_STRING if streamed_data.test_case_run.failed else PASS_STRING))
         if streamed_data.HasField("test_suite_tests_run_summary"):
             total_run += streamed_data.test_suite_tests_run_summary.total_count
             total_failed += streamed_data.test_suite_tests_run_summary.failed_count

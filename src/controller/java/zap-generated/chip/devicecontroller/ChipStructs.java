@@ -25,12 +25,12 @@ import javax.annotation.Nullable;
 
 public class ChipStructs {
   public static class ScenesClusterAttributeValuePair {
-    public Optional<Long> attributeId;
+    public Optional<Long> attributeID;
     public ArrayList<Object> attributeValue;
 
     public ScenesClusterAttributeValuePair(
-        Optional<Long> attributeId, ArrayList<Object> attributeValue) {
-      this.attributeId = attributeId;
+        Optional<Long> attributeID, ArrayList<Object> attributeValue) {
+      this.attributeID = attributeID;
       this.attributeValue = attributeValue;
     }
 
@@ -38,8 +38,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("ScenesClusterAttributeValuePair {\n");
-      output.append("\tattributeId: ");
-      output.append(attributeId);
+      output.append("\tattributeID: ");
+      output.append(attributeID);
       output.append("\n");
       output.append("\tattributeValue: ");
       output.append(attributeValue);
@@ -50,12 +50,12 @@ public class ChipStructs {
   }
 
   public static class ScenesClusterExtensionFieldSet {
-    public Long clusterId;
+    public Long clusterID;
     public ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList;
 
     public ScenesClusterExtensionFieldSet(
-        Long clusterId, ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList) {
-      this.clusterId = clusterId;
+        Long clusterID, ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList) {
+      this.clusterID = clusterID;
       this.attributeValueList = attributeValueList;
     }
 
@@ -63,8 +63,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("ScenesClusterExtensionFieldSet {\n");
-      output.append("\tclusterId: ");
-      output.append(clusterId);
+      output.append("\tclusterID: ");
+      output.append(clusterID);
       output.append("\n");
       output.append("\tattributeValueList: ");
       output.append(attributeValueList);
@@ -75,11 +75,11 @@ public class ChipStructs {
   }
 
   public static class DescriptorClusterDeviceTypeStruct {
-    public Long type;
+    public Long deviceType;
     public Integer revision;
 
-    public DescriptorClusterDeviceTypeStruct(Long type, Integer revision) {
-      this.type = type;
+    public DescriptorClusterDeviceTypeStruct(Long deviceType, Integer revision) {
+      this.deviceType = deviceType;
       this.revision = revision;
     }
 
@@ -87,8 +87,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("DescriptorClusterDeviceTypeStruct {\n");
-      output.append("\ttype: ");
-      output.append(type);
+      output.append("\tdeviceType: ");
+      output.append(deviceType);
       output.append("\n");
       output.append("\trevision: ");
       output.append(revision);
@@ -172,14 +172,14 @@ public class ChipStructs {
     }
   }
 
-  public static class AccessControlClusterAccessControlEntry {
+  public static class AccessControlClusterAccessControlEntryStruct {
     public Integer privilege;
     public Integer authMode;
     public @Nullable ArrayList<Object> subjects;
     public @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets;
     public Integer fabricIndex;
 
-    public AccessControlClusterAccessControlEntry(
+    public AccessControlClusterAccessControlEntryStruct(
         Integer privilege,
         Integer authMode,
         @Nullable ArrayList<Object> subjects,
@@ -195,7 +195,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AccessControlClusterAccessControlEntry {\n");
+      output.append("AccessControlClusterAccessControlEntryStruct {\n");
       output.append("\tprivilege: ");
       output.append(privilege);
       output.append("\n");
@@ -216,11 +216,11 @@ public class ChipStructs {
     }
   }
 
-  public static class AccessControlClusterExtensionEntry {
+  public static class AccessControlClusterAccessControlExtensionStruct {
     public byte[] data;
     public Integer fabricIndex;
 
-    public AccessControlClusterExtensionEntry(byte[] data, Integer fabricIndex) {
+    public AccessControlClusterAccessControlExtensionStruct(byte[] data, Integer fabricIndex) {
       this.data = data;
       this.fabricIndex = fabricIndex;
     }
@@ -228,7 +228,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AccessControlClusterExtensionEntry {\n");
+      output.append("AccessControlClusterAccessControlExtensionStruct {\n");
       output.append("\tdata: ");
       output.append(Arrays.toString(data));
       output.append("\n");
@@ -616,7 +616,7 @@ public class ChipStructs {
     }
   }
 
-  public static class GeneralDiagnosticsClusterNetworkInterfaceType {
+  public static class GeneralDiagnosticsClusterNetworkInterface {
     public String name;
     public Boolean isOperational;
     public @Nullable Boolean offPremiseServicesReachableIPv4;
@@ -626,7 +626,7 @@ public class ChipStructs {
     public ArrayList<byte[]> IPv6Addresses;
     public Integer type;
 
-    public GeneralDiagnosticsClusterNetworkInterfaceType(
+    public GeneralDiagnosticsClusterNetworkInterface(
         String name,
         Boolean isOperational,
         @Nullable Boolean offPremiseServicesReachableIPv4,
@@ -648,7 +648,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterNetworkInterfaceType {\n");
+      output.append("GeneralDiagnosticsClusterNetworkInterface {\n");
       output.append("\tname: ");
       output.append(name);
       output.append("\n");
@@ -678,14 +678,14 @@ public class ChipStructs {
     }
   }
 
-  public static class SoftwareDiagnosticsClusterThreadMetrics {
+  public static class SoftwareDiagnosticsClusterThreadMetricsStruct {
     public Long id;
     public Optional<String> name;
     public Optional<Long> stackFreeCurrent;
     public Optional<Long> stackFreeMinimum;
     public Optional<Long> stackSize;
 
-    public SoftwareDiagnosticsClusterThreadMetrics(
+    public SoftwareDiagnosticsClusterThreadMetricsStruct(
         Long id,
         Optional<String> name,
         Optional<Long> stackFreeCurrent,
@@ -701,7 +701,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterThreadMetrics {\n");
+      output.append("SoftwareDiagnosticsClusterThreadMetricsStruct {\n");
       output.append("\tid: ");
       output.append(id);
       output.append("\n");
@@ -1004,25 +1004,25 @@ public class ChipStructs {
     }
   }
 
-  public static class OperationalCredentialsClusterFabricDescriptor {
+  public static class OperationalCredentialsClusterFabricDescriptorStruct {
     public byte[] rootPublicKey;
-    public Integer vendorId;
-    public Long fabricId;
-    public Long nodeId;
+    public Integer vendorID;
+    public Long fabricID;
+    public Long nodeID;
     public String label;
     public Integer fabricIndex;
 
-    public OperationalCredentialsClusterFabricDescriptor(
+    public OperationalCredentialsClusterFabricDescriptorStruct(
         byte[] rootPublicKey,
-        Integer vendorId,
-        Long fabricId,
-        Long nodeId,
+        Integer vendorID,
+        Long fabricID,
+        Long nodeID,
         String label,
         Integer fabricIndex) {
       this.rootPublicKey = rootPublicKey;
-      this.vendorId = vendorId;
-      this.fabricId = fabricId;
-      this.nodeId = nodeId;
+      this.vendorID = vendorID;
+      this.fabricID = fabricID;
+      this.nodeID = nodeID;
       this.label = label;
       this.fabricIndex = fabricIndex;
     }
@@ -1030,18 +1030,18 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("OperationalCredentialsClusterFabricDescriptor {\n");
+      output.append("OperationalCredentialsClusterFabricDescriptorStruct {\n");
       output.append("\trootPublicKey: ");
       output.append(Arrays.toString(rootPublicKey));
       output.append("\n");
-      output.append("\tvendorId: ");
-      output.append(vendorId);
+      output.append("\tvendorID: ");
+      output.append(vendorID);
       output.append("\n");
-      output.append("\tfabricId: ");
-      output.append(fabricId);
+      output.append("\tfabricID: ");
+      output.append(fabricID);
       output.append("\n");
-      output.append("\tnodeId: ");
-      output.append(nodeId);
+      output.append("\tnodeID: ");
+      output.append(nodeID);
       output.append("\n");
       output.append("\tlabel: ");
       output.append(label);
@@ -1262,11 +1262,11 @@ public class ChipStructs {
     }
   }
 
-  public static class ModeSelectClusterSemanticTag {
+  public static class ModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public ModeSelectClusterSemanticTag(Integer mfgCode, Integer value) {
+    public ModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1274,7 +1274,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ModeSelectClusterSemanticTag {\n");
+      output.append("ModeSelectClusterSemanticTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1289,12 +1289,12 @@ public class ChipStructs {
   public static class ModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.ModeSelectClusterSemanticTag> semanticTags;
+    public ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags;
 
     public ModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.ModeSelectClusterSemanticTag> semanticTags) {
+        ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags) {
       this.label = label;
       this.mode = mode;
       this.semanticTags = semanticTags;
@@ -1318,11 +1318,11 @@ public class ChipStructs {
     }
   }
 
-  public static class DoorLockClusterDlCredential {
+  public static class DoorLockClusterCredentialStruct {
     public Integer credentialType;
     public Integer credentialIndex;
 
-    public DoorLockClusterDlCredential(Integer credentialType, Integer credentialIndex) {
+    public DoorLockClusterCredentialStruct(Integer credentialType, Integer credentialIndex) {
       this.credentialType = credentialType;
       this.credentialIndex = credentialIndex;
     }
@@ -1330,7 +1330,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterDlCredential {\n");
+      output.append("DoorLockClusterCredentialStruct {\n");
       output.append("\tcredentialType: ");
       output.append(credentialType);
       output.append("\n");
@@ -1372,14 +1372,14 @@ public class ChipStructs {
     }
   }
 
-  public static class ChannelClusterChannelInfo {
+  public static class ChannelClusterChannelInfoStruct {
     public Integer majorNumber;
     public Integer minorNumber;
     public Optional<String> name;
     public Optional<String> callSign;
     public Optional<String> affiliateCallSign;
 
-    public ChannelClusterChannelInfo(
+    public ChannelClusterChannelInfoStruct(
         Integer majorNumber,
         Integer minorNumber,
         Optional<String> name,
@@ -1395,7 +1395,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ChannelClusterChannelInfo {\n");
+      output.append("ChannelClusterChannelInfoStruct {\n");
       output.append("\tmajorNumber: ");
       output.append(majorNumber);
       output.append("\n");
@@ -1416,13 +1416,13 @@ public class ChipStructs {
     }
   }
 
-  public static class ChannelClusterLineupInfo {
+  public static class ChannelClusterLineupInfoStruct {
     public String operatorName;
     public Optional<String> lineupName;
     public Optional<String> postalCode;
     public Integer lineupInfoType;
 
-    public ChannelClusterLineupInfo(
+    public ChannelClusterLineupInfoStruct(
         String operatorName,
         Optional<String> lineupName,
         Optional<String> postalCode,
@@ -1436,7 +1436,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ChannelClusterLineupInfo {\n");
+      output.append("ChannelClusterLineupInfoStruct {\n");
       output.append("\toperatorName: ");
       output.append(operatorName);
       output.append("\n");
@@ -1454,11 +1454,11 @@ public class ChipStructs {
     }
   }
 
-  public static class TargetNavigatorClusterTargetInfo {
+  public static class TargetNavigatorClusterTargetInfoStruct {
     public Integer identifier;
     public String name;
 
-    public TargetNavigatorClusterTargetInfo(Integer identifier, String name) {
+    public TargetNavigatorClusterTargetInfoStruct(Integer identifier, String name) {
       this.identifier = identifier;
       this.name = name;
     }
@@ -1466,7 +1466,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TargetNavigatorClusterTargetInfo {\n");
+      output.append("TargetNavigatorClusterTargetInfoStruct {\n");
       output.append("\tidentifier: ");
       output.append(identifier);
       output.append("\n");
@@ -1478,11 +1478,11 @@ public class ChipStructs {
     }
   }
 
-  public static class MediaPlaybackClusterPlaybackPosition {
+  public static class MediaPlaybackClusterPlaybackPositionStruct {
     public Long updatedAt;
     public @Nullable Long position;
 
-    public MediaPlaybackClusterPlaybackPosition(Long updatedAt, @Nullable Long position) {
+    public MediaPlaybackClusterPlaybackPositionStruct(Long updatedAt, @Nullable Long position) {
       this.updatedAt = updatedAt;
       this.position = position;
     }
@@ -1490,7 +1490,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("MediaPlaybackClusterPlaybackPosition {\n");
+      output.append("MediaPlaybackClusterPlaybackPositionStruct {\n");
       output.append("\tupdatedAt: ");
       output.append(updatedAt);
       output.append("\n");
@@ -1502,13 +1502,13 @@ public class ChipStructs {
     }
   }
 
-  public static class MediaInputClusterInputInfo {
+  public static class MediaInputClusterInputInfoStruct {
     public Integer index;
     public Integer inputType;
     public String name;
     public String description;
 
-    public MediaInputClusterInputInfo(
+    public MediaInputClusterInputInfoStruct(
         Integer index, Integer inputType, String name, String description) {
       this.index = index;
       this.inputType = inputType;
@@ -1519,7 +1519,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("MediaInputClusterInputInfo {\n");
+      output.append("MediaInputClusterInputInfoStruct {\n");
       output.append("\tindex: ");
       output.append(index);
       output.append("\n");
@@ -1537,12 +1537,12 @@ public class ChipStructs {
     }
   }
 
-  public static class ContentLauncherClusterDimension {
+  public static class ContentLauncherClusterDimensionStruct {
     public Double width;
     public Double height;
     public Integer metric;
 
-    public ContentLauncherClusterDimension(Double width, Double height, Integer metric) {
+    public ContentLauncherClusterDimensionStruct(Double width, Double height, Integer metric) {
       this.width = width;
       this.height = height;
       this.metric = metric;
@@ -1551,7 +1551,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ContentLauncherClusterDimension {\n");
+      output.append("ContentLauncherClusterDimensionStruct {\n");
       output.append("\twidth: ");
       output.append(width);
       output.append("\n");
@@ -1566,11 +1566,11 @@ public class ChipStructs {
     }
   }
 
-  public static class ContentLauncherClusterAdditionalInfo {
+  public static class ContentLauncherClusterAdditionalInfoStruct {
     public String name;
     public String value;
 
-    public ContentLauncherClusterAdditionalInfo(String name, String value) {
+    public ContentLauncherClusterAdditionalInfoStruct(String name, String value) {
       this.name = name;
       this.value = value;
     }
@@ -1578,7 +1578,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ContentLauncherClusterAdditionalInfo {\n");
+      output.append("ContentLauncherClusterAdditionalInfoStruct {\n");
       output.append("\tname: ");
       output.append(name);
       output.append("\n");
@@ -1590,15 +1590,17 @@ public class ChipStructs {
     }
   }
 
-  public static class ContentLauncherClusterParameter {
+  public static class ContentLauncherClusterParameterStruct {
     public Integer type;
     public String value;
-    public Optional<ArrayList<ChipStructs.ContentLauncherClusterAdditionalInfo>> externalIDList;
+    public Optional<ArrayList<ChipStructs.ContentLauncherClusterAdditionalInfoStruct>>
+        externalIDList;
 
-    public ContentLauncherClusterParameter(
+    public ContentLauncherClusterParameterStruct(
         Integer type,
         String value,
-        Optional<ArrayList<ChipStructs.ContentLauncherClusterAdditionalInfo>> externalIDList) {
+        Optional<ArrayList<ChipStructs.ContentLauncherClusterAdditionalInfoStruct>>
+            externalIDList) {
       this.type = type;
       this.value = value;
       this.externalIDList = externalIDList;
@@ -1607,7 +1609,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ContentLauncherClusterParameter {\n");
+      output.append("ContentLauncherClusterParameterStruct {\n");
       output.append("\ttype: ");
       output.append(type);
       output.append("\n");
@@ -1622,18 +1624,18 @@ public class ChipStructs {
     }
   }
 
-  public static class ContentLauncherClusterContentSearch {
-    public ArrayList<ChipStructs.ContentLauncherClusterParameter> parameterList;
+  public static class ContentLauncherClusterContentSearchStruct {
+    public ArrayList<ChipStructs.ContentLauncherClusterParameterStruct> parameterList;
 
-    public ContentLauncherClusterContentSearch(
-        ArrayList<ChipStructs.ContentLauncherClusterParameter> parameterList) {
+    public ContentLauncherClusterContentSearchStruct(
+        ArrayList<ChipStructs.ContentLauncherClusterParameterStruct> parameterList) {
       this.parameterList = parameterList;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ContentLauncherClusterContentSearch {\n");
+      output.append("ContentLauncherClusterContentSearchStruct {\n");
       output.append("\tparameterList: ");
       output.append(parameterList);
       output.append("\n");
@@ -1642,16 +1644,16 @@ public class ChipStructs {
     }
   }
 
-  public static class ContentLauncherClusterStyleInformation {
-    public Optional<String> imageUrl;
+  public static class ContentLauncherClusterStyleInformationStruct {
+    public Optional<String> imageURL;
     public Optional<String> color;
-    public Optional<ChipStructs.ContentLauncherClusterDimension> size;
+    public Optional<ChipStructs.ContentLauncherClusterDimensionStruct> size;
 
-    public ContentLauncherClusterStyleInformation(
-        Optional<String> imageUrl,
+    public ContentLauncherClusterStyleInformationStruct(
+        Optional<String> imageURL,
         Optional<String> color,
-        Optional<ChipStructs.ContentLauncherClusterDimension> size) {
-      this.imageUrl = imageUrl;
+        Optional<ChipStructs.ContentLauncherClusterDimensionStruct> size) {
+      this.imageURL = imageURL;
       this.color = color;
       this.size = size;
     }
@@ -1659,9 +1661,9 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ContentLauncherClusterStyleInformation {\n");
-      output.append("\timageUrl: ");
-      output.append(imageUrl);
+      output.append("ContentLauncherClusterStyleInformationStruct {\n");
+      output.append("\timageURL: ");
+      output.append(imageURL);
       output.append("\n");
       output.append("\tcolor: ");
       output.append(color);
@@ -1674,21 +1676,21 @@ public class ChipStructs {
     }
   }
 
-  public static class ContentLauncherClusterBrandingInformation {
+  public static class ContentLauncherClusterBrandingInformationStruct {
     public String providerName;
-    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> background;
-    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> logo;
-    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> progressBar;
-    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> splash;
-    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> waterMark;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> background;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> logo;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> progressBar;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> splash;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> waterMark;
 
-    public ContentLauncherClusterBrandingInformation(
+    public ContentLauncherClusterBrandingInformationStruct(
         String providerName,
-        Optional<ChipStructs.ContentLauncherClusterStyleInformation> background,
-        Optional<ChipStructs.ContentLauncherClusterStyleInformation> logo,
-        Optional<ChipStructs.ContentLauncherClusterStyleInformation> progressBar,
-        Optional<ChipStructs.ContentLauncherClusterStyleInformation> splash,
-        Optional<ChipStructs.ContentLauncherClusterStyleInformation> waterMark) {
+        Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> background,
+        Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> logo,
+        Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> progressBar,
+        Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> splash,
+        Optional<ChipStructs.ContentLauncherClusterStyleInformationStruct> waterMark) {
       this.providerName = providerName;
       this.background = background;
       this.logo = logo;
@@ -1700,7 +1702,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ContentLauncherClusterBrandingInformation {\n");
+      output.append("ContentLauncherClusterBrandingInformationStruct {\n");
       output.append("\tproviderName: ");
       output.append(providerName);
       output.append("\n");
@@ -1724,12 +1726,12 @@ public class ChipStructs {
     }
   }
 
-  public static class AudioOutputClusterOutputInfo {
+  public static class AudioOutputClusterOutputInfoStruct {
     public Integer index;
     public Integer outputType;
     public String name;
 
-    public AudioOutputClusterOutputInfo(Integer index, Integer outputType, String name) {
+    public AudioOutputClusterOutputInfoStruct(Integer index, Integer outputType, String name) {
       this.index = index;
       this.outputType = outputType;
       this.name = name;
@@ -1738,7 +1740,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AudioOutputClusterOutputInfo {\n");
+      output.append("AudioOutputClusterOutputInfoStruct {\n");
       output.append("\tindex: ");
       output.append(index);
       output.append("\n");
@@ -1753,36 +1755,38 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationLauncherClusterApplication {
-    public Integer catalogVendorId;
-    public String applicationId;
+  public static class ApplicationLauncherClusterApplicationStruct {
+    public Integer catalogVendorID;
+    public String applicationID;
 
-    public ApplicationLauncherClusterApplication(Integer catalogVendorId, String applicationId) {
-      this.catalogVendorId = catalogVendorId;
-      this.applicationId = applicationId;
+    public ApplicationLauncherClusterApplicationStruct(
+        Integer catalogVendorID, String applicationID) {
+      this.catalogVendorID = catalogVendorID;
+      this.applicationID = applicationID;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplication {\n");
-      output.append("\tcatalogVendorId: ");
-      output.append(catalogVendorId);
+      output.append("ApplicationLauncherClusterApplicationStruct {\n");
+      output.append("\tcatalogVendorID: ");
+      output.append(catalogVendorID);
       output.append("\n");
-      output.append("\tapplicationId: ");
-      output.append(applicationId);
+      output.append("\tapplicationID: ");
+      output.append(applicationID);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class ApplicationLauncherClusterApplicationEP {
-    public ChipStructs.ApplicationLauncherClusterApplication application;
+  public static class ApplicationLauncherClusterApplicationEPStruct {
+    public ChipStructs.ApplicationLauncherClusterApplicationStruct application;
     public Optional<Integer> endpoint;
 
-    public ApplicationLauncherClusterApplicationEP(
-        ChipStructs.ApplicationLauncherClusterApplication application, Optional<Integer> endpoint) {
+    public ApplicationLauncherClusterApplicationEPStruct(
+        ChipStructs.ApplicationLauncherClusterApplicationStruct application,
+        Optional<Integer> endpoint) {
       this.application = application;
       this.endpoint = endpoint;
     }
@@ -1790,7 +1794,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplicationEP {\n");
+      output.append("ApplicationLauncherClusterApplicationEPStruct {\n");
       output.append("\tapplication: ");
       output.append(application);
       output.append("\n");
@@ -1802,25 +1806,54 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationBasicClusterApplicationBasicApplication {
-    public Integer catalogVendorId;
-    public String applicationId;
+  public static class ApplicationBasicClusterApplicationStruct {
+    public Integer catalogVendorID;
+    public String applicationID;
 
-    public ApplicationBasicClusterApplicationBasicApplication(
-        Integer catalogVendorId, String applicationId) {
-      this.catalogVendorId = catalogVendorId;
-      this.applicationId = applicationId;
+    public ApplicationBasicClusterApplicationStruct(Integer catalogVendorID, String applicationID) {
+      this.catalogVendorID = catalogVendorID;
+      this.applicationID = applicationID;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationBasicClusterApplicationBasicApplication {\n");
-      output.append("\tcatalogVendorId: ");
-      output.append(catalogVendorId);
+      output.append("ApplicationBasicClusterApplicationStruct {\n");
+      output.append("\tcatalogVendorID: ");
+      output.append(catalogVendorID);
       output.append("\n");
-      output.append("\tapplicationId: ");
-      output.append(applicationId);
+      output.append("\tapplicationID: ");
+      output.append(applicationID);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ClientMonitoringClusterMonitoringRegistration {
+    public Long clientNodeId;
+    public Long ICid;
+    public Integer fabricIndex;
+
+    public ClientMonitoringClusterMonitoringRegistration(
+        Long clientNodeId, Long ICid, Integer fabricIndex) {
+      this.clientNodeId = clientNodeId;
+      this.ICid = ICid;
+      this.fabricIndex = fabricIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ClientMonitoringClusterMonitoringRegistration {\n");
+      output.append("\tclientNodeId: ");
+      output.append(clientNodeId);
+      output.append("\n");
+      output.append("\tICid: ");
+      output.append(ICid);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();

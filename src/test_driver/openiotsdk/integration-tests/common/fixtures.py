@@ -15,23 +15,21 @@
 #    limitations under the License.
 #
 
-import pytest
+import logging
 import os
 import pathlib
-from time import sleep
 import shutil
+from time import sleep
 
-from .telnet_connection import TelnetConnection
-from .fvp_device import FvpDevice
-
-from chip import exceptions
-
-from chip import ChipDeviceCtrl
-from chip.ChipStack import *
-import chip.native
 import chip.CertificateAuthority
+import chip.native
+import pytest
+from chip import ChipDeviceCtrl, exceptions
+from chip.ChipStack import *
 
-import logging
+from .fvp_device import FvpDevice
+from .telnet_connection import TelnetConnection
+
 log = logging.getLogger(__name__)
 
 

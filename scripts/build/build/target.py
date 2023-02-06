@@ -42,12 +42,10 @@ import itertools
 import logging
 import os
 import re
-
 from dataclasses import dataclass
-from typing import Any, Dict, List, Iterable, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 from builders.builder import BuilderOptions
-
 
 report_rejected_parts = True
 

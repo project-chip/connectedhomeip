@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Send Identify command and expect success response"
-      command: "identify"
+      command: "Identify"
       arguments:
           values:
               - name: "IdentifyTime"

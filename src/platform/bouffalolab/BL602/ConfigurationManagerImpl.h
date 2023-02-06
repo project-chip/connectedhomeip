@@ -33,7 +33,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
 
-#include <blog.h>
 #include <platform/bouffalolab/BL602/BL602Config.h>
 
 namespace chip {

@@ -127,7 +127,6 @@ private:
      */
     CHIP_ERROR HandleThreadStateChange(const ChipDeviceEvent * event);
     CHIP_ERROR HandleOperationalNetworkEnabled(const ChipDeviceEvent * event);
-    static void BLEConnDisconnect(chip::System::Layer * aLayer, void * aAppState);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     CHIP_ERROR PrepareC3CharData();

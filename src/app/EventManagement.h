@@ -33,7 +33,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/ObjectList.h>
 #include <app/util/basic-types.h>
-#include <lib/core/CHIPCircularTLVBuffer.h>
+#include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
 #include <messaging/ExchangeMgr.h>
 
@@ -49,17 +49,17 @@ constexpr uint16_t kRequiredEventField =
 
 /**
  * @brief
- *   Internal event buffer, built around the TLV::CHIPCircularTLVBuffer
+ *   Internal event buffer, built around the TLV::TLVCircularBuffer
  */
 
-class CircularEventBuffer : public TLV::CHIPCircularTLVBuffer
+class CircularEventBuffer : public TLV::TLVCircularBuffer
 {
 public:
     /**
      * @brief
      *   A constructor for the CircularEventBuffer (internal API).
      */
-    CircularEventBuffer() : CHIPCircularTLVBuffer(nullptr, 0){};
+    CircularEventBuffer() : TLVCircularBuffer(nullptr, 0){};
 
     /**
      * @brief
@@ -119,10 +119,10 @@ class CircularEventReader;
  *   if nothing left there update its CircularEventBuffer until the buffer with data has been found,
  *   the tlv reader will have a pointer to this impl.
  */
-class CircularEventBufferWrapper : public TLV::CHIPCircularTLVBuffer
+class CircularEventBufferWrapper : public TLV::TLVCircularBuffer
 {
 public:
-    CircularEventBufferWrapper() : CHIPCircularTLVBuffer(nullptr, 0), mpCurrent(nullptr){};
+    CircularEventBufferWrapper() : TLVCircularBuffer(nullptr, 0), mpCurrent(nullptr){};
     CircularEventBuffer * mpCurrent;
 
 private:
@@ -149,7 +149,7 @@ enum class EventManagementStates
 
 struct LogStorageResources
 {
-    // TODO: Update CHIPCircularTLVBuffer with size_t for buffer size, then use ByteSpan
+    // TODO: Update TLVCircularBuffer with size_t for buffer size, then use ByteSpan
     uint8_t * mpBuffer =
         nullptr; // Buffer to be used as a storage at the particular priority level and shared with more important events.
                  // Must not be nullptr.  Must be large enough to accommodate the largest event emitted by the system.
@@ -466,8 +466,8 @@ private:
      * @brief checking if the tail's event can be moved to higher priority, if not, dropped, if yes, note how much space it
      * requires, and return.
      */
-    static CHIP_ERROR EvictEvent(chip::TLV::CHIPCircularTLVBuffer & aBuffer, void * apAppData, TLV::TLVReader & aReader);
-    static CHIP_ERROR AlwaysFail(chip::TLV::CHIPCircularTLVBuffer & aBuffer, void * apAppData, TLV::TLVReader & aReader)
+    static CHIP_ERROR EvictEvent(chip::TLV::TLVCircularBuffer & aBuffer, void * apAppData, TLV::TLVReader & aReader);
+    static CHIP_ERROR AlwaysFail(chip::TLV::TLVCircularBuffer & aBuffer, void * apAppData, TLV::TLVReader & aReader)
     {
         return CHIP_ERROR_NO_MEMORY;
     };

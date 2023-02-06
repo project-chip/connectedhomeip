@@ -15,21 +15,19 @@
 #    limitations under the License.
 #
 
+import asyncio
+import ctypes
+import logging
 import os
 import random
-import shlex
 import re
-import ctypes
-import asyncio
+import shlex
 from time import sleep
 
-from chip.setup_payload import SetupPayload
-from chip import exceptions
-
+from chip import discovery, exceptions
 from chip.clusters import Objects as GeneratedObjects
-from chip import discovery
+from chip.setup_payload import SetupPayload
 
-import logging
 log = logging.getLogger(__name__)
 
 IP_ADDRESS_BUFFER_LEN = 100

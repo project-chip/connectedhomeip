@@ -44,7 +44,14 @@ limitations under the License.
             <access op="invoke" privilege="manage"/>
         </command>
 
-        <command source="client" code="0x01" name="StayAwakeRequest" optional="true">
+        <command source="client" code="0x01" name="UnregisterClientMonitoring" optional="false">
+            <description> Unregister a client from an end device </description>
+            <arg name="ClientNodeId" type="node_id"/>
+            <arg name="ICid" type="INT64U"/>
+            <access op="invoke" privilege="manage"/>
+        </command>
+
+        <command source="client" code="0x02" name="StayAwakeRequest" optional="true">
             <description>Request the end device to stay in Active Mode for an additional ActiveModeThreshold</description>
             <access op="invoke" privilege="manage"/>
         </command>

@@ -120,8 +120,8 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
         for (auto & deviceType : deviceTypeList)
         {
-            deviceStruct.type     = deviceType.deviceId;
-            deviceStruct.revision = deviceType.deviceVersion;
+            deviceStruct.deviceType = deviceType.deviceId;
+            deviceStruct.revision   = deviceType.deviceVersion;
             ReturnErrorOnFailure(encoder.Encode(deviceStruct));
         }
 

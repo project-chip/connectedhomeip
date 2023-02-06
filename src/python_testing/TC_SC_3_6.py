@@ -15,18 +15,19 @@
 #    limitations under the License.
 #
 
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
+import asyncio
+import logging
+import queue
+import time
+from threading import Event
+
+import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.FabricAdmin
-import chip.CertificateAuthority
-import logging
-from mobly import asserts
+from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.utils import CommissioningBuildingBlocks
-from chip.clusters.Attribute import TypedAttributePath, SubscriptionTransaction
-import queue
-import asyncio
-from threading import Event
-import time
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from mobly import asserts
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic
 #       to some internal behavior assumptions of the SDK we are making relative to the write to
@@ -129,7 +130,7 @@ class TC_SC_3_6(MatterBaseTest):
         client_list.append(dev_ctrl)
 
         if num_controllers_per_fabric > 1:
-            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id)
+            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=self.dut_node_id)
             for controller in new_controllers:
                 controller.name = all_names.pop(0)
             client_list.extend(new_controllers)
@@ -147,7 +148,7 @@ class TC_SC_3_6(MatterBaseTest):
 
             if num_controllers_per_fabric > 1:
                 new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=new_fabric_admin, adminDevCtrl=new_admin_ctrl,
-                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id)
+                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=self.dut_node_id)
                 for controller in new_controllers:
                     controller.name = all_names.pop(0)
 

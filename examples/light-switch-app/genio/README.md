@@ -1,21 +1,17 @@
-#Matter `Genio` Light Switch Example
+# Matter `Genio` Light Switch Example
 
 An example showing the use of Matter on the MediaTek `Genio` MT793X.
 
 <hr>
 
--   [Matter Genio Light Switch Example](#chip-genio-light-switch-example)
+-   [Matter Genio Light Switch Example](#matter-genio-light-switch-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
-        -   [Note](#note)
     -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
 
 <hr>
-
-<a name="intro"></a>
 
 ## Introduction
 
@@ -31,8 +27,6 @@ device which will then join the network.
 The light switch example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 MediaTek platform.
-
-<a name="building"></a>
 
 ## Building
 

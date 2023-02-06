@@ -57,6 +57,10 @@ using SubscriptionOnDoneCallback      = std::function<void(void)>;
 class DLL_EXPORT ClusterBase
 {
 public:
+    ClusterBase(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        mExchangeManager(exchangeManager), mSession(session), mEndpoint(endpoint)
+    {}
+
     virtual ~ClusterBase() {}
 
     // Temporary function to set command timeout before we move over to InvokeCommand
@@ -68,8 +72,6 @@ public:
      * empty optional if no timeout has been set.
      */
     Optional<System::Clock::Timeout> GetCommandTimeout() { return mTimeout; }
-
-    ClusterId GetClusterId() const { return mClusterId; }
 
     /*
      * This function permits sending an invoke request using cluster objects that represent the request and response data payloads.
@@ -397,12 +399,6 @@ public:
     }
 
 protected:
-    ClusterBase(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, ClusterId cluster,
-                EndpointId endpoint) :
-        mExchangeManager(exchangeManager),
-        mSession(session), mClusterId(cluster), mEndpoint(endpoint)
-    {}
-
     Messaging::ExchangeManager & mExchangeManager;
 
     // Since cluster object is ephemeral, the session shall be valid during the entire lifespan, so we do not need to check the
@@ -410,7 +406,6 @@ protected:
     // can't use SessionHandle here, in such case, the cluster object must be freed when the session is released.
     SessionHolder mSession;
 
-    const ClusterId mClusterId;
     EndpointId mEndpoint;
     Optional<System::Clock::Timeout> mTimeout;
 };

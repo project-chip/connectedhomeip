@@ -178,7 +178,7 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 bool Cmd_ConvertCert(int argc, char * argv[])
 {
     bool res = true;
-    std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
 
     if (argc == 1)
     {
@@ -192,7 +192,7 @@ bool Cmd_ConvertCert(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    res = ReadCert(gInFileNameOrStr, cert.get());
+    res = ReadCert(gInFileNameOrStr, cert);
     VerifyTrueOrExit(res);
 
     res = WriteCert(gOutFileName, cert.get(), gOutCertFormat);

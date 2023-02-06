@@ -17,16 +17,16 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="Privilege" type="ENUM8">
+  <enum name="AccessControlEntryPrivilegeEnum" type="ENUM8">
     <cluster code="0x001F"/>
     <item name="View" value="0x01"/>
-    <item name="ProxyView" value="0x02"/>
+    <item name="Proxy View" value="0x02"/>
     <item name="Operate" value="0x03"/>
     <item name="Manage" value="0x04"/>
     <item name="Administer" value="0x05"/>
   </enum>
 
-  <enum name="AuthMode" type="ENUM8">
+  <enum name="AccessControlEntryAuthModeEnum" type="ENUM8">
     <cluster code="0x001F"/>
     <item name="PASE" value="0x01"/>
     <item name="CASE" value="0x02"/>
@@ -47,15 +47,15 @@ limitations under the License.
     <item fieldId="2" name="DeviceType" type="devtype_id" isNullable="true"/>
   </struct>
 
-  <struct name="AccessControlEntry" isFabricScoped="true">
+  <struct name="AccessControlEntryStruct" isFabricScoped="true">
     <cluster code="0x001F"/>
-    <item fieldId="1" name="Privilege" type="Privilege" isFabricSensitive="true"/>
-    <item fieldId="2" name="AuthMode" type="AuthMode" isFabricSensitive="true"/>
+    <item fieldId="1" name="Privilege" type="AccessControlEntryPrivilegeEnum" isFabricSensitive="true"/>
+    <item fieldId="2" name="AuthMode" type="AccessControlEntryAuthModeEnum" isFabricSensitive="true"/>
     <item fieldId="3" name="Subjects" type="INT64U" isNullable="true" array="true" isFabricSensitive="true"/>
     <item fieldId="4" name="Targets" type="Target" isNullable="true" array="true" isFabricSensitive="true"/>
   </struct>
 
-  <struct name="ExtensionEntry" isFabricScoped="true">
+  <struct name="AccessControlExtensionStruct" isFabricScoped="true">
     <cluster code="0x001F"/>
     <item fieldId="1" name="Data" type="OCTET_STRING" length="128" isFabricSensitive="true"/>
   </struct>
@@ -72,14 +72,14 @@ limitations under the License.
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances.</description>
 
-    <attribute side="server" code="0x0000" define="ACL" type="ARRAY" entryType="AccessControlEntry" writable="true">
+    <attribute side="server" code="0x0000" define="ACL" type="ARRAY" entryType="AccessControlEntryStruct" writable="true">
       <description>ACL</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
       <access modifier="fabric-scoped"/>
     </attribute>
 
-    <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="ExtensionEntry" writable="true" optional="true">
+    <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="AccessControlExtensionStruct" writable="true" optional="true">
       <description>Extension</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
@@ -106,7 +106,7 @@ limitations under the License.
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
       <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
-      <field id="4" name="LatestValue" type="AccessControlEntry" isNullable="true"/>
+      <field id="4" name="LatestValue" type="AccessControlEntryStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
     <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" isFabricSensitive="true" optional="false">
@@ -114,7 +114,7 @@ limitations under the License.
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
       <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
-      <field id="4" name="LatestValue" type="ExtensionEntry" isNullable="true"/>
+      <field id="4" name="LatestValue" type="AccessControlExtensionStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
   </cluster>

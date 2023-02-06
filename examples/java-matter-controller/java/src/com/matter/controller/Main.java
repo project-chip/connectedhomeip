@@ -112,10 +112,9 @@ public class Main {
 
     try {
       commandManager.run(args);
-    } catch (IllegalArgumentException e) {
-      logger.log(Level.INFO, "Arguments init failed with exception: " + e.getMessage());
     } catch (Exception e) {
       logger.log(Level.INFO, "Run command failed with exception: " + e.getMessage());
+      System.exit(1);
     }
     controller.shutdownCommissioning();
   }

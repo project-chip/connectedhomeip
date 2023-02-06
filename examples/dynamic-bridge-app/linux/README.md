@@ -9,13 +9,11 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 <hr>
 
 -   [CHIP Linux Bridge Example](#chip-linux-bridge-example)
-    -   [Theory of Operation](#operation)
+    -   [Theory of Operation](#theory-of-operation)
     -   [Building](#building)
-    -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
 <hr>
-
-<a name="operation"></a>
 
 ## Theory of Operation
 
@@ -89,7 +87,7 @@ clusters as well as the root descriptor cluster.
 The example demonstrates the use of dynamic endpoints and the concept of adding
 and removing endpoints at runtime. First, the example declares a
 `bridgedLightEndpoint` data structure for a Light endpoint with `OnOff`,
-`Descriptor`, `BridgedDeviceBasic`, and `FixedLabel` clusters.
+`Descriptor`, `BridgedDeviceBasicInformation`, and `FixedLabel` clusters.
 
 Using this declared endpoint structure, three endpoints for three bridged lights
 are dynamically added at endpoint ID's `2`, `3`, and `4`, representing
@@ -101,12 +99,10 @@ A fourth light, `Light 4`, is then added occupying endpoint ID `5`.
 
 Finally, `Light 2` is re-added, and will occupy endpoint ID `6`.
 
-All endpoints populate the `Bridged Device Basic` and `Fixed Label` clusters. In
-the `Bridged Device Basic` cluster, the `reachable` attribute is simulated. In
-the `Fixed Label` cluster, the `LabelList` attribute is simulated with the
-value/label pair `"room"`/`[light name]`.
-
-<a name="building"></a>
+All endpoints populate the `Bridged Device Basic Information` and `Fixed Label`
+clusters. In the `Bridged Device Basic Information` cluster, the `reachable`
+attribute is simulated. In the `Fixed Label` cluster, the `LabelList` attribute
+is simulated with the value/label pair `"room"`/`[light name]`.
 
 ## Building
 
@@ -132,8 +128,6 @@ value/label pair `"room"`/`[light name]`.
           $ cd ~/connectedhomeip/examples/dynamic-bridge-app/linux
           $ rm -rf out/
           ```
-
-<a name="running-complete-example"></a>
 
 ## Running the Complete Example on Raspberry Pi 4
 

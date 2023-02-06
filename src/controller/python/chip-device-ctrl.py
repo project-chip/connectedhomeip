@@ -23,39 +23,30 @@
 #      This file implements the Python-based Chip Device Controller Shell.
 #
 
-from __future__ import absolute_import
-from __future__ import print_function
-from sqlite3 import adapt
-from chip import ChipDeviceCtrl
-from chip import clusters as Clusters
-from chip import FabricAdmin
-from chip import ChipStack
-from chip import ChipCommissionableNodeCtrl
-from chip import exceptions
-from chip import native
+from __future__ import absolute_import, print_function
+
 import argparse
+import base64
 import ctypes
-import sys
+import logging
 import os
 import platform
 import random
-from optparse import OptionParser, OptionValueError
 import shlex
-import base64
+import string
+import sys
 import textwrap
 import time
-import string
 import traceback
-from cmd import Cmd
-from chip.setup_payload import SetupPayload
-import deprecation
 import warnings
-import logging
-from rich import print
-from rich.pretty import pprint
-from rich import pretty
-import coloredlogs
+from cmd import Cmd
+from optparse import OptionParser, OptionValueError
+
 import chip.logging
+import coloredlogs
+from chip import ChipCommissionableNodeCtrl, ChipStack, FabricAdmin, exceptions, native
+from chip.setup_payload import SetupPayload
+from rich import pretty, print
 
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
@@ -894,7 +885,7 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[1])
                 cluster_attrs = all_attrs.get(args[1], {})
                 print('\n'.join(["{}: {}".format(key, cluster_attrs[key]["type"])
-                      for key in cluster_attrs.keys() if cluster_attrs[key].get("writable", False)]))
+                                 for key in cluster_attrs.keys() if cluster_attrs[key].get("writable", False)]))
             elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])

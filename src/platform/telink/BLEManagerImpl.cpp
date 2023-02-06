@@ -886,24 +886,17 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 }
 #endif
 
-void BLEManagerImpl::BLEConnDisconnect(System::Layer * layer, void * param)
+CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent * event)
 {
+    ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
+
     int error = bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN);
     if (error)
     {
         ChipLogError(DeviceLayer, "Close BLEConn err: %d", error);
     }
-}
 
-CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent * event)
-{
-
-    ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
-
-    // Start timer to close BLE connection.
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(20), BLEConnDisconnect, this);
-
-    return CHIP_NO_ERROR;
+    return MapErrorZephyr(error);
 }
 
 CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)

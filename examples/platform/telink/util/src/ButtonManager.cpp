@@ -29,14 +29,15 @@ LOG_MODULE_REGISTER(ButtonManager);
 
 ButtonManager ButtonManager::sInstance;
 
-void Button::Configure(const struct device * port, gpio_pin_t outPin, gpio_pin_t inPin, void (*callback)(void))
+void Button::Configure(const struct device * port, gpio_pin_t outPin, gpio_pin_t inPin, bool intBothLevel, void (*callback)(void))
 {
     __ASSERT(device_is_ready(port), "%s is not ready\n", port->name);
 
-    mPort     = port;
-    mOutPin   = outPin;
-    mInPin    = inPin;
-    mCallback = callback;
+    mPort         = port;
+    mOutPin       = outPin;
+    mInPin        = inPin;
+    mIntBothLevel = intBothLevel;
+    mCallback     = callback;
 }
 
 int Button::Init(void)
@@ -91,19 +92,15 @@ void Button::Poll(Button * previous)
     ret = gpio_pin_get(mPort, mInPin);
     assert(ret >= 0);
 
-    if (ret == STATE_HIGH && mPreviousState != STATE_HIGH)
+    if ((mIntBothLevel && ret != mPreviousState) || (!mIntBothLevel && ret == STATE_HIGH && ret != mPreviousState))
     {
-        mPreviousState = STATE_HIGH;
-
         if (mCallback != NULL)
         {
             mCallback();
         }
     }
-    else if (ret == STATE_LOW)
-    {
-        mPreviousState = STATE_LOW;
-    }
+
+    mPreviousState = ret;
 
     k_msleep(10);
 }

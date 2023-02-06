@@ -11,9 +11,9 @@ Run with:
 """
 
 import os
-import sys
 import subprocess
-import json
+import sys
+
 import intelhex
 
 # The extension is probably not necessary

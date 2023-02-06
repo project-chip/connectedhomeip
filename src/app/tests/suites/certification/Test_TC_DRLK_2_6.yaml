@@ -50,13 +50,13 @@ tests:
       command: "SetHolidaySchedule"
       arguments:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 20
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 30
-              - name: "operatingMode"
+              - name: "OperatingMode"
                 value: 0
 
     - label: "Get Holiday Schedule with HolidayIndex as 1"
@@ -64,21 +64,21 @@ tests:
       command: "GetHolidaySchedule"
       arguments:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 1
       response:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 20
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 30
                 constraints:
                     minValue: 21
-              - name: "operatingMode"
+              - name: "OperatingMode"
                 value: 0
 
     - label: "Create Holiday schedule with invalid operating mode"
@@ -86,13 +86,13 @@ tests:
       command: "SetHolidaySchedule"
       arguments:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 20
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 30
-              - name: "operatingMode"
+              - name: "OperatingMode"
                 value: 5
       response:
           error: INVALID_COMMAND
@@ -102,13 +102,13 @@ tests:
       command: "GetHolidaySchedule"
       arguments:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 15
       response:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 15
-              - name: "status"
+              - name: "Status"
                 value: 133
 
     - label: "Get Holiday Schedule with the Non-scheduled HolidayIndex"
@@ -116,13 +116,13 @@ tests:
       command: "GetHolidaySchedule"
       arguments:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 10
       response:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 10
-              - name: "status"
+              - name: "Status"
                 value: 139
 
     - label: "Clear Holiday schedule with 1 index"
@@ -130,7 +130,7 @@ tests:
       command: "ClearHolidaySchedule"
       arguments:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 1
 
     - label: "Make sure that holiday schedule was deleted"
@@ -138,13 +138,13 @@ tests:
       command: "GetHolidaySchedule"
       arguments:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 1
       response:
           values:
-              - name: "holidayIndex"
+              - name: "HolidayIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 139
 
     - label: "Cleanup the created user"
@@ -152,5 +152,5 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1

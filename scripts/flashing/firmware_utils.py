@@ -15,10 +15,10 @@
 """Utitilies to flash or erase a device."""
 
 import argparse
-import pathlib
 import errno
 import locale
 import os
+import pathlib
 import stat
 import subprocess
 import sys

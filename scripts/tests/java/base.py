@@ -17,17 +17,18 @@
 #    limitations under the License.
 #
 
+import asyncio
+import datetime
 # Commissioning test.
 import logging
 import os
-import sys
 import queue
-import datetime
-import asyncio
-import threading
-import typing
-import time
 import subprocess
+import sys
+import threading
+import time
+import typing
+
 from colorama import Fore, Style
 
 

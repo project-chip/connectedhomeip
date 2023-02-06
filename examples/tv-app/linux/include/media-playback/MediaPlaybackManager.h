@@ -24,7 +24,7 @@ using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using MediaPlaybackDelegate = chip::app::Clusters::MediaPlayback::Delegate;
 using PlaybackResponseType  = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
-using PlaybackPositionType  = chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type;
+using PlaybackPositionType  = chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type;
 
 class MediaPlaybackManager : public MediaPlaybackDelegate
 {

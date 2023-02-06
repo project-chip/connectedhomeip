@@ -45,16 +45,14 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return InteractionModelCommands::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload,
-                                                     mTimedInteractionTimeoutMs, mSuppressResponse, mRepeatCount, mRepeatDelayInMs);
+        return InteractionModelCommands::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload);
     }
 
     template <class T>
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                            chip::CommandId commandId, const T & value)
     {
-        return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value, mTimedInteractionTimeoutMs,
-                                                     mSuppressResponse, mRepeatCount, mRepeatDelayInMs);
+        return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
@@ -76,6 +74,8 @@ public:
         CHIP_ERROR error = status.ToChipError();
         if (CHIP_NO_ERROR != error)
         {
+            ReturnOnFailure(RemoteDataModelLogger::LogErrorAsJSON(path, status));
+
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
             mError = error;
             return;
@@ -83,6 +83,8 @@ public:
 
         if (data != nullptr)
         {
+            ReturnOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
+
             error = DataModelLogger::LogCommand(path, data);
             if (CHIP_NO_ERROR != error)
             {
@@ -95,6 +97,8 @@ public:
 
     virtual void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override
     {
+        ReturnOnFailure(RemoteDataModelLogger::LogErrorAsJSON(error));
+
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
         mError = error;
     }
@@ -175,6 +179,8 @@ protected:
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
                     "If provided, do a timed invoke with the given timed interaction timeout. See \"7.6.10. Timed Interaction\" in "
                     "the Matter specification.");
+        AddArgument("busyWaitForMs", 0, UINT16_MAX, &mBusyWaitForMs,
+                    "If provided, block the main thread processing for the given time right after sending a command.");
         AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
         AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
@@ -184,10 +190,6 @@ protected:
 private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
-    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
-    chip::Optional<bool> mSuppressResponse;
-    chip::Optional<uint16_t> mRepeatCount;
-    chip::Optional<uint16_t> mRepeatDelayInMs;
 
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;

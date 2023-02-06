@@ -36,11 +36,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x0A
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "TH sends CEC Home Keys(0x09) to DUT"
@@ -48,9 +48,9 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x09
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0

@@ -22,6 +22,8 @@ import os.log
 struct TvCastingApp: App {
     let Log = Logger(subsystem: "com.matter.casting",
                      category: "TvCastingApp")
+    @State
+    var firstAppActivation: Bool = true
 
     var body: some Scene {
         WindowGroup {
@@ -44,11 +46,46 @@ struct TvCastingApp: App {
                         
                         appParameters.onboardingPayload = onboardingParameters
                         
-                        castingServerBridge.initApp(appParameters, clientQueue: DispatchQueue.main, initAppStatusHandler: { (result: Bool) -> () in
-                            self.Log.info("initApp result \(result)")
+                        let err = castingServerBridge.initializeApp(appParameters, clientQueue: DispatchQueue.main, initAppStatusHandler: { (result: Bool) -> () in
+                            self.Log.info("initializeApp result \(result)")
                         })
+                        self.Log.info("initializeApp return value \(err)")
                     }
                 })
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.willResignActiveNotification")
+                    if let castingServerBridge = CastingServerBridge.getSharedInstance()
+                    {
+                        castingServerBridge.stopMatterServer()
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.didBecomeActiveNotification")
+                    if(!firstAppActivation)
+                    {
+                        if let castingServerBridge = CastingServerBridge.getSharedInstance()
+                        {
+                            castingServerBridge.startMatterServer(DispatchQueue.main, startMatterServerCompletionCallback: { (error: MatterError) -> () in
+                                DispatchQueue.main.async {
+                                    self.Log.info("TvCastingApp.startMatterServerCompletionCallback called with \(error)")
+                                }
+                            })
+                        }
+                    }
+                    firstAppActivation = false
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.didEnterBackgroundNotification")
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didFinishLaunchingNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.didFinishLaunchingNotification")
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.willEnterForegroundNotification")
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.willTerminateNotification")
+                }
         }
     }
 }

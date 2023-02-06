@@ -32,8 +32,6 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 > release with added tools and documentation.
 > [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
 
-<a name="intro"></a>
-
 ## Introduction
 
 The EFR32 light switch example provides a baseline demonstration of a on-off
@@ -52,8 +50,6 @@ Rendez-vous procedure.
 The light switch example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
-
-<a name="building"></a>
 
 ## Building
 
@@ -107,35 +103,10 @@ Silicon Labs platform.
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
-    MG24 boards :
-
-    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/efr32/ ./out/light-switch-app BRD4161A
+          ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app BRD4161A
 
 -   To delete generated executable, libraries and object files use:
 
@@ -144,7 +115,7 @@ Silicon Labs platform.
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/efr32
+          $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
@@ -153,16 +124,16 @@ Silicon Labs platform.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/efr32
+          $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
           $ rm -rf out/
 
 *   Build the example with Matter shell
 
-          ./scripts/examples/gn_efr32_example.sh examples/light-switch-app/efr32/ out/light-switch-app BRD4161A chip_build_libshell=true
+          ./scripts/examples/gn_efr32_example.sh examples/light-switch-app/silabs/efr32/ out/light-switch-app BRD4161A chip_build_libshell=true
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/efr32/ ./out/light-switch-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app_SED BRD4161A --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
@@ -170,36 +141,30 @@ Silicon Labs platform.
 
 *   Build the example with pigweed RCP
 
-          $ ./scripts/examples/gn_efr32_example.sh examples/light-switch-app/efr32/ out/light-switch-app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_efr32_example.sh examples/light-switch-app/silabs/efr32/ out/light-switch-app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/efr32
+          $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
-    [Running Pigweed RPC console](#running-pigweed-rpc-console)
-
 For more build options, help is provided when running the build script without
 arguments
 
     ./scripts/examples/gn_efr32_example.sh
 
-<a name="flashing"></a>
-
 ## Flashing the Application
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
           $ python3 out/debug/chip-efr32-light-switch-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
-
-<a name="view-logging"></a>
 
 ## Viewing Logging Output
 
@@ -249,8 +214,6 @@ combination with JLinkRTTClient as follows:
 
           $ JLinkRTTClient
 
-<a name="running-complete-example"></a>
-
 ## Running the Complete Example
 
 -   It is assumed here that you already have an OpenThread border router
@@ -264,7 +227,7 @@ combination with JLinkRTTClient as follows:
 
 -   For this example to work, it is necessary to have a second efr32 device
     running the
-    [lighting app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/lighting-app/efr32/README.md)
+    [lighting app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/lighting-app/silabs/efr32/README.md)
     commissioned on the same openthread network
 
 -   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
@@ -385,8 +348,6 @@ combination with JLinkRTTClient as follows:
 #Add Ipv6 route on PC(Linux) \$ sudo ip route add <Thread global ipv6 prefix>/64
 via 2002::2
 
-<a name="running-pigweed-rpc-console"></a>
-
 ## Running RPC console
 
 -   As part of building the example with RPCs enabled the chip_rpc python
@@ -425,14 +386,14 @@ To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+modify `examples/platform/silabs/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
 
 ## OTA Software Update
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../../docs/guides/silabs_efr32_software_update.md)
 
 ## Building options
 
@@ -444,19 +405,19 @@ features can easily be toggled on or off. Here is a short list of options :
 
 chip_progress_logging, chip_detail_logging, chip_automation_logging
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/efr32 ./out/light-switch-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
 
 ### Debug build / release build
 
 is_debug
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/efr32 ./out/light-switch-app BRD4164A "is_debug=false"
 
 ### Disabling LCD
 
 show_qr_code
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/efr32 ./out/light-switch-app BRD4164A "show_qr_code=false"
 
 ### KVS maximum entry count
 
@@ -465,4 +426,4 @@ kvs_max_entries
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/efr32 ./out/light-switch-app BRD4164A kvs_max_entries=50

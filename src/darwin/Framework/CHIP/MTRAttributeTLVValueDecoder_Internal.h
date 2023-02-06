@@ -22,7 +22,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

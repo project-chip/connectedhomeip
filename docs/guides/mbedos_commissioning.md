@@ -1,6 +1,6 @@
 ![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
-<h1> Matter Arm Mbed OS provisioning guide </h1>
+# Matter Arm Mbed OS provisioning guide
 
 -   [Overview](#overview)
 -   [Prerequisites](#prerequisites)
@@ -21,7 +21,7 @@
 
 <hr>
 
-# Overview
+## Overview
 
 This document provides a step-by-step guide how to commission any Matter
 application. For demonstration purposes the Lighting app is used.
@@ -37,7 +37,7 @@ The provisioning process is composed of the following stages:
 BLE is only used during first phase. Afterwards, only the IP connectivity
 between the smartphone and the accessory device is needed to send messages.
 
-# Prerequisites
+## Prerequisites
 
 To complete all the steps in the tutorial, you need:
 
@@ -50,9 +50,9 @@ To complete all the steps in the tutorial, you need:
 -   Any currently supported target device (for example, a Cypress PSoC6
     CY8CPROTO-062-4343W board)
 
-# CHIPTool for Android
+## CHIPTool for Android
 
-## Building and installing
+### Building and installing
 
 To make provisioning possible and to control the Matter device from your Android
 based smartphone, you must first build and install the CHIPTool application.
@@ -85,7 +85,7 @@ After building, install the application by completing the following steps:
 
 Android CHIPTool is now ready to be used for commissioning.
 
-## Accessory Matter device setup
+### Accessory Matter device setup
 
 To prepare the accessory Matter device for commissioning (called rendezvous),
 complete the following steps:
@@ -113,7 +113,7 @@ to the UART console.
 
 -   Open URL from the console to display the QR in a web browser.
 
-## Device commissioning for Android
+### Device commissioning for Android
 
 To commission Matter device onto the network created complete the following
 steps:
@@ -137,7 +137,7 @@ steps:
 -   After successful completion of the process, the application returns to the
     main screen.
 
-## Sending ZCL commands
+### Sending ZCL commands
 
 After the accessory device has been successfully commissioned to the network, it
 is possible to communicate with it using IP. Matter uses Zigbee Cluster Library
@@ -156,9 +156,9 @@ If **Lighting LED** is available then brightness change can be observed.
 > For more details about Android CHIPTool please visit
 > [CHIPTool](../../examples/android/CHIPTool/README.md)
 
-# POSIX CLI CHIPTool
+## POSIX CLI CHIPTool
 
-## Building
+### Building
 
 To make provisioning possible and to control the Matter device from Linux-based
 device, you can build and run the Matter Client example application on it.
@@ -166,7 +166,7 @@ device, you can build and run the Matter Client example application on it.
 To build the POSIX CLI CHIPTool application check the guide
 [POSIX CLI guide](../../examples/chip-tool/README.md).
 
-## Device commissioning for CLI
+### Device commissioning for CLI
 
 In order to send commands to a device, it must be paired with the client and
 connected to the network.
@@ -179,7 +179,7 @@ Example:
 
     $ chip-tool pairing ble-wifi node_id_to_assign network_ssid network_password 20202021 3840
 
-## Sending ZCL commands
+### Sending ZCL commands
 
 If the commissioning process was successful, it is possible to send a ZCL
 command to the device which initiate a certain action.
@@ -198,9 +198,9 @@ The client will send a single command packet and then exit.
 > For more details about POSIX CLI CHIPTool please visit
 > [POSIX CLI CHIPTool](../../examples/chip-tool/README.md)
 
-# Python Device Controller
+## Python Device Controller
 
-## Building and installing
+### Building and installing
 
 To make provisioning possible and to control the Matter device with Python
 application, you can build and run the Python CHIP controller.
@@ -208,7 +208,7 @@ application, you can build and run the Python CHIP controller.
 To build and install the Python Device Controller application check the guide
 [Python Device Controller guide](python_chip_controller_building.md).
 
-## Device commissioning for Python Device Controller
+### Device commissioning for Python Device Controller
 
 In order to send commands to a device, it must be paired with the client and
 connected to the network.
@@ -232,7 +232,7 @@ To run the auto commissioning process via BLE:
 
         chip-device-ctrl > connect -ble 3840 20202021 1234
 
-## Sending ZCL commands
+### Sending ZCL commands
 
 If the commissioning process was successful, it is possible to send a ZCL
 command to the device which initiates a certain action.
@@ -243,7 +243,7 @@ Example:
 
     chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
 
-### ZCL commands details
+#### ZCL commands details
 
 To get the list of supported clusters run:
 

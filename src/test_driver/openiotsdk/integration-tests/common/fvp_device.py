@@ -16,9 +16,9 @@
 #
 
 import logging
-import threading
 import os
 import subprocess
+import threading
 from time import sleep
 
 from .device import Device

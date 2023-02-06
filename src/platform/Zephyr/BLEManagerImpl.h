@@ -25,13 +25,11 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/conn.h>
-#include <bluetooth/gatt.h>
+#include <platform/Zephyr/BLEAdvertisingArbiter.h>
 
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <type_traits>
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/conn.h>
+#include <zephyr/bluetooth/gatt.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -49,13 +47,6 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     friend BLEManager;
 
 private:
-    // As a result of https://github.com/zephyrproject-rtos/zephyr/issues/29357, BLE indication
-    // callback parameter type has changed in recent Zephyr revisions. Select the compatible type
-    // below to support both versions for now.
-    using IndicationAttrType =
-        std::conditional_t<std::is_same<bt_gatt_indicate_func_t, void (*)(bt_conn *, bt_gatt_indicate_params *, uint8_t)>::value,
-                           bt_gatt_indicate_params *, const bt_gatt_attr *>;
-
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
@@ -110,12 +101,13 @@ private:
     bool mSubscribedConns[CONFIG_BT_MAX_CONN];
     bt_gatt_indicate_params mIndicateParams[CONFIG_BT_MAX_CONN];
     bt_conn_cb mConnCallbacks;
+    BLEAdvertisingArbiter::Request mAdvertisingRequest = {};
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
 
     void DriveBLEState(void);
-    CHIP_ERROR ConfigureAdvertising(void);
+    CHIP_ERROR PrepareAdvertisingRequest();
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
@@ -134,7 +126,7 @@ private:
     static void DriveBLEState(intptr_t arg);
 
     // Below callbacks run from the system workqueue context and have a limited stack capacity.
-    static void HandleTXIndicated(bt_conn * conn, IndicationAttrType attr, uint8_t err);
+    static void HandleTXIndicated(bt_conn * conn, bt_gatt_indicate_params * attr, uint8_t err);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
     static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);

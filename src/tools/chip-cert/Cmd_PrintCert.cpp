@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -371,7 +371,7 @@ exit:
 bool Cmd_PrintCert(int argc, char * argv[])
 {
     bool res = true;
-    std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
 
     if (argc == 1)
     {
@@ -382,7 +382,7 @@ bool Cmd_PrintCert(int argc, char * argv[])
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets, HandleNonOptionArgs);
     VerifyTrueOrExit(res);
 
-    res = ReadCert(gInFileNameOrStr, cert.get());
+    res = ReadCert(gInFileNameOrStr, cert);
     VerifyTrueOrExit(res);
 
     res = PrintCert(gOutFileName, cert.get());

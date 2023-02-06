@@ -60,6 +60,7 @@ class SelectActionFragment : Fragment() {
       clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
       provisionCustomFlowBtn.setOnClickListener{  getCallback()?.handleCustomFlowClicked() }
       wildcardBtn.setOnClickListener { getCallback()?.handleWildcardClicked() }
+      unpairDeviceBtn.setOnClickListener{ getCallback()?.handleUnpairDeviceClicked() }
     }
   }
 
@@ -157,6 +158,8 @@ class SelectActionFragment : Fragment() {
     fun handleWildcardClicked()
     /** Notifies listener of provision-custom-flow button click. */
     fun handleCustomFlowClicked()
+    /** Notifies listener of unpair button click. */
+    fun handleUnpairDeviceClicked()
   }
 
   companion object {

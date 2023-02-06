@@ -31,11 +31,7 @@ tests:
 
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-          DUT
-          sudo ./chip-all-clusters-app --wifi
-
-          TH1
-          ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
+          DUT is commissioned on TH1 fabric
       disabled: true
 
     - label:
@@ -47,33 +43,6 @@ tests:
           On TH1(Chiptool), verify CurrentFabricIndex attribute of operationalCredential cluster  as 1
 
 
-          [1661170026.158253][5954:5959] CHIP:EM: Removed CHIP MessageCounter:62138196 from RetransTable on exchange 61072i
-          [1661170026.158379][5954:5959] CHIP:DMG: ReportDataMessage =
-          [1661170026.158448][5954:5959] CHIP:DMG: {
-          [1661170026.158502][5954:5959] CHIP:DMG:         AttributeReportIBs =
-          [1661170026.158581][5954:5959] CHIP:DMG:         [
-          [1661170026.158645][5954:5959] CHIP:DMG:                 AttributeReportIB =
-          [1661170026.158735][5954:5959] CHIP:DMG:                 {
-          [1661170026.158801][5954:5959] CHIP:DMG:                         AttributeDataIB =
-          [1661170026.158881][5954:5959] CHIP:DMG:                         {
-          [1661170026.159014][5954:5959] CHIP:DMG:                                 DataVersion = 0xcf6a5453,
-          [1661170026.159098][5954:5959] CHIP:DMG:                                 AttributePathIB =
-          [1661170026.159184][5954:5959] CHIP:DMG:                                 {
-          [1661170026.159271][5954:5959] CHIP:DMG:                                         Endpoint = 0x0,
-          [1661170026.159363][5954:5959] CHIP:DMG:                                         Cluster = 0x3e,
-          [1661170026.159454][5954:5959] CHIP:DMG:                                         Attribute = 0x0000_0005,
-          [1661170026.159540][5954:5959] CHIP:DMG:                                 }
-          [1661170026.159630][5954:5959] CHIP:DMG:
-          [1661170026.159720][5954:5959] CHIP:DMG:                                 Data = 1,
-          [1661170026.159800][5954:5959] CHIP:DMG:                         },
-          [1661170026.159887][5954:5959] CHIP:DMG:
-          [1661170026.159956][5954:5959] CHIP:DMG:                 },
-          [1661170026.160037][5954:5959] CHIP:DMG:
-          [1661170026.160097][5954:5959] CHIP:DMG:         ],
-          [1661170026.160173][5954:5959] CHIP:DMG:
-          [1661170026.160237][5954:5959] CHIP:DMG:         SuppressResponse = true,
-          [1661170026.160300][5954:5959] CHIP:DMG:         InteractionModelRevision = 1
-          [1661170026.160357][5954:5959] CHIP:DMG: }
           [1661170026.160663][5954:5959] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 3479852115
           [1661170026.160789][5954:5959] CHIP:TOO:   CurrentFabricIndex: 1
           [1661170026.160987][5954:5959] CHIP:EM: Sending Standalone Ack for MessageCounter:183974641 on exchange 61072i

@@ -16,8 +16,8 @@
 # limitations under the License.
 
 import optparse
-import sys
 import re
+import sys
 
 TEMPLATE_PREFIX = '''/*
  *

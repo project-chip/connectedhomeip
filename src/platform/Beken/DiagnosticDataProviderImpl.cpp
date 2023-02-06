@@ -134,7 +134,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     Platform::CopyString(ifp->Name, netif->hostname);
     ifp->name = CharSpan::fromCharString(ifp->Name);
-    ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
     ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
     memcpy(ifp->MacAddress, netif->hwaddr, sizeof(netif->hwaddr));
@@ -173,7 +173,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
 {
     // Support 802.11a/n Wi-Fi in Beken chipset
-    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
     return CHIP_NO_ERROR;
 }
 

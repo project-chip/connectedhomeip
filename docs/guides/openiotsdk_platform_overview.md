@@ -93,3 +93,23 @@ This becomes the lower bound for timers.
 Drivers are provided by
 [Reference MCU-Driver-HAL driver implementation for Arm platforms](https://gitlab.arm.com/iot/open-iot-sdk/mcu-driver-hal/mcu-driver-reference-platforms-for-arm)
 which is provided by Open IoT SDK.
+
+## Trusted Firmware-M
+
+[Trusted Firmware-M](https://tf-m-user-guide.trustedfirmware.org) (`TF-M`)
+implements the Secure Processing Environment (`SPE`) for `Armv8-M`, `Armv8.1-M`
+architectures and dual-core platforms. It is the platform security architecture
+reference implementation aligning with `PSA` Certified guidelines, enabling
+chips, Real Time Operating Systems and devices to become `PSA` Certified. `TF-M`
+relies on an isolation boundary between the Non-secure Processing Environment
+(`NSPE`) and the Secure Processing Environment (`SPE`).
+
+`TF-M` consists of:
+
+-   Secure Boot to authenticate `NSPE` and `SPE` images
+
+-   `TF-M Core` for controlling the isolation, communication and execution
+    within `SPE` and with `NSPE`
+
+-   Crypto, Internal Trusted Storage (`ITS`), Protected Storage (`PS`), Firmware
+    Update and Attestation secure services

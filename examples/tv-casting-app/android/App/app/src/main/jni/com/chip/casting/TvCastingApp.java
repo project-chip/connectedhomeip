@@ -65,21 +65,40 @@ public class TvCastingApp {
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
-    chipPlatform.updateCommissionableDataProviderData(
-        appParameters.getSpake2pVerifierBase64(),
-        appParameters.getSpake2pSaltBase64(),
-        appParameters.getSpake2pIterationCount(),
-        appParameters.getSetupPasscode(),
-        appParameters.getDiscriminator());
+    boolean ret =
+        chipPlatform.updateCommissionableDataProviderData(
+            appParameters.getSpake2pVerifierBase64(),
+            appParameters.getSpake2pSaltBase64(),
+            appParameters.getSpake2pIterationCount(),
+            appParameters.getSetupPasscode(),
+            appParameters.getDiscriminator());
+    if (!ret) {
+      Log.e(
+          TAG,
+          "TvCastingApp.initApp failed to updateCommissionableDataProviderData on chipPlatform");
+      return ret;
+    }
+
+    ret = preInitJni(appParameters);
+    if (!ret) {
+      Log.e(TAG, "TvCastingApp.initApp failed in preInitJni");
+      return ret;
+    }
 
     chipAppServer = new ChipAppServer();
-    chipAppServer.startApp();
+    ret = chipAppServer.startApp();
+    if (!ret) {
+      Log.e(TAG, "TvCastingApp.initApp failed in start chipAppServer");
+      return ret;
+    }
 
     setDACProvider(appParameters.getDacProvider());
     return initJni(appParameters);
   }
 
   private native void setDACProvider(DACProvider provider);
+
+  private native boolean preInitJni(AppParameters appParameters);
 
   private native boolean initJni(AppParameters appParameters);
 
@@ -229,6 +248,14 @@ public class TvCastingApp {
   public native boolean mediaPlayback_stopPlayback(ContentApp contentApp, Object responseHandler);
 
   public native boolean mediaPlayback_next(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_previous(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_rewind(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_fastForward(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_startOver(ContentApp contentApp, Object responseHandler);
 
   public native boolean mediaPlayback_seek(
       ContentApp contentApp, long position, Object responseHandler);
@@ -399,7 +426,13 @@ public class TvCastingApp {
   public native boolean applicationBasic_readApplicationVersion(
       ContentApp contentApp,
       SuccessCallback<String> readSuccessHandler,
-      FailureCallback readFailureHandlerr);
+      FailureCallback readFailureHandler);
+
+  public native boolean onOff_on(ContentApp contentApp, Object responseHandler);
+
+  public native boolean onOff_off(ContentApp contentApp, Object responseHandler);
+
+  public native boolean onOff_toggle(ContentApp contentApp, Object responseHandler);
 
   static {
     System.loadLibrary("TvCastingApp");

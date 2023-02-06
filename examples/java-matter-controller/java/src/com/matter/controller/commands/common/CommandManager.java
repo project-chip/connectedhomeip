@@ -36,7 +36,7 @@ public final class CommandManager {
     mClusters.put(clusterName, commandsList);
   }
 
-  public final void run(String[] args) {
+  public final void run(String[] args) throws Exception {
     Command command;
 
     if (args.length < 1) {
@@ -98,13 +98,13 @@ public final class CommandManager {
 
     try {
       command.initArguments(temp.length, temp);
-      command.run();
     } catch (IllegalArgumentException e) {
-      System.out.println("Run command failed with exception: " + e.getMessage());
+      logger.log(Level.INFO, "Arguments init failed with exception: " + e.getMessage());
       showCommand(args[0], command);
-    } catch (Exception e) {
-      logger.log(Level.INFO, "Run command failed with exception: " + e.getMessage());
+      System.exit(1);
     }
+
+    command.run();
   }
 
   private boolean isAttributeCommand(String commandName) {

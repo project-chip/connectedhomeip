@@ -82,7 +82,7 @@ public abstract class PairingCommand extends MatterCommand
   public void onPairingComplete(int errorCode) {
     logger.log(Level.INFO, "onPairingComplete with error code: " + errorCode);
     if (errorCode != 0) {
-      setTestResult("Failure");
+      setFailure("onPairingComplete failure");
     }
   }
 
@@ -95,9 +95,9 @@ public abstract class PairingCommand extends MatterCommand
   public void onCommissioningComplete(long nodeId, int errorCode) {
     logger.log(Level.INFO, "onCommissioningComplete with error code: " + errorCode);
     if (errorCode == 0) {
-      setTestResult("Success");
+      setSuccess();
     } else {
-      setTestResult("Failure");
+      setFailure("onCommissioningComplete failure");
     }
   }
 
@@ -124,7 +124,7 @@ public abstract class PairingCommand extends MatterCommand
 
   @Override
   public void onError(Throwable error) {
-    setTestResult(error.toString());
+    setFailure(error.toString());
     logger.log(Level.INFO, "onError with error: " + error.toString());
   }
 

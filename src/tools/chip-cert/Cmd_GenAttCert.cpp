@@ -560,10 +560,10 @@ bool Cmd_GenAttCert(int argc, char * argv[])
     }
     else
     {
-        std::unique_ptr<X509, void (*)(X509 *)> caCert(X509_new(), &X509_free);
+        std::unique_ptr<X509, void (*)(X509 *)> caCert(nullptr, &X509_free);
         std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> caKey(EVP_PKEY_new(), &EVP_PKEY_free);
 
-        res = ReadCert(gCACertFileNameOrStr, caCert.get());
+        res = ReadCert(gCACertFileNameOrStr, caCert);
         VerifyTrueOrExit(res);
 
         res = ReadKey(gCAKeyFileNameOrStr, caKey, gCertConfig.IsErrorTestCaseEnabled());

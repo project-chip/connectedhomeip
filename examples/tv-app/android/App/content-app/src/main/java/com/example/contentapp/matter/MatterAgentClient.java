@@ -10,31 +10,37 @@ import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import androidx.annotation.Nullable;
 import com.matter.tv.app.api.IMatterAppAgent;
 import com.matter.tv.app.api.MatterIntentConstants;
 import com.matter.tv.app.api.SetSupportedClustersRequest;
-import com.matter.tv.app.api.SupportedCluster;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class MatterAgentClient {
 
   private static final String TAG = "MatterAgentClient";
-  private static MatterAgentClient instance;
+  private static MatterAgentClient instance = new MatterAgentClient();
   private IMatterAppAgent service;
   private boolean bound = false;
   private CountDownLatch latch = new CountDownLatch(1);
+  private static Context context;
 
   // TODO : Introduce dependency injection
   private MatterAgentClient() {};
 
+  // This could be called from the main activity or the receiver.
+  // In either case cache the context in case the connection is lost and has to be reestablished.
   public static synchronized void initialize(Context context) {
-    if (instance == null || (instance.service == null && !instance.bound)) {
-      instance = new MatterAgentClient();
+    instance.context = context;
+    initInternal();
+  }
+
+  private static void initInternal() {
+    if (instance.service == null || !instance.bound) {
       if (!instance.bindService(context)) {
         Log.e(TAG, "Matter agent binding request unsuccessful.");
-        instance = null;
       } else {
         Log.d(TAG, "Matter agent binding request successful.");
       }
@@ -45,42 +51,57 @@ public class MatterAgentClient {
     return instance;
   }
 
-  public void reportClusters() {
-    IMatterAppAgent matterAgent = instance.getMatterAgent();
-    if (matterAgent == null) {
-      Log.e(TAG, "Matter agent not retrieved.");
-      return;
-    }
-    SetSupportedClustersRequest supportedClustersRequest = new SetSupportedClustersRequest();
-    supportedClustersRequest.supportedClusters = new ArrayList<SupportedCluster>();
-    SupportedCluster supportedCluster = new SupportedCluster();
-    supportedCluster.clusterIdentifier = 1;
-
-    supportedClustersRequest.supportedClusters.add(supportedCluster);
+  public boolean reportClusters(SetSupportedClustersRequest supportedClustersRequest) {
+    IMatterAppAgent matterAgent = getOrReinitializeMatterAgent();
+    if (matterAgent == null) return false;
     try {
-      boolean success = matterAgent.setSupportedClusters(supportedClustersRequest);
-      Log.d(TAG, "Setting supported clusters returned " + (success ? "True" : "False"));
+      return matterAgent.setSupportedClusters(supportedClustersRequest);
     } catch (RemoteException e) {
-      e.printStackTrace();
+      Log.e(TAG, "Error invoking remote method to set supported clusters to Matter agent");
     }
+    return false;
   }
 
-  public void reportAttributeChange(int clusterId, int attributeId) {
-    IMatterAppAgent matterAgent = instance.getMatterAgent();
-    if (matterAgent == null) {
-      Log.e(TAG, "Matter agent not retrieved.");
-      return;
-    }
+  public boolean reportAttributeChange(int clusterId, int attributeId) {
+    IMatterAppAgent matterAgent = getOrReinitializeMatterAgent();
+    if (matterAgent == null) return false;
     try {
-      matterAgent.reportAttributeChange(clusterId, attributeId);
+      return matterAgent.reportAttributeChange(clusterId, attributeId);
     } catch (RemoteException e) {
       Log.e(TAG, "Error invoking remote method to report attribute change to Matter agent");
     }
+    return false;
+  }
+
+  @Nullable
+  private IMatterAppAgent getOrReinitializeMatterAgent() {
+    IMatterAppAgent matterAgent = getMatterAgent();
+    if (matterAgent == null) {
+      Log.w(TAG, "Matter agent not retrieved.");
+      if (context == null) {
+        Log.e(TAG, "Matter agent never initialized (missing context). Cannot reinitialize.");
+        return null;
+      }
+      initInternal();
+      matterAgent = getMatterAgent();
+      if (matterAgent == null) {
+        Log.e(TAG, "Matter agent could not be reinitialized.");
+        return null;
+      }
+    }
+    return matterAgent;
   }
 
   private IMatterAppAgent getMatterAgent() {
     try {
-      latch.await();
+      // If this was the first call after trying to bind to the service,
+      // we have to wait till service connection is established.
+      // put a check for the latch existing. just in case someone makes this call before initialize.
+      if (latch != null) {
+        if (!latch.await(8, TimeUnit.SECONDS)) {
+          Log.e(TAG, "Timed out while waiting for service connection.");
+        }
+      }
       return service;
     } catch (InterruptedException e) {
       Log.e(TAG, "Interrupted while waiting for service connection.", e);
@@ -89,7 +110,6 @@ public class MatterAgentClient {
   }
 
   private synchronized boolean bindService(Context context) {
-
     ServiceConnection serviceConnection = new MyServiceConnection();
     final Intent intent = new Intent(MatterIntentConstants.ACTION_MATTER_AGENT);
     if (intent.getComponent() == null) {
@@ -109,9 +129,9 @@ public class MatterAgentClient {
     }
 
     try {
-      Log.e(TAG, "Binding to service");
-      bound = context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-      return bound;
+      Log.d(TAG, "Binding to service");
+      latch = new CountDownLatch(1);
+      return context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     } catch (final Throwable e) {
       Log.e(TAG, "Exception binding to service", e);
     }
@@ -221,11 +241,16 @@ public class MatterAgentClient {
               "onServiceConnected for API with intent action %s",
               MatterIntentConstants.ACTION_MATTER_AGENT));
       service = IMatterAppAgent.Stub.asInterface(binder);
-      latch.countDown();
+      bound = true;
+      // latch could already be at zero but should never be null here. But check anyway.
+      if (latch != null) {
+        latch.countDown();
+      }
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
+      bound = false;
       service = null;
     }
   }

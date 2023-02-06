@@ -41,7 +41,7 @@
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -278,7 +278,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     bool dataExists =
         (emberAfGetServerAttributeIndexByAttributeId(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != UINT16_MAX);
 
-    ChipLogDetail(DataManagement, "Reading Mock Endpoint %" PRIx32 "Mock Cluster %" PRIx32 ", Field %" PRIx32 " is dirty",
+    ChipLogDetail(DataManagement, "Reading Mock Endpoint %x Mock Cluster %" PRIx32 ", Field %" PRIx32 " is dirty",
                   aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
     if (!dataExists)

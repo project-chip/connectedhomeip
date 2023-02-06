@@ -82,6 +82,10 @@ static_library("ESP32") {
       "ConnectivityManagerImpl_WiFi.cpp",
       "NetworkCommissioningDriver.cpp",
       "NetworkCommissioningDriver.h",
+      "route_hook/ESP32RouteHook.c",
+      "route_hook/ESP32RouteHook.h",
+      "route_hook/ESP32RouteTable.c",
+      "route_hook/ESP32RouteTable.h",
     ]
     if (chip_mdns == "platform") {
       sources += [

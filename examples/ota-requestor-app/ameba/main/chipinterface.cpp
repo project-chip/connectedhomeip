@@ -35,8 +35,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-void * __dso_handle = 0;
-
 using chip::ByteSpan;
 using chip::EndpointId;
 using chip::FabricIndex;

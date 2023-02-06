@@ -1,0 +1,262 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Commissioner Node ID
+
+config:
+    nodeId: 0x12344321
+    endpoint: 0
+    cluster: "Access Control"
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved for alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Open Commissioning Window from alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for beta"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Open Commissioning Window from alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from gamma"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for gamma"
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the fabric ID from the alpha fabric"
+      identity: "alpha"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: alphaIndex
+
+    - label: "Read the commissioner node ID from the alpha fabric"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdAlpha
+
+    - label: "Read the fabric ID from the beta fabric"
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: betaIndex
+
+    - label: "Read the commissioner node ID from the beta fabric"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdBeta
+
+    - label: "Read the fabric ID from the gamma fabric"
+      identity: "gamma"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: gammaIndex
+
+    - label: "Read the commissioner node ID from the gamma fabric"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdGamma
+
+    - label: "Read the ACL from alpha and check commissioner node id"
+      identity: "alpha"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: alphaIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Read the ACL from beta and check commissioner node id"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: betaIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdBeta],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Read the ACL from gamma and check commissioner node id"
+      identity: "gamma"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: gammaIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdGamma],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write the ACL using the commissioner node id value"
+      identity: "beta"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: betaIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdBeta],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write the ACL using the commissioner node id value"
+      identity: "gamma"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: gammaIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdGamma],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Read the ACL from beta and check commissioner node id"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: betaIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdBeta],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Read the ACL from gamma and check commissioner node id"
+      identity: "gamma"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: gammaIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdGamma],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Remove beta fabric"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: betaIndex
+
+    - label: "Remove gamma fabric"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: gammaIndex

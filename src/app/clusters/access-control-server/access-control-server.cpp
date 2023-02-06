@@ -82,7 +82,7 @@ private:
     CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 } sAttribute;
 
-CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::ExtensionEntry::Type & item,
+CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::AccessControlExtensionStruct::Type & item,
                                     const Access::SubjectDescriptor & subjectDescriptor,
                                     AccessControlCluster::ChangeTypeEnum changeType)
 {
@@ -207,7 +207,7 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
                 continue;
             }
             ReturnErrorOnFailure(errStorage);
-            AccessControlCluster::Structs::ExtensionEntry::Type item = {
+            AccessControlCluster::Structs::AccessControlExtensionStruct::Type item = {
                 .data        = ByteSpan(buffer, size),
                 .fabricIndex = fabric.GetFabricIndex(),
             };
@@ -306,7 +306,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 
     if (!aPath.IsListItemOperation())
     {
-        DataModel::DecodableList<AccessControlCluster::Structs::ExtensionEntry::DecodableType> list;
+        DataModel::DecodableList<AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
         size_t count = 0;
@@ -317,7 +317,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
             ReturnErrorCodeIf(errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
             ReturnErrorOnFailure(storage.SyncDeleteKeyValue(
                 DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName()));
-            AccessControlCluster::Structs::ExtensionEntry::Type item = {
+            AccessControlCluster::Structs::AccessControlExtensionStruct::Type item = {
                 .data        = ByteSpan(buffer, size),
                 .fabricIndex = accessingFabricIndex,
             };
@@ -355,7 +355,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         ReturnErrorCodeIf(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        AccessControlCluster::Structs::ExtensionEntry::DecodableType item;
+        AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually
         ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));

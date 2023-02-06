@@ -878,6 +878,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
     }
 
     UniquePtr<ListenIterator> allInterfaces = GetAddressPolicy()->GetListenEndpoints();
+    VerifyOrDieWithMsg(allInterfaces != nullptr, Discovery, "Failed to allocate memory for endpoints.");
 
     chip::Inet::InterfaceId interfaceId;
     chip::Inet::IPAddressType addressType;
@@ -885,6 +886,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
     while (allInterfaces->Next(&interfaceId, &addressType))
     {
         UniquePtr<IpAddressIterator> allIps = GetAddressPolicy()->GetIpAddressesForEndpoint(interfaceId, addressType);
+        VerifyOrDieWithMsg(allIps != nullptr, Discovery, "Failed to allocate memory for ip addresses.");
 
         Inet::IPAddress ipAddress;
         while (allIps->Next(ipAddress))

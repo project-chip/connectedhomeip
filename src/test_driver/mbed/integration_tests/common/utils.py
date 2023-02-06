@@ -14,22 +14,22 @@
 # limitations under the License.
 
 
-import sys
+import logging
 import os
 import platform
 import random
-import shlex
 import re
+import shlex
+import sys
 
-from chip.setup_payload import SetupPayload
 from chip import exceptions
+from chip.setup_payload import SetupPayload
 
 if platform.system() == 'Darwin':
     from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
-import logging
 log = logging.getLogger(__name__)
 
 

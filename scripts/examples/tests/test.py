@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import coloredlogs
 import difflib
 import logging
 import os
 import subprocess
 import sys
-
 from typing import List
+
+import coloredlogs
 
 SCRIPT_ROOT = os.path.dirname(__file__)
 

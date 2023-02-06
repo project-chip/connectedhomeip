@@ -276,7 +276,7 @@ tests:
           "TH1 Reads the VendorID attribute of the Basic Information cluster and
           saves it as basic_info_vendor_id"
       verification: |
-          ./chip-tool basic read vendor-id 1 0  --trace_decode 1
+          ./chip-tool  basicinformation read vendor-id 1 0  --trace_decode 1
 
           Verify the vendorId in TH (chip-tool) Log , Note this Vendor ID and you are going to verify this matching with CD in the steps below
 
@@ -289,7 +289,7 @@ tests:
           "TH1 Reads the ProductID attribute of the Basic Information cluster
           and saves it as basic_info_product_id"
       verification: |
-          ./chip-tool basic read product-id 1 0  --trace_decode 1
+          ./chip-tool  basicinformation read product-id 1 0  --trace_decode 1
 
           Verify  ProductId in TH (chip-tool) Log,  Note this PID and you are going to verify this matching with CD in the steps below
 

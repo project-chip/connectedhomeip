@@ -15,19 +15,32 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import <MTRDeviceAttestationDelegate_Internal.h>
+#import "MTRDeviceAttestationDelegate_Internal.h"
+
+#import "MTRConversion.h"
+
+#include <crypto/CHIPCryptoPAL.h>
+
+using namespace chip::Crypto;
 
 @implementation MTRDeviceAttestationDeviceInfo
-- (instancetype)initWithDACCertificate:(NSData *)dacCertificate
-                     dacPAICertificate:(NSData *)dacPAICertificate
+
+- (instancetype)initWithDACCertificate:(MTRCertificateDERBytes)dacCertificate
+                     dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
                 certificateDeclaration:(NSData *)certificateDeclaration
 {
     if (self = [super init]) {
         _dacCertificate = [dacCertificate copy];
         _dacPAICertificate = [dacPAICertificate copy];
         _certificateDeclaration = [certificateDeclaration copy];
+
+        struct AttestationCertVidPid dacVidPid;
+        if (ExtractVIDPIDFromX509Cert(AsByteSpan(_dacCertificate), dacVidPid) == CHIP_NO_ERROR) {
+            _vendorID = AsNumber(dacVidPid.mVendorId);
+            _productID = AsNumber(dacVidPid.mProductId);
+        }
     }
     return self;
 }
+
 @end

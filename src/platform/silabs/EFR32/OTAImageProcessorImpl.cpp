@@ -23,6 +23,10 @@
 extern "C" {
 #include "btl_interface.h"
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#include "sl_wfx_host_api.h"
+#include "spi_multiplex.h"
+#endif
 }
 
 #include <platform/silabs/SilabsConfig.h>
@@ -162,8 +166,13 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
             writeBuffer[writeBufOffset] = 0;
             writeBufOffset++;
         }
-
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+        pre_bootloader_spi_transfer();
+#endif
         CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+        post_bootloader_spi_transfer();
+#endif
         if (err)
         {
             ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize bootloader_eraseWriteStorage() error %ld", err);
@@ -185,7 +194,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
-
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_bootloader_spi_transfer();
+#endif
     CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
     if (err != SL_BOOTLOADER_OK)
     {
@@ -204,6 +215,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -254,8 +268,13 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         if (writeBufOffset == kAlignmentBytes)
         {
             writeBufOffset = 0;
-
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+            pre_bootloader_spi_transfer();
+#endif
             CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+            post_bootloader_spi_transfer();
+#endif
             if (err)
             {
                 ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock bootloader_eraseWriteStorage() error %ld", err);

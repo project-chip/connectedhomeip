@@ -209,6 +209,7 @@ chip_python_wheel_action("chip-core") {
         "chip/clusters/Attribute.py",
         "chip/clusters/Command.py",
         "chip/clusters/__init__.py",
+        "chip/clusters/enum.py",
         "chip/configuration/__init__.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
@@ -230,12 +231,10 @@ chip_python_wheel_action("chip-core") {
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
         "chip/yaml/__init__.py",
-        "chip/yaml/constraints.py",
         "chip/yaml/data_model_lookup.py",
         "chip/yaml/errors.py",
         "chip/yaml/format_converter.py",
-        "chip/yaml/parser.py",
-        "chip/yaml/variable_storage.py",
+        "chip/yaml/runner.py",
       ]
 
       if (chip_controller) {
@@ -291,6 +290,7 @@ chip_python_wheel_action("chip-core") {
   }
 
   py_package_reqs = [
+    "aenum",
     "coloredlogs",
     "construct",
     "dacite",

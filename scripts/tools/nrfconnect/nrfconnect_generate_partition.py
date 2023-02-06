@@ -15,13 +15,14 @@
 #    limitations under the License.
 #
 
-import codecs
-import sys
-from intelhex import IntelHex
 import argparse
+import codecs
 import json
 import logging as log
+import sys
+
 import cbor2 as cbor
+from intelhex import IntelHex
 
 HEX_PREFIX = "hex:"
 

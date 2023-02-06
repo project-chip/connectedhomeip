@@ -18,26 +18,6 @@
         {
             "name": "im_command_handler_cluster_commands",
             "path": "partials/im_command_handler_cluster_commands.zapt"
-        },
-        {
-            "name": "idl_structure_definition",
-            "path": "partials/idl/structure_definition.zapt"
-        },
-        {
-            "name": "idl_structure_member",
-            "path": "partials/idl/structure_member.zapt"
-        },
-        {
-            "name": "idl_command_request_response",
-            "path": "partials/idl/command_request_response.zapt"
-        },
-        {
-            "name": "idl_command_request_struct",
-            "path": "partials/idl/command_request_struct.zapt"
-        },
-        {
-            "name": "idl_command_response_struct",
-            "path": "partials/idl/command_response_struct.zapt"
         }
     ],
     "templates": [
@@ -65,11 +45,6 @@
             "path": "templates/app/CHIPClusters.zapt",
             "name": "C++ ZCL API Header",
             "output": "CHIPClusters.h"
-        },
-        {
-            "path": "templates/app/MatterIDL.zapt",
-            "name": "Human-readable Matter IDL",
-            "output": "Clusters.matter"
         },
         {
             "path": "templates/app/access.zapt",

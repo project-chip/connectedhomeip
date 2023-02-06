@@ -1,0 +1,37 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+# Templates used for generation
+matter_idl_generator_templates = [
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/BridgeClustersCpp.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/BridgeClustersCommon.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/BridgeClustersGlobalStructs.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipClustersCpp.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipClustersRead.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/CallbackStubSource.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/PluginApplicationCallbacksHeader.jinja",
+]
+
+matter_idl_generator_sources = [
+  "${chip_root}/scripts/py_matter_idl/matter_idl/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/filters.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/types.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/matter_idl_parser.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/matter_idl_types.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/xml_parser.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml/handlers/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml/handlers/base.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml/handlers/context.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml/handlers/handlers.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml/handlers/parsing.py",
+]
+
+# All the files that the matter idl infrastructure will use
+matter_idl_generator_files =
+    matter_idl_generator_templates + matter_idl_generator_sources

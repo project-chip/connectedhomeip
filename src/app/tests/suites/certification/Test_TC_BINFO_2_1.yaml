@@ -37,27 +37,45 @@ tests:
           "During Commissioning, TH Saves the CountryCode Information from
           SetRegulatoryConfig command"
       verification: |
-          While commissioning TH Saves the CountryCode Information from SetRegulatoryConfig command
+          execute the below mentioned command to put DUT(all-clusters-app) into a commissionable state, Pls use equivalent command on the respective DUT
+          ./chip-all-clusters-app  --trace_decode 1
 
+          Once DUT reach the  commissionable state pls send below mentioned command on TH(chip-tool) Pls use equivalent command on the respective DUT.
+          ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
-          ./chip-tool pairing ble-wifi 1 GRLPrivate_EXT matter123 20202021 3840
+          While provisioning TH(chip-tool) Saves the CountryCode Information from SetRegulatoryConfig command.
 
-          TH END:
-          [1641381202.376419][5628:5633] CHIP:CTL: Received success response 0x3df8
-
-          sudo ./all-clusters-app --wifi
-
-          DUT END:
-          [1641381202.306840][4431:4431] CHIP:DL: NVS set: chip-config/regulatory-location = 0 (0x0)
-
-          After pairing, Verify the countrycode Information by reading location atrribute from TH to DUT.
-          ./chip-tool basic read location 1 0
-
-          On TH,  Verify that TH reads Location from the DUT successfully,  the name should be string and length is less than or equal to 2 bytes.
-          [1656495999.760797][2249:2254] CHIP:DMG: }
-          [1656495999.761084][2249:2254] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 941124320
-          [1656495999.761187][2249:2254] CHIP:TOO:   Location: XX
-          [1656495999.761371][2249:2254] CHIP:EM: Sending Standalone Ack for MessageCounter:7663506 on exchange 28126i
+          [1664530365.393968][20927:20932] CHIP:DMG:
+          [1664530365.393981][20927:20932] CHIP:DMG: InvokeRequestMessage =
+          [1664530365.393984][20927:20932] CHIP:DMG: {
+          [1664530365.393986][20927:20932] CHIP:DMG:         suppressResponse = false,
+          [1664530365.393989][20927:20932] CHIP:DMG:         timedRequest = false,
+          [1664530365.393992][20927:20932] CHIP:DMG:         InvokeRequests =
+          [1664530365.393997][20927:20932] CHIP:DMG:         [
+          [1664530365.394000][20927:20932] CHIP:DMG:                 CommandDataIB =
+          [1664530365.394004][20927:20932] CHIP:DMG:                 {
+          [1664530365.394006][20927:20932] CHIP:DMG:                         CommandPathIB =
+          [1664530365.394010][20927:20932] CHIP:DMG:                         {
+          [1664530365.394013][20927:20932] CHIP:DMG:                                 EndpointId = 0x0,
+          [1664530365.394017][20927:20932] CHIP:DMG:                                 ClusterId = 0x30,
+          [1664530365.394020][20927:20932] CHIP:DMG:                                 CommandId = 0x2,
+          [1664530365.394024][20927:20932] CHIP:DMG:                         },
+          [1664530365.394028][20927:20932] CHIP:DMG:
+          [1664530365.394031][20927:20932] CHIP:DMG:                         CommandFields =
+          [1664530365.394035][20927:20932] CHIP:DMG:                         {
+          [1664530365.394039][20927:20932] CHIP:DMG:                                 0x0 = 0,
+          [1664530365.394043][20927:20932] CHIP:DMG:                                 0x1 = "XX" (2 chars),
+          [1664530365.394047][20927:20932] CHIP:DMG:                                 0x2 = 4,
+          [1664530365.394050][20927:20932] CHIP:DMG:                         },
+          [1664530365.394053][20927:20932] CHIP:DMG:                 },
+          [1664530365.394058][20927:20932] CHIP:DMG:
+          [1664530365.394061][20927:20932] CHIP:DMG:         ],
+          [1664530365.394066][20927:20932] CHIP:DMG:
+          [1664530365.394069][20927:20932] CHIP:DMG:         InteractionModelRevision = 1
+          [1664530365.394072][20927:20932] CHIP:DMG: },
+          [1664530365.394075][20927:20932] CHIP:DMG:
+          [1664530365.394096][20927:20932] CHIP:DMG: ICR moving to [CommandSen]
+          [1664530365.394107][20927:20932] CHIP:DMG: ICR moving to [AwaitingDe]
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

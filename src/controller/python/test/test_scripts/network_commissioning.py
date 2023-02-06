@@ -15,15 +15,14 @@
 #    limitations under the License.
 #
 
-import chip.clusters as Clusters
-import logging
-from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure
-from chip.clusters.Types import NullValue
-import chip.interaction_model
 import asyncio
+import logging
 import random
 
 import base
+import chip.clusters as Clusters
+import chip.interaction_model
+from chip.clusters.Types import NullValue
 
 logger = logging.getLogger('NetworkCommissioning')
 logger.setLevel(logging.INFO)

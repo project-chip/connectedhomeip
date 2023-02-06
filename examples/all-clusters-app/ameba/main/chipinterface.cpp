@@ -131,6 +131,7 @@ static void InitServer(intptr_t context)
     initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    // TODO: Use our own DeviceInfoProvider
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     NetWorkCommissioningInstInit();
@@ -141,7 +142,9 @@ static void InitServer(intptr_t context)
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
 
+#if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
+#endif
 }
 
 extern "C" void ChipTest(void)
@@ -155,11 +158,10 @@ extern "C" void ChipTest(void)
 
     initPref();
 
-    // Initialize device attestation, commissionable data and device instance info
-    // TODO: Use our own DeviceInstanceInfoProvider
-    // SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    mFactoryDataProvider.Init();
     SetCommissionableDataProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
@@ -167,10 +169,12 @@ extern "C" void ChipTest(void)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!\r\n");
     }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
-    }
+
+    // Set DeviceInstanceInfoProvider after CHIPDeviceManager init
+    // CHIPDeviceManager init will set GenericDeviceInsanceInfoProvider first
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+#endif
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 

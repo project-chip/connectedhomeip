@@ -5,7 +5,7 @@ Instruments CC32XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC32XX Lock Example Application](#matter-cc32xx-lock-example-application)
+-   [Matter CC32XX Lock Example Application](#matter-cc32xxsf-lock-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -13,18 +13,14 @@ Instruments CC32XX family of Wireless MCUs.
         -   [Compilation](#compilation)
     -   [Programming](#programming)
         -   [Code Composer Studio](#code-composer-studio)
-        -   [UniFlash](#uniflash)
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Example](#running-the-example)
         -   [Provisioning](#provisioning)
-        -   [Matter Remote Commands](#matter-remote-commands)
     -   [TI Support](#ti-support)
 
 ---
 
 ## Introduction
-
-![CC3235SF_LAUNCHXL](doc/images/cc3235sf_launchxl.jpg)
 
 The CC32XX lock example application provides a working demonstration of a
 connected door lock device. This uses the open-source CHIP implementation and

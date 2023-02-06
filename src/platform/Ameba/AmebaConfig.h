@@ -40,22 +40,6 @@ public:
     static const char kConfigNamespace_ChipFactory[];
     static const char kConfigNamespace_ChipConfig[];
     static const char kConfigNamespace_ChipCounters[];
-    static const char kConfigNamespace_ChipFabric1[];
-    static const char kConfigNamespace_ChipFabric2[];
-    static const char kConfigNamespace_ChipFabric3[];
-    static const char kConfigNamespace_ChipFabric4[];
-    static const char kConfigNamespace_ChipFabric5[];
-    static const char kConfigNamespace_ChipACL[];
-    static const char kConfigNamespace_ChipGroupMessageCounters[];
-    static const char kConfigNamespace_ChipAttributes[];
-    static const char kConfigNamespace_ChipBindingTable[];
-    static const char kConfigNamespace_ChipOTA[];
-    static const char kConfigNamespace_ChipFailSafe[];
-    static const char kConfigNamespace_ChipSessionResumption[];
-    static const char kConfigNamespace_ChipDeviceInfoProvider[];
-    static const char kConfigNamespace_ChipGroupDataProvider[];
-    static const char kConfigNamespace_ChipOthers[];
-    static const char kConfigNamespace_ChipOthers2[];
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
@@ -105,9 +89,8 @@ public:
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
 
-    static CHIP_ERROR EnsureNamespace(const char * ns);
-    static CHIP_ERROR EnsureNamespace2(const char * ns);
-    static CHIP_ERROR ClearNamespace(const char * ns);
+    static CHIP_ERROR InitNamespace(void);
+    static CHIP_ERROR ClearNamespace(void);
 
     static void RunConfigUnitTest(void);
 };

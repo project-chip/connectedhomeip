@@ -93,7 +93,7 @@ private:
         }
 
         if ([network supportsSecurity:kCWSecurityWEP]) {
-            return WiFiSecurity::kWepPersonal;
+            return WiFiSecurity::kWep;
         }
 
         if ([network supportsSecurity:kCWSecurityWPAPersonal]) {

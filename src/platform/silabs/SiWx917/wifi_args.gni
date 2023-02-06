@@ -32,7 +32,7 @@ chip_crypto = "tinycrypt"
 chip_use_transitional_commissionable_data_provider = false
 
 #lwip_platform = "external"
-lwip_platform = "efr32"
+lwip_platform = "silabs"
 lwip_ipv6 = true
 lwip_ipv4 = true
 lwip_api = true

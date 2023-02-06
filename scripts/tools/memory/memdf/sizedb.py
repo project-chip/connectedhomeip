@@ -20,9 +20,8 @@ import json
 import logging
 import sqlite3
 import zipfile
-
 from pathlib import Path
-from typing import Dict, IO, Iterable, List, Optional, Union
+from typing import IO, Dict, Iterable, List, Optional, Union
 
 import memdf.util.sqlite
 

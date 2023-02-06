@@ -48,14 +48,14 @@ tests:
     - label: "TH write 1 (Minimum) to the OperationMode attribute to DUT"
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: PCC.S.A0020 && PCC.M.ControlModeConstSpeed
+      PICS: PCC.S.F03 && PCC.S.A0020
       arguments:
           value: 1
 
     - label: "TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: PCC.S.A0011 && PCC.M.ControlModeConstSpeed
+      PICS: PCC.S.F03 && PCC.S.A0011
       response:
           value: 1
 
@@ -64,27 +64,27 @@ tests:
           time."
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: PCC.S.A0020 && PCC.M.ControlModeConstSpeed
+      PICS: PCC.S.F03 && PCC.S.A0020
       arguments:
           value: 2
 
     - label: "TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: PCC.S.A0011 && PCC.M.ControlModeConstSpeed
+      PICS: PCC.S.F03 && PCC.S.A0011
       response:
           value: 2
 
     - label: "TH write 3 (Local) to the OperationMode attribute to DUT"
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: PCC.S.A0020
+      PICS: PCC.S.F06 && PCC.S.A0020
       arguments:
           value: 3
 
     - label: "TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: PCC.S.A0011
+      PICS: PCC.S.F06 && PCC.S.A0011
       response:
           value: 3

@@ -18,9 +18,9 @@ Test for GN Java build rules. This test should be executed using ninja.
 
 import json
 import os
-from os import path
 import subprocess
 import unittest
+from os import path
 
 
 class JavaBuildTest(unittest.TestCase):

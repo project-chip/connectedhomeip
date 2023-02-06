@@ -42,15 +42,15 @@ tests:
       command: "StopApp"
       arguments:
           values:
-              - name: "application"
+              - name: "Application"
                 value:
                     {
-                        catalogVendorId: catalogVendorId,
-                        applicationId: applicationId,
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
                     }
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     #Endpoint configuration is not supported in YAML

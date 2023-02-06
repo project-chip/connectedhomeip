@@ -17,10 +17,10 @@
 #    limitations under the License.
 #
 
+import sys
+
 import IPython
 from traitlets.config import Config
-import builtins
-import sys
 
 
 def main():

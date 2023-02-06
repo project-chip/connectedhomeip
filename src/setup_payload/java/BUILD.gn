@@ -54,7 +54,10 @@ android_library("java") {
     "src/chip/setuppayload/SetupPayloadParser.java",
   ]
 
-  javac_flags = [ "-Xlint:deprecation" ]
+  javac_flags = [
+    "-Xlint:deprecation",
+    "-parameters",  # Store infomation about method parameters
+  ]
 
   # TODO: add classpath support (we likely need to add something like
   #  ..../platforms/android-21/android.jar to access BLE items)

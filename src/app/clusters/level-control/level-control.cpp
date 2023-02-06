@@ -761,15 +761,14 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
-    if (commandId == Commands::MoveToLevelWithOnOff::Id)
+#ifdef EMBER_AF_PLUGIN_ON_OFF
+    // Check that the received MoveToLevelWithOnOff produces a On action and that the onoff support the lighting featuremap
+    if (commandId == Commands::MoveToLevelWithOnOff::Id && state->moveToLevel != state->minLevel &&
+        OnOffServer::Instance().SupportsLightingApplications(endpoint))
     {
-        uint32_t featureMap;
-        if (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS &&
-            READBITS(featureMap, EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING))
-        {
-            OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
-        }
+        OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
     }
+#endif // EMBER_AF_PLUGIN_ON_OFF
 
     return status;
 }

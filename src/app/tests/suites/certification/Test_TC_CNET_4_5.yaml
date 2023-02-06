@@ -69,8 +69,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork command to the DUT with NetworkID argument
-          value as Userwifi_ssid and Breadcrumb argument value as 1"
+          "TH sends RemoveNetwork command to the DUT with NetworkID field set to
+          PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb field set to 1"
       PICS: CNET.S.C02.Rsp
       verification: |
           ./chip-tool networkcommissioning remove hex:<your network id in hex> 1 0
@@ -87,8 +87,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID argument
-          value as Userwifi_ssid and Breadcrumb argument value as 1"
+          "TH sends ConnectNetwork command to the DUT with NetworkID field set
+          to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb field set to 1"
       PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool networkcommissioning connect hex:<your network id in hex> 1 0

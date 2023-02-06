@@ -16,8 +16,9 @@
 # limitations under the License.
 #
 
-import github
 import logging
+
+import github
 import requests
 
 # Artifacts can be fetched using:

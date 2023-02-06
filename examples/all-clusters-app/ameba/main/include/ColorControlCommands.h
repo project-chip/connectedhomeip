@@ -453,10 +453,10 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
         break;
 
     case Clusters::ColorControl::Commands::MoveToColorTemperature::Id:
-        moveToColorTemperatureCommand.colorTemperature = static_cast<uint16_t>(data->args[0]);
-        moveToColorTemperatureCommand.transitionTime   = static_cast<uint16_t>(data->args[1]);
-        moveToColorTemperatureCommand.optionsMask      = static_cast<uint8_t>(data->args[2]);
-        moveToColorTemperatureCommand.optionsOverride  = static_cast<uint8_t>(data->args[3]);
+        moveToColorTemperatureCommand.colorTemperatureMireds = static_cast<uint16_t>(data->args[0]);
+        moveToColorTemperatureCommand.transitionTime         = static_cast<uint16_t>(data->args[1]);
+        moveToColorTemperatureCommand.optionsMask            = static_cast<uint8_t>(data->args[2]);
+        moveToColorTemperatureCommand.optionsOverride        = static_cast<uint8_t>(data->args[3]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          moveToColorTemperatureCommand, onSuccess, onFailure);
         break;
@@ -658,10 +658,10 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
 
     case Clusters::ColorControl::Commands::MoveToColorTemperature::Id:
-        moveToColorTemperatureCommand.colorTemperature = static_cast<uint16_t>(data->args[0]);
-        moveToColorTemperatureCommand.transitionTime   = static_cast<uint16_t>(data->args[1]);
-        moveToColorTemperatureCommand.optionsMask      = static_cast<uint8_t>(data->args[2]);
-        moveToColorTemperatureCommand.optionsOverride  = static_cast<uint8_t>(data->args[3]);
+        moveToColorTemperatureCommand.colorTemperatureMireds = static_cast<uint16_t>(data->args[0]);
+        moveToColorTemperatureCommand.transitionTime         = static_cast<uint16_t>(data->args[1]);
+        moveToColorTemperatureCommand.optionsMask            = static_cast<uint8_t>(data->args[2]);
+        moveToColorTemperatureCommand.optionsOverride        = static_cast<uint8_t>(data->args[3]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorTemperatureCommand);
         break;
 

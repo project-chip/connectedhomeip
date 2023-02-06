@@ -27,7 +27,7 @@
 #include <controller/python/chip/native/PyChipError.h>
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/dnssd/Resolver.h>
 
 using namespace chip;

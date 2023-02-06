@@ -14,9 +14,10 @@
 #    limitations under the License.
 #
 
-import chip.native
 import ctypes
-from chip.discovery.types import DiscoverSuccessCallback_t, DiscoverFailureCallback_t
+
+import chip.native
+from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
 from chip.native import PyChipError
 
 

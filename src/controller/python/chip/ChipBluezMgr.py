@@ -22,34 +22,29 @@
 #      BLE Central support for Chip Device Manager via BlueZ APIs.
 #
 
-from __future__ import absolute_import
-from __future__ import print_function
-import dbus
-import dbus.service
-import dbus.mainloop.glib
+from __future__ import absolute_import, print_function
+
 import logging
+import queue
 import sys
 import threading
 import time
 import traceback
 import uuid
-import queue
-
 from ctypes import *
+
+import dbus
+import dbus.mainloop.glib
+import dbus.service
+
+from .ChipBleBase import ChipBleBase
+from .ChipBleUtility import BLE_ERROR_REMOTE_DEVICE_DISCONNECTED, BleDisconnectEvent, ParseServiceData
 
 try:
     from gi.repository import GObject
 except Exception as ex:
     logging.exception("Unable to find GObject from gi.repository")
     from pgi.repository import GObject
-
-from .ChipBleUtility import (
-    BLE_ERROR_REMOTE_DEVICE_DISCONNECTED,
-    BleDisconnectEvent,
-    ParseServiceData,
-)
-
-from .ChipBleBase import ChipBleBase
 
 chip_service = uuid.UUID("0000FFF6-0000-1000-8000-00805F9B34FB")
 chip_tx = uuid.UUID("18EE2EF5-263D-4559-959F-4F9C429F9D11")

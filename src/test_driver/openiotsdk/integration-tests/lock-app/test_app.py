@@ -15,14 +15,13 @@
 #    limitations under the License.
 #
 
-import pytest
+import logging
 from time import sleep
 
+import pytest
+from chip.clusters.Objects import DoorLock
 from common.utils import *
 
-from chip.clusters.Objects import DoorLock
-
-import logging
 log = logging.getLogger(__name__)
 
 
@@ -114,7 +113,7 @@ def test_lock_ctrl(device, controller):
     assert err == 0
     assert res.userIndex == LOCK_CTRL_TEST_USER_INDEX
     assert res.userName == LOCK_CTRL_TEST_USER_NAME
-    assert res.userUniqueId == LOCK_CTRL_TEST_USER_INDEX
+    assert res.userUniqueID == LOCK_CTRL_TEST_USER_INDEX
     assert res.userStatus == DoorLock.Enums.DlUserStatus.kOccupiedEnabled
     assert res.userType == DoorLock.Enums.DlUserType.kUnrestrictedUser
     assert res.credentialRule == DoorLock.Enums.DlCredentialRule.kSingle

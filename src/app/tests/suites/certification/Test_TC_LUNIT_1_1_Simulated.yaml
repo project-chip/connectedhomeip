@@ -1,0 +1,54 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 104.1.1. [TC-LUNIT-1.1] Global Attributes [DUT as Client]
+
+PICS:
+    - LUNIT.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Unit Localization"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the device to be commissioned"
+      cluster: "DelayCommands"
+      command: "WaitForCommissioning"
+
+    - label: "DUT read (0xFFFD) ClusterRevision attribute"
+      PICS: LUNIT.C.Afffd
+      wait: "readAttribute"
+      attribute: "ClusterRevision"
+
+    - label: "DUT read (0xFFFC) FeatureMap attribute"
+      PICS: LUNIT.C.Afffc
+      wait: "readAttribute"
+      attribute: "FeatureMap"
+
+    - label: "DUT read (0xFFFB) AttributeList attribute"
+      PICS: LUNIT.C.Afffb
+      wait: "readAttribute"
+      attribute: "AttributeList"
+
+    - label: "DUT read (0xFFF9) AcceptedCommandList attribute"
+      PICS: LUNIT.C.Afff9
+      wait: "readAttribute"
+      attribute: "AcceptedCommandList"
+
+    - label: "DUT read (0xFFF8) GeneratedCommandList attribute"
+      PICS: LUNIT.C.Afff8
+      wait: "readAttribute"
+      attribute: "GeneratedCommandList"

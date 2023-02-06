@@ -136,7 +136,7 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().IsNull());
     NL_TEST_ASSERT(suite, commissionMgr.GetOpenerVendorId().IsNull());
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
@@ -174,7 +174,7 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kBasicWindowOpen);
     NL_TEST_ASSERT(suite, !commissionMgr.GetOpenerFabricIndex().IsNull());
     NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().Value() == fabricIndex);
     NL_TEST_ASSERT(suite, !commissionMgr.GetOpenerVendorId().IsNull());
@@ -214,7 +214,7 @@ void CheckCommissioningWindowManagerWindowClosedTask(chip::System::Layer *, void
     NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     NL_TEST_ASSERT(suite, !sWindowStatusDirty);
     NL_TEST_ASSERT(suite, !sAdminFabricIndexDirty);
     NL_TEST_ASSERT(suite, !sAdminVendorIdDirty);
@@ -237,7 +237,7 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     NL_TEST_ASSERT(suite, !sWindowStatusDirty);
     NL_TEST_ASSERT(suite, !sAdminFabricIndexDirty);
@@ -261,7 +261,7 @@ void SimulateFailedSessionEstablishmentTask(chip::System::Layer *, void * contex
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     NL_TEST_ASSERT(suite, !sWindowStatusDirty);
     NL_TEST_ASSERT(suite, !sAdminFabricIndexDirty);
     NL_TEST_ASSERT(suite, !sAdminVendorIdDirty);
@@ -271,7 +271,7 @@ void SimulateFailedSessionEstablishmentTask(chip::System::Layer *, void * contex
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     NL_TEST_ASSERT(suite, !sWindowStatusDirty);
     NL_TEST_ASSERT(suite, !sAdminFabricIndexDirty);
     NL_TEST_ASSERT(suite, !sAdminVendorIdDirty);
@@ -293,7 +293,7 @@ void CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsT
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     NL_TEST_ASSERT(suite, !sWindowStatusDirty);
     NL_TEST_ASSERT(suite, !sAdminFabricIndexDirty);
@@ -339,7 +339,7 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     NL_TEST_ASSERT(suite, !commissionMgr.GetOpenerFabricIndex().IsNull());
     NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().Value() == fabricIndex);
@@ -358,7 +358,7 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatusForCluster() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().IsNull());
     NL_TEST_ASSERT(suite, commissionMgr.GetOpenerVendorId().IsNull());
     NL_TEST_ASSERT(suite, sWindowStatusDirty);

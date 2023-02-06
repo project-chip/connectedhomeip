@@ -100,7 +100,7 @@ DLL_EXPORT void SetLogFilter(uint8_t category);
  *   category.
  *
  */
-#define ChipLogError(MOD, MSG, ...) ChipInternalLog(MOD, Error, MSG, ##__VA_ARGS__)
+#define ChipLogError(MOD, MSG, ...) ChipInternalLog(MOD, ERROR, MSG, ##__VA_ARGS__)
 #else // CHIP_ERROR_LOGGING
 #define ChipLogError(MOD, MSG, ...) ((void) 0)
 #endif // CHIP_ERROR_LOGGING
@@ -114,7 +114,7 @@ DLL_EXPORT void SetLogFilter(uint8_t category);
  *   category.
  *
  */
-#define ChipLogProgress(MOD, MSG, ...) ChipInternalLog(MOD, Progress, MSG, ##__VA_ARGS__)
+#define ChipLogProgress(MOD, MSG, ...) ChipInternalLog(MOD, PROGRESS, MSG, ##__VA_ARGS__)
 #else // CHIP_PROGRESS_LOGGING
 #define ChipLogProgress(MOD, MSG, ...) ((void) 0)
 #endif // CHIP_PROGRESS_LOGGING
@@ -128,7 +128,7 @@ DLL_EXPORT void SetLogFilter(uint8_t category);
  *   category.
  *
  */
-#define ChipLogDetail(MOD, MSG, ...) ChipInternalLog(MOD, Detail, MSG, ##__VA_ARGS__)
+#define ChipLogDetail(MOD, MSG, ...) ChipInternalLog(MOD, DETAIL, MSG, ##__VA_ARGS__)
 
 /**
  * @def ChipLogByteSpan(MOD, DATA)
@@ -137,7 +137,7 @@ DLL_EXPORT void SetLogFilter(uint8_t category);
  *   Log a byte span for the specified module in the 'Detail' category.
  *
  */
-#define ChipLogByteSpan(MOD, DATA) ChipInternalLogByteSpan(MOD, Detail, DATA)
+#define ChipLogByteSpan(MOD, DATA) ChipInternalLogByteSpan(MOD, DETAIL, DATA)
 #else // CHP_DETAIL_LOGGING
 #define ChipLogDetail(MOD, MSG, ...) ((void) 0)
 #define ChipLogByteSpan(MOD, DATA) ((void) 0)
@@ -152,7 +152,7 @@ DLL_EXPORT void SetLogFilter(uint8_t category);
  *   category.
  *
  */
-#define ChipLogAutomation(MSG, ...) ChipInternalLog(Automation, Automation, MSG, ##__VA_ARGS__)
+#define ChipLogAutomation(MSG, ...) ChipInternalLog(Automation, AUTOMATION, MSG, ##__VA_ARGS__)
 #else // CHIP_AUTOMATION_LOGGING
 #define ChipLogAutomation(MOD, MSG, ...) ((void) 0)
 #endif // CHIP_AUTOMATION_LOGGING
@@ -346,6 +346,55 @@ DLL_LOCAL inline bool IsCategoryEnabled(uint8_t category)
 }
 #endif // CHIP_LOG_FILTERING
 
+/* Internal macros mapping upper case definitions to camel case category constants*/
+#define CHIP_LOG_CATEGORY_DETAIL chip::Logging::kLogCategory_Detail
+#define CHIP_LOG_CATEGORY_PROGRESS chip::Logging::kLogCategory_Progress
+#define CHIP_LOG_CATEGORY_ERROR chip::Logging::kLogCategory_Error
+#define CHIP_LOG_CATEGORY_AUTOMATION chip::Logging::kLogCategory_Automation
+
+/*
+ * CHIP Logging Modules Categories filtering implementation.
+ *
+ * @brief
+ *     Macro for use to check if given category is enabled for given log module.
+ *
+ * Example Usage:
+ *     Let's assume PROGRESS category control for DeviceLayer log module.
+ *
+ *     Default behavior - category is not modified, so macro returns global category value:
+ *     IsModuleCategoryEnabled(DeviceLayer, PROGRESS) returns CHIP_PROGRESS_LOGGING
+ *
+ *     Enabling category - category is enabled for module, the category value is ignored and the global value is used:
+ *     #define CHIP_CONFIG_LOG_MODULE_DeviceLayer_PROGRESS 1
+ *     IsModuleCategoryEnabled(DeviceLayer, PROGRESS) returns CHIP_PROGRESS_LOGGING
+ *
+ *     Disabling category - category is disabled for module, ignoring global category value:
+ *     #define CHIP_CONFIG_LOG_MODULE_DeviceLayer_PROGRESS 0
+ *     IsModuleCategoryEnabled(DeviceLayer, PROGRESS) returns 0
+ *
+ * Algorithm flow:
+ *     1. IsModuleCategoryEnabled(MOD, CAT) uses MOD and CAT to create strings for category module macro and global category macro,
+ * and invokes _IsModuleCategoryEnabled1().
+ *     2. _IsModuleCategoryEnabled1(MOD_CAT, GLOB_CAT) invokes _IsModuleCategoryEnabled2(MOD_CAT, GLOB_CAT) to extract macros
+ * values.
+ *     3. _IsModuleCategoryEnabled2(MOD_CAT, GLOB_CAT) uses MOD_CAT to create string for helper macro.
+ *        - If MOD_CAT is 0 the helper macro containing dummy arg is used.
+ *        - If MOD_CAT doesn't exist, empty is used.
+ *     4. _IsModuleCategoryEnabled3(DUMMY_ARG, GLOB_CAT) invokes _IsModuleCategoryEnabled4() using different number of arguments
+ * depending on DUMMY_ARG.
+ *     5. _IsModuleCategoryEnabled4 output:
+ *        - If category for module was not defined or define 1, the DUMMY_ARG was empty, so returning ARG2 is GLOB_CAT.
+ *        - If category for module was defined 0, the DUMMY_ARG had one argument, so returning ARG2 is 0.
+ *
+ */
+#define IsModuleCategoryEnabled(MOD, CAT) _IsModuleCategoryEnabled1(CHIP_CONFIG_LOG_MODULE_##MOD##_##CAT, CHIP_##CAT##_LOGGING)
+#define _IsModuleCategoryEnabled1(MOD_CAT, GLOB_CAT) _IsModuleCategoryEnabled2(MOD_CAT, GLOB_CAT)
+#define _IsModuleCategoryEnabled2(MOD_CAT, GLOB_CAT)                                                                               \
+    _IsModuleCategoryEnabled3(_IsModuleCategoryEnabled3_DummyArg##MOD_CAT, GLOB_CAT)
+#define _IsModuleCategoryEnabled3_DummyArg0 dummyArg,
+#define _IsModuleCategoryEnabled3(DUMMY_ARG, GLOB_CAT) _IsModuleCategoryEnabled4(DUMMY_ARG 0, GLOB_CAT)
+#define _IsModuleCategoryEnabled4(ARG1, ARG2, ...) (ARG2)
+
 DLL_LOCAL void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
 DLL_LOCAL void LogByteSpan(uint8_t module, uint8_t category, const ByteSpan & span);
 DLL_LOCAL void LogV(uint8_t module, uint8_t category, const char * msg, va_list args) ENFORCE_FORMAT(3, 0);
@@ -360,28 +409,36 @@ DLL_LOCAL void LogV(uint8_t module, uint8_t category, const char * msg, va_list 
 #define ChipInternalLog(...) ChipPlatformLog(__VA_ARGS__)
 #define ChipInternalLogByteSpan(...) ChipPlatformLogByteSpan(__VA_ARGS__)
 #else // CHIP_SYSTEM_CONFIG_PLATFORM_LOG
-#define ChipInternalLog(MOD, CAT, MSG, ...) ChipInternalLogImpl(MOD, CAT, MSG, ##__VA_ARGS__)
-#define ChipInternalLogByteSpan(MOD, CAT, DATA) ChipInternalLogByteSpanImpl(MOD, CAT, DATA)
+#define ChipInternalLog(MOD, CAT, MSG, ...)                                                                                        \
+    if (CHIP_CONFIG_LOG_MODULE_##MOD && IsModuleCategoryEnabled(MOD, CAT))                                                         \
+    {                                                                                                                              \
+        ChipInternalLogImpl(MOD, CHIP_LOG_CATEGORY_##CAT, MSG, ##__VA_ARGS__);                                                     \
+    }
+
+#define ChipInternalLogByteSpan(MOD, CAT, DATA)                                                                                    \
+    if (CHIP_CONFIG_LOG_MODULE_##MOD && IsModuleCategoryEnabled(MOD, CAT))                                                         \
+    {                                                                                                                              \
+        ChipInternalLogByteSpanImpl(MOD, CHIP_LOG_CATEGORY_##CAT, DATA);                                                           \
+    }
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_LOG
 
 #if CHIP_PW_TOKENIZER_LOGGING
 #define ChipInternalLogImpl(MOD, CAT, MSG, ...)                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        if (chip::Logging::IsCategoryEnabled(chip::Logging::kLogCategory_##CAT))                                                   \
+        if (chip::Logging::IsCategoryEnabled(CAT))                                                                                 \
         {                                                                                                                          \
-            PW_TOKENIZE_TO_GLOBAL_HANDLER_WITH_PAYLOAD(                                                                            \
-                (pw_tokenizer_Payload)((chip::Logging::kLogCategory_##CAT << 8) | chip::Logging::kLogModule_##MOD), MSG,           \
-                __VA_ARGS__);                                                                                                      \
+            PW_TOKENIZE_TO_GLOBAL_HANDLER_WITH_PAYLOAD((pw_tokenizer_Payload)((CAT << 8) | chip::Logging::kLogModule_##MOD), MSG,  \
+                                                       __VA_ARGS__);                                                               \
         }                                                                                                                          \
     } while (0)
 #else // CHIP_PW_TOKENIZER_LOGGING
 #define ChipInternalLogImpl(MOD, CAT, MSG, ...)                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        if (chip::Logging::IsCategoryEnabled(chip::Logging::kLogCategory_##CAT))                                                   \
+        if (chip::Logging::IsCategoryEnabled(CAT))                                                                                 \
         {                                                                                                                          \
-            chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_##CAT, MSG, ##__VA_ARGS__);            \
+            chip::Logging::Log(chip::Logging::kLogModule_##MOD, CAT, MSG, ##__VA_ARGS__);                                          \
         }                                                                                                                          \
     } while (0)
 #endif // CHIP_PW_TOKENIZER_LOGGING
@@ -389,9 +446,9 @@ DLL_LOCAL void LogV(uint8_t module, uint8_t category, const char * msg, va_list 
 #define ChipInternalLogByteSpanImpl(MOD, CAT, DATA)                                                                                \
     do                                                                                                                             \
     {                                                                                                                              \
-        if (chip::Logging::IsCategoryEnabled(chip::Logging::kLogCategory_##CAT))                                                   \
+        if (chip::Logging::IsCategoryEnabled(CAT))                                                                                 \
         {                                                                                                                          \
-            chip::Logging::LogByteSpan(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_##CAT, DATA);                  \
+            chip::Logging::LogByteSpan(chip::Logging::kLogModule_##MOD, CAT, DATA);                                                \
         }                                                                                                                          \
     } while (0)
 

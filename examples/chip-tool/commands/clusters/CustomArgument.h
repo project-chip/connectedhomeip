@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <commands/common/HexConversion.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
@@ -140,14 +141,18 @@ private:
 
     static CHIP_ERROR PutOctetString(chip::TLV::TLVWriter * writer, chip::TLV::Tag tag, Json::Value & value)
     {
-        size_t size = strlen(value.asCString());
-        VerifyOrReturnError(size % 2 == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-
+        const char * hexData = value.asCString() + kPayloadHexPrefixLen;
+        size_t hexDataLen    = strlen(hexData);
         chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-        VerifyOrReturnError(buffer.Calloc(size / 2), CHIP_ERROR_NO_MEMORY);
-        size_t octetCount = chip::Encoding::HexToBytes(value.asCString() + kPayloadHexPrefixLen, size - kPayloadHexPrefixLen,
-                                                       buffer.Get(), (size - kPayloadHexPrefixLen) / 2);
-        VerifyOrReturnError(octetCount != 0, CHIP_ERROR_NO_MEMORY);
+
+        size_t octetCount;
+        ReturnErrorOnFailure(HexToBytes(
+            chip::CharSpan(hexData, hexDataLen),
+            [&buffer](size_t allocSize) {
+                buffer.Calloc(allocSize);
+                return buffer.Get();
+            },
+            &octetCount));
 
         return chip::app::DataModel::Encode(*writer, tag, chip::ByteSpan(buffer.Get(), octetCount));
     }

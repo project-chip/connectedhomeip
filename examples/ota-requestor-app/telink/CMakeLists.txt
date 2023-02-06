@@ -49,10 +49,10 @@ target_sources(app PRIVATE
                src/AppTask.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp)
+               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
+               ${TELINK_COMMON}/util/src/PWMDevice.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

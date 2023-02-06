@@ -34,7 +34,7 @@
         _Pragma("clang diagnostic ignored \"-Wformat\"");                                                                          \
         os_log_with_type(chip::Logging::Platform::LoggerForModule(chip::Logging::kLogModule_##MOD, #MOD),                          \
                          static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), MSG, ##__VA_ARGS__);           \
-        ChipInternalLogImpl(MOD, CAT, MSG, ##__VA_ARGS__);                                                                         \
+        ChipInternalLogImpl(MOD, CHIP_LOG_CATEGORY_##CAT, MSG, ##__VA_ARGS__);                                                     \
         _Pragma("clang diagnostic pop");                                                                                           \
     } while (0)
 
@@ -43,7 +43,7 @@
     {                                                                                                                              \
         chip::Logging::Platform::LogByteSpan(chip::Logging::kLogModule_##MOD, #MOD,                                                \
                                              static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), DATA);     \
-        ChipInternalLogByteSpanImpl(MOD, CAT, DATA);                                                                               \
+        ChipInternalLogByteSpanImpl(MOD, CHIP_LOG_CATEGORY_##CAT, DATA);                                                           \
     } while (0)
 
 namespace chip {
@@ -59,10 +59,10 @@ namespace Platform {
 // Names align with chip::Logging::LogCategory
 enum OSLogCategory
 {
-    kOSLogCategory_Error      = OS_LOG_TYPE_ERROR,
-    kOSLogCategory_Progress   = OS_LOG_TYPE_DEFAULT,
-    kOSLogCategory_Detail     = OS_LOG_TYPE_INFO,
-    kOSLogCategory_Automation = OS_LOG_TYPE_DEFAULT,
+    kOSLogCategory_ERROR      = OS_LOG_TYPE_ERROR,
+    kOSLogCategory_PROGRESS   = OS_LOG_TYPE_DEFAULT,
+    kOSLogCategory_DETAIL     = OS_LOG_TYPE_INFO,
+    kOSLogCategory_AUTOMATION = OS_LOG_TYPE_DEFAULT,
 };
 
 DLL_LOCAL os_log_t LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);

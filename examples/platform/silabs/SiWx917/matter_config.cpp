@@ -57,7 +57,7 @@ using namespace ::chip::DeviceLayer;
 #include "SiWx917DeviceDataProvider.h"
 
 #if EFR32_OTA_ENABLED
-void EFR32MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+void SI917MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
 #if 0 // TODO : OTA is not planned now for CCP
     OTAConfig::Init();

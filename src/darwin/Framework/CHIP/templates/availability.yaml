@@ -36,11 +36,23 @@
 #   * "ids": Can contain clusters, attributes, commands, events as described
 #            above inside it, but just indicates whether the id was
 #            introduced/deprecated, not the construct itself.
+#   * "command payloads": Lists commands only, if we introduced the payload without
+#                         actually exposing API for the command.
 #   * "global attributes": An array of names of global attributes.
 #   * "apis": An array of API labels that codegen can use.
-#   * "renames": Can contain clusters, attributes, etc as described above, with
-#                the one difference that instead of an array the value is a hash
-#                with new names as keys and old names as values.
+#
+# * "renames": Can contain clusters, attributes, etc as described
+#              above for "introduced" and "deprecated", with the one
+#              difference that instead of an array the value is a hash
+#              with new names as keys and old names as values.
+#
+# * "removed": Can contain clusters, commands, attributes, etc as described
+#              above for "introduced" and "deprecated".  Items can be removed
+#              without ever being introduced, if they are added to the XML but
+#              we have never shipped generated APIs for them.
+#              NOTE: support for "removed" may not be complete in the templates.
+#              Please examine codegen carefully when using "removed" to make
+#              sure all the things that should have been removed have been.
 
 - release: "Initial release"
   versions:
@@ -3078,7 +3090,10 @@
           GeneralDiagnostics:
               - BootReasonType
               - HardwareFaultType
-              - InterfaceType
+              # InterfaceTypeEnum was originally just named InterfaceType, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - InterfaceTypeEnum
               - NetworkFaultType
               - RadioFaultType
           ThreadNetworkDiagnostics:
@@ -3096,7 +3111,10 @@
               - GranularityEnum
               - TimeSourceEnum
           AdministratorCommissioning:
-              - CommissioningWindowStatus
+              # CommissioningWindowStatusEnum was originally just named
+              # CommissioningWindowStatus, but we generate the same API for both
+              # of those names, so the name can just change here.
+              - CommissioningWindowStatusEnum
               - StatusCode
           OperationalCredentials:
               - OperationalCertStatus
@@ -3123,6 +3141,11 @@
               - DoorLockSetPinOrIdStatus
               - DoorLockUserStatus
               - DoorLockUserType
+              # UserTypeEnum and UserStatusEnum use the same generated name as
+              # DoorLockUserStatus and DoorLockUserType, so need to be
+              # considered as introduced at the same time.
+              - UserStatusEnum
+              - UserTypeEnum
           WindowCovering:
               - EndProductType
               - Type
@@ -3418,7 +3441,10 @@
                   - UserInterfaceFault
                   - NonVolatileMemoryError
                   - TamperDetected
-              InterfaceType:
+              # InterfaceTypeEnum was originally just named InterfaceType, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              InterfaceTypeEnum:
                   - Unspecified
                   - WiFi
                   - Ethernet
@@ -3515,7 +3541,10 @@
                   - Ptp
                   - Gnss
           AdministratorCommissioning:
-              CommissioningWindowStatus:
+              # CommissioningWindowStatusEnum was originally just named
+              # CommissioningWindowStatus, but we generate the same API for both
+              # of those names, so the name can just change here.
+              CommissioningWindowStatusEnum:
                   - WindowNotOpen
                   - EnhancedWindowOpen
                   - BasicWindowOpen
@@ -3683,6 +3712,22 @@
                   - OccupiedDisabled
                   - NotSupported
               DoorLockUserType:
+                  - Unrestricted
+                  - YearDayScheduleUser
+                  - WeekDayScheduleUser
+                  - MasterUser
+                  - NonAccessUser
+                  - NotSupported
+              # UserTypeEnum and UserStatusEnum use the same generated name as
+              # DoorLockUserStatus and DoorLockUserType, so need to be
+              # considered as introduced at the same time, with the enum value
+              # names that match DoorLockUserStatus and DoorLockUserType.
+              UserStatusEnum:
+                  - Available
+                  - OccupiedEnabled
+                  - OccupiedDisabled
+                  - NotSupported
+              UserTypeEnum:
                   - Unrestricted
                   - YearDayScheduleUser
                   - WeekDayScheduleUser
@@ -4009,7 +4054,6 @@
           OnOff:
               - OnOffControl
               - OnOffFeature
-              - SceneFeatures
           LevelControl:
               - LevelControlFeature
           Actions:
@@ -4097,8 +4141,6 @@
                   - AcceptOnlyWhenOn
               OnOffFeature:
                   - Lighting
-              SceneFeatures:
-                  - SceneNames
           LevelControl:
               LevelControlFeature:
                   - OnOff
@@ -4532,17 +4574,25 @@
           attributes:
               Descriptor:
                   - DeviceTypeList
+  renames:
+      structs:
+          Descriptor:
+              DeviceTypeStruct: DeviceType
 
 - release: "First major API revamp"
-  versions: "future"
+  versions:
+      ios: "16.4"
+      macos: "13.3"
+      watchos: "9.4"
+      tvos: "16.4"
   introduced:
       clusters:
           - OTASoftwareUpdateProvider
           - OTASoftwareUpdateRequestor
           - UnitTesting
           - WakeOnLAN
-          - ClientMonitoring
           - BasicInformation
+          - BridgedDeviceBasicInformation
       attributes:
           Descriptor:
               # We really only started treating DeviceTypeList as DeviceTypeList in the API revamp,
@@ -4550,20 +4600,12 @@
               - DeviceTypeList
           AccessControl:
               - ACL
+          BallastConfiguration:
+              - IntrinsicBallastFactor
           OccupancySensing:
               - PIROccupiedToUnoccupiedDelay
               - PIRUnoccupiedToOccupiedDelay
               - PIRUnoccupiedToOccupiedThreshold
-          ClientMonitoring:
-              - IdleModeInterval
-              - ActiveModeInterval
-              - ActiveModeThreshold
-              - ExpectedClients
-              - FeatureMap
-              - ClusterRevision
-              - AttributeList
-              - GeneratedCommandList
-              - AcceptedCommandList
           UnitTesting:
               - Boolean
               - Bitmap8
@@ -4659,7 +4701,7 @@
               - FeatureMap
               - ClusterRevision
           OTASoftwareUpdateRequestor:
-              - DefaultOtaProviders
+              - DefaultOTAProviders
               - UpdatePossible
               - UpdateState
               - UpdateStateProgress
@@ -4701,6 +4743,35 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          ThreadNetworkDiagnostics:
+              - NeighborTable
+              - RouteTable
+          WiFiNetworkDiagnostics:
+              - BSSID
+              - RSSI
+          GeneralDiagnostics:
+              - BootReason
+          BridgedDeviceBasicInformation:
+              - VendorName
+              - VendorID
+              - ProductName
+              - NodeLabel
+              - HardwareVersion
+              - HardwareVersionString
+              - SoftwareVersion
+              - SoftwareVersionString
+              - ManufacturingDate
+              - PartNumber
+              - ProductURL
+              - ProductLabel
+              - SerialNumber
+              - Reachable
+              - UniqueID
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -4709,7 +4780,7 @@
               - ApplyUpdateResponse
               - NotifyUpdateApplied
           OTASoftwareUpdateRequestor:
-              - AnnounceOtaProvider
+              - AnnounceOTAProvider
           UnitTesting:
               - Test
               - TestSpecificResponse
@@ -4745,12 +4816,10 @@
               - TestSimpleOptionalArgumentRequest
               - TestEmitTestEventRequest
               - TestEmitTestFabricScopedEventRequest
-          ClientMonitoring:
-              - RegisterClientMonitoring
-              - StayAwakeRequest
-          BasicInformation:
-              # TODO: Can we avoid generating this??
-              - MfgSpecificPing
+          ContentLauncher:
+              - LauncherResponse
+          MediaPlayback:
+              - Stop
       command fields:
           UnitTesting:
               TestSpecificResponse:
@@ -4869,14 +4938,17 @@
                   - arg1
           OTASoftwareUpdateProvider:
               QueryImage:
-                  - vendorId
-                  - productId
+                  - vendorID
+                  - productID
                   - softwareVersion
                   - protocolsSupported
                   - hardwareVersion
                   - location
                   - requestorCanConsent
                   - metadataForProvider
+                  # Next two were introduced and deprecated at the same time, effectively
+                  - vendorId
+                  - productId
               QueryImageResponse:
                   - status
                   - delayedActionTime
@@ -4896,16 +4968,113 @@
                   - updateToken
                   - softwareVersion
           OTASoftwareUpdateRequestor:
-              AnnounceOtaProvider:
-                  - providerNodeId
-                  - vendorId
+              AnnounceOTAProvider:
+                  - providerNodeID
+                  - vendorID
                   - announcementReason
                   - metadataForNode
                   - endpoint
-          ClientMonitoring:
-              RegisterClientMonitoring:
-                  - clientNodeId
-                  - iCid
+                  # Next two were introduced and deprecated at the same time, effectively
+                  - providerNodeId
+                  - vendorId
+          Groups:
+              AddGroup:
+                  - groupID
+              AddGroupIfIdentifying:
+                  - groupID
+              AddGroupResponse:
+                  - groupID
+              RemoveGroup:
+                  - groupID
+              RemoveGroupResponse:
+                  - groupID
+              ViewGroup:
+                  - groupID
+              ViewGroupResponse:
+                  - groupID
+          OnOff:
+              OffWithEffect:
+                  - effectIdentifier
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  - logContent
+                  - utcTimeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakePasscodeVerifier
+          OperationalCredentials:
+              AttestationResponse:
+                  - attestationSignature
+              AddTrustedRootCertificate:
+                  - rootCACertificate
+          DoorLock:
+              SetUser:
+                  - userUniqueID
+              GetUserResponse:
+                  - userUniqueID
+          ColorControl:
+              MoveToColorTemperature:
+                  - colorTemperatureMireds
+          ContentLauncher:
+              LauncherResponse:
+                  - status
+                  - data
+          Scenes:
+              AddScene:
+                  - groupID
+                  - sceneID
+              ViewScene:
+                  - groupID
+                  - sceneID
+              RemoveScene:
+                  - groupID
+                  - sceneID
+              RemoveAllScenes:
+                  - groupID
+              StoreScene:
+                  - groupID
+                  - sceneID
+              RecallScene:
+                  - groupID
+                  - sceneID
+              GetSceneMembership:
+                  - groupID
+              EnhancedAddScene:
+                  - groupID
+                  - sceneID
+              EnhancedViewScene:
+                  - groupID
+                  - sceneID
+              CopyScene:
+                  - groupIdentifierFrom
+                  - sceneIdentifierFrom
+                  - groupIdentifierTo
+                  - sceneIdentifierTo
+              AddSceneResponse:
+                  - groupID
+                  - sceneID
+              ViewSceneResponse:
+                  - groupID
+                  - sceneID
+              RemoveSceneResponse:
+                  - groupID
+                  - sceneID
+              RemoveAllScenesResponse:
+                  - groupID
+              StoreSceneResponse:
+                  - groupID
+                  - sceneID
+              GetSceneMembershipResponse:
+                  - groupID
+              EnhancedAddSceneResponse:
+                  - groupID
+                  - sceneID
+              EnhancedViewSceneResponse:
+                  - groupID
+                  - sceneID
+              CopySceneResponse:
+                  - groupIdentifierFrom
+                  - sceneIdentifierFrom
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -4917,10 +5086,44 @@
               - NestedStructList
               - DoubleNestedStructList
               - TestListStructOctet
-          ClientMonitoring:
-              - MonitoringRegistration
           BasicInformation:
               - CapabilityMinimaStruct
+          AccessControl:
+              - AccessControlEntryStruct
+              - AccessControlExtensionStruct
+          SoftwareDiagnostics:
+              - ThreadMetricsStruct
+          GeneralDiagnostics:
+              - NetworkInterface
+          ModeSelect:
+              - SemanticTagStruct
+          OperationalCredentials:
+              - FabricDescriptorStruct
+          DoorLock:
+              - CredentialStruct
+          MediaPlayback:
+              - PlaybackPositionStruct
+          TargetNavigator:
+              - TargetInfoStruct
+          MediaInput:
+              - InputInfoStruct
+          AudioOutput:
+              - OutputInfoStruct
+          Channel:
+              - ChannelInfoStruct
+              - LineupInfoStruct
+          ContentLauncher:
+              - DimensionStruct
+              - AdditionalInfoStruct
+              - ParameterStruct
+              - ContentSearchStruct
+              - StyleInformationStruct
+              - BrandingInformationStruct
+          ApplicationLauncher:
+              - ApplicationStruct
+              - ApplicationEPStruct
+          ApplicationBasic:
+              - ApplicationStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -4976,15 +5179,144 @@
                   - providerNodeID
                   - endpoint
                   - fabricIndex
-          ClientMonitoring:
-              MonitoringRegistration:
-                  - clientNodeId
-                  - iCid
-                  - fabricIndex
           BasicInformation:
               CapabilityMinimaStruct:
                   - caseSessionsPerFabric
                   - subscriptionsPerFabric
+          Descriptor:
+              DeviceTypeStruct:
+                  - deviceType
+          AccessControl:
+              AccessControlEntryStruct:
+                  - privilege
+                  - authMode
+                  - subjects
+                  - targets
+                  - fabricIndex
+              AccessControlExtensionStruct:
+                  - data
+                  - fabricIndex
+          SoftwareDiagnostics:
+              ThreadMetricsStruct:
+                  - id
+                  - name
+                  - stackFreeCurrent
+                  - stackFreeMinimum
+                  - stackSize
+          GeneralDiagnostics:
+              NetworkInterface:
+                  - name
+                  - isOperational
+                  - offPremiseServicesReachableIPv4
+                  - offPremiseServicesReachableIPv6
+                  - hardwareAddress
+                  - iPv4Addresses
+                  - iPv6Addresses
+                  - type
+          ModeSelect:
+              SemanticTagStruct:
+                  - mfgCode
+                  - value
+          OperationalCredentials:
+              FabricDescriptorStruct:
+                  - rootPublicKey
+                  - vendorID
+                  - fabricID
+                  - nodeID
+                  - label
+                  - fabricIndex
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - vendorId
+                  - fabricId
+                  - nodeId
+          DoorLock:
+              CredentialStruct:
+                  - credentialType
+                  - credentialIndex
+          MediaPlayback:
+              PlaybackPositionStruct:
+                  - updatedAt
+                  - position
+          TargetNavigator:
+              TargetInfoStruct:
+                  - identifier
+                  - name
+          MediaInput:
+              InputInfoStruct:
+                  - index
+                  - inputType
+                  - name
+                  - descriptionString
+          AudioOutput:
+              OutputInfoStruct:
+                  - index
+                  - outputType
+                  - name
+          Channel:
+              ChannelInfoStruct:
+                  - majorNumber
+                  - minorNumber
+                  - name
+                  - callSign
+                  - affiliateCallSign
+              LineupInfoStruct:
+                  - operatorName
+                  - lineupName
+                  - postalCode
+                  - lineupInfoType
+          ContentLauncher:
+              DimensionStruct:
+                  - width
+                  - height
+                  - metric
+              AdditionalInfoStruct:
+                  - name
+                  - value
+              ParameterStruct:
+                  - type
+                  - value
+                  - externalIDList
+              ContentSearchStruct:
+                  - parameterList
+              StyleInformationStruct:
+                  - imageURL
+                  - color
+                  - size
+                  # Member that is actually deprecated, but we effectively
+                  # introduced it in this release.
+                  - imageUrl
+              BrandingInformationStruct:
+                  - providerName
+                  - background
+                  - logo
+                  - progressBar
+                  - splash
+                  - waterMark
+          ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorID
+                  - applicationID
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - catalogVendorId
+                  - applicationId
+              ApplicationEPStruct:
+                  - application
+                  - endpoint
+          ApplicationBasic:
+              ApplicationStruct:
+                  - catalogVendorID
+                  - applicationID
+                  # Values that are actually deprecated, but we effectively
+                  # introduced them in this release.
+                  - catalogVendorId
+                  - applicationId
+          Scenes:
+              AttributeValuePair:
+                  - attributeID
+              ExtensionFieldSet:
+                  - clusterID
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -4994,6 +5326,15 @@
               - TestEvent
               - TestFabricScopedEvent
           BasicInformation:
+              - StartUp
+              - ShutDown
+              - Leave
+              - ReachableChanged
+          PowerSource:
+              - WiredFaultChange
+              - BatFaultChange
+              - BatChargeFaultChange
+          BridgedDeviceBasicInformation:
               - StartUp
               - ShutDown
               - Leave
@@ -5033,6 +5374,21 @@
                   - fabricIndex
               ReachableChanged:
                   - reachableNewValue
+          PowerSource:
+              WiredFaultChange:
+                  - current
+                  - previous
+              BatFaultChange:
+                  - current
+                  - previous
+              BatChargeFaultChange:
+                  - current
+                  - previous
+          BridgedDeviceBasicInformation:
+              StartUp:
+                  - softwareVersion
+              ReachableChanged:
+                  - reachableNewValue
       enums:
           OTASoftwareUpdateProvider:
               - OTAApplyUpdateAction
@@ -5044,6 +5400,32 @@
               - OTAUpdateStateEnum
           UnitTesting:
               - SimpleEnum
+          AccessControl:
+              - AccessControlEntryPrivilegeEnum
+              - AccessControlEntryAuthModeEnum
+          ThreadNetworkDiagnostics:
+              - ConnectionStatusEnum
+          EthernetNetworkDiagnostics:
+              - PHYRateEnum
+          GeneralDiagnostics:
+              - HardwareFaultEnum
+              - RadioFaultEnum
+              - BootReasonEnum
+              - NetworkFaultEnum
+          OperationalCredentials:
+              - NodeOperationalCertStatusEnum
+              - CertificateChainTypeEnum
+          DoorLock:
+              - AlarmCodeEnum
+              - CredentialRuleEnum
+              - CredentialTypeEnum
+              - DataOperationTypeEnum
+              - DoorStateEnum
+              - LockDataTypeEnum
+              - LockOperationTypeEnum
+              - OperationErrorEnum
+              - OperatingModeEnum
+              - OperationSourceEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5087,6 +5469,205 @@
                   - ValueA
                   - ValueB
                   - ValueC
+          GeneralCommissioning:
+              CommissioningError:
+                  - OK
+          AccessControl:
+              AccessControlEntryPrivilegeEnum:
+                  - View
+                  - ProxyView
+                  - Operate
+                  - Manage
+                  - Administer
+              AccessControlEntryAuthModeEnum:
+                  - PASE
+                  - CASE
+                  - Group
+          PowerSource:
+              BatChargeLevel:
+                  - OK
+              BatChargeFault:
+                  - Unspecified
+              PowerSourceStatus:
+                  - Unspecified
+          ThreadNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
+          EthernetNetworkDiagnostics:
+              PHYRateEnum:
+                  - Rate10M
+                  - Rate100M
+                  - Rate1G
+                  - Rate25G
+                  - Rate5G
+                  - Rate10G
+                  - Rate40G
+                  - Rate100G
+                  - Rate200G
+                  - Rate400G
+          GeneralDiagnostics:
+              HardwareFaultEnum:
+                  - Unspecified
+                  - Radio
+                  - Sensor
+                  - ResettableOverTemp
+                  - NonResettableOverTemp
+                  - PowerSource
+                  - VisualDisplayFault
+                  - AudioOutputFault
+                  - UserInterfaceFault
+                  - NonVolatileMemoryError
+                  - TamperDetected
+              RadioFaultEnum:
+                  - Unspecified
+                  - WiFiFault
+                  - CellularFault
+                  - ThreadFault
+                  - NFCFault
+                  - BLEFault
+                  - EthernetFault
+              BootReasonEnum:
+                  - Unspecified
+                  - PowerOnReboot
+                  - BrownOutReset
+                  - SoftwareWatchdogReset
+                  - HardwareWatchdogReset
+                  - SoftwareUpdateCompleted
+                  - SoftwareReset
+              NetworkFaultEnum:
+                  - Unspecified
+                  - HardwareFailure
+                  - NetworkJammed
+                  - ConnectionFailed
+          OperationalCredentials:
+              NodeOperationalCertStatusEnum:
+                  - OK
+                  - InvalidPublicKey
+                  - InvalidNodeOpId
+                  - InvalidNOC
+                  - MissingCsr
+                  - TableFull
+                  - InvalidAdminSubject
+                  - FabricConflict
+                  - LabelConflict
+                  - InvalidFabricIndex
+              CertificateChainTypeEnum:
+                  - DACCertificate
+                  - PAICertificate
+          DoorLock:
+              AlarmCodeEnum:
+                  - LockJammed
+                  - LockFactoryReset
+                  - LockRadioPowerCycled
+                  - WrongCodeEntryLimit
+                  - FrontEsceutcheonRemoved
+                  - DoorForcedOpen
+                  - DoorAjar
+                  - ForcedUser
+              CredentialRuleEnum:
+                  - Single
+                  - Dual
+                  - Tri
+              CredentialTypeEnum:
+                  - ProgrammingPIN
+                  - PIN
+                  - RFID
+                  - Fingerprint
+                  - FingerVein
+                  - Face
+              DataOperationTypeEnum:
+                  - Add
+                  - Clear
+                  - Modify
+              DoorStateEnum:
+                  - DoorOpen
+                  - DoorClosed
+                  - DoorJammed
+                  - DoorForcedOpen
+                  - DoorUnspecifiedError
+                  - DoorAjar
+              LockDataTypeEnum:
+                  - Unspecified
+                  - ProgrammingCode
+                  - UserIndex
+                  - WeekDaySchedule
+                  - YearDaySchedule
+                  - HolidaySchedule
+                  - PIN
+                  - RFID
+                  - Fingerprint
+              LockOperationTypeEnum:
+                  - Lock
+                  - Unlock
+                  - NonAccessUserEvent
+                  - ForcedUserEvent
+              OperationErrorEnum:
+                  - Unspecified
+                  - InvalidCredential
+                  - DisabledUserDenied
+                  - Restricted
+                  - InsufficientBattery
+              OperatingModeEnum:
+                  - Normal
+                  - Vacation
+                  - Privacy
+                  - NoRemoteLockUnlock
+                  - Passage
+              OperationSourceEnum:
+                  - Unspecified
+                  - Manual
+                  - ProprietaryRemote
+                  - Keypad
+                  - Auto
+                  - Button
+                  - Schedule
+                  - Remote
+                  - RFID
+                  - Biometric
+              UserTypeEnum:
+                  - UnrestrictedUser
+                  - ProgrammingUser
+                  - ForcedUser
+                  - DisposableUser
+                  - ExpiringUser
+                  - ScheduleRestrictedUser
+                  - RemoteOnlyUser
+          MediaInput:
+              InputTypeEnum:
+                  - HDMI
+                  - SCART
+                  - USB
+          AudioOutput:
+              OutputTypeEnum:
+                  - HDMI
+                  - BT
+          Channel:
+              LineupInfoTypeEnum:
+                  - MSO
+          ContentLauncher:
+              MetricTypeEnum:
+                  - Pixels
+                  - Percentage
+              ParameterEnum:
+                  - Video
+          Thermostat:
+              ThermostatSystemMode:
+                  - EmergencyHeat
+                  - Dry
+                  - Sleep
+              SetpointAdjustMode:
+                  - Heat
+                  - Cool
+                  - Both
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5096,6 +5677,14 @@
               - SimpleBitmap
           LevelControl:
               - LevelControlOptions
+          DoorLock:
+              - DaysMaskMap
+          PumpConfigurationAndControl:
+              - PumpFeature
+          WiFiNetworkDiagnostics:
+              - WiFiNetworkDiagnosticsFeature
+          EthernetNetworkDiagnostics:
+              - EthernetNetworkDiagnosticsFeature
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5126,6 +5715,58 @@
               LevelControlOptions:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
+          NetworkCommissioning:
+              WiFiSecurity:
+                  - WEP
+                  - WPAPersonal
+                  - WPA2Personal
+                  - WPA3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  - Extended
+          DoorLock:
+              DaysMaskMap:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+              DoorLockFeature:
+                  - PINCredential
+                  - RFIDCredential
+                  - WeekDayAccessSchedules
+                  - CredentialsOverTheAirAccess
+                  - User
+                  - Notification
+                  - YearDayAccessSchedules
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - ConstantPressure
+                  - CompensatedPressure
+                  - ConstantFlow
+                  - ConstantSpeed
+                  - ConstantTemperature
+                  - Automatic
+                  - Local
+          Thermostat:
+              ThermostatFeature:
+                  - ScheduleConfiguration
+                  - AutoMode
+              DayOfWeek:
+                  - Away
+              ModeForSequence:
+                  - HeatSetpointPresent
+                  - CoolSetpointPresent
+          WiFiNetworkDiagnostics:
+              WiFiNetworkDiagnosticsFeature:
+                  - PacketCounts
+                  - ErrorCounts
+          EthernetNetworkDiagnostics:
+              EthernetNetworkDiagnosticsFeature:
+                  - PacketCounts
+                  - ErrorCounts
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5138,24 +5779,729 @@
               - DeviceList
           AccessControl:
               - Acl
+          BallastConfiguration:
+              - IntrinsicBalanceFactor
           OccupancySensing:
               - PirOccupiedToUnoccupiedDelay
               - PirUnoccupiedToOccupiedDelay
               - PirUnoccupiedToOccupiedThreshold
+          ThreadNetworkDiagnostics:
+              - NeighborTableList
+              - RouteTableList
+          WiFiNetworkDiagnostics:
+              - Bssid
+              - Rssi
+          GeneralDiagnostics:
+              - BootReasons
+      commands:
+          ContentLauncher:
+              - LaunchResponse
+          MediaPlayback:
+              - StopPlayback
+      command fields:
+          Groups:
+              AddGroup:
+                  - groupId
+              AddGroupIfIdentifying:
+                  - groupId
+              AddGroupResponse:
+                  - groupId
+              RemoveGroup:
+                  - groupId
+              RemoveGroupResponse:
+                  - groupId
+              ViewGroup:
+                  - groupId
+              ViewGroupResponse:
+                  - groupId
+          OnOff:
+              OffWithEffect:
+                  - effectId
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  - content
+                  - timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakeVerifier
+          OperationalCredentials:
+              AttestationResponse:
+                  - signature
+              AddTrustedRootCertificate:
+                  - rootCertificate
+          DoorLock:
+              SetUser:
+                  - userUniqueId
+              GetUserResponse:
+                  - userUniqueId
+          ColorControl:
+              MoveToColorTemperature:
+                  - colorTemperature
+          OTASoftwareUpdateProvider:
+              QueryImage:
+                  - vendorId
+                  - productId
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider:
+                  - providerNodeId
+                  - vendorId
+          Scenes:
+              AddScene:
+                  - groupId
+                  - sceneId
+              ViewScene:
+                  - groupId
+                  - sceneId
+              RemoveScene:
+                  - groupId
+                  - sceneId
+              RemoveAllScenes:
+                  - groupId
+              StoreScene:
+                  - groupId
+                  - sceneId
+              RecallScene:
+                  - groupId
+                  - sceneId
+              GetSceneMembership:
+                  - groupId
+              EnhancedAddScene:
+                  - groupId
+                  - sceneId
+              EnhancedViewScene:
+                  - groupId
+                  - sceneId
+              CopyScene:
+                  - groupIdFrom
+                  - sceneIdFrom
+                  - groupIdTo
+                  - sceneIdTo
+              AddSceneResponse:
+                  - groupId
+                  - sceneId
+              ViewSceneResponse:
+                  - groupId
+                  - sceneId
+              RemoveSceneResponse:
+                  - groupId
+                  - sceneId
+              RemoveAllScenesResponse:
+                  - groupId
+              StoreSceneResponse:
+                  - groupId
+                  - sceneId
+              GetSceneMembershipResponse:
+                  - groupId
+              EnhancedAddSceneResponse:
+                  - groupId
+                  - sceneId
+              EnhancedViewSceneResponse:
+                  - groupId
+                  - sceneId
+              CopySceneResponse:
+                  - groupIdFrom
+                  - sceneIdFrom
       structs:
           Descriptor:
               - DeviceType
+          AccessControl:
+              - AccessControlEntry
+              - ExtensionEntry
+          PowerSource:
+              - WiredFaultChangeType
+              - BatFaultChangeType
+              - BatChargeFaultChangeType
+          SoftwareDiagnostics:
+              - ThreadMetrics
+          GeneralDiagnostics:
+              - NetworkInterfaceType
+          ModeSelect:
+              - SemanticTag
+          OperationalCredentials:
+              - FabricDescriptor
+          DoorLock:
+              - DlCredential
+          MediaPlayback:
+              - PlaybackPosition
+          TargetNavigator:
+              - TargetInfo
+          MediaInput:
+              - InputInfo
+          AudioOutput:
+              - OutputInfo
+          Channel:
+              - ChannelInfo
+              - LineupInfo
+          ContentLauncher:
+              - Dimension
+              - AdditionalInfo
+              - Parameter
+              - ContentSearch
+              - StyleInformation
+              - BrandingInformation
+          ApplicationLauncher:
+              - Application
+              - ApplicationEP
+          ApplicationBasic:
+              - ApplicationBasicApplication
+      struct fields:
+          Descriptor:
+              DeviceTypeStruct:
+                  - type
+          OperationalCredentials:
+              FabricDescriptorStruct:
+                  - vendorId
+                  - fabricId
+                  - nodeId
+          ContentLauncher:
+              StyleInformationStruct:
+                  - imageUrl
+          ApplicationLauncher:
+              ApplicationStruct:
+                  - catalogVendorId
+                  - applicationId
+          ApplicationBasic:
+              ApplicationStruct:
+                  - catalogVendorId
+                  - applicationId
+          Scenes:
+              AttributeValuePair:
+                  - attributeId
+              ExtensionFieldSet:
+                  - clusterId
       event fields:
           Switch:
               MultiPressComplete:
                   - newPosition
+      enums:
+          AccessControl:
+              - Privilege
+              - AuthMode
+          ThreadNetworkDiagnostics:
+              - ThreadConnectionStatus
+          EthernetNetworkDiagnostics:
+              - PHYRateType
+          GeneralDiagnostics:
+              - HardwareFaultType
+              - RadioFaultType
+              - BootReasonType
+              - NetworkFaultType
+          OperationalCredentials:
+              - OperationalCertStatus
+          DoorLock:
+              - DlAlarmCode
+              - DlCredentialRule
+              - DlCredentialType
+              - DlDataOperationType
+              - DlDoorState
+              - DlLockDataType
+              - DlLockOperationType
+              - DlOperationError
+              - DlOperatingMode
+              - DlOperationSource
+              - DlUserStatus
+              - DlUserType
+              # The enums after this come from the silabs types-silabs.xml, not the
+              # door lock cluster XML
+              #
+              # DoorLockUserStatus is not marked deprecated here because the
+              # UserStatusEnum from the spec ends up with the same enum name
+              # (MTRDoorLockUserStatus) but is missing one of the values
+              # compared to DoorLockUserStatus.  So we have to keep
+              # DoorLockUserStatus for now and just deprecate its one extra name.
+              - DoorLockUserStatus
+              - DoorLockUserType
+              - DoorLockDayOfWeek
+              - DoorLockSetPinOrIdStatus
+              - DoorLockOperationEventCode
+              - DoorLockProgrammingEventCode
+      enum values:
+          GeneralCommissioning:
+              CommissioningError:
+                  - Ok
+          PowerSource:
+              BatChargeLevel:
+                  - Ok
+              BatChargeFault:
+                  - Unspecfied
+              PowerSourceStatus:
+                  - Unspecfied
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  - 80211a
+                  - 80211b
+                  - 80211g
+                  - 80211n
+                  - 80211ac
+                  - 80211ax
+          DoorLock:
+              UserStatusEnum:
+                  - NotSupported
+              UserTypeEnum:
+                  - NotSupported
+                  - Unrestricted
+                  - MasterUser
+          MediaInput:
+              InputTypeEnum:
+                  - Hdmi
+                  - Scart
+                  - Usb
+          AudioOutput:
+              OutputTypeEnum:
+                  - Hdmi
+                  - Bt
+          Channel:
+              LineupInfoTypeEnum:
+                  - Mso
+          ContentLauncher:
+              MetricTypeEnum:
+                  - PIXELS
+                  - PERCENTAGE
+          Thermostat:
+              ThermostatSystemMode:
+                  - EmergencyHeating
+              SetpointAdjustMode:
+                  - HeatSetpoint
+                  - CoolSetpoint
+                  - HeatAndCoolSetpoints
+      bitmaps:
+          DoorLock:
+              - DlDaysMaskMap
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  - WepPersonal
+                  - WpaPersonal
+                  - Wpa2Personal
+                  - Wpa3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  - EXT
+          DoorLock:
+              DoorLockFeature:
+                  - PINCredentials
+                  - RFIDCredentials
+                  - WeekDaySchedules
+                  - CredentialsOTA
+                  - UsersManagement
+                  - Notifications
+                  - YearDaySchedules
+          Thermostat:
+              ThermostatFeature:
+                  - Schedule
+                  - Automode
+              DayOfWeek:
+                  - AwayOrVacation
+              ModeForSequence:
+                  - HeatSetpointFieldPresent
+                  - CoolSetpointFieldPresent
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
+  removed:
+      clusters:
+          # Not ready to be public API yet.
+          - ClientMonitoring
+      commands:
+          BasicInformation:
+              - MfgSpecificPing
+      enums:
+          # DoorLockUserStatus (non-spec) and UserStatusEnum (from the spec) end
+          # up with the same enum name (MTRDoorLockUserStatus), so just remove
+          # the non-spec one.
+          DoorLock:
+              - DoorLockUserStatus
+              - DoorLockUserType
+      enum values:
+          EthernetNetworkDiagnostics:
+              # Both the enum and the values got renamed, so don't output the
+              # new values with the old enum name or the old values with the
+              # new enum name.
+              PHYRateType:
+                  - Rate10M
+                  - Rate100M
+                  - Rate1G
+                  - Rate25G
+                  - Rate5G
+                  - Rate10G
+                  - Rate40G
+                  - Rate100G
+                  - Rate200G
+                  - Rate400G
+              PHYRateEnum:
+                  - 10M
+                  - 100M
+                  - 1000M
+                  - 25G
+                  - 5G
+                  - 10G
+                  - 40G
+                  - 100G
+                  - 200G
+                  - 400G
+          OperationalCredentials:
+              # Both the enum and the values got renamed, so don't output the
+              # new value with the old enum name or the old value with the
+              # new enum name.
+              NodeOperationalCertStatusEnum:
+                  - SUCCESS
+              OperationalCertStatus:
+                  - OK
+          DoorLock:
+              # Both the enum and the values got renamed, so don't output the
+              # new values with the old enum name or the old values with the
+              # new enum name.
+              DlCredentialRule:
+                  - Dual
+              CredentialRuleEnum:
+                  - Double
+      bitmaps:
+          Scenes:
+              # All the other feature map bitmaps have names ending in
+              # "Feature", so let's not ship this one until it aligns
+              # with the others.
+              # See https://github.com/project-chip/connectedhomeip/issues/24681
+              - SceneFeatures
   renames:
       clusters:
           UnitTesting: TestCluster
           BasicInformation: Basic
+          OTASoftwareUpdateProvider: OtaSoftwareUpdateProvider
+          OTASoftwareUpdateRequestor: OtaSoftwareUpdateRequestor
+          WakeOnLAN: WakeOnLan
+          BridgedDeviceBasicInformation: BridgedDeviceBasic
       attributes:
           Descriptor:
               DeviceTypeList: DeviceList
+          AccessControl:
+              ACL: Acl
+          BallastConfiguration:
+              IntrinsicBallastFactor: IntrinsicBalanceFactor
+          OccupancySensing:
+              PIROccupiedToUnoccupiedDelay: PirOccupiedToUnoccupiedDelay
+              PIRUnoccupiedToOccupiedDelay: PirUnoccupiedToOccupiedDelay
+              PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
+          OTASoftwareUpdateRequestor:
+              DefaultOTAProviders: DefaultOtaProviders
+          ThreadNetworkDiagnostics:
+              NeighborTable: NeighborTableList
+              RouteTable: RouteTableList
+          WiFiNetworkDiagnostics:
+              BSSID: Bssid
+              RSSI: Rssi
+          GeneralDiagnostics:
+              BootReason: BootReasons
+      commands:
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider: AnnounceOtaProvider
+          ContentLauncher:
+              LauncherResponse: LaunchResponse
+          MediaPlayback:
+              Stop: StopPlayback
+      command fields:
+          OTASoftwareUpdateProvider:
+              QueryImage:
+                  vendorID: vendorId
+                  productID: productId
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider:
+                  providerNodeID: providerNodeId
+                  vendorID: vendorId
+          Groups:
+              AddGroup:
+                  groupID: groupId
+              AddGroupIfIdentifying:
+                  groupID: groupId
+              AddGroupResponse:
+                  groupID: groupId
+              RemoveGroup:
+                  groupID: groupId
+              RemoveGroupResponse:
+                  groupID: groupId
+              ViewGroup:
+                  groupID: groupId
+              ViewGroupResponse:
+                  groupID: groupId
+          OnOff:
+              OffWithEffect:
+                  effectIdentifier: effectId
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  logContent: content
+                  utcTimeStamp: timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  pakePasscodeVerifier: pakeVerifier
+          OperationalCredentials:
+              AttestationResponse:
+                  attestationSignature: signature
+              AddTrustedRootCertificate:
+                  rootCACertificate: rootCertificate
+          DoorLock:
+              SetUser:
+                  userUniqueID: userUniqueId
+              GetUserResponse:
+                  userUniqueID: userUniqueId
+          ColorControl:
+              MoveToColorTemperature:
+                  colorTemperatureMireds: colorTemperature
+          Scenes:
+              AddScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              ViewScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveAllScenes:
+                  groupID: groupId
+              StoreScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              RecallScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              GetSceneMembership:
+                  groupID: groupId
+              EnhancedAddScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              EnhancedViewScene:
+                  groupID: groupId
+                  sceneID: sceneId
+              CopyScene:
+                  groupIdentifierFrom: groupIdFrom
+                  sceneIdentifierFrom: sceneIdFrom
+                  groupIdentifierTo: groupIdTo
+                  sceneIdentifierTo: sceneIdTo
+              AddSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              ViewSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              RemoveAllScenesResponse:
+                  groupID: groupId
+              StoreSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              GetSceneMembershipResponse:
+                  groupID: groupId
+              EnhancedAddSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              EnhancedViewSceneResponse:
+                  groupID: groupId
+                  sceneID: sceneId
+              CopySceneResponse:
+                  groupIdentifierFrom: groupIdFrom
+                  sceneIdentifierFrom: sceneIdFrom
+      structs:
+          AccessControl:
+              AccessControlEntryStruct: AccessControlEntry
+              AccessControlExtensionStruct: ExtensionEntry
+          SoftwareDiagnostics:
+              ThreadMetricsStruct: ThreadMetrics
+          GeneralDiagnostics:
+              NetworkInterface: NetworkInterfaceType
+          ModeSelect:
+              SemanticTagStruct: SemanticTag
+          OperationalCredentials:
+              FabricDescriptorStruct: FabricDescriptor
+          DoorLock:
+              CredentialStruct: DlCredential
+          MediaPlayback:
+              PlaybackPositionStruct: PlaybackPosition
+          TargetNavigator:
+              TargetInfoStruct: TargetInfo
+          MediaInput:
+              InputInfoStruct: InputInfo
+          AudioOutput:
+              OutputInfoStruct: OutputInfo
+          Channel:
+              ChannelInfoStruct: ChannelInfo
+              LineupInfoStruct: LineupInfo
+          ContentLauncher:
+              DimensionStruct: Dimension
+              AdditionalInfoStruct: AdditionalInfo
+              ParameterStruct: Parameter
+              ContentSearchStruct: ContentSearch
+              StyleInformationStruct: StyleInformation
+              BrandingInformationStruct: BrandingInformation
+          ApplicationLauncher:
+              ApplicationStruct: Application
+              ApplicationEPStruct: ApplicationEP
+          ApplicationBasic:
+              ApplicationStruct: ApplicationBasicApplication
+      struct fields:
+          Descriptor:
+              DeviceTypeStruct:
+                  deviceType: type
+          OperationalCredentials:
+              FabricDescriptorStruct:
+                  vendorID: vendorId
+                  fabricID: fabricId
+                  nodeID: nodeId
+          ContentLauncher:
+              StyleInformationStruct:
+                  imageURL: imageUrl
+          ApplicationLauncher:
+              ApplicationStruct:
+                  catalogVendorID: catalogVendorId
+                  applicationID: applicationId
+          ApplicationBasic:
+              ApplicationStruct:
+                  catalogVendorID: catalogVendorId
+                  applicationID: applicationId
+          Scenes:
+              AttributeValuePair:
+                  attributeID: attributeId
+              ExtensionFieldSet:
+                  clusterID: clusterId
+      event fields:
+          Switch:
+              MultiPressComplete:
+                  previousPosition: newPosition
+      enums:
+          AccessControl:
+              AccessControlEntryPrivilegeEnum: Privilege
+              AccessControlEntryAuthModeEnum: AuthMode
+          ThreadNetworkDiagnostics:
+              ConnectionStatusEnum: ThreadConnectionStatus
+          EthernetNetworkDiagnostics:
+              PHYRateEnum: PHYRateType
+          GeneralDiagnostics:
+              HardwareFaultEnum: HardwareFaultType
+              RadioFaultEnum: RadioFaultType
+              BootReasonEnum: BootReasonType
+              NetworkFaultEnum: NetworkFaultType
+          OperationalCredentials:
+              NodeOperationalCertStatusEnum: OperationalCertStatus
+          DoorLock:
+              AlarmCodeEnum: DlAlarmCode
+              CredentialRuleEnum: DlCredentialRule
+              CredentialTypeEnum: DlCredentialType
+              DataOperationTypeEnum: DlDataOperationType
+              DoorStateEnum: DlDoorState
+              LockDataTypeEnum: DlLockDataType
+              LockOperationTypeEnum: DlLockOperationType
+              OperationErrorEnum: DlOperationError
+              OperatingModeEnum: DlOperatingMode
+              OperationSourceEnum: DlOperationSource
+              UserStatusEnum: DlUserStatus
+              UserTypeEnum: DlUserType
+      enum values:
+          GeneralCommissioning:
+              CommissioningError:
+                  OK: Ok
+          PowerSource:
+              BatChargeLevel:
+                  OK: Ok
+              BatChargeFault:
+                  Unspecified: Unspecfied
+              PowerSourceStatus:
+                  Unspecified: Unspecfied
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  A: 80211a
+                  B: 80211b
+                  G: 80211g
+                  N: 80211n
+                  Ac: 80211ac
+                  Ax: 80211ax
+          EthernetNetworkDiagnostics:
+              PHYRateEnum:
+                  Rate10M: 10M
+                  Rate100M: 100M
+                  Rate1G: 1000M
+                  Rate25G: 25G
+                  Rate5G: 5G
+                  Rate10G: 10G
+                  Rate40G: 40G
+                  Rate100G: 100G
+                  Rate200G: 200G
+                  Rate400G: 400G
+              PHYRateType:
+                  Rate10M: 10M
+                  Rate100M: 100M
+                  Rate1G: 1000M
+                  Rate25G: 25G
+                  Rate5G: 5G
+                  Rate10G: 10G
+                  Rate40G: 40G
+                  Rate100G: 100G
+                  Rate200G: 200G
+                  Rate400G: 400G
+          OperationalCredentials:
+              NodeOperationalCertStatusEnum:
+                  OK: SUCCESS
+              OperationalCertStatus:
+                  OK: SUCCESS
+          DoorLock:
+              CredentialRuleEnum:
+                  Dual: Double
+              UserTypeEnum:
+                  UnrestrictedUser: Unrestricted
+                  ProgrammingUser: MasterUser
+          MediaInput:
+              InputTypeEnum:
+                  HDMI: Hdmi
+                  SCART: Scart
+                  USB: Usb
+          AudioOutput:
+              OutputTypeEnum:
+                  HDMI: Hdmi
+                  BT: Bt
+          Channel:
+              LineupInfoTypeEnum:
+                  MSO: Mso
+          ContentLauncher:
+              MetricTypeEnum:
+                  Pixels: PIXELS
+                  Percentage: PERCENTAGE
+          Thermostat:
+              ThermostatSystemMode:
+                  EmergencyHeat: EmergencyHeating
+              SetpointAdjustMode:
+                  Heat: HeatSetpoint
+                  Cool: CoolSetpoint
+                  Both: HeatAndCoolSetpoints
+      bitmaps:
+          DoorLock:
+              DaysMaskMap: DlDaysMaskMap
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  WEP: WepPersonal
+                  WPAPersonal: WpaPersonal
+                  WPA2Personal: Wpa2Personal
+                  WPA3Personal: Wpa3Personal
+          PressureMeasurement:
+              PressureFeature:
+                  Extended: EXT
+          DoorLock:
+              DoorLockFeature:
+                  PINCredential: PINCredentials
+                  RFIDCredential: RFIDCredentials
+                  WeekDayAccessSchedules: WeekDaySchedules
+                  CredentialsOverTheAirAccess: CredentialsOTA
+                  User: UsersManagement
+                  Notification: Notifications
+                  YearDayAccessSchedules: YearDaySchedules
+          Thermostat:
+              ThermostatFeature:
+                  ScheduleConfiguration: Schedule
+                  AutoMode: Automode
+              DayOfWeek:
+                  Away: AwayOrVacation
+              ModeForSequence:
+                  HeatSetpointPresent: HeatSetpointFieldPresent
+                  CoolSetpointPresent: CoolSetpointFieldPresent
+
+- release: "Future"
+  versions: "future"

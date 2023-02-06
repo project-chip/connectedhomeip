@@ -26,10 +26,10 @@ chip_test_suite("tests") {
     "TestCATValues.cpp",
     "TestCHIPCallback.cpp",
     "TestCHIPErrorStr.cpp",
-    "TestCHIPTLV.cpp",
     "TestOTAImageHeader.cpp",
     "TestOptional.cpp",
     "TestReferenceCounted.cpp",
+    "TestTLV.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

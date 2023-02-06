@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import os
-from enum import Enum, auto
 import shlex
 import subprocess
+from enum import Enum, auto
 
 from .gn import GnBuilder
 
@@ -241,6 +241,13 @@ class Efr32Builder(GnBuilder):
             cmd += ['--dotfile=%s' % self.dotfile]
 
         extra_args = self.GnBuildArgs()
+
+        if self.options.pw_command_launcher:
+            extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
+
+        if self.options.pregen_dir:
+            extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
+
         if extra_args:
             cmd += ['--args=%s' % ' '.join(extra_args)]
 

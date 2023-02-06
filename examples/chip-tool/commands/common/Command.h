@@ -65,7 +65,6 @@ enum ArgumentType
     String,
     CharString,
     OctetString,
-    Attribute,
     Address,
     Complex,
     Custom,
@@ -95,6 +94,13 @@ struct Argument
     bool isNullable() const { return flags & kNullable; }
 };
 
+struct ReadOnlyGlobalCommandArgument
+{
+    const char * name;
+    const char * value;
+    const char * desc;
+};
+
 class Command
 {
 public:
@@ -109,6 +115,7 @@ public:
 
     const char * GetName(void) const { return mName; }
     const char * GetHelpText() const { return mHelpText; }
+    const char * GetReadOnlyGlobalCommandArgument(void) const;
     const char * GetAttribute(void) const;
     const char * GetEvent(void) const;
     const char * GetArgumentName(size_t index) const;
@@ -117,7 +124,7 @@ public:
     size_t GetArgumentsCount(void) const { return mArgs.size(); }
 
     bool InitArguments(int argc, char ** argv);
-    size_t AddArgument(const char * name, const char * value, const char * desc = "", uint8_t flags = 0);
+    void AddArgument(const char * name, const char * value, const char * desc = "");
     /**
      * @brief
      *   Add a char string command argument
@@ -274,5 +281,7 @@ private:
     const char * mName     = nullptr;
     const char * mHelpText = nullptr;
     bool mIsInteractive    = false;
+
+    chip::Optional<ReadOnlyGlobalCommandArgument> mReadOnlyGlobalCommandArgument;
     std::vector<Argument> mArgs;
 };

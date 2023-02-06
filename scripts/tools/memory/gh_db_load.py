@@ -24,8 +24,8 @@ import memdf.sizedb
 import memdf.util.config
 import memdf.util.markdown
 import memdf.util.sqlite
-from memdf.util.github import Gh
 from memdf import Config, ConfigDescription
+from memdf.util.github import Gh
 
 GITHUB_CONFIG: ConfigDescription = {
     Config.group_def('github'): {

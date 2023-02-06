@@ -32,8 +32,8 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/Optional.h>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>

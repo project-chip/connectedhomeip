@@ -92,6 +92,8 @@ set(CHIP_GN_ROOT_TARGET ${CHIP_ROOT}/config/nrfconnect/chip-gn)
 
 # Prepare compiler flags
 
+list(APPEND CHIP_CFLAGS -D_DEFAULT_SOURCE)
+
 if (CONFIG_ARM)
     list(APPEND CHIP_CFLAGS_C
         --specs=nosys.specs
@@ -210,6 +212,7 @@ chip_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 chip_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
 chip_gn_arg_bool  ("chip_enable_nfc"                        CONFIG_CHIP_NFC_COMMISSIONING)
 chip_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
+chip_gn_arg_bool  ("chip_persist_subscriptions"             CONFIG_CHIP_PERSISTENT_SUBSCRIPTIONS)
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
@@ -309,6 +312,7 @@ add_dependencies(chip-gn kernel)
 
 zephyr_interface_library_named(chip)
 target_compile_definitions(chip INTERFACE CHIP_HAVE_CONFIG_H)
+target_compile_definitions(chip INTERFACE _DEFAULT_SOURCE)
 target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/include

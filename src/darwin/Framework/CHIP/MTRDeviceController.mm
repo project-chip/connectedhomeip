@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ static NSString * const kErrorPartialDacVerifierInit = @"Init failure while crea
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
-static NSString * const kErrorPrepareCommissioning = @"Failure while trying to prepare the commissioning process";
+static NSString * const kErrorPreWarmCommissioning = @"Failure while trying to pre-warm the commissioning process";
 static NSString * const kErrorOpenPairingWindow = @"Open Pairing Window failed";
 static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
@@ -431,13 +431,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             [self clearDeviceAttestationDelegateBridge];
 
             chip::Optional<uint16_t> timeoutSecs;
-            if (commissioningParams.failSafeExpiryTimeout) {
-                timeoutSecs
-                    = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeout unsignedIntValue]));
+            if (commissioningParams.failSafeTimeout) {
+                timeoutSecs = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeTimeout unsignedIntValue]));
             }
             BOOL shouldWaitAfterDeviceAttestation = NO;
             if ([commissioningParams.deviceAttestationDelegate
-                    respondsToSelector:@selector(deviceAttestationCompletedForController:device:attestationDeviceInfo:error:)]
+                    respondsToSelector:@selector(deviceAttestationCompletedForController:
+                                                                      opaqueDeviceHandle:attestationDeviceInfo:error:)]
                 || [commissioningParams.deviceAttestationDelegate
                     respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
                 shouldWaitAfterDeviceAttestation = YES;
@@ -485,14 +485,15 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
-- (BOOL)prepareCommissioningSession:(NSError * __autoreleasing *)error
+- (void)preWarmCommissioningSession
 {
-    auto block = ^BOOL {
+    auto block = ^{
         auto errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPrepareCommissioning error:error];
+        // The checkForError is just so it logs
+        [MTRDeviceController checkForError:errorCode logMsg:kErrorPreWarmCommissioning error:nil];
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    [self syncRunOnWorkQueue:block error:nil];
 }
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
@@ -558,8 +559,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     }
 
     auto block = ^{
+        BOOL usePartialDACVerifier = NO;
         if (operationalCertificateIssuer != nil) {
             self->_operationalCredentialsDelegate->SetOperationalCertificateIssuer(operationalCertificateIssuer, queue);
+            usePartialDACVerifier = operationalCertificateIssuer.shouldSkipAttestationCertificateValidation;
+        }
+        if (usePartialDACVerifier) {
             self->_cppCommissioner->SetDeviceAttestationVerifier(self->_partialDACVerifier);
         } else {
             // TODO: Once we are not supporting setNocChainIssuer this
@@ -921,6 +926,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
  */
 @interface MTROperationalCertificateChainIssuerShim : NSObject <MTROperationalCertificateIssuer>
 @property (nonatomic, readonly) id<MTRNOCChainIssuer> nocChainIssuer;
+@property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;
 - (instancetype)initWithIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer;
 @end
 
@@ -929,12 +935,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 {
     if (self = [super init]) {
         _nocChainIssuer = nocChainIssuer;
+        _shouldSkipAttestationCertificateValidation = YES;
     }
     return self;
 }
 
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
-                              attestationInfo:(MTRAttestationInfo *)attestationInfo
+                              attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
                                    controller:(MTRDeviceController *)controller
                                    completion:(MTROperationalCertificateIssuedHandler)completion
 {
@@ -960,11 +967,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                      attestationInfo:oldAttestationInfo
         onNOCChainGenerationComplete:^(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
             NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error) {
-            auto * info = [[MTROperationalCertificateInfo alloc] initWithOperationalCertificate:operationalCertificate
-                                                                        intermediateCertificate:intermediateCertificate
-                                                                                rootCertificate:rootCertificate
-                                                                                   adminSubject:adminSubject];
-            completion(info, nil);
+            auto * chain = [[MTROperationalCertificateChain alloc] initWithOperationalCertificate:operationalCertificate
+                                                                          intermediateCertificate:intermediateCertificate
+                                                                                  rootCertificate:rootCertificate
+                                                                                     adminSubject:adminSubject];
+            completion(chain, nil);
             if (error != nil) {
                 *error = nil;
             }

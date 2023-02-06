@@ -16,9 +16,9 @@ import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/examples/platform/bouffalolab/bl602/args.gni")
 
-riscv_platform_config = "${bl602_sdk_build_root}/bl602_riscv.gni"
+riscv_platform_config = "${bouffalolab_iot_sdk_build_root}/common/rsicv.gni"
 
-mbedtls_target = "${bl602_sdk_build_root}:bl602_sdk"
+mbedtls_target = "${bouffalolab_iot_sdk_build_root}/bl602:bl_iot_sdk"
 
 chip_device_platform = "bl602"
 

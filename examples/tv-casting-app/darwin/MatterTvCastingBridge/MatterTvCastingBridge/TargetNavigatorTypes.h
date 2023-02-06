@@ -20,12 +20,12 @@
 #ifndef TargetNavigatorTypes_h
 #define TargetNavigatorTypes_h
 
-@interface TargetNavigator_TargetInfo : NSObject <NSCopying>
+@interface TargetNavigator_TargetInfoStruct : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull identifier;
 @property (nonatomic, copy) NSString * _Nonnull name;
 
-- (TargetNavigator_TargetInfo * _Nonnull)initWithIdentifier:(NSNumber * _Nonnull)identifier name:(NSString * _Nonnull)name;
+- (TargetNavigator_TargetInfoStruct * _Nonnull)initWithIdentifier:(NSNumber * _Nonnull)identifier name:(NSString * _Nonnull)name;
 
 - (id _Nonnull)copyWithZone:(NSZone * _Nullable)zone;
 @end

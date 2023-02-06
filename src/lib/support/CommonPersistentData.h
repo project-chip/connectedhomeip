@@ -76,11 +76,8 @@ struct StoredDataList : public PersistentData<kMaxSerializedSize>
 constexpr size_t kPersistentFabricBufferMax = 32;
 struct FabricList : StoredDataList<FabricIndex, kPersistentFabricBufferMax>
 {
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
-    {
-        key = DefaultStorageKeyAllocator::FabricList();
-        return CHIP_NO_ERROR;
-    }
+    // Subclasses need to define UpdateKey to be whatever fabric list key they
+    // care about.
 
     void Clear() override
     {

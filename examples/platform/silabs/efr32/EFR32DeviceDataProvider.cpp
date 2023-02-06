@@ -321,7 +321,24 @@ exit:
         ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
     }
     return err;
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR EFR32DeviceDataProvider::GetPartNumber(char * buf, size_t bufSize)
+{
+    size_t partNumberLen = 0; // without counting null-terminator
+    return SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_PartNumber, buf, bufSize, partNumberLen);
+}
+
+CHIP_ERROR EFR32DeviceDataProvider::GetProductURL(char * buf, size_t bufSize)
+{
+    size_t productUrlLen = 0; // without counting null-terminator
+    return SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_ProductURL, buf, bufSize, productUrlLen);
+}
+
+CHIP_ERROR EFR32DeviceDataProvider::GetProductLabel(char * buf, size_t bufSize)
+{
+    size_t productLabelLen = 0; // without counting null-terminator
+    return SILABSConfig::ReadConfigValueStr(SILABSConfig::KConfigKey_ProductLabel, buf, bufSize, productLabelLen);
 }
 
 EFR32DeviceDataProvider & EFR32DeviceDataProvider::GetDeviceDataProvider()

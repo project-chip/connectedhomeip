@@ -433,7 +433,7 @@ CHIP_ERROR EFR32OpaqueP256Keypair::ECDH_derive_secret(const P256PublicKey & remo
     CHIP_ERROR error     = CHIP_NO_ERROR;
     size_t output_length = 0;
 
-    error = Derive(Uint8::to_const_uchar(remote_public_key), remote_public_key.Length(), Uint8::to_uchar(out_secret),
+    error = Derive(Uint8::to_const_uchar(remote_public_key), remote_public_key.Length(), out_secret.Bytes(),
                    (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length(), &output_length);
 
     SuccessOrExit(error);

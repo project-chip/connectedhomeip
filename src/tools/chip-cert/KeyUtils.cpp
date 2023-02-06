@@ -264,9 +264,8 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
 
         if (keyFormat == kKeyFormat_X509_Pubkey_PEM)
         {
-            EC_KEY * ecKey = EC_KEY_new();
-
-            if (PEM_read_bio_EC_PUBKEY(keyBIO.get(), &ecKey, nullptr, nullptr) == nullptr)
+            EC_KEY * ecKey = PEM_read_bio_EC_PUBKEY(keyBIO.get(), nullptr, nullptr, nullptr);
+            if (ecKey == nullptr)
             {
                 ReportOpenSSLErrorAndExit("PEM_read_bio_EC_PUBKEY", res = false);
             }
@@ -278,21 +277,19 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
         }
         else if (keyFormat == kKeyFormat_X509_PEM)
         {
-            EVP_PKEY * tmpKeyPtr = nullptr;
-            if (PEM_read_bio_PrivateKey(keyBIO.get(), &tmpKeyPtr, nullptr, nullptr) == nullptr)
+            key.reset(PEM_read_bio_PrivateKey(keyBIO.get(), nullptr, nullptr, nullptr));
+            if (key.get() == nullptr)
             {
                 ReportOpenSSLErrorAndExit("PEM_read_bio_PrivateKey", res = false);
             }
-            key.reset(tmpKeyPtr);
         }
         else
         {
-            EVP_PKEY * tmpKeyPtr = nullptr;
-            if (d2i_PrivateKey_bio(keyBIO.get(), &tmpKeyPtr) == nullptr)
+            key.reset(d2i_PrivateKey_bio(keyBIO.get(), nullptr));
+            if (key.get() == nullptr)
             {
                 ReportOpenSSLErrorAndExit("d2i_PrivateKey_bio", res = false);
             }
-            key.reset(tmpKeyPtr);
         }
     }
 

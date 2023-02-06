@@ -16,22 +16,23 @@
 #    limitations under the License.
 #
 
-import os
-import sys
-import shutil
-import base64
-import logging
 import argparse
-import subprocess
-import cryptography.x509
-from types import SimpleNamespace
+import base64
 import enum
+import logging
+import os
+import shutil
+import subprocess
+import sys
+from types import SimpleNamespace
+
+import cryptography.x509
 from bitarray import bitarray
 from bitarray.util import ba2int
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
-from spake2p import generate_verifier  # noqa: E402
+from spake2p import generate_verifier  # noqa: E402 isort:skip
 
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
@@ -40,7 +41,7 @@ if os.getenv('IDF_PATH'):
                                     'nvs_partition_generator'))
     import nvs_partition_gen
 else:
-    log.error("Please set the IDF_PATH environment variable.")
+    sys.stderr.write("Please set the IDF_PATH environment variable.")
     exit(0)
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
@@ -235,7 +236,7 @@ def check_str_range(s, min_len, max_len, name):
 
 
 def check_int_range(value, min_value, max_value, name):
-    if value and ((value < min_value) or (value > max_value)):
+    if (value is not None) and ((value < min_value) or (value > max_value)):
         logging.error('%s is out of range, should be in range [%d, %d]', name, min_value, max_value)
         sys.exit(1)
 
@@ -276,40 +277,48 @@ def gen_spake2p_params(passcode):
 
 
 def populate_factory_data(args, spake2p_params):
-    FACTORY_DATA['discriminator']['value'] = args.discriminator
-    FACTORY_DATA['iteration-count']['value'] = spake2p_params['Iteration Count']
-    FACTORY_DATA['salt']['value'] = spake2p_params['Salt']
-    FACTORY_DATA['verifier']['value'] = spake2p_params['Verifier']
-    FACTORY_DATA['dac-cert']['value'] = os.path.abspath(args.dac_cert)
-    FACTORY_DATA['pai-cert']['value'] = os.path.abspath(args.pai_cert)
-    FACTORY_DATA['cert-dclrn']['value'] = os.path.abspath(args.cd)
-    FACTORY_DATA['dac-key']['value'] = os.path.abspath('dac_raw_privkey.bin')
-    FACTORY_DATA['dac-pub-key']['value'] = os.path.abspath('dac_raw_pubkey.bin')
+    if args.discriminator is not None:
+        FACTORY_DATA['discriminator']['value'] = args.discriminator
 
-    if args.serial_num is not None:
+    if spake2p_params:
+        FACTORY_DATA['iteration-count']['value'] = spake2p_params['Iteration Count']
+        FACTORY_DATA['salt']['value'] = spake2p_params['Salt']
+        FACTORY_DATA['verifier']['value'] = spake2p_params['Verifier']
+
+    if args.dac_cert:
+        FACTORY_DATA['dac-cert']['value'] = os.path.abspath(args.dac_cert)
+    if args.pai_cert:
+        FACTORY_DATA['pai-cert']['value'] = os.path.abspath(args.pai_cert)
+    if args.cd:
+        FACTORY_DATA['cert-dclrn']['value'] = os.path.abspath(args.cd)
+    if args.dac_key:
+        FACTORY_DATA['dac-key']['value'] = os.path.abspath('dac_raw_privkey.bin')
+        FACTORY_DATA['dac-pub-key']['value'] = os.path.abspath('dac_raw_pubkey.bin')
+
+    if args.serial_num:
         FACTORY_DATA['serial-num']['value'] = args.serial_num
-    if args.rd_id_uid is not None:
+    if args.rd_id_uid:
         FACTORY_DATA['rd-id-uid']['value'] = args.rd_id_uid
-    if args.mfg_date is not None:
+    if args.mfg_date:
         FACTORY_DATA['mfg-date']['value'] = args.mfg_date
     if args.vendor_id is not None:
         FACTORY_DATA['vendor-id']['value'] = args.vendor_id
-    if args.vendor_name is not None:
+    if args.vendor_name:
         FACTORY_DATA['vendor-name']['value'] = args.vendor_name
     if args.product_id is not None:
         FACTORY_DATA['product-id']['value'] = args.product_id
-    if args.product_name is not None:
+    if args.product_name:
         FACTORY_DATA['product-name']['value'] = args.product_name
     if args.hw_ver is not None:
         FACTORY_DATA['hardware-ver']['value'] = args.hw_ver
-    if (args.hw_ver_str is not None):
+    if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
 
-    if (args.calendar_types is not None):
+    if args.calendar_types:
         FACTORY_DATA['cal-types']['value'] = calendar_types_to_uint32(args.calendar_types)
 
     # Supported locale is stored as multiple entries, key format: "locale/<index>, example key: "locale/0"
-    if (args.locales is not None):
+    if args.locales:
         FACTORY_DATA['locale-sz']['value'] = len(args.locales)
 
         for i in range(len(args.locales)):
@@ -324,7 +333,7 @@ def populate_factory_data(args, spake2p_params):
     #  - fl-sz/<index>     : number of fixed labels for the endpoint
     #  - fl-k/<ep>/<index> : fixed label key for the endpoint and index
     #  - fl-v/<ep>/<index> : fixed label value for the endpoint and index
-    if (args.fixed_labels is not None):
+    if args.fixed_labels:
         dict = get_fixed_label_dict(args.fixed_labels)
         for key in dict.keys():
             _sz = {
@@ -377,7 +386,7 @@ def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
         f.write(public_number_y.to_bytes(32, byteorder='big'))
 
 
-def generate_nvs_bin(args):
+def generate_nvs_csv(out_csv_filename):
     csv_content = 'key,type,encoding,value\n'
     csv_content += 'chip-factory,namespace,,\n'
 
@@ -386,31 +395,35 @@ def generate_nvs_bin(args):
             continue
         csv_content += f"{k},{v['type']},{v['encoding']},{v['value']}\n"
 
-    with open(FACTORY_PARTITION_CSV, 'w') as f:
+    with open(out_csv_filename, 'w') as f:
         f.write(csv_content)
 
-    if args.encrypt:
+    logging.info('Generated the factory partition csv file : {}'.format(os.path.abspath(out_csv_filename)))
+
+
+def generate_nvs_bin(encrypt, size, csv_filename, bin_filename):
+    if encrypt:
         nvs_args = SimpleNamespace(version=2,
                                    keygen=True,
                                    keyfile=NVS_KEY_PARTITION_BIN,
                                    inputkey=None,
                                    outdir=os.getcwd(),
-                                   input=FACTORY_PARTITION_CSV,
-                                   output=FACTORY_PARTITION_BIN,
-                                   size=hex(args.size))
+                                   input=csv_filename,
+                                   output=bin_filename,
+                                   size=hex(size))
         nvs_partition_gen.encrypt(nvs_args)
     else:
-        nvs_args = SimpleNamespace(input=FACTORY_PARTITION_CSV,
-                                   output=FACTORY_PARTITION_BIN,
-                                   size=hex(args.size),
+        nvs_args = SimpleNamespace(input=csv_filename,
+                                   output=bin_filename,
+                                   size=hex(size),
                                    outdir=os.getcwd(),
                                    version=2)
         nvs_partition_gen.generate(nvs_args)
 
 
-def print_flashing_help(encrypt):
-    logging.info('Run below command to flash {}'.format(FACTORY_PARTITION_BIN))
-    logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), FACTORY_PARTITION_BIN)))
+def print_flashing_help(encrypt, bin_filename):
+    logging.info('Run below command to flash {}'.format(bin_filename))
+    logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), bin_filename)))
     if (encrypt):
         logging.info('Run below command to flash {}'.format(NVS_KEY_PARTITION_BIN))
         logging.info('esptool.py -p (PORT) write_flash --encrypt (NVS_KEY_PARTITION_ADDR) {}'.format(
@@ -418,9 +431,10 @@ def print_flashing_help(encrypt):
 
 
 def clean_up():
-    os.remove(FACTORY_PARTITION_CSV)
-    os.remove(FACTORY_DATA['dac-pub-key']['value'])
-    os.remove(FACTORY_DATA['dac-key']['value'])
+    if FACTORY_DATA['dac-pub-key']['value']:
+        os.remove(FACTORY_DATA['dac-pub-key']['value'])
+    if FACTORY_DATA['dac-key']['value']:
+        os.remove(FACTORY_DATA['dac-key']['value'])
 
 
 def main():
@@ -429,53 +443,61 @@ def main():
     parser = argparse.ArgumentParser(description='Chip Factory NVS binary generator tool')
 
     # These will be used by CommissionalbeDataProvider
-    parser.add_argument('-p', '--passcode', type=any_base_int, required=True,
+    parser.add_argument('-p', '--passcode', type=any_base_int,
                         help='The setup passcode for pairing, range: 0x01-0x5F5E0FE')
-    parser.add_argument('-d', '--discriminator', type=any_base_int, required=True,
+    parser.add_argument('-d', '--discriminator', type=any_base_int,
                         help='The discriminator for pairing, range: 0x00-0x0FFF')
 
     # These will be used by DeviceAttestationCredentialsProvider
-    parser.add_argument('--dac-cert', type=str, required=True,
-                        help='The path to the DAC certificate in der format')
-    parser.add_argument('--dac-key', type=str, required=True,
-                        help='The path to the DAC private key in der format')
-    parser.add_argument('--pai-cert', type=str, required=True,
-                        help='The path to the PAI certificate in der format')
-    parser.add_argument('--cd', type=str, required=True,
-                        help='The path to the certificate declaration der format')
+    parser.add_argument('--dac-cert', help='The path to the DAC certificate in der format')
+    parser.add_argument('--dac-key', help='The path to the DAC private key in der format')
+    parser.add_argument('--pai-cert', help='The path to the PAI certificate in der format')
+    parser.add_argument('--cd', help='The path to the certificate declaration der format')
 
     # These will be used by DeviceInstanceInfoProvider
-    parser.add_argument('--vendor-id', type=any_base_int, required=False, help='Vendor id')
-    parser.add_argument('--vendor-name', type=str, required=False, help='Vendor name')
-    parser.add_argument('--product-id', type=any_base_int, required=False, help='Product id')
-    parser.add_argument('--product-name', type=str, required=False, help='Product name')
-    parser.add_argument('--hw-ver', type=any_base_int, required=False, help='Hardware version')
-    parser.add_argument('--hw-ver-str', type=str, required=False, help='Hardware version string')
-    parser.add_argument('--mfg-date', type=str, required=False, help='Manufacturing date in format YYYY-MM-DD')
-    parser.add_argument('--serial-num', type=str, required=False, help='Serial number')
-    parser.add_argument('--rd-id-uid', type=str, required=False,
+    parser.add_argument('--vendor-id', type=any_base_int, help='Vendor id')
+    parser.add_argument('--vendor-name', help='Vendor name')
+    parser.add_argument('--product-id', type=any_base_int, help='Product id')
+    parser.add_argument('--product-name', help='Product name')
+    parser.add_argument('--hw-ver', type=any_base_int, help='Hardware version')
+    parser.add_argument('--hw-ver-str', help='Hardware version string')
+    parser.add_argument('--mfg-date', help='Manufacturing date in format YYYY-MM-DD')
+    parser.add_argument('--serial-num', help='Serial number')
+    parser.add_argument('--rd-id-uid',
                         help='128-bit unique identifier for generating rotating device identifier, provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
 
     # These will be used by DeviceInfoProvider
-    parser.add_argument('--calendar-types', type=str, nargs='+', required=False,
+    parser.add_argument('--calendar-types', nargs='+',
                         help='List of supported calendar types.\nSupported Calendar Types: Buddhist, Chinese, Coptic, Ethiopian, Gregorian, Hebrew, Indian, Islamic, Japanese, Korean, Persian, Taiwanese')
-    parser.add_argument('--locales', type=str, nargs='+', required=False,
-                        help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
-    parser.add_argument('--fixed-labels', type=str, nargs='+', required=False,
+    parser.add_argument('--locales', nargs='+', help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
+    parser.add_argument('--fixed-labels', nargs='+',
                         help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
 
-    parser.add_argument('-s', '--size', type=any_base_int, required=False, default=0x6000,
+    parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
-    parser.add_argument('-e', '--encrypt', action='store_true', required=False,
+    parser.add_argument('-e', '--encrypt', action='store_true',
                         help='Encrypt the factory parititon NVS binary')
+    parser.add_argument('--no-bin', action='store_false', dest='generate_bin',
+                        help='Do not generate the factory partition binary')
+    parser.set_defaults(generate_bin=True)
 
     args = parser.parse_args()
     validate_args(args)
-    spake2p_params = gen_spake2p_params(args.passcode)
+
+    if args.passcode is not None:
+        spake2p_params = gen_spake2p_params(args.passcode)
+
     populate_factory_data(args, spake2p_params)
-    gen_raw_ec_keypair_from_der(args.dac_key, FACTORY_DATA['dac-pub-key']['value'], FACTORY_DATA['dac-key']['value'])
-    generate_nvs_bin(args)
-    print_flashing_help(args.encrypt)
+
+    if args.dac_key:
+        gen_raw_ec_keypair_from_der(args.dac_key, FACTORY_DATA['dac-pub-key']['value'], FACTORY_DATA['dac-key']['value'])
+
+    generate_nvs_csv(FACTORY_PARTITION_CSV)
+
+    if args.generate_bin:
+        generate_nvs_bin(args.encrypt, args.size, FACTORY_PARTITION_CSV, FACTORY_PARTITION_BIN)
+        print_flashing_help(args.encrypt, FACTORY_PARTITION_BIN)
+
     clean_up()
 
 

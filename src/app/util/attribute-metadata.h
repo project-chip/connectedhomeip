@@ -132,27 +132,31 @@ union EmberAfDefaultOrMinMaxAttributeValue
 struct EmberAfAttributeMetadata
 {
     /**
+     * Pointer to the default value union. Actual value stored
+     * depends on the mask.
+     */
+    EmberAfDefaultOrMinMaxAttributeValue defaultValue;
+
+    /**
      * Attribute ID, according to ZCL specs.
      */
     chip::AttributeId attributeId;
-    /**
-     * Attribute type, according to ZCL specs.
-     */
-    EmberAfAttributeType attributeType;
+
     /**
      * Size of this attribute in bytes.
      */
     uint16_t size;
+
+    /**
+     * Attribute type, according to ZCL specs.
+     */
+    EmberAfAttributeType attributeType;
+
     /**
      * Attribute mask, tagging attribute with specific
      * functionality.
      */
     EmberAfAttributeMask mask;
-    /**
-     * Pointer to the default value union. Actual value stored
-     * depends on the mask.
-     */
-    EmberAfDefaultOrMinMaxAttributeValue defaultValue;
 
     /**
      * Check whether this attribute is nullable.

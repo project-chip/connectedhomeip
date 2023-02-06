@@ -15,11 +15,12 @@
 #    limitations under the License.
 #
 
-from imaplib import Commands
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
-from chip.interaction_model import Status, InteractionModelError
-import chip.clusters as Clusters
 import logging
+from imaplib import Commands
+
+import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # Assumes `--enable-key 000102030405060708090a0b0c0d0e0f` on Linux app command line, or a DUT

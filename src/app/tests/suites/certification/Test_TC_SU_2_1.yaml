@@ -31,6 +31,15 @@ tests:
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
           Verify on the OTA Provider logs received QueryImage:
+          Verify the QueryImage command has the following mandatory fields
+          VendorID - Should match the value reported by the Basic Information Cluster VendorId attribute of the DUT.
+          ProductID - Should match the value reported by the Basic Information Cluster ProductId attribute of the DUT.
+          SoftwareVersion - Should match the value reported by the Basic Information Cluster SoftwareVersion attribute of the DUT.
+          Verify the ProtocolsSupported lists the BDX Synchronous protocol.
+          HardwareVersion - If present, verify that it matches the value reported by the Basic Information Cluster HardwareVersion attribute of the DUT.
+          Location field is same as Basic Information Cluster Attribute of the DUT.
+          RequestorCanConsent field should be set to True. Otherwise it should be False.
+
 
           [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
           [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1

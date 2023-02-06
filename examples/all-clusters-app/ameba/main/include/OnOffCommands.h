@@ -124,8 +124,8 @@ void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const EmberBin
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
-        offwitheffectCommand.effectId      = static_cast<EmberAfOnOffEffectIdentifier>(data->args[0]);
-        offwitheffectCommand.effectVariant = static_cast<EmberAfOnOffDelayedAllOffEffectVariant>(data->args[1]);
+        offwitheffectCommand.effectIdentifier = static_cast<EmberAfOnOffEffectIdentifier>(data->args[0]);
+        offwitheffectCommand.effectVariant    = static_cast<EmberAfOnOffDelayedAllOffEffectVariant>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          offwitheffectCommand, onSuccess, onFailure);
         break;
@@ -171,8 +171,8 @@ void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const EmberBindi
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
-        offwitheffectCommand.effectId      = static_cast<EmberAfOnOffEffectIdentifier>(data->args[0]);
-        offwitheffectCommand.effectVariant = static_cast<EmberAfOnOffDelayedAllOffEffectVariant>(data->args[1]);
+        offwitheffectCommand.effectIdentifier = static_cast<EmberAfOnOffEffectIdentifier>(data->args[0]);
+        offwitheffectCommand.effectVariant    = static_cast<EmberAfOnOffDelayedAllOffEffectVariant>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand);
         break;
 

@@ -33,11 +33,11 @@ tests:
           "Preparation: TH as server exposes an Actions server cluster on EP 1,
           with one action (supporting all possible commands) and corresponding
           ActionLists and EndpointLists attributes: ActionList: contains one
-          list element (ActionListStruct):   ActionIO = 0x1001   Name = some
-          test   Type = other   EndpointListID = 0xE001   SupportedCommands =
-          0x0fff // suppports all commands   State = Inactive EndpointLists:
-          contains one list element (EndpointListStruct):   EndpointListID =
-          0xE001   Name = test room   Type = room   Endpoints = [3]
+          list element (ActionListStruct):  ActionIO = 0x1001  Name = some
+          test  Type = other  EndpointListID = 0xE001  SupportedCommands =
+          0x0fff // suppports all commands  State = Inactive EndpointLists:
+          contains one list element (EndpointListStruct):  EndpointListID =
+          0xE001  Name = test room  Type = room  Endpoints = [3]
           SetupURL:  (empty string)"
       verification: |
           pre-condition :
@@ -47,24 +47,105 @@ tests:
 
           ./chip-tool actions read action-list 1 1
 
-          [1662053538.864044][37149:37154] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3676955533
-          [1662053538.864116][37149:37154] CHIP:TOO:   ActionList: 2 entries
-          [1662053538.864180][37149:37154] CHIP:TOO:     [1]: {
-          [1662053538.864202][37149:37154] CHIP:TOO:       ActionID: 4097
-          [1662053538.864221][37149:37154] CHIP:TOO:       Name: Room 1 On
-          [1662053538.864240][37149:37154] CHIP:TOO:       Type: 3
-          [1662053538.864259][37149:37154] CHIP:TOO:       EndpointListID: 57345
-          [1662053538.864276][37149:37154] CHIP:TOO:       SupportedCommands: 1
-          [1662053538.864295][37149:37154] CHIP:TOO:       State: 0
-          [1662053538.864313][37149:37154] CHIP:TOO:      }
-          [1662053538.864342][37149:37154] CHIP:TOO:     [2]: {
-          [1662053538.864360][37149:37154] CHIP:TOO:       ActionID: 4098
-          [1662053538.864377][37149:37154] CHIP:TOO:       Name: Turn On Room 2
-          [1662053538.864395][37149:37154] CHIP:TOO:       Type: 3
-          [1662053538.864413][37149:37154] CHIP:TOO:       EndpointListID: 57346
-          [1662053538.864431][37149:37154] CHIP:TOO:       SupportedCommands: 1
-          [1662053538.864449][37149:37154] CHIP:TOO:       State: 0
-          [1662053538.864466][37149:37154] CHIP:TOO:      }
+          [1666952908.036087][217545:217550] CHIP:DMG: ReportDataMessage =
+          [1666952908.036108][217545:217550] CHIP:DMG: {
+          [1666952908.036123][217545:217550] CHIP:DMG:         AttributeReportIBs =
+          [1666952908.036146][217545:217550] CHIP:DMG:         [
+          [1666952908.036162][217545:217550] CHIP:DMG:                 AttributeReportIB =
+          [1666952908.036186][217545:217550] CHIP:DMG:                 {
+          [1666952908.036201][217545:217550] CHIP:DMG:                         AttributeDataIB =
+          [1666952908.036218][217545:217550] CHIP:DMG:                         {
+          [1666952908.036236][217545:217550] CHIP:DMG:                                 DataVersion = 0x24eeedc4,
+          [1666952908.036253][217545:217550] CHIP:DMG:                                 AttributePathIB =
+          [1666952908.036271][217545:217550] CHIP:DMG:                                 {
+          [1666952908.036291][217545:217550] CHIP:DMG:                                         Endpoint = 0x1,
+          [1666952908.036309][217545:217550] CHIP:DMG:                                         Cluster = 0x25,
+          [1666952908.036330][217545:217550] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1666952908.036347][217545:217550] CHIP:DMG:                                 }
+          [1666952908.036368][217545:217550] CHIP:DMG:
+          [1666952908.036387][217545:217550] CHIP:DMG:                                 Data = [
+          [1666952908.036404][217545:217550] CHIP:DMG:
+          [1666952908.036422][217545:217550] CHIP:DMG:                                 ],
+          [1666952908.036438][217545:217550] CHIP:DMG:                         },
+          [1666952908.036463][217545:217550] CHIP:DMG:
+          [1666952908.036482][217545:217550] CHIP:DMG:                 },
+          [1666952908.036511][217545:217550] CHIP:DMG:
+          [1666952908.036531][217545:217550] CHIP:DMG:                 AttributeReportIB =
+          [1666952908.036558][217545:217550] CHIP:DMG:                 {
+          [1666952908.036576][217545:217550] CHIP:DMG:                         AttributeDataIB =
+          [1666952908.036593][217545:217550] CHIP:DMG:                         {
+          [1666952908.036610][217545:217550] CHIP:DMG:                                 DataVersion = 0x24eeedc4,
+          [1666952908.036627][217545:217550] CHIP:DMG:                                 AttributePathIB =
+          [1666952908.036646][217545:217550] CHIP:DMG:                                 {
+          [1666952908.036667][217545:217550] CHIP:DMG:                                         Endpoint = 0x1,
+          [1666952908.036688][217545:217550] CHIP:DMG:                                         Cluster = 0x25,
+          [1666952908.036713][217545:217550] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1666952908.036731][217545:217550] CHIP:DMG:                                         ListIndex = Null,
+          [1666952908.036749][217545:217550] CHIP:DMG:                                 }
+          [1666952908.036770][217545:217550] CHIP:DMG:
+          [1666952908.036787][217545:217550] CHIP:DMG:                                 Data =
+          [1666952908.036805][217545:217550] CHIP:DMG:                                 {
+          [1666952908.036824][217545:217550] CHIP:DMG:                                         0x0 = 4097,
+          [1666952908.036846][217545:217550] CHIP:DMG:                                         0x1 = "Room 1 On" (9 chars),
+          [1666952908.036866][217545:217550] CHIP:DMG:                                         0x2 = 3,
+          [1666952908.036889][217545:217550] CHIP:DMG:                                         0x3 = 57345,
+          [1666952908.036908][217545:217550] CHIP:DMG:                                         0x4 = 1,
+          [1666952908.036924][217545:217550] CHIP:DMG:                                         0x5 = 0,
+          [1666952908.036938][217545:217550] CHIP:DMG:                                 },
+          [1666952908.036954][217545:217550] CHIP:DMG:                         },
+          [1666952908.036981][217545:217550] CHIP:DMG:
+          [1666952908.036995][217545:217550] CHIP:DMG:                 },
+          [1666952908.037037][217545:217550] CHIP:DMG:
+          [1666952908.037052][217545:217550] CHIP:DMG:                 AttributeReportIB =
+          [1666952908.037082][217545:217550] CHIP:DMG:                 {
+          [1666952908.037095][217545:217550] CHIP:DMG:                         AttributeDataIB =
+          [1666952908.037106][217545:217550] CHIP:DMG:                         {
+          [1666952908.037118][217545:217550] CHIP:DMG:                                 DataVersion = 0x24eeedc4,
+          [1666952908.037129][217545:217550] CHIP:DMG:                                 AttributePathIB =
+          [1666952908.037142][217545:217550] CHIP:DMG:                                 {
+          [1666952908.037155][217545:217550] CHIP:DMG:                                         Endpoint = 0x1,
+          [1666952908.037168][217545:217550] CHIP:DMG:                                         Cluster = 0x25,
+          [1666952908.037181][217545:217550] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1666952908.037193][217545:217550] CHIP:DMG:                                         ListIndex = Null,
+          [1666952908.037206][217545:217550] CHIP:DMG:                                 }
+          [1666952908.037220][217545:217550] CHIP:DMG:
+          [1666952908.037231][217545:217550] CHIP:DMG:                                 Data =
+          [1666952908.037243][217545:217550] CHIP:DMG:                                 {
+          [1666952908.037263][217545:217550] CHIP:DMG:                                         0x0 = 4098,
+          [1666952908.037289][217545:217550] CHIP:DMG:                                         0x1 = "Turn On Room 2" (14 chars),
+          [1666952908.037314][217545:217550] CHIP:DMG:                                         0x2 = 3,
+          [1666952908.037334][217545:217550] CHIP:DMG:                                         0x3 = 57346,
+          [1666952908.037355][217545:217550] CHIP:DMG:                                         0x4 = 1,
+          [1666952908.037380][217545:217550] CHIP:DMG:                                         0x5 = 0,
+          [1666952908.037393][217545:217550] CHIP:DMG:                                 },
+          [1666952908.037404][217545:217550] CHIP:DMG:                         },
+          [1666952908.037426][217545:217550] CHIP:DMG:
+          [1666952908.037437][217545:217550] CHIP:DMG:                 },
+          [1666952908.037456][217545:217550] CHIP:DMG:
+          [1666952908.037465][217545:217550] CHIP:DMG:         ],
+          [1666952908.037519][217545:217550] CHIP:DMG:
+          [1666952908.037550][217545:217550] CHIP:DMG:         SuppressResponse = true,
+          [1666952908.037569][217545:217550] CHIP:DMG:         InteractionModelRevision = 1
+          [1666952908.037588][217545:217550] CHIP:DMG: }
+          [1666952908.037903][217545:217550] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 619638212
+          [1666952908.037961][217545:217550] CHIP:TOO:   ActionList: 2 entries
+          [1666952908.037989][217545:217550] CHIP:TOO:     [1]: {
+          [1666952908.038003][217545:217550] CHIP:TOO:       ActionID: 4097
+          [1666952908.038015][217545:217550] CHIP:TOO:       Name: Room 1 On
+          [1666952908.038027][217545:217550] CHIP:TOO:       Type: 3
+          [1666952908.038039][217545:217550] CHIP:TOO:       EndpointListID: 57345
+          [1666952908.038052][217545:217550] CHIP:TOO:       SupportedCommands: 1
+          [1666952908.038063][217545:217550] CHIP:TOO:       State: 0
+          [1666952908.038074][217545:217550] CHIP:TOO:      }
+          [1666952908.038093][217545:217550] CHIP:TOO:     [2]: {
+          [1666952908.038104][217545:217550] CHIP:TOO:       ActionID: 4098
+          [1666952908.038114][217545:217550] CHIP:TOO:       Name: Turn On Room 2
+          [1666952908.038125][217545:217550] CHIP:TOO:       Type: 3
+          [1666952908.038136][217545:217550] CHIP:TOO:       EndpointListID: 57346
+          [1666952908.038147][217545:217550] CHIP:TOO:       SupportedCommands: 1
+          [1666952908.038158][217545:217550] CHIP:TOO:       State: 0
+          [1666952908.038168][217545:217550] CHIP:TOO:      }
+
 
           2. Use the above obtained ActionID to verify the following commands
            ./chip-tool actions instant-action 4097 1 1
@@ -75,42 +156,41 @@ tests:
       verification: |
           ./chip-tool actions instant-action 4097 1 1
 
-          Verify command is successfully sent on TH(bridge-app)
+          Verify the command is successfully sent on TH(bridge-app)
 
-          [1658848801.832452][10096:10101] CHIP:EM: Removed CHIP MessageCounter:163269462 from RetransTable on exchange 54295i
-          [1658848801.832487][10096:10101] CHIP:DMG: ICR moving to [ResponseRe]
-          [1658848801.832544][10096:10101] CHIP:DMG: InvokeResponseMessage =
-          [1658848801.832574][10096:10101] CHIP:DMG: {
-          [1658848801.832603][10096:10101] CHIP:DMG:         suppressResponse = false,
-          [1658848801.832637][10096:10101] CHIP:DMG:         InvokeResponseIBs =
-          [1658848801.832675][10096:10101] CHIP:DMG:         [
-          [1658848801.832705][10096:10101] CHIP:DMG:                 InvokeResponseIB =
-          [1658848801.832744][10096:10101] CHIP:DMG:                 {
-          [1658848801.832775][10096:10101] CHIP:DMG:                         CommandStatusIB =
-          [1658848801.832813][10096:10101] CHIP:DMG:                         {
-          [1658848801.832849][10096:10101] CHIP:DMG:                                 CommandPathIB =
-          [1658848801.832890][10096:10101] CHIP:DMG:                                 {
-          [1658848801.832931][10096:10101] CHIP:DMG:                                         EndpointId = 0x1,
-          [1658848801.832972][10096:10101] CHIP:DMG:                                         ClusterId = 0x25,
-          [1658848801.833017][10096:10101] CHIP:DMG:                                         CommandId = 0x0,
-          [1658848801.833055][10096:10101] CHIP:DMG:                                 },
-          [1658848801.833100][10096:10101] CHIP:DMG:
-          [1658848801.833133][10096:10101] CHIP:DMG:                                 StatusIB =
-          [1658848801.833176][10096:10101] CHIP:DMG:                                 {
-          [1658848801.833217][10096:10101] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1658848801.833256][10096:10101] CHIP:DMG:                                 },
-          [1658848801.833292][10096:10101] CHIP:DMG:
-          [1658848801.833326][10096:10101] CHIP:DMG:                         },
-          [1658848801.833371][10096:10101] CHIP:DMG:
-          [1658848801.833402][10096:10101] CHIP:DMG:                 },
-          [1658848801.833438][10096:10101] CHIP:DMG:
-          [1658848801.833466][10096:10101] CHIP:DMG:         ],
-          [1658848801.833502][10096:10101] CHIP:DMG:
-          [1658848801.833530][10096:10101] CHIP:DMG:         InteractionModelRevision = 1
-          [1658848801.833559][10096:10101] CHIP:DMG: },
-          [1658848801.833627][10096:10101] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0025 Command=0x0000_0000 Status=0x0
-          [1658848801.833676][10096:10101] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1658848801.833742][10096:10101] CHIP:EM: Sending Standalone Ack for MessageCounter:266293997 on exchange 54295i
+          [1666953083.522228][217528:217528] CHIP:DMG:         suppressResponse = false,
+          [1666953083.522251][217528:217528] CHIP:DMG:         InvokeResponseIBs =
+          [1666953083.522287][217528:217528] CHIP:DMG:         [
+          [1666953083.522307][217528:217528] CHIP:DMG:                 InvokeResponseIB =
+          [1666953083.522343][217528:217528] CHIP:DMG:                 {
+          [1666953083.522364][217528:217528] CHIP:DMG:                         CommandStatusIB =
+          [1666953083.522393][217528:217528] CHIP:DMG:                         {
+          [1666953083.522416][217528:217528] CHIP:DMG:                                 CommandPathIB =
+          [1666953083.522445][217528:217528] CHIP:DMG:                                 {
+          [1666953083.522473][217528:217528] CHIP:DMG:                                         EndpointId = 0x1,
+          [1666953083.522504][217528:217528] CHIP:DMG:                                         ClusterId = 0x25,
+          [1666953083.522528][217528:217528] CHIP:DMG:                                         CommandId = 0x0,
+          [1666953083.522549][217528:217528] CHIP:DMG:                                 },
+          [1666953083.522578][217528:217528] CHIP:DMG:
+          [1666953083.522599][217528:217528] CHIP:DMG:                                 StatusIB =
+          [1666953083.522622][217528:217528] CHIP:DMG:                                 {
+          [1666953083.522645][217528:217528] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1666953083.522667][217528:217528] CHIP:DMG:                                 },
+          [1666953083.522690][217528:217528] CHIP:DMG:
+          [1666953083.522710][217528:217528] CHIP:DMG:                         },
+          [1666953083.522738][217528:217528] CHIP:DMG:
+          [1666953083.522756][217528:217528] CHIP:DMG:                 },
+          [1666953083.522785][217528:217528] CHIP:DMG:
+          [1666953083.522803][217528:217528] CHIP:DMG:         ],
+          [1666953083.522832][217528:217528] CHIP:DMG:
+          [1666953083.522851][217528:217528] CHIP:DMG:         InteractionModelRevision = 1
+          [1666953083.522869][217528:217528] CHIP:DMG: },
+          [1666953083.522888][217528:217528] CHIP:DMG:
+          [1666953083.523029][217528:217528] CHIP:DMG: Command handler moving to [CommandSen]
+          [1666953083.523057][217528:217528] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1666953083.523120][217528:217528] CHIP:DMG: Endpoint a, Cluster 0x0000_0006 update version to 37442e42
+          [1666953083.523159][217528:217528] CHIP:DMG: Endpoint b, Cluster 0x0000_0006 update version to a57a1137
+          [1666953083.523956][217528:217528] CHIP:DMG: << from UDP:[fe80::485c:bace:6107:3682%wlp3s0]:49809 | 100197571 | [Secure Channel  (0) / Standalone Ack (0x10) / Session = 0 / Exchange = 45347]
       disabled: true
 
     - label: "DUT issues an StartAction command to TH"

@@ -18,7 +18,6 @@
 
 from typing import Dict, Set
 
-
 # IGNORE lists source files that are not checked at all.
 #
 # Each entry is a string giving a Python regular expression,

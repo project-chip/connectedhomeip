@@ -16,10 +16,9 @@
  *    limitations under the License.
  */
 
-#include "MemMonitoring.h"
-
-#include "AppConfig.h"
-#include "FreeRTOS.h"
+#include <FreeRTOS.h>
+#include <MemMonitoring.h>
+#include <plat.h>
 #include <platform/CHIPDeviceLayer.h>
 
 static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte / sizeof(StackType_t)];

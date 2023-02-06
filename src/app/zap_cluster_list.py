@@ -2,10 +2,10 @@
 """Parses a ZAP input file and outputs directories to compile."""
 
 import argparse
-import pathlib
 import json
-import typing
+import pathlib
 import sys
+import typing
 
 # List of directories in src/app/clusters to build for server clusters.
 SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
@@ -23,7 +23,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'BINDING_CLUSTER': ['bindings'],
     'BOOLEAN_STATE_CLUSTER': [],
     'ACTIONS_CLUSTER': [],
-    'BRIDGED_DEVICE_BASIC_CLUSTER': ['bridged-device-basic-information-server'],
+    'BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER': ['bridged-device-basic-information-server'],
     'CHANNEL_CLUSTER': ['channel-server'],
     'CLIENT_MONITORING_CLUSTER': ['client-monitoring-server'],
     'COLOR_CONTROL_CLUSTER': ['color-control-server'],
@@ -109,7 +109,7 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'BINDING_CLUSTER': [],
     'BOOLEAN_STATE_CLUSTER': [],
     'ACTIONS_CLUSTER': [],
-    'BRIDGED_DEVICE_BASIC_CLUSTER': [],
+    'BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER': [],
     'CHANNEL_CLUSTER': [],
     'CLIENT_MONITORING_CLUSTER': [],
     'COLOR_CONTROL_CLUSTER': [],

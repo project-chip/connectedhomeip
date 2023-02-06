@@ -111,7 +111,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     return true;
 }
 
-bool LockManager::SetDoorState(chip::EndpointId endpointId, DlDoorState doorState)
+bool LockManager::SetDoorState(chip::EndpointId endpointId, DoorStateEnum doorState)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -123,7 +123,7 @@ bool LockManager::SetDoorState(chip::EndpointId endpointId, DlDoorState doorStat
     return lockEndpoint->SetDoorState(doorState);
 }
 
-bool LockManager::SendLockAlarm(chip::EndpointId endpointId, DlAlarmCode alarmCode)
+bool LockManager::SendLockAlarm(chip::EndpointId endpointId, AlarmCodeEnum alarmCode)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -134,7 +134,7 @@ bool LockManager::SendLockAlarm(chip::EndpointId endpointId, DlAlarmCode alarmCo
     return lockEndpoint->SendLockAlarm(alarmCode);
 }
 
-bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
+bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -145,7 +145,7 @@ bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpa
     return lockEndpoint->Lock(pin, err);
 }
 
-bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
+bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -168,8 +168,8 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 }
 
 bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                          const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
-                          DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
+                          const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
+                          CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -181,7 +181,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                                  credentials, totalCredentials);
 }
 
-bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
     auto lockEndpoint = getEndpoint(endpointId);
@@ -194,7 +194,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 }
 
 bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
-                                chip::FabricIndex modifier, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+                                chip::FabricIndex modifier, DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                 const chip::ByteSpan & credentialData)
 {
     auto lockEndpoint = getEndpoint(endpointId);
@@ -220,8 +220,7 @@ DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t weekDayIn
 }
 
 DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status,
-                                  DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
-                                  uint8_t endMinute)
+                                  DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -273,7 +272,7 @@ DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t holidayIn
 }
 
 DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
-                                  uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
+                                  uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)

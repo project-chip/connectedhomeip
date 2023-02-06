@@ -16,14 +16,14 @@
  */
 
 #include <aos/yloop.h>
+#include <bl60x_wifi_driver/wifi_mgmr.h>
+#include <bl60x_wifi_driver/wifi_mgmr_api.h>
 #include <hal_wifi.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lwip/tcpip.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
-#include <tcpip.h>
-#include <wifi_mgmr.h>
-#include <wifi_mgmr_api.h>
 #include <wifi_mgmr_ext.h>
 #include <wifi_mgmr_portable.h>
 
@@ -47,7 +47,7 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 constexpr char blWiFiSSIDKeyName[]        = "bl-wifi-ssid";
 constexpr char blWiFiCredentialsKeyName[] = "bl-wifi-pass";
 
-static uint8_t WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+static char WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
 static uint8_t scan_type = 0;
 } // namespace
 
@@ -184,7 +184,7 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     memcpy(passwd, key, keyLen);
     wifi_interface_t wifi_interface;
     wifi_interface = wifi_mgmr_sta_enable();
-    wifi_mgmr_sta_connect(wifi_interface, wifi_ssid, passwd, NULL, NULL, 0, 0);
+    wifi_mgmr_sta_connect(&wifi_interface, wifi_ssid, passwd, NULL, NULL, 0, 0);
 
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
@@ -221,7 +221,6 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
-    static int save         = 0;
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);

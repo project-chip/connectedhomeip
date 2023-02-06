@@ -30,36 +30,36 @@ Interactions with the switch device are exposed as attributes (for the latching 
     <globalAttribute side="server" code="0xFFFC" value="0" />
     <globalAttribute side="server" code="0xFFFD" value="1" />
 
-    <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="INT8U" writable="false" optional="false" default="2" min="2">number of positions</attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="INT8U" writable="false" reportable="true" optional="false">current position</attribute>
-    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="INT8U" writable="false" optional="true" default="2" min="2">multi press max</attribute>
+    <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="INT8U" writable="false" optional="false" default="2" min="2">NumberOfPositions</attribute>
+    <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="INT8U" writable="false" reportable="true" optional="false">CurrentPosition</attribute>
+    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="INT8U" writable="false" optional="true" default="2" min="2">MultiPressMax</attribute>
     <event side="server" code="0x00" priority="info" name="SwitchLatched" optional="true">
-      <description>Switch Latched</description>
+      <description>SwitchLatched</description>
       <field id="0" name="NewPosition" type="INT8U" />
     </event>
     <event side="server" code="0x01" priority="info" name="InitialPress" optional="true">
-      <description>Initial Press</description>
+      <description>InitialPress</description>
       <field id="0" name="NewPosition" type="INT8U" />
     </event>
     <event side="server" code="0x02" priority="info" name="LongPress" optional="true">
-      <description>Long Press</description>
+      <description>LongPress</description>
       <field id="0" name="NewPosition" type="INT8U" />
     </event>
     <event side="server" code="0x03" priority="info" name="ShortRelease" optional="true">
-      <description>Short Release</description>
+      <description>ShortRelease</description>
       <field id="0" name="PreviousPosition" type="INT8U" />
     </event>
     <event side="server" code="0x04" priority="info" name="LongRelease" optional="true">
-      <description>Long Release</description>
+      <description>LongRelease</description>
       <field id="0" name="PreviousPosition" type="INT8U" />
     </event>
     <event side="server" code="0x05" priority="info" name="MultiPressOngoing" optional="true">
-      <description>MultiPress Ongoing</description>
+      <description>MultiPressOngoing</description>
       <field id="0" name="NewPosition" type="INT8U" />
       <field id="1" name="CurrentNumberOfPressesCounted" type="INT8U" />
     </event>
     <event side="server" code="0x06" priority="info" name="MultiPressComplete" optional="true">
-      <description>MultiPress Complete</description>
+      <description>MultiPressComplete</description>
       <field id="0" name="PreviousPosition" type="INT8U" />
       <field id="1" name="TotalNumberOfPressesCounted" type="INT8U" />
     </event>
@@ -68,11 +68,11 @@ Interactions with the switch device are exposed as attributes (for the latching 
 
   <bitmap name="SwitchFeature" type="BITMAP32">
     <cluster code="0x003B" />
-    <field name="LatchingSwitch" mask="0x1" />
-    <field name="MomentarySwitch" mask="0x2" />
-    <field name="MomentarySwitchRelease" mask="0x4" />
-    <field name="MomentarySwitchLongPress" mask="0x8" />
-    <field name="MomentarySwitchMultiPress" mask="0x10" />
+    <field name="Latching Switch" mask="0x1" />
+    <field name="Momentary Switch" mask="0x2" />
+    <field name="Momentary Switch Release" mask="0x4" />
+    <field name="Momentary Switch LongPress" mask="0x8" />
+    <field name="Momentary Switch MultiPress" mask="0x10" />
   </bitmap>
 
 </configurator>

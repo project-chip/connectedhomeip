@@ -43,10 +43,10 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-app::Clusters::GeneralDiagnostics::InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+app::Clusters::GeneralDiagnostics::InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
-    app::Clusters::GeneralDiagnostics::InterfaceType ret =
-        app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+    app::Clusters::GeneralDiagnostics::InterfaceTypeEnum ret =
+        app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
     int sock = -1;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -61,7 +61,7 @@ app::Clusters::GeneralDiagnostics::InterfaceType ConnectivityUtils::GetInterface
 
     if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
     {
-        ret = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ret = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     }
     else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
     {
@@ -72,7 +72,7 @@ app::Clusters::GeneralDiagnostics::InterfaceType ConnectivityUtils::GetInterface
         Platform::CopyString(ifr.ifr_name, ifname);
 
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
-            ret = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+            ret = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
     }
 
     close(sock);

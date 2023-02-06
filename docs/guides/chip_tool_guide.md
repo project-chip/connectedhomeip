@@ -8,14 +8,12 @@ the setup payload or performing discovery actions.
 
 <hr>
 
--   [Source files](#source)
--   [Building and running the CHIP Tool](#building)
--   [Using the CHIP Tool for Matter device testing](#using)
--   [Supported commands and options](#commands)
+-   [Source files](#source-files)
+-   [Building and running the CHIP Tool](#building-and-running-the-chip-tool)
+-   [Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+-   [Supported commands and options](#supported-commands-and-options)
 
 <hr>
-
-<a name="source"></a>
 
 ## Source files
 
@@ -27,8 +25,6 @@ directory.
 > `/tmp` directory can sometimes resolve issues related to stale configuration.
 
 <hr>
-
-<a name="building"></a>
 
 ## Building and running the CHIP Tool
 
@@ -69,11 +65,10 @@ _clusters_ in this context, but not all listed commands correspond to the
 _clusters_ in the Data Model (for example, pairing or discover commands). Each
 listed command can however become the root of the new more complex command by
 appending it with sub-commands. Examples of specific commands and their use
-cases are described in the [Supported commands and options](#commands) section.
+cases are described in the
+[Supported commands and options](#supported-commands-and-options) section.
 
 <hr>
-
-<a name="using"></a>
 
 ## Using CHIP Tool for Matter device testing
 
@@ -218,9 +213,10 @@ In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<operational_dataset\>_ is the Operational Dataset determined in the
-    step 3.
+    [step 4](#step-4-determine-network-pairing-credentials).
 -   _<pin_code\>_ and _<discriminator\>_ are device-specific keys determined in
-    the step 4.
+    the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code).
 
 ##### Commissioning into Wi-Fi network over Bluetooth LE
 
@@ -236,7 +232,8 @@ In this command:
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<ssid\>_ and _<password\>_ are credentials determined in the step 3.
 -   _<pin_code\>_ and _<discriminator\>_ are device-specific keys determined in
-    the step 4.
+    the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code).
 
 If you prefer the hexadecimal format, use the `hex:` prefix. For example:
 
@@ -268,7 +265,8 @@ $ ./chip-tool pairing onnetwork <node_id> <pin_code>
 In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
--   _<pin_code\>_ is device specific _setup PIN code_ determined in the step 4
+-   _<pin_code\>_ is device specific _setup PIN code_ determined in the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code)
     and used to discover the device.
 
 ##### Commissioning with long discriminator
@@ -284,7 +282,8 @@ In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<pin_code\>_ and _<discriminator\>_ are device specific keys determined in
-    the step 4.
+    the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code).
 
 ##### Commissioning with QR code payload or manual pairing code
 
@@ -384,8 +383,6 @@ $ ./chip-tool basic
 ```
 
 <hr>
-
-<a name="commands"></a>
 
 ## Supported commands and options
 
@@ -770,7 +767,8 @@ The `pairing` command supports different means regarding Matter device
 commissioning procedure.
 
 Thread and Wi-Fi commissioning use cases are described in the
-[Using the CHIP Tool for Matter device testing](#using) section.
+[Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+section.
 
 To list all `pairing` sub-commands, run the following command:
 
@@ -780,7 +778,8 @@ $ ./chip-tool pairing
 
 ### Interacting with Data Model clusters
 
-As mentioned in the [Using the CHIP Tool for Matter device testing](#using)
+As mentioned in the
+[Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
 section, executing the `chip-tool` command with a particular cluster name lists
 all operations supported for this cluster, as in the following command pattern:
 
@@ -874,7 +873,8 @@ In this command:
 Multi-admin feature allows you to join Matter device to several Matter fabrics
 and administer it by several different Matter administrators. First you need to
 commission the Matter device to first fabric following the
-[Using CHIP Tool for Matter device testing](#using) section.
+[Using CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+section.
 
 Before it is possible to commission a Matter device to a new fabric, the
 administrator from first fabric must open the commissioning window for a new

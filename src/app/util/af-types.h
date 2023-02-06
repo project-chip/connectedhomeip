@@ -34,8 +34,11 @@
 #include <app/util/attribute-metadata.h> // EmberAfAttributeMetadata
 
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
 #include <lib/support/Variant.h>
 #include <messaging/ExchangeContext.h>
+
+#include <app-common/zap-generated/cluster-enums.h>
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
@@ -734,7 +737,7 @@ typedef struct
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
     bool hasCurrentLevelValue;
-    uint8_t currentLevelValue;
+    chip::app::DataModel::Nullable<uint8_t> currentLevelValue;
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
     bool hasOccupiedCoolingSetpointValue;
@@ -764,17 +767,17 @@ typedef struct
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
     bool hasLockStateValue;
-    uint8_t lockStateValue;
+    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> lockStateValue;
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
     bool hasCurrentPositionLiftPercentageValue;
-    uint8_t currentPositionLiftPercentageValue;
+    chip::app::DataModel::Nullable<chip::Percent> currentPositionLiftPercentageValue;
     bool hasCurrentPositionTiltPercentageValue;
-    uint8_t currentPositionTiltPercentageValue;
+    chip::app::DataModel::Nullable<chip::Percent> currentPositionTiltPercentageValue;
     bool hasTargetPositionLiftPercent100thsValue;
-    uint16_t targetPositionLiftPercent100thsValue;
+    chip::app::DataModel::Nullable<chip::Percent100ths> targetPositionLiftPercent100thsValue;
     bool hasTargetPositionTiltPercent100thsValue;
-    uint16_t targetPositionTiltPercent100thsValue;
+    chip::app::DataModel::Nullable<chip::Percent100ths> targetPositionTiltPercent100thsValue;
 #endif
 } EmberAfSceneTableEntry;
 

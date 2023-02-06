@@ -44,6 +44,7 @@ CIRQUE_TESTS=(
     "SplitCommissioningTest"
     "CommissioningFailureTest"
     "CommissioningFailureOnReportTest"
+    "CommissioningWindowTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -105,8 +106,16 @@ function cirquetest_bootstrap() {
     set -ex
 
     cd "$REPO_DIR"/third_party/cirque/repo
+    pip3 uninstall -y setuptools
+    pip3 install setuptools==65.7.0
     pip3 install pycodestyle==2.5.0 wheel
+
     make NO_GRPC=1 install -j
+
+    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+        # Note: This script will be invoked in docker on CI, We should add CHIP repo to safe directory to silent git error messages.
+        git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
+    fi
 
     "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh
 

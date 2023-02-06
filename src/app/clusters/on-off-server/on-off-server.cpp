@@ -351,7 +351,7 @@ bool OnOffServer::toggleCommand(const app::ConcreteCommandPath & commandPath)
 bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::OffWithEffect::DecodableType & commandData)
 {
-    OnOffEffectIdentifier effectId = commandData.effectId;
+    OnOffEffectIdentifier effectId = commandData.effectIdentifier;
     uint8_t effectVariant          = commandData.effectVariant;
     chip::EndpointId endpoint      = commandPath.mEndpointId;
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;

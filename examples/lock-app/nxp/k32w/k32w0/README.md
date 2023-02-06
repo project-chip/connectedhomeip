@@ -16,28 +16,26 @@ network.
 
 <hr>
 
--   [CHIP K32W0 Lock Example Application](#chip-k32w-lock-example-application) -
+-   [CHIP K32W0 Lock Example Application](#chip-k32w061-lock-example-application)
 -   [Introduction](#introduction)
     -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#building-issues)
--   [Manufacturing data](#manufacturing)
--   [Flashing and debugging](#flashdebug)
--   [Pigweed Tokenizer](#tokenizer)
-    -   [Detokenizer script](#detokenizer)
-    -   [Notes](#detokenizer-notes)
-    -   [Known issues](#detokenizer-known-issues)
--   [Tinycrypt ECC operations](#tinycrypt)
-    -   [Building steps](#tinycrypt-building-steps)
+    -   [Known issues](#known-issues)
+-   [Manufacturing data](#manufacturing-data)
+-   [Flashing and debugging](#flashing-and-debugging)
+-   [Pigweed Tokenizer](#pigweed-tokenizer)
+    -   [Detokenizer script](#detokenizer-script)
+    -   [Notes](#notes)
+    -   [Known issues](#known-issues-1)
+-   [Tinycrypt ECC operations](#tinycrypt-ecc-operations)
+    -   [Building steps](#building-steps)
 -   [Low power](#low-power)
 
-    -   [Known issues](#low-power-issues)
+    -   [Known issues](#known-issues-2)
 
     </hr>
-
-<a name="intro"></a>
 
 ## Introduction
 
@@ -167,8 +165,6 @@ DS3, which can be found on the DK6 board.
 Also, by long pressing the **USERINTERFACE** button, the factory reset action
 will be initiated.
 
-<a name="building"></a>
-
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
@@ -217,21 +213,15 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
 
-<a name="building-issues"></a>
-
 ## Known issues
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
 
-<a name="manufacturing"></a>
-
 ## Manufacturing data
 
 See
 [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
-
-<a name="flashdebug"></a>
 
 ## Flashing and debugging
 
@@ -242,16 +232,12 @@ All you have to do is to replace the Openthread binaries from the above
 documentation with _out/debug/chip-k32w0x-lock-example.bin_ if DK6Programmer is
 used or with _out/debug/chip-k32w0x-lock-example_ if MCUXpresso is used.
 
-<a name="tokenizer"></a>
-
 ## Pigweed tokenizer
 
 The tokenizer is a pigweed module that allows hashing the strings. This greatly
 reduces the flash needed for logs. The module can be enabled by building with
 the gn argument _chip_pw_tokenizer_logging=true_. The detokenizer script is
 needed for parsing the hashed scripts.
-
-<a name="detokenizer"></a>
 
 ### Detokenizer script
 
@@ -281,8 +267,6 @@ where the decoded logs will be stored. This parameter is required for file usage
 and optional for serial usage. If not provided when used with serial port, it
 will show the decoded log only at the stdout and not save it to file.
 
-<a name="detokenizer-notes"></a>
-
 ### Notes
 
 The token database is created automatically after building the binary if the
@@ -296,8 +280,6 @@ detokenizer script to see logs of a lock app:
 ```
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-lock-example-database.bin -o device.txt
 ```
-
-<a name="detokenizer-known-issues"></a>
 
 ### Known issues
 
@@ -316,11 +298,7 @@ If run, closed and rerun with the serial option on the same serial port, the
 detokenization script will get stuck and not show any logs. The solution is to
 unplug and plug the board and then rerun the script.
 
-<a name="tinycrypt"></a>
-
 ## Tinycrypt ECC operations
-
-<a name="tinycrypt-building-steps"></a>
 
 ### Building steps
 
@@ -335,8 +313,6 @@ In order to use the tinycrypt ecc operations, use the following build arguments:
 To disable tinycrypt ecc operations, simply build with _chip_crypto=\"mbedtls\"_
 and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls
 implementation from `NXPmicro/mbedtls` library will be used.
-
-<a name="low-power"></a>
 
 ## Low power
 
@@ -368,8 +344,6 @@ below:
 
 Please note that that the Power Measurement Tool is not very accurate and
 professional tools must be used if exact power consumption needs to be known.
-
-<a name="low-power-issues"></a>
 
 ## Known issues
 

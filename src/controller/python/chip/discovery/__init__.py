@@ -14,16 +14,15 @@
 #    limitations under the License.
 #
 
-import logging
-import time
-import threading
 import enum
-
+import logging
+import threading
+import time
 from dataclasses import dataclass
-from typing import List, Dict, Set, Callable
+from typing import Callable, List, Set
 
 from chip.discovery.library_handle import _GetDiscoveryLibraryHandle
-from chip.discovery.types import DiscoverSuccessCallback_t, DiscoverFailureCallback_t
+from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
 from chip.native import PyChipError
 
 

@@ -36,127 +36,11 @@
 rsi_ble_event_conn_status_t conn_event_to_app;
 rsi_ble_t att_list;
 sl_wfx_msg_t event_msg;
+extern rsi_semaphore_handle_t sl_ble_event_sem;
 
 // Memory to initialize driver
 uint8_t bt_global_buf[BT_GLOBAL_BUFF_LEN];
-static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
-
-/* Rsi driver Task will use as its stack */
-// StackType_t driverRsiTaskStack[WFX_RSI_WLAN_TASK_SZ] = { 0 };
-
-/* Structure that will hold the TCB of the wfxRsi Task being created. */
-// StaticTask_t driverRsiTaskBuffer;
-
-StaticTask_t rsiBLETaskStruct;
-
-/* wfxRsi Task will use as its stack */
-StackType_t wfxBLETaskStack[WFX_RSI_TASK_SZ] = { 0 };
-
-int32_t ble_rsi_task(void)
-{
-    int32_t status;
-    uint8_t buf[RSI_RESPONSE_HOLD_BUFF_SIZE];
-    //    extern void rsi_hal_board_init(void);
-    //
-    //    WFX_RSI_LOG("%s: starting(HEAP_SZ = %d)", __func__, SL_HEAP_SIZE);
-    //
-    //    //! Driver initialization
-    //    status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
-    //    if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
-    //    {
-    //        WFX_RSI_LOG("%s: error: RSI Driver initialization failed with status: %02x", __func__, status);
-    //        return status;
-    //    }
-    //
-    //    WFX_RSI_LOG("%s: rsi_device_init", __func__);
-    //
-    //    /* ! Redpine module intialisation */
-    //    if ((status = rsi_device_init(LOAD_NWP_FW)) != RSI_SUCCESS)
-    //    {
-    //        WFX_RSI_LOG("%s: error: rsi_device_init failed with status: %02x", __func__, status);
-    //        return status;
-    //    }
-    //    WFX_RSI_LOG("%s: start wireless drv task", __func__);
-    //
-    //    /*
-    //     * Create the driver task
-    //     */
-    //    wfx_rsi.drv_task = xTaskCreateStatic((TaskFunction_t) rsi_wireless_driver_task, "rsi_drv", WFX_RSI_WLAN_TASK_SZ, NULL,
-    //                                         1, driverRsiTaskStack, &driverRsiTaskBuffer);
-    //    if (NULL == wfx_rsi.drv_task)
-    //    {
-    //        WFX_RSI_LOG("%s: error: Create the driver task failed", __func__);
-    //        return RSI_ERROR_INVALID_PARAM;
-    //    }
-    //
-    //    /* Initialize WiSeConnect or Module features. */
-    //    WFX_RSI_LOG("%s: rsi_wireless_init", __func__);
-    //    if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS)
-    //    {
-    //        WFX_RSI_LOG("%s: error: Initialize WiSeConnect failed with status: %02x", __func__, status);
-    //        return status;
-    //    }
-    //
-    //    WFX_RSI_LOG("%s: get FW version..", __func__);
-    //
-    //    /*
-    //     * Get the MAC and other info to let the user know about it.
-    //     */
-    //    if (rsi_wlan_get(RSI_FW_VERSION, buf, sizeof(buf)) != RSI_SUCCESS)
-    //    {
-    //        WFX_RSI_LOG("%s: error: rsi_wlan_get(RSI_FW_VERSION) failed with status: %02x", __func__, status);
-    //        return status;
-    //    }
-    //
-    //    buf[sizeof(buf) - 1] = 0;
-    //    WFX_RSI_LOG("%s: RSI firmware version: %s", __func__, buf);
-    //    //! Send feature frame
-    //    if ((status = rsi_send_feature_frame()) != RSI_SUCCESS)
-    //    {
-    //        WFX_RSI_LOG("%s: error: rsi_send_feature_frame failed with status: %02x", __func__, status);
-    //        return status;
-    //    }
-    //
-    //    WFX_RSI_LOG("%s: sent rsi_send_feature_frame", __func__);
-    //    /* initializes wlan radio parameters and WLAN supplicant parameters.
-    //     */
-    //    (void) rsi_wlan_radio_init(); /* Required so we can get MAC address */
-    //    if ((status = rsi_wlan_get(RSI_MAC_ADDRESS, &wfx_rsi.sta_mac.octet[0], RESP_BUFF_SIZE)) != RSI_SUCCESS)
-    //    {
-    //        WFX_RSI_LOG("%s: error: rsi_wlan_get failed with status: %02x", __func__, status);
-    //        return status;
-    //    }
-
-    // registering the GAP callback functions
-    rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
-                                   NULL, NULL, NULL);
-
-    // registering the GATT call back functions
-    rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, rsi_ble_on_gatt_write_event, NULL, NULL, NULL,
-                                    rsi_ble_on_mtu_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                                    rsi_ble_on_event_indication_confirmation, NULL);
-
-    WFX_RSI_LOG("registering rsi_ble_add_service");
-
-    //  Exchange of GATT info with BLE stack
-    rsi_ble_add_matter_service();
-
-    //  initializing the application events map
-    rsi_ble_app_init_events();
-
-    wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) rsi_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL, 2,
-                                         wfxBLETaskStack, &rsiBLETaskStruct);
-    WFX_RSI_LOG("%s: rsi_task_suspend init_task ", __func__);
-    if (wfx_rsi.ble_task == NULL)
-    {
-        WFX_RSI_LOG("%s: error: failed to create ble task.", __func__);
-    }
-
-    WFX_RSI_LOG("%s complete", __func__);
-    //    rsi_task_destroy((rsi_task_handle_t *)wfx_rsi.init_task);
-    return RSI_SUCCESS;
-}
 
 /*==============================================*/
 /**
@@ -169,10 +53,10 @@ int32_t ble_rsi_task(void)
  */
 void rsi_ble_app_init_events()
 {
+    WFX_RSI_LOG("%s: starting", __func__);
     event_msg.ble_app_event_map  = 0;
     event_msg.ble_app_event_mask = 0xFFFFFFFF;
     event_msg.ble_app_event_mask = event_msg.ble_app_event_mask; // To suppress warning while compiling
-    WFX_RSI_LOG("Function :: rsi_ble_app_init_events");
     return;
 }
 
@@ -187,6 +71,7 @@ void rsi_ble_app_init_events()
  */
 void rsi_ble_app_clear_event(uint32_t event_num)
 {
+    WFX_RSI_LOG("%s: starting", __func__);
     event_msg.event_num = event_num;
     event_msg.ble_app_event_map &= ~BIT(event_num);
     return;
@@ -203,8 +88,7 @@ void rsi_ble_app_clear_event(uint32_t event_num)
  */
 void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
 {
-    WFX_RSI_LOG(" RSI_BLE : rsi_ble_on_mtu_event");
-    memset(&event_msg.rsi_ble_mtu, 0, sizeof(rsi_ble_event_mtu_t));
+    WFX_RSI_LOG("%s: starting", __func__);
     memcpy(&event_msg.rsi_ble_mtu, rsi_ble_mtu, sizeof(rsi_ble_event_mtu_t));
     rsi_ble_app_set_event(RSI_BLE_MTU_EVENT);
 }
@@ -221,8 +105,7 @@ void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
  */
 void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write)
 {
-    WFX_RSI_LOG(" RSI_BLE : rsi_ble_on_gatt_write_event");
-    memset(&event_msg.rsi_ble_write, 0, sizeof(rsi_ble_event_write_t));
+    WFX_RSI_LOG("%s: starting", __func__);
     event_msg.event_id = event_id;
     memcpy(&event_msg.rsi_ble_write, rsi_ble_write, sizeof(rsi_ble_event_write_t));
     rsi_ble_app_set_event(RSI_BLE_GATT_WRITE_EVENT);
@@ -239,7 +122,7 @@ void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_
  */
 void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn)
 {
-    WFX_RSI_LOG(" RSI_BLE : rsi_ble_on_enhance_conn_status_event");
+    WFX_RSI_LOG("%s: starting", __func__);
     event_msg.connectionHandle = 1;
     event_msg.bondingHandle    = 255;
     memcpy(event_msg.resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
@@ -258,7 +141,7 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * 
  */
 void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
 {
-    WFX_RSI_LOG(" RSI_BLE : rsi_ble_on_disconnect_event");
+    WFX_RSI_LOG("%s: starting", __func__);
     event_msg.reason = reason;
     memcpy(event_msg.resp_disconnect, resp_disconnect, sizeof(rsi_ble_event_disconnect_t));
     rsi_ble_app_set_event(RSI_BLE_DISCONN_EVENT);
@@ -275,7 +158,7 @@ void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, u
  */
 void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
 {
-    WFX_RSI_LOG(" RSI_BLE : rsi_ble_on_event_indication_confirmation");
+    WFX_RSI_LOG("%s: starting", __func__);
     event_msg.resp_status = resp_status;
     memcpy(&event_msg.rsi_ble_event_set_att_rsp, rsi_ble_event_set_att_rsp, sizeof(rsi_ble_set_att_resp_t));
     rsi_ble_app_set_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
@@ -318,7 +201,9 @@ int32_t rsi_ble_app_get_event(void)
  */
 void rsi_ble_app_set_event(uint32_t event_num)
 {
+    WFX_RSI_LOG("%s: starting", __func__);
     event_msg.ble_app_event_map |= BIT(event_num);
+    rsi_semaphore_post(&sl_ble_event_sem);
     return;
 }
 

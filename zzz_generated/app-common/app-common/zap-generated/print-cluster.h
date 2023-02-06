@@ -210,10 +210,12 @@
 #define CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER
 #endif
 
-#if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER { chip::app::Clusters::BridgedDeviceBasic::Id, "Bridged Device Basic" },
+#if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_SERVER) ||                                                          \
+    defined(ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER                                                                 \
+    { chip::app::Clusters::BridgedDeviceBasicInformation::Id, "Bridged Device Basic Information" },
 #else
-#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER
+#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_SWITCH_CLUSTER_SERVER) || defined(ZCL_USING_SWITCH_CLUSTER_CLIENT)
@@ -224,7 +226,7 @@
 
 #if defined(ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                      \
-    { chip::app::Clusters::AdministratorCommissioning::Id, "AdministratorCommissioning" },
+    { chip::app::Clusters::AdministratorCommissioning::Id, "Administrator Commissioning" },
 #else
 #define CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER
 #endif
@@ -509,7 +511,7 @@
     CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER                                                                                 \
-    CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER                                                                     \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \

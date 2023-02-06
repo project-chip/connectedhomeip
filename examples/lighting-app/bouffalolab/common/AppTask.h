@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +29,14 @@
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
+
+#define APP_BUTTON_PRESS_JITTER 50
+#define APP_BUTTON_PRESS_SHORT 1000
+#define APP_BUTTON_PRESS_LONG 4000
+
+#define APP_LIGHT_ENDPOINT_ID 1
+#define APP_REBOOT_RESET_COUNT 3
+#define APP_REBOOT_RESET_COUNT_KEY "app_reset_cnt"
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)

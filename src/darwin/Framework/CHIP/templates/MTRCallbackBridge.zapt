@@ -16,19 +16,24 @@ typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataM
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_cluster_responses}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}CallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &);
+{{/unless}}
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) enum=(asUpperCamelCase name preserveAcronyms=true))}}
 typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback)(void *, chip::app::Clusters::{{asUpperCamelCase parent.name}}::{{asType label}});
 typedef void (*Nullable{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::app::Clusters::{{asUpperCamelCase parent.name}}::{{asType label}}> &);
+{{/unless}}
 {{/zcl_enums}}
 {{/zcl_clusters}}
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_server_cluster_attributes}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#if isArray}}
 typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCamelCase name preserveAcronyms=true}}ListAttributeCallback)(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} data);
 {{else}}
@@ -39,6 +44,7 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback)(void *, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}});
 {{/if_is_strongly_typed_bitmap}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
@@ -75,6 +81,7 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_server_cluster_attributes}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#if isArray}}
 {{#>MTRCallbackBridge header="1" ns=parent.name                                }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}ListAttributeCallback{{/MTRCallbackBridge}}
 {{else}}
@@ -85,18 +92,23 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
   {{#>MTRCallbackBridge header="1" ns=parent.name                              }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
   {{/if_is_strongly_typed_bitmap}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_cluster_responses}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#>MTRCallbackBridge header="1" partial-type="Command"                        }}{{asUpperCamelCase ../../name preserveAcronyms=true}}Cluster{{asUpperCamelCase ../name preserveAcronyms=true}}Callback{{/MTRCallbackBridge}}
+{{/unless}}
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) enum=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#>MTRCallbackBridge header="1" type=(asType label) isNullable=false ns=parent.name}}{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge header="1" type=(asType label) isNullable=true  ns=parent.name}}Nullable{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
+{{/unless}}
 {{/zcl_enums}}
 {{/zcl_clusters}}

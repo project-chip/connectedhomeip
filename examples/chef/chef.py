@@ -18,17 +18,16 @@ import hashlib
 import json
 import optparse
 import os
+import re
 import shutil
 import sys
 import tarfile
 import textwrap
 from typing import Any, Dict, Sequence
 
-import yaml
-import re
-
 import constants
 import stateful_shell
+import yaml
 from sample_app_util import zap_file_parser
 
 TermColors = constants.TermColors
@@ -876,14 +875,14 @@ def main() -> int:
                 f"python3 -m chip_rpc.console --device {config['esp32']['TTY']}")
         elif (options.build_target == "silabs-thread"):
             if (sys.platform == "linux") or (sys.platform == "linux2"):
-                if(config['silabs-thread']['TTY'] is None):
+                if (config['silabs-thread']['TTY'] is None):
                     flush_print(
                         'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
                     exit(1)
                 shell.run_cmd(
                     f"python3 -m chip_rpc.console --device {config['silabs-thread']['TTY']} -b 115200")
             elif sys.platform == "darwin":
-                if(config['silabs-thread']['CU'] is None):
+                if (config['silabs-thread']['CU'] is None):
                     flush_print(
                         'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.CU is set on your config.yaml file')
                     exit(1)

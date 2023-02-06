@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 import argparse
+import glob
 import json
 import os
+import os.path
 import subprocess
 import sys
-import typing
-import cryptography.x509
-import os.path
-import glob
-from binascii import hexlify, unhexlify
+from binascii import hexlify
 from enum import Enum
+
+import cryptography.x509
 
 VID_NOT_PRESENT = 0xFFFF
 PID_NOT_PRESENT = 0x0000

@@ -31,14 +31,14 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
+#include <utils_log.h>
 
 #include <aos/kernel.h>
-#include <aos/yloop.h>
 #include <bl60x_fw_api.h>
 #include <bl_sec.h>
 #include <event_device.h>
 #include <hal_wifi.h>
-#include <tcpip.h>
+#include <lwip/tcpip.h>
 #include <wifi_mgmr_ext.h>
 
 extern "C" {
@@ -76,6 +76,8 @@ static void WifiStaDisconect(void)
     {
         return;
     }
+
+    ChipLogError(DeviceLayer, "WiFi station disconnect, reason %d.", reason);
 
     switch (reason)
     {
@@ -165,13 +167,10 @@ static void WifiStaConnected(void)
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
     }
 }
+typedef void (*aos_event_cb)(input_event_t * event, void * private_data);
 
 void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 {
-    static char * ssid;
-    static char * password;
-    int ret;
-
     switch (event->code)
     {
     case CODE_WIFI_ON_INIT_DONE: {
@@ -181,14 +180,22 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
     case CODE_WIFI_ON_MGMR_DONE: {
     }
     break;
+    case CODE_WIFI_ON_CONNECTED: {
+        ChipLogProgress(DeviceLayer, "WiFi station connected.");
+    }
+    break;
     case CODE_WIFI_ON_SCAN_DONE: {
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     break;
+    case CODE_WIFI_ON_CONNECTING: {
+        ChipLogProgress(DeviceLayer, "WiFi station starts connecting.");
+    }
+    break;
     case CODE_WIFI_ON_DISCONNECT: {
-        log_info("[APP] [EVT] disconnect %lld, Reason: %s\r\n", aos_now_ms(), wifi_mgmr_status_code_str(event->value));
+        ChipLogProgress(DeviceLayer, "WiFi station disconnect, reason %s.", wifi_mgmr_status_code_str(event->value));
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         WifiStaDisconect();
@@ -196,11 +203,12 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
     }
     break;
     case CODE_WIFI_CMD_RECONNECT: {
-        log_info("[APP] [EVT] Reconnect %lld\r\n", aos_now_ms());
+        ChipLogProgress(DeviceLayer, "WiFi station reconnect.");
     }
     break;
     case CODE_WIFI_ON_GOT_IP: {
-        log_info("[APP] [EVT] GOT IP %lld\r\n", aos_now_ms());
+
+        ChipLogProgress(DeviceLayer, "WiFi station gets IPv4 address.");
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         WifiStaConnected();
@@ -208,14 +216,15 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
     }
     break;
     case CODE_WIFI_ON_GOT_IP6: {
-        log_info("[APP] [EVT] GOT IP6 %lld\r\n", aos_now_ms());
+        ChipLogProgress(DeviceLayer, "WiFi station gets IPv6 address.");
+
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         ConnectivityMgrImpl().OnIPv6AddressAvailable();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     break;
     default: {
-        log_info("[APP] [EVT] Unknown code %u, %lld\r\n", event->code, aos_now_ms());
+        ChipLogProgress(DeviceLayer, "WiFi station gets unknow code %u.", event->code);
         /*nothing*/
     }
     }
@@ -223,7 +232,7 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
     static uint8_t stack_wifi_init = 0;
     TaskHandle_t backup_eventLoopTask;
 
@@ -237,8 +246,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     if (1 == stack_wifi_init)
     {
-        log_error("Wi-Fi already initialized!\r\n");
-        return;
+        ChipLogError(DeviceLayer, "Wi-Fi already initialized!");
+        return CHIP_NO_ERROR;
     }
 
     hal_wifi_start_firmware_task();
@@ -255,6 +264,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
+
 exit:
     return err;
 }

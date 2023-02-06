@@ -91,6 +91,9 @@ public:
         return mReadApplicationVersionSuccessHandlerJNI;
     }
 
+    jboolean runCastingServerCommand(JNIEnv * env, jobject contentApp, jobject jResponseHandler, const char * commandName,
+                                     MediaCommandName command, const std::function<CHIP_ERROR(TargetEndpointInfo)> & commandRunner);
+
 private:
     friend TvCastingAppJNI & TvCastingAppJNIMgr();
 

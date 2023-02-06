@@ -63,7 +63,7 @@ print_help() {
         enable_heap_monitoring
             Monitor & log memory usage at runtime. (Default false)
         setupDiscriminator
-            Discriminatoor value used for BLE connexion. (Default 3840)
+            Discriminatoor value used for commission. (Default 3840)
         setupPinCode
             PIN code for PASE session establishment. (Default 20202021)
         'import("//with_pw_rpc.gni")'
@@ -90,7 +90,7 @@ else
     baudrate=2000000
     optArgs=""
 
-    optArgs=custom_toolchain=\"$MATTER_ROOT/examples/platform/bouffalolab/common/toolchain:riscv_gcc\"
+    optArgs=custom_toolchain=\"$MATTER_ROOT/config/bouffalolab/toolchain:riscv_gcc\"
 
     shift
     shift

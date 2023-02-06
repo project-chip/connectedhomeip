@@ -63,6 +63,7 @@ bool hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool hasNotifiedWifiConnectivity = false;
 
+extern rsi_semaphore_handle_t sl_ble_init_sem;
 /*
  * This file implements the interface to the RSI SAPIs
  */
@@ -275,7 +276,7 @@ static int32_t wfx_rsi_init(void)
 
     /* Initialize WiSeConnect or Module features. */
     WFX_RSI_LOG("%s: rsi_wireless_init", __func__);
-    if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS)
+    if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS)
     {
         WFX_RSI_LOG("%s: error: rsi_wireless_init failed with status: %02x", __func__, status);
         return status;
@@ -331,6 +332,7 @@ static int32_t wfx_rsi_init(void)
     }
 #endif
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
+    rsi_semaphore_post(&sl_ble_init_sem);
     WFX_RSI_LOG("%s: RSI: OK", __func__);
     return RSI_SUCCESS;
 }

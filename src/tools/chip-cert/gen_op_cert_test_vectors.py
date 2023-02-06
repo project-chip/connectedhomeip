@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 
 import argparse
-import json
 import os
+import os.path
 import subprocess
 import sys
-import typing
-import cryptography.x509
-import os.path
-import glob
-from binascii import hexlify, unhexlify
 from enum import Enum
-from dacs import copyrightNotice, bytes_from_hex, make_c_array, make_array_header, open_outfile
+
+from dacs import copyrightNotice, make_array_header, make_c_array
 
 
 class CertType(Enum):

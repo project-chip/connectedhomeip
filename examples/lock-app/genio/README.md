@@ -1,21 +1,17 @@
-#Matter `Genio` Lock Example
+# Matter `Genio` Lock Example
 
 An example showing the use of Matter on the MediaTek `Genio` MT793X.
 
 <hr>
 
--   [Matter Genio Lock Example](#chip-genio-lock-example)
+-   [Matter Genio Lock Example](#matter-genio-lock-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
-        -   [Note](#note)
     -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
 
 <hr>
-
-<a name="intro"></a>
 
 ## Introduction
 
@@ -31,8 +27,6 @@ device which will then join the network.
 The lighting example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 MediaTek platform.
-
-<a name="building"></a>
 
 ## Building
 
@@ -104,8 +98,6 @@ MediaTek platform.
       chiptool onoff off 1 1
     ```
 
-````
-
 -   You can test the LED by light command as shown below
 
     ```
@@ -114,7 +106,7 @@ MediaTek platform.
        onoff           Usage: light onoff <subcommand>
        color           Usage: light color <r:0~255> <g:0~255> <b:0~255>
        level           Usage: light level <level:0~100>
- ```
+    ```
 
 ### Notes
 
@@ -122,4 +114,3 @@ MediaTek platform.
     addresses to your devices (Border router / PC). If this is the case, you
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
-````

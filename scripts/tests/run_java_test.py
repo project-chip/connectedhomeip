@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
 import logging
 import os
 import pathlib
@@ -26,10 +24,13 @@ import shlex
 import signal
 import subprocess
 import sys
+
+import click
+import coloredlogs
+from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
 from java.commissioning_test import CommissioningTest
 from java.discover_test import DiscoverTest
-from colorama import Fore, Style
 
 
 @click.command()

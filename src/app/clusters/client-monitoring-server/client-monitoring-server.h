@@ -18,6 +18,20 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
+
+class ClientMonitoringServer
+{
+public:
+    chip::Protocols::InteractionModel::Status StayAwakeRequestCommand(const chip::app::ConcreteCommandPath & commandPath);
+    chip::Protocols::InteractionModel::Status RegisterClientMonitoringCommand(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::DecodableType & commandData);
+
+    chip::Protocols::InteractionModel::Status UnregisterClientMonitoringCommand(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::DecodableType & commandData);
+};
