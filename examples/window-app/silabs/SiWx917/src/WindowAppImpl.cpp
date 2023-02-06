@@ -32,9 +32,6 @@
 #include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
 
-#ifdef ENABLE_WSTK_LEDS
-#include <sl_simple_led_instances.h>
-#endif // ENABLE_WSTK_LEDS
 extern "C" void sl_button_on_change();
 
 #ifdef SL_WIFI
@@ -58,8 +55,8 @@ SilabsLCD slLCD;
 using namespace chip::app::Clusters::WindowCovering;
 using namespace chip;
 using namespace ::chip::DeviceLayer;
-#define APP_STATE_LED &sl_led_led0
-#define APP_ACTION_LED &sl_led_led1
+#define APP_STATE_LED 0
+#define APP_ACTION_LED 1
 
 #ifdef SL_WIFI
 chip::app::Clusters::NetworkCommissioning::Instance
@@ -207,7 +204,6 @@ CHIP_ERROR WindowAppImpl::Init()
 
     // Initialize LEDs
 #ifdef ENABLE_WSTK_LEDS
-    LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
 #endif // ENABLE_WSTK_LEDS
