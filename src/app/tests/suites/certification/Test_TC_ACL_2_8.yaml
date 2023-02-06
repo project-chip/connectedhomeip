@@ -99,8 +99,8 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH1CommissionerNodeId, 1111],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
@@ -116,8 +116,8 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH2CommissionerNodeId, 2222],
                       Targets: null,
                       FabricIndex: TH2FabricIndex,
@@ -128,12 +128,12 @@ tests:
       PICS: ACL.S.A0000
       command: "readAttribute"
       attribute: "ACL"
-      arguments:
+      response:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH1CommissionerNodeId, 1111],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
@@ -145,12 +145,12 @@ tests:
       identity: "beta"
       command: "readAttribute"
       attribute: "ACL"
-      arguments:
+      response:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH2CommissionerNodeId, 2222],
                       Targets: null,
                       FabricIndex: TH2FabricIndex,
