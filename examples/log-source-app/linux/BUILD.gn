@@ -34,3 +34,7 @@ executable("chip-log-source-app") {
 group("linux") {
   deps = [ ":chip-log-source-app" ]
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}
