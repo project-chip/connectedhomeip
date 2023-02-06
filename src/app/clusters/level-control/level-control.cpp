@@ -176,7 +176,7 @@ static uint32_t computeCallbackWaitTimeMs(CallbackScheduleState & callbackSchedu
     return waitTime.count();
 }
 
-static void schedule(EndpointId endpoint, uint32_t delayMs)
+static void scheduleTimerCallbackMs(EndpointId endpoint, uint32_t delayMs)
 {
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
                                                            reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
@@ -187,7 +187,7 @@ static void schedule(EndpointId endpoint, uint32_t delayMs)
     }
 }
 
-static void deactivate(EndpointId endpoint)
+static void deactivateEndpointTimerCallback(EndpointId endpoint)
 {
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
@@ -317,7 +317,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     {
         state->callbackSchedule.runTime = System::SystemClock().GetMonotonicTimestamp() - callbackStartTimestamp;
         writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs));
-        schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+        scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     }
 }
 
@@ -653,7 +653,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     }
 
     // Cancel any currently active command before fiddling with the state.
-    deactivate(endpoint);
+    deactivateEndpointTimerCallback(endpoint);
 
     EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -765,7 +765,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+    scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
 
 #ifdef EMBER_AF_PLUGIN_ON_OFF
     // Check that the received MoveToLevelWithOnOff produces a On action and that the onoff support the lighting featuremap
@@ -804,7 +804,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     }
 
     // Cancel any currently active command before fiddling with the state.
-    deactivate(endpoint);
+    deactivateEndpointTimerCallback(endpoint);
 
     status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
     if (status != Status::Success)
@@ -902,7 +902,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+    scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     status = Status::Success;
 
 send_default_response:
@@ -935,7 +935,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     }
 
     // Cancel any currently active command before fiddling with the state.
-    deactivate(endpoint);
+    deactivateEndpointTimerCallback(endpoint);
 
     status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
     if (status != Status::Success)
@@ -1042,7 +1042,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+    scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     status = Status::Success;
 
 send_default_response:
@@ -1072,7 +1072,7 @@ static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     }
 
     // Cancel any currently active command.
-    deactivate(endpoint);
+    deactivateEndpointTimerCallback(endpoint);
     writeRemainingTime(endpoint, 0);
     status = Status::Success;
 

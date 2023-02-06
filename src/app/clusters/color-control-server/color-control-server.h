@@ -199,9 +199,9 @@ private:
 
     // Matter timer scheduling glue logic
     static void timerCallback(chip::System::Layer *, void * callbackContext);
-    void schedule(EmberEventControl * control, uint32_t delayMs);
-    void deactivate(EmberEventControl * control);
-    void deactivate(chip::EndpointId endpoint);
+    void scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs);
+    void deactivateEndpointTimerCallback(EmberEventControl * control);
+    void deactivateEndpointTimerCallback(chip::EndpointId endpoint);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
     ColorHueTransitionState * getColorHueTransitionState(chip::EndpointId endpoint);

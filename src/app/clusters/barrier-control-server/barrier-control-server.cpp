@@ -66,13 +66,13 @@ static void timerCallback(System::Layer *, void * callbackContext)
     emberAfBarrierControlClusterServerTickCallback(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext)));
 }
 
-static void schedule(EndpointId endpoint, uint32_t delayMs)
+static void scheduleTimerCallbackMs(EndpointId endpoint, uint32_t delayMs)
 {
     DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
                                           reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
-static void deactivate(EndpointId endpoint)
+static void deactivateEndpointTimerCallback(EndpointId endpoint)
 {
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
@@ -277,7 +277,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
         setMovingState(
             endpoint,
             (state.increasing ? EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING : EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING));
-        schedule(endpoint, state.delayMs);
+        scheduleTimerCallackMs(endpoint, state.delayMs);
     }
 }
 
@@ -321,7 +321,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         state.delayMs         = calculateDelayMs(endpoint, state.targetPosition, &state.increasing);
         emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
                                             state.targetPosition, state.delayMs);
-        schedule(endpoint, state.delayMs);
+        scheduleTimerCallackMs(endpoint, state.delayMs);
 
         if (state.currentPosition < state.targetPosition)
         {

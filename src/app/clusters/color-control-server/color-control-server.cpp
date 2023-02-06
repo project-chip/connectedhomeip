@@ -41,7 +41,7 @@ void ColorControlServer::timerCallback(System::Layer *, void * callbackContext)
     (control->callback)(control->endpoint);
 }
 
-void ColorControlServer::schedule(EmberEventControl * control, uint32_t delayMs)
+void ColorControlServer::scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs)
 {
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback, control);
 
@@ -51,7 +51,7 @@ void ColorControlServer::schedule(EmberEventControl * control, uint32_t delayMs)
     }
 }
 
-void ColorControlServer::deactivate(EmberEventControl * control)
+void ColorControlServer::deactivateEndpointTimerCallback(EmberEventControl * control)
 {
     if (control->status != EMBER_EVENT_INACTIVE)
     {
@@ -60,10 +60,10 @@ void ColorControlServer::deactivate(EmberEventControl * control)
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, control);
 }
 
-void ColorControlServer::deactivate(EndpointId endpoint)
+void ColorControlServer::deactivateEndpointTimerCallback(EndpointId endpoint)
 {
     auto control = ColorControlServer::getEventControl(endpoint);
-    deactivate(control);
+    deactivateEndpointTimerCallback(control);
 }
 
 /**********************************************************
@@ -95,9 +95,8 @@ Status ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
     EmberEventControl * event = getEventControl(endpoint);
     VerifyOrReturnError(event != nullptr, Status::UnsupportedEndpoint);
 
-    deactivate(event);
+    deactivateEndpointTimerCallback(event);
     return Status::Success;
-
 }
 
 bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -605,7 +604,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
 
     Attributes::RemainingTime::Set(endpoint, MAX_INT16U_VALUE);
 
-    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 }
 
 /**
@@ -887,7 +886,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     colorSaturationTransitionState->stepsRemaining = 0;
 
     // kick off the state machine:
-    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1035,7 +1034,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1163,7 +1162,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1274,7 +1273,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1344,7 +1343,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1419,7 +1418,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1494,7 +1493,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1639,7 +1638,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     }
     else
     {
-        schedule(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+        scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
     }
 
     if (colorHueTransitionState->isEnhancedHue)
@@ -1804,7 +1803,7 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1897,7 +1896,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     }
 
     // kick off the state machine:
-    schedule(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1971,7 +1970,7 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -2000,7 +1999,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     }
     else
     {
-        schedule(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+        scheduleTimerCallbackMs(configureXYEventControl(endpoint), UPDATE_TIME_MS);
     }
 
     // update the attributes
@@ -2088,7 +2087,7 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     colorTempTransitionState->highLimit      = temperatureMax;
 
     // kick off the state machine
-    schedule(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
     return Status::Success;
 }
 
@@ -2200,7 +2199,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
     }
     else
     {
-        schedule(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+        scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
     }
 
     Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue);
@@ -2313,7 +2312,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -2432,7 +2431,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    schedule(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
     commandObj->AddStatus(commandPath, status);

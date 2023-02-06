@@ -871,14 +871,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         }
         else
         {
-            uint8_t i;
-            for (i = 0; i < emAfEndpoints[index].endpointType->clusterCount; i++)
-            {
-                // Note: Matter has no central "tick" engine for clusters
-                // if we decide to refactor and have a central engine,
-                // here you would deactivate ticks fired to that cluster
-            }
-
             // Clear out any command handler overrides registered for this
             // endpoint.
             chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(endpoint);

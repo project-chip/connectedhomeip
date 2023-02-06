@@ -65,7 +65,7 @@ void OnOffServer::timerCallback(System::Layer *, void * callbackContext)
     (control->callback)(control->endpoint);
 }
 
-void OnOffServer::schedule(EmberEventControl * control, uint32_t delayMs)
+void OnOffServer::scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs)
 {
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
                                                            control);
@@ -76,7 +76,7 @@ void OnOffServer::schedule(EmberEventControl * control, uint32_t delayMs)
     }
 }
 
-void OnOffServer::deactivate(EmberEventControl * control)
+void OnOffServer::deactivateEndpointTimerCallback(EmberEventControl * control)
 {
     if (control->status != EMBER_EVENT_INACTIVE)
     {
@@ -85,10 +85,10 @@ void OnOffServer::deactivate(EmberEventControl * control)
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, control);
 }
 
-void OnOffServer::deactivate(EndpointId endpoint)
+void OnOffServer::deactivateEndpointTimerCallback(EndpointId endpoint)
 {
     auto control = OnOffServer::getEventControl(endpoint);
-    deactivate(control);
+    deactivateEndpointTimerCallback(control);
 }
 
 /**********************************************************
@@ -189,7 +189,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
                 Attributes::OffWaitTime::Set(endpoint, 0);
 
                 // Stop timer on the endpoint
-                deactivate(endpoint);
+                deactivateEndpointTimerCallback(endpoint);
             }
 
             Attributes::GlobalSceneControl::Set(endpoint, true);
@@ -557,7 +557,7 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
     if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
     {
         nextDesiredOnWithTimedOffTimestamp = chip::System::SystemClock().GetMonotonicTimestamp() + UPDATE_TIME_MS;
-        schedule(configureEventControl(endpoint), (uint32_t) UPDATE_TIME_MS.count());
+        scheduleTimerCallbackMs(configureEventControl(endpoint), (uint32_t) UPDATE_TIME_MS.count());
     }
 
 exit:
@@ -580,7 +580,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
     if (isOn) // OnOff On case
     {
         // Restart Timer
-        schedule(configureEventControl(endpoint), calculateNextWaitTimeMS());
+        scheduleTimerCallbackMs(configureEventControl(endpoint), calculateNextWaitTimeMS());
 
         // Update onTime values
         uint16_t onTime = MIN_TIME_VALUE;
@@ -619,14 +619,14 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         if (offWaitTime > 0)
         {
             // Restart Timer
-            schedule(configureEventControl(endpoint), calculateNextWaitTimeMS());
+            scheduleTimerCallbackMs(configureEventControl(endpoint), calculateNextWaitTimeMS());
         }
         else
         {
             emberAfOnOffClusterPrintln("Timer  Callback - wait Off Time cycle finished");
 
             // Stop timer on the endpoint
-            deactivate(getEventControl(endpoint));
+            deactivateEndpointTimerCallback(getEventControl(endpoint));
         }
     }
 }
