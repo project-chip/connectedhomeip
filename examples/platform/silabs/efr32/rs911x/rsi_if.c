@@ -114,7 +114,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
 #ifdef SiWx917_WIFI
-    //TODO: for wisemcu
+    // TODO: for wisemcu
     return 0;
 #else
     int32_t status;
@@ -150,7 +150,7 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 int32_t wfx_rsi_reset_count()
 {
 #ifdef SiWx917_WIFI
-    //TODO: for wisemcu
+    // TODO: for wisemcu
     return 0;
 #else
     int32_t status;

@@ -195,7 +195,8 @@ efr32_executable("window_app") {
     sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
   }
 
-  if (chip_build_libshell || enable_openthread_cli || use_wf200 || use_SiWx917) {
+  if (chip_build_libshell || enable_openthread_cli || use_wf200 ||
+      use_SiWx917) {
     #sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
