@@ -67,10 +67,10 @@ declare_args() {
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_rs911x && chip_enable_openthread))
+assert(!(use_rs9117 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
-  assert(use_rs911x || use_wf200)
+  assert(use_rs9117 || use_wf200)
   enable_openthread_cli = false
   import("${chip_root}/src/platform/silabs/SiWx917/wifi_args.gni")
 }
@@ -159,7 +159,7 @@ efr32_sdk("sdk") {
 
   # WiFi Settings
   if (chip_enable_wifi) {
-    if (use_rs911x) {
+    if (use_rs9117) {
       defines += rs911x_defs
       include_dirs += rs911x_plat_incs
     } else if (use_wf200) {
@@ -206,7 +206,7 @@ efr32_executable("lighting_app") {
     sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
   }
 
-  if (chip_enable_pw_rpc || chip_build_libshell || use_rs911x) {
+  if (chip_enable_pw_rpc || chip_build_libshell || use_rs9117) {
     # TODO: Commentting for CCP till the bring up of this is done
     #sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
@@ -232,7 +232,7 @@ efr32_executable("lighting_app") {
 
   # WiFi Settings
   if (chip_enable_wifi) {
-    if (use_rs911x) {
+    if (use_rs9117) {
       sources += rs911x_src_plat
 
       # All the stuff from wiseconnect
