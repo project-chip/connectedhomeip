@@ -36,3 +36,7 @@ executable("thermostat-app") {
 group("linux") {
   deps = [ ":thermostat-app" ]
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}

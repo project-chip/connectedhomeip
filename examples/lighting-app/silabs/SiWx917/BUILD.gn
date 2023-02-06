@@ -204,8 +204,7 @@ efr32_executable("lighting_app") {
   ]
 
   if (use_wstk_leds) {
-    # TODO: Commentting for CCP till the bring up of this is done
-    #sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
   }
 
   if (chip_enable_pw_rpc || chip_build_libshell || use_rs911x) {

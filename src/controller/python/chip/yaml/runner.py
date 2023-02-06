@@ -754,23 +754,6 @@ class ReplTestRunner:
             return decoded_response
 
         if isinstance(response, chip.discovery.CommissionableNode):
-            # CommissionableNode(
-            #    instanceName='04DD55352DD2AC53',
-            #    hostName='E6A32C6DBA8D0000',
-            #    port=5540,
-            #    longDiscriminator=3840,
-            #    vendorId=65521,
-            #    productId=32769,
-            #    commissioningMode=1,
-            #    deviceType=0,
-            #    deviceName='',
-            #    pairingInstruction='',
-            #    pairingHint=36,
-            #    mrpRetryIntervalIdle=None,
-            #    mrpRetryIntervalActive=None,
-            #    supportsTcp=True,
-            #    addresses=['fd00:0:1:1::3', '10.10.10.1']
-            # ), ...
             decoded_response['value'] = {
                 'instanceName': response.instanceName,
                 'hostName': response.hostName,
@@ -787,11 +770,10 @@ class ReplTestRunner:
                 'mrpRetryIntervalActive': response.mrpRetryIntervalActive,
                 'supportsTcp': response.supportsTcp,
                 'addresses': response.addresses,
-
-                # TODO: NOT AVAILABLE
-                'rotatingIdLen': 0,
+                'rotatingId': response.rotatingId,
 
                 # derived values
+                'rotatingIdLen': 0 if not response.rotatingId else len(response.rotatingId),
                 'numIPs': len(response.addresses),
 
             }

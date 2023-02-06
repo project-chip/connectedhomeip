@@ -70,3 +70,7 @@ executable("chip-${chip_tests_zap_config}") {
 group("linux") {
   deps = [ ":chip-${chip_tests_zap_config}" ]
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}

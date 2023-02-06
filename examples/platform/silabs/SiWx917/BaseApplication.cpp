@@ -25,6 +25,10 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
+#ifdef ENABLE_WSTK_LEDS
+#include "LEDWidget.h"
+#endif // ENABLE_WSTK_LEDS
+
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
@@ -60,6 +64,9 @@
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
+#ifdef ENABLE_WSTK_LEDS
+#define APP_STATE_LED 0
+#endif // ENABLE_WSTK_LEDS
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -75,6 +82,10 @@ TimerHandle_t sLightTimer;
 
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
+
+#ifdef ENABLE_WSTK_LEDS
+LEDWidget sStatusLED;
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef SL_WIFI
 app::Clusters::NetworkCommissioning::Instance
@@ -188,6 +199,10 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     SILABS_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
+#ifdef ENABLE_WSTK_LEDS
+    sStatusLED.Init(APP_STATE_LED);
+#endif // ENABLE_WSTK_LEDS
+
     ConfigurationMgr().LogDeviceConfig();
 
     // Create buffer for QR code that can fit max size and null terminator.
@@ -243,6 +258,13 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
         mFunction = kFunction_FactoryReset;
+
+#ifdef ENABLE_WSTK_LEDS
+        // Turn off LED before starting blink to make sure blink is
+        // co-ordinated.
+        sStatusLED.Set(false);
+        sStatusLED.Blink(500);
+#endif // ENABLE_WSTK_LEDS
     }
     else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
     {
@@ -294,6 +316,106 @@ void BaseApplication::LightEventHandler()
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, blink the LED ON for a very short time.
+#ifdef ENABLE_WSTK_LEDS
+    if (mFunction != kFunction_FactoryReset)
+    {
+        if ((gIdentifyptr != nullptr) && (gIdentifyptr->mActive))
+        {
+            sStatusLED.Blink(250, 250);
+        }
+        else if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
+        {
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
+            {
+                sStatusLED.Blink(50, 50);
+            }
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
+            {
+                sStatusLED.Blink(1000, 1000);
+            }
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
+            {
+                sStatusLED.Blink(300, 700);
+            }
+        }
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+        else if (sIsProvisioned && sIsEnabled)
+        {
+            if (sIsAttached)
+            {
+                sStatusLED.Set(true);
+            }
+            else
+            {
+                sStatusLED.Blink(950, 50);
+            }
+        }
+        else if (sHaveBLEConnections)
+        {
+            sStatusLED.Blink(100, 100);
+        }
+        else
+        {
+            sStatusLED.Blink(50, 950);
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+    }
+
+    sStatusLED.Animate();
+#endif // ENABLE_WSTK_LEDS
+}
+
+void BaseApplication::ButtonHandler(AppEvent * aEvent)
+{
+    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
+    // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
+    // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
+    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
+    // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
+    // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
+    // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
+    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+    {
+        if (!mFunctionTimerActive && mFunction == kFunction_NoneSelected)
+        {
+            StartFunctionTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+            mFunction = kFunction_StartBleAdv;
+        }
+    }
+    else
+    {
+        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+        if (mFunctionTimerActive && mFunction == kFunction_StartBleAdv)
+        {
+            CancelFunctionTimer();
+            mFunction = kFunction_NoneSelected;
+
+#ifdef SL_WIFI
+            if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+            if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+            {
+                // Enable BLE advertisements
+                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+                ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
+            }
+            else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
+        }
+        else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
+        {
+            CancelFunctionTimer();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+            StopStatusLEDTimer();
+#endif
+
+            // Change the function to none selected since factory reset has been
+            // canceled.
+            mFunction = kFunction_NoneSelected;
+            SILABS_LOG("Factory Reset has been Canceled");
+        }
+    }
 }
 
 void BaseApplication::CancelFunctionTimer()
@@ -338,6 +460,9 @@ void BaseApplication::StartStatusLEDTimer()
 
 void BaseApplication::StopStatusLEDTimer()
 {
+#ifdef ENABLE_WSTK_LEDS
+    sStatusLED.Set(false);
+#endif // ENABLE_WSTK_LEDS
 
     if (xTimerStop(sLightTimer, 100) != pdPASS)
     {

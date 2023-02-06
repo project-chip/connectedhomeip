@@ -182,8 +182,8 @@ darwin:
     - examples/darwin-framework-tool/**/*
 
 efr32:
-    - src/platform/EFR32/*
-    - src/platform/EFR32/**/*
+    - src/platform/efr32/*
+    - src/platform/efr32/**/*
 
 esp32:
     - src/platform/ESP32/*

@@ -104,8 +104,10 @@
 #define RSI_BLE_ADV_DIR_ADDR_TYPE LE_PUBLIC_ADDRESS
 #define RSI_BLE_ADV_DIR_ADDR "00:15:83:6A:64:17"
 
-#define RSI_BLE_ADV_INT_MIN 0x100
-#define RSI_BLE_ADV_INT_MAX 0x200
+//! Reduced the BLE adv interval time to match with EFR BLE
+#define RSI_BLE_ADV_INT_MIN 0x20
+#define RSI_BLE_ADV_INT_MAX 0x20
+
 #define RSI_BLE_ADV_CHANNEL_MAP 0x07
 
 //! Advertise status
