@@ -84,6 +84,8 @@ struct Nullable : protected Optional<T>
 
     bool operator==(const Nullable & other) const { return Optional<T>::operator==(other); }
     bool operator!=(const Nullable & other) const { return !(*this == other); }
+    bool operator==(const T & other) const { return !IsNull() && Value() == other; }
+    bool operator!=(const T & other) const { return IsNull() || Value() != other; }
 };
 
 template <class T>

@@ -380,7 +380,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
-    if (!userType.IsNull() && userType.Value() == UserTypeEnum::kUnknownEnumValue)
+    if (userType == UserTypeEnum::kUnknownEnumValue)
     {
         emberAfDoorLockClusterPrintln(
             "[SetUser] Unable to set the user: user type is unknown [endpointId=%d,userIndex=%d,userType=%u]",
@@ -693,7 +693,7 @@ void DoorLockServer::setCredentialCommandHandler(
         return;
     }
 
-    if (!userType.IsNull() && userType.Value() == UserTypeEnum::kUnknownEnumValue)
+    if (userType == UserTypeEnum::kUnknownEnumValue)
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user type is unknown "
                                       "[endpointId=%d,credentialIndex=%d,userType=%u]",
