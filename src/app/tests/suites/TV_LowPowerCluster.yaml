@@ -29,4 +29,4 @@ tests:
                 value: nodeId
 
     - label: "Sleep Input Status Command"
-      command: "sleep"
+      command: "Sleep"

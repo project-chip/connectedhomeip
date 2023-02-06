@@ -17,7 +17,6 @@ name: 3.2.2. [TC-DGGEN-2.2] Event functionality test with server as DUT
 
 PICS:
     - DGGEN.S
-    - DGGEN.S.E
 
 config:
     nodeId: 0x12344321
@@ -58,9 +57,9 @@ tests:
 
           ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
 
-          On TH(chip-tool) verify that HardwareFaultChange Event SHALL indicate a change in the set of hardware faults currently
+          Verify that HardwareFaultChange Event SHALL indicate a change in the set of hardware faults currently
           detected by the Node. The current and previous field SHALL represent the set of faults as per Section 11.11.6.1,
-          “HardwareFault enum”
+          “HardwareFault enum”, On TH(chip-tool)
 
           [1659530031.316459][4951:4956] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0000
           [1659530031.316486][4951:4956] CHIP:TOO:   Event number: 6
@@ -87,8 +86,8 @@ tests:
 
           ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
 
-          On TH (chip-tool) verify that RadioFaultChange Event SHALL indicate a change in the set of radio faults currently detected
-          by the Node.
+          Verify that RadioFaultChange Event SHALL indicate a change in the set of radio faults currently detected
+          by the Node.TH receives RadioFaultChange event with current and previous data specified by RadioFault ENUM table 11.11.6.2 according to two repeated failures On TH(chip-tool)
 
           [1659530181.319598][4969:4975] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0001
           [1659530181.319628][4969:4975] CHIP:TOO:   Event number: 7
@@ -112,7 +111,9 @@ tests:
           echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
 
            ./chip-tool generaldiagnostics read-event network-fault-change 1 0
-          On TH(chip-tool) verify that read  response  of NetworkFault event is shown
+
+          Verify that NetworkFaultChange Event SHALL indicate a change in the set of network faults currently
+          TH receives NetworkFaultChange event with current and previous data specified by NetworkFault ENUM table 11.11.2.3 according to two failure causes, On TH(chip-tool)
 
           [1659530237.352498][4985:4990] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0002
           [1659530237.352541][4985:4990] CHIP:TOO:   Event number: 8
@@ -136,8 +137,8 @@ tests:
 
           ./chip-tool generaldiagnostics read-event boot-reason 1 0
 
-          On TH(chip-tool) verify that The NetworkFaultChange Event SHALL indicate a change in the set of network faults currently
-          detected by the Node.
+          Read the event data of BootReason specified by Table 103 BootReason ENUM table On TH(chip-tool)
+
           [1659530352.583608][4993:4998] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
           [1659530352.583636][4993:4998] CHIP:TOO:   Event number: 0
           [1659530352.583656][4993:4998] CHIP:TOO:   Priority: Critical

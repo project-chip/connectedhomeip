@@ -73,7 +73,7 @@
  *
  * A size, in bytes, of the individual debug event logging buffer.
  */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (256)
 
 #define MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED 0
 

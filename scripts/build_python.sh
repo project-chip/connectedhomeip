@@ -63,6 +63,7 @@ Input Options:
                                                             no: Do not install
                                                             build-env: install to virtual env for build matter
                                                             separate: install to another virtual env (out/python_env)
+  -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
 "
 }
 
@@ -94,6 +95,10 @@ while (($#)); do
             install_wheel=$2
             shift
             ;;
+        --pregen_dir | -z)
+            pregen_dir=$2
+            shift
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -104,7 +109,7 @@ while (($#)); do
 done
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\""
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\""
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
@@ -112,8 +117,9 @@ source "$CHIP_ROOT/scripts/activate.sh"
 # Generates ninja files
 [[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
 [[ -n "$chip_case_retry_delta" ]] && chip_case_retry_arg="chip_case_retry_delta=$chip_case_retry_delta" || chip_case_retry_arg=""
+[[ -n "$pregen_dir" ]] && pregen_dir_arg="chip_code_pre_generated_directory=\"$pregen_dir\"" || pregen_dir_arg=""
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg"
 
 # Compiles python files
 # Check pybindings was requested

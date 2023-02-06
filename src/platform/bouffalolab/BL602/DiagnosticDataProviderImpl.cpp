@@ -194,7 +194,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         Platform::CopyString(ifp->Name, netif->name);
         ifp->name          = CharSpan::fromCharString(ifp->Name);
         ifp->isOperational = true;
-        ifp->type          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ifp->type          = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
         ifp->offPremiseServicesReachableIPv4.SetNull();
         ifp->offPremiseServicesReachableIPv6.SetNull();
         bl_efuse_read_mac(ifp->MacAddress);

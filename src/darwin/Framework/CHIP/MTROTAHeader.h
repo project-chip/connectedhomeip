@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -42,6 +42,18 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
 @interface MTROTAHeader : NSObject
 
 /**
+ * Initialize the MTROTAHeader with the given Matter OTA software image data (as defined in the
+ * "Over-the-Air (OTA) Software Update File Format" section of the Matter specification).  The
+ * provided data is expected to point to a large enough initial chunk of an OTA software image that
+ * it includes the entire header (e.g. the entire image).
+ *
+ * If the passed-in data is too small and does not contain the entire OTA image header, initWithData
+ * will return nil and the caller should try creating a new MTROTAHeader object and initializing it
+ * with a larger chunk of the image.
+ */
+- (instancetype)initWithData:(NSData *)data API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
  * The identifier of the vendor whose product this image is meant for.
  *
  * This field can be compared to the vendor id received in the Query Image
@@ -52,17 +64,20 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
  * Image for this image to be considered.
  */
 @property (nonatomic, copy) NSNumber * vendorID;
+
 /**
  * The identifier of the specific product the image is meant for.  May be 0, if
  * the image might apply to more than one product.  This is allowed, but not
  * required, to be matched against the product id received in Query Image.
  */
 @property (nonatomic, copy) NSNumber * productID;
+
 /**
  * The size of the actual image payload, which follows the header in the OTA
  * file.
  */
 @property (nonatomic, copy) NSNumber * payloadSize;
+
 /**
  * The version of the software contained in this image.  This is the version the
  * OTA requestor will be updated to if this image is installed.  This can be
@@ -71,25 +86,30 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
  * command.
  */
 @property (nonatomic, copy) NSNumber * softwareVersion;
+
 /**
  * Human-readable version of softwareVersion.  This must not be used for
  * deciding which versions are newer or older; use softwareVersion for that.
  */
 @property (nonatomic, copy) NSString * softwareVersionString;
+
 /**
  * If not nil a URL pointing to release notes for the software update
  * represented by the image.
  */
 @property (nonatomic, copy, nullable) NSString * releaseNotesURL;
+
 /**
  * A digest of the payload that follows the header.  Can be used to verify that
  * the payload is not truncated or corrupted.
  */
 @property (nonatomic, copy) NSData * imageDigest;
+
 /**
  * The specific algorithm that was used to compute imageDigest.
  */
 @property (nonatomic, assign) MTROTAImageDigestType imageDigestType;
+
 /**
  * If not nil, specifies the smallest software version that this update can be
  * applied on top of.  In that case, this value must be compared to the
@@ -97,6 +117,7 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
  * valid for the OTA requestor.
  */
 @property (nonatomic, copy, nullable) NSNumber * minApplicableVersion;
+
 /**
  * If not nil, specifies the largest software version that this update can be
  * applied on top of.  In that case, this value must be compared to the
@@ -105,10 +126,9 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
  */
 @property (nonatomic, copy, nullable) NSNumber * maxApplicableVersion;
 
-+ (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_NEWLY_DEPRECATED("Please use [MTROTAHeader headerFromData]")
+API_DEPRECATED("Please use MTROTAHeader's initWithData:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTROTAHeaderParser : NSObject
 + (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error;
 @end

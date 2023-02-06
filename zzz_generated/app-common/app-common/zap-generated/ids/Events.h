@@ -175,7 +175,7 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace WiFiNetworkDiagnostics
 
-namespace BridgedDeviceBasic {
+namespace BridgedDeviceBasicInformation {
 namespace Events {
 
 namespace StartUp {
@@ -195,7 +195,7 @@ static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
 } // namespace Events
-} // namespace BridgedDeviceBasic
+} // namespace BridgedDeviceBasicInformation
 
 namespace Switch {
 namespace Events {

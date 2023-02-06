@@ -6,6 +6,11 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
+struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
+}
+
 server cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -34,10 +39,6 @@ server cluster OnOff = 6 {
 
   bitmap OnOffFeature : BITMAP32 {
     kLighting = 0x1;
-  }
-
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -851,7 +852,7 @@ server cluster GeneralDiagnostics = 51 {
     kSoftwareReset = 6;
   }
 
-  enum HardwareFault : ENUM8 {
+  enum HardwareFaultEnum : ENUM8 {
     kUnspecified = 0;
     kRadio = 1;
     kSensor = 2;
@@ -865,7 +866,7 @@ server cluster GeneralDiagnostics = 51 {
     kTamperDetected = 10;
   }
 
-  enum InterfaceType : ENUM8 {
+  enum InterfaceTypeEnum : ENUM8 {
     kUnspecified = 0;
     kWiFi = 1;
     kEthernet = 2;
@@ -873,14 +874,14 @@ server cluster GeneralDiagnostics = 51 {
     kThread = 4;
   }
 
-  enum NetworkFaultType : ENUM8 {
+  enum NetworkFaultEnum : ENUM8 {
     kUnspecified = 0;
     kHardwareFailure = 1;
     kNetworkJammed = 2;
     kConnectionFailed = 3;
   }
 
-  enum RadioFault : ENUM8 {
+  enum RadioFaultEnum : ENUM8 {
     kUnspecified = 0;
     kWiFiFault = 1;
     kCellularFault = 2;
@@ -898,22 +899,22 @@ server cluster GeneralDiagnostics = 51 {
     octet_string<8> hardwareAddress = 4;
     octet_string IPv4Addresses[] = 5;
     octet_string IPv6Addresses[] = 6;
-    InterfaceType type = 7;
+    InterfaceTypeEnum type = 7;
   }
 
   critical event HardwareFaultChange = 0 {
-    HardwareFault current[] = 0;
-    HardwareFault previous[] = 1;
+    HardwareFaultEnum current[] = 0;
+    HardwareFaultEnum previous[] = 1;
   }
 
   critical event RadioFaultChange = 1 {
-    RadioFault current[] = 0;
-    RadioFault previous[] = 1;
+    RadioFaultEnum current[] = 0;
+    RadioFaultEnum previous[] = 1;
   }
 
   critical event NetworkFaultChange = 2 {
-    NetworkFaultType current[] = 0;
-    NetworkFaultType previous[] = 1;
+    NetworkFaultEnum current[] = 0;
+    NetworkFaultEnum previous[] = 1;
   }
 
   critical event BootReason = 3 {
@@ -925,9 +926,9 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute int64u upTime = 2;
   readonly attribute int32u totalOperationalHours = 3;
   readonly attribute BootReasonEnum bootReason = 4;
-  readonly attribute HardwareFault activeHardwareFaults[] = 5;
-  readonly attribute RadioFault activeRadioFaults[] = 6;
-  readonly attribute NetworkFaultType activeNetworkFaults[] = 7;
+  readonly attribute HardwareFaultEnum activeHardwareFaults[] = 5;
+  readonly attribute RadioFaultEnum activeRadioFaults[] = 6;
+  readonly attribute NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -1154,6 +1155,11 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kAx = 5;
   }
 
+  bitmap WiFiNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+  }
+
   info event Disconnection = 0 {
     INT16U reasonCode = 0;
   }
@@ -1185,7 +1191,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
-  enum PHYRate : ENUM8 {
+  enum PHYRateEnum : ENUM8 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
@@ -1198,7 +1204,12 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate400G = 9;
   }
 
-  readonly attribute nullable PHYRate PHYRate = 0;
+  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+  }
+
+  readonly attribute nullable PHYRateEnum PHYRate = 0;
   readonly attribute nullable boolean fullDuplex = 1;
   readonly attribute int64u packetRxCount = 2;
   readonly attribute int64u packetTxCount = 3;
@@ -1214,7 +1225,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster AdministratorCommissioning = 60 {
-  enum CommissioningWindowStatus : ENUM8 {
+  enum CommissioningWindowStatusEnum : ENUM8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
     kBasicWindowOpen = 2;
@@ -1226,7 +1237,7 @@ server cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 4;
   }
 
-  readonly attribute CommissioningWindowStatus windowStatus = 0;
+  readonly attribute CommissioningWindowStatusEnum windowStatus = 0;
   readonly attribute nullable fabric_idx adminFabricIndex = 1;
   readonly attribute nullable int16u adminVendorId = 2;
   readonly attribute bitmap32 featureMap = 65532;
@@ -1250,8 +1261,13 @@ server cluster AdministratorCommissioning = 60 {
 }
 
 client cluster OperationalCredentials = 62 {
-  enum OperationalCertStatus : ENUM8 {
-    kSuccess = 0;
+  enum CertificateChainTypeEnum : ENUM8 {
+    kDACCertificate = 1;
+    kPAICertificate = 2;
+  }
+
+  enum NodeOperationalCertStatusEnum : ENUM8 {
+    kOk = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1269,17 +1285,17 @@ client cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_scoped struct FabricDescriptor {
+  fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
-    vendor_id vendorId = 2;
-    fabric_id fabricId = 3;
-    node_id nodeId = 4;
+    vendor_id vendorID = 2;
+    fabric_id fabricID = 3;
+    node_id nodeID = 4;
     char_string<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
-  readonly attribute FabricDescriptor fabrics[] = 1;
+  readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
@@ -1292,7 +1308,7 @@ client cluster OperationalCredentials = 62 {
   }
 
   request struct CertificateChainRequestRequest {
-    INT8U certificateType = 0;
+    CertificateChainTypeEnum certificateType = 0;
   }
 
   request struct CSRRequestRequest {
@@ -1317,12 +1333,12 @@ client cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    OCTET_STRING rootCertificate = 0;
+    OCTET_STRING rootCACertificate = 0;
   }
 
   response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
-    OCTET_STRING signature = 1;
+    OCTET_STRING attestationSignature = 1;
   }
 
   response struct CertificateChainResponse = 3 {
@@ -1335,7 +1351,7 @@ client cluster OperationalCredentials = 62 {
   }
 
   response struct NOCResponse = 8 {
-    OperationalCertStatus statusCode = 0;
+    NodeOperationalCertStatusEnum statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
   }
@@ -1350,8 +1366,13 @@ client cluster OperationalCredentials = 62 {
 }
 
 server cluster OperationalCredentials = 62 {
-  enum OperationalCertStatus : ENUM8 {
-    kSuccess = 0;
+  enum CertificateChainTypeEnum : ENUM8 {
+    kDACCertificate = 1;
+    kPAICertificate = 2;
+  }
+
+  enum NodeOperationalCertStatusEnum : ENUM8 {
+    kOk = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1369,17 +1390,17 @@ server cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_scoped struct FabricDescriptor {
+  fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
-    vendor_id vendorId = 2;
-    fabric_id fabricId = 3;
-    node_id nodeId = 4;
+    vendor_id vendorID = 2;
+    fabric_id fabricID = 3;
+    node_id nodeID = 4;
     char_string<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
-  readonly attribute FabricDescriptor fabrics[] = 1;
+  readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
@@ -1392,7 +1413,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct CertificateChainRequestRequest {
-    INT8U certificateType = 0;
+    CertificateChainTypeEnum certificateType = 0;
   }
 
   request struct CSRRequestRequest {
@@ -1422,12 +1443,12 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    OCTET_STRING rootCertificate = 0;
+    OCTET_STRING rootCACertificate = 0;
   }
 
   response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
-    OCTET_STRING signature = 1;
+    OCTET_STRING attestationSignature = 1;
   }
 
   response struct CertificateChainResponse = 3 {
@@ -1440,7 +1461,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   response struct NOCResponse = 8 {
-    OperationalCertStatus statusCode = 0;
+    NodeOperationalCertStatusEnum statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
   }
@@ -1564,24 +1585,24 @@ server cluster Channel = 1284 {
     kLineupInfo = 0x2;
   }
 
-  struct ChannelInfo {
+  struct ChannelInfoStruct {
     int16u majorNumber = 0;
     int16u minorNumber = 1;
-    optional char_string<32> name = 2;
-    optional char_string<32> callSign = 3;
-    optional char_string<32> affiliateCallSign = 4;
+    optional char_string name = 2;
+    optional char_string callSign = 3;
+    optional char_string affiliateCallSign = 4;
   }
 
-  struct LineupInfo {
+  struct LineupInfoStruct {
     char_string operatorName = 0;
     optional char_string lineupName = 1;
     optional char_string postalCode = 2;
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
-  readonly attribute ChannelInfo channelList[] = 0;
-  readonly attribute nullable LineupInfo lineup = 1;
-  readonly attribute nullable ChannelInfo currentChannel = 2;
+  readonly attribute ChannelInfoStruct channelList[] = 0;
+  readonly attribute nullable LineupInfoStruct lineup = 1;
+  readonly attribute nullable ChannelInfoStruct currentChannel = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1618,12 +1639,12 @@ server cluster TargetNavigator = 1285 {
     kNotAllowed = 2;
   }
 
-  struct TargetInfo {
+  struct TargetInfoStruct {
     int8u identifier = 0;
     char_string<32> name = 1;
   }
 
-  readonly attribute TargetInfo targetList[] = 0;
+  readonly attribute TargetInfoStruct targetList[] = 0;
   readonly attribute int8u currentTarget = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1666,15 +1687,15 @@ server cluster MediaPlayback = 1286 {
     kVariableSpeed = 0x2;
   }
 
-  struct PlaybackPosition {
-    int64u updatedAt = 0;
+  struct PlaybackPositionStruct {
+    epoch_us updatedAt = 0;
     nullable int64u position = 1;
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
   readonly attribute nullable epoch_us startTime = 1;
   readonly attribute nullable int64u duration = 2;
-  readonly attribute nullable PlaybackPosition sampledPosition = 3;
+  readonly attribute nullable PlaybackPositionStruct sampledPosition = 3;
   readonly attribute single playbackSpeed = 4;
   readonly attribute nullable int64u seekRangeEnd = 5;
   readonly attribute nullable int64u seekRangeStart = 6;
@@ -1703,7 +1724,7 @@ server cluster MediaPlayback = 1286 {
 
   command Play(): PlaybackResponse = 0;
   command Pause(): PlaybackResponse = 1;
-  command StopPlayback(): PlaybackResponse = 2;
+  command Stop(): PlaybackResponse = 2;
   command StartOver(): PlaybackResponse = 3;
   command Previous(): PlaybackResponse = 4;
   command Next(): PlaybackResponse = 5;
@@ -1734,14 +1755,14 @@ server cluster MediaInput = 1287 {
     kNameUpdates = 0x1;
   }
 
-  struct InputInfo {
+  struct InputInfoStruct {
     int8u index = 0;
     InputTypeEnum inputType = 1;
     char_string<32> name = 2;
     char_string<32> description = 3;
   }
 
-  readonly attribute InputInfo inputList[] = 0;
+  readonly attribute InputInfoStruct inputList[] = 0;
   readonly attribute int8u currentInput = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -1913,6 +1934,7 @@ server cluster ContentLauncher = 1290 {
     kSport = 10;
     kSportsTeam = 11;
     kType = 12;
+    kVideo = 13;
   }
 
   bitmap ContentLauncherFeature : BITMAP32 {
@@ -1925,37 +1947,37 @@ server cluster ContentLauncher = 1290 {
     kHls = 0x2;
   }
 
-  struct ContentSearch {
-    Parameter parameterList[] = 0;
+  struct ContentSearchStruct {
+    ParameterStruct parameterList[] = 0;
   }
 
-  struct Parameter {
+  struct ParameterStruct {
     ParameterEnum type = 0;
     char_string value = 1;
-    optional AdditionalInfo externalIDList[] = 2;
+    optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
-  struct AdditionalInfo {
+  struct AdditionalInfoStruct {
     char_string name = 0;
     char_string value = 1;
   }
 
-  struct BrandingInformation {
+  struct BrandingInformationStruct {
     char_string providerName = 0;
-    optional StyleInformation background = 1;
-    optional StyleInformation logo = 2;
-    optional StyleInformation progressBar = 3;
-    optional StyleInformation splash = 4;
-    optional StyleInformation waterMark = 5;
+    optional StyleInformationStruct background = 1;
+    optional StyleInformationStruct logo = 2;
+    optional StyleInformationStruct progressBar = 3;
+    optional StyleInformationStruct splash = 4;
+    optional StyleInformationStruct waterMark = 5;
   }
 
-  struct StyleInformation {
-    optional char_string imageUrl = 0;
+  struct StyleInformationStruct {
+    optional char_string imageURL = 0;
     optional char_string color = 1;
-    optional Dimension size = 2;
+    optional DimensionStruct size = 2;
   }
 
-  struct Dimension {
+  struct DimensionStruct {
     double width = 0;
     double height = 1;
     MetricTypeEnum metric = 2;
@@ -1967,7 +1989,7 @@ server cluster ContentLauncher = 1290 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequest {
-    ContentSearch search = 0;
+    ContentSearchStruct search = 0;
     BOOLEAN autoPlay = 1;
     optional CHAR_STRING data = 2;
   }
@@ -1975,16 +1997,16 @@ server cluster ContentLauncher = 1290 {
   request struct LaunchURLRequest {
     CHAR_STRING contentURL = 0;
     optional CHAR_STRING displayString = 1;
-    optional BrandingInformation brandingInformation = 2;
+    optional BrandingInformationStruct brandingInformation = 2;
   }
 
-  response struct LaunchResponse = 2 {
+  response struct LauncherResponse = 2 {
     ContentLaunchStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
-  command LaunchContent(LaunchContentRequest): LaunchResponse = 0;
-  command LaunchURL(LaunchURLRequest): LaunchResponse = 1;
+  command LaunchContent(LaunchContentRequest): LauncherResponse = 0;
+  command LaunchURL(LaunchURLRequest): LauncherResponse = 1;
 }
 
 server cluster AudioOutput = 1291 {
@@ -2001,13 +2023,13 @@ server cluster AudioOutput = 1291 {
     kNameUpdates = 0x1;
   }
 
-  struct OutputInfo {
+  struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
     char_string<32> name = 2;
   }
 
-  readonly attribute OutputInfo outputList[] = 0;
+  readonly attribute OutputInfoStruct outputList[] = 0;
   readonly attribute int8u currentOutput = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2039,18 +2061,13 @@ server cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  struct ApplicationEP {
-    Application application = 0;
+  struct ApplicationEPStruct {
+    ApplicationStruct application = 0;
     optional endpoint_no endpoint = 1;
   }
 
-  struct Application {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
-  }
-
   readonly attribute INT16U catalogList[] = 0;
-  attribute nullable ApplicationEP currentApp = 1;
+  attribute nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2058,21 +2075,21 @@ server cluster ApplicationLauncher = 1292 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
     optional OCTET_STRING data = 1;
   }
 
   request struct StopAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   request struct HideAppRequest {
-    Application application = 0;
+    optional ApplicationStruct application = 0;
   }
 
   response struct LauncherResponse = 3 {
     ApplicationLauncherStatusEnum status = 0;
-    OCTET_STRING data = 1;
+    optional OCTET_STRING data = 1;
   }
 
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
@@ -2088,16 +2105,11 @@ server cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  struct ApplicationBasicApplication {
-    int16u catalogVendorId = 0;
-    char_string applicationId = 1;
-  }
-
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
-  readonly attribute ApplicationBasicApplication application = 4;
+  readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
@@ -2157,7 +2169,7 @@ endpoint 0 {
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
-    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute accessControlEntriesPerFabric default = 4;
     callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;

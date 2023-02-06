@@ -16,8 +16,10 @@
 #
 
 import argparse
+import fcntl
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -40,6 +42,7 @@ class CmdLineArgs:
     prettify_output: bool = True
     version_check: bool = True
     lock_file: Optional[str] = None
+    delete_output_dir: bool = False
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -65,8 +68,11 @@ def checkDirExists(path):
         exit(1)
 
 
-def getFilePath(name):
-    fullpath = os.path.join(CHIP_ROOT_DIR, name)
+def getFilePath(name, prefix_chip_root_dir=True):
+    if prefix_chip_root_dir:
+        fullpath = os.path.join(CHIP_ROOT_DIR, name)
+    else:
+        fullpath = name
     checkFileExists(fullpath)
     return fullpath
 
@@ -80,6 +86,7 @@ def getDirPath(name):
 def detectZclFile(zapFile):
     print(f"Searching for zcl file from {zapFile}")
 
+    prefix_chip_root_dir = True
     path = 'src/app/zap-templates/zcl/zcl.json'
 
     data = json.load(open(zapFile))
@@ -87,19 +94,26 @@ def detectZclFile(zapFile):
         if package["type"] != "zcl-properties":
             continue
 
+        prefix_chip_root_dir = (package["pathRelativity"] != "resolveEnvVars")
         # found the right path, try to figure out the actual path
         if package["pathRelativity"] == "relativeToZap":
             path = os.path.abspath(os.path.join(
                 os.path.dirname(zapFile), package["path"]))
+        elif package["pathRelativity"] == "resolveEnvVars":
+            path = os.path.expandvars(package["path"])
         else:
             path = package["path"]
 
-    return getFilePath(path)
+    return getFilePath(path, prefix_chip_root_dir)
 
 
 def runArgumentsParser() -> CmdLineArgs:
-    default_templates = 'src/app/zap-templates/app-templates.json'
-    default_output_dir = 'zap-generated/'
+    # By default generate the idl file only. This will get moved from the
+    # output directory into the zap file directory automatically.
+    #
+    # All the rest of the files (app-templates.json) are generally built at
+    # compile time.
+    default_templates = 'src/app/zap-templates/matter-idl.json'
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
@@ -109,7 +123,7 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.add_argument('-z', '--zcl',
                         help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
     parser.add_argument('-o', '--output-dir', default=None,
-                        help='Output directory for the generated files (default: automatically selected)')
+                        help='Output directory for the generated files (default: a temporary directory in out)')
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     parser.add_argument('--parallel', action='store_true')
@@ -121,20 +135,21 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.add_argument('--version-check', action='store_true')
     parser.add_argument('--no-version-check',
                         action='store_false', dest='version_check')
+    parser.add_argument('--keep-output-dir', action='store_true',
+                        help='Keep any created output directory. Useful for temporary directories.')
     parser.set_defaults(parallel=True)
     parser.set_defaults(prettify_output=True)
     parser.set_defaults(version_check=True)
     parser.set_defaults(lock_file=None)
+    parser.set_defaults(keep_output_dir=False)
     args = parser.parse_args()
 
-    # By default, this script assumes that the global CHIP template is used with
-    # a default 'zap-generated/' output folder relative to APP_ROOT_DIR.
-    # If needed, the user may specify a specific template as a second argument. In
-    # this case the output folder is relative to CHIP_ROOT_DIR.
+    delete_output_dir = False
     if args.output_dir:
         output_dir = args.output_dir
     elif args.templates == default_templates:
-        output_dir = os.path.join(Path(args.zap).parent, default_output_dir)
+        output_dir = tempfile.mkdtemp(prefix='zapgen')
+        delete_output_dir = not args.keep_output_dir
     else:
         output_dir = ''
 
@@ -148,7 +163,14 @@ def runArgumentsParser() -> CmdLineArgs:
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
-    return CmdLineArgs(zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap)
+    return CmdLineArgs(
+        zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
+        parallel=args.parallel,
+        prettify_output=args.prettify_output,
+        version_check=args.version_check,
+        lock_file=args.lock_file,
+        delete_output_dir=delete_output_dir,
+    )
 
 
 def extractGeneratedIdl(output_dir, zap_config_path):
@@ -167,7 +189,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
         # multiple extensions. This is to work with existing codebase only
         raise Error("Unexpected input zap file  %s" % self.zap_config)
 
-    os.rename(idl_path, target_path)
+    shutil.move(idl_path, target_path)
 
 
 def runGeneration(cmdLineArgs):
@@ -276,7 +298,7 @@ class LockFileSerializer:
             return
 
         fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
-        close(self.lock_file)
+        self.lock_file.close()
         self.lock_file = None
 
 
@@ -312,6 +334,11 @@ def main():
 
         for prettifier in prettifiers:
             prettifier(cmdLineArgs.templateFile, cmdLineArgs.outputDir)
+
+    if cmdLineArgs.delete_output_dir:
+        shutil.rmtree(cmdLineArgs.outputDir)
+    else:
+        print("Files generated in: %s" % cmdLineArgs.outputDir)
 
 
 if __name__ == '__main__':

@@ -23,8 +23,6 @@
 #include "LEDWidget.h"
 
 #include <DeviceInfoProviderImpl.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -179,7 +177,7 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_MCUMGR_SMP_BT
     // Initialize DFU over SMP
-    GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+    GetDFUOverSMP().Init();
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
@@ -398,16 +396,6 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
 #endif
     }
 }
-
-#ifdef CONFIG_MCUMGR_SMP_BT
-void AppTask::RequestSMPAdvertisingStart(void)
-{
-    AppEvent event;
-    event.Type    = AppEventType::StartSMPAdvertising;
-    event.Handler = [](const AppEvent &) { GetDFUOverSMP().StartBLEAdvertising(); };
-    PostEvent(event);
-}
-#endif
 
 void AppTask::FunctionHandler(const AppEvent & event)
 {

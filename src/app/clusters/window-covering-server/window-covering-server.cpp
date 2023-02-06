@@ -17,10 +17,8 @@
 
 #include "window-covering-server.h"
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
@@ -595,7 +593,7 @@ EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, Channel::Id);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
 
     // if endpoint is found and is not a dynamic endpoint
     if (ep != 0xFFFF && ep < EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT)

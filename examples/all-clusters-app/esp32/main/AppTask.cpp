@@ -23,11 +23,20 @@
 #include "LEDWidget.h"
 #include "ScreenManager.h"
 #include "driver/gpio.h"
+#include "esp_idf_version.h"
 #include "esp_log.h"
-#include "esp_spi_flash.h"
 #include "freertos/FreeRTOS.h"
 #include <app/server/OnboardingCodesUtil.h>
+#include <lock/BoltLockManager.h>
 
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "esp_spi_flash.h"
+#else
+#include "esp_chip_info.h"
+#include "esp_flash.h"
+#endif
+
+#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_NAME "APP"
 #define APP_EVENT_QUEUE_SIZE 10
 #define APP_TASK_STACK_SIZE (3072)
@@ -35,6 +44,7 @@
 static const char * TAG = "app-task";
 
 namespace {
+TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer
 
 QueueHandle_t sAppEventQueue;
 TaskHandle_t sAppTaskHandle;
@@ -58,18 +68,143 @@ CHIP_ERROR AppTask::StartAppTask()
     return (xReturned == pdPASS) ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
+void AppTask::TimerEventHandler(TimerHandle_t xTimer)
+{
+    AppEvent event;
+    event.mType                = AppEvent::kEventType_Timer;
+    event.mTimerEvent.mContext = (void *) xTimer;
+    event.mHandler             = FunctionTimerEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->mType != AppEvent::kEventType_Timer)
+    {
+        return;
+    }
+    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
+    // initiate factory reset
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
+    {
+        // ESP_LOGI(TAG, "Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
+        // cancel, if required.
+        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        sAppTask.mFunction = kFunction_FactoryReset;
+        // Turn off all LEDs before starting blink to make sure blink is
+        // co-ordinated.
+        // sStatusLED.Set(false);
+        // sLockLED.Set(false);
+        // sStatusLED.Blink(500);
+        // sLockLED.Blink(500);
+    }
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
+    {
+        // Actually trigger Factory Reset
+        sAppTask.mFunction = kFunction_NoneSelected;
+        chip::Server::GetInstance().ScheduleFactoryReset();
+    }
+}
+
+void AppTask::CancelTimer()
+{
+    if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
+    {
+        ESP_LOGI(TAG, "app timer stop() failed");
+        return;
+    }
+    mFunctionTimerActive = false;
+}
+void AppTask::StartTimer(uint32_t aTimeoutInMs)
+{
+    if (xTimerIsTimerActive(sFunctionTimer))
+    {
+        ESP_LOGI(TAG, "app timer already started!");
+        CancelTimer();
+    }
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
+    {
+        ESP_LOGI(TAG, "app timer start() failed");
+        return;
+    }
+    mFunctionTimerActive = true;
+}
+void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
+{
+    // If the action has been initiated by the lock, update the bolt lock trait
+    // and start flashing the LEDs rapidly to indicate action initiation.
+    if (aAction == BoltLockManager::LOCK_ACTION)
+    {
+        ESP_LOGI(TAG, "Lock Action has been initiated");
+    }
+    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    {
+        ESP_LOGI(TAG, "Unlock Action has been initiated");
+    }
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
+    // sLockLED.Blink(50, 50);
+}
+void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
+{
+    // if the action has been completed by the lock, update the bolt lock trait.
+    // Turn on the lock LED if in a LOCKED state OR
+    // Turn off the lock LED if in an UNLOCKED state.
+    if (aAction == BoltLockManager::LOCK_ACTION)
+    {
+        ESP_LOGI(TAG, "Lock Action has been completed");
+        // sLockLED.Set(true);
+    }
+    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    {
+        ESP_LOGI(TAG, "Unlock Action has been completed");
+        // sLockLED.Set(false);
+    }
+}
+
+CHIP_ERROR AppTask::LockInit()
+{
+    ReturnErrorOnFailure(BoltLockMgr().InitLockState());
+    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AppTask::Init()
 {
     /* Print chip information */
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
+    uint32_t flash_size = 0;
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+    flash_size = spi_flash_get_chip_size();
+#else
+    if (esp_flash_get_size(NULL, &flash_size) != ESP_OK)
+    {
+        ESP_LOGW(TAG, "Failed to get flash size");
+    }
+#endif
     ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
              (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
     ESP_LOGI(TAG, "silicon revision %d, ", chip_info.revision);
-    ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
+    ESP_LOGI(TAG, "%" PRIu32 " MB %s flash\n", flash_size / (1024 * 1024),
              (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    // Create FreeRTOS sw timer for Function Selection
+    sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
+                                  1,                // == default timer period (mS)
+                                  false,            // no timer reload (==one-shot)
+                                  (void *) this,    // init timer id = app task obj context
+                                  TimerEventHandler // timer callback handler
+    );
+    VerifyOrReturnError(sFunctionTimer != NULL, CHIP_ERROR_NO_MEMORY, ESP_LOGE(TAG, "Failed to create function selection timer"));
+
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual
     // "LED"s on devices with screens.
@@ -85,7 +220,7 @@ CHIP_ERROR AppTask::Init()
     InitDeviceDisplay();
 #endif
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void AppTask::AppTaskMain(void * pvParameter)

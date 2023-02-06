@@ -33,8 +33,7 @@
 #include "events/EventQueue.h"
 
 // ZAP -- ZCL Advanced Platform
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
 
@@ -463,8 +462,7 @@ void AppTask::UpdateClusterState()
     uint8_t onoff = LightingMgr().IsTurnedOn();
 
     // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteServerAttribute(1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, onoff);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "Updating on/off cluster failed: %x", status);
@@ -472,8 +470,7 @@ void AppTask::UpdateClusterState()
 
     uint8_t level = LightingMgr().GetLevel();
 
-    status = emberAfWriteServerAttribute(1, app::Clusters::LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, &level,
-                                         ZCL_INT8U_ATTRIBUTE_TYPE);
+    status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, level);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {

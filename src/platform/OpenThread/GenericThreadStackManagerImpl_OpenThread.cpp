@@ -1896,20 +1896,29 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiv
 
     if (!onOff && delayIdle && CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD.count() != 0)
     {
-        err = DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD, RequestSEDModeChange, this);
+        // StartTimer will cancel a timer if the same callback & context is used.
+        // This will have the effect of canceling the previous one (if any) and starting
+        // a new timer of the same duration. This effectively prolongs the active threshold
+        // without consuming additional resources.
+        err = DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD, RequestSEDModeUpdate, this);
         if (CHIP_NO_ERROR == err)
         {
+            if (!mDelayIdleTimerRunning)
+            {
+                mDelayIdleTimerRunning = true;
+                mActiveModeConsumers++;
+            }
             return err;
         }
 
-        ChipLogError(DeviceLayer, "Failed to postponed Idle Mode with error %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "Failed to postpone Idle Mode with error %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    return SEDChangeMode();
+    return SEDUpdateMode();
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDChangeMode()
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDUpdateMode()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ConnectivityManager::SEDIntervalMode mode;
@@ -1923,12 +1932,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDChangeMode()
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeChange(chip::System::Layer * apSystemLayer,
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeUpdate(chip::System::Layer * apSystemLayer,
                                                                                void * apAppState)
 {
     if (apAppState != nullptr)
     {
-        static_cast<GenericThreadStackManagerImpl_OpenThread *>(apAppState)->SEDChangeMode();
+        GenericThreadStackManagerImpl_OpenThread * obj = static_cast<GenericThreadStackManagerImpl_OpenThread *>(apAppState);
+        if (obj->mActiveModeConsumers > 0)
+        {
+            obj->mActiveModeConsumers--;
+        }
+
+        obj->mDelayIdleTimerRunning = false;
+
+        obj->SEDUpdateMode();
     }
 }
 #endif

@@ -51,7 +51,7 @@ tests:
 
     - label: "Precondition: Reset Devices to factory defaults"
       verification: |
-          Not implemented in YAML
+          Reset Devices to factory defaults
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -72,7 +72,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000

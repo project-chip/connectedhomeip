@@ -104,8 +104,18 @@ config BT_PERIPHERAL_PREF_MIN_INT
 config BT_PERIPHERAL_PREF_MAX_INT
     default 36
 
+# Increase BT timeout to 5 s to improve connection reliability and avoid fast drop outs.
+config BT_PERIPHERAL_PREF_TIMEOUT
+    default 500
+
 config BT_GAP_AUTO_UPDATE_CONN_PARAMS
     default y
+
+# Decrease connection parameters update time, as some Matter controllers request
+# enabling IP networking faster than BT connection parameters are updated, what may result
+# in commissioning instabilities.
+config BT_CONN_PARAM_UPDATE_TIMEOUT
+    default 1000
 
 config BT_GATT_DYNAMIC_DB
     default y
@@ -117,9 +127,7 @@ config BT_DEVICE_NAME_MAX
     default 15
 
 config BT_MAX_CONN
-    default 2 # a workaround for non-unreferenced BLE connection object
-              # when restaring the BLE advertising in disconnect callback
-              # TODO: analyze and revert to 1 if proper fix exists
+    default 1
 
 config BT_L2CAP_TX_MTU
     default 247

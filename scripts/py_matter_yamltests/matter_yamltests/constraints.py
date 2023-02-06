@@ -24,31 +24,29 @@ class ConstraintParseError(Exception):
         super().__init__(message)
 
 
-class ConstraintValidationError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-
-
 class BaseConstraint(ABC):
-    '''Constrain Interface'''
+    '''Constraint Interface'''
 
     def __init__(self, types: list, is_null_allowed: bool = False):
         '''An empty type list provided that indicates any type is accepted'''
         self._types = types
         self._is_null_allowed = is_null_allowed
 
-    def is_met(self, value):
+    def is_met(self, value, value_type_name):
         if value is None:
             return self._is_null_allowed
 
         response_type = type(value)
-        if self._types and response_type not in self._types:
-            return False
+        if self._types:
+            found_type_match = any(
+                [issubclass(response_type, expected) for expected in self._types])
+            if not found_type_match:
+                return False
 
-        return self.check_response(value)
+        return self.check_response(value, value_type_name)
 
     @abstractmethod
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         pass
 
 
@@ -57,8 +55,15 @@ class _ConstraintHasValue(BaseConstraint):
         super().__init__(types=[])
         self._has_value = has_value
 
-    def check_response(self, value) -> bool:
-        raise ConstraintValidationError('HasValue constraint currently not implemented')
+    def is_met(self, value, value_type_name):
+        # We are overriding the BaseConstraint of is_met since has value is a special case where
+        # we might not be expecting a value at all, but the basic null check in BaseConstraint
+        # is not what we want.
+        return self.check_response(value, value_type_name)
+
+    def check_response(self, value, value_type_name) -> bool:
+        has_value = value is not None
+        return self._has_value == has_value
 
 
 class _ConstraintType(BaseConstraint):
@@ -66,7 +71,7 @@ class _ConstraintType(BaseConstraint):
         super().__init__(types=[], is_null_allowed=True)
         self._type = type
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         success = False
         if self._type == 'boolean' and type(value) is bool:
             success = True
@@ -74,7 +79,11 @@ class _ConstraintType(BaseConstraint):
             success = True
         elif self._type == 'char_string' and type(value) is str:
             success = True
+        elif self._type == 'long_char_string' and type(value) is str:
+            success = True
         elif self._type == 'octet_string' and type(value) is bytes:
+            success = True
+        elif self._type == 'long_octet_string' and type(value) is bytes:
             success = True
         elif self._type == 'vendor_id' and type(value) is int:
             success = value >= 0 and value <= 0xFFFF
@@ -104,9 +113,9 @@ class _ConstraintType(BaseConstraint):
             success = value >= 0 and value <= 0xFFFFFFFF
         elif self._type == 'bitmap64' and type(value) is int:
             success = value >= 0 and value <= 0xFFFFFFFFFFFFFFFF
-        elif self._type == 'enum8' and type(value) is int:
+        elif self._type == 'enum8' and isinstance(value, int):
             success = value >= 0 and value <= 0xFF
-        elif self._type == 'enum16' and type(value) is int:
+        elif self._type == 'enum16' and isinstance(value, int):
             success = value >= 0 and value <= 0xFFFF
         elif self._type == 'Percent' and type(value) is int:
             success = value >= 0 and value <= 0xFF
@@ -186,6 +195,8 @@ class _ConstraintType(BaseConstraint):
             success = value >= -36028797018963967 and value <= 36028797018963967
         elif self._type == 'nullable_int64s' and type(value) is int:
             success = value >= -9223372036854775807 and value <= 9223372036854775807
+        else:
+            success = self._type == value_type_name
         return success
 
 
@@ -194,7 +205,7 @@ class _ConstraintMinLength(BaseConstraint):
         super().__init__(types=[str, bytes, list])
         self._min_length = min_length
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return len(value) >= self._min_length
 
 
@@ -203,7 +214,7 @@ class _ConstraintMaxLength(BaseConstraint):
         super().__init__(types=[str, bytes, list])
         self._max_length = max_length
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return len(value) <= self._max_length
 
 
@@ -212,7 +223,7 @@ class _ConstraintIsHexString(BaseConstraint):
         super().__init__(types=[str])
         self._is_hex_string = is_hex_string
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return all(c in string.hexdigits for c in value) == self._is_hex_string
 
 
@@ -221,7 +232,7 @@ class _ConstraintStartsWith(BaseConstraint):
         super().__init__(types=[str])
         self._starts_with = starts_with
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return value.startswith(self._starts_with)
 
 
@@ -230,7 +241,7 @@ class _ConstraintEndsWith(BaseConstraint):
         super().__init__(types=[str])
         self._ends_with = ends_with
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return value.endswith(self._ends_with)
 
 
@@ -239,7 +250,7 @@ class _ConstraintIsUpperCase(BaseConstraint):
         super().__init__(types=[str])
         self._is_upper_case = is_upper_case
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return value.isupper() == self._is_upper_case
 
 
@@ -248,7 +259,7 @@ class _ConstraintIsLowerCase(BaseConstraint):
         super().__init__(types=[str])
         self._is_lower_case = is_lower_case
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return value.islower() == self._is_lower_case
 
 
@@ -257,7 +268,7 @@ class _ConstraintMinValue(BaseConstraint):
         super().__init__(types=[int, float], is_null_allowed=True)
         self._min_value = min_value
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return value >= self._min_value
 
 
@@ -266,7 +277,7 @@ class _ConstraintMaxValue(BaseConstraint):
         super().__init__(types=[int, float], is_null_allowed=True)
         self._max_value = max_value
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return value <= self._max_value
 
 
@@ -275,7 +286,7 @@ class _ConstraintContains(BaseConstraint):
         super().__init__(types=[list])
         self._contains = contains
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return set(self._contains).issubset(value)
 
 
@@ -284,7 +295,7 @@ class _ConstraintExcludes(BaseConstraint):
         super().__init__(types=[list])
         self._excludes = excludes
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return set(self._excludes).isdisjoint(value)
 
 
@@ -293,7 +304,7 @@ class _ConstraintHasMaskSet(BaseConstraint):
         super().__init__(types=[int])
         self._has_masks_set = has_masks_set
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return all([(value & mask) == mask for mask in self._has_masks_set])
 
 
@@ -302,7 +313,7 @@ class _ConstraintHasMaskClear(BaseConstraint):
         super().__init__(types=[int])
         self._has_masks_clear = has_masks_clear
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return all([(value & mask) == 0 for mask in self._has_masks_clear])
 
 
@@ -311,7 +322,7 @@ class _ConstraintNotValue(BaseConstraint):
         super().__init__(types=[], is_null_allowed=True)
         self._not_value = not_value
 
-    def check_response(self, value) -> bool:
+    def check_response(self, value, value_type_name) -> bool:
         return value != self._not_value
 
 
@@ -355,3 +366,29 @@ def get_constraints(constraints: dict) -> list[BaseConstraint]:
             raise ConstraintParseError(f'Unknown constraint type:{constraint}')
 
     return _constraints
+
+
+def is_typed_constraint(constraint: str):
+    constraints = {
+        'hasValue': False,
+        'type': False,
+        'minLength': False,
+        'maxLength': False,
+        'isHexString': False,
+        'startsWith': True,
+        'endsWith': True,
+        'isUpperCase': False,
+        'isLowerCase': False,
+        'minValue': True,
+        'maxValue': True,
+        'contains': True,
+        'excludes': True,
+        'hasMasksSet': False,
+        'hasMasksClear': False,
+        'notValue': True,
+    }
+
+    is_typed = constraints.get(constraint)
+    if is_typed is None:
+        raise ConstraintParseError(f'Unknown constraint type:{constraint}')
+    return is_typed

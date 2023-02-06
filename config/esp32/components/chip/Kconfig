@@ -673,7 +673,7 @@ menu "CHIP Device Layer"
 
         config ENABLE_ESP32_LOCATIONCAPABILITY
             depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER
-            bool "Enable ESP32 Device LocationCapability "
+            bool "Enable ESP32 Device LocationCapability"
             default n
             help
                 Enable ESP32 Device LocationCapability

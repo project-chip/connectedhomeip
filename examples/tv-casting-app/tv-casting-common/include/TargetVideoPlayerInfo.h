@@ -19,7 +19,8 @@
 #pragma once
 
 #include "TargetEndpointInfo.h"
-#include "app/clusters/bindings/BindingManager.h"
+
+#include <app/OperationalSessionSetup.h>
 #include <platform/CHIPDeviceLayer.h>
 
 constexpr size_t kMaxNumberOfEndpoints = 5;

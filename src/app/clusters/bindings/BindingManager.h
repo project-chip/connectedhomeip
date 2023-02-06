@@ -53,6 +53,7 @@ struct BindingManagerInitParams
     FabricTable * mFabricTable               = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
     PersistentStorageDelegate * mStorage     = nullptr;
+    bool mEstablishConnectionOnInit          = true;
 };
 
 /**
@@ -61,6 +62,7 @@ struct BindingManagerInitParams
  * when a binding is ready to be communicated with.
  *
  * A CASE connection will be triggered when:
+ *  - During init of the BindingManager, unless the application actively disables this using mEstablishConnectionOnInit
  *  - The binding cluster adds a unicast entry to the binding table.
  *  - A watched cluster changes with a unicast binding but we cannot find an active connection to the peer.
  *

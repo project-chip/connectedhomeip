@@ -1058,7 +1058,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4329,7 +4329,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "PHYRate",
+              "type": "PHYRateEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4603,7 +4603,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -4655,7 +4655,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -4667,7 +4667,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "CommissioningWindowStatus",
+              "type": "CommissioningWindowStatusEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -5509,7 +5509,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "DlDoorState",
+              "type": "DoorStateEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -5589,7 +5589,7 @@
               "code": 37,
               "mfgCode": null,
               "side": "server",
-              "type": "DlOperatingMode",
+              "type": "OperatingModeEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7509,6 +7509,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "TriggerEffect",
+              "code": 64,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -10057,7 +10065,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "DlDoorState",
+              "type": "DoorStateEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -10137,7 +10145,7 @@
               "code": 37,
               "mfgCode": null,
               "side": "server",
-              "type": "DlOperatingMode",
+              "type": "OperatingModeEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13253,7 +13261,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "LineupInfo",
+              "type": "LineupInfoStruct",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13269,7 +13277,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "ChannelInfo",
+              "type": "ChannelInfoStruct",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13401,7 +13409,7 @@
               "outgoing": 1
             },
             {
-              "name": "StopPlayback",
+              "name": "Stop",
               "code": 2,
               "mfgCode": null,
               "source": "client",

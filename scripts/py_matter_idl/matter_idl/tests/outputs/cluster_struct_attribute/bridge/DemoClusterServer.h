@@ -1,15 +1,15 @@
 #pragma once
 
 #include "BridgeGlobalStructs.h"
-#include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/GeneratedClusters.h"
+#include "GeneratedClusters.h"
 
 namespace clusters {
 struct DemoClusterCluster : public GeneratedCluster
 {
 
   DemoClusterCluster() :
-      mSingleFailSafe(chip::CharSpan("singleFailSafe"), 5, ATTRIBUTE_MASK_WRITABLE, ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest)),
-      mArmFailsafes(chip::CharSpan("armFailsafes"), 100, ATTRIBUTE_MASK_WRITABLE, ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest))
+      mSingleFailSafe(chip::CharSpan("singleFailSafe"), 5, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest)),
+      mArmFailsafes(chip::CharSpan("armFailsafes"), 100, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest))
   {
   }
 

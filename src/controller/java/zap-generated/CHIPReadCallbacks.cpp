@@ -7906,7 +7906,7 @@ CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback::~CHIPGeneralDiagnos
 }
 
 void CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7977,7 +7977,7 @@ CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback::~CHIPGeneralDiagnostic
 }
 
 void CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8048,7 +8048,7 @@ CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::~CHIPGeneralDiagnost
 }
 
 void CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11413,7 +11413,7 @@ CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::~CHIPEthernetNetworkDiag
 }
 
 void CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11798,9 +11798,9 @@ void CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBridgedDeviceBasicVendorIDAttributeCallback::CHIPBridgedDeviceBasicVendorIDAttributeCallback(jobject javaCallback,
-                                                                                                 bool keepAlive) :
-    chip::Callback::Callback<CHIPBridgedDeviceBasicClusterVendorIDAttributeCallbackType>(CallbackFn, this),
+CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback::CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPBridgedDeviceBasicInformationClusterVendorIDAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -11817,7 +11817,7 @@ CHIPBridgedDeviceBasicVendorIDAttributeCallback::CHIPBridgedDeviceBasicVendorIDA
     }
 }
 
-CHIPBridgedDeviceBasicVendorIDAttributeCallback::~CHIPBridgedDeviceBasicVendorIDAttributeCallback()
+CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback::~CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -11828,7 +11828,7 @@ CHIPBridgedDeviceBasicVendorIDAttributeCallback::~CHIPBridgedDeviceBasicVendorID
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBridgedDeviceBasicVendorIDAttributeCallback::CallbackFn(void * context, chip::VendorId value)
+void CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback::CallbackFn(void * context, chip::VendorId value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11836,8 +11836,8 @@ void CHIPBridgedDeviceBasicVendorIDAttributeCallback::CallbackFn(void * context,
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPBridgedDeviceBasicVendorIDAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPBridgedDeviceBasicVendorIDAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -11857,9 +11857,9 @@ void CHIPBridgedDeviceBasicVendorIDAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPBridgedDeviceBasicClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
+CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback::
+    CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPBridgedDeviceBasicInformationClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -11876,7 +11876,8 @@ CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::CHIPBridgedDeviceBa
     }
 }
 
-CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::~CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback()
+CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback::
+    ~CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -11887,7 +11888,7 @@ CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::~CHIPBridgedDeviceB
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::CallbackFn(
+void CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -11897,8 +11898,8 @@ void CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -11928,9 +11929,9 @@ void CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPBridgedDeviceBasicClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
+CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback::
+    CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPBridgedDeviceBasicInformationClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -11947,7 +11948,8 @@ CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::CHIPBridgedDeviceBas
     }
 }
 
-CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::~CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback()
+CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback::
+    ~CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -11958,7 +11960,7 @@ CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::~CHIPBridgedDeviceBa
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::CallbackFn(
+void CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -11968,8 +11970,8 @@ void CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -11999,9 +12001,9 @@ void CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBridgedDeviceBasicAttributeListAttributeCallback::CHIPBridgedDeviceBasicAttributeListAttributeCallback(jobject javaCallback,
-                                                                                                           bool keepAlive) :
-    chip::Callback::Callback<CHIPBridgedDeviceBasicClusterAttributeListAttributeCallbackType>(CallbackFn, this),
+CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback::CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPBridgedDeviceBasicInformationClusterAttributeListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -12018,7 +12020,7 @@ CHIPBridgedDeviceBasicAttributeListAttributeCallback::CHIPBridgedDeviceBasicAttr
     }
 }
 
-CHIPBridgedDeviceBasicAttributeListAttributeCallback::~CHIPBridgedDeviceBasicAttributeListAttributeCallback()
+CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback::~CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -12029,7 +12031,7 @@ CHIPBridgedDeviceBasicAttributeListAttributeCallback::~CHIPBridgedDeviceBasicAtt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBridgedDeviceBasicAttributeListAttributeCallback::CallbackFn(
+void CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -12039,8 +12041,8 @@ void CHIPBridgedDeviceBasicAttributeListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPBridgedDeviceBasicAttributeListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPBridgedDeviceBasicAttributeListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -12773,7 +12775,7 @@ CHIPOperationalCredentialsFabricsAttributeCallback::~CHIPOperationalCredentialsF
 void CHIPOperationalCredentialsFabricsAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list)
+        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12807,23 +12809,23 @@ void CHIPOperationalCredentialsFabricsAttributeCallback::CallbackFn(
         env->SetByteArrayRegion(newElement_0_rootPublicKeyByteArray, 0, static_cast<jsize>(entry_0.rootPublicKey.size()),
                                 reinterpret_cast<const jbyte *>(entry_0.rootPublicKey.data()));
         newElement_0_rootPublicKey = newElement_0_rootPublicKeyByteArray;
-        jobject newElement_0_vendorId;
-        std::string newElement_0_vendorIdClassName     = "java/lang/Integer";
-        std::string newElement_0_vendorIdCtorSignature = "(I)V";
+        jobject newElement_0_vendorID;
+        std::string newElement_0_vendorIDClassName     = "java/lang/Integer";
+        std::string newElement_0_vendorIDCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-            newElement_0_vendorIdClassName.c_str(), newElement_0_vendorIdCtorSignature.c_str(),
-            static_cast<uint16_t>(entry_0.vendorId), newElement_0_vendorId);
-        jobject newElement_0_fabricId;
-        std::string newElement_0_fabricIdClassName     = "java/lang/Long";
-        std::string newElement_0_fabricIdCtorSignature = "(J)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_fabricIdClassName.c_str(),
-                                                                       newElement_0_fabricIdCtorSignature.c_str(), entry_0.fabricId,
-                                                                       newElement_0_fabricId);
-        jobject newElement_0_nodeId;
-        std::string newElement_0_nodeIdClassName     = "java/lang/Long";
-        std::string newElement_0_nodeIdCtorSignature = "(J)V";
+            newElement_0_vendorIDClassName.c_str(), newElement_0_vendorIDCtorSignature.c_str(),
+            static_cast<uint16_t>(entry_0.vendorID), newElement_0_vendorID);
+        jobject newElement_0_fabricID;
+        std::string newElement_0_fabricIDClassName     = "java/lang/Long";
+        std::string newElement_0_fabricIDCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_fabricIDClassName.c_str(),
+                                                                       newElement_0_fabricIDCtorSignature.c_str(), entry_0.fabricID,
+                                                                       newElement_0_fabricID);
+        jobject newElement_0_nodeID;
+        std::string newElement_0_nodeIDClassName     = "java/lang/Long";
+        std::string newElement_0_nodeIDCtorSignature = "(J)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
-            newElement_0_nodeIdClassName.c_str(), newElement_0_nodeIdCtorSignature.c_str(), entry_0.nodeId, newElement_0_nodeId);
+            newElement_0_nodeIDClassName.c_str(), newElement_0_nodeIDCtorSignature.c_str(), entry_0.nodeID, newElement_0_nodeID);
         jobject newElement_0_label;
         newElement_0_label = env->NewStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str());
         jobject newElement_0_fabricIndex;
@@ -12833,26 +12835,27 @@ void CHIPOperationalCredentialsFabricsAttributeCallback::CallbackFn(
                                                                       newElement_0_fabricIndexCtorSignature.c_str(),
                                                                       entry_0.fabricIndex, newElement_0_fabricIndex);
 
-        jclass fabricDescriptorStructClass_1;
+        jclass fabricDescriptorStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterFabricDescriptor", fabricDescriptorStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterFabricDescriptorStruct",
+            fabricDescriptorStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterFabricDescriptor");
+            ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterFabricDescriptorStruct");
             return;
         }
-        jmethodID fabricDescriptorStructCtor_1 =
-            env->GetMethodID(fabricDescriptorStructClass_1, "<init>",
+        jmethodID fabricDescriptorStructStructCtor_1 =
+            env->GetMethodID(fabricDescriptorStructStructClass_1, "<init>",
                              "([BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;)V");
-        if (fabricDescriptorStructCtor_1 == nullptr)
+        if (fabricDescriptorStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterFabricDescriptor constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterFabricDescriptorStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(fabricDescriptorStructClass_1, fabricDescriptorStructCtor_1, newElement_0_rootPublicKey,
-                                      newElement_0_vendorId, newElement_0_fabricId, newElement_0_nodeId, newElement_0_label,
-                                      newElement_0_fabricIndex);
+        newElement_0 = env->NewObject(fabricDescriptorStructStructClass_1, fabricDescriptorStructStructCtor_1,
+                                      newElement_0_rootPublicKey, newElement_0_vendorID, newElement_0_fabricID, newElement_0_nodeID,
+                                      newElement_0_label, newElement_0_fabricIndex);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -14965,7 +14968,7 @@ CHIPDoorLockDoorStateAttributeCallback::~CHIPDoorLockDoorStateAttributeCallback(
 }
 
 void CHIPDoorLockDoorStateAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19251,9 +19254,9 @@ void CHIPColorControlAttributeListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback(
+CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback::CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback(
     jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPBallastConfigurationClusterIntrinsicBalanceFactorAttributeCallbackType>(CallbackFn, this),
+    chip::Callback::Callback<CHIPBallastConfigurationClusterIntrinsicBallastFactorAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -19270,7 +19273,7 @@ CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::CHIPBallastConf
     }
 }
 
-CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::~CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback()
+CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback::~CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19281,7 +19284,7 @@ CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::~CHIPBallastCon
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::CallbackFn(
+void CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -19290,8 +19293,8 @@ void CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback::CallbackFn
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -22312,7 +22315,7 @@ CHIPChannelChannelListAttributeCallback::~CHIPChannelChannelListAttributeCallbac
 
 void CHIPChannelChannelListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -22391,26 +22394,26 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
                                                               newElement_0_affiliateCallSign);
         }
 
-        jclass channelInfoStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfo",
-                                                             channelInfoStructClass_1);
+        jclass channelInfoStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfoStruct", channelInfoStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfo");
+            ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfoStruct");
             return;
         }
-        jmethodID channelInfoStructCtor_1 = env->GetMethodID(
-            channelInfoStructClass_1, "<init>",
+        jmethodID channelInfoStructStructCtor_1 = env->GetMethodID(
+            channelInfoStructStructClass_1, "<init>",
             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-        if (channelInfoStructCtor_1 == nullptr)
+        if (channelInfoStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfo constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfoStruct constructor");
             return;
         }
 
         newElement_0 =
-            env->NewObject(channelInfoStructClass_1, channelInfoStructCtor_1, newElement_0_majorNumber, newElement_0_minorNumber,
-                           newElement_0_name, newElement_0_callSign, newElement_0_affiliateCallSign);
+            env->NewObject(channelInfoStructStructClass_1, channelInfoStructStructCtor_1, newElement_0_majorNumber,
+                           newElement_0_minorNumber, newElement_0_name, newElement_0_callSign, newElement_0_affiliateCallSign);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -22661,7 +22664,8 @@ CHIPTargetNavigatorTargetListAttributeCallback::~CHIPTargetNavigatorTargetListAt
 
 void CHIPTargetNavigatorTargetListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -22699,23 +22703,24 @@ void CHIPTargetNavigatorTargetListAttributeCallback::CallbackFn(
         jobject newElement_0_name;
         newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
 
-        jclass targetInfoStructClass_1;
+        jclass targetInfoStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfo", targetInfoStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfoStruct", targetInfoStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfo");
+            ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfoStruct");
             return;
         }
-        jmethodID targetInfoStructCtor_1 =
-            env->GetMethodID(targetInfoStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (targetInfoStructCtor_1 == nullptr)
+        jmethodID targetInfoStructStructCtor_1 =
+            env->GetMethodID(targetInfoStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+        if (targetInfoStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$TargetNavigatorClusterTargetInfo constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$TargetNavigatorClusterTargetInfoStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(targetInfoStructClass_1, targetInfoStructCtor_1, newElement_0_identifier, newElement_0_name);
+        newElement_0 =
+            env->NewObject(targetInfoStructStructClass_1, targetInfoStructStructCtor_1, newElement_0_identifier, newElement_0_name);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -23441,7 +23446,7 @@ CHIPMediaInputInputListAttributeCallback::~CHIPMediaInputInputListAttributeCallb
 
 void CHIPMediaInputInputListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -23486,24 +23491,25 @@ void CHIPMediaInputInputListAttributeCallback::CallbackFn(
         jobject newElement_0_description;
         newElement_0_description = env->NewStringUTF(std::string(entry_0.description.data(), entry_0.description.size()).c_str());
 
-        jclass inputInfoStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$MediaInputClusterInputInfo",
-                                                             inputInfoStructClass_1);
+        jclass inputInfoStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$MediaInputClusterInputInfoStruct", inputInfoStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$MediaInputClusterInputInfo");
+            ChipLogError(Zcl, "Could not find class ChipStructs$MediaInputClusterInputInfoStruct");
             return;
         }
-        jmethodID inputInfoStructCtor_1 = env->GetMethodID(
-            inputInfoStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
-        if (inputInfoStructCtor_1 == nullptr)
+        jmethodID inputInfoStructStructCtor_1 =
+            env->GetMethodID(inputInfoStructStructClass_1, "<init>",
+                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
+        if (inputInfoStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$MediaInputClusterInputInfo constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$MediaInputClusterInputInfoStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(inputInfoStructClass_1, inputInfoStructCtor_1, newElement_0_index, newElement_0_inputType,
-                                      newElement_0_name, newElement_0_description);
+        newElement_0 = env->NewObject(inputInfoStructStructClass_1, inputInfoStructStructCtor_1, newElement_0_index,
+                                      newElement_0_inputType, newElement_0_name, newElement_0_description);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -24455,7 +24461,7 @@ CHIPAudioOutputOutputListAttributeCallback::~CHIPAudioOutputOutputListAttributeC
 
 void CHIPAudioOutputOutputListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24498,24 +24504,24 @@ void CHIPAudioOutputOutputListAttributeCallback::CallbackFn(
         jobject newElement_0_name;
         newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
 
-        jclass outputInfoStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$AudioOutputClusterOutputInfo",
-                                                             outputInfoStructClass_1);
+        jclass outputInfoStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$AudioOutputClusterOutputInfoStruct", outputInfoStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$AudioOutputClusterOutputInfo");
+            ChipLogError(Zcl, "Could not find class ChipStructs$AudioOutputClusterOutputInfoStruct");
             return;
         }
-        jmethodID outputInfoStructCtor_1 =
-            env->GetMethodID(outputInfoStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (outputInfoStructCtor_1 == nullptr)
+        jmethodID outputInfoStructStructCtor_1 = env->GetMethodID(outputInfoStructStructClass_1, "<init>",
+                                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
+        if (outputInfoStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$AudioOutputClusterOutputInfo constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$AudioOutputClusterOutputInfoStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(outputInfoStructClass_1, outputInfoStructCtor_1, newElement_0_index, newElement_0_outputType,
-                                      newElement_0_name);
+        newElement_0 = env->NewObject(outputInfoStructStructClass_1, outputInfoStructStructCtor_1, newElement_0_index,
+                                      newElement_0_outputType, newElement_0_name);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

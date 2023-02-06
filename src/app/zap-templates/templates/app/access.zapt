@@ -23,11 +23,11 @@
                         {{#if (isStrEqual role "view")}}
     /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "operate")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
                         {{/if}}
@@ -56,11 +56,11 @@
                         {{#if (isStrEqual role "view")}}
     /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "operate")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
                         {{/if}}
@@ -126,9 +126,9 @@
                         {{else if (isStrEqual role "operate")}}
     /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
                         {{/if}}
@@ -159,9 +159,9 @@
                         {{else if (isStrEqual role "operate")}}
     /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
                         {{/if}}
@@ -227,9 +227,9 @@
                         {{else if (isStrEqual role "operate")}}
     /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{/if}}
@@ -260,9 +260,9 @@
                         {{else if (isStrEqual role "operate")}}
     /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+    {{asMEI parent.commandMfgCode parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+    {{asMEI parent.commandMfgCode parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{/if}}
@@ -326,11 +326,11 @@
                         {{#if (isStrEqual role "view")}}
     /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "operate")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
                         {{/if}}
@@ -359,11 +359,11 @@
                         {{#if (isStrEqual role "view")}}
     /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "operate")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
                         {{/if}}

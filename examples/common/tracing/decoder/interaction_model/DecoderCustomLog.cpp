@@ -263,7 +263,7 @@ CHIP_ERROR LogAddTrustedRootCertificateRequest(TLV::TLVReader & reader)
     app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType value;
     ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, value));
 
-    LogCertificate("RCACValue", value.rootCertificate);
+    LogCertificate("RCACValue", value.rootCACertificate);
 
     return CHIP_NO_ERROR;
 }

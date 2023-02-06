@@ -33,9 +33,9 @@
 
 + (CastingServerBridge * _Nullable)getSharedInstance;
 
-- (void)initApp:(AppParameters * _Nullable)appParameters
-             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-    initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler;
+- (MatterError * _Nonnull)initializeApp:(AppParameters * _Nullable)appParameters
+                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                   initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler;
 
 /*!
  @brief Browse for on-network commissioner TVs
@@ -481,6 +481,70 @@
           responseCallback:(void (^_Nonnull)(bool))responseCallback
                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:Previous request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_previous:(ContentApp * _Nonnull)contentApp
+              responseCallback:(void (^_Nonnull)(bool))responseCallback
+                   clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+            requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:FastForward request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_fastForward:(ContentApp * _Nonnull)contentApp
+                 responseCallback:(void (^_Nonnull)(bool))responseCallback
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:Rewind request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_rewind:(ContentApp * _Nonnull)contentApp
+            responseCallback:(void (^_Nonnull)(bool))responseCallback
+                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+          requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:StartOver request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_startOver:(ContentApp * _Nonnull)contentApp
+               responseCallback:(void (^_Nonnull)(bool))responseCallback
+                    clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+             requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 
 /*!
  @brief Send a MediaPlayback:Seek request to a TV
@@ -1137,5 +1201,52 @@
                              requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
                                 successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
                                 failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback;
+/*!
+ @brief Send a OnOff:On request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)onOff_on:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a OnOff:Off request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)onOff_off:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a OnOff:Toggle request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)onOff_toggle:(ContentApp * _Nonnull)contentApp
+      responseCallback:(void (^_Nonnull)(bool))responseCallback
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 @end
 #endif /* CastingServerBridge_h */

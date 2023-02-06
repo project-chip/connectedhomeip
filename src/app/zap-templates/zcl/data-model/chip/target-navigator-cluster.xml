@@ -24,19 +24,19 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.</description>
-    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST"           type="ARRAY" entryType="TargetInfo"          length="254" writable="false" optional="false">TargetList</attribute>
+    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST"           type="ARRAY" entryType="TargetInfoStruct"    length="254" writable="false" optional="false">TargetList</attribute>
     <attribute side="server" code="0x0001" define="TARGET_NAVIGATOR_CURRENT_TARGET" type="INT8U" default="0"            min="0x00" max="0xFF" writable="false" optional="true">CurrentTarget</attribute>
 
     <command source="client" code="0x00" name="NavigateTarget" response="NavigateTargetResponse" optional="false">
       <description>Upon receipt, this SHALL navigation the UX to the target identified.</description>
-      <arg name="target" type="INT8U"/>
-      <arg name="data"   type="CHAR_STRING" optional="true"/>
+      <arg name="Target" type="INT8U"/>
+      <arg name="Data"   type="CHAR_STRING" optional="true"/>
     </command>
 
     <command source="server" code="0x01" name="NavigateTargetResponse" optional="false">
       <description>This command SHALL be generated in response to NavigateTarget commands.</description>
-      <arg name="status" type="TargetNavigatorStatusEnum"/>
-      <arg name="data"   type="CHAR_STRING" optional="true"/>
+      <arg name="Status" type="TargetNavigatorStatusEnum"/>
+      <arg name="Data"   type="CHAR_STRING" optional="true"/>
     </command>
   </cluster>
 
@@ -47,9 +47,9 @@ limitations under the License.
     <item name="NotAllowed"     value="0x02"/>
   </enum>
 
-  <struct name="TargetInfo">
+  <struct name="TargetInfoStruct">
     <cluster code="0x0505"/>
-    <item name="identifier" type="INT8U"/>
-    <item name="name"       type="CHAR_STRING" length="32"/>
+    <item name="Identifier" type="INT8U"/>
+    <item name="Name"       type="CHAR_STRING" length="32"/>
   </struct>
 </configurator>

@@ -15,7 +15,6 @@
 name: 51.2.1. [TC-DGWIFI-2.1] Attributes with server as DUT
 
 PICS:
-    - DGWIFI.S.A
     - DGWIFI.S
 
 config:

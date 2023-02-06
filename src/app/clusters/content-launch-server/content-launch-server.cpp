@@ -201,7 +201,7 @@ bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * command
     auto & data                   = commandData.data;
     auto & decodableParameterList = commandData.search.parameterList;
 
-    app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
+    app::CommandResponseHelper<Commands::LauncherResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
 
@@ -236,7 +236,7 @@ bool emberAfContentLauncherClusterLaunchURLCallback(CommandHandler * commandObj,
     auto & displayString       = commandData.displayString;
     auto & brandingInformation = commandData.brandingInformation;
 
-    app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
+    app::CommandResponseHelper<Commands::LauncherResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true && delegate->HasFeature(endpoint, ContentLauncherFeature::kURLPlayback),

@@ -19,6 +19,7 @@ import enum
 import typing
 from dataclasses import dataclass
 
+from chip.clusters.enum import MatterIntEnum
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import float32, uint
 from chip.yaml.errors import ValidationError
@@ -201,8 +202,8 @@ def convert_to_data_model_type(field_value, field_type):
         value = int(field_value)
         return field_type(value)
     # YAML treats enums as ints. Convert to the typed enum class.
-    elif (issubclass(field_type, enum.Enum)):
-        return field_type(field_value)
+    elif (issubclass(field_type, MatterIntEnum)):
+        return field_type.extend_enum_if_value_doesnt_exist(field_value)
     # By default, just return the field_value casted to field_type.
     else:
         return field_type(field_value)

@@ -53,7 +53,9 @@ public:
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
+    CHIP_ERROR PreInit(AppParams * AppParams = nullptr);
     CHIP_ERROR Init(AppParams * AppParams = nullptr);
+    CHIP_ERROR InitBindingHandlers();
 
     CHIP_ERROR DiscoverCommissioners();
     const chip::Dnssd::DiscoveredNodeData *
@@ -112,10 +114,10 @@ public:
      */
     CHIP_ERROR ContentLauncher_LaunchURL(
         TargetEndpointInfo * endpoint, const char * contentUrl, const char * contentDisplayStr,
-        chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+        chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type> brandingInformation,
         std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ContentLauncher_LaunchContent(TargetEndpointInfo * endpoint,
-                                             chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
+                                             chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type search,
                                              bool autoPlay, chip::Optional<chip::CharSpan> data,
                                              std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR
@@ -183,6 +185,10 @@ public:
     CHIP_ERROR MediaPlayback_Pause(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_StopPlayback(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_Next(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Previous(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Rewind(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_FastForward(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_StartOver(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_Seek(TargetEndpointInfo * endpoint, uint64_t position,
                                   std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_SkipForward(TargetEndpointInfo * endpoint, uint64_t deltaPositionMilliseconds,
@@ -246,13 +252,13 @@ public:
      * @brief Application Launcher cluster
      */
     CHIP_ERROR ApplicationLauncher_LaunchApp(TargetEndpointInfo * endpoint,
-                                             chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                             chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                              chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_StopApp(TargetEndpointInfo * endpoint,
-                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_HideApp(TargetEndpointInfo * endpoint,
-                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback);
 
     CHIP_ERROR
@@ -418,7 +424,8 @@ private:
     static CastingServer * castingServer_;
     CastingServer();
 
-    CHIP_ERROR InitBindingHandlers();
+    CHIP_ERROR SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteSpan> rotatingDeviceIdUniqueId);
+
     static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void ReadServerClusters(chip::EndpointId endpointId);
 
@@ -474,6 +481,10 @@ private:
     PauseCommand mPauseCommand;
     StopPlaybackCommand mStopPlaybackCommand;
     NextCommand mNextCommand;
+    PreviousCommand mPreviousCommand;
+    RewindCommand mRewindCommand;
+    FastForwardCommand mFastForwardCommand;
+    StartOverCommand mStartOverCommand;
     SeekCommand mSeekCommand;
     SkipForwardCommand mSkipForwardCommand;
     SkipBackwardCommand mSkipBackwardCommand;

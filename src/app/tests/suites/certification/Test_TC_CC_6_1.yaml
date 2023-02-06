@@ -84,7 +84,7 @@ tests:
       command: "MoveToColorTemperature"
       arguments:
           values:
-              - name: "colorTemperature"
+              - name: "ColorTemperatureMireds"
                 value: 310
               - name: "TransitionTime"
                 value: 0
@@ -94,6 +94,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -108,7 +109,7 @@ tests:
       command: "MoveToColorTemperature"
       arguments:
           values:
-              - name: "colorTemperature"
+              - name: "ColorTemperatureMireds"
                 value: 250
               - name: "TransitionTime"
                 value: 300
@@ -118,6 +119,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -135,6 +137,7 @@ tests:
               maxValue: 334
 
     - label: "Wait 10s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -152,6 +155,7 @@ tests:
               maxValue: 310
 
     - label: "Wait 10s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -169,6 +173,7 @@ tests:
               maxValue: 288
 
     - label: "Wait 5s"
+      PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

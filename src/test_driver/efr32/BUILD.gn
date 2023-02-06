@@ -56,7 +56,6 @@ efr32_sdk("sdk") {
   ]
 
   defines = [
-    "BOARD_ID=${silabs_board}",
     "SILABS_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
 

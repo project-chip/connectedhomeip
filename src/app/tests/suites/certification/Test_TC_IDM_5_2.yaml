@@ -30,7 +30,7 @@ tests:
           "TH sends a Timed Request Message with the timeout value set. (Example
           - 200 milliseconds). +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
 
           Verify on TH(chip-tool) receives the StatusResponseMessage for the data sent in the above command
@@ -49,7 +49,7 @@ tests:
           response message to be received. Send the Write Request Message to the
           DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
           ./chip-tool levelcontrol write on-level 1 1 1 --timedInteractionTimeoutMs 500
 
@@ -95,9 +95,9 @@ tests:
           response message to be received. Wait for 5 seconds(Timer has expired)
           and then send the Invoke Request Message to the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-           sudo ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
+           ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
 
           On TH(chip-tool), Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command
 
@@ -131,7 +131,7 @@ tests:
           response message to be received. Wait for 5 seconds(Timer has expired)
           and then send the Write Request Message to the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
           ./chip-tool modeselect write on-mode 0 1 1 --repeat-delay-ms 1000 --timedInteractionTimeoutMs 500
 

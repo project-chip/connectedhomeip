@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ typedef uint64_t FabricId;
 typedef uint8_t FabricIndex;
 typedef uint32_t FieldId;
 typedef uint16_t ListIndex;
+typedef uint16_t LocalizedStringIdentifier;
 typedef uint32_t TransactionId;
 typedef uint16_t KeysetId;
 typedef uint8_t InteractionModelRevision;

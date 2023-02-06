@@ -709,7 +709,7 @@
             { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },                                /* FeatureMap */       \
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },                                  /* ClusterRevision */  \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                        \
+            /* Endpoint: 0, Cluster: Administrator Commissioning (server) */                                                       \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* WindowStatus */      \
             { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(FABRIC_IDX),                                                            \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* AdminFabricIndex */                        \
@@ -1193,9 +1193,9 @@
             { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Occupancy Sensing (server) */                                                                 \
-            { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(BITMAP8), 0 },    /* occupancy */                                       \
-            { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8), 0 },      /* occupancy sensor type */                           \
-            { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BITMAP8), 0 },    /* occupancy sensor type bitmap */                    \
+            { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(BITMAP8), 0 },    /* Occupancy */                                       \
+            { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8), 0 },      /* OccupancySensorType */                             \
+            { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BITMAP8), 0 },    /* OccupancySensorTypeBitmap */                       \
             { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                      \
             { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
@@ -1461,9 +1461,9 @@
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },              /* ClusterRevision */                      \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Occupancy Sensing (server) */                                                                 \
-            { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(BITMAP8), 0 },    /* occupancy */                                       \
-            { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8), 0 },      /* occupancy sensor type */                           \
-            { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BITMAP8), 0 },    /* occupancy sensor type bitmap */                    \
+            { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(BITMAP8), 0 },    /* Occupancy */                                       \
+            { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8), 0 },      /* OccupancySensorType */                             \
+            { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BITMAP8), 0 },    /* OccupancySensorTypeBitmap */                       \
             { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                      \
             { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
@@ -1489,7 +1489,7 @@
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
-#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
+#define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
@@ -1629,7 +1629,7 @@
   /*   AcceptedCommandList (index=48) */ \
   0x00000000 /* ResetCounts */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */\
+  /* Endpoint: 0, Cluster: Administrator Commissioning (server) */\
   /*   AcceptedCommandList (index=50) */ \
   0x00000000 /* OpenCommissioningWindow */, \
   0x00000001 /* OpenBasicCommissioningWindow */, \
@@ -2128,7 +2128,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */ \
+      /* Endpoint: 0, Cluster: Administrator Commissioning (server) */ \
       .clusterId = 0x0000003C,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(201), \
       .attributeCount = 5, \

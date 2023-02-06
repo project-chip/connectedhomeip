@@ -53,27 +53,28 @@ bool emberAfPluginDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Emb
 }
 
 bool emberAfPluginDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, FabricIndex creator, FabricIndex modifier,
-                                  const CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType userType,
-                                  DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
+                                  const CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType,
+                                  CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
     return BoltLockMgr().SetUser(userIndex, creator, modifier, userName, uniqueId, userStatus, userType, credentialRule,
                                  credentials, totalCredentials);
 }
 
-bool emberAfPluginDoorLockGetCredential(EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+bool emberAfPluginDoorLockGetCredential(EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential)
 {
     return BoltLockMgr().GetCredential(credentialIndex, credentialType, credential);
 }
 
 bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
-                                        DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+                                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                         const ByteSpan & secret)
 {
     return BoltLockMgr().SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType, secret);
 }
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                            OperationErrorEnum & err)
 {
     bool returnValue = false;
 
@@ -86,7 +87,7 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
-                                              DlOperationError & err)
+                                              OperationErrorEnum & err)
 {
     bool returnValue = false;
 
@@ -116,7 +117,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     logOnFailure(DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER),
                  "number of credentials per user");
 
-    // Set FeatureMap to (kUsersManagement|kPINCredentials), default is:
-    // (kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials) 0x113
+    // Set FeatureMap to (kUser|kPinCredential), default is:
+    // (kUser|kAccessSchedules|kRfidCredential|kPinCredential) 0x113
     logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
 }

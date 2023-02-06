@@ -921,6 +921,122 @@
           ]
         },
         {
+          "name": "Time Format Localization",
+          "code": 44,
+          "mfgCode": null,
+          "define": "TIME_FORMAT_LOCALIZATION_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "attributes": [
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Time Format Localization",
+          "code": 44,
+          "mfgCode": null,
+          "define": "TIME_FORMAT_LOCALIZATION_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "attributes": [
+            {
+              "name": "HourFormat",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "enum8",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActiveCalendarType",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "enum8",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "SupportedCalendarTypes",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Power Source Configuration",
           "code": 46,
           "mfgCode": null,
@@ -2785,7 +2901,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "PHYRate",
+              "type": "PHYRateEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -3139,7 +3255,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -3191,7 +3307,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -3203,7 +3319,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "CommissioningWindowStatus",
+              "type": "CommissioningWindowStatusEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -6457,7 +6573,7 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "LaunchResponse",
+              "name": "LauncherResponse",
               "code": 2,
               "mfgCode": null,
               "source": "server",
@@ -6683,7 +6799,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "ApplicationBasicApplication",
+              "type": "ApplicationStruct",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -8623,7 +8739,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "occupancy",
+              "name": "Occupancy",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8639,7 +8755,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type",
+              "name": "OccupancySensorType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8655,7 +8771,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type bitmap",
+              "name": "OccupancySensorTypeBitmap",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -8671,7 +8787,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR occupied to unoccupied delay",
+              "name": "PIROccupiedToUnoccupiedDelay",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -8687,7 +8803,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR unoccupied to occupied delay",
+              "name": "PIRUnoccupiedToOccupiedDelay",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -8703,7 +8819,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR unoccupied to occupied threshold",
+              "name": "PIRUnoccupiedToOccupiedThreshold",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -8719,7 +8835,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic occupied to unoccupied delay",
+              "name": "UltrasonicOccupiedToUnoccupiedDelay",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -8735,7 +8851,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic unoccupied to occupied delay",
+              "name": "UltrasonicUnoccupiedToOccupiedDelay",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -8751,7 +8867,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic unoccupied to occupied threshold",
+              "name": "UltrasonicUnoccupiedToOccupiedThreshold",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -8767,7 +8883,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact occupied to unoccupied delay",
+              "name": "PhysicalContactOccupiedToUnoccupiedDelay",
               "code": 48,
               "mfgCode": null,
               "side": "server",
@@ -8783,7 +8899,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact unoccupied to occupied delay",
+              "name": "PhysicalContactUnoccupiedToOccupiedDelay",
               "code": 49,
               "mfgCode": null,
               "side": "server",
@@ -8799,7 +8915,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact unoccupied to occupied threshold",
+              "name": "PhysicalContactUnoccupiedToOccupiedThreshold",
               "code": 50,
               "mfgCode": null,
               "side": "server",

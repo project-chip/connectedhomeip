@@ -19,7 +19,7 @@
 
 #import "ContentApp.h"
 
-#include <zap-generated/CHIPClusters.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 @implementation ContentApp
 

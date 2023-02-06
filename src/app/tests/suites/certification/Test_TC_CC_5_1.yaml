@@ -50,9 +50,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 32768
-              - name: "colorY"
+              - name: "ColorY"
                 value: 19660
               - name: "TransitionTime"
                 value: 0
@@ -62,6 +62,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -94,9 +95,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 13107
-              - name: "colorY"
+              - name: "ColorY"
                 value: 13107
               - name: "TransitionTime"
                 value: 200
@@ -106,6 +107,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -132,6 +134,7 @@ tests:
               maxValue: 19660
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -158,6 +161,7 @@ tests:
               maxValue: 15073
 
     - label: "Wait 5s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -210,9 +214,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 32768
-              - name: "colorY"
+              - name: "ColorY"
                 value: 19660
               - name: "TransitionTime"
                 value: 0
@@ -222,6 +226,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -259,9 +264,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 13107
-              - name: "colorY"
+              - name: "ColorY"
                 value: 13107
               - name: "TransitionTime"
                 value: 0
@@ -271,6 +276,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -299,9 +305,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 13107
-              - name: "colorY"
+              - name: "ColorY"
                 value: 32768
               - name: "TransitionTime"
                 value: 0
@@ -311,6 +317,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -339,9 +346,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 26214
-              - name: "colorY"
+              - name: "ColorY"
                 value: 32768
               - name: "TransitionTime"
                 value: 0
@@ -351,6 +358,7 @@ tests:
                 value: 1
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -402,9 +410,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 32768
-              - name: "colorY"
+              - name: "ColorY"
                 value: 19660
               - name: "TransitionTime"
                 value: 0
@@ -414,6 +422,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -451,9 +460,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 13107
-              - name: "colorY"
+              - name: "ColorY"
                 value: 13107
               - name: "TransitionTime"
                 value: 0
@@ -463,6 +472,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -495,9 +505,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 13107
-              - name: "colorY"
+              - name: "ColorY"
                 value: 32768
               - name: "TransitionTime"
                 value: 0
@@ -507,6 +517,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -535,9 +546,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 26214
-              - name: "colorY"
+              - name: "ColorY"
                 value: 32768
               - name: "TransitionTime"
                 value: 0
@@ -547,6 +558,7 @@ tests:
                 value: 1
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

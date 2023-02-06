@@ -42,16 +42,21 @@ tests:
 
     - label: "TH is instructed to advertise Commissioner Discovery service"
       verification: |
-          chip-tv-app is used as TH
+          chip-tv-app is used as dut
 
-          ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
+           ./chip-tv-app
 
           Verify in tv-app side
-
-          CHIP:DL: Using wifi MAC for hostname
-          CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
-          CHIP:DIS: CHIP minimal mDNS configured as "Operational device".
-          CHIP:DIS: Broadcasting mDns reply for query from
+          [1667820688.750031][13245:13245] CHIP:DL: Using wifi MAC for hostname
+          [1667820688.750083][13245:13245] CHIP:DIS: Advertise operational node 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF
+          [1667820688.782144][13245:13245] CHIP:DIS: Responding with _matter._tcp.local
+          [1667820688.782192][13245:13245] CHIP:DIS: Responding with 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF._matter._tcp.local
+          [1667820688.782220][13245:13245] CHIP:DIS: Responding with 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF._matter._tcp.local
+          [1667820688.782240][13245:13245] CHIP:DIS: Responding with E45F016961B10000.local
+          [1667820688.782259][13245:13245] CHIP:DIS: Responding with E45F016961B10000.local
+          [1667820688.782284][13245:13245] CHIP:DIS: Responding with _I43D06D09FCEEDF78._sub._matter._tcp.local
+          [1667820688.782301][13245:13245] CHIP:DIS: CHIP minimal mDNS configured as "Operational device"; instance name: 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF.
+          [1667820688.824041][13245:13245] CHIP:DIS: mDNS service published: _matter._tcp
       disabled: true
 
     - label:
@@ -59,13 +64,13 @@ tests:
           Discovery"
       verification: |
           In certification QA we are using chip-tv-casting-app as a reference app, In case of certification testing, DUT (app) vendor to provide instructions on how to scan for commissioners
-
-          connectedhomeip/examples/tv-casting-app/linux/out/tv-casting-app$ sudo ./chip-tv-casting-app
+           ./chip-tv-casting-app
 
           Verify for the commissioner advertisements from the TH in tv-casting-app side
 
           CHIP:SVR: Discovered Commissioner #0
-          [1653478433.097515][3785:3785] CHIP:DIS:         Hostname: E45F010F19FF0000        [1653478433.097546][3785:3785] CHIP:DIS:         IP Address #1: fe80::d83a:21ff:fe24:b6d6
+          [1653478433.097515][3785:3785] CHIP:DIS:         Hostname: E45F010F19FF0000
+          [1653478433.097546][3785:3785] CHIP:DIS:         IP Address #1: fe80::d83a:21ff:fe24:b6d6
           [1653478433.097570][3785:3785] CHIP:DIS:         Port: 5540
           [1653478433.097593][3785:3785] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1653478433.097615][3785:3785] CHIP:DIS:         Mrp Interval active: 300 ms
@@ -78,7 +83,8 @@ tests:
           [1653478433.097775][3785:3785] CHIP:DIS:         Instance Name: C1E39719B158802A
           [1653478433.097797][3785:3785] CHIP:DIS:         Commissioning Mode: 0
           [1653478433.097821][3785:3785] CHIP:SVR: Discovered Commissioner #1
-          [1653478433.097841][3785:3785] CHIP:DIS:         Hostname: E45F010F27530000        [1653478433.097867][3785:3785] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
+          [1653478433.097841][3785:3785] CHIP:DIS:         Hostname: E45F010F27530000
+          [1653478433.097867][3785:3785] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
           [1653478433.097890][3785:3785] CHIP:DIS:         Port: 5650
           [1653478433.097912][3785:3785] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1653478433.097934][3785:3785] CHIP:DIS:         Mrp Interval active: 300 ms
@@ -108,7 +114,7 @@ tests:
       verification: |
           Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side
 
-          > cast request 0
+          > cast request 1
           [1653179218011] [47890:1899175] CHIP: [DL] request
           [1653179218011] [47890:1899175] CHIP: [SVR]   ------- PrepareForCommissioning
           [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...

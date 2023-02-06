@@ -29,22 +29,22 @@ tests:
                 value: nodeId
 
     - label: "Send Test Command"
-      command: "test"
+      command: "Test"
 
     - label: "Send Test Not Handled Command"
-      command: "testNotHandled"
+      command: "TestNotHandled"
       response:
           error: INVALID_COMMAND
 
     - label: "Send Test Specific Command"
-      command: "testSpecific"
+      command: "TestSpecific"
       response:
           values:
               - name: "returnValue"
                 value: 7
 
     - label: "Send Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"
@@ -57,7 +57,7 @@ tests:
                 value: 20
 
     - label: "Send failing Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"
@@ -1007,13 +1007,13 @@ tests:
           value: 0
 
     - label: "Send Test Command to unsupported endpoint"
-      command: "test"
+      command: "Test"
       endpoint: 200
       response:
           error: UNSUPPORTED_ENDPOINT
 
     - label: "Send Test Command to unsupported cluster"
-      command: "test"
+      command: "Test"
       endpoint: 0
       response:
           error: UNSUPPORTED_CLUSTER
@@ -1045,7 +1045,7 @@ tests:
           value: 0
 
     - label: "Send a command with a vendor_id and enum"
-      command: "testEnumsRequest"
+      command: "TestEnumsRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1077,7 +1077,7 @@ tests:
     # Tests for Struct
 
     - label: "Send Test Command With Struct Argument and arg1.b is true"
-      command: "testStructArgumentRequest"
+      command: "TestStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1098,7 +1098,7 @@ tests:
                 value: true
 
     - label: "Send Test Command With Struct Argument and arg1.b is false"
-      command: "testStructArgumentRequest"
+      command: "TestStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1120,7 +1120,7 @@ tests:
 
     - label:
           "Send Test Command With Nested Struct Argument and arg1.c.b is true"
-      command: "testNestedStructArgumentRequest"
+      command: "TestNestedStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1146,7 +1146,7 @@ tests:
                 value: true
 
     - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
-      command: "testNestedStructArgumentRequest"
+      command: "TestNestedStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1174,7 +1174,7 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and all fields b
           of arg1.d are true"
-      command: "testNestedStructListArgumentRequest"
+      command: "TestNestedStructListArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1233,7 +1233,7 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of arg1.d are false"
-      command: "testNestedStructListArgumentRequest"
+      command: "TestNestedStructListArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1323,7 +1323,7 @@ tests:
     # Tests for List
 
     - label: "Send Test Command With List of INT8U and none of them is set to 0"
-      command: "testListInt8UArgumentRequest"
+      command: "TestListInt8UArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1334,7 +1334,7 @@ tests:
                 value: true
 
     - label: "Send Test Command With List of INT8U and one of them is set to 0"
-      command: "testListInt8UArgumentRequest"
+      command: "TestListInt8UArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1345,7 +1345,7 @@ tests:
                 value: false
 
     - label: "Send Test Command With List of INT8U and get it reversed"
-      command: "testListInt8UReverseRequest"
+      command: "TestListInt8UReverseRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1357,7 +1357,7 @@ tests:
 
     - label:
           "Send Test Command With empty List of INT8U and get an empty list back"
-      command: "testListInt8UReverseRequest"
+      command: "TestListInt8UReverseRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1370,7 +1370,7 @@ tests:
     - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
           item is true"
-      command: "testListStructArgumentRequest"
+      command: "TestListStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1405,7 +1405,7 @@ tests:
     - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
           item is false"
-      command: "testListStructArgumentRequest"
+      command: "TestListStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1440,7 +1440,7 @@ tests:
     - label:
           "Send Test Command With List of Nested Struct List Argument and all
           fields b of elements of arg1.d are true"
-      command: "testListNestedStructListArgumentRequest"
+      command: "TestListNestedStructListArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1501,7 +1501,7 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of elements of arg1.d are false"
-      command: "testListNestedStructListArgumentRequest"
+      command: "TestListNestedStructListArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1611,7 +1611,7 @@ tests:
     # Tests for Nullables and Optionals
 
     - label: "Send Test Command with optional arg set."
-      command: "testNullableOptionalRequest"
+      command: "TestNullableOptionalRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1628,7 +1628,7 @@ tests:
                 value: 5
 
     - label: "Send Test Command without its optional arg."
-      command: "testNullableOptionalRequest"
+      command: "TestNullableOptionalRequest"
       response:
           values:
               - name: "wasPresent"

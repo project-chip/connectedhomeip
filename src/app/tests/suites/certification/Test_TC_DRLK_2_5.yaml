@@ -39,48 +39,48 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
-              - name: "credentials"
+              - name: "Credentials"
                 value: null
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextUserIndex"
+              - name: "NextUserIndex"
                 value: null
 
     - label: "TH reads NumberOfWeekDay SchedulesSupportedPerUser attribute"
@@ -108,19 +108,19 @@ tests:
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 2
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 45
-              - name: "endHour"
+              - name: "EndHour"
                 value: 16
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 55
 
     #issue #18591
@@ -129,29 +129,29 @@ tests:
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 2
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 45
-              - name: "endHour"
+              - name: "EndHour"
                 constraints:
                     hasValue: true
                     minValue: 16
-              - name: "endMinute"
+              - name: "EndMinute"
                 constraints:
                     hasValue: true
                     minValue: 55
@@ -161,19 +161,19 @@ tests:
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 7
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 45
-              - name: "endHour"
+              - name: "EndHour"
                 value: 16
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 55
       response:
           error: INVALID_COMMAND
@@ -183,31 +183,31 @@ tests:
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x85
-              - name: "daysMask"
+              - name: "DaysMask"
                 constraints:
                     hasValue: false
-              - name: "startHour"
+              - name: "StartHour"
                 constraints:
                     hasValue: false
-              - name: "startMinute"
+              - name: "StartMinute"
                 constraints:
                     hasValue: false
-              - name: "endHour"
+              - name: "EndHour"
                 constraints:
                     hasValue: false
-              - name: "endMinute"
+              - name: "EndMinute"
                 constraints:
                     hasValue: false
 
@@ -216,9 +216,9 @@ tests:
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "TH sends Get Week Day Schedule Command to DUT"
@@ -226,31 +226,31 @@ tests:
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "daysMask"
+              - name: "DaysMask"
                 constraints:
                     hasValue: false
-              - name: "startHour"
+              - name: "StartHour"
                 constraints:
                     hasValue: false
-              - name: "startMinute"
+              - name: "StartMinute"
                 constraints:
                     hasValue: false
-              - name: "endHour"
+              - name: "EndHour"
                 constraints:
                     hasValue: false
-              - name: "endMinute"
+              - name: "EndMinute"
                 constraints:
                     hasValue: false
 
@@ -259,5 +259,5 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1

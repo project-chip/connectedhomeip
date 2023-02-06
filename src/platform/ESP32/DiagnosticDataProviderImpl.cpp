@@ -50,15 +50,15 @@ using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace {
 
-InterfaceType GetInterfaceType(const char * if_desc)
+InterfaceTypeEnum GetInterfaceType(const char * if_desc)
 {
     if (strncmp(if_desc, "ap", strnlen(if_desc, 2)) == 0 || strncmp(if_desc, "sta", strnlen(if_desc, 3)) == 0)
-        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     if (strncmp(if_desc, "openthread", strnlen(if_desc, 10)) == 0)
-        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
     if (strncmp(if_desc, "eth", strnlen(if_desc, 3)) == 0)
-        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
-    return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+    return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

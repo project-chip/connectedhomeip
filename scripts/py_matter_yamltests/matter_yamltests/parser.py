@@ -14,12 +14,14 @@
 #    limitations under the License.
 
 import copy
-from enum import Enum
+from enum import Enum, auto
 
 import yaml
 
 from . import fixes
-from .constraints import get_constraints
+from .constraints import get_constraints, is_typed_constraint
+from .definitions import SpecDefinitions
+from .pics_checker import PICSChecker
 
 _TESTS_SECTION = [
     'name',
@@ -36,6 +38,7 @@ _TEST_SECTION = [
     'endpoint',
     'identity',
     'fabricFiltered',
+    'groupId',
     'verification',
     'nodeId',
     'attribute',
@@ -47,6 +50,7 @@ _TEST_SECTION = [
     'maxInterval',
     'timedInteractionTimeoutMs',
     'busyWaitMs',
+    'wait',
 ]
 
 _TEST_ARGUMENTS_SECTION = [
@@ -88,11 +92,12 @@ class PostProcessCheckStatus(Enum):
 
 class PostProcessCheckType(Enum):
     '''Indicates the post processing check step type.'''
-    IM_STATUS = 'IMStatus',
-    CLUSTER_STATUS = 'ClusterStatus',
-    RESPONSE_VALIDATION = 'Response',
-    CONSTRAINT_VALIDATION = 'Constraints',
-    SAVE_AS_VARIABLE = 'SaveAs'
+    IM_STATUS = auto()
+    CLUSTER_STATUS = auto()
+    RESPONSE_VALIDATION = auto()
+    CONSTRAINT_VALIDATION = auto()
+    SAVE_AS_VARIABLE = auto()
+    WAIT_VALIDATION = auto()
 
 
 class PostProcessCheck:
@@ -163,8 +168,7 @@ def _check_valid_keys(section, valid_keys_dict):
     if section:
         for key in section:
             if key not in valid_keys_dict:
-                print(f'Unknown key: {key}')
-                raise KeyError
+                raise KeyError(f'Unknown key: {key}')
 
 
 def _value_or_none(data, key):
@@ -172,7 +176,7 @@ def _value_or_none(data, key):
 
 
 def _value_or_config(data, key, config):
-    return data[key] if key in data else config[key]
+    return data[key] if key in data else config.get(key)
 
 
 class _TestStepWithPlaceholders:
@@ -183,7 +187,7 @@ class _TestStepWithPlaceholders:
     processed.
     '''
 
-    def __init__(self, test: dict, config: dict, definitions):
+    def __init__(self, test: dict, config: dict, definitions: SpecDefinitions, pics_checker: PICSChecker):
         # Disabled tests are not parsed in order to allow the test to be added to the test
         # suite even if the feature is not implemented yet.
         self.is_enabled = not ('disabled' in test and test['disabled'])
@@ -197,10 +201,12 @@ class _TestStepWithPlaceholders:
         self.label = _value_or_none(test, 'label')
         self.optional = _value_or_none(test, 'optional')
         self.node_id = _value_or_config(test, 'nodeId', config)
+        self.group_id = _value_or_config(test, 'groupId', config)
         self.cluster = _value_or_config(test, 'cluster', config)
         self.command = _value_or_config(test, 'command', config)
         self.attribute = _value_or_none(test, 'attribute')
         self.endpoint = _value_or_config(test, 'endpoint', config)
+        self.is_pics_enabled = pics_checker.check(_value_or_none(test, 'PICS'))
 
         self.identity = _value_or_none(test, 'identity')
         self.fabric_filtered = _value_or_none(test, 'fabricFiltered')
@@ -209,9 +215,10 @@ class _TestStepWithPlaceholders:
         self.timed_interaction_timeout_ms = _value_or_none(
             test, 'timedInteractionTimeoutMs')
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
+        self.wait_for = _value_or_none(test, 'wait')
 
-        self.is_attribute = self.command in _ATTRIBUTE_COMMANDS
-        self.is_event = self.command in _EVENT_COMMANDS
+        self.is_attribute = self.command in _ATTRIBUTE_COMMANDS or self.wait_for in _ATTRIBUTE_COMMANDS
+        self.is_event = self.command in _EVENT_COMMANDS or self.wait_for in _EVENT_COMMANDS
 
         self.arguments_with_placeholders = _value_or_none(test, 'arguments')
         self.response_with_placeholders = _value_or_none(test, 'response')
@@ -226,6 +233,7 @@ class _TestStepWithPlaceholders:
 
         argument_mapping = None
         response_mapping = None
+        response_mapping_name = None
 
         if self.is_attribute:
             attribute = definitions.get_attribute_by_name(
@@ -235,6 +243,7 @@ class _TestStepWithPlaceholders:
                                                      attribute.definition.data_type.name)
                 argument_mapping = attribute_mapping
                 response_mapping = attribute_mapping
+                response_mapping_name = attribute.definition.data_type.name
         else:
             command = definitions.get_command_by_name(
                 self.cluster, self.command)
@@ -243,13 +252,15 @@ class _TestStepWithPlaceholders:
                     definitions, self.cluster, command.input_param)
                 response_mapping = self._as_mapping(
                     definitions, self.cluster, command.output_param)
+                response_mapping_name = command.output_param
 
-        self._update_with_definition(
-            self.arguments_with_placeholders, argument_mapping)
-        self._update_with_definition(
-            self.response_with_placeholders, response_mapping)
+        self.argument_mapping = argument_mapping
+        self.response_mapping = response_mapping
+        self.response_mapping_name = response_mapping_name
+        self.update_arguments(self.arguments_with_placeholders)
+        self.update_response(self.response_with_placeholders)
 
-        # This performs a very basic sanity parse time check of constrains. This parsing happens
+        # This performs a very basic sanity parse time check of constraints. This parsing happens
         # again inside post processing response since at that time we will have required variables
         # to substitute in. This parsing check here has value since some test can take a really
         # long time to run so knowing earlier on that the test step would have failed at parsing
@@ -297,13 +308,32 @@ class _TestStepWithPlaceholders:
 
         return target_name
 
+    def update_arguments(self, arguments_with_placeholders):
+        self._update_with_definition(
+            arguments_with_placeholders, self.argument_mapping)
+
+    def update_response(self, response_with_placeholders):
+        self._update_with_definition(
+            response_with_placeholders, self.response_mapping)
+
     def _update_with_definition(self, container: dict, mapping_type):
         if not container or not mapping_type:
             return
 
         for value in list(container['values']):
             for key, item_value in list(value.items()):
-                mapping = mapping_type if self.is_attribute else mapping_type[value['name']]
+                if self.is_attribute:
+                    mapping = mapping_type
+                else:
+                    target_key = value['name']
+                    if mapping_type.get(target_key) is None:
+                        for candidate_key in mapping_type:
+                            if candidate_key.lower() == target_key.lower():
+                                raise KeyError(
+                                    f'"{self.label}": Unknown key: "{target_key}". Did you mean "{candidate_key}" ?')
+                        raise KeyError(
+                            f'"{self.label}": Unknown key: "{target_key}". Candidates are: "{[ key for key in mapping_type]}".')
+                    mapping = mapping_type[target_key]
 
                 if key == 'value':
                     value[key] = self._update_value_with_definition(
@@ -312,8 +342,11 @@ class _TestStepWithPlaceholders:
                     self._parsing_config_variable_storage[item_value] = None
                 elif key == 'constraints':
                     for constraint, constraint_value in item_value.items():
-                        value[key][constraint] = self._update_value_with_definition(
-                            constraint_value, mapping_type)
+                        # Only apply update_value_with_definition to constraints that have a value that depends on
+                        # the the value type for the target field.
+                        if is_typed_constraint(constraint):
+                            value[key][constraint] = self._update_value_with_definition(
+                                constraint_value, mapping_type)
                 else:
                     # This key, value pair does not rely on cluster specifications.
                     pass
@@ -342,11 +375,14 @@ class _TestStepWithPlaceholders:
         # the wrong thing below.
         if value is not None and value not in self._parsing_config_variable_storage:
             if mapping_type == 'int64u' or mapping_type == 'int64s' or mapping_type == 'bitmap64' or mapping_type == 'epoch_us':
+                value = fixes.try_apply_float_to_integer_fix(value)
                 value = fixes.try_apply_yaml_cpp_longlong_limitation_fix(value)
                 value = fixes.try_apply_yaml_unrepresentable_integer_for_javascript_fixes(
                     value)
             elif mapping_type == 'single' or mapping_type == 'double':
                 value = fixes.try_apply_yaml_float_written_as_strings(value)
+            elif isinstance(value, float) and mapping_type != 'single' and mapping_type != 'double':
+                value = fixes.try_apply_float_to_integer_fix(value)
             elif mapping_type == 'octet_string' or mapping_type == 'long_octet_string':
                 value = fixes.convert_yaml_octet_string_to_bytes(value)
             elif mapping_type == 'boolean':
@@ -369,12 +405,21 @@ class TestStep:
         self._runtime_config_variable_storage = runtime_config_variable_storage
         self.arguments = copy.deepcopy(test.arguments_with_placeholders)
         self.response = copy.deepcopy(test.response_with_placeholders)
-        self._update_placeholder_values(self.arguments)
-        self._update_placeholder_values(self.response)
+        if test.is_pics_enabled:
+            self._update_placeholder_values(self.arguments)
+            self._update_placeholder_values(self.response)
+            self._test.node_id = self._config_variable_substitution(
+                self._test.node_id)
+            test.update_arguments(self.arguments)
+            test.update_response(self.response)
 
     @property
     def is_enabled(self):
         return self._test.is_enabled
+
+    @property
+    def is_pics_enabled(self):
+        return self._test.is_pics_enabled
 
     @property
     def is_attribute(self):
@@ -395,6 +440,10 @@ class TestStep:
     @property
     def node_id(self):
         return self._test.node_id
+
+    @property
+    def group_id(self):
+        return self._test.group_id
 
     @property
     def cluster(self):
@@ -436,8 +485,16 @@ class TestStep:
     def busy_wait_ms(self):
         return self._test.busy_wait_ms
 
+    @property
+    def wait_for(self):
+        return self._test.wait_for
+
     def post_process_response(self, response: dict):
         result = PostProcessResponseResult()
+
+        if self.wait_for is not None:
+            self._response_cluster_wait_validation(response, result)
+            return result
 
         if self._skip_post_processing(response, result):
             return result
@@ -450,6 +507,52 @@ class TestStep:
             self._maybe_save_as(response, result)
 
         return result
+
+    def _response_cluster_wait_validation(self, response, result):
+        """Check if the response concrete path matches the configuration of the test step
+           and validate that the response type (e.g readAttribute/writeAttribute/...) matches
+           the expectation from the test step."""
+        check_type = PostProcessCheckType.WAIT_VALIDATION
+        error_success = 'The test expectation "{wait_for}" for "{cluster}.{wait_type}" on endpoint {endpoint} is true'
+        error_failure = 'The test expectation "{expected} == {received}" is false'
+
+        if self.is_attribute:
+            expected_wait_type = self.attribute
+            received_wait_type = response.get('attribute')
+        elif self.is_event:
+            expected_wait_type = self.event
+            received_wait_type = response.get('event')
+        else:
+            expected_wait_type = self.command
+            received_wait_type = response.get('command')
+
+        expected_values = [
+            self.wait_for,
+            self.endpoint,
+            # TODO The name in tests does not always use spaces
+            self.cluster.replace(' ', ''),
+            expected_wait_type
+        ]
+
+        received_values = [
+            response.get('wait_for'),
+            response.get('endpoint'),
+            response.get('cluster'),
+            received_wait_type
+        ]
+
+        success = True
+        for expected_value in expected_values:
+            received_value = received_values.pop(0)
+
+            if expected_value != received_value:
+                result.error(check_type, error_failure.format(
+                    expected=expected_value, received=received_value))
+                success = False
+
+        if success:
+            result.success(check_type, error_success.format(
+                wait_for=self.wait_for, cluster=self.cluster, wait_type=expected_wait_type, endpoint=self.endpoint))
 
     def _skip_post_processing(self, response: dict, result) -> bool:
         '''Should we skip perform post processing.
@@ -482,13 +585,7 @@ class TestStep:
 
         expected_error = self.response.get('error') if self.response else None
 
-        # Handle generic success/error
-        if type(response) is str and response == 'failure':
-            received_error = response
-        elif type(response) is str and response == 'success':
-            received_error = None
-        else:
-            received_error = response.get('error')
+        received_error = response.get('error')
 
         if expected_error and received_error and expected_error == received_error:
             result.success(check_type, error_success.format(
@@ -545,7 +642,7 @@ class TestStep:
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if expected_name not in received_value:
+                if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
                         name=expected_name))
                     continue
@@ -553,39 +650,64 @@ class TestStep:
                 received_value = received_value.get(
                     expected_name) if received_value else None
 
-            # TODO Supports Array/List. See an exemple of failure in TestArmFailSafe.yaml
             expected_value = value.get('value')
-            if expected_value == received_value:
-                result.success(
-                    check_type, error_success.format(name=expected_name, value=received_value))
+            if self._response_value_validation(expected_value, received_value):
+                result.success(check_type, error_success.format(
+                    name=expected_name, value=expected_value))
             else:
-                result.error(
-                    check_type, error_failure.format(name=expected_name, value=expected_value))
+                result.error(check_type, error_failure.format(
+                    name=expected_name, value=expected_value))
+
+    def _response_value_validation(self, expected_value, received_value):
+        if isinstance(expected_value, list):
+            if len(expected_value) != len(received_value):
+                return False
+
+            for index, expected_item in enumerate(expected_value):
+                received_item = received_value[index]
+                if not self._response_value_validation(expected_item, received_item):
+                    return False
+            return True
+        elif isinstance(expected_value, dict):
+            for key, expected_item in expected_value.items():
+                received_item = received_value.get(key)
+                if not self._response_value_validation(expected_item, received_item):
+                    return False
+            return True
+        else:
+            return expected_value == received_value
 
     def _response_constraints_validation(self, response, result):
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
         error_success = 'Constraints check passed'
         error_failure = 'Constraints check failed'
-        error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
+        response_type_name = self._test.response_mapping_name
         for value in self.response['values']:
             if 'constraints' not in value:
                 continue
 
-            expected_name = 'value'
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if expected_name not in received_value:
-                    result.error(check_type, error_name_does_not_exist.format(
-                        name=expected_name))
-                    continue
+                if received_value is None or expected_name not in received_value:
+                    received_value = None
+                else:
+                    received_value = received_value.get(
+                        expected_name) if received_value else None
 
-                received_value = received_value.get(
-                    expected_name) if received_value else None
+                if self._test.response_mapping:
+                    response_type_name = self._test.response_mapping.get(
+                        expected_name)
+                else:
+                    # We don't have a mapping for this type. This happens for pseudo clusters.
+                    # If there is a constraint check for the type it is likely an incorrect
+                    # constraint check by the test writter.
+                    response_type_name = None
 
             constraints = get_constraints(value['constraints'])
-            if all([constraint.is_met(received_value) for constraint in constraints]):
+
+            if all([constraint.is_met(received_value, response_type_name) for constraint in constraints]):
                 result.success(check_type, error_success)
             else:
                 # TODO would be helpful to be more verbose here
@@ -600,11 +722,10 @@ class TestStep:
             if 'saveAs' not in value:
                 continue
 
-            expected_name = 'value'
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if expected_name not in received_value:
+                if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
                         name=expected_name))
                     continue
@@ -659,8 +780,9 @@ class TestStep:
                     variable_info = self._runtime_config_variable_storage[token]
                     if type(variable_info) is dict and 'defaultValue' in variable_info:
                         variable_info = variable_info['defaultValue']
-                    tokens[idx] = variable_info
-                    substitution_occured = True
+                    if variable_info is not None:
+                        tokens[idx] = variable_info
+                        substitution_occured = True
 
             if len(tokens) == 1:
                 return tokens[0]
@@ -685,12 +807,12 @@ class YamlTests:
     multiple runs.
     '''
 
-    def __init__(self, parsing_config_variable_storage: dict, definitions, tests: dict):
+    def __init__(self, parsing_config_variable_storage: dict, definitions: SpecDefinitions, pics_checker: PICSChecker, tests: dict):
         self._parsing_config_variable_storage = parsing_config_variable_storage
         enabled_tests = []
         for test in tests:
             test_with_placeholders = _TestStepWithPlaceholders(
-                test, self._parsing_config_variable_storage, definitions)
+                test, self._parsing_config_variable_storage, definitions, pics_checker)
             if test_with_placeholders.is_enabled:
                 enabled_tests.append(test_with_placeholders)
         fixes.try_update_yaml_node_id_test_runner_state(
@@ -717,24 +839,39 @@ class YamlTests:
 
 class TestParser:
     def __init__(self, test_file, pics_file, definitions):
-        # TODO Needs supports for PICS file
+        data = self.__load_yaml(test_file)
+
+        _check_valid_keys(data, _TESTS_SECTION)
+
+        self.name = _value_or_none(data, 'name')
+        self.PICS = _value_or_none(data, 'PICS')
+
+        self._parsing_config_variable_storage = data.get('config', {})
+
+        # These are a list of "KnownVariables". These are defaults the codegen used to use. This
+        # is added for legacy support of tests that expect to uses these "defaults".
+        self.__populate_default_config_if_missing('nodeId', 0x12345)
+        self.__populate_default_config_if_missing('endpoint', '')
+        self.__populate_default_config_if_missing('cluster', '')
+        self.__populate_default_config_if_missing('timeout', '90')
+
+        pics_checker = PICSChecker(pics_file)
+        tests = _value_or_none(data, 'tests')
+        self.tests = YamlTests(
+            self._parsing_config_variable_storage, definitions, pics_checker, tests)
+
+    def update_config(self, key, value):
+        self._parsing_config_variable_storage[key] = value
+
+    def __populate_default_config_if_missing(self, key, value):
+        if key not in self._parsing_config_variable_storage:
+            self._parsing_config_variable_storage[key] = value
+
+    def __load_yaml(self, test_file):
         with open(test_file) as f:
             loader = yaml.FullLoader
             loader = fixes.try_add_yaml_support_for_scientific_notation_without_dot(
                 loader)
 
-            data = yaml.load(f, Loader=loader)
-            _check_valid_keys(data, _TESTS_SECTION)
-
-            self.name = _value_or_none(data, 'name')
-            self.PICS = _value_or_none(data, 'PICS')
-
-            self._parsing_config_variable_storage = _value_or_none(
-                data, 'config')
-
-            tests = _value_or_none(data, 'tests')
-            self.tests = YamlTests(
-                self._parsing_config_variable_storage, definitions, tests)
-
-    def update_config(self, key, value):
-        self._parsing_config_variable_storage[key] = value
+            return yaml.load(f, Loader=loader)
+        return None

@@ -54,6 +54,11 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include "EFR32DeviceDataProvider.h"
+#include <app/InteractionModelEngine.h>
+
+#ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+ICDSubscriptionCallback EFR32MatterConfig::mICDSubscriptionHandler;
+#endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -189,6 +194,12 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
+
+#ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+    // Register ICD subscription callback to match subscription max intervals to its idle time interval
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&mICDSubscriptionHandler);
+#endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     ReturnErrorOnFailure(err);

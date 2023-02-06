@@ -51,7 +51,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -63,6 +63,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -77,7 +78,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 0
@@ -89,6 +90,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -106,6 +108,7 @@ tests:
               maxValue: 92
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -123,6 +126,7 @@ tests:
               maxValue: 115
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -140,6 +144,7 @@ tests:
               maxValue: 138
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -163,7 +168,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -175,6 +180,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -189,7 +195,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 135
               - name: "Direction"
                 value: 1
@@ -201,6 +207,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -228,6 +235,7 @@ tests:
                 value: "y"
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -245,6 +253,7 @@ tests:
               maxValue: 224
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -262,6 +271,7 @@ tests:
               maxValue: 155
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -285,7 +295,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -297,6 +307,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -311,7 +322,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 2
@@ -323,6 +334,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -340,6 +352,7 @@ tests:
               maxValue: 92
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -357,6 +370,7 @@ tests:
               maxValue: 115
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -374,6 +388,7 @@ tests:
               maxValue: 138
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -397,7 +412,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 0
@@ -409,6 +424,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -423,7 +439,7 @@ tests:
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 3
@@ -435,6 +451,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -452,6 +469,7 @@ tests:
               maxValue: 115
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -469,6 +487,7 @@ tests:
               maxValue: 92
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -486,6 +505,7 @@ tests:
               maxValue: 69
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

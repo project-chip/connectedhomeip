@@ -49,14 +49,8 @@ declare_args() {
   OTA_periodic_query_timeout = 86400
 
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
-  use_wf200 = false
-  use_rs911x = false
-  use_rs911x_sockets = false
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
-
-  # Disable LCD on supported devices
-  disable_lcd = true
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
@@ -70,14 +64,6 @@ declare_args() {
   #default Wifi Password
   psk = ""
 }
-
-declare_args() {
-  # Enables LCD Qr Code on supported devices
-  show_qr_code = !disable_lcd
-}
-
-# qr code cannot be true if lcd is disabled
-assert(!(disable_lcd && show_qr_code))
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))

@@ -91,7 +91,7 @@ public:
 
     void CloseCommissioningWindow();
 
-    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus CommissioningWindowStatusForCluster() const;
+    app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum CommissioningWindowStatusForCluster() const;
 
     bool IsCommissioningWindowOpen() const;
 
@@ -175,15 +175,15 @@ private:
      * Helpers to ensure the right attribute reporting happens when our state is
      * updated.
      */
-    void UpdateWindowStatus(app::Clusters::AdministratorCommissioning::CommissioningWindowStatus aNewStatus);
+    void UpdateWindowStatus(app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum aNewStatus);
     void UpdateOpenerVendorId(app::DataModel::Nullable<VendorId> aNewOpenerVendorId);
     void UpdateOpenerFabricIndex(app::DataModel::Nullable<FabricIndex> aNewOpenerFabricIndex);
 
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
 
-    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus mWindowStatus =
-        app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
+    app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum mWindowStatus =
+        app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     bool mIsBLE = true;
 

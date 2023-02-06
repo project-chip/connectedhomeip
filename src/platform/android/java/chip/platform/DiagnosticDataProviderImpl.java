@@ -65,8 +65,8 @@ public class DiagnosticDataProviderImpl implements DiagnosticDataProvider {
           anInterface.name = nif.getName();
           anInterface.type =
               name.startsWith("wlan")
-                  ? NetworkInterface.INTERFACE_TYPE_WI_FI
-                  : NetworkInterface.INTERFACE_TYPE_ETHERNET;
+                  ? NetworkInterface.INTERFACE_TYPE_ENUM_WI_FI
+                  : NetworkInterface.INTERFACE_TYPE_ENUM_ETHERNET;
 
           Enumeration<InetAddress> inetAddress = nif.getInetAddresses();
           while (inetAddress.hasMoreElements()) {

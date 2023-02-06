@@ -73,7 +73,6 @@ static constexpr size_t kDiscriminatorId  = 7;
 static constexpr size_t kMaxId = kDiscriminatorId;
 
 static uint16_t maxLengths[kMaxId + 1];
-static uint32_t factoryDataActualSize = 0;
 
 typedef otaUtilsResult_t (*OtaUtils_EEPROM_ReadData)(uint16_t nbBytes, uint32_t address, uint8_t * pInbuf);
 

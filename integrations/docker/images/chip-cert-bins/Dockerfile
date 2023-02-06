@@ -2,12 +2,12 @@
 FROM ubuntu:22.04 as chip-build-cert
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=451e602649b8b37ba6c9aab8ba5e30747293f778
+ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
 
 # ZAP Development install, so that it runs on both x64 and arm64
 # Generally this should match with the ZAP version that is used for codegen within the
 # specified SHA
-ARG ZAP_VERSION=v2023.01.09-nightly
+ARG ZAP_VERSION=v2023.01.31-nightly
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -163,10 +163,10 @@ RUN case ${TARGETPLATFORM} in \
             set -x \
             && mkdir node_js \
             && cd node_js \
-            && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-x64.tar.xz \
-            && tar xfvJ node-v12.19.0-linux-x64.tar.xz \
-            && mv node-v12.19.0-linux-x64 /opt/ \
-            && ln -s /opt/node-v12.19.0-linux-x64 /opt/node \
+            && wget https://nodejs.org/dist/v12.22.12/node-v12.22.12-linux-x64.tar.xz \
+            && tar xfvJ node-v12.22.12-linux-x64.tar.xz \
+            && mv node-v12.22.12-linux-x64 /opt/ \
+            && ln -s /opt/node-v12.22.12-linux-x64 /opt/node \
             && ln -s /opt/node/bin/* /usr/bin \
             && cd .. \
             && rm -rf node_js \
@@ -175,16 +175,25 @@ RUN case ${TARGETPLATFORM} in \
             set -x \
             && mkdir node_js \
             && cd node_js \
-            && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-arm64.tar.xz \
-            && tar xfvJ node-v12.19.0-linux-arm64.tar.xz \
-            && mv node-v12.19.0-linux-arm64 /opt/ \
-            && ln -s /opt/node-v12.19.0-linux-arm64 /opt/node \
+            && wget https://nodejs.org/dist/v12.22.12/node-v12.22.12-linux-arm64.tar.xz \
+            && tar xfvJ node-v12.22.12-linux-arm64.tar.xz \
+            && mv node-v12.22.12-linux-arm64 /opt/ \
+            && ln -s /opt/node-v12.22.12-linux-arm64 /opt/node \
             && ln -s /opt/node/bin/* /usr/bin \
             && cd .. \
             && rm -rf node_js \
             ;; \
         *) ;; \
     esac
+
+RUN set -x \
+    && mkdir -p /opt/zap-${ZAP_VERSION} \
+    && git clone https://github.com/project-chip/zap.git /opt/zap-${ZAP_VERSION} \
+    && cd /opt/zap-${ZAP_VERSION} \
+    && git checkout ${ZAP_VERSION} \
+    && npm config set user 0 \
+    && npm ci
+ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
 
 # Stage 1.5: Bootstrap Matter.
 RUN mkdir /root/connectedhomeip
@@ -201,7 +210,9 @@ RUN set -x && \
 
 # Stage 2: Build.
 from chip-build-cert as chip-build-cert-bins
+
 SHELL ["/bin/bash", "-c"]
+
 # Records Matter SDK commit hash to include in the image.
 RUN git rev-parse HEAD > /root/.sdk-sha-version
 
@@ -261,14 +272,6 @@ RUN case ${TARGETPLATFORM} in \
         *) ;; \
     esac
 
-RUN set -x \
-    && mkdir -p /opt/zap-${ZAP_VERSION} \
-    && git clone https://github.com/project-chip/zap.git /opt/zap-${ZAP_VERSION} \
-    && cd /opt/zap-${ZAP_VERSION} \
-    && git checkout ${ZAP_VERSION} \
-    && npm config set user 0 \
-    && npm ci
-ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
 RUN scripts/examples/gn_build_test_example.sh app1
 
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no

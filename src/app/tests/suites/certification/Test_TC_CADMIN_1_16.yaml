@@ -44,7 +44,7 @@ tests:
 
     - label: "Precondition: Reset Devices to factory defaults"
       verification: |
-          Not implemented in YAML
+          Reset Devices to factory defaults
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -67,7 +67,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -100,7 +100,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -141,9 +141,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, NodeId: nodeId },
-                  { Label: "", FabricIndex: 2, NodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 2, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -204,8 +204,8 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, NodeId: nodeId },
-                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -213,7 +213,7 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
       identity: "alpha"
       PICS: CADMIN.S.C01.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -253,9 +253,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, NodeId: nodeId },
-                  { Label: "", FabricIndex: 4, NodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, NodeId: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 4, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list

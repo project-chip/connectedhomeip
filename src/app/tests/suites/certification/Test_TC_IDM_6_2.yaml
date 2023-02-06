@@ -38,13 +38,13 @@ tests:
           specific node that is, [Node = Specific, Endpoint = Specific, Cluster
           = Specific, Event = Specific]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster on DUT.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
           Pls run this test in chip tool interactive mode ./chip-tool interactive start
 
           On the TH (chip-tool) pls subscribe to start-up event (below command), right after you power on the DUT. If DUT vendor is subscribing to any other event, Pls use appropriate steps on the DUT to generate that event and use subscribe to that event from TH.
 
-          basic subscribe-event  start-up  20 100 1 0
+          basicinformation subscribe-event  start-up  20 100 1 0
 
           On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
 
@@ -97,10 +97,10 @@ tests:
           specific node that is, [Node = Specific, Endpoint = Specific, Cluster
           = Specific, Event = Wildcard]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Pls run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event-by-id 0xFFFFFFFF 10 100 1 0
+          basicinformation subscribe-event-by-id 0xFFFFFFFF 10 100 1 0
 
           On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
 
@@ -154,7 +154,7 @@ tests:
           that is, [Node = Specific, Endpoint = Specific, Cluster = Wildcard,
           Event = Wildcard]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 20 100  1 0
 
@@ -261,10 +261,10 @@ tests:
           node that is, [Node = Specific, Endpoint = Wildcard, Cluster =
           Specific, Event = Specific]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event-by-id 0x00 10 700 1 0xFFFF
+          basicinformation subscribe-event-by-id 0x00 10 700 1 0xFFFF
           On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
           [1657456063.474971][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733253 from RetransTable on exchange 33694i
           [1657456063.475103][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -314,10 +314,10 @@ tests:
           that is, [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
           Event = Wildcard]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-           basic subscribe-event-by-id 0xFFFFFFFF 10 100 1 0xFFFF
+           basicinformation subscribe-event-by-id 0xFFFFFFFF 10 100 1 0xFFFF
           On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
           [1657456157.932285][11635:11640] CHIP:EM: Rxd Ack; Removing MessageCounter:190733256 from Retrans Table on exchange 33695i
           [1657456157.932327][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733256 from RetransTable on exchange 33695i
@@ -587,10 +587,10 @@ tests:
           "Activate Event subscription from TH to DUT and trigger the subscribed
           event on the DUT before minimum interval."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-           basic subscribe-event-by-id 0x000 100 1000 1 0
+           basicinformation subscribe-event-by-id 0x000 100 1000 1 0
 
           On TH(chip-tool) verify that the Report Data Message for event only after the minimum interval has expiredwith SubscriptionId which uniquely identifies this subscription events in Subscribe Request Message from DUT.
           [1657456305.446793][11635:11640] CHIP:EM: Rxd Ack; Removing MessageCounter:190733262 from Retrans Table on exchange 33697i
@@ -642,10 +642,10 @@ tests:
           set to True for a particular event path in the EventPathIB in the
           SubscribeRequestMessage."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event start-up  30 100 1 0 --is-urgent true
+          basicinformation subscribe-event start-up  30 100 1 0 --is-urgent true
 
           On TH(chip-tool) verify that the Report Data Message for all subscribed events,
           [1657456352.516479][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -693,10 +693,10 @@ tests:
           "Activate Event subscription from TH to DUT with no change in event
           triggering attribute values before maximum interval."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event  start-up  20 100 1 0
+          basicinformation subscribe-event  start-up  20 100 1 0
 
           On TH(chip-tool) verify that the Report Data Message from DUT to TH
 
@@ -746,10 +746,10 @@ tests:
           "With an active Event subscription from TH to DUT, TH sends another
           Subscribe Request Message to DUT with KeepSubscriptions as False."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event-by-id 0x000 10 500 1 0
+          basicinformation subscribe-event-by-id 0x000 10 500 1 0
 
           On TH(chip-tool) verify that the Report Data Message any event changes for the second subscribe request sent by the TH with SubscriptionId which uniquely identifies this subscription events in Subscribe Request Message from DUT.
 
@@ -792,7 +792,7 @@ tests:
           [1657456542.477992][11635:11640] CHIP:TOO:     SoftwareVersion: 1
           [1657456542.478012][11635:11640] CHIP:TOO:    }
 
-          basic subscribe-event-by-id 0x000 100 1000 1 0 --keepSubscriptions 0
+          basicinformation subscribe-event-by-id 0x000 100 1000 1 0 --keepSubscriptions 0
           [1657456699.444604][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657456699.444671][11635:11640] CHIP:DMG: {
           [1657456699.444728][11635:11640] CHIP:DMG:      SubscriptionId = 0x4a1b991b,
@@ -841,10 +841,10 @@ tests:
           message to DUT. TH sends Status Response Message with a success Status
           code."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event-by-id 0x000 20 400 1 0
+          basicinformation subscribe-event-by-id 0x000 20 400 1 0
 
           On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher, Maximuminterval and miinimuminterval in seconds for events in Subscribe Request Message from DUT
 
@@ -869,18 +869,17 @@ tests:
           path which requires a privilege that is not granted for the cluster in
           the path."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
           #1:- Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
 
-          #2:- To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
-          Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access.
+          #2:- To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command and Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access.
 
           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
 
 
 
-          #3:- basic subscribe-event-by-id 0x000 100 1000 1 0
+          #3:- basicinformation subscribe-event-by-id 0x000 100 1000 1 0
           on TH(chip-tool) verify DUT responds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
           [1663151225.226869][41115:41120] CHIP:DMG: ReportDataMessage =
@@ -928,7 +927,7 @@ tests:
           Wildcard path where reading an event in the path requires a privilege
           that is not granted for the cluster in the path."
       verification: |
-          chip tool is used as TH and send the below command from TH
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
@@ -955,7 +954,7 @@ tests:
           information field matching the node indicated in the path and EventMin
           field."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
@@ -1102,12 +1101,12 @@ tests:
           information field matching the node indicated in the path and the
           event number is less than the EventMin field."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          basic subscribe-event-by-id 0x000 100 1000 1 0  --event-min 1
+          basicinformation subscribe-event-by-id 0x000 100 1000 1 0  --event-min 1
 
 
           On TH(chip-tool) verify that the Report Data Message with empty EventReports from DUT and  Verify that the subsequent ReportData actions as part of the subscription include the latest EventNo associated with each node generating new events.
@@ -1129,7 +1128,7 @@ tests:
           "With an active Event subscription from TH to DUT, trigger events on
           DUT multiple times."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 

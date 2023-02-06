@@ -45,10 +45,12 @@
 #define LWS_WITHOUT_DAEMONIZE // "Don't build the daemonization api" - default: ON
 #define LWS_LOGS_TIMESTAMP    // "Timestamp at start of logs" - default: ON
 #define LWS_LOG_TAG_LIFECYCLE // "Log tagged object lifecycle as NOTICE" - default: ON
+#define LWS_WITH_NO_LOGS      // "Disable all logging other than _err and _user from being compiled in" - defaults: OFF
 
 //
 // Implied Options
 //
+#define LWS_HAS_INTPTR_T
 #define LWS_WITH_POLL
 #define LWS_MAX_SMP 1
 

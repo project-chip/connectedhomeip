@@ -23,7 +23,7 @@ using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using TargetNavigatorDelegate    = chip::app::Clusters::TargetNavigator::Delegate;
-using TargetInfoType             = chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type;
+using TargetInfoType             = chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type;
 using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
 
 class TargetNavigatorManager : public TargetNavigatorDelegate

@@ -48,7 +48,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     bool failSafeArmed;
-    uint32_t bootCount = 0;
+    uint32_t rebootCount = 0;
 
     err = Internal::GenericConfigurationManagerImpl<BL702Config>::Init();
 
@@ -76,11 +76,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (BL_RST_HBN != bootCause)
     {
-        if (CHIP_NO_ERROR == ReadConfigValue(BL702Config::kCounterKey_BootCount, bootCount))
+        if (CHIP_NO_ERROR == ReadConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount))
         {
-            bootCount += 1;
+            rebootCount += 1;
         }
-        WriteConfigValue(BL702Config::kCounterKey_BootCount, bootCount + 1);
+        WriteConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount + 1);
     }
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
@@ -130,12 +130,12 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return ReadConfigValue(BL702Config::kCounterKey_BootCount, rebootCount);
+    return ReadConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
-    return WriteConfigValue(BL702Config::kCounterKey_BootCount, rebootCount);
+    return WriteConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)

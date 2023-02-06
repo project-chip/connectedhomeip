@@ -50,9 +50,9 @@ tests:
       command: "MoveToColor"
       arguments:
           values:
-              - name: "colorX"
+              - name: "ColorX"
                 value: 33000
-              - name: "colorY"
+              - name: "ColorY"
                 value: 26000
               - name: "TransitionTime"
                 value: 0
@@ -62,6 +62,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -74,9 +75,9 @@ tests:
       PICS: CC.S.F03 && CC.S.C08.Rsp
       arguments:
           values:
-              - name: "rateX"
+              - name: "RateX"
                 value: -100
-              - name: "rateY"
+              - name: "RateY"
                 value: 100
               - name: "OptionsMask"
                 value: 0
@@ -84,6 +85,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -110,6 +112,7 @@ tests:
               maxValue: 31100
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -136,6 +139,7 @@ tests:
               maxValue: 32200
 
     - label: "Wait 10s"
+      PICS: CC.S.F03
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

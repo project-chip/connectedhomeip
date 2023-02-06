@@ -251,7 +251,7 @@
 #define EMBER_AF_PLUGIN_SWITCH_SERVER
 #define EMBER_AF_PLUGIN_SWITCH
 
-// Use this macro to check if the server side of the AdministratorCommissioning cluster is included
+// Use this macro to check if the server side of the Administrator Commissioning cluster is included
 #define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING

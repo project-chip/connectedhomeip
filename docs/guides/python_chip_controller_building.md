@@ -517,7 +517,7 @@ AudioOutput
 BarrierControl
 BasicInformation
 Binding
-BridgedDeviceBasic
+BridgedDeviceBasicInformation
 ColorControl
 ContentLaunch
 Descriptor

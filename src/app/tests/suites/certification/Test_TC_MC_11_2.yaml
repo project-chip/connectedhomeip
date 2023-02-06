@@ -35,7 +35,8 @@ tests:
           The shell should show a discovered commissioner, similar to the following:
 
           [1653089767279] [88361:1149415] CHIP: [SVR] Discovered Commissioner #0
-          [1653089767279] [88361:1149415] CHIP: [DIS]         Hostname: 147dda9ac00a        [1653089767279] [88361:1149415] CHIP: [DIS]         IP Address #1: 169.254.81.148
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Hostname: 147dda9ac00a
+          [1653089767279] [88361:1149415] CHIP: [DIS]         IP Address #1: 169.254.81.148
           [1653089767279] [88361:1149415] CHIP: [DIS]         Port: 5650
           [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval idle: 5000 ms
           [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval active: 2000 ms
@@ -94,7 +95,7 @@ tests:
       verification: |
           Into the shell, enter "cast cluster descriptor read device-list 0 1" to read the device list of the descriptor cluster on endpoint 1
 
-          > cast cluster descriptor read device-list 0 1
+          > cast cluster descriptor read device-type-list   0 1
           ....
           [1653180010083] [48426:1914389] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2009082322
           [1653180010083] [48426:1914389] CHIP: [TOO]   device list: 1 entries
@@ -108,7 +109,7 @@ tests:
       verification: |
           Into the shell, enter "cast cluster descriptor read device-list 0 2" to read the device list of the descriptor cluster on endpoint 2
 
-          > cast cluster descriptor read device-list 0 2
+          > cast cluster descriptor read device-type-list 0 2
           ....
           [1653180162379] [48426:1917385] CHIP: [TOO] Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 631462374
           [1653180162379] [48426:1917385] CHIP: [TOO]   device list: 1 entries
@@ -120,9 +121,9 @@ tests:
 
     - label: "TH reads the endpoints from the DUT"
       verification: |
-          Into the shell, enter "cast cluster descriptor read device-list 0 6" to read the device list of the descriptor cluster on endpoint 6
+          Into the shell, enter "cast cluster descriptor read device-list 0 4" to read the device list of the descriptor cluster on endpoint 4
 
-          > cast cluster descriptor read device-list 0 6
+          > cast cluster descriptor read device-type-list 0 4
           ....
           [1653180214397] [48426:1919098] CHIP: [TOO] Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4094146641
           [1653180214397] [48426:1919098] CHIP: [TOO]   device list: 1 entries

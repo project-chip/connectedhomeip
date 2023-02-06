@@ -115,6 +115,13 @@ static void InitServer(intptr_t context)
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     InitBindingHandlers();
+
+    CHIP_ERROR err = GetAppTask().LockInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize app task lock, err:%" CHIP_ERROR_FORMAT, err.Format());
+    }
+
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
@@ -155,7 +162,7 @@ extern "C" void app_main()
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
@@ -173,7 +180,7 @@ extern "C" void app_main()
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));

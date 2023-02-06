@@ -43,10 +43,10 @@ tests:
           be discovered by a commissioner"
       verification: |
           1. After launching all-clusters-app using discriminator 3841 using below command
-          $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
+          ./chip-all-clusters-app --wifi --discriminator 3841
           No applicable TH or DUT logs.
 
-          $ dns-sd -B _matterc._udp,_L3841
+           dns-sd -B _matterc._udp,_L3841
           Browsing for _matterc._udp,_L3841
           DATE: ---Thu 07 Jul 2022---
           17:39:06.762  ...STARTING...
@@ -59,10 +59,10 @@ tests:
           be discovered by a commissioner"
       verification: |
           1. After launching all-clusters-app using discriminator 3844 using below command
-          sudo ./chip-all-clusters-app --wifi --discriminator 3844
+          ./chip-all-clusters-app --wifi --discriminator 3844
           No applicable TH or DUT logs.
 
-          $ dns-sd -B _matterc._udp,_L3844
+           dns-sd -B _matterc._udp,_L3844
           Browsing for _matterc._udp,_L3844
           DATE: ---Thu 07 Jul 2022---
           17:39:35.265  ...STARTING...
@@ -82,12 +82,12 @@ tests:
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
-          Verify on the TH1 Commissionee:
+          Verify on the TH1 (All-cluster-app):
           [1657240914.891250][372173:372173] CHIP:SVR: Commissioning completed successfully
           [1657240914.891297][372173:372173] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on the DUT Commissioner:
-          $ ./chip-tool pairing code 1 MT:-24J0IRV01KA0648G00
+          Verify in DUT (Chip-tool):
+           ./chip-tool pairing code 1 MT:-24J0IRV01KA0648G00
 
           [1657240914764] [32262:16895870] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657240914764] [32262:16895870] CHIP: [TOO] Device commissioning completed with success
@@ -105,12 +105,12 @@ tests:
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
-          Verify on the TH2 Commissionee:
+          Verify on the TH2 (All-cluster-app):
           [1657240985.801360][112581:112581] CHIP:SVR: Commissioning completed successfully
           [1657240985.801406][112581:112581] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on the DUT Commissioner:
-          $ ./chip-tool pairing code 2 MT:-24J04QI14KA0648G00
+          Verify in DUT (Chip-tool):
+           ./chip-tool pairing code 2 MT:-24J04QI14KA0648G00
 
           [1657240985682] [32264:16896797] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657240985682] [32264:16896797] CHIP: [TOO] Device commissioning completed with success
@@ -120,9 +120,9 @@ tests:
           "Verify the Commissioner can still interact with TH1 (ex: Read any
           clusters attribute from TH1)"
       verification: |
-          $ ./chip-tool basic read reachable 1 0
+          ./chip-tool  basicinformation read reachable 1 0
 
-          Verify in DUT Commissioner side:
+          Verify in DUT (Chip-tool):
 
           [1657241043430] [32266:16897416] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0011 DataVersion: 131004400
           [1657241043432] [32266:16897416] CHIP: [TOO]   Reachable: TRUE
@@ -132,9 +132,9 @@ tests:
           "Verify the Commissioner can still interact with TH2 (ex: Read any
           clusters attribute from TH2)"
       verification: |
-          $ ./chip-tool basic read reachable 2 0
+          ./chip-tool  basicinformation read reachable 2 0
 
-          Verify in DUT Commissioner side:
+          Verify in DUT (Chip-tool):
 
           [1657241066927] [32267:16897671] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0011 DataVersion: 2450774961
           [1657241066927] [32267:16897671] CHIP: [TOO]   Reachable: TRUE
