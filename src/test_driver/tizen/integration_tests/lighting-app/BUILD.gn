@@ -26,6 +26,11 @@ tizen_qemu_mkisofs("test-runner") {
 }
 
 tizen_qemu_run("check") {
+  # Enable network support, so Tizen can obtain current date/time from the
+  # network. Correct date/time is required for the commissioning process -
+  # attestation will fail otherwise.
+  virtio_net = true
+
   deps = [ ":test-runner" ]
   mkisofs_outputs = get_target_outputs(":test-runner")
   iso_image = rebase_path(mkisofs_outputs[0])

@@ -225,7 +225,7 @@ template("tizen_qemu_run") {
       "--image-iso=" + invoker.iso_image,
       "--output=" + rebase_path(output_log_file),
     ]
-    if (defined(invoker.virtio_net)) {
+    if (defined(invoker.virtio_net) && invoker.virtio_net) {
       args += [ "--virtio-net" ]
     }
 
