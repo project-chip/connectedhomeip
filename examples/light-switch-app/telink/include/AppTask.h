@@ -96,7 +96,6 @@ private:
     PWMDevice mPwmIdentifyLed;
 
 #if CONFIG_CHIP_FACTORY_DATA
-    // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
 #endif
 };
