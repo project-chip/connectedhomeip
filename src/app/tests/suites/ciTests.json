@@ -261,7 +261,8 @@
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9"
+        "Test_TC_DRLK_2_9",
+        "Test_TC_DRLK_2_11"
     ],
     "Groups": [
         "TestGroupMessaging",

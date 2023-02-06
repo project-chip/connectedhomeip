@@ -39,6 +39,8 @@ tests:
     - label: "DUT reads HourFormat attribute from TH"
       PICS: LTIME.C.A0000
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool timeformatlocalization read hour-format 1 0
           Verify HourFormat attribute read request is successful  on the TH(all-clusters-app) Log:
 
@@ -74,6 +76,8 @@ tests:
           "If (LTIME.C.A0000.12HR) DUT writes 0 to HourFormat attribute on TH"
       PICS: LTIME.C.A0000.12HR
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool timeformatlocalization write hour-format 0 1 0
           Verify TH receives write command and updates 0 to HourFormat attribute on the TH(all-clusters-app) Log:
           WriteRequestMessage =
@@ -152,6 +156,8 @@ tests:
     - label: "DUT reads HourFormat attribute from TH"
       PICS: LTIME.C.A0000
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool timeformatlocalization read hour-format 1 0
           Verify  HourFormat attribute  value is the one that was set in the above step  on the TH(all-clusters-app) Log:
           ReportDataMessage =
@@ -186,6 +192,8 @@ tests:
           "If (LTIME.C.A0000.24HR) DUT writes 1 to HourFormat attribute on TH"
       PICS: LTIME.C.A0000.24HR
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool timeformatlocalization write hour-format 1 1 0
           Verify  TH receives write command and updates 1 to HourFormat attribute on the TH(all-clusters-app) Log:
           WriteRequestMessage =
@@ -264,6 +272,8 @@ tests:
     - label: "DUT reads HourFormat attribute on TH"
       PICS: LTIME.C.A0000
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool timeformatlocalization read hour-format 1 0
           Verify HourFormat attribute value is the one that was set in the above step on the TH(all-clusters-app) Log:
           d28
@@ -298,6 +308,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute on TH"
       PICS: LTIME.C.A0001
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           Verify active-calendar-type attribute read request is successful on the TH(all-clusters-app) Log:
           ReportDataMessage =
@@ -331,6 +343,8 @@ tests:
     - label: "DUT reads SupportedCalendarTypes attribute TH"
       PICS: LTIME.C.A0002
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool timeformatlocalization read supported-calendar-types 1 0
           Verify supported-calendar-types attribute read request is successful  on the TH(all-clusters-app) Log:
 
@@ -585,6 +599,8 @@ tests:
           on TH, followed by reading the ActiveCalendarType attribute from TH"
       PICS: LTIME.C.A0001
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
 
           Verify TH receives the write command and updates the respective value  on the TH(all-clusters-app) Log:
@@ -659,38 +675,6 @@ tests:
           [1667882949.751136][3974:3974] CHIP:DMG:
           [1667882949.751141][3974:3974] CHIP:DMG:         InteractionModelRevision = 1
           [1667882949.751146][3974:3974] CHIP:DMG: }
-
-
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          Verify  active-calendar-type attribute value is same as the value that was set before on the TH(all-clusters-app) Log:
-          ReportDataMessage =
-          [1666854060.848201][20237:20237] CHIP:DMG: {
-          [1666854060.848204][20237:20237] CHIP:DMG:         AttributeReportIBs =
-          [1666854060.848211][20237:20237] CHIP:DMG:         [
-          [1666854060.848215][20237:20237] CHIP:DMG:                 AttributeReportIB =
-          [1666854060.848222][20237:20237] CHIP:DMG:                 {
-          [1666854060.848225][20237:20237] CHIP:DMG:                         AttributeDataIB =
-          [1666854060.848229][20237:20237] CHIP:DMG:                         {
-          [1666854060.848234][20237:20237] CHIP:DMG:                                 DataVersion = 0xbeb406de,
-          [1666854060.848238][20237:20237] CHIP:DMG:                                 AttributePathIB =
-          [1666854060.848244][20237:20237] CHIP:DMG:                                 {
-          [1666854060.848248][20237:20237] CHIP:DMG:                                         Endpoint = 0x0,
-          [1666854060.848253][20237:20237] CHIP:DMG:                                         Cluster = 0x2c,
-          [1666854060.848257][20237:20237] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1666854060.848260][20237:20237] CHIP:DMG:                                 }
-          [1666854060.848266][20237:20237] CHIP:DMG:
-          [1666854060.848269][20237:20237] CHIP:DMG:                                 Data = 0,
-          [1666854060.848272][20237:20237] CHIP:DMG:                         },
-          [1666854060.848276][20237:20237] CHIP:DMG:
-          [1666854060.848279][20237:20237] CHIP:DMG:                 },
-          [1666854060.848284][20237:20237] CHIP:DMG:
-          [1666854060.848287][20237:20237] CHIP:DMG:         ],
-          [1666854060.848294][20237:20237] CHIP:DMG:
-          [1666854060.848298][20237:20237] CHIP:DMG:         SuppressResponse = true,
-          [1666854060.848301][20237:20237] CHIP:DMG:         InteractionModelRevision = 1
-          [1666854060.848304][20237:20237] CHIP:DMG: }
       disabled: true
 
     - label: "Repeat step 8 for all the values in PIXIT.LTIME.SCT"

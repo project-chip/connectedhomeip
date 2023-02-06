@@ -42,7 +42,7 @@ tests:
 
     - label: "Precondition: Reset Devices to factory defaults"
       verification: |
-          Not implemented in YAML
+          Reset Devices to factory defaults
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -208,7 +208,7 @@ tests:
           attribute of DUT_CE"
       command: "writeAttribute"
       cluster: "Basic Information"
-      PICS: OPCREDS.S.A0001
+      PICS: BINFO.S.A0005
       attribute: "NodeLabel"
       arguments:
           value: "chiptest1"
@@ -218,7 +218,7 @@ tests:
           attribute of DUT_CE"
       command: "readAttribute"
       cluster: "Basic Information"
-      PICS: OPCREDS.S.A0001
+      PICS: BINFO.S.A0005
       attribute: "NodeLabel"
       response:
           value: "chiptest1"
@@ -232,7 +232,7 @@ tests:
       identity: "beta"
       command: "writeAttribute"
       cluster: "Basic Information"
-      PICS: OPCREDS.S.A0001
+      PICS: BINFO.S.A0005
       attribute: "NodeLabel"
       arguments:
           value: "chiptest2"
@@ -243,7 +243,7 @@ tests:
       identity: "beta"
       command: "readAttribute"
       cluster: "Basic Information"
-      PICS: OPCREDS.S.A0001
+      PICS: BINFO.S.A0005
       attribute: "NodeLabel"
       response:
           value: "chiptest2"

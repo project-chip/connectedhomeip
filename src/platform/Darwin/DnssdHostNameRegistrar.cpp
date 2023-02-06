@@ -36,7 +36,7 @@ namespace Dnssd {
 
 namespace {
 
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
 constexpr const char * kPathStatusInvalid     = "Invalid";
 constexpr const char * kPathStatusUnsatisfied = "Unsatisfied";
 constexpr const char * kPathStatusSatisfied   = "Satisfied";
@@ -118,7 +118,7 @@ void LogDetails(uint32_t interfaceId, InetInterfacesVector inetInterfaces, Inet6
         {
             char addr[INET_ADDRSTRLEN] = {};
             inet_ntop(AF_INET, &inetInterface.second, addr, sizeof(addr));
-            ChipLogDetail(Discovery, "\t\t* ipv4: %s", addr);
+            ChipLogProgress(Discovery, "\t\t* ipv4: %s", addr);
         }
     }
 
@@ -128,7 +128,7 @@ void LogDetails(uint32_t interfaceId, InetInterfacesVector inetInterfaces, Inet6
         {
             char addr[INET6_ADDRSTRLEN] = {};
             inet_ntop(AF_INET6, &inet6Interface.second, addr, sizeof(addr));
-            ChipLogDetail(Discovery, "\t\t* ipv6: %s", addr);
+            ChipLogProgress(Discovery, "\t\t* ipv6: %s", addr);
         }
     }
 }
@@ -136,7 +136,7 @@ void LogDetails(uint32_t interfaceId, InetInterfacesVector inetInterfaces, Inet6
 void LogDetails(nw_path_t path)
 {
     auto status = nw_path_get_status(path);
-    ChipLogDetail(Discovery, "Status: %s", GetPathStatusString(status));
+    ChipLogProgress(Discovery, "Status: %s", GetPathStatusString(status));
 }
 
 void LogDetails(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces)
@@ -156,7 +156,7 @@ void LogDetails(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6
     {
         char interfaceName[IFNAMSIZ] = {};
         if_indextoname(interfaceId, interfaceName);
-        ChipLogDetail(Discovery, "\t%s (%u)", interfaceName, interfaceId);
+        ChipLogProgress(Discovery, "\t%s (%u)", interfaceName, interfaceId);
         LogDetails(interfaceId, inetInterfaces, inet6Interfaces);
     }
 }
@@ -166,10 +166,10 @@ void LogDetails(nw_interface_t interface, InetInterfacesVector inetInterfaces, I
     auto interfaceId   = nw_interface_get_index(interface);
     auto interfaceName = nw_interface_get_name(interface);
     auto interfaceType = nw_interface_get_type(interface);
-    ChipLogDetail(Discovery, "\t%s (%u / %s)", interfaceName, interfaceId, GetInterfaceTypeString(interfaceType));
+    ChipLogProgress(Discovery, "\t%s (%u / %s)", interfaceName, interfaceId, GetInterfaceTypeString(interfaceType));
     LogDetails(interfaceId, inetInterfaces, inet6Interfaces);
 }
-#endif // CHIP_DETAIL_LOGGING
+#endif // CHIP_PROGRESS_LOGGING
 
 bool HasValidFlags(unsigned int flags, bool allowLoopbackOnly)
 {
@@ -205,7 +205,7 @@ void ShouldUseVersion(chip::Inet::IPAddressType addressType, bool & shouldUseIPv
 static void OnRegisterRecord(DNSServiceRef sdRef, DNSRecordRef recordRef, DNSServiceFlags flags, DNSServiceErrorType err,
                              void * context)
 {
-    ChipLogDetail(Discovery, "Mdns: %s flags: %d", __func__, flags);
+    ChipLogProgress(Discovery, "Mdns: %s flags: %d", __func__, flags);
     if (kDNSServiceErr_NoError != err)
     {
         ChipLogError(Discovery, "%s (%s)", __func__, Error::ToString(err));
@@ -304,9 +304,9 @@ CHIP_ERROR HostNameRegistrar::StartMonitorInterfaces(OnInterfaceChanges interfac
     nw_path_monitor_set_queue(mInterfaceMonitor, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
 
     nw_path_monitor_set_update_handler(mInterfaceMonitor, ^(nw_path_t path) {
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
         LogDetails(path);
-#endif // CHIP_DETAIL_LOGGING
+#endif // CHIP_PROGRESS_LOGGING
 
         __block InetInterfacesVector inet;
         __block Inet6InterfacesVector inet6;
@@ -315,9 +315,9 @@ CHIP_ERROR HostNameRegistrar::StartMonitorInterfaces(OnInterfaceChanges interfac
         // loopback interface with the specified interface id. If the specified interface id is kDNSServiceInterfaceIndexAny, it
         // will look for all available loopback interfaces.
         GetInterfaceAddresses(mInterfaceId, mAddressType, inet, inet6, true /* searchLoopbackOnly */);
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
         LogDetails(inet, inet6);
-#endif // CHIP_DETAIL_LOGGING
+#endif // CHIP_PROGRESS_LOGGING
 
         auto status = nw_path_get_status(path);
         if (status == nw_path_status_satisfied)
@@ -328,9 +328,9 @@ CHIP_ERROR HostNameRegistrar::StartMonitorInterfaces(OnInterfaceChanges interfac
 
                 auto targetInterfaceId = nw_interface_get_index(interface);
                 GetInterfaceAddresses(targetInterfaceId, mAddressType, inet, inet6);
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
                 LogDetails(interface, inet, inet6);
-#endif // CHIP_DETAIL_LOGGING
+#endif // CHIP_PROGRESS_LOGGING
                 return true;
             });
         }
