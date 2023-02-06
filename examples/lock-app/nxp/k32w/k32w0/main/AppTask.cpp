@@ -761,8 +761,9 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new door lock state
-    EmberAfStatus status = emberAfWriteAttribute(1, chip::app::Clusters::DoorLock::Id, ZCL_LOCK_STATE_ATTRIBUTE_ID,
-                                                 (uint8_t *) &newValue, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    EmberAfStatus status =
+        emberAfWriteAttribute(1, chip::app::Clusters::DoorLock::Id, chip::app::Clusters::DoorLock::Attributes::LockState::Id,
+                              (uint8_t *) &newValue, ZCL_ENUM8_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
