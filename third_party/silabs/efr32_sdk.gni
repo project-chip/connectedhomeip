@@ -40,6 +40,8 @@ declare_args() {
 
   sleep_time_ms = 3300000  # 55 mins sleep
 
+  silabs_log_enabled = true
+
   # Enable Sleepy end device
   enable_sleepy_device = false
 }
@@ -165,7 +167,7 @@ template("efr32_sdk") {
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
-      "SILABS_LOG_ENABLED=1",
+      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
