@@ -281,7 +281,7 @@
         "Test_TC_DGTHREAD_3_4",
         "Test_TC_DGTHREAD_3_5"
     ],
-    "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_3_2"],
+    "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
     "TimeFormatLocalization": ["Test_TC_LTIME_2_1", "Test_TC_LTIME_3_1"],
     "UnitLocalization": [],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],

@@ -136,7 +136,6 @@ tests:
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      optional: true
       response:
           constraints:
               type: int16s
@@ -150,7 +149,6 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.A0017 && !TSTAT.S.A0018
-      optional: true
       response:
           constraints:
               type: int16s
@@ -162,7 +160,6 @@ tests:
           OccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      optional: true
       PICS: TSTAT.S.F01
       arguments:
           value: 2500
@@ -172,7 +169,6 @@ tests:
           OccupiedCoolingSetpoint attribute"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      optional: true
       PICS: TSTAT.S.F01
       response:
           value: 2500
@@ -180,7 +176,6 @@ tests:
     - label:
           "Writes OccupiedCoolingSetpoint to value below the
           MinCoolSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.A0017
@@ -219,7 +214,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.A0017
-      optional: true
       arguments:
           value: 4000
       response:
@@ -231,7 +225,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
-      optional: true
       arguments:
           value: MaxCoolSetpointLimit + 1000
       response:
@@ -243,7 +236,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.F05 && !TSTAT.S.A0017
-      optional: true
       arguments:
           value: 1600
 
@@ -253,7 +245,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.F05 && TSTAT.S.A0017
-      optional: true
       arguments:
           value: MinCoolSetpointLimit
 
@@ -287,7 +278,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.A0017
-      optional: true
       arguments:
           value: 3200
 
@@ -297,7 +287,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
-      optional: true
       arguments:
           value: MaxCoolSetpointLimit
 
@@ -308,7 +297,6 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0016
-      optional: true
       response:
           constraints:
               type: int16s
@@ -322,7 +310,6 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.A0015 && !TSTAT.S.A0016
-      optional: true
       response:
           constraints:
               type: int16s
@@ -335,7 +322,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
-      optional: true
       arguments:
           value: 2100
 
@@ -345,7 +331,6 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
-      optional: true
       response:
           value: 2100
 
@@ -355,7 +340,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.A0015
-      optional: true
       arguments:
           value: 600
       response:
@@ -392,7 +376,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.A0016
-      optional: true
       arguments:
           value: 4010
       response:
@@ -404,7 +387,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016
-      optional: true
       arguments:
           value: MaxHeatSetpointLimit + 1000
       response:
@@ -416,7 +398,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.A0015
-      optional: true
       arguments:
           value: 700
 
@@ -426,7 +407,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015
-      optional: true
       arguments:
           value: MinHeatSetpointLimit
 
@@ -436,7 +416,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.F05 && !TSTAT.S.A0016
-      optional: true
       arguments:
           value: 3000
 
@@ -446,7 +425,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.F05 && TSTAT.S.A0016
-      optional: true
       arguments:
           value: MaxHeatSetpointLimit
 
@@ -456,7 +434,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F05 && !TSTAT.S.A0015
-      optional: true
       arguments:
           value: 3000
       response:
@@ -501,7 +478,6 @@ tests:
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
-      optional: true
       response:
           constraints:
               type: int16s
@@ -514,7 +490,6 @@ tests:
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017 && !TSTAT.S.A0018
-      optional: true
       response:
           constraints:
               type: int16s
@@ -527,7 +502,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01
-      optional: true
       arguments:
           value: 2500
 
@@ -537,7 +511,6 @@ tests:
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01
-      optional: true
       response:
           value: 2500
 
@@ -547,7 +520,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017
-      optional: true
       arguments:
           value: 1002
       response:
@@ -579,7 +551,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0018
-      optional: true
       arguments:
           value: 4010
       response:
@@ -591,7 +562,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0018
-      optional: true
       arguments:
           value: MaxCoolSetpointLimit + 1000
       response:
@@ -603,7 +573,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 1600
 
@@ -613,7 +582,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017 && TSTAT.S.F05
-      optional: true
       arguments:
           value: 1600
       response:
@@ -625,7 +593,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: MinCoolSetpointLimit
 
@@ -662,7 +629,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0018 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 3200
 
@@ -672,7 +638,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: MaxCoolSetpointLimit
 
@@ -683,7 +648,6 @@ tests:
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0016
-      optional: true
       response:
           constraints:
               type: int16s
@@ -697,7 +661,6 @@ tests:
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0015 && !TSTAT.S.A0016
-      optional: true
       response:
           constraints:
               type: int16s
@@ -710,7 +673,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00
-      optional: true
       arguments:
           value: 2500
 
@@ -720,7 +682,6 @@ tests:
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00
-      optional: true
       response:
           value: 2500
 
@@ -730,7 +691,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0015
-      optional: true
       arguments:
           value: 500
       response:
@@ -766,7 +726,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0016
-      optional: true
       arguments:
           value: 4010
       response:
@@ -778,7 +737,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0016
-      optional: true
       arguments:
           value: MaxHeatSetpointLimit + 1000
       response:
@@ -790,7 +748,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0015
-      optional: true
       arguments:
           value: 700
 
@@ -800,7 +757,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0015
-      optional: true
       arguments:
           value: MinHeatSetpointLimit
 
@@ -810,7 +766,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0016 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 3000
 
@@ -820,7 +775,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: MaxHeatSetpointLimit
 
@@ -830,7 +784,6 @@ tests:
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0016 && TSTAT.S.F05
-      optional: true
       arguments:
           value: 3000
       response:
@@ -871,7 +824,6 @@ tests:
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0016 && TSTAT.S.A0003
-      optional: true
       response:
           constraints:
               type: int16s
@@ -884,7 +836,6 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
-      optional: true
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && !TSTAT.S.A0016 && !TSTAT.S.A0003
       response:
           constraints:
@@ -898,7 +849,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015
-      optional: true
       arguments:
           value: 800
 
@@ -908,7 +858,6 @@ tests:
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015
-      optional: true
       response:
           value: 800
 
@@ -916,7 +865,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.A0015 && TSTAT.S.F05
-      optional: true
       arguments:
           value: 2000
       response:
@@ -928,7 +876,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && !TSTAT.S.A0003
-      optional: true
       arguments:
           value: 100
       response:
@@ -963,7 +910,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.A0016
-      optional: true
       arguments:
           value: 4050
       response:
@@ -975,7 +921,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && TSTAT.S.A0016
-      optional: true
       arguments:
           value: MaxHeatSetpointLimit + 1000
       response:
@@ -987,7 +932,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.A0003
-      optional: true
       arguments:
           value: 700
 
@@ -997,7 +941,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && TSTAT.S.A0003
-      optional: true
       arguments:
           value: AbsMinHeatSetpointLimitValue
 
@@ -1007,7 +950,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.F05 && !TSTAT.S.A0016
-      optional: true
       arguments:
           value: 3000
 
@@ -1017,7 +959,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.F05 && TSTAT.S.A0016
-      optional: true
       arguments:
           value: MaxHeatSetpointLimit
 
@@ -1059,7 +1000,6 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
-      optional: true
       PICS:
           TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004 &&
           TSTAT.S.A0016
@@ -1075,7 +1015,6 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
-      optional: true
       PICS:
           " TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004 &&
           !TSTAT.S.A0016 "
@@ -1090,7 +1029,6 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      optional: true
       PICS: TSTAT.S.F00  && TSTAT.S.A0015
       arguments:
           value: 700
@@ -1101,7 +1039,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.A0015 && TSTAT.S.F05
-      optional: true
       arguments:
           value: 3000
       response:
@@ -1113,7 +1050,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 2900
 
@@ -1123,7 +1059,6 @@ tests:
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05
-      optional: true
       response:
           value: 2900
 
@@ -1133,7 +1068,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.A0015
-      optional: true
       arguments:
           value: 500
       response:
@@ -1181,7 +1115,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.A0004
-      optional: true
       arguments:
           value: 4000
       response:
@@ -1193,7 +1126,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && TSTAT.S.A0004
-      optional: true
       arguments:
           value: AbsMaxHeatSetpointLimitValue + 1000
       response:
@@ -1205,7 +1137,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.A0015
-      optional: true
       arguments:
           value: 700
 
@@ -1215,7 +1146,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016 && TSTAT.S.A0015
-      optional: true
       arguments:
           value: MinHeatSetpointLimit
 
@@ -1225,7 +1155,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004
-      optional: true
       arguments:
           value: 3000
 
@@ -1235,7 +1164,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004
-      optional: true
       arguments:
           value: AbsMaxHeatSetpointLimitValue
 
@@ -1279,7 +1207,6 @@ tests:
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018 && TSTAT.S.A0005
-      optional: true
       response:
           constraints:
               type: int16s
@@ -1293,7 +1220,6 @@ tests:
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0018 && !TSTAT.S.A0005
-      optional: true
       response:
           constraints:
               type: int16s
@@ -1306,7 +1232,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
-      optional: true
       arguments:
           value: 2000
 
@@ -1316,7 +1241,6 @@ tests:
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
-      optional: true
       response:
           value: 2000
 
@@ -1326,7 +1250,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0005
-      optional: true
       arguments:
           value: 1000
       response:
@@ -1367,7 +1290,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0018
-      optional: true
       arguments:
           value: 4000
       response:
@@ -1378,7 +1300,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
-      optional: true
       arguments:
           value: MaxCoolSetpointLimit + 1000
       response:
@@ -1390,7 +1311,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0005 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 1600
 
@@ -1400,7 +1320,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0005 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: AbsMinCoolSetpointLimit
 
@@ -1437,7 +1356,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0018
-      optional: true
       arguments:
           value: 3200
 
@@ -1447,7 +1365,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
-      optional: true
       arguments:
           value: MaxCoolSetpointLimit
 
@@ -1458,7 +1375,6 @@ tests:
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0017 && TSTAT.S.A0006
-      optional: true
       response:
           constraints:
               type: int16s
@@ -1472,7 +1388,6 @@ tests:
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017 && !TSTAT.S.A0006
-      optional: true
       response:
           constraints:
               type: int16s
@@ -1485,7 +1400,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 2000
 
@@ -1495,7 +1409,6 @@ tests:
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.F05
-      optional: true
       response:
           value: 2000
 
@@ -1505,7 +1418,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017
-      optional: true
       arguments:
           value: 1000
       response:
@@ -1542,7 +1454,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0006
-      optional: true
       arguments:
           value: 4000
       response:
@@ -1553,7 +1464,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0006
-      optional: true
       arguments:
           value: AbsMaxCoolSetpointLimit + 1000
       response:
@@ -1565,7 +1475,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 1600
 
@@ -1575,7 +1484,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017 && TSTAT.S.F05
-      optional: true
       arguments:
           value: 1600
       response:
@@ -1587,7 +1495,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0017 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: MinCoolSetpointLimit
 
@@ -1623,7 +1530,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0006
-      optional: true
       arguments:
           value: 3200
 
@@ -1633,14 +1539,12 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0006
-      optional: true
       arguments:
           value: AbsMaxCoolSetpointLimit
 
     - label: "Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      optional: true
       PICS: TSTAT.S.F01 && TSTAT.S.A0015
       arguments:
           value: 700
@@ -1649,7 +1553,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 3000
 
@@ -1657,7 +1560,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05
-      optional: true
       arguments:
           value: 2950
 
@@ -1665,7 +1567,6 @@ tests:
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
-      optional: true
       arguments:
           value: 1600
 
@@ -1673,7 +1574,6 @@ tests:
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018
-      optional: true
       arguments:
           value: 3200
 
@@ -1758,7 +1658,6 @@ tests:
       command: "writeAttribute"
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F00 || TSTAT.S.F01
-      optional: true
       arguments:
           value: 2
 
@@ -1766,7 +1665,6 @@ tests:
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F00 || TSTAT.S.F01
-      optional: true
       response:
           value: 2
 
@@ -1776,14 +1674,12 @@ tests:
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.F05
-      optional: true
       arguments:
           value: 2950
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      optional: true
       PICS: TSTAT.S.F01
       arguments:
           value: 2600
@@ -1791,7 +1687,6 @@ tests:
     - label: "Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      optional: true
       PICS: TSTAT.S.F00
       arguments:
           value: 2000
@@ -1811,7 +1706,6 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      optional: true
       PICS: TSTAT.S.F00
       response:
           value: 1700
@@ -1820,7 +1714,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
-      optional: true
       arguments:
           value: 2000
 
@@ -1840,7 +1733,6 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
-      optional: true
       response:
           value: 2300
 
@@ -1860,14 +1752,12 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
-      optional: true
       response:
           value: 2300
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      optional: true
       PICS: TSTAT.S.F01
       arguments:
           value: 2600
@@ -1887,7 +1777,6 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      optional: true
       PICS: TSTAT.S.F01
       response:
           value: 2900
@@ -1895,7 +1784,6 @@ tests:
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      optional: true
       PICS: TSTAT.S.F01
       arguments:
           value: 2600
@@ -1903,7 +1791,6 @@ tests:
     - label: "Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      optional: true
       PICS: TSTAT.S.F00
       arguments:
           value: 2000
@@ -1924,7 +1811,6 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
-      optional: true
       response:
           value: 2300
 
@@ -1934,7 +1820,6 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
-      optional: true
       response:
           value: 1700
 
@@ -1942,7 +1827,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
-      optional: true
       arguments:
           value: 2600
 
@@ -1950,7 +1834,6 @@ tests:
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
-      optional: true
       arguments:
           value: 2000
 
@@ -1970,7 +1853,6 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
-      optional: true
       response:
           value: 2900
 
@@ -1980,6 +1862,5 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
-      optional: true
       response:
           value: 2300
