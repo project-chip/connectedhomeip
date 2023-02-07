@@ -40,8 +40,7 @@ class CodeGenerator(enum.Enum):
         elif self == CodeGenerator.CUSTOM:
             # Use a package naming convention to find the custom generator:
             # ./matter_idl_plugin/__init__.py defines a subclass of CodeGenerator named CustomGenerator.
-            # The current working directory is added to the python path so that the custom generator
-            # can be found.
+        ``` # The plugin is expected to be in the path provided via the `--plugin <path>` cli argument.
             from matter_idl_plugin import CustomGenerator
             return CustomGenerator(*args, **kargs)
         else:
