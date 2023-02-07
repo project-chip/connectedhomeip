@@ -94,3 +94,7 @@ executable("chip-tv-app") {
 group("linux") {
   deps = [ ":chip-tv-app" ]
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}

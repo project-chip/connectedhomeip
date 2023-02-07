@@ -20,8 +20,9 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/ClusterIds.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -29,7 +30,10 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <examples/platform/cc32xx/CC32XXDeviceAttestationCreds.h>
 
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -59,6 +63,7 @@ using namespace ::chip::System;
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceManager;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
@@ -67,6 +72,8 @@ extern LED_Handle gLedGreenHandle, gLedRedHandle;
 static Button_Handle gButtonRightHandle;
 
 AppTask AppTask::sAppTask;
+
+static DeviceCallbacks EchoCallbacks;
 
 int AppTask::StartAppTask()
 {
@@ -139,14 +146,6 @@ int AppTask::Init()
         while (true)
             ;
     }
-    PLAT_LOG("Start Event Loop Task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
-        while (true)
-            ;
-    }
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
@@ -156,7 +155,12 @@ int AppTask::Init()
 
     // Initialize device attestation config
     PLAT_LOG("Initialize device attestation config");
+#ifdef CC32XX_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC32XX::GetCC32XXDacProvider());
+#else
+
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     // Initialize BoltLock module
     PLAT_LOG("Initialize BoltLock");
@@ -169,6 +173,16 @@ int AppTask::Init()
     // QR code will be used with CHIP Tool
     PLAT_LOG("Print Onboarding Codes");
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork));
+
+    PLAT_LOG("Start CHIPDeviceManager and Start Event Loop Task");
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    ret                           = deviceMgr.Init(&EchoCallbacks);
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
+        while (1)
+            ;
+    }
 
     return 0;
 }

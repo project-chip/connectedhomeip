@@ -58,7 +58,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13x2_26x2,bouffalolab,efr32,esp32,k32w0,infineon,qpg
+	platforms = ameba,cc13x2_26x2,bouffalolab,efr32,esp32,k32w0,infineon,qpg,cc32xx
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git

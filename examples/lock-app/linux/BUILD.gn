@@ -44,3 +44,7 @@ executable("chip-lock-app") {
 group("linux") {
   deps = [ ":chip-lock-app" ]
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}

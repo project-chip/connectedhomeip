@@ -145,6 +145,11 @@ template("efr32_sdk") {
 
     defines += board_defines
 
+    # Enabling led interface
+    if (use_wstk_leds) {
+      defines += [ "ENABLE_WSTK_LEDS" ]
+    }
+
     if (defined(invoker.enable_sleepy_device)) {
       if (invoker.enable_sleepy_device) {
         defines += [

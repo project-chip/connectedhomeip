@@ -211,7 +211,7 @@ tests:
     - label:
           "Step 10:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
       PICS: ACL.S.A0000
-      command: "readAttribute"
+      command: "writeAttribute"
       attribute: "ACL"
       arguments:
           value:
@@ -233,13 +233,13 @@ tests:
               ]
 
     - label:
-          "Step 11:TH1 resds DUT Endpoint 0 AccessControl cluster Extension
+          "Step 11:TH1 reads DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element"
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
-      arguments:
+      response:
           value: [{ Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex }]
 
     - label:
@@ -333,8 +333,8 @@ tests:
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
-      arguments:
-          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex }]
+      response:
+          value: [{ Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex }]
 
     - label:
           "Step 18: If DUT is an app on host, examine persistent storage in
