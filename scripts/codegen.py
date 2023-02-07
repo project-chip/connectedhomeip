@@ -70,8 +70,10 @@ __LOG_LEVELS__ = {
 @click.option(
     '--generator',
     default='JAVA',
-    type=click.Choice(GENERATORS.keys(), case_sensitive=False),
-    help='What code generator to run')
+    help='What code generator to run.  The choices are: '+'|'.join(GENERATORS.keys())+'. ' +
+         'When using custom, provide the plugin path using ' +
+         '`--generator custom:<path_to_plugin>` syntax. The plugin path shall contain a package ' +
+         'named `matter_idl_plugin/__init.py__` that defines a subclass of CodeGenerator named CustomGenerator.')
 @click.option(
     '--output-dir',
     type=click.Path(exists=False),
@@ -92,15 +94,10 @@ __LOG_LEVELS__ = {
     type=click.Path(exists=True),
     default=None,
     help='A file containing all expected outputs. Script will fail if outputs do not match')
-@click.option(
-    '--plugin',
-    type=click.Path(exists=True),
-    default='.',
-    help='A path to a directory containing matter_idl_plagin/__init__.py that defines CustomGenerator. Will auto-set --generator to CUSTOM.')
 @click.argument(
     'idl_path',
     type=click.Path(exists=True))
-def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs, plugin, idl_path):
+def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs, idl_path):
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
@@ -115,11 +112,13 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
-    if plugin:
-        if generator != 'custom':
-            print('GENERATOR = '+generator)
-            logging.warning("Overriding --generator to 'custom' to support --plugin.")
-
+    if generator.startswith('custom'):
+        # check that the plugin path is provided
+        if ':' not in generator:
+            logging.fatal("Custom generator plugin path not provided. Use --generator custom:<path_to_plugin>")
+            sys.exit(1)
+        plugin = generator.split(':', 1)[1]
+        logging.info("Using CustomGenerator at plugin path %s" % plugin)
         sys.path.append(plugin)
         generator = 'CUSTOM'
 
