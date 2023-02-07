@@ -28,10 +28,22 @@ SecureSession * Session::AsSecureSession()
     return static_cast<SecureSession *>(this);
 }
 
+const SecureSession * Session::AsSecureSession() const
+{
+    VerifyOrDie(GetSessionType() == SessionType::kSecure);
+    return static_cast<const SecureSession *>(this);
+}
+
 UnauthenticatedSession * Session::AsUnauthenticatedSession()
 {
     VerifyOrDie(GetSessionType() == SessionType::kUnauthenticated);
     return static_cast<UnauthenticatedSession *>(this);
+}
+
+const UnauthenticatedSession * Session::AsUnauthenticatedSession() const
+{
+    VerifyOrDie(GetSessionType() == SessionType::kUnauthenticated);
+    return static_cast<const UnauthenticatedSession *>(this);
 }
 
 IncomingGroupSession * Session::AsIncomingGroupSession()
@@ -40,10 +52,22 @@ IncomingGroupSession * Session::AsIncomingGroupSession()
     return static_cast<IncomingGroupSession *>(this);
 }
 
+const IncomingGroupSession * Session::AsIncomingGroupSession() const
+{
+    VerifyOrDie(GetSessionType() == SessionType::kGroupIncoming);
+    return static_cast<const IncomingGroupSession *>(this);
+}
+
 OutgoingGroupSession * Session::AsOutgoingGroupSession()
 {
     VerifyOrDie(GetSessionType() == SessionType::kGroupOutgoing);
     return static_cast<OutgoingGroupSession *>(this);
+}
+
+const OutgoingGroupSession * Session::AsOutgoingGroupSession() const
+{
+    VerifyOrDie(GetSessionType() == SessionType::kGroupOutgoing);
+    return static_cast<const OutgoingGroupSession *>(this);
 }
 
 System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout)
@@ -53,6 +77,24 @@ System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout u
         return System::Clock::kZero;
     }
     return GetAckTimeout() + upperlayerProcessingTimeout;
+}
+
+uint16_t Session::SessionIdForLogging() const
+{
+    switch (GetSessionType())
+    {
+    case Session::SessionType::kGroupIncoming:
+        return AsIncomingGroupSession()->GetGroupId();
+    case Session::SessionType::kGroupOutgoing:
+        return AsOutgoingGroupSession()->GetGroupId();
+    case Session::SessionType::kSecure:
+        return AsSecureSession()->GetLocalSessionId();
+    case Session::SessionType::kUnauthenticated:
+        return 0;
+    default:
+        VerifyOrDie(false);
+        return 0;
+    }
 }
 
 const char * GetSessionTypeString(const SessionHandle & session)

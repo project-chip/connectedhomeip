@@ -211,9 +211,13 @@ public:
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     SecureSession * AsSecureSession();
+    const SecureSession * AsSecureSession() const;
     UnauthenticatedSession * AsUnauthenticatedSession();
+    const UnauthenticatedSession * AsUnauthenticatedSession() const;
     IncomingGroupSession * AsIncomingGroupSession();
+    const IncomingGroupSession * AsIncomingGroupSession() const;
     OutgoingGroupSession * AsOutgoingGroupSession();
+    const OutgoingGroupSession * AsOutgoingGroupSession() const;
 
     bool IsGroupSession() const
     {
@@ -233,6 +237,11 @@ public:
             cur->DispatchSessionEvent(event);
         }
     }
+
+    // Return a session id that is usable for logging. This is the local session
+    // id for secure unicast sessions, 0 for non-secure unicast sessions, and
+    // the group id for group sessions.
+    uint16_t SessionIdForLogging() const;
 
 protected:
     // This should be called by sub-classes at the very beginning of the destructor, before any data field is disposed, such that

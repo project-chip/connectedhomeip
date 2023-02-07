@@ -15,7 +15,6 @@
  */
 
 #include <access/AuthMode.h>
-#include <cstdio>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
 
@@ -217,12 +216,6 @@ void SecureSession::NewerSessionAvailable(const SessionHandle & session)
 
         iter = next;
     }
-}
-
-void SecureSession::FormatLSID(SessionIdBufferTypeRef buffer)
-{
-    // Use the same %d format as we do in all our other session id logging.
-    snprintf(buffer, sizeof(buffer), " S:%d", GetLocalSessionId());
 }
 
 } // namespace Transport
