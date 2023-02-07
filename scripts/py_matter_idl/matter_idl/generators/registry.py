@@ -42,9 +42,6 @@ class CodeGenerator(enum.Enum):
             # ./matter_idl_plugin/__init__.py defines a subclass of CodeGenerator named CustomGenerator.
             # The current working directory is added to the python path so that the custom generator
             # can be found.
-            import os
-            import sys
-            sys.path.append(os.getcwd())
             from matter_idl_plugin import CustomGenerator
             return CustomGenerator(*args, **kargs)
         else:

@@ -92,10 +92,15 @@ __LOG_LEVELS__ = {
     type=click.Path(exists=True),
     default=None,
     help='A file containing all expected outputs. Script will fail if outputs do not match')
+@click.option(
+    '--plugin',
+    type=click.Path(exists=True),
+    default='.',
+    help='A path to a directory containing matter_idl_plagin/__init__.py that defines CustomGenerator. Will auto-set --generator to CUSTOM.')
 @click.argument(
     'idl_path',
     type=click.Path(exists=True))
-def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs, idl_path):
+def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs, plugin, idl_path):
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
@@ -109,6 +114,14 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
             format='%(asctime)s %(levelname)-7s %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
+
+    if plugin:
+        if generator != 'custom':
+            print('GENERATOR = '+generator)
+            logging.warning("Overriding --generator to 'custom' to support --plugin.")
+
+        sys.path.append(plugin)
+        generator = 'CUSTOM'
 
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())

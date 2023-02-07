@@ -10,10 +10,10 @@ scripts/py_matter_idl/examples/matter_idl_plugin:
    `CodeGenerator` named `CustomGenerator`.
 3. Have CustomGenerator load jinja templates, also under the "matter_idl_plugin"
    subdirectory.
-4. Execute the `codegen.py` script from the parent directory of
-   "matter_idl_plugin".
+4. Execute the `codegen.py` script passing the path to the parent directory of
+   "matter_idl_plugin" via `--plugin` argument.
 
 ```
 cd scripts/py_matter_idl/examples
-../../codegen.py --generator custom ../../../src/controller/data_model/controller-clusters.matter
+../../codegen.py --plugin ./scripts/py_matter_idl/examples ./src/controller/data_model/controller-clusters.matter
 ```
