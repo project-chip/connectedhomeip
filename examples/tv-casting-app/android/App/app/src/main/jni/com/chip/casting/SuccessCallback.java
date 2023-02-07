@@ -27,8 +27,8 @@ public abstract class SuccessCallback<R> {
   public void handleInternal(R response) {
     try {
       handle(response);
-    } catch (Exception e) {
-      Log.e(TAG, "SuccessCallback::Caught an unhandled exception from the client: " + e);
+    } catch (Throwable t) {
+      Log.e(TAG, "SuccessCallback::Caught an unhandled Throwable from the client: " + t);
     }
   }
 }

@@ -27,8 +27,8 @@ public abstract class FailureCallback {
   private final void handleInternal(int errorCode, String errorMessage) {
     try {
       handle(new MatterError(errorCode, errorMessage));
-    } catch (Exception e) {
-      Log.e(TAG, "FailureCallback::Caught an unhandled exception from the client: " + e);
+    } catch (Throwable t) {
+      Log.e(TAG, "FailureCallback::Caught an unhandled Throwable from the client: " + t);
     }
   }
 }

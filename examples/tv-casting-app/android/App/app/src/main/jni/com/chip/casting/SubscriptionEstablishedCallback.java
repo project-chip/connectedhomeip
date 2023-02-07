@@ -27,10 +27,10 @@ public abstract class SubscriptionEstablishedCallback {
   private void handleInternal() {
     try {
       handle();
-    } catch (Exception e) {
+    } catch (Throwable t) {
       Log.e(
           TAG,
-          "SubscriptionEstablishedCallback::Caught an unhandled exception from the client: " + e);
+          "SubscriptionEstablishedCallback::Caught an unhandled Throwable from the client: " + t);
     }
   }
 }

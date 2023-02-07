@@ -27,8 +27,8 @@ public abstract class MatterCallbackHandler {
   private final void handleInternal(int errorCode, String errorMessage) {
     try {
       handle(new MatterError(errorCode, errorMessage));
-    } catch (Exception e) {
-      Log.e(TAG, "MatterCallbackHandler::Caught an unhandled exception from the client: " + e);
+    } catch (Throwable t) {
+      Log.e(TAG, "MatterCallbackHandler::Caught an unhandled Throwable from the client: " + t);
     }
   }
 }
