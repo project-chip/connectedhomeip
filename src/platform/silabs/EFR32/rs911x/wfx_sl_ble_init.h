@@ -27,6 +27,7 @@
 #define RSI_BLE_ENABLE 1
 
 // BLE include file to refer BLE APIs
+#include <stdbool.h>
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "rsi_ble_config.h"
@@ -46,12 +47,12 @@
 #include <rsi_wlan_apis.h>
 #include <rsi_wlan_config.h>
 #include <rsi_wlan_non_rom.h>
-#include <stdbool.h>
 #include <string.h>
 
 #ifdef RSI_M4_INTERFACE
 #include "rsi_board.h"
 #endif
+
 
 typedef struct sl_wfx_msg_s
 {
@@ -61,11 +62,11 @@ typedef struct sl_wfx_msg_s
     uint16_t reason;
     uint16_t event_id;
     uint16_t resp_status;
-    rsi_ble_event_mtu_t rsi_ble_mtu;
-    rsi_ble_event_write_t rsi_ble_write;
-    rsi_ble_event_enhance_conn_status_t resp_enh_conn;
+    rsi_ble_event_mtu_t  rsi_ble_mtu;
+    rsi_ble_event_write_t  rsi_ble_write;
+    rsi_ble_event_enhance_conn_status_t  resp_enh_conn;
     rsi_ble_event_disconnect_t * resp_disconnect;
-    rsi_ble_set_att_resp_t rsi_ble_event_set_att_rsp;
+    rsi_ble_set_att_resp_t  rsi_ble_event_set_att_rsp;
     uint32_t ble_app_event_map;
     uint32_t ble_app_event_mask;
     uint16_t rsi_ble_measurement_hndl;
@@ -73,6 +74,8 @@ typedef struct sl_wfx_msg_s
     uint16_t subscribed;
 
 } sl_wfx_msg_t;
+
+
 
 #define ATT_REC_IN_HOST 0
 
@@ -97,6 +100,7 @@ typedef struct sl_wfx_msg_s
 #define RSI_BLE_CHARACTERISTIC_RX_ATTRIBUTE_HANDLE_LOCATION 1
 #define RSI_BLE_CHARACTERISTIC_RX_VALUE_HANDLE_LOCATION 2
 
+
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE 16
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_RESERVED 0x00, 0x00, 0x00
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1 0x18EE2EF5
@@ -106,6 +110,7 @@ typedef struct sl_wfx_msg_s
 #define RSI_BLE_CHARACTERISTIC_TX_ATTRIBUTE_HANDLE_LOCATION 3
 #define RSI_BLE_CHARACTERISTIC_TX_MEASUREMENT_HANDLE_LOCATION 4
 #define RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION 5
+
 
 // ALL Ble functions
 void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t * resp_conn);
