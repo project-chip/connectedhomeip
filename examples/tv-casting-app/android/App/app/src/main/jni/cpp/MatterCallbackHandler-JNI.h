@@ -71,7 +71,7 @@ template <typename T>
 class SuccessHandlerJNI : public CallbackBaseJNI
 {
 public:
-    SuccessHandlerJNI(const char * methodSignature) : CallbackBaseJNI(methodSignature) {}
+    SuccessHandlerJNI() : CallbackBaseJNI("(Ljava/lang/Object;)V") {}
 
     virtual ~SuccessHandlerJNI() = 0;
 
@@ -104,14 +104,12 @@ SuccessHandlerJNI<T>::~SuccessHandlerJNI(){};
 class OnConnectionSuccessHandlerJNI : public SuccessHandlerJNI<TargetVideoPlayerInfo *>
 {
 public:
-    OnConnectionSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
     jobject ConvertToJObject(TargetVideoPlayerInfo * responseData);
 };
 
 class OnNewOrUpdatedEndpointHandlerJNI : public SuccessHandlerJNI<TargetEndpointInfo *>
 {
 public:
-    OnNewOrUpdatedEndpointHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
     jobject ConvertToJObject(TargetEndpointInfo * responseData);
 };
 
@@ -120,7 +118,6 @@ class CurrentStateSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType>
 {
 public:
-    CurrentStateSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType responseData);
 };
 
@@ -128,7 +125,6 @@ class DurationSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType>
 {
 public:
-    DurationSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Long;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType responseData);
 };
 
@@ -136,7 +132,6 @@ class SampledPositionSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType>
 {
 public:
-    SampledPositionSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
     jobject
     ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType responseData);
 };
@@ -145,7 +140,6 @@ class PlaybackSpeedSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType>
 {
 public:
-    PlaybackSpeedSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Float;)V") {}
     jobject
     ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType responseData);
 };
@@ -154,7 +148,6 @@ class SeekRangeEndSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType>
 {
 public:
-    SeekRangeEndSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Long;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType responseData);
 };
 
@@ -162,7 +155,6 @@ class SeekRangeStartSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType>
 {
 public:
-    SeekRangeStartSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Long;)V") {}
     jobject
     ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType responseData);
 };
@@ -172,7 +164,6 @@ class CurrentTargetSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType>
 {
 public:
-    CurrentTargetSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Byte;)V") {}
     jobject
     ConvertToJObject(chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType responseData);
 };
@@ -181,7 +172,6 @@ class TargetListSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType>
 {
 public:
-    TargetListSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType responseData);
 };
 
@@ -190,7 +180,6 @@ class CurrentLevelSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType>
 {
 public:
-    CurrentLevelSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Byte;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType responseData);
 };
 
@@ -198,7 +187,6 @@ class MinLevelSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType>
 {
 public:
-    MinLevelSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Byte;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType responseData);
 };
 
@@ -206,7 +194,6 @@ class MaxLevelSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType>
 {
 public:
-    MaxLevelSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Byte;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType responseData);
 };
 
@@ -216,7 +203,6 @@ class SupportedStreamingProtocolsSuccessHandlerJNI
           chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType>
 {
 public:
-    SupportedStreamingProtocolsSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Integer;)V") {}
     jobject ConvertToJObject(
         chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType responseData);
 };
@@ -226,7 +212,6 @@ class VendorNameSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType>
 {
 public:
-    VendorNameSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/String;)V") {}
     jobject
     ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType responseData);
 };
@@ -235,7 +220,6 @@ class VendorIDSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
 {
 public:
-    VendorIDSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Integer;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType responseData);
 };
 
@@ -243,7 +227,6 @@ class ApplicationNameSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType>
 {
 public:
-    ApplicationNameSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/String;)V") {}
     jobject
     ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType responseData);
 };
@@ -252,7 +235,6 @@ class ProductIDSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
 {
 public:
-    ProductIDSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Integer;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType responseData);
 };
 
@@ -260,7 +242,6 @@ class ApplicationVersionSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType>
 {
 public:
-    ApplicationVersionSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/String;)V") {}
     jobject ConvertToJObject(
         chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType responseData);
 };
