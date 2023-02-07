@@ -211,13 +211,9 @@ public:
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     SecureSession * AsSecureSession();
-    const SecureSession * AsSecureSession() const;
     UnauthenticatedSession * AsUnauthenticatedSession();
-    const UnauthenticatedSession * AsUnauthenticatedSession() const;
     IncomingGroupSession * AsIncomingGroupSession();
-    const IncomingGroupSession * AsIncomingGroupSession() const;
     OutgoingGroupSession * AsOutgoingGroupSession();
-    const OutgoingGroupSession * AsOutgoingGroupSession() const;
 
     bool IsGroupSession() const
     {
@@ -256,6 +252,10 @@ protected:
     }
 
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
+
+    const SecureSession * AsConstSecureSession() const;
+    const IncomingGroupSession * AsConstIncomingGroupSession() const;
+    const OutgoingGroupSession * AsConstOutgoingGroupSession() const;
 
     IntrusiveList<SessionHolder> mHolders;
 

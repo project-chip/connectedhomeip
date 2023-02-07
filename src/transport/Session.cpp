@@ -28,7 +28,7 @@ SecureSession * Session::AsSecureSession()
     return static_cast<SecureSession *>(this);
 }
 
-const SecureSession * Session::AsSecureSession() const
+const SecureSession * Session::AsConstSecureSession() const
 {
     VerifyOrDie(GetSessionType() == SessionType::kSecure);
     return static_cast<const SecureSession *>(this);
@@ -40,19 +40,13 @@ UnauthenticatedSession * Session::AsUnauthenticatedSession()
     return static_cast<UnauthenticatedSession *>(this);
 }
 
-const UnauthenticatedSession * Session::AsUnauthenticatedSession() const
-{
-    VerifyOrDie(GetSessionType() == SessionType::kUnauthenticated);
-    return static_cast<const UnauthenticatedSession *>(this);
-}
-
 IncomingGroupSession * Session::AsIncomingGroupSession()
 {
     VerifyOrDie(GetSessionType() == SessionType::kGroupIncoming);
     return static_cast<IncomingGroupSession *>(this);
 }
 
-const IncomingGroupSession * Session::AsIncomingGroupSession() const
+const IncomingGroupSession * Session::AsConstIncomingGroupSession() const
 {
     VerifyOrDie(GetSessionType() == SessionType::kGroupIncoming);
     return static_cast<const IncomingGroupSession *>(this);
@@ -64,7 +58,7 @@ OutgoingGroupSession * Session::AsOutgoingGroupSession()
     return static_cast<OutgoingGroupSession *>(this);
 }
 
-const OutgoingGroupSession * Session::AsOutgoingGroupSession() const
+const OutgoingGroupSession * Session::AsConstOutgoingGroupSession() const
 {
     VerifyOrDie(GetSessionType() == SessionType::kGroupOutgoing);
     return static_cast<const OutgoingGroupSession *>(this);
@@ -84,11 +78,11 @@ uint16_t Session::SessionIdForLogging() const
     switch (GetSessionType())
     {
     case Session::SessionType::kGroupIncoming:
-        return AsIncomingGroupSession()->GetGroupId();
+        return AsConstIncomingGroupSession()->GetGroupId();
     case Session::SessionType::kGroupOutgoing:
-        return AsOutgoingGroupSession()->GetGroupId();
+        return AsConstOutgoingGroupSession()->GetGroupId();
     case Session::SessionType::kSecure:
-        return AsSecureSession()->GetLocalSessionId();
+        return AsConstSecureSession()->GetLocalSessionId();
     case Session::SessionType::kUnauthenticated:
         return 0;
     default:
