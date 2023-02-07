@@ -85,9 +85,9 @@ tests:
 
           ./chip-tool relativehumiditymeasurement read attribute-list  1 1
 
-          verify TH recieves "attribute-list response" on the TH (all-cluster-minimal-app) log: 
+          verify TH recieves "attribute-list response" on the TH (all-cluster-minimal-app) log:
 
-          [1666943792.254338][12769:12769] CHIP:DMG:  
+          [1666943792.254338][12769:12769] CHIP:DMG:
           [1666943792.254369][12769:12769] CHIP:DMG: ReportDataMessage =
           [1666943792.254372][12769:12769] CHIP:DMG: {
           [1666943792.254374][12769:12769] CHIP:DMG:         AttributeReportIBs =
@@ -103,14 +103,14 @@ tests:
           [1666943792.254404][12769:12769] CHIP:DMG:                                         Cluster = 0x405,
           [1666943792.254406][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254409][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254411][12769:12769] CHIP:DMG:                                         
+          [1666943792.254411][12769:12769] CHIP:DMG:
           [1666943792.254414][12769:12769] CHIP:DMG:                                 Data = [
-          [1666943792.254418][12769:12769] CHIP:DMG:                                                 
+          [1666943792.254418][12769:12769] CHIP:DMG:
           [1666943792.254422][12769:12769] CHIP:DMG:                                 ],
           [1666943792.254424][12769:12769] CHIP:DMG:                         },
-          [1666943792.254427][12769:12769] CHIP:DMG:                         
+          [1666943792.254427][12769:12769] CHIP:DMG:
           [1666943792.254430][12769:12769] CHIP:DMG:                 },
-          [1666943792.254435][12769:12769] CHIP:DMG:                 
+          [1666943792.254435][12769:12769] CHIP:DMG:
           [1666943792.254437][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943792.254441][12769:12769] CHIP:DMG:                 {
           [1666943792.254443][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -123,12 +123,12 @@ tests:
           [1666943792.254465][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254470][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943792.254473][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254477][12769:12769] CHIP:DMG:                                         
-          [1666943792.254480][12769:12769] CHIP:DMG:                                 Data = 0, 
+          [1666943792.254477][12769:12769] CHIP:DMG:
+          [1666943792.254480][12769:12769] CHIP:DMG:                                 Data = 0,
           [1666943792.254483][12769:12769] CHIP:DMG:                         },
-          [1666943792.254487][12769:12769] CHIP:DMG:                         
+          [1666943792.254487][12769:12769] CHIP:DMG:
           [1666943792.254489][12769:12769] CHIP:DMG:                 },
-          [1666943792.254495][12769:12769] CHIP:DMG:                 
+          [1666943792.254495][12769:12769] CHIP:DMG:
           [1666943792.254497][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943792.254501][12769:12769] CHIP:DMG:                 {
           [1666943792.254504][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -141,12 +141,12 @@ tests:
           [1666943792.254525][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254527][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943792.254530][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254534][12769:12769] CHIP:DMG:                                         
-          [1666943792.254538][12769:12769] CHIP:DMG:                                 Data = 1, 
+          [1666943792.254534][12769:12769] CHIP:DMG:
+          [1666943792.254538][12769:12769] CHIP:DMG:                                 Data = 1,
           [1666943792.254540][12769:12769] CHIP:DMG:                         },
-          [1666943792.254544][12769:12769] CHIP:DMG:                         
+          [1666943792.254544][12769:12769] CHIP:DMG:
           [1666943792.254546][12769:12769] CHIP:DMG:                 },
-          [1666943792.254551][12769:12769] CHIP:DMG:                 
+          [1666943792.254551][12769:12769] CHIP:DMG:
           [1666943792.254553][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943792.254557][12769:12769] CHIP:DMG:                 {
           [1666943792.254559][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -159,12 +159,12 @@ tests:
           [1666943792.254578][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254580][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943792.254582][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254586][12769:12769] CHIP:DMG:                                         
-          [1666943792.254589][12769:12769] CHIP:DMG:                                 Data = 2, 
+          [1666943792.254586][12769:12769] CHIP:DMG:
+          [1666943792.254589][12769:12769] CHIP:DMG:                                 Data = 2,
           [1666943792.254592][12769:12769] CHIP:DMG:                         },
-          [1666943792.254596][12769:12769] CHIP:DMG:                         
+          [1666943792.254596][12769:12769] CHIP:DMG:
           [1666943792.254598][12769:12769] CHIP:DMG:                 },
-          [1666943792.254604][12769:12769] CHIP:DMG:                 
+          [1666943792.254604][12769:12769] CHIP:DMG:
           [1666943792.254606][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943792.254610][12769:12769] CHIP:DMG:                 {
           [1666943792.254612][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -177,12 +177,12 @@ tests:
           [1666943792.254633][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254635][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943792.254638][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254642][12769:12769] CHIP:DMG:                                         
-          [1666943792.254645][12769:12769] CHIP:DMG:                                 Data = 65528, 
+          [1666943792.254642][12769:12769] CHIP:DMG:
+          [1666943792.254645][12769:12769] CHIP:DMG:                                 Data = 65528,
           [1666943792.254647][12769:12769] CHIP:DMG:                         },
-          [1666943792.254651][12769:12769] CHIP:DMG:                         
+          [1666943792.254651][12769:12769] CHIP:DMG:
           [1666943792.254653][12769:12769] CHIP:DMG:                 },
-          [1666943792.254658][12769:12769] CHIP:DMG:                 
+          [1666943792.254658][12769:12769] CHIP:DMG:
           [1666943792.254660][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943792.254664][12769:12769] CHIP:DMG:                 {
           [1666943792.254666][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -195,12 +195,12 @@ tests:
           [1666943792.254686][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254689][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943792.254691][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254695][12769:12769] CHIP:DMG:                                         
-          [1666943792.254698][12769:12769] CHIP:DMG:                                 Data = 65529, 
+          [1666943792.254695][12769:12769] CHIP:DMG:
+          [1666943792.254698][12769:12769] CHIP:DMG:                                 Data = 65529,
           [1666943792.254700][12769:12769] CHIP:DMG:                         },
-          [1666943792.254704][12769:12769] CHIP:DMG:                         
+          [1666943792.254704][12769:12769] CHIP:DMG:
           [1666943792.254707][12769:12769] CHIP:DMG:                 },
-          [1666943792.254712][12769:12769] CHIP:DMG:                 
+          [1666943792.254712][12769:12769] CHIP:DMG:
           [1666943792.254714][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943792.254718][12769:12769] CHIP:DMG:                 {
           [1666943792.254720][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -213,12 +213,12 @@ tests:
           [1666943792.254740][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254743][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943792.254746][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254750][12769:12769] CHIP:DMG:                                         
-          [1666943792.254753][12769:12769] CHIP:DMG:                                 Data = 65531, 
+          [1666943792.254750][12769:12769] CHIP:DMG:
+          [1666943792.254753][12769:12769] CHIP:DMG:                                 Data = 65531,
           [1666943792.254756][12769:12769] CHIP:DMG:                         },
-          [1666943792.254759][12769:12769] CHIP:DMG:                         
+          [1666943792.254759][12769:12769] CHIP:DMG:
           [1666943792.254762][12769:12769] CHIP:DMG:                 },
-          [1666943792.254767][12769:12769] CHIP:DMG:                 
+          [1666943792.254767][12769:12769] CHIP:DMG:
           [1666943792.254769][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943792.254773][12769:12769] CHIP:DMG:                 {
           [1666943792.254775][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -231,12 +231,12 @@ tests:
           [1666943792.254797][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254799][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943792.254802][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254804][12769:12769] CHIP:DMG:                                         
-          [1666943792.254807][12769:12769] CHIP:DMG:                                 Data = 65532, 
+          [1666943792.254804][12769:12769] CHIP:DMG:
+          [1666943792.254807][12769:12769] CHIP:DMG:                                 Data = 65532,
           [1666943792.254809][12769:12769] CHIP:DMG:                         },
-          [1666943792.254811][12769:12769] CHIP:DMG:                         
+          [1666943792.254811][12769:12769] CHIP:DMG:
           [1666943792.254813][12769:12769] CHIP:DMG:                 },
-          [1666943792.254820][12769:12769] CHIP:DMG:                 
+          [1666943792.254820][12769:12769] CHIP:DMG:
           [1666943792.254822][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943792.254826][12769:12769] CHIP:DMG:                 {
           [1666943792.254828][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -249,23 +249,23 @@ tests:
           [1666943792.254849][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943792.254851][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943792.254853][12769:12769] CHIP:DMG:                                 }
-          [1666943792.254856][12769:12769] CHIP:DMG:                                         
-          [1666943792.254859][12769:12769] CHIP:DMG:                                 Data = 65533, 
+          [1666943792.254856][12769:12769] CHIP:DMG:
+          [1666943792.254859][12769:12769] CHIP:DMG:                                 Data = 65533,
           [1666943792.254861][12769:12769] CHIP:DMG:                         },
-          [1666943792.254865][12769:12769] CHIP:DMG:                         
+          [1666943792.254865][12769:12769] CHIP:DMG:
           [1666943792.254867][12769:12769] CHIP:DMG:                 },
-          [1666943792.254872][12769:12769] CHIP:DMG:                 
+          [1666943792.254872][12769:12769] CHIP:DMG:
           [1666943792.254874][12769:12769] CHIP:DMG:         ],
-          [1666943792.254884][12769:12769] CHIP:DMG:         
-          [1666943792.254886][12769:12769] CHIP:DMG:         SuppressResponse = true, 
+          [1666943792.254884][12769:12769] CHIP:DMG:
+          [1666943792.254886][12769:12769] CHIP:DMG:         SuppressResponse = true,
           [1666943792.254889][12769:12769] CHIP:DMG:         InteractionModelRevision = 1
           [1666943792.254891][12769:12769] CHIP:DMG: }
           [1666943792.254894][12769:12769] CHIP:DMG:
 
           ./chip-tool relativehumiditymeasurement read measured-value 1 1
 
-          verify TH recieves "measured-value response" on the TH (all-cluster-minimal-app) log: 
-          [1666943851.649935][12769:12769] CHIP:DMG:  
+          verify TH recieves "measured-value response" on the TH (all-cluster-minimal-app) log:
+          [1666943851.649935][12769:12769] CHIP:DMG:
           [1666943851.649947][12769:12769] CHIP:DMG: ReportDataMessage =
           [1666943851.649950][12769:12769] CHIP:DMG: {
           [1666943851.649952][12769:12769] CHIP:DMG:         AttributeReportIBs =
@@ -281,20 +281,20 @@ tests:
           [1666943851.649981][12769:12769] CHIP:DMG:                                         Cluster = 0x405,
           [1666943851.649984][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1666943851.649987][12769:12769] CHIP:DMG:                                 }
-          [1666943851.649990][12769:12769] CHIP:DMG:                                         
-          [1666943851.649994][12769:12769] CHIP:DMG:                                 Data = 0, 
+          [1666943851.649990][12769:12769] CHIP:DMG:
+          [1666943851.649994][12769:12769] CHIP:DMG:                                 Data = 0,
           [1666943851.649997][12769:12769] CHIP:DMG:                         },
-          [1666943851.650001][12769:12769] CHIP:DMG:                         
+          [1666943851.650001][12769:12769] CHIP:DMG:
           [1666943851.650003][12769:12769] CHIP:DMG:                 },
-          [1666943851.650007][12769:12769] CHIP:DMG:                 
+          [1666943851.650007][12769:12769] CHIP:DMG:
           [1666943851.650009][12769:12769] CHIP:DMG:         ],
-          [1666943851.650013][12769:12769] CHIP:DMG:         
-          [1666943851.650015][12769:12769] CHIP:DMG:         SuppressResponse = true, 
+          [1666943851.650013][12769:12769] CHIP:DMG:
+          [1666943851.650015][12769:12769] CHIP:DMG:         SuppressResponse = true,
           [1666943851.650017][12769:12769] CHIP:DMG:         InteractionModelRevision = 1
 
           ./chip-tool relativehumiditymeasurement read min-measured-value 1 1
 
-          verify TH recieves "min-measured-value response" on the TH (all-cluster-minimal-app) log: 
+          verify TH recieves "min-measured-value response" on the TH (all-cluster-minimal-app) log:
 
           1651147834.075387][2336:2336] CHIP:IM: Received Read request
 
@@ -313,21 +313,21 @@ tests:
           [1666943887.048862][12769:12769] CHIP:DMG:                                         Cluster = 0x405,
           [1666943887.048865][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1666943887.048868][12769:12769] CHIP:DMG:                                 }
-          [1666943887.048871][12769:12769] CHIP:DMG:                                         
-          [1666943887.048874][12769:12769] CHIP:DMG:                                 Data = 0, 
+          [1666943887.048871][12769:12769] CHIP:DMG:
+          [1666943887.048874][12769:12769] CHIP:DMG:                                 Data = 0,
           [1666943887.048877][12769:12769] CHIP:DMG:                         },
-          [1666943887.048881][12769:12769] CHIP:DMG:                         
+          [1666943887.048881][12769:12769] CHIP:DMG:
           [1666943887.048883][12769:12769] CHIP:DMG:                 },
-          [1666943887.048887][12769:12769] CHIP:DMG:                 
+          [1666943887.048887][12769:12769] CHIP:DMG:
           [1666943887.048889][12769:12769] CHIP:DMG:         ],
-          [1666943887.048893][12769:12769] CHIP:DMG:         
-          [1666943887.048894][12769:12769] CHIP:DMG:         SuppressResponse = true, 
+          [1666943887.048893][12769:12769] CHIP:DMG:
+          [1666943887.048894][12769:12769] CHIP:DMG:         SuppressResponse = true,
           [1666943887.048897][12769:12769] CHIP:DMG:         InteractionModelRevision = 1
 
 
           ./chip-tool relativehumiditymeasurement read max-measured-value 1 1
 
-          verify TH recieves "max-measured-value response" on the TH (all-cluster-minimal-app) log: 
+          verify TH recieves "max-measured-value response" on the TH (all-cluster-minimal-app) log:
 
           [1666943902.417737][12769:12769] CHIP:DMG: ReportDataMessage =
           [1666943902.417740][12769:12769] CHIP:DMG: {
@@ -344,15 +344,15 @@ tests:
           [1666943902.417777][12769:12769] CHIP:DMG:                                         Cluster = 0x405,
           [1666943902.417781][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_0002,
           [1666943902.417784][12769:12769] CHIP:DMG:                                 }
-          [1666943902.417788][12769:12769] CHIP:DMG:                                         
-          [1666943902.417791][12769:12769] CHIP:DMG:                                 Data = 10000, 
+          [1666943902.417788][12769:12769] CHIP:DMG:
+          [1666943902.417791][12769:12769] CHIP:DMG:                                 Data = 10000,
           [1666943902.417794][12769:12769] CHIP:DMG:                         },
-          [1666943902.417798][12769:12769] CHIP:DMG:                         
+          [1666943902.417798][12769:12769] CHIP:DMG:
           [1666943902.417801][12769:12769] CHIP:DMG:                 },
-          [1666943902.417805][12769:12769] CHIP:DMG:                 
+          [1666943902.417805][12769:12769] CHIP:DMG:
           [1666943902.417808][12769:12769] CHIP:DMG:         ],
-          [1666943902.417812][12769:12769] CHIP:DMG:         
-          [1666943902.417815][12769:12769] CHIP:DMG:         SuppressResponse = true, 
+          [1666943902.417812][12769:12769] CHIP:DMG:
+          [1666943902.417815][12769:12769] CHIP:DMG:         SuppressResponse = true,
           [1666943902.417819][12769:12769] CHIP:DMG:         InteractionModelRevision = 1
       cluster: "LogCommands"
       command: "UserPrompt"
@@ -368,7 +368,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          TH all-clusters-minimal-app does not support optional attributes 
+          TH all-clusters-minimal-app does not support optional attributes
 
           ./chip-tool relativehumiditymeasurement read tolerance 1 1
 
