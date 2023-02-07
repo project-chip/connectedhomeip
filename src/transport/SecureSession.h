@@ -241,6 +241,14 @@ public:
     // It requires that the target sessoin is also a CASE session, having the same peer and CATs as this session.
     void NewerSessionAvailable(const SessionHandle & session);
 
+#if CHIP_PROGRESS_LOGGING
+    // 3 chars for " S:" prefix, 5 chars for the 16-bit session id, one for the
+    // null terminator.
+    using SessionIdBufferType    = char[9];
+    using SessionIdBufferTypeRef = SessionIdBufferType &;
+    void FormatLSID(SessionIdBufferTypeRef buffer);
+#endif // CHIP_PROGRESS_LOGGING
+
 private:
     enum class State : uint8_t
     {

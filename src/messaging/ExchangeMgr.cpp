@@ -215,13 +215,20 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         }
     }
 
+    Transport::SecureSession::SessionIdBufferType lsidBuf;
+    lsidBuf[0] = '\0';
+    if (session->IsSecureSession())
+    {
+        session->AsSecureSession()->FormatLSID(lsidBuf);
+    }
+
     //
     // Legend that can be used to decode this log line can be found in README.md
     //
     ChipLogProgress(ExchangeManager,
-                    ">>> [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX from %u:" ChipLogFormatX64
-                    " [%04X] --- Type %04x:%02x (%s:%s)",
-                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
+                    ">>> [E:" ChipLogFormatExchangeId "%s M:" ChipLogFormatMessageCounter
+                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %04x:%02x (%s:%s)",
+                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), lsidBuf, packetHeader.GetMessageCounter(), ackBuf,
                     Transport::GetSessionTypeString(session), session->GetFabricIndex(),
                     ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
                     payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);

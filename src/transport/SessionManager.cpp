@@ -281,13 +281,20 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
     }
 
+    SecureSession::SessionIdBufferType lsidBuf;
+    lsidBuf[0] = '\0';
+    if (sessionHandle->IsSecureSession())
+    {
+        sessionHandle->AsSecureSession()->FormatLSID(lsidBuf);
+    }
+
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
     ChipLogProgress(ExchangeManager,
-                    "<<< [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
+                    "<<< [E:" ChipLogFormatExchangeId "%s M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
                     " [%04X] --- Type %04X:%02X (%s:%s)",
-                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
+                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), lsidBuf, packetHeader.GetMessageCounter(), ackBuf,
                     Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
                     static_cast<uint16_t>(compressedFabricId), payloadHeader.GetProtocolID().GetProtocolId(),
                     payloadHeader.GetMessageType(), protocolName, msgTypeName);
