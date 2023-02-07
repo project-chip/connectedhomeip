@@ -112,6 +112,9 @@ if [ "$#" == "0" ]; then
         --no-version
             Skip the silabs formating for the Matter software version string
             Currently : v1.0-<branchName>-<ShortCommitSha>
+        --release
+            Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
+
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -171,8 +174,17 @@ else
                 optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
+            # Option not to be used until ot-efr32 github is updated
+            # --use_ot_github_sources)
+            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
+            #    shift
+            #    ;;
             --no-version)
                 USE_GIT_SHA_FOR_VERSION=false
+                shift
+                ;;
+            --release)
+                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
                 shift
                 ;;
             *)

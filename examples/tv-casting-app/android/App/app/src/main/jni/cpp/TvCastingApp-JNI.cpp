@@ -944,6 +944,80 @@ exit:
     return (err == CHIP_NO_ERROR);
 }
 
+JNI_METHOD(jboolean, mediaPlayback_1previous)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
+{
+    return TvCastingAppJNIMgr().runCastingServerCommand(
+        env, contentApp, jResponseHandler, "MediaPlayback_Previous", MediaPlayback_Previous,
+        [](TargetEndpointInfo endpoint) -> CHIP_ERROR {
+            return CastingServer::GetInstance()->MediaPlayback_Previous(&endpoint, [](CHIP_ERROR err) {
+                TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Previous).Handle(err);
+            });
+        });
+}
+
+JNI_METHOD(jboolean, mediaPlayback_1rewind)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
+{
+    return TvCastingAppJNIMgr().runCastingServerCommand(
+        env, contentApp, jResponseHandler, "MediaPlayback_Rewind", MediaPlayback_Rewind,
+        [](TargetEndpointInfo endpoint) -> CHIP_ERROR {
+            return CastingServer::GetInstance()->MediaPlayback_Rewind(&endpoint, [](CHIP_ERROR err) {
+                TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Rewind).Handle(err);
+            });
+        });
+}
+
+JNI_METHOD(jboolean, mediaPlayback_1fastForward)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
+{
+    return TvCastingAppJNIMgr().runCastingServerCommand(
+        env, contentApp, jResponseHandler, "MediaPlayback_FastForward", MediaPlayback_FastForward,
+        [](TargetEndpointInfo endpoint) -> CHIP_ERROR {
+            return CastingServer::GetInstance()->MediaPlayback_FastForward(&endpoint, [](CHIP_ERROR err) {
+                TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_FastForward).Handle(err);
+            });
+        });
+}
+
+JNI_METHOD(jboolean, mediaPlayback_1startOver)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
+{
+    return TvCastingAppJNIMgr().runCastingServerCommand(
+        env, contentApp, jResponseHandler, "MediaPlayback_StartOver", MediaPlayback_StartOver,
+        [](TargetEndpointInfo endpoint) -> CHIP_ERROR {
+            return CastingServer::GetInstance()->MediaPlayback_StartOver(&endpoint, [](CHIP_ERROR err) {
+                TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_StartOver).Handle(err);
+            });
+        });
+}
+
+jboolean TvCastingAppJNI::runCastingServerCommand(JNIEnv * env, jobject contentApp, jobject jResponseHandler,
+                                                  const char * commandName, MediaCommandName command,
+                                                  const std::function<CHIP_ERROR(TargetEndpointInfo)> & commandRunner)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(AppServer, "JNI_METHOD %s called", commandName);
+
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(command).SetUp(env, jResponseHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = commandRunner(endpoint);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer.%s failed %" CHIP_ERROR_FORMAT, commandName, err.Format()));
+
+exit:
+    return (err == CHIP_NO_ERROR);
+}
+
 JNI_METHOD(jboolean, mediaPlayback_1subscribeToCurrentState)
 (JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
  jint maxInterval, jobject jSubscriptionEstablishedHandler)

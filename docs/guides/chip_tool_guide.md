@@ -213,9 +213,10 @@ In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<operational_dataset\>_ is the Operational Dataset determined in the
-    step 3.
+    [step 4](#step-4-determine-network-pairing-credentials).
 -   _<pin_code\>_ and _<discriminator\>_ are device-specific keys determined in
-    the step 4.
+    the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code).
 
 ##### Commissioning into Wi-Fi network over Bluetooth LE
 
@@ -231,7 +232,8 @@ In this command:
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<ssid\>_ and _<password\>_ are credentials determined in the step 3.
 -   _<pin_code\>_ and _<discriminator\>_ are device-specific keys determined in
-    the step 4.
+    the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code).
 
 If you prefer the hexadecimal format, use the `hex:` prefix. For example:
 
@@ -263,7 +265,8 @@ $ ./chip-tool pairing onnetwork <node_id> <pin_code>
 In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
--   _<pin_code\>_ is device specific _setup PIN code_ determined in the step 4
+-   _<pin_code\>_ is device specific _setup PIN code_ determined in the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code)
     and used to discover the device.
 
 ##### Commissioning with long discriminator
@@ -279,7 +282,8 @@ In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<pin_code\>_ and _<discriminator\>_ are device specific keys determined in
-    the step 4.
+    the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code).
 
 ##### Commissioning with QR code payload or manual pairing code
 

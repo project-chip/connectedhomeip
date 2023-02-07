@@ -49,7 +49,7 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/silabs/EFR32",
+    "${chip_root}/src/platform/silabs/efr32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
@@ -92,10 +92,6 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}:efr32-common",
     app_data_model,
   ]
-
-  if (!disable_lcd) {
-    defines += [ "IS_DEMO_LIGHT=1" ]
-  }
 
   if (chip_enable_pw_rpc) {
     defines += [

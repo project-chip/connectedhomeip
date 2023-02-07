@@ -194,7 +194,7 @@ $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
 #### Commissioning the Ethernet device (ESP32-Ethernet-Kit)
 
 ```
-$ out/debug/chip-tool pairing ethernet 12345 20202021 3840 device-remote-ip 5540
+$ out/debug/chip-tool pairing onnetwork 12345 20202021
 ```
 
 Note: In order to commission an ethernet device, from all-clusters-app enable

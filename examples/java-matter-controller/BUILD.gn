@@ -46,7 +46,6 @@ java_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/pairing/PairCodePaseCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairCodeThreadCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairCodeWifiCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairEthernetCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissionerCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissioningModeCommand.java",

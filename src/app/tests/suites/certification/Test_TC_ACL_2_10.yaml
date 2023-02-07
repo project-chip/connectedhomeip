@@ -25,12 +25,6 @@ config:
     nodeId2:
         type: node_id
         defaultValue: 0xCAFE
-    TH1CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
-    TH2CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
     discriminator:
         type: int16u
         defaultValue: 3840
@@ -52,6 +46,14 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Read the TH1 commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH1CommissionerNodeId
 
     - label:
           "Step 2:TH1 reads OperationalCredentials cluster CurrentFabricIndex
@@ -92,6 +94,15 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId2
+
+    - label: "Read the TH2 commissioner node ID"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH2CommissionerNodeId
 
     - label:
           "Step 4:TH2 reads OperationalCredentials cluster CurrentFabricIndex
@@ -180,7 +191,7 @@ tests:
 
     - label: "Step 9: Reboot DUT"
       verification: |
-          Not implemented in YAML
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -211,7 +222,7 @@ tests:
     - label:
           "Step 10:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
       PICS: ACL.S.A0000
-      command: "readAttribute"
+      command: "writeAttribute"
       attribute: "ACL"
       arguments:
           value:
@@ -233,13 +244,13 @@ tests:
               ]
 
     - label:
-          "Step 11:TH1 resds DUT Endpoint 0 AccessControl cluster Extension
+          "Step 11:TH1 reads DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element"
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
-      arguments:
+      response:
           value: [{ Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex }]
 
     - label:
@@ -333,8 +344,8 @@ tests:
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
-      arguments:
-          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex }]
+      response:
+          value: [{ Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex }]
 
     - label:
           "Step 18: If DUT is an app on host, examine persistent storage in

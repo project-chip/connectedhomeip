@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 import copy
+from dataclasses import dataclass, field
 from enum import Enum, auto
 
 import yaml
@@ -837,8 +838,15 @@ class YamlTests:
         raise StopIteration
 
 
+@dataclass
+class TestParserConfig:
+    pics: str = None
+    definitions: SpecDefinitions = None
+    config_override: dict = field(default_factory=dict)
+
+
 class TestParser:
-    def __init__(self, test_file, pics_file, definitions):
+    def __init__(self, test_file: str, parser_config: TestParserConfig = TestParserConfig()):
         data = self.__load_yaml(test_file)
 
         _check_valid_keys(data, _TESTS_SECTION)
@@ -846,7 +854,16 @@ class TestParser:
         self.name = _value_or_none(data, 'name')
         self.PICS = _value_or_none(data, 'PICS')
 
-        self._parsing_config_variable_storage = data.get('config', {})
+        config = data.get('config', {})
+        for key, value in parser_config.config_override.items():
+            if value is None:
+                continue
+
+            if isinstance(config[key], dict) and 'defaultValue' in config[key]:
+                config[key]['defaultValue'] = value
+            else:
+                config[key] = value
+        self._parsing_config_variable_storage = config
 
         # These are a list of "KnownVariables". These are defaults the codegen used to use. This
         # is added for legacy support of tests that expect to uses these "defaults".
@@ -855,13 +872,10 @@ class TestParser:
         self.__populate_default_config_if_missing('cluster', '')
         self.__populate_default_config_if_missing('timeout', '90')
 
-        pics_checker = PICSChecker(pics_file)
+        pics_checker = PICSChecker(parser_config.pics)
         tests = _value_or_none(data, 'tests')
         self.tests = YamlTests(
-            self._parsing_config_variable_storage, definitions, pics_checker, tests)
-
-    def update_config(self, key, value):
-        self._parsing_config_variable_storage[key] = value
+            self._parsing_config_variable_storage, parser_config.definitions, pics_checker, tests)
 
     def __populate_default_config_if_missing(self, key, value):
         if key not in self._parsing_config_variable_storage:

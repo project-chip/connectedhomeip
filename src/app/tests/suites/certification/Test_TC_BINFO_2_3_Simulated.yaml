@@ -35,78 +35,102 @@ tests:
               - name: "message"
                 value: "*** Basic Cluster Tests Ready"
 
-    - label: "Query Data Model Revision"
+    - label: "DUT reads DataModelRevision from the TH"
+      PICS: BINFO.C.A0000
       wait: "readAttribute"
       attribute: "DataModelRevision"
 
-    - label: "Query Vendor Name"
+    - label: "DUT reads VendorName from the TH"
+      PICS: BINFO.C.A0001
       wait: "readAttribute"
       attribute: "VendorName"
 
-    - label: "Query VendorID"
+    - label: "DUT reads VendorID from the TH"
+      PICS: BINFO.C.A0002
       wait: "readAttribute"
       attribute: "VendorID"
 
-    - label: "Query Product Name"
+    - label: "DUT reads ProductName from the TH"
+      PICS: BINFO.C.A0003
       wait: "readAttribute"
       attribute: "ProductName"
 
-    - label: "Query ProductID"
+    - label: "DUT reads ProductID from the TH"
+      PICS: BINFO.C.A0004
       wait: "readAttribute"
       attribute: "ProductID"
 
-    - label: "Query Node Label"
+    - label: "DUT reads NodeLabel from the TH"
+      PICS: BINFO.C.A0005
       wait: "readAttribute"
       attribute: "NodeLabel"
 
-    - label: "Query User Location"
+    - label: "DUT reads Location from the TH"
+      PICS: BINFO.C.A0006
       wait: "readAttribute"
       attribute: "Location"
 
-    - label: "Query HardwareVersion"
+    - label: "DUT reads HardwareVersion from the TH"
+      PICS: BINFO.C.A0007
       wait: "readAttribute"
       attribute: "HardwareVersion"
 
-    - label: "Query HardwareVersionString"
+    - label: "DUT reads HardwareVersionString from the TH"
+      PICS: BINFO.C.A0008
       wait: "readAttribute"
       attribute: "HardwareVersionString"
 
-    - label: "Query SoftwareVersion"
+    - label: "DUT reads SoftwareVersion from the TH"
+      PICS: BINFO.C.A0009
       wait: "readAttribute"
       attribute: "SoftwareVersion"
 
-    - label: "Query SoftwareVersionString"
+    - label: "DUT reads SoftwareVersionString from the TH"
+      PICS: BINFO.C.A000a
       wait: "readAttribute"
       attribute: "SoftwareVersionString"
 
-    - label: "Query ManufacturingDate"
+    - label: "DUT reads ManufacturingDate from the TH"
+      PICS: BINFO.C.A000b
       wait: "readAttribute"
       attribute: "ManufacturingDate"
 
-    - label: "Query PartNumber"
+    - label: "DUT reads PartNumber from the TH"
+      PICS: BINFO.C.A000c
       wait: "readAttribute"
       attribute: "PartNumber"
 
-    - label: "Query ProductURL"
+    - label: "DUT reads ProductURL from the TH"
+      PICS: BINFO.C.A000d
       wait: "readAttribute"
       attribute: "ProductURL"
 
-    - label: "Query ProductLabel"
+    - label: "DUT reads ProductLabel from the TH"
+      PICS: BINFO.C.A000e
       wait: "readAttribute"
       attribute: "ProductLabel"
 
-    - label: "Query SerialNumber"
+    - label: "DUT reads SerialNumber from the TH"
+      PICS: BINFO.C.A000f
       wait: "readAttribute"
       attribute: "SerialNumber"
 
-    - label: "Query LocalConfigDisabled"
+    - label: "DUT reads LocalConfigDisabled from the TH"
+      PICS: BINFO.C.A0010
       wait: "readAttribute"
       attribute: "LocalConfigDisabled"
 
-    - label: "Query Reachable"
+    - label: "DUT reads Reachable from the TH"
+      PICS: BINFO.C.A0011
       wait: "readAttribute"
       attribute: "Reachable"
 
-    - label: "Query UniqueID"
+    - label: "DUT reads UniqueID from the TH"
+      PICS: BINFO.C.A0012
       wait: "readAttribute"
       attribute: "UniqueID"
+
+    - label: "DUT reads CapabilityMinima from the TH"
+      PICS: BINFO.C.A0013
+      wait: "readAttribute"
+      attribute: "CapabilityMinima"

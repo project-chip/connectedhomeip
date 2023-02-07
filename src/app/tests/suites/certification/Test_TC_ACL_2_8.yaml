@@ -24,12 +24,6 @@ config:
     nodeId2:
         type: node_id
         defaultValue: 0xCAFE
-    TH1CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
-    TH2CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
@@ -42,6 +36,14 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Read the TH1 commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH1CommissionerNodeId
 
     - label:
           "TH1 reads OperationalCredentials cluster CurrentFabricIndex attribute"
@@ -82,6 +84,15 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
+    - label: "Read the TH2 commissioner node ID"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH2CommissionerNodeId
+
     - label:
           "TH2 reads OperationalCredentials cluster CurrentFabricIndex attribute"
       identity: "beta"
@@ -99,8 +110,8 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH1CommissionerNodeId, 1111],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
@@ -116,8 +127,8 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH2CommissionerNodeId, 2222],
                       Targets: null,
                       FabricIndex: TH2FabricIndex,
@@ -128,12 +139,12 @@ tests:
       PICS: ACL.S.A0000
       command: "readAttribute"
       attribute: "ACL"
-      arguments:
+      response:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH1CommissionerNodeId, 1111],
                       Targets: null,
                       FabricIndex: TH1FabricIndex,
@@ -145,12 +156,12 @@ tests:
       identity: "beta"
       command: "readAttribute"
       attribute: "ACL"
-      arguments:
+      response:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: 5,
+                      AuthMode: 2,
                       Subjects: [TH2CommissionerNodeId, 2222],
                       Targets: null,
                       FabricIndex: TH2FabricIndex,

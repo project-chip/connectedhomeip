@@ -193,7 +193,7 @@ efr32_executable("window_app") {
   ]
 
   if (use_wstk_leds) {
-    #sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
   }
 
   if (chip_build_libshell || enable_openthread_cli || use_wf200 || use_rs911x) {

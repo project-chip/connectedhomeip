@@ -68,8 +68,8 @@ class CommissioningTest:
         return java_process.wait()
 
     def RunTest(self):
-        logging.info("Testing onnetwork-long pairing")
         if self.command_name == 'onnetwork-long':
+            logging.info("Testing pairing over onnetwork-long")
             code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
             if code != 0:
                 raise Exception(f"Testing onnetwork-long pairing failed with error {code}")
