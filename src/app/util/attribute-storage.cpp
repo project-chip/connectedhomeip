@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -81,6 +81,10 @@ GENERATED_FUNCTION_ARRAYS
 #ifdef GENERATED_COMMANDS
 constexpr const chip::CommandId generatedCommands[] = GENERATED_COMMANDS;
 #endif // GENERATED_COMMANDS
+
+#if (defined(GENERATED_EVENTS) && (GENERATED_EVENT_COUNT > 0))
+constexpr const chip::EventId generatedEvents[] = GENERATED_EVENTS;
+#endif // GENERATED_EVENTS
 
 constexpr const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
 constexpr const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
