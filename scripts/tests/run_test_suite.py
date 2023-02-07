@@ -18,6 +18,7 @@ import enum
 import logging
 import os
 import sys
+import tempfile
 import time
 import typing
 from dataclasses import dataclass, field
@@ -29,6 +30,9 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
+from diskcache import Cache
+
+cache = Cache(os.path.join(tempfile.gettempdir(), 'yaml_runner_cache'))
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -41,11 +45,20 @@ class ManualHandling(enum.Enum):
 
 
 def FindBinaryPath(name: str):
+    binary_path = cache.get(name)
+    if binary_path:
+        if Path(binary_path).is_file():
+            return binary_path
+        else:
+            del cache[name]
+
+    start = time.time()
     for path in Path(DEFAULT_CHIP_ROOT).rglob(name):
         if not path.is_file():
             continue
         if path.name != name:
             continue
+        cache[name] = str(path)
         return str(path)
 
     return 'NOT_FOUND_IN_OUTPUT_' + name
