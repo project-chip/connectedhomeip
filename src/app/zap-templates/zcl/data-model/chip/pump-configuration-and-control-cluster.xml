@@ -65,55 +65,55 @@ limitations under the License.
       <access op="write" privilege="manage"/>
     </attribute>
 
-    <event side="server" code="0x00" priority="info" name="SupplyVoltageLow">
+    <event side="server" code="0x00" priority="info" name="SupplyVoltageLow" optional="true">
       <description>SupplyVoltageLow</description>
     </event>
-    <event side="server" code="0x01" priority="info" name="SupplyVoltageHigh">
+    <event side="server" code="0x01" priority="info" name="SupplyVoltageHigh" optional="true">
       <description>SupplyVoltageHigh</description>
     </event>
-    <event side="server" code="0x02" priority="info" name="PowerMissingPhase">
+    <event side="server" code="0x02" priority="info" name="PowerMissingPhase" optional="true">
       <description>PowerMissingPhase</description>
     </event>
-    <event side="server" code="0x03" priority="info" name="SystemPressureLow">
+    <event side="server" code="0x03" priority="info" name="SystemPressureLow" optional="true">
       <description>SystemPressureLow</description>
     </event>
-    <event side="server" code="0x04" priority="info" name="SystemPressureHigh">
+    <event side="server" code="0x04" priority="info" name="SystemPressureHigh" optional="true">
       <description>SystemPressureHigh</description>
     </event>
-    <event side="server" code="0x05" priority="critical" name="DryRunning">
+    <event side="server" code="0x05" priority="critical" name="DryRunning" optional="true">
       <description>DryRunning</description>
     </event>
-    <event side="server" code="0x06" priority="info" name="MotorTemperatureHigh">
+    <event side="server" code="0x06" priority="info" name="MotorTemperatureHigh" optional="true">
       <description>MotorTemperatureHigh</description>
     </event>
-    <event side="server" code="0x07" priority="critical" name="PumpMotorFatalFailure">
+    <event side="server" code="0x07" priority="critical" name="PumpMotorFatalFailure" optional="true">
       <description>PumpMotorFatalFailure</description>
     </event>
-    <event side="server" code="0x08" priority="info" name="ElectronicTemperatureHigh">
+    <event side="server" code="0x08" priority="info" name="ElectronicTemperatureHigh" optional="true">
       <description>ElectronicTemperatureHigh</description>
     </event>
-    <event side="server" code="0x09" priority="critical" name="PumpBlocked">
+    <event side="server" code="0x09" priority="critical" name="PumpBlocked" optional="true">
       <description>PumpBlocked</description>
     </event>
-    <event side="server" code="0x0A" priority="info" name="SensorFailure">
+    <event side="server" code="0x0A" priority="info" name="SensorFailure" optional="true">
       <description>SensorFailure</description>
     </event>
-    <event side="server" code="0x0B" priority="info" name="ElectronicNonFatalFailure">
+    <event side="server" code="0x0B" priority="info" name="ElectronicNonFatalFailure" optional="true">
       <description>ElectronicNonFatalFailure</description>
     </event>
-    <event side="server" code="0x0C" priority="critical" name="ElectronicFatalFailure">
+    <event side="server" code="0x0C" priority="critical" name="ElectronicFatalFailure" optional="true">
       <description>ElectronicFatalFailure</description>
     </event>
-    <event side="server" code="0x0D" priority="info" name="GeneralFault">
+    <event side="server" code="0x0D" priority="info" name="GeneralFault" optional="true">
       <description>GeneralFault</description>
     </event>
-    <event side="server" code="0x0E" priority="info" name="Leakage">
+    <event side="server" code="0x0E" priority="info" name="Leakage" optional="true">
       <description>Leakage</description>
     </event>
-    <event side="server" code="0x0F" priority="info" name="AirDetection">
+    <event side="server" code="0x0F" priority="info" name="AirDetection" optional="true">
       <description>AirDetection</description>
     </event>
-    <event side="server" code="0x10" priority="info" name="TurbineOperation">
+    <event side="server" code="0x10" priority="info" name="TurbineOperation" optional="true">
       <description>TurbineOperation</description>
     </event>
   </cluster>
