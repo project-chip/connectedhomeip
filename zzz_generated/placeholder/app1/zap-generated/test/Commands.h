@@ -1415,7 +1415,7 @@ private:
 class Test_TC_RH_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_RH_3_1_SimulatedSuite() : TestCommand("Test_TC_RH_3_1_Simulated", 5)
+    Test_TC_RH_3_1_SimulatedSuite() : TestCommand("Test_TC_RH_3_1_Simulated", 8)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -1444,6 +1444,18 @@ private:
         switch (mTestIndex - 1)
         {
         case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -1487,6 +1499,41 @@ private:
             LogStep(4, "Read attribute Tolerance");
             return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::Tolerance::Id);
+        }
+        case 5: {
+            LogStep(5,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList.Commission "
+                    "DUT to TH again");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 6: {
+            LogStep(6, "DUT reads all supported optional attributes from TH one at a time in a manufacturer specific order");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 7: {
+            LogStep(7,
+                    "DUT writes a suitable value to all supported optional attributes on the TH one at a time in a manufacturer "
+                    "specific order");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
