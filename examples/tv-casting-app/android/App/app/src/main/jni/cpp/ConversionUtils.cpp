@@ -61,6 +61,7 @@ CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams 
 CHIP_ERROR convertJContentAppToTargetEndpointInfo(jobject contentApp, TargetEndpointInfo & outTargetEndpointInfo)
 {
     ChipLogProgress(AppServer, "convertJContentAppToTargetEndpointInfo called");
+    VerifyOrReturnError(contentApp != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jContentAppClass;
@@ -124,6 +125,7 @@ CHIP_ERROR convertTargetEndpointInfoToJContentApp(TargetEndpointInfo * targetEnd
 CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, TargetVideoPlayerInfo & outTargetVideoPlayerInfo)
 {
     ChipLogProgress(AppServer, "convertJVideoPlayerToTargetVideoPlayerInfo called");
+    VerifyOrReturnError(videoPlayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jVideoPlayerClass;
@@ -241,6 +243,7 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
                                                              chip::Dnssd::DiscoveredNodeData & outCppDiscoveredNodeData)
 {
     ChipLogProgress(AppServer, "convertJDiscoveredNodeDataToCppDiscoveredNodeData called");
+    VerifyOrReturnError(jDiscoveredNodeData != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
