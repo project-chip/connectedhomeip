@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 declare_args() {
-  chip_tests_zap_config = "none"
+  chip_tests_zap_config = "app1"
 }
 
 chip_data_model("configuration") {
-  zap_file = "apps/${chip_tests_zap_config}/config.zap"
+  zap_file = "config.zap"
 
   zap_pregenerated_dir = "${chip_root}/zzz_generated/placeholder/${chip_tests_zap_config}/zap-generated"
   is_server = true
@@ -32,17 +32,20 @@ config("includes") {
   include_dirs = [
     ".",
     "${chip_root}/examples/common",
-    "include",
+    "${chip_root}/examples/placeholder/linux/app-common/include",
+    "${chip_root}/examples/chip-tool",
+    "${chip_root}/zzz_generated/placeholder/${chip_tests_zap_config}",
+    "${chip_root}/zzz_generated/chip-tool",
   ]
 }
 
 executable("chip-${chip_tests_zap_config}") {
   sources = [
-    "AppOptions.cpp",
-    "InteractiveServer.cpp",
-    "main.cpp",
-    "src/bridged-actions-stub.cpp",
-    "static-supported-modes-manager.cpp",
+    "${chip_root}/examples/placeholder/linux/app-common/src/AppOptions.cpp",
+    "${chip_root}/examples/placeholder/linux/app-common/src/InteractiveServer.cpp",
+    "${chip_root}/examples/placeholder/linux/app-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/placeholder/linux/app-common/src/main.cpp",
+    "${chip_root}/examples/placeholder/linux/app-common/src/static-supported-modes-manager.cpp",
   ]
 
   deps = [
