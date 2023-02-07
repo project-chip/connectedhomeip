@@ -47,9 +47,12 @@ group("efr32_sdk") {
   public_deps = [ efr32_sdk_target ]
 }
 
+# Openthread GSDK libraries configurations
 if (use_silabs_thread_lib) {
   config("libopenthread-platform_config") {
     include_dirs = [ "${sl_openthread_root}/examples/platforms" ]
+
+    defines = [ "SL_CONFIG_OPENTHREAD_LIB=1" ]
   }
 
   copy("copy_openthread_system") {

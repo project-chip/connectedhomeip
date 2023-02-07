@@ -19,14 +19,16 @@
 
 #pragma once
 
-#include "sl_led.h"
 #include <stdint.h>
+
+extern "C" void RSI_Board_LED_Set(int, bool);
+extern "C" void RSI_Board_LED_Toggle(int);
+extern "C" bool RSI_Board_LED_GetState(int);
 
 class LEDWidget
 {
 public:
-    static void InitGpio(void);
-    void Init(const sl_led_t * led);
+    void Init(int led);
     void Set(bool state);
     void Invert(void);
     void Blink(uint32_t changeRateMS);
@@ -37,5 +39,7 @@ private:
     uint64_t mLastChangeTimeMS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
-    const sl_led_t * mLed;
+    int mLed;
+    // created a temporary mLedStatus since Led status is not updating from the platform API(RSI_EGPIO_GetPin)
+    bool mLedStatus;
 };

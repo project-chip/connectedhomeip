@@ -21,10 +21,6 @@ limitations under the License.
     <field name="opening" mask="0x4"/>
     <field name="motorOpening" mask="0x8"/>
   </bitmap>
-  <bitmap name="AlarmMask" type="BITMAP8">
-    <field name="GeneralHwFault" mask="0x1"/>
-    <field name="GeneralSwFault" mask="0x2"/>
-  </bitmap>
   <bitmap name="MainsAlarmMask" type="BITMAP8">
     <field name="VoltageTooLow" mask="0x1"/>
     <field name="VoltageTooHigh" mask="0x2"/>
@@ -46,22 +42,6 @@ limitations under the License.
   <enum name="OperatingMode" type="ENUM8">
     <item name="normal" value="0x0"/>
     <item name="configure" value="0x1"/>
-  </enum>
-  <enum name="PowerSource" type="ENUM8">
-    <item name="Unknown" value="0x0"/>
-    <item name="SinglePhaseMains" value="0x1"/>
-    <item name="ThreePhaseMains" value="0x2"/>
-    <item name="Battery" value="0x3"/>
-    <item name="DcSource" value="0x4"/>
-    <item name="EmergencyMainsConstantPower" value="0x5"/>
-    <item name="EmergencyMainsTransferSwitch" value="0x6"/>
-    <item name="BatteryBackup" value="0x80"/>
-  </enum>
-  <enum name="PhysicalEnvironment" type="ENUM8">
-    <item name="Unspecified" value="0x0"/>
-    <item name="FirstProfileSpecifiedValue" value="0x1"/>
-    <item name="LastProfileSpecifiedValue" value="0x7f"/>
-    <item name="Unknown" value="0xff"/>
   </enum>
   <enum name="BatterySize" type="ENUM8">
     <item name="NoBattery" value="0x0"/>
@@ -217,46 +197,5 @@ limitations under the License.
     <item name="OnlyInstantaneousPowerNotCertified" value="0x0001"/>
     <item name="OnlyCumulatedConsumptionNotCertified" value="0x0002"/>
     <item name="NotCertifiedData" value="0x0003"/>
-  </enum>
-  <!-- Lighting and Occupancy Types -->
-  <enum name="GenericDeviceType" type="ENUM8">
-    <item name="Incandescent" value="0x00"/>
-    <item name="SpotlightHalogen" value="0x01"/>
-    <item name="HalogenBulb" value="0x02"/>
-    <item name="CFL" value="0x03"/>
-    <item name="LinearFlourescent" value="0x04"/>
-    <item name="LedBulb" value="0x05"/>
-    <item name="SpotlightLed" value="0x06"/>
-    <item name="LedStrip" value="0x07"/>
-    <item name="LedTube" value="0x08"/>
-    <item name="GenericIndoorFixture" value="0x09"/>
-    <item name="GenericOutdoorFixture" value="0x0A"/>
-    <item name="PendantFixture" value="0x0B"/>
-    <item name="FloorStandingFixture" value="0x0C"/>
-    <!-- 0x0D-0xDF reserved -->
-    <item name="GenericController" value="0xE0"/>
-    <item name="WallSwitch" value="0xE1"/>
-    <item name="PortableRemoteController" value="0xE2"/>
-    <item name="MotionOrLightSensor" value="0xE3"/>
-    <!-- 0xE4-0xEF reserved -->
-    <item name="GenericActuator" value="0xF0"/>
-    <item name="PluginUnit" value="0xF1"/>
-    <item name="RetrofitActuator" value="0xF2"/>
-    <!-- 0xF5-0xFE reserved -->
-    <item name="Unspecified" value="0xFF"/>
-  </enum>
-  <enum name="ProductCode" type="ENUM8">
-    <item name="ManufacturerDefined" value="0x00"/>
-    <item name="IternationalArticleNumber" value="0x01"/>
-    <item name="GlobalTradeItemNumber" value="0x02"/>
-    <item name="UniversalProductCode" value="0x03"/>
-    <item name="StockKeepingUnit" value="0x04"/>
-    <!-- 0x05-0xFF reserved -->
-  </enum>
-  <enum name="StartUpOnOffValue" type="ENUM8">
-    <item name="SetToOff" value="0x00"/>
-    <item name="SetToOn" value="0x01"/>
-    <item name="SetToToggle" value="0x02"/>
-    <!-- 0x03-0xFF reserved -->
   </enum>
 </configurator>
