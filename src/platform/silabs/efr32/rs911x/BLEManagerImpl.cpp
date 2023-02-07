@@ -768,7 +768,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
     ChipDeviceEvent event;
 
     // Determine if the client is enabling or disabling notification/indication.
-    if (evt->att_value[0] == 1)
+    if (evt->att_value[0] != 1)
     {
         isIndicationEnabled = true;
     }
