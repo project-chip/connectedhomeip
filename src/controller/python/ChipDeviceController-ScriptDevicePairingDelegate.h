@@ -59,6 +59,7 @@ public:
     void SetCommissioningSuccessCallback(DevicePairingDelegate_OnCommissioningSuccessFunct callback);
     void SetCommissioningFailureCallback(DevicePairingDelegate_OnCommissioningFailureFunct callback);
     void SetCommissioningWindowOpenCallback(DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
+    void OnStatusUpdate(Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
     void OnCommissioningSuccess(PeerId peerId) override;

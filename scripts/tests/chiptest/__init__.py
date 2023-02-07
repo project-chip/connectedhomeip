@@ -140,7 +140,6 @@ def _GetInDevelopmentTests() -> Set[str]:
 
         "TestClusterMultiFabric.yaml",  # Enum mismatch
         "TestGroupMessaging.yaml",     # Needs group support in repl
-        "TestMultiAdmin.yaml",         # chip-repl hang on command expeted to fail
     }
 
 
