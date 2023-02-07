@@ -59,31 +59,18 @@ void ARM_USART_SignalEvent(uint32_t event)
 #ifdef ENABLE_CHIP_SHELL
         chip::NotifyShellProcessFromISR();
 #endif;
-        break;
     case ARM_USART_EVENT_TRANSFER_COMPLETE:
-        break;
     case ARM_USART_EVENT_TX_COMPLETE:
-        break;
     case ARM_USART_EVENT_TX_UNDERFLOW:
-        break;
     case ARM_USART_EVENT_RX_OVERFLOW:
-        break;
     case ARM_USART_EVENT_RX_TIMEOUT:
-        break;
     case ARM_USART_EVENT_RX_BREAK:
-        break;
     case ARM_USART_EVENT_RX_FRAMING_ERROR:
-        break;
     case ARM_USART_EVENT_RX_PARITY_ERROR:
-        break;
     case ARM_USART_EVENT_CTS:
-        break;
     case ARM_USART_EVENT_DSR:
-        break;
     case ARM_USART_EVENT_DCD:
-        break;
     case ARM_USART_EVENT_RI:
-        break;
     }
 }
 
