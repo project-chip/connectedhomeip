@@ -190,18 +190,7 @@ template("efr32_sdk") {
     ]
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-      if (use_rs9116) {
-        defines += [
-          "SL_HEAP_SIZE=32768",
-          "SL_WIFI=1",
-          "SL_WFX_USE_SPI",
-          "EFX32_RS911X=1",
-          "RS911X_WIFI",
-          "RSI_WLAN_ENABLE",
-          "RSI_SPI_INTERFACE",
-          "RSI_WITH_OS",
-        ]
-      } else if (use_SiWx917) {
+      if (use_rs9116 || use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",
           "SL_WIFI=1",
