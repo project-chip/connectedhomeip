@@ -49,7 +49,6 @@ public abstract class PairingCommand extends MatterCommand
   private final StringBuffer mPassword = new StringBuffer();
   private final StringBuffer mOnboardingPayload = new StringBuffer();
   private final StringBuffer mDiscoveryFilterInstanceName = new StringBuffer();
-
   private static Logger logger = Logger.getLogger(PairingCommand.class.getName());
 
   public long getNodeId() {
@@ -201,12 +200,6 @@ public abstract class PairingCommand extends MatterCommand
         break;
       case SOFT_AP:
         AP:
-        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
-        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
-        addArgument("device-remote-ip", mRemoteAddr, false);
-        addArgument("device-remote-port", (short) 0, Short.MAX_VALUE, mRemotePort, null, false);
-        break;
-      case ETHERNET:
         addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
         addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
         addArgument("device-remote-ip", mRemoteAddr, false);

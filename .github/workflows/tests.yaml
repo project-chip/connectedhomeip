@@ -511,7 +511,7 @@ jobs:
                       --target linux-x64-java-matter-controller \
                       build \
                    "
-            - name: Run Discover Tests
+            - name: Run Discover Commissionables Test
               timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
@@ -523,7 +523,7 @@ jobs:
                      --tool-args "commissionables" \
                      --factoryreset \
                   '
-            - name: Run Pairing Tests
+            - name: Run Pairing over Onnetwork Test
               timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
