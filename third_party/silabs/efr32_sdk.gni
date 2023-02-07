@@ -163,6 +163,7 @@ template("efr32_sdk") {
         "${chip_root}/examples/platform/silabs/efr32/rs911x",
         "${chip_root}/examples/platform/silabs/efr32/rs911x/hal",
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/include",
+        "${chip_root}/src/platform/silabs/efr32/rs911x",
       ]
     }
 
