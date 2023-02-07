@@ -233,89 +233,22 @@ CHIP_ERROR ESP32FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan
 
 CHIP_ERROR ESP32FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
-    ChipError err       = CHIP_NO_ERROR;
-    size_t serialNumLen = 0; // without counting null-terminator
-
-    err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
-
-#ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-    if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
-        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        err          = CHIP_NO_ERROR;
-    }
-#endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-    ReturnErrorOnFailure(err);
-
-    ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    return err;
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetSerialNumber(buf, bufSize);
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    CHIP_ERROR err;
-    enum
-    {
-        kDateStringLength = 10 // YYYY-MM-DD
-    };
-    char dateStr[kDateStringLength + 1];
-    size_t dateLen;
-    char * parseEnd;
-
-    err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
-    SuccessOrExit(err);
-
-    VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 4 digits, so our number can't be bigger than 9999.
-    year = static_cast<uint16_t>(strtoul(dateStr, &parseEnd, 10));
-    VerifyOrExit(parseEnd == dateStr + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 2 digits, so our number can't be bigger than 99.
-    month = static_cast<uint8_t>(strtoul(dateStr + 5, &parseEnd, 10));
-    VerifyOrExit(parseEnd == dateStr + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 2 digits, so our number can't be bigger than 99.
-    day = static_cast<uint8_t>(strtoul(dateStr + 8, &parseEnd, 10));
-    VerifyOrExit(parseEnd == dateStr + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-exit:
-    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
-    }
-    return err;
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetManufacturingDate(year, month, day);
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
-    ChipError err   = CHIP_NO_ERROR;
-    uint32_t valInt = 0;
-
-    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_HardwareVersion, valInt);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        hardwareVersion = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION);
-        err             = CHIP_NO_ERROR;
-    }
-    else
-    {
-        hardwareVersion = static_cast<uint16_t>(valInt);
-    }
-
-    return err;
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetHardwareVersion(hardwareVersion);
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetPartNumber(buf, bufSize);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 

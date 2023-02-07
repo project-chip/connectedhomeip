@@ -1555,14 +1555,14 @@ CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, job
     CHIP_ERROR err                        = CHIP_NO_ERROR;
     chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeoutSecs));
     bool shouldWaitAfterDeviceAttestation = false;
-    jclass completionCallbackCls          = nullptr;
+    jclass deviceAttestationDelegateCls   = nullptr;
     jobject deviceAttestationDelegateRef  = env->NewGlobalRef(deviceAttestationDelegate);
-    VerifyOrExit(deviceAttestationDelegateRef != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
-    JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationCompletionCallback", completionCallbackCls);
-    VerifyOrExit(completionCallbackCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
-    if (env->IsInstanceOf(deviceAttestationDelegate, completionCallbackCls))
+    VerifyOrExit(deviceAttestationDelegateRef != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+    JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate", deviceAttestationDelegateCls);
+    VerifyOrExit(deviceAttestationDelegateCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
+    if (env->IsInstanceOf(deviceAttestationDelegate, deviceAttestationDelegateCls))
     {
         shouldWaitAfterDeviceAttestation = true;
     }

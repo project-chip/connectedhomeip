@@ -32,7 +32,7 @@ class ESP32FactoryDataProvider : public CommissionableDataProvider,
                                  public Credentials::DeviceAttestationCredentialsProvider
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     ,
-                                 public DeviceInstanceInfoProvider
+                                 public Internal::GenericDeviceInstanceInfoProvider<Internal::ESP32Config>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 {
 public:
@@ -40,8 +40,8 @@ public:
         CommissionableDataProvider(), Credentials::DeviceAttestationCredentialsProvider()
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
         ,
-        DeviceInstanceInfoProvider()
-#endif
+        Internal::GenericDeviceInstanceInfoProvider<Internal::ESP32Config>(ConfigurationManagerImpl::GetDefaultInstance())
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     {}
 
     // ===== Members functions that implement the CommissionableDataProvider

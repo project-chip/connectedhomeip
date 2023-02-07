@@ -1,7 +1,7 @@
 import("//build_overrides/chip.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
-wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
+wifi_sdk_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
 
 wf200_plat_incs = [ "${examples_plat_dir}/wf200" ]
 wf200_plat_src = [

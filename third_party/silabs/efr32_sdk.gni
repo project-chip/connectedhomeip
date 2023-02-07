@@ -212,7 +212,7 @@ template("efr32_sdk") {
       }
 
       if (use_wf200 || !use_rs911x_sockets) {
-        import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
+        import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
         if (lwip_ipv4) {
@@ -297,7 +297,7 @@ template("efr32_sdk") {
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) ||
-        show_qr_code || disable_lcd || use_external_flash) {
+        show_qr_code || !disable_lcd || use_external_flash) {
       defines += [ "CONFIG_ENABLE_UART" ]
 
       if (use_external_flash) {
@@ -455,8 +455,8 @@ template("efr32_sdk") {
     # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
     # edited.
     sources = [
-      "${chip_root}/src/platform/silabs/EFR32/efr32-chip-mbedtls-config.h",
-      "${chip_root}/src/platform/silabs/EFR32/psa_crypto_config.h",
+      "${chip_root}/src/platform/silabs/efr32/efr32-chip-mbedtls-config.h",
+      "${chip_root}/src/platform/silabs/efr32/psa_crypto_config.h",
     ]
 
     public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
