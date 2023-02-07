@@ -96,6 +96,7 @@ tests:
                 value: nodeId2
 
     - label: "Read the TH2 commissioner node ID"
+      identity: "beta"
       cluster: "CommissionerCommands"
       command: "GetCommissionerNodeId"
       response:
