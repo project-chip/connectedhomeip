@@ -121,7 +121,7 @@ tests:
     - label:
           "Step 7:TH1 reads DUT Endpoint 0 AccessControl cluster
           SubjectsPerAccessControlEntry attribute"
-      PICS: ACL.S.A0001
+      PICS: ACL.S.A0002
       command: "readAttribute"
       attribute: "SubjectsPerAccessControlEntry"
       response:
@@ -131,7 +131,7 @@ tests:
     - label:
           "Step 8:TH1 reads DUT Endpoint 0 AccessControl cluster
           TargetsPerAccessControlEntry attribute"
-      PICS: ACL.S.A0001
+      PICS: ACL.S.A0003
       command: "readAttribute"
       attribute: "TargetsPerAccessControlEntry"
       response:
@@ -141,7 +141,7 @@ tests:
     - label:
           "Step 9:TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntriesPerFabric attribute"
-      PICS: ACL.S.A0001
+      PICS: ACL.S.A0004
       command: "readAttribute"
       attribute: "AccessControlEntriesPerFabric"
       response:
