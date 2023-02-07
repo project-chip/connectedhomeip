@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,9 @@
 #pragma once
 
 #include "AppEvent.h"
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 #include "LEDWidget.h"
+#endif
 #include "PWMDevice.h"
 
 #include <zephyr/drivers/gpio.h>
@@ -65,8 +67,11 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
-    static void UpdateStatusLED();
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
+    static void UpdateStatusLED();
+#endif
     static void SwitchActionButtonEventHandler(void);
     static void FactoryResetButtonEventHandler(void);
     static void StartThreadButtonEventHandler(void);
@@ -81,7 +86,6 @@ private:
     static void StartThreadHandler(AppEvent * aEvent);
     static void SwitchActionEventHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
@@ -92,7 +96,6 @@ private:
     PWMDevice mPwmIdentifyLed;
 
 #if CONFIG_CHIP_FACTORY_DATA
-    // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
 #endif
 };

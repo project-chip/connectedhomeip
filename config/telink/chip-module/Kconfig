@@ -149,3 +149,16 @@ config CHIP_LOG_SIZE_OPTIMIZATION
 	  information that is too detailed to be used in most cases. You can find
 	  full configuration enabled by this option in the
 	  platform/telink/CHIPPlatformConfig.h file.
+
+config CHIP_BUTTON_MANAGER_IRQ_MODE
+	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
+	default n
+	help
+	  Use GPIO in an IRQ mode to avoid button polling loop and extend the battery lifetime by waking up by GPIO event. 
+	  GPIO events are working only with GPIO IRQ. This option changes button matrix configuration. 
+	
+config CHIP_ENABLE_APPLICATION_STATUS_LED
+	bool "Enable application status LED"
+	default y
+	help
+	  Enable application status LED.
