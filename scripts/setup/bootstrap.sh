@@ -22,11 +22,13 @@ _bootstrap_or_activate() {
     fi
 
     local _BOOTSTRAP_NAME="${_BOOTSTRAP_PATH##*/}"
-    local _CHIP_ROOT="$(cd "${_BOOTSTRAP_PATH%/*}/../.." && pwd)"
+    local _BOOTSTRAP_DIR="${_BOOTSTRAP_PATH%/*}"
+    # Strip off the 'scripts[/setup]' directory, leaving the root of the repo.
+    local _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." && pwd)"
 
     local _CONFIG_FILE="scripts/setup/environment.json"
 
-    if [ ! -z "$PW_CONFIG_FILE" ]; then
+    if [ -n "$PW_CONFIG_FILE" ]; then
         _CONFIG_FILE="$PW_CONFIG_FILE"
     fi
 
