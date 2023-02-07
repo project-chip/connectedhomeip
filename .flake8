@@ -1,2 +1,7 @@
 [flake8]
 max-line-length = 132
+exclude = third_party
+          .*
+          out/*
+          scripts/idl/*
+          ./examples/common/QRCode/*
