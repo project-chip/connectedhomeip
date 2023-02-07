@@ -1492,7 +1492,7 @@
 #define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 
 // clang-format off
-#define GENERATED_EVENT_COUNT 42
+#define GENERATED_EVENT_COUNT 41
 #define GENERATED_EVENTS { \
   /* Endpoint: 0, Cluster: Access Control (server) */ \
   /* EventList (index=0) */ \
@@ -1503,51 +1503,50 @@
   0x00000000, /* StartUp */ \
   0x00000001, /* ShutDown */ \
   0x00000002, /* Leave */ \
-  0x00000003, /* ReachableChanged */ \
   /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */ \
-  /* EventList (index=6) */ \
+  /* EventList (index=5) */ \
   0x00000000, /* StateTransition */ \
   0x00000001, /* VersionApplied */ \
   0x00000002, /* DownloadError */ \
   /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
-  /* EventList (index=9) */ \
+  /* EventList (index=8) */ \
   0x00000000, /* HardwareFaultChange */ \
   0x00000001, /* RadioFaultChange */ \
   0x00000002, /* NetworkFaultChange */ \
   0x00000003, /* BootReason */ \
   /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
-  /* EventList (index=13) */ \
+  /* EventList (index=12) */ \
   0x00000000, /* SoftwareFault */ \
   /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
-  /* EventList (index=14) */ \
+  /* EventList (index=13) */ \
   0x00000000, /* ConnectionStatus */ \
   0x00000001, /* NetworkFaultChange */ \
   /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
-  /* EventList (index=16) */ \
+  /* EventList (index=15) */ \
   0x00000000, /* Disconnection */ \
   0x00000001, /* AssociationFailure */ \
   0x00000002, /* ConnectionStatus */ \
   /* Endpoint: 1, Cluster: Actions (server) */ \
-  /* EventList (index=19) */ \
+  /* EventList (index=18) */ \
   0x00000000, /* StateChanged */ \
   0x00000001, /* ActionFailed */ \
   /* Endpoint: 1, Cluster: Power Source (server) */ \
-  /* EventList (index=21) */ \
+  /* EventList (index=20) */ \
   0x00000001, /* BatFaultChange */ \
   /* Endpoint: 1, Cluster: Switch (server) */ \
-  /* EventList (index=22) */ \
+  /* EventList (index=21) */ \
   0x00000000, /* SwitchLatched */ \
   /* Endpoint: 1, Cluster: Boolean State (server) */ \
-  /* EventList (index=23) */ \
+  /* EventList (index=22) */ \
   0x00000000, /* StateChange */ \
   /* Endpoint: 1, Cluster: Door Lock (server) */ \
-  /* EventList (index=24) */ \
+  /* EventList (index=23) */ \
   0x00000000, /* DoorLockAlarm */ \
   0x00000002, /* LockOperation */ \
   0x00000003, /* LockOperationError */ \
   0x00000004, /* LockUserChange */ \
   /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */ \
-  /* EventList (index=28) */ \
+  /* EventList (index=27) */ \
   0x00000000, /* SupplyVoltageLow */ \
   0x00000001, /* SupplyVoltageHigh */ \
   0x00000002, /* PowerMissingPhase */ \
@@ -1561,7 +1560,7 @@
   0x0000000A, /* SensorFailure */ \
   0x0000000B, /* ElectronicNonFatalFailure */ \
   /* Endpoint: 1, Cluster: Unit Testing (server) */ \
-  /* EventList (index=40) */ \
+  /* EventList (index=39) */ \
   0x00000001, /* TestEvent */ \
   0x00000002, /* TestFabricScopedEvent */ \
 }
@@ -2051,7 +2050,7 @@
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 2 ), \
-      .eventCount = 4, \
+      .eventCount = 3, \
     },\
   { \
       /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */ \
@@ -2076,7 +2075,7 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 15 ) ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 6 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 5 ), \
       .eventCount = 3, \
     },\
   { \
@@ -2193,7 +2192,7 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 40 ) ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 9 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 8 ), \
       .eventCount = 4, \
     },\
   { \
@@ -2206,7 +2205,7 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 42 ) ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 13 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 12 ), \
       .eventCount = 1, \
     },\
   { \
@@ -2219,7 +2218,7 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 44 ) ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 14 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 13 ), \
       .eventCount = 2, \
     },\
   { \
@@ -2232,7 +2231,7 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 46 ) ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 16 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 15 ), \
       .eventCount = 3, \
     },\
   { \
@@ -2466,7 +2465,7 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 19 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 18 ), \
       .eventCount = 2, \
     },\
   { \
@@ -2479,7 +2478,7 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 21 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 20 ), \
       .eventCount = 1, \
     },\
   { \
@@ -2492,7 +2491,7 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 22 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 21 ), \
       .eventCount = 1, \
     },\
   { \
@@ -2531,7 +2530,7 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 23 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 22 ), \
       .eventCount = 1, \
     },\
   { \
@@ -2557,7 +2556,7 @@
       .functions = chipFuncArrayDoorLockServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 127 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 142 ) ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 24 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 23 ), \
       .eventCount = 4, \
     },\
   { \
@@ -2596,7 +2595,7 @@
       .functions = chipFuncArrayPumpConfigurationAndControlServer, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 28 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 27 ), \
       .eventCount = 12, \
     },\
   { \
@@ -2908,7 +2907,7 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 196 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 215 ) ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 40 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 39 ), \
       .eventCount = 2, \
     },\
   { \
