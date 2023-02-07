@@ -25,8 +25,8 @@ class TelinkApp(Enum):
     ALL_CLUSTERS_MINIMAL = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
-    LOCK = auto()
     SWITCH = auto()
+    LOCK = auto()
     OTA_REQUESTOR = auto()
     THERMOSTAT = auto()
 
