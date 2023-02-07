@@ -219,13 +219,11 @@ void SecureSession::NewerSessionAvailable(const SessionHandle & session)
     }
 }
 
-#if CHIP_PROGRESS_LOGGING
 void SecureSession::FormatLSID(SessionIdBufferTypeRef buffer)
 {
     // Use the same %d format as we do in all our other session id logging.
     snprintf(buffer, sizeof(buffer), " S:%d", GetLocalSessionId());
 }
-#endif // CHIP_PROGRESS_LOGGING
 
 } // namespace Transport
 } // namespace chip
