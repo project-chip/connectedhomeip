@@ -1341,33 +1341,43 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
 #if defined(SEMAILBOX_PRESENT)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result;
+
     // Accelerate 'muladd' using separate point multiplication operations
     mbedtls_ecp_point fe1P1, fe2P2;
     mbedtls_mpi one;
     mbedtls_mpi_init(&one);
-    mbedtls_mpi_lset(&one, 1);
     mbedtls_ecp_point_init(&fe1P1);
     mbedtls_ecp_point_init(&fe2P2);
 
+    result = mbedtls_mpi_lset(&one, 1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_NO_MEMORY);
+
     // Do fe1P1 = fe1 * P1 and fe2P2 = fe2 * P2 since those can be accelerated
-    PointMul(&fe1P1, P1, fe1);
-    PointMul(&fe2P2, P2, fe2);
+    SuccessOrExit(error = PointMul(&fe1P1, P1, fe1));
+    SuccessOrExit(error = PointMul(&fe2P2, P2, fe2));
 
     // Do R = (1 * fe1P1) + (1 * fe2P2) since point addition is not a public mbedTLS API
     // mbedTLS will apply a shortcut since (1 * A) == A
-    mbedtls_ecp_muladd(&context->curve, (mbedtls_ecp_point *) R, &one, &fe1P1, &one, &fe2P2);
+    result = mbedtls_ecp_muladd(&context->curve, (mbedtls_ecp_point *) R, &one, &fe1P1, &one, &fe2P2);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
+exit:
     mbedtls_mpi_free(&one);
     mbedtls_ecp_point_free(&fe1P1);
     mbedtls_ecp_point_free(&fe2P2);
+
+    return error;
 #else  /* SEMAILBOX_PRESENT */
     if (mbedtls_ecp_muladd(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
                            (const mbedtls_mpi *) fe2, (const mbedtls_ecp_point *) P2) != 0)
     {
         return CHIP_ERROR_INTERNAL;
     }
-#endif /* SEMAILBOX_PRESENT */
+
     return CHIP_NO_ERROR;
+#endif /* SEMAILBOX_PRESENT */
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
