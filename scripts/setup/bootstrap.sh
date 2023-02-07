@@ -22,9 +22,9 @@ _bootstrap_or_activate() {
     fi
 
     local _BOOTSTRAP_NAME="${_BOOTSTRAP_PATH##*/}"
-    local _CHIP_ROOT="$(cd "${_BOOTSTRAP_PATH%/*}/.." && pwd)"
+    local _CHIP_ROOT="$(cd "${_BOOTSTRAP_PATH%/*}/../.." && pwd)"
 
-    local _CONFIG_FILE="scripts/environment.json"
+    local _CONFIG_FILE="scripts/setup/environment.json"
 
     if [ ! -z "$PW_CONFIG_FILE" ]; then
         _CONFIG_FILE="$PW_CONFIG_FILE"
@@ -40,7 +40,7 @@ _bootstrap_or_activate() {
         git submodule update
     fi
 
-    PW_BRANDING_BANNER="$_CHIP_ROOT/scripts/matter_banner.txt"
+    PW_BRANDING_BANNER="$_CHIP_ROOT/scripts/setup/banner.txt"
     export PW_BRANDING_BANNER
 
     PW_PROJECT_ROOT="$_CHIP_ROOT"

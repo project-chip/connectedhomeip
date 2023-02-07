@@ -2,8 +2,8 @@
     "virtualenv": {
         "gn_root": ".",
         "gn_targets": [":python_packages.install"],
-        "requirements": ["scripts/requirements.txt"],
-        "constraints": ["scripts/constraints.txt"],
+        "requirements": ["scripts/setup/requirements.txt"],
+        "constraints": ["scripts/setup/constraints.txt"],
         "gn_args": ["chip_crypto=\"boringssl\""]
     },
     "required_submodules": ["third_party/pigweed/repo"],
