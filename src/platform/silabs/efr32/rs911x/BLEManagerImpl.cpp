@@ -58,7 +58,6 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-// static int32_t handleTxConfirmationFlag = 0;
 extern uint16_t rsi_ble_measurement_hndl;
 extern rsi_ble_event_conn_status_t conn_event_to_app;
 extern sl_wfx_msg_t event_msg;
@@ -66,7 +65,6 @@ extern sl_wfx_msg_t event_msg;
 StaticTask_t rsiBLETaskStruct;
 rsi_semaphore_handle_t sl_ble_init_sem;
 rsi_semaphore_handle_t sl_ble_event_sem;
-
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxBLETaskStack[WFX_RSI_TASK_SZ] = { 0 };
