@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,11 +22,10 @@ from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command
 
 
 def toUpperSnakeCase(s):
-    """ Convert camelCaseString to UPPER_SNAKE_CASE """
+    """ Convert camelCaseString to UPPER_SNAKE_CASE with proper handling of acronyms and numerals. """
     lastLower = False
     letters = []
     for c in s:
-        #if c == '_': next
         if c.isupper():
             if lastLower:
                 letters.append('_')
@@ -40,7 +39,7 @@ def toUpperSnakeCase(s):
 
 
 def toLowerSnakeCase(s):
-    """ Convert camelCaseString to lower_snake_case whenever a transition from lower to upper case is detected """
+    """ Convert camelCaseString to lower_snake_case with proper handling of acronyms and numerals. """
     return toUpperSnakeCase(s).lower()
 
 
@@ -49,146 +48,46 @@ def toUpperAcronym(s):
     return ''.join([i for i in s if i.isupper() or i.isnumeric()]).upper()
 
 
-def toEnumConstant(enumEntry, enumName):
+def toEnumEntryName(enumEntry, enumName):
     """ Create enum entry name by prepending that acronym of the enum name and converting to upper snake case """
     prefix = toUpperAcronym(enumName)
     if (enumEntry[0] == 'k'):
         enumEntry = enumEntry[1:]
     return prefix + '_' + toUpperSnakeCase(enumEntry)
 
-
-def toEnumName(s):
-    """ Add En umto the end of the string if it is not already there """
-    return s + "Enum" if not s.endswith("Enum") else s
-
-
-def toStructName(s):
-    """ Add Struct to the end of the string if it is not already there """
-    return s + "Struct" if not s.endswith("Struct") else s
-
-
-def toEventName(s):
-    """ Add Event to the end of the string if it is not already there """
-    return s + "Event" if not s.endswith("Event") else s
-
-
-def toProtobufType(s):
+def toProtobufType(zapType: str) -> str:
     """ Convert zap type to protobuf type """
+    u32Types = ["uint32", "enum8", "enum16", "enum32", "bitmap8", "bitmap16", "bitmap32", "cluster_id", "attrib_id", "event_id", "command_id", "endpoint_no", "group_id", "devtype_id", "fabric_idx", "vendor_id", "status_code", "faulttype", "levelcontroloptions", "percent100ths", "percent"]
+    u64Types = ["uint64", "enum64", "bitmap64", "node_id", "fabric_id", "int40u", "int48u", "int56u", "int64u"]
+    i32Types = ["int32", "int8s", "int16s", "int24s", "int32s"]
+    i64Types = ["int64", "int40s", "int48s", "int56s", "int64s"]
+    floatTypes = ["float", "double"]
+    stringTypes = ["char_string", "long_char_string"]
+    bytesTypes = ["octet_string", "long_octet_string"]
 
-    match(s.lower()):
+    zapTypeLower = zapType.lower()
+    if zapTypeLower in u32Types:
+        return "uint32"
+    if zapTypeLower in u64Types:
+        return "uint64"
+    if zapTypeLower in i32Types:
+        return "int32"
+    if zapTypeLower in i64Types:
+        return "int64"
+        
+    match(zapTypeLower):
         case "boolean":
             return "bool"
 
-        case "enum8":
-            return "uint32"
-        case "enum16":
-            return "uint32"
-        case "enum32":
-            return "uint32"
-        case "bitmap8":
-            return "uint32"
-        case "bitmap16":
-            return "uint32"
-        case "bitmap32":
-            return "uint32"
-        case "cluster_id":
-            return "uint32"
-        case "attrib_id":
-            return "uint32"
-        case "event_id":
-            return "uint32"
-        case "command_id":
-            return "uint32"
-        case "endpoint_no":
-            return "uint32"
-        case "group_id":
-            return "uint32"
-        case "devtype_id":
-            return "uint32"
-        case "fabric_idx":
-            return "uint32"
-        case "vendor_id":
-            return "uint32"
-        case "status_code":
-            return "uint32"
-        case "faulttype":
-            return "uint32"
-        case 'epoch_s':
-            return "uint32"
-        case "levelcontroloptions":
-            return "uint32"
-        case "percent100ths":
-            return "uint32"
-        case "percent":
-            return "uint32"
 
-        case "int8u":
-            return "uint32"
-        case "int16u":
-            return "uint32"
-        case "int24u":
-            return "uint32"
-        case "int32u":
-            return "uint32"
-
-        case "enum64":
-            return "uint64"
-        case "bitmap64":
-            return "uint64"
-        case "node_id":
-            return "uint64"
-        case "fabric_id":
-            return "uint64"
-        case "epoch_us":
-            return "uint64"
-        case "int40u":
-            return "uint64"
-        case "int48u":
-            return "uint64"
-        case "int56u":
-            return "uint64"
-        case "int64u":
-            return "uint64"
-
-        case "int8s":
-            return "int32"
-        case "int16s":
-            return "int32"
-        case "int24s":
-            return "int32"
-        case "int32s":
-            return "int32"
-
-        case "int40s":
-            return "int64"
-        case "int48s":
-            return "int64"
-        case "int56s":
-            return "int64"
-        case "int64s":
-            return "int64"
-
-        case "long_char_string":
-            return "string"
-        case "char_string":
-            return "string"
-
-        case "long_octet_string":
-            return "bytes"
-        case "octet_string":
-            return "bytes"
-
-        case "single":
-            return "float"
-        case "float":
-            return "float"
         case "double":
             return "double"
 
-    return s
+    # If no match, return the original type name for the Struct, Enum, or Bitmap.
+    return zapType
 
 
-# Python enum of types
+# Enum for encoding type into protobuf field tag for stateless translation.
 class DataType:
     UINT = 1
     INT = 2
@@ -234,8 +133,8 @@ def commandResponseArgs(command: Command, cluster: Cluster):
 
 
 def toTypeEncodedTag(tag, typeNum):
+    """ Encode the type into the upper range of the protobuf field tag for stateless translation. """
     tag = (int(typeNum) << 19) | int(tag)
-    #tag = tag + 1
     return tag
 
 
@@ -266,7 +165,7 @@ def toFieldComment(field: Field):
 
 class CustomGenerator(CodeGenerator):
     """
-    Generation of cpp code for application implementation for matter.
+    Example of a custom generator.  Outputs protobuf representation of MAtter clusters.
     """
 
     def __init__(self, storage: GeneratorStorage, idl: Idl):
@@ -287,10 +186,7 @@ class CustomGenerator(CodeGenerator):
         self.jinja_env.filters['toUpperSnakeCase'] = toUpperSnakeCase
 
         # Type helpers
-        self.jinja_env.filters['toStructName'] = toStructName
-        self.jinja_env.filters['toEventName'] = toEventName
-        self.jinja_env.filters['toEnumName'] = toEnumName
-        self.jinja_env.filters['toEnumConstant'] = toEnumConstant
+        self.jinja_env.filters['toEnumEntryName'] = toEnumEntryName
         self.jinja_env.filters['toProtobufType'] = toProtobufType
         self.jinja_env.filters['toTypeEncodedTag'] = toTypeEncodedTag
 
@@ -314,7 +210,7 @@ class CustomGenerator(CodeGenerator):
             if cluster.side != ClusterSide.CLIENT:
                 continue
 
-            filename = "proto/%s_trait.proto" % toLowerSnakeCase(cluster.name)
+            filename = "proto/%s_cluster.proto" % toLowerSnakeCase(cluster.name)
 
             # Header containing a macro to initialize all cluster plugins
             self.internal_render_one_output(

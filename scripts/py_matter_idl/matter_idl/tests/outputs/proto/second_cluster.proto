@@ -1,0 +1,36 @@
+
+/// AUTO-GENERATED with matter_idl.
+
+syntax = "proto3";
+
+package com.chip.proto;
+
+option java_multiple_files = true;
+
+message SecondCluster {
+  // option (message_type) = MATTER_TRAIT;
+
+  enum ClusterId {
+    CLUSTER_ID_UNSUPPORTED = 0;
+    CLUSTER_ID = 2;
+  }
+
+  // Enums
+
+  // Bitmaps
+
+  // Structs
+
+  // Attributes
+  /** octet_string Type: 6 IsList: 0 FieldId: 123 */
+  octet_string some_bytes = 3145851;
+    // [(attribute) = {
+      // is_subscribable: true,
+    // }];
+
+
+
+  // Commands
+
+  // Events
+}

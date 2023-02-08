@@ -122,6 +122,10 @@ class GeneratorTest:
             return BridgeGenerator(storage, idl)
         if self.generator_name.lower() == 'cpp-app':
             return CppApplicationGenerator(storage, idl)
+        if self.generator_name.lower() == 'custom':
+            sys.path.append('../examples')
+            from matter_idl_plugin import CustomGenerator
+            return CustomGenerator(storage, idl)
         else:
             raise Exception("Unknown generator for testing: %s",
                             self.generator_name.lower())

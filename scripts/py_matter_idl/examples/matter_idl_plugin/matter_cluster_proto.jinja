@@ -7,7 +7,7 @@ package com.chip.proto;
 
 option java_multiple_files = true;
 
-message {{cluster.name}}Trait {
+message {{cluster.name}}Cluster {
   // option (message_type) = MATTER_TRAIT;
 
   enum ClusterId {
@@ -18,18 +18,18 @@ message {{cluster.name}}Trait {
   // Enums
 {%-   for entry in cluster.enums %}
   enum {{entry.name}} {
-    {% if (entry.entries[0].code != 0) %}{{"unsupported" | toEnumConstant(entry.name)}} = 0;{% endif %}
+    {% if (entry.entries[0].code != 0) %}{{"unsupported" | toEnumEntryName(entry.name)}} = 0;{% endif %}
     {%-  for field in entry.entries %}
-    {{field.name | toEnumConstant(entry.name)}} = {{field.code}};{%   endfor %}
+    {{field.name | toEnumEntryName(entry.name)}} = {{field.code}};{%   endfor %}
   }
 {%   endfor %}
 
   // Bitmaps
 {%-   for entry in cluster.bitmaps %}
   enum {{entry.name}} {
-    {{"unsupported" | toEnumConstant(entry.name)}} = 0;
+    {{"unsupported" | toEnumEntryName(entry.name)}} = 0;
     {%-  for field in entry.entries %}
-    {{field.name | toEnumConstant(entry.name)}} = {{field.code}};{%   endfor %}
+    {{field.name | toEnumEntryName(entry.name)}} = {{field.code}};{%   endfor %}
   }
 {%   endfor %}
 
@@ -74,7 +74,7 @@ message {{cluster.name}}Trait {
 
   // Events
 {%-   for entry in cluster.events %}
-  message {{entry.name | toEventName}} {
+  message {{entry.name}} {
     // option (message_type) = MATTER_EVENT;
     {%  for field in entry.fields %}
     {{field | toFieldComment}}

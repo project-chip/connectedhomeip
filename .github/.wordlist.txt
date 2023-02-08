@@ -326,7 +326,6 @@ CurrentHue
 CurrentLevel
 CurrentSaturation
 customAcl
-CustomGenerator
 customizations
 cvfJ
 cxx
