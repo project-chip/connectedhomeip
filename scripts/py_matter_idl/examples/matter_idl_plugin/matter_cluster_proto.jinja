@@ -38,7 +38,7 @@ message {{cluster.name}}Cluster {
   message {{entry.name}} {
     {%-  for field in entry.fields %}
     {{field | toFieldComment}}
-    {{field | toFieldType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}
+    {{field | toProtobufFullType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}
   }
 {% endif %}{%   endfor %}
 
@@ -61,14 +61,14 @@ message {{cluster.name}}Cluster {
     // option (message_type) = MATTER_COMMAND;
     {% if cmd.input_param %}{%-  for field in cmd | commandArgs(cluster) %}
     {{field | toFieldComment}}
-    {{field | toFieldType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}{% endif %}
+    {{field | toProtobufFullType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}{% endif %}
 }{% if cmd.output_param != "DefaultSuccess" %}
   
   message {{cmd.name}}CommandResponse {
     // option (message_type) = MATTER_COMMAND_RESPONSE;
     {% if cmd.output_param %}{%-  for field in cmd | commandResponseArgs(cluster) %}
     {{field | toFieldComment}}
-    {{field | toFieldType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}{% endif %}
+    {{field | toProtobufFullType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}{% endif %}
   }{% endif %}
 {%   endfor %}
 
@@ -78,7 +78,7 @@ message {{cluster.name}}Cluster {
     // option (message_type) = MATTER_EVENT;
     {%  for field in entry.fields %}
     {{field | toFieldComment}}
-    {{field | toFieldType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}
+    {{field | toProtobufFullType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}
   }
 
 {%   endfor %}

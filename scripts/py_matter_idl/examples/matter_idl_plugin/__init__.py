@@ -118,11 +118,13 @@ class EncodingDataType:
             case "float": return EncodingDataType.FLOAT
             case "double": return EncodingDataType.DOUBLE
 
+        # If not a primitive type, it is a named type; assume it is a Struct.
+        # NOTE: the actual type may be an Enum or Bitmap.
         return EncodingDataType.STRUCT
 
 
 def commandArgs(command: Command, cluster: Cluster):
-    # Find command.input_arg in cluster.structs
+    """Return the list of fields for the command request for the given command and cluster."""
     for struct in cluster.structs:
         if struct.name == command.input_param:
             return struct.fields
@@ -131,7 +133,7 @@ def commandArgs(command: Command, cluster: Cluster):
 
 
 def commandResponseArgs(command: Command, cluster: Cluster):
-    # Find command.input_arg in cluster.structs
+    """Return the list of fields for the command response for the given command and cluster."""
     for struct in cluster.structs:
         if struct.name == command.output_param:
             return struct.fields
@@ -147,7 +149,8 @@ def toEncodedTag(tag, typeNum: EncodingDataType):
     return tag
 
 
-def toFieldType(field: Field):
+def toProtobufFullType(field: Field):
+    """Return the full protobuf type for the given field, including repeated and optional specifiers."""
     prefix = ""
     protobufType = toProtobufType(field.data_type.name)
     if field.is_list:
@@ -174,7 +177,7 @@ def toFieldComment(field: Field):
 
 class CustomGenerator(CodeGenerator):
     """
-    Example of a custom generator.  Outputs protobuf representation of MAtter clusters.
+    Example of a custom generator.  Outputs protobuf representation of Matter clusters.
     """
 
     def __init__(self, storage: GeneratorStorage, idl: Idl):
@@ -201,7 +204,7 @@ class CustomGenerator(CodeGenerator):
 
         # Tag helpers
         self.jinja_env.filters['toFieldTag'] = toFieldTag
-        self.jinja_env.filters['toFieldType'] = toFieldType
+        self.jinja_env.filters['toProtobufFullType'] = toProtobufFullType
         self.jinja_env.filters['toFieldComment'] = toFieldComment
 
         # Command helpers
