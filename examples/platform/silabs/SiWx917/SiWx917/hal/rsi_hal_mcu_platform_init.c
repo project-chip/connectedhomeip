@@ -32,6 +32,10 @@
 #define ICACHE_DISABLE
 #define DEBUG_DISABLE
 
+/* QSPI clock config params */
+#define INTF_PLL_500_CTRL_VALUE 0xD900
+#define INTF_PLL_CLK            160000000 /* PLL out clock 160MHz */
+
 #define PMU_GOOD_TIME 31  /*Duration in us*/
 #define XTAL_GOOD_TIME 31 /*Duration in us*/
 
@@ -55,6 +59,8 @@
  */
 int soc_pll_config(void)
 {
+    int32_t status = RSI_OK;
+
     RSI_CLK_SocPllLockConfig(1, 1, 7);
 
     RSI_CLK_SocPllRefClkConfig(2);
@@ -77,7 +83,16 @@ int soc_pll_config(void)
     RSI_CLK_M4SocClkConfig(M4CLK, M4_SOCPLLCLK, 0);
 
 #ifdef SWITCH_QSPI_TO_SOC_PLL
-    RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 0);
+    /* program intf pll to 160Mhz */
+    SPI_MEM_MAP_PLL(INTF_PLL_500_CTRL_REG9) = INTF_PLL_500_CTRL_VALUE;
+    status = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
+    if (status != RSI_OK) {
+        SILABS_LOG("Failed to Config Interface PLL Clock, status:%d", status);
+    } else {
+        SILABS_LOG("Configured Interface PLL Clock to %d", INTF_PLL_CLK);
+    }
+
+    RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 1);
 #endif /* SWITCH_QSPI_TO_SOC_PLL */
 
     return 0;

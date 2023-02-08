@@ -40,6 +40,8 @@
  *********************************************************/
 // Button specific defines for SiWx917
 #define SL_SIMPLE_BUTTON_PRESSED 1U
+#define SL_SIMPLE_BUTTON_RELEASED 0U
+
 #define SIWx917_BTN0 0
 #define SIWx917_BTN1 1
 

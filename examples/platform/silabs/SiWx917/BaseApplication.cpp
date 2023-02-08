@@ -382,7 +382,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
         }
 
 #ifdef ENABLE_WSTK_LEDS
-        // Turn off all LEDs before starting blink to make sure blink is
+        // Turn off status LED before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
