@@ -45,7 +45,8 @@ tests:
           [1674550919.106455][20702:20704] CHIP:TOO:   MaxGroupsPerFabric: 4
       disabled: true
 
-    - label: "Pre-Conditions: If maxgroups>0, proceed with the following steps
+    - label: |
+          Pre-Conditions: If maxgroups>0, proceed with the following steps
 
           TH generates fabric-unique GroupID, GroupName, random key, EpochKey0
           and GroupKeySetID.
@@ -71,16 +72,16 @@ tests:
 
           TH binds GroupId(0x0006 to (maxgroups+1)) with GroupKeySetID in the
           GroupKeyMap attribute list on GroupKeyManagement cluster with the
-          values provided in the above steps"
+          values provided in the above steps
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
 
-          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 1,
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
           "groupKeySecurityPolicy": 0, "epochKey0":
           "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 1 0
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
 
           Verify the "status is success" on the TH(Chip-tool)  Log:
 
@@ -91,7 +92,7 @@ tests:
 
           Before adding the Groups (0x0002,0x0003) execute this command
 
-          ./chip-tool groupkeymanagement write group-key-map "[{"groupId":2, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 3, "groupKeySetID": 1,"fabricIndex": 1} ]" 1 0
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId":2, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 3, "groupKeySetID": 1,"fabricIndex": 1} ]' 1 0
 
 
           Verify the status is success on the TH Log:
@@ -131,7 +132,7 @@ tests:
 
           Before adding the Groups (0x0006,0x0007) execute this command
 
-          ./chip-tool groupkeymanagement write group-key-map "[{"groupId":6, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 7, "groupKeySetID": 1,"fabricIndex": 1}]" 1 0
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId":6, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 7, "groupKeySetID": 1,"fabricIndex": 1}]' 1 0
 
 
           Verify the "status is success" on the TH(Chip-tool)  Log:
@@ -192,7 +193,7 @@ tests:
 
           Before adding the Groups (0x0008) execute this command
 
-          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 8, "groupKeySetID": 1, "fabricIndex": 1}]" 1 0
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 8, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
           Verify the "status is success" on the TH(Chip-tool)  Log:
 
@@ -235,7 +236,7 @@ tests:
 
           Before adding the Group0x0009 execute this command which is used to check the Resource_Exhausted Condition
 
-          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 9, "groupKeySetID": 1, "fabricIndex": 1}]" 1 0
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 9, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
           Verify the "status is success" on the TH(Chip-tool)  Log:
 

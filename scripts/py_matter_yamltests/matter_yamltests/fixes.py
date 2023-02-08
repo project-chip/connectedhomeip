@@ -130,10 +130,10 @@ def try_update_yaml_node_id_test_runner_state(tests, config):
 
         if test.cluster == 'CommissionerCommands' or test.cluster == 'DelayCommands':
             if test.command == 'PairWithCode' or test.command == 'WaitForCommissionee':
-                if test.response_with_placeholders:
+                if test.responses_with_placeholders:
                     # It the test expects an error, we should not update the
                     # nodeId of the identity.
-                    error = test.response_with_placeholders.get('error')
+                    error = test.responses_with_placeholders[0].get('error')
                     if error:
                         continue
 
