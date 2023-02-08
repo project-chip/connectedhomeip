@@ -72,6 +72,14 @@ jobs:
               env:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -83,6 +91,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Check nRF Connect SDK revision.
               timeout-minutes: 15
               run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --check"

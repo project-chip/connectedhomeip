@@ -42,6 +42,14 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -53,6 +61,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build
               run: scripts/examples/esp_example.sh all-clusters-app
 
@@ -87,6 +96,14 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -98,6 +115,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build example EFR32 Lock App
               run: scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
                   out/lock_app_debug $SILABS_BOARD

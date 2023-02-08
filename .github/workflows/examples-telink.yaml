@@ -57,6 +57,17 @@ jobs:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
+            - name: Bootstrap
+              timeout-minutes: 25
+              run: scripts/build/gn_bootstrap.sh
+
             - name: Build example Telink All Clusters App
               run: |
                   ./scripts/run_in_build_env.sh \

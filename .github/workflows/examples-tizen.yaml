@@ -51,6 +51,13 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform tizen
 
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
 
