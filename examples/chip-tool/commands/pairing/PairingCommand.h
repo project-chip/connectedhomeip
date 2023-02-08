@@ -43,7 +43,7 @@ enum class PairingNetworkType
     None,
     WiFi,
     Thread,
-    Ethernet,
+    Network,
 };
 
 class PairingCommand : public CHIPCommand,
@@ -69,7 +69,7 @@ public:
         switch (networkType)
         {
         case PairingNetworkType::None:
-        case PairingNetworkType::Ethernet:
+        case PairingNetworkType::Network:
             break;
         case PairingNetworkType::WiFi:
             AddArgument("ssid", &mSSID);
@@ -112,7 +112,6 @@ public:
         case PairingMode::AlreadyDiscovered:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);

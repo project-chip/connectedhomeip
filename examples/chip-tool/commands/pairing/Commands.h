@@ -177,7 +177,7 @@ class PairAlreadyDiscovered : public PairingCommand
 {
 public:
     PairAlreadyDiscovered(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("already-discovered", PairingMode::AlreadyDiscovered, PairingNetworkType::Ethernet, credsIssuerConfig)
+        PairingCommand("already-discovered", PairingMode::AlreadyDiscovered, PairingNetworkType::Network, credsIssuerConfig)
     {}
 };
 

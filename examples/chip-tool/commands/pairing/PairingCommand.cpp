@@ -100,7 +100,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     case PairingNetworkType::Thread:
         params.SetThreadOperationalDataset(mOperationalDataset);
         break;
-    case PairingNetworkType::Ethernet:
+    case PairingNetworkType::Network:
     case PairingNetworkType::None:
         break;
     }
