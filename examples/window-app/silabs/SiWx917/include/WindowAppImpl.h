@@ -34,6 +34,9 @@
 #include <LcdPainter.h>
 #endif
 
+#define SIWx917_BTN0 0
+#define SIWx917_BTN1 1
+
 #define SL_SIMPLE_BUTTON_MODE_POLL 0U              ///< BUTTON input capture using polling
 #define SL_SIMPLE_BUTTON_MODE_POLL_AND_DEBOUNCE 1U ///< BUTTON input capture using polling and debouncing
 #define SL_SIMPLE_BUTTON_MODE_INTERRUPT 2U         ///< BUTTON input capture using interrupt
@@ -88,8 +91,7 @@ public:
     void Finish() override;
     void PostEvent(const WindowApp::Event & event) override;
     void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId) override;
-    friend void sl_button_on_change(const sl_button_t * handle);
-    void OnButtonChange(const sl_button_t * handle);
+    void OnButtonChange(uint8_t btn, uint8_t btnAction);
 
 protected:
     struct Timer : public WindowApp::Timer
