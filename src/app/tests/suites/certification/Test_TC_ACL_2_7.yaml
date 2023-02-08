@@ -25,12 +25,6 @@ config:
     nodeId2:
         type: node_id
         defaultValue: 0xCAFE
-    TH1CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
-    TH2CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
@@ -49,6 +43,14 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Read the TH1 commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH1CommissionerNodeId
 
     - label:
           "Step 2:TH1 reads OperationalCredentials cluster CurrentFabricIndex
@@ -89,6 +91,15 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId2
+
+    - label: "Read the TH2 commissioner node ID"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH2CommissionerNodeId
 
     - label:
           "Step 5:TH2 reads OperationalCredentials cluster CurrentFabricIndex

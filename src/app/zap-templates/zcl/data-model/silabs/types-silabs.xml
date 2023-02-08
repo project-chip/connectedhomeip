@@ -15,106 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <bitmap name="ShadeClosureStatus" type="BITMAP8">
-    <field name="operational" mask="0x1"/>
-    <field name="adjusting" mask="0x2"/>
-    <field name="opening" mask="0x4"/>
-    <field name="motorOpening" mask="0x8"/>
-  </bitmap>
-  <bitmap name="MainsAlarmMask" type="BITMAP8">
-    <field name="VoltageTooLow" mask="0x1"/>
-    <field name="VoltageTooHigh" mask="0x2"/>
-    <field name="MainsPowerSupplyLost" mask="0x4"/>
-  </bitmap>
-  <bitmap name="BatteryAlarmMask" type="BITMAP8">
-    <field name="VoltageTooLow" mask="0x1"/>
-  </bitmap>
-  <bitmap name="DeviceTempAlarmMask" type="BITMAP8">
-    <field name="TooLow" mask="0x1"/>
-    <field name="TooHigh" mask="0x2"/>
-  </bitmap>
-  <bitmap name="TimeStatusMask" type="BITMAP8">
-    <field name="MasterClock" mask="0x1"/>
-    <field name="Synchronized" mask="0x2"/>
-    <field name="MasterZoneDst" mask="0x4"/>
-    <field name="Superseding" mask="0x8"/>
-  </bitmap>
   <enum name="OperatingMode" type="ENUM8">
     <item name="normal" value="0x0"/>
     <item name="configure" value="0x1"/>
-  </enum>
-  <enum name="BatterySize" type="ENUM8">
-    <item name="NoBattery" value="0x0"/>
-    <item name="BuiltIn" value="0x1"/>
-    <item name="Other" value="0x2"/>
-    <item name="AA" value="0x3"/>
-    <item name="AAA" value="0x4"/>
-    <item name="C" value="0x5"/>
-    <item name="D" value="0x6"/>
-    <item name="Unknown" value="0xff"/>
-  </enum>
-  <enum name="SwitchType" type="ENUM8">
-    <item name="Toggle" value="0x00"/>
-    <item name="Momentary" value="0x01"/>
-    <item name="MultiFunction" value="0x02" introducedIn="ha-1.2-05-3520-29"/>
-  </enum>
-  <enum name="SwitchActions" type="ENUM8">
-    <item name="On" value="0x0"/>
-    <item name="Off" value="0x1"/>
-    <item name="Toggle" value="0x2"/>
-  </enum>
-  <enum name="RelativeHumidityMode" type="ENUM8">
-    <item name="measureLocally" value="0x0"/>
-    <item name="updatedOverTheNetwork" value="0x1"/>
-  </enum>
-  <enum name="DehumidifcationLockout" type="ENUM8">
-    <item name="notAllowed" value="0x0"/>
-    <item name="allowed" value="0x1"/>
-  </enum>
-  <enum name="RelativeHumidityDisplay" type="ENUM8">
-    <item name="notDisplayed" value="0x0"/>
-    <item name="displayed" value="0x1"/>
-  </enum>
-  <enum name="LevelStatus" type="ENUM8">
-    <item name="OnTarget" value="0x0"/>
-    <item name="BelowTarget" value="0x1"/>
-    <item name="AboveTarget" value="0x2"/>
-  </enum>
-  <enum name="WarningMode" type="ENUM8">
-    <item name="stop" value="0x0"/>
-    <item name="burglar" value="0x1"/>
-    <item name="fire" value="0x2"/>
-    <item name="emergency" value="0x3"/>
-    <item name="policePanic" value="0x4"/>
-    <item name="firePanic" value="0x5"/>
-    <item name="emergencyPanic" value="0x6"/>
-  </enum>
-  <enum name="WarningStobe" type="ENUM8">
-    <item name="noStrobe" value="0x0"/>
-    <item name="useStrobe" value="0x1"/>
-  </enum>
-  <enum name="SquawkMode" type="ENUM8">
-    <item name="systemIsArmed" value="0x0"/>
-    <item name="systemIsDisarmed" value="0x1"/>
-  </enum>
-  <enum name="SquawkStobe" type="ENUM8">
-    <item name="noStrobe" value="0x0"/>
-    <item name="useStrobe" value="0x1"/>
-  </enum>
-  <enum name="SquawkLevel" type="ENUM8">
-    <item name="lowLevel" value="0x0"/>
-    <item name="mediumLevel" value="0x1"/>
-    <item name="highLevel" value="0x2"/>
-    <item name="veryHighLevel" value="0x2"/>
-  </enum>
-  <enum name="AmiRegistrationState" type="ENUM8">
-    <item name="Unregistered" value="0x0"/>
-    <item name="JoiningNetwork" value="0x1"/>
-    <item name="JoinedNetwork" value="0x2"/>
-    <item name="SubmittedRegistrationRequest" value="0x3"/>
-    <item name="RegistrationRejected" value="0x4"/>
-    <item name="Registered" value="0x5"/>
-    <item name="RegistrationNotPossible" value="0x6"/>
   </enum>
   <enum name="AnonymousDataState" type="ENUM8">
     <item name="NoSourceFound" value="0x0"/>
@@ -133,22 +36,6 @@ limitations under the License.
     <item name="contentId" type="INT16U"/>
     <item name="statusFeedback" type="ENUM8"/>
   </struct>
-  <bitmap name="EnergyFormatting" type="BITMAP8">
-    <field name="NumberOfDigitsToTheRightOfTheDecimalPoint" mask="0x07"/>
-    <field name="NumberOfDigitsToTheLeftOfTheDecimalPoint" mask="0x78"/>
-    <field name="SuppressLeadingZeros" mask="0x80"/>
-  </bitmap>
-  <enum name="PowerProfileState" type="ENUM8">
-    <item name="PowerProfileWaitingToStart" value="0x01"/>
-    <item name="PowerProfileStarted" value="0x02"/>
-    <item name="EnergyPhaseRunning" value="0x03"/>
-    <item name="EnergyPhaseEnded" value="0x04"/>
-    <item name="EnergyPhaseWaitingToStart" value="0x05"/>
-    <item name="EnergyPhaseStarted" value="0x06"/>
-    <item name="PowerProfileEnded" value="0x07"/>
-    <item name="ProfileReadyForScheduling" value="0x08"/>
-    <item name="PowerProfileScheduled" value="0x09"/>
-  </enum>
   <enum name="RemoteEnableFlags" type="ENUM8">
     <item name="Disabled" value="0x00"/>
     <item name="TemporarilyLockedDisabled" value="0x07"/>
@@ -166,36 +53,5 @@ limitations under the License.
   <enum name="TimeEncoding" type="ENUM8">
     <item name="Relative" value="0x00"/>
     <item name="Absolute" value="0x40"/>
-  </enum>
-  <enum name="ProductTypeId" type="ENUM16">
-    <item name="WhiteGoods" value="0x0000"/>
-    <item name="Dishwasher" value="0x5601"/>
-    <item name="TumbleDryer" value="0x5602"/>
-    <item name="WasherDryer" value="0x5603"/>
-    <item name="WashingMachine" value="0x5604"/>
-    <item name="Hobs" value="0x5E03"/>
-    <item name="InductionHobs" value="0x5E09"/>
-    <item name="Oven" value="0x5E01"/>
-    <item name="ElectricalOven" value="0x5E06"/>
-    <item name="RefrigeratorFreezer" value="0x6601"/>
-  </enum>
-  <enum name="CecedSpecificationVersion" type="ENUM8">
-    <item name="CompliantWithV10NotCertified" value="0x10"/>
-    <item name="CompliantWithV10Certified" value="0x1A"/>
-  </enum>
-  <enum name="MeterTypeId" type="ENUM16">
-    <item name="UtilityPrimaryMeter" value="0x0000"/>
-    <item name="UtilityProductionMeter" value="0x0001"/>
-    <item name="UtilitySecondaryMeter" value="0x0002"/>
-    <item name="PrivatePrimaryMeter" value="0x0100"/>
-    <item name="PrivateProductionMeter" value="0x0101"/>
-    <item name="PrivateSecondaryMeters" value="0x0102"/>
-    <item name="GenericMeter" value="0x0110"/>
-  </enum>
-  <enum name="DataQualityId" type="ENUM16">
-    <item name="AllDataCertified" value="0x0000"/>
-    <item name="OnlyInstantaneousPowerNotCertified" value="0x0001"/>
-    <item name="OnlyCumulatedConsumptionNotCertified" value="0x0002"/>
-    <item name="NotCertifiedData" value="0x0003"/>
   </enum>
 </configurator>

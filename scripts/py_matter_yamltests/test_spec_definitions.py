@@ -94,6 +94,8 @@ source_event = '''<?xml version="1.0"?>
 
       <event code="0x0" name="TestEvent" priority="info" side="server"></event>
 
+      <event code="0x1" name="TestEventFabricScoped" priority="info" side="server" isFabricSensitive="true"></event>
+
     </cluster>
   </configurator>
 '''
@@ -232,8 +234,10 @@ class TestSpecDefinitions(unittest.TestCase):
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_event), name='source_event')])
         self.assertIsNone(definitions.get_event_name(0x4321, 0x0))
-        self.assertIsNone(definitions.get_event_name(0x1234, 0x1))
+        self.assertIsNone(definitions.get_event_name(0x1234, 0x2))
         self.assertEqual(definitions.get_event_name(0x1234, 0x0), 'TestEvent')
+        self.assertEqual(definitions.get_event_name(
+            0x1234, 0x1), 'TestEventFabricScoped')
 
     def test_get_command_by_name(self):
         definitions = SpecDefinitions(
@@ -358,7 +362,8 @@ class TestSpecDefinitions(unittest.TestCase):
 
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_event), name='source_event')])
-        self.assertIsNone(definitions.get_type_by_name('Test', 'TestEvent'))
+        self.assertIsInstance(
+            definitions.get_type_by_name('Test', 'TestEvent'), Event)
 
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_bitmap), name='source_bitmap')])
@@ -375,7 +380,7 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(definitions.get_type_by_name(
             'Test', 'TestStruct'), Struct)
 
-    def test_is_fabric_scoped(self):
+    def test_struct_is_fabric_scoped(self):
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_struct), name='source_struct')])
 
@@ -385,6 +390,17 @@ class TestSpecDefinitions(unittest.TestCase):
         struct = definitions.get_struct_by_name(
             'Test', 'TestStructFabricScoped')
         self.assertTrue(definitions.is_fabric_scoped(struct))
+
+    def test_event_is_fabric_scoped(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_event), name='source_event')])
+
+        event = definitions.get_event_by_name('Test', 'TestEvent')
+        self.assertFalse(definitions.is_fabric_scoped(event))
+
+        event = definitions.get_event_by_name(
+            'Test', 'TestEventFabricScoped')
+        self.assertTrue(definitions.is_fabric_scoped(event))
 
 
 if __name__ == '__main__':

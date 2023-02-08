@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +19,18 @@
 #pragma once
 
 #include "AppEvent.h"
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 #include "LEDWidget.h"
+#endif
 #include "PWMDevice.h"
 
 #include <zephyr/drivers/gpio.h>
 
 #include <platform/CHIPDeviceLayer.h>
+
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/telink/FactoryDataProvider.h>
+#endif
 
 #include <cstdint>
 
@@ -41,14 +47,18 @@ public:
 
 private:
     friend AppTask & GetAppTask(void);
+
     CHIP_ERROR Init(void);
 
     static void ActionIdentifyStateUpdateHandler(k_timer * timer);
 
     void DispatchEvent(AppEvent * event);
 
-    static void UpdateStatusLED(void);
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
+    static void UpdateStatusLED();
+#endif
     static void FactoryResetButtonEventHandler(void);
     static void StartThreadButtonEventHandler(void);
     static void StartBleAdvButtonEventHandler(void);
@@ -61,7 +71,6 @@ private:
     static void FactoryResetHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
@@ -70,6 +79,10 @@ private:
 
     static AppTask sAppTask;
     PWMDevice mPwmIdentifyLed;
+
+#if CONFIG_CHIP_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
+#endif
 };
 
 inline AppTask & GetAppTask(void)

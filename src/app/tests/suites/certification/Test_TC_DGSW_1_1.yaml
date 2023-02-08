@@ -66,7 +66,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [65528, 65529, 65531, 65532, 65533]
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "TH reads optional attribute(ThreadMetrics) in AttributeList"
       PICS: DGSW.S.A0000
