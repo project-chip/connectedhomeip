@@ -20,8 +20,6 @@
 
 #include <cstdint>
 
-// #include "EventTypes.h" // NRF legacy
-
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
