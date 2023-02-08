@@ -35,6 +35,7 @@ public:
     static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
     static constexpr size_t kSceneNameMax       = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
     static constexpr uint8_t kMaxScenePerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
+
     /// @brief struct used to identify a scene in storage by 3 ids, endpoint, group and scene
     struct SceneStorageId
     {
@@ -249,7 +250,7 @@ public:
     virtual ~SceneTable() = default;
 
     // Not copyable
-    SceneTable(const SceneTable &) = delete;
+    SceneTable(const SceneTable &)             = delete;
     SceneTable & operator=(const SceneTable &) = delete;
 
     virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;
@@ -259,6 +260,7 @@ public:
     virtual CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)                    = 0;
     virtual CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry) = 0;
     virtual CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)                       = 0;
+    virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx)               = 0;
 
     // Iterators
     using SceneEntryIterator = CommonIterator<SceneTableEntry>;

@@ -29,6 +29,10 @@ using SceneData          = chip::scenes::DefaultSceneTableImpl::SceneData;
 using CharSpan           = chip::CharSpan;
 using ExtensionFieldsSet = chip::scenes::ExtensionFieldsSet;
 
+#define ON_OFF_CID 0x0006
+#define LV_CTR_CID 0x0008
+#define CO_CTR_CID 0x0300
+
 namespace {
 
 static chip::TestPersistentStorageDelegate testStorage;
@@ -78,78 +82,74 @@ SceneTableEntry scene11(sceneId5, sceneData11);
 SceneTableEntry scene12(sceneId8, sceneData12);
 
 // EFS
-static const ExtensionFieldsSet onOffEFS1        = ExtensionFieldsSet(0x0006, (uint8_t *) "1", 1);
-static const ExtensionFieldsSet onOffEFS2        = ExtensionFieldsSet(0x0006, (uint8_t *) "0", 1);
-static const ExtensionFieldsSet levelControlEFS1 = ExtensionFieldsSet(0x0008, (uint8_t *) "511", 3);
-static const ExtensionFieldsSet levelControlEFS2 = ExtensionFieldsSet(0x0008, (uint8_t *) "222", 3);
-static const ExtensionFieldsSet colorControlEFS1 = ExtensionFieldsSet(0x0303, (uint8_t *) "123456789abcde", 14);
-static const ExtensionFieldsSet colorControlEFS2 = ExtensionFieldsSet(0x0303, (uint8_t *) "abcdefghi12345", 14);
+static const ExtensionFieldsSet onOffEFS1 = ExtensionFieldsSet(ON_OFF_CID, (uint8_t *) "1", 1);
+static const ExtensionFieldsSet onOffEFS2 = ExtensionFieldsSet(ON_OFF_CID, (uint8_t *) "0", 1);
+static const ExtensionFieldsSet lvCtrEFS1 = ExtensionFieldsSet(LV_CTR_CID, (uint8_t *) "511", 3);
+static const ExtensionFieldsSet lvCtrEFS2 = ExtensionFieldsSet(LV_CTR_CID, (uint8_t *) "222", 3);
+static const ExtensionFieldsSet coCtrEFS1 = ExtensionFieldsSet(CO_CTR_CID, (uint8_t *) "123456789abcde", 14);
+static const ExtensionFieldsSet coCtrEFS2 = ExtensionFieldsSet(CO_CTR_CID, (uint8_t *) "abcdefghi12345", 14);
 
 // Simulation of clusters callbacks (sate #1)
-CHIP_ERROR test_on_off_from_cluster_callback1(ExtensionFieldsSet & fields)
+CHIP_ERROR oo_from_cluster_cb1(ExtensionFieldsSet & fields)
 {
     ReturnErrorOnFailure(fields = onOffEFS1);
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR test_on_off_to_cluster_callback1(ExtensionFieldsSet & fields)
+CHIP_ERROR oo_to_cluster_cb1(ExtensionFieldsSet & fields)
 {
-    VerifyOrReturnError(fields == onOffEFS1, CHIP_ERROR_WRITE_FAILED);
+    VerifyOrReturnError(fields == onOffEFS1, CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR test_level_control_from_cluster_callback1(ExtensionFieldsSet & fields)
+CHIP_ERROR lc_from_cluster_cb1(ExtensionFieldsSet & fields)
 {
-    ReturnErrorOnFailure(fields = levelControlEFS1);
+    ReturnErrorOnFailure(fields = lvCtrEFS1);
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR test_level_control_to_cluster_callback1(ExtensionFieldsSet & fields)
+CHIP_ERROR lc_to_cluster_cb1(ExtensionFieldsSet & fields)
 {
-    VerifyOrReturnError(fields == levelControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    VerifyOrReturnError(fields == lvCtrEFS1, CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR test_color_control_from_cluster_callback1(ExtensionFieldsSet & fields)
+CHIP_ERROR cc_from_cluster_cb1(ExtensionFieldsSet & fields)
 {
-    ReturnErrorOnFailure(fields = colorControlEFS1);
+    ReturnErrorOnFailure(fields = coCtrEFS1);
     return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR test_color_control_to_cluster_callback1(ExtensionFieldsSet & fields)
+CHIP_ERROR cc_to_cluster_cb1(ExtensionFieldsSet & fields)
 {
-    VerifyOrReturnError(fields == colorControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    VerifyOrReturnError(fields == coCtrEFS1, CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 
 // Simulation of clusters callbacks (sate #2)
-CHIP_ERROR test_on_off_from_cluster_callback2(ExtensionFieldsSet & fields)
+CHIP_ERROR oo_from_cluster_cb2(ExtensionFieldsSet & fields)
 {
     ReturnErrorOnFailure(fields = onOffEFS1);
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR test_on_off_to_cluster_callback2(ExtensionFieldsSet & fields)
+CHIP_ERROR oo_to_cluster_cb2(ExtensionFieldsSet & fields)
 {
-    VerifyOrReturnError(fields == onOffEFS1, CHIP_ERROR_WRITE_FAILED);
+    VerifyOrReturnError(fields == onOffEFS1, CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR test_level_control_from_cluster_callback2(ExtensionFieldsSet & fields)
+CHIP_ERROR lc_from_cluster_cb2(ExtensionFieldsSet & fields)
 {
-    ReturnErrorOnFailure(fields = levelControlEFS1);
+    ReturnErrorOnFailure(fields = lvCtrEFS2);
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR test_level_control_to_cluster_callback2(ExtensionFieldsSet & fields)
+CHIP_ERROR lc_to_cluster_cb2(ExtensionFieldsSet & fields)
 {
-    VerifyOrReturnError(fields == levelControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    VerifyOrReturnError(fields == lvCtrEFS2, CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR test_color_control_from_cluster_callback2(ExtensionFieldsSet & fields)
+CHIP_ERROR cc_from_cluster_cb2(ExtensionFieldsSet & fields)
 {
-    ReturnErrorOnFailure(fields = colorControlEFS1);
+    ReturnErrorOnFailure(fields = coCtrEFS2);
     return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR test_color_control_to_cluster_callback2(ExtensionFieldsSet & fields)
+CHIP_ERROR cc_to_cluster_cb2(ExtensionFieldsSet & fields)
 {
-    VerifyOrReturnError(fields == colorControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    VerifyOrReturnError(fields == coCtrEFS2, CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 
@@ -168,18 +168,9 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     ResetSceneTable(sceneTable);
 
     // Test SceneHandlers
-    NL_TEST_ASSERT(
-        aSuite,
-        CHIP_NO_ERROR ==
-            sceneTable->registerHandler(onOffEFS1.ID, &test_on_off_from_cluster_callback1, &test_on_off_to_cluster_callback1));
-    NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       sceneTable->registerHandler(levelControlEFS1.ID, &test_level_control_from_cluster_callback1,
-                                                   &test_level_control_to_cluster_callback1));
-    NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       sceneTable->registerHandler(colorControlEFS1.ID, &test_color_control_from_cluster_callback1,
-                                                   &test_color_control_to_cluster_callback1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(onOffEFS1.ID, &oo_from_cluster_cb1, &oo_to_cluster_cb1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(lvCtrEFS1.ID, &lc_from_cluster_cb1, &lc_to_cluster_cb1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(coCtrEFS2.ID, &cc_from_cluster_cb1, &cc_to_cluster_cb1));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene1.storageData.extentsionFieldsSets));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene2.storageData.extentsionFieldsSets));
@@ -205,6 +196,7 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     // Not Found
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId9, scene));
 
+    // Get test
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, scene == scene1);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.storageData.extentsionFieldsSets));
@@ -239,18 +231,9 @@ void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     // Test SceneHandlers overwrite
-    NL_TEST_ASSERT(
-        aSuite,
-        CHIP_NO_ERROR ==
-            sceneTable->registerHandler(onOffEFS2.ID, &test_on_off_from_cluster_callback2, &test_on_off_to_cluster_callback2));
-    NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       sceneTable->registerHandler(levelControlEFS2.ID, &test_level_control_from_cluster_callback2,
-                                                   &test_level_control_to_cluster_callback2));
-    NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       sceneTable->registerHandler(colorControlEFS2.ID, &test_color_control_from_cluster_callback2,
-                                                   &test_color_control_to_cluster_callback2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(onOffEFS2.ID, &oo_from_cluster_cb2, &oo_to_cluster_cb2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(lvCtrEFS2.ID, &lc_from_cluster_cb2, &lc_to_cluster_cb2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(coCtrEFS2.ID, &cc_from_cluster_cb2, &cc_to_cluster_cb2));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene10.storageData.extentsionFieldsSets));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene11.storageData.extentsionFieldsSets));
@@ -292,7 +275,6 @@ void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
     if (iterator)
     {
         NL_TEST_ASSERT(aSuite, iterator->Count() == 8);
-
         NL_TEST_ASSERT(aSuite, iterator->Next(scene));
         NL_TEST_ASSERT(aSuite, scene == scene10);
         NL_TEST_ASSERT(aSuite, iterator->Next(scene));
@@ -329,7 +311,20 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, iterator->Count() == 7);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene10);
-    iterator->Release();
+
+    // Adde scene in middle, a spot should have been freed
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene9));
+    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    NL_TEST_ASSERT(aSuite, iterator->Count() == 8);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId9, scene));
+    NL_TEST_ASSERT(aSuite, scene == scene9);
+
+    // Remove the recently added scene 9
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene9.storageId));
+    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    NL_TEST_ASSERT(aSuite, iterator->Count() == 7);
+    NL_TEST_ASSERT(aSuite, iterator->Next(scene));
+    NL_TEST_ASSERT(aSuite, scene == scene10);
 
     // Remove first
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene1.storageId));
@@ -381,6 +376,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 0);
+    iterator->Release();
 }
 
 void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
@@ -393,10 +389,12 @@ void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
 
     SceneTableEntry scene;
 
+    // Fabric 1 inserts
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene1));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene2));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene3));
 
+    // Fabric 2 inserts
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene1));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene2));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene3));
@@ -422,7 +420,7 @@ void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
 
-    // Confirm Fabric 2 still there
+    // Verify Fabric 2 still there
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, scene == scene1);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId2, scene));
@@ -432,7 +430,7 @@ void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
 
     // Remove Fabric 2
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveFabric(kFabric2));
-    // Verify Fabric 1 removed
+    // Verify Fabric 2 removed
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->RemoveFabric(kFabric2));
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId2, scene));
@@ -470,9 +468,9 @@ int TestTeardown(void * inContext)
 int TestSceneTable()
 {
     static nlTest sTests[] = {
-        NL_TEST_DEF("TestFabricScenes", TestFabricScenes),       NL_TEST_DEF("TestStoreScenes", TestStoreScenes),
-        NL_TEST_DEF("TestOverwriteScenes", TestOverwriteScenes), NL_TEST_DEF("TestIterateScenes", TestIterateScenes),
-        NL_TEST_DEF("TestRemoveScenes", TestRemoveScenes),       NL_TEST_SENTINEL()
+        NL_TEST_DEF("TestStoreScenes", TestStoreScenes),     NL_TEST_DEF("TestOverwriteScenes", TestOverwriteScenes),
+        NL_TEST_DEF("TestIterateScenes", TestIterateScenes), NL_TEST_DEF("TestRemoveScenes", TestRemoveScenes),
+        NL_TEST_DEF("TestFabricScenes", TestFabricScenes),   NL_TEST_SENTINEL()
     };
 
     nlTestSuite theSuite = {
