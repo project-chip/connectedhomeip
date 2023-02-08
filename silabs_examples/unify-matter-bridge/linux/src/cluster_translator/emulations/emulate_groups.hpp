@@ -37,9 +37,14 @@ public:
         cluster_builder.outgoing_commands.clear();
 
         // Add GroupsType attribute to the matter cluster
-        cluster_builder.attributes.push_back(EmberAfAttributeMetadata{ Groups::Attributes::NameSupport::Id, ZCL_ENUM8_ATTRIBUTE_ID,
-                                                                       1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),
-                                                                       ZAP_EMPTY_DEFAULT() });
+        cluster_builder.attributes.push_back({ Groups::Attributes::NameSupport::Id, ZAP_TYPE(BITMAP8),
+                                                                       1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) , ZAP_SIMPLE_DEFAULT(128) });
+        cluster_builder.attributes.push_back({ Groups::Attributes::ClusterRevision::Id, ZAP_TYPE(INT16U),
+                                                                       2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_SIMPLE_DEFAULT(4) });
+        cluster_builder.attributes.push_back({ Groups::Attributes::FeatureMap::Id, ZAP_TYPE(INT16U),
+                                                                       2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_SIMPLE_DEFAULT(1) });
+
+
 
         cluster_builder.incoming_commands.insert(cluster_builder.incoming_commands.end(),
                                                  { Groups::Commands::AddGroup::Id, Groups::Commands::ViewGroup::Id,

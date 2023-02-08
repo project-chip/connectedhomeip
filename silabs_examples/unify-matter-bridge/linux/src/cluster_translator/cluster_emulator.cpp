@@ -22,6 +22,28 @@
 
 #define LOG_TAG "cluster_emulator"
 
+#include <app-common/zap-generated/callback.h>
+
+/**
+ * @brief Use default values for external attribute storage, this functions overrides a _weak_ symbol on the ember framework.
+ * 
+ * All attributes which has meta data with ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) and is not overridden by an attribute access interface,
+ * will be read though this function. Right now this only applies to the attriutes in the Group cluster.
+ * 
+ * @param endpoint 
+ * @param clusterId 
+ * @param attributeMetadata 
+ * @param buffer 
+ * @param maxReadLength 
+ * @return EmberAfStatus 
+ */
+EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
+                                     uint8_t * buffer, uint16_t maxReadLength) {
+  memcpy(buffer, &attributeMetadata->defaultValue, attributeMetadata->size);
+  return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+
 namespace unify::matter_bridge {
 
 #define ON_OFF_LIGHTING_FEATURE_MAP_MASK 0x01
