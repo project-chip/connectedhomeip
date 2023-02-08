@@ -141,11 +141,19 @@ class SpecDefinitions:
         if struct:
             return struct
 
+        event = self.get_event_by_name(cluster_name, target_name)
+        if event:
+            return event
+
         return None
 
     def is_fabric_scoped(self, target) -> bool:
-        if hasattr(target, 'qualities'):
+        if isinstance(target, Event):
+            return bool(target.is_fabric_sensitive)
+
+        if isinstance(target, Struct) and hasattr(target, 'qualities'):
             return bool(target.qualities & StructQuality.FABRIC_SCOPED)
+
         return False
 
     def is_nullable(self, target) -> bool:
