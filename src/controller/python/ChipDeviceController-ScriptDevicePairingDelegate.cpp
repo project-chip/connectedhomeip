@@ -66,7 +66,6 @@ void ScriptDevicePairingDelegate::SetCommissioningStatusUpdateCallback(
     mOnCommissioningStatusUpdateCallback = callback;
 }
 
-
 void ScriptDevicePairingDelegate::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     switch (status)
