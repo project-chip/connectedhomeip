@@ -45,6 +45,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include "rsi_board.h"
+#include "rsi_chip.h"
+#include "siwx917_utils.h"
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
@@ -56,8 +59,9 @@
  * Defines and Constants
  *********************************************************/
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
+#define FACTORY_RESET_TRIGGER_TIMEOUT 7000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
+#define FACTORY_RESET_LOOP_COUNT 5
 #ifndef APP_TASK_STACK_SIZE
 #define APP_TASK_STACK_SIZE (4096)
 #endif
@@ -243,40 +247,23 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
         return;
     }
 
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    // initiate factory reset
-    if (mFunctionTimerActive && mFunction == kFunction_StartBleAdv)
-    {
-        SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+}
 
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
-        // cancel, if required.
-        StartFunctionTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+void BaseApplication::FunctionFactoryReset( void )
+{
+    SILABS_LOG("#################################################################");
+    SILABS_LOG("################### Factory reset triggered #####################");
+    SILABS_LOG("#################################################################");
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-        StartStatusLEDTimer();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
-        mFunction = kFunction_FactoryReset;
-
-#ifdef ENABLE_WSTK_LEDS
-        // Turn off LED before starting blink to make sure blink is
-        // co-ordinated.
-        sStatusLED.Set(false);
-        sStatusLED.Blink(500);
-#endif // ENABLE_WSTK_LEDS
-    }
-    else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
-    {
-        // Actually trigger Factory Reset
-        mFunction = kFunction_NoneSelected;
+    // Actually trigger Factory Reset
+    mFunction = kFunction_NoneSelected;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-        StopStatusLEDTimer();
+    StopStatusLEDTimer();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
-        chip::Server::GetInstance().ScheduleFactoryReset();
-    }
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
 void BaseApplication::LightEventHandler()
@@ -367,6 +354,8 @@ void BaseApplication::LightEventHandler()
 
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
 {
+	uint8_t count = FACTORY_RESET_LOOP_COUNT;
+
     // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
     // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
     // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
@@ -376,45 +365,58 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
     if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
     {
-        if (!mFunctionTimerActive && mFunction == kFunction_NoneSelected)
+        if ((!mFunctionTimerActive) && (mFunction == kFunction_NoneSelected))
         {
-            StartFunctionTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-            mFunction = kFunction_StartBleAdv;
+	    mFunction = kFunction_FactoryReset;
+
+            // Wait for sometime to determine button is pressed for Factory reset
+            // other functionality
+            vTaskDelay(1000); // Delay of 1sec before we check the button status
         }
     }
-    else
-    {
-        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
-        if (mFunctionTimerActive && mFunction == kFunction_StartBleAdv)
-        {
-            CancelFunctionTimer();
-            mFunction = kFunction_NoneSelected;
 
-#ifdef SL_WIFI
-            if (!ConnectivityMgr().IsWiFiStationProvisioned())
-#else
-            if (!ConnectivityMgr().IsThreadProvisioned())
-#endif /* !SL_WIFI */
-            {
-                // Enable BLE advertisements
-                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-                ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
-            }
-            else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
+    while(!(RSI_NPSSGPIO_GetPin(NPSS_GPIO_0))) {
+        if(count == 0){
+            FunctionFactoryReset();
+            break;
         }
-        else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
-        {
-            CancelFunctionTimer();
+
+#ifdef ENABLE_WSTK_LEDS
+        // Turn off all LEDs before starting blink to make sure blink is
+        // co-ordinated.
+        sStatusLED.Set(false);
+        sStatusLED.Blink(500);
+#endif // ENABLE_WSTK_LEDS
+
+        SILABS_LOG("Factory reset triggering in %d sec release button to cancel",count--);
+
+        // Delay of 1sec before checking the button status again
+        vTaskDelay(1000);
+    }
+
+    if (count > 0) {
+#ifdef ENABLE_WSTK_LEDS
+        sStatusLED.Set(false);
+#endif
+        SILABS_LOG("Factory Reset has been Canceled");    // button held past Timeout wait till button is released
+    }
+
+    // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+    if (mFunction == kFunction_FactoryReset)
+    {
+        mFunction = kFunction_NoneSelected;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-            StopStatusLEDTimer();
+        StopStatusLEDTimer();
 #endif
 
-            // Change the function to none selected since factory reset has been
-            // canceled.
-            mFunction = kFunction_NoneSelected;
-            SILABS_LOG("Factory Reset has been Canceled");
+        if (!ConnectivityMgr().IsWiFiStationProvisioned())
+        {
+            // Enable BLE advertisements
+            ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+            ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
         }
+        else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
     }
 }
 

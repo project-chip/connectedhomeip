@@ -100,13 +100,13 @@ void RSI_Wakeupsw_config(void)
     RSI_NPSSGPIO_InputBufferEn(NPSS_GPIO_2, 1);
 
     /*Configure the NPSS GPIO mode to wake up  */
-    RSI_NPSSGPIO_SetPinMux(NPSS_GPIO_2, 2);
+    RSI_NPSSGPIO_SetPinMux(NPSS_GPIO_2, NPSSGPIO_PIN_MUX_MODE2);
 
     /*Configure the NPSS GPIO direction to input */
     RSI_NPSSGPIO_SetDir(NPSS_GPIO_2, NPSS_GPIO_DIR_OUTPUT);
 
-    /* Enables rise edge interrupt detection for UULP_VBAT_GPIO_0 */
-    RSI_NPSSGPIO_SetIntLevelLowEnable(NPSS_GPIO_2_INTR);
+    /* Enables fall edge interrupt detection for UULP_VBAT_GPIO_0 */
+    RSI_NPSSGPIO_SetIntFallEdgeEnable(NPSS_GPIO_2_INTR);
 
     /* Un mask the NPSS GPIO interrupt*/
     RSI_NPSSGPIO_IntrUnMask(NPSS_GPIO_2_INTR);
@@ -118,9 +118,9 @@ void RSI_Wakeupsw_config(void)
     RSI_NPSSGPIO_ClrIntr(NPSS_GPIO_2_INTR);
 
     /*Enable the NPSS GPIO interrupt slot*/
-    NVIC_EnableIRQ(21);
+    NVIC_EnableIRQ(NPSS_TO_MCU_GPIO_INTR_IRQn);
 
-    NVIC_SetPriority(21, 7);
+    NVIC_SetPriority(NPSS_TO_MCU_GPIO_INTR_IRQn, 7);
 }
 
 void RSI_Wakeupsw_config_gpio0(void)
@@ -140,8 +140,8 @@ void RSI_Wakeupsw_config_gpio0(void)
     /* Set the GPIO to wake from deep sleep */
     RSI_NPSSGPIO_SetWkpGpio(NPSS_GPIO_0_INTR);
 
-    /* Enables rise edge interrupt detection for UULP_VBAT_GPIO_0 */
-    RSI_NPSSGPIO_SetIntLevelLowEnable(NPSS_GPIO_0_INTR);
+    /* Enables fall edge interrupt detection for UULP_VBAT_GPIO_0 */
+    RSI_NPSSGPIO_SetIntFallEdgeEnable(NPSS_GPIO_0_INTR);
 
     /* Un mask the NPSS GPIO interrupt*/
     RSI_NPSSGPIO_IntrUnMask(NPSS_GPIO_0_INTR);
@@ -153,8 +153,8 @@ void RSI_Wakeupsw_config_gpio0(void)
     RSI_NPSSGPIO_ClrIntr(NPSS_GPIO_0_INTR);
 
     // 21 being the NPSS_TO_MCU_GPIO_INTR_IRQn
-    NVIC_EnableIRQ(21);
-    NVIC_SetPriority(21, 7);
+    NVIC_EnableIRQ(NPSS_TO_MCU_GPIO_INTR_IRQn);
+    NVIC_SetPriority(NPSS_TO_MCU_GPIO_INTR_IRQn, 7);
 }
 
 /*==============================================*/
