@@ -22,9 +22,6 @@ config:
     nodeId: 0x12344321
     cluster: "Access Control"
     endpoint: 0
-    CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
     CAT1:
         type: int64u
         defaultValue: 65520
@@ -46,6 +43,14 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: CommissionerNodeId
 
     - label:
           "Step 2:TH1 reads DUT Endpoint 0 OperationalCredentials cluster

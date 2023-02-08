@@ -48,15 +48,16 @@ CHIP_ERROR WriteHandler::Init()
 
 void WriteHandler::Close()
 {
-    mSuppressResponse = false;
     VerifyOrReturn(mState != State::Uninitialized);
 
-    ClearState();
-}
-
-void WriteHandler::Abort()
-{
-    ClearState();
+    // DeliverFinalListWriteEnd will be a no-op if we have called
+    // DeliverFinalListWriteEnd in success conditions, so passing false for
+    // wasSuccessful here is safe: if it does anything, we were in fact not
+    // successful.
+    DeliverFinalListWriteEnd(false /* wasSuccessful */);
+    mExchangeCtx.Release();
+    mSuppressResponse = false;
+    MoveToState(State::Uninitialized);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -689,13 +690,6 @@ void WriteHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
-}
-
-void WriteHandler::ClearState()
-{
-    DeliverFinalListWriteEnd(false /* wasSuccessful */);
-    mExchangeCtx.Release();
-    MoveToState(State::Uninitialized);
 }
 
 } // namespace app

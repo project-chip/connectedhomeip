@@ -36,6 +36,8 @@ _TEST_SECTION = [
     'cluster',
     'command',
     'disabled',
+    'event',
+    'eventNumber',
     'endpoint',
     'identity',
     'fabricFiltered',
@@ -81,6 +83,7 @@ _ATTRIBUTE_COMMANDS = [
 _EVENT_COMMANDS = [
     'readEvent',
     'subscribeEvent',
+    'waitForReport',
 ]
 
 
@@ -99,6 +102,7 @@ class PostProcessCheckType(Enum):
     CONSTRAINT_VALIDATION = auto()
     SAVE_AS_VARIABLE = auto()
     WAIT_VALIDATION = auto()
+    OPTIONAL = auto()
 
 
 class PostProcessCheck:
@@ -206,6 +210,7 @@ class _TestStepWithPlaceholders:
         self.cluster = _value_or_config(test, 'cluster', config)
         self.command = _value_or_config(test, 'command', config)
         self.attribute = _value_or_none(test, 'attribute')
+        self.event = _value_or_none(test, 'event')
         self.endpoint = _value_or_config(test, 'endpoint', config)
         self.is_pics_enabled = pics_checker.check(_value_or_none(test, 'PICS'))
 
@@ -217,20 +222,35 @@ class _TestStepWithPlaceholders:
             test, 'timedInteractionTimeoutMs')
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
         self.wait_for = _value_or_none(test, 'wait')
+        self.event_number = _value_or_none(test, 'eventNumber')
 
-        self.is_attribute = self.command in _ATTRIBUTE_COMMANDS or self.wait_for in _ATTRIBUTE_COMMANDS
-        self.is_event = self.command in _EVENT_COMMANDS or self.wait_for in _EVENT_COMMANDS
+        self.is_attribute = self.attribute and (
+            self.command in _ATTRIBUTE_COMMANDS or self.wait_for in _ATTRIBUTE_COMMANDS)
+        self.is_event = self.event and (
+            self.command in _EVENT_COMMANDS or self.wait_for in _EVENT_COMMANDS)
 
-        self.arguments_with_placeholders = _value_or_none(test, 'arguments')
-        self.response_with_placeholders = _value_or_none(test, 'response')
+        arguments = _value_or_none(test, 'arguments')
+        _check_valid_keys(arguments, _TEST_ARGUMENTS_SECTION)
+        self._convert_single_value_to_values(arguments)
+        self.arguments_with_placeholders = arguments
 
-        _check_valid_keys(self.arguments_with_placeholders,
-                          _TEST_ARGUMENTS_SECTION)
-        _check_valid_keys(self.response_with_placeholders,
-                          _TEST_RESPONSE_SECTION)
+        responses = _value_or_none(test, 'response')
+        # Test may expect multiple responses. For example reading events may
+        # trigger multiple event responses. Or reading multiple attributes
+        # at the same time, may trigger multiple responses too.
+        if responses is None:
+            # If no response is specified at all, it implies that the step expect
+            # a success with any associatied value(s). So the empty response is effectively
+            # replace by an array that contains an empty object to represent that.
+            responses = [{}]
+        elif not isinstance(responses, list):
+            # If a single response is specified, it is converted to a list of responses.
+            responses = [responses]
 
-        self._convert_single_value_to_values(self.arguments_with_placeholders)
-        self._convert_single_value_to_values(self.response_with_placeholders)
+        for response in responses:
+            _check_valid_keys(response, _TEST_RESPONSE_SECTION)
+            self._convert_single_value_to_values(response)
+        self.responses_with_placeholders = responses
 
         argument_mapping = None
         response_mapping = None
@@ -245,6 +265,15 @@ class _TestStepWithPlaceholders:
                 argument_mapping = attribute_mapping
                 response_mapping = attribute_mapping
                 response_mapping_name = attribute.definition.data_type.name
+        elif self.is_event:
+            event = definitions.get_event_by_name(
+                self.cluster, self.event)
+            if event:
+                event_mapping = self._as_mapping(definitions, self.cluster,
+                                                 event.name)
+                argument_mapping = event_mapping
+                response_mapping = event_mapping
+                response_mapping_name = event.name
         else:
             command = definitions.get_command_by_name(
                 self.cluster, self.command)
@@ -259,15 +288,25 @@ class _TestStepWithPlaceholders:
         self.response_mapping = response_mapping
         self.response_mapping_name = response_mapping_name
         self.update_arguments(self.arguments_with_placeholders)
-        self.update_response(self.response_with_placeholders)
+        self.update_responses(self.responses_with_placeholders)
+
+        # Some keywords, such as "optional" and "wait_for" do not support multiple
+        # responses.
+        if len(responses) > 1:
+            if self.optional:
+                raise Exception(
+                    'The "optional" keyword can not be used with multiple expected responses')
+            elif self.wait_for:
+                raise Exception(
+                    'The "wait_for" keyword can not be used with multiple expected responses')
 
         # This performs a very basic sanity parse time check of constraints. This parsing happens
         # again inside post processing response since at that time we will have required variables
         # to substitute in. This parsing check here has value since some test can take a really
         # long time to run so knowing earlier on that the test step would have failed at parsing
         # time before the test step run occurs save developer time that building yaml tests.
-        if self.response_with_placeholders:
-            for value in self.response_with_placeholders['values']:
+        for response in self.responses_with_placeholders:
+            for value in response:
                 if 'constraints' not in value:
                     continue
                 get_constraints(value['constraints'])
@@ -313,17 +352,22 @@ class _TestStepWithPlaceholders:
         self._update_with_definition(
             arguments_with_placeholders, self.argument_mapping)
 
-    def update_response(self, response_with_placeholders):
-        self._update_with_definition(
-            response_with_placeholders, self.response_mapping)
+    def update_responses(self, responses_with_placeholders):
+        for response in responses_with_placeholders:
+            self._update_with_definition(
+                response, self.response_mapping)
 
     def _update_with_definition(self, container: dict, mapping_type):
         if not container or not mapping_type:
             return
 
-        for value in list(container['values']):
+        values = container['values']
+        if values is None:
+            return
+
+        for value in list(values):
             for key, item_value in list(value.items()):
-                if self.is_attribute:
+                if self.is_attribute or self.is_event:
                     mapping = mapping_type
                 else:
                     target_key = value['name']
@@ -405,14 +449,16 @@ class TestStep:
         self._test = test
         self._runtime_config_variable_storage = runtime_config_variable_storage
         self.arguments = copy.deepcopy(test.arguments_with_placeholders)
-        self.response = copy.deepcopy(test.response_with_placeholders)
+        self.responses = copy.deepcopy(test.responses_with_placeholders)
         if test.is_pics_enabled:
             self._update_placeholder_values(self.arguments)
-            self._update_placeholder_values(self.response)
+            self._update_placeholder_values(self.responses)
             self._test.node_id = self._config_variable_substitution(
                 self._test.node_id)
+            self._test.event_number = self._config_variable_substitution(
+                self._test.event_number)
             test.update_arguments(self.arguments)
-            test.update_response(self.response)
+            test.update_responses(self.responses)
 
     @property
     def is_enabled(self):
@@ -459,6 +505,10 @@ class TestStep:
         return self._test.attribute
 
     @property
+    def event(self):
+        return self._test.event
+
+    @property
     def endpoint(self):
         return self._test.endpoint
 
@@ -490,42 +540,86 @@ class TestStep:
     def wait_for(self):
         return self._test.wait_for
 
-    def post_process_response(self, response: dict):
+    @property
+    def event_number(self):
+        return self._test.event_number
+
+    def post_process_response(self, received_responses):
         result = PostProcessResponseResult()
 
+        # A list of responses is what is expected, but for legacy, if the response
+        # does not comes up as a list, it is converted here.
+        # TODO It should be removed once all decoders returns a list.
+        if not isinstance(received_responses, list):
+            received_responses = [received_responses]
+
         if self.wait_for is not None:
-            self._response_cluster_wait_validation(response, result)
+            self._response_cluster_wait_validation(received_responses, result)
             return result
 
-        if self._skip_post_processing(response, result):
+        if self._skip_post_processing(received_responses, result):
             return result
 
-        self._response_error_validation(response, result)
-        if self.response:
-            self._response_cluster_error_validation(response, result)
-            self._response_values_validation(response, result)
-            self._response_constraints_validation(response, result)
-            self._maybe_save_as(response, result)
+        check_type = PostProcessCheckType.RESPONSE_VALIDATION
+        error_failure_wrong_response_number = f'The test expects {len(self.responses)} responses but got {len(received_responses)} responses.'
+
+        received_responses_copy = copy.deepcopy(received_responses)
+        for expected_response in self.responses:
+            if len(received_responses_copy) == 0:
+                result.error(check_type, error_failure_wrong_response_number)
+                return result
+            received_response = received_responses_copy.pop(0)
+            self._response_error_validation(
+                expected_response, received_response, result)
+            self._response_cluster_error_validation(
+                expected_response, received_response, result)
+            self._response_values_validation(
+                expected_response, received_response, result)
+            self._response_constraints_validation(
+                expected_response, received_response, result)
+            self._maybe_save_as(expected_response, received_response, result)
+
+        # An empty response array in a test step (responses: []) implies that the test step does expect a response
+        # but without any associated value.
+        if self.responses == [] and received_responses_copy == [{}]:
+            # if the received responses is a simple success ([{}]), that is valid.
+            return result
+        # This is different from the case where no response is specified at all, which implies that the step expect
+        # a success with any associatied value(s).
+        elif self.responses == [{'values': [{}]}] and len(received_responses_copy):
+            # if there are multiple responses and the test specifies that it does not really care
+            # about which values are returned, that is valid too.
+            return result
+        # Anything more complex where the response field as been defined with some values and the number
+        # of expected responses differs from the number of received responses is an error.
+        elif len(received_responses_copy) != 0:
+            result.error(check_type, error_failure_wrong_response_number)
 
         return result
 
-    def _response_cluster_wait_validation(self, response, result):
+    def _response_cluster_wait_validation(self, received_responses, result):
         """Check if the response concrete path matches the configuration of the test step
            and validate that the response type (e.g readAttribute/writeAttribute/...) matches
            the expectation from the test step."""
         check_type = PostProcessCheckType.WAIT_VALIDATION
         error_success = 'The test expectation "{wait_for}" for "{cluster}.{wait_type}" on endpoint {endpoint} is true'
         error_failure = 'The test expectation "{expected} == {received}" is false'
+        error_failure_multiple_responses = 'The test expects a single response but got {len(received_responses)} responses.'
+
+        if len(received_responses) > 1:
+            result.error(check_type, error_failure.multiple_responses)
+            return
+        received_response = received_responses[0]
 
         if self.is_attribute:
             expected_wait_type = self.attribute
-            received_wait_type = response.get('attribute')
+            received_wait_type = received_response.get('attribute')
         elif self.is_event:
             expected_wait_type = self.event
-            received_wait_type = response.get('event')
+            received_wait_type = received_response.get('event')
         else:
             expected_wait_type = self.command
-            received_wait_type = response.get('command')
+            received_wait_type = receive_response.get('command')
 
         expected_values = [
             self.wait_for,
@@ -536,9 +630,9 @@ class TestStep:
         ]
 
         received_values = [
-            response.get('wait_for'),
-            response.get('endpoint'),
-            response.get('cluster'),
+            received_response.get('wait_for'),
+            received_response.get('endpoint'),
+            received_response.get('cluster'),
             received_wait_type
         ]
 
@@ -555,7 +649,7 @@ class TestStep:
             result.success(check_type, error_success.format(
                 wait_for=self.wait_for, cluster=self.cluster, wait_type=expected_wait_type, endpoint=self.endpoint))
 
-    def _skip_post_processing(self, response: dict, result) -> bool:
+    def _skip_post_processing(self, received_responses, result) -> bool:
         '''Should we skip perform post processing.
 
         Currently we only skip post processing if the test step indicates that sent test step
@@ -566,17 +660,26 @@ class TestStep:
         if not self.optional:
             return False
 
-        received_error = response.get('error', None)
+        check_type = PostProcessCheckType.OPTIONAL
+        error_failure_multiple_responses = 'The test expects a single response but got {len(received_responses)} responses.'
+
+        if len(received_responses) > 1:
+            result.error(check_type, error_failure.multiple_responses)
+            return False
+        received_response = received_responses[0]
+
+        received_error = received_response.get('error', None)
         if received_error is None:
             return False
 
         if received_error == 'UNSUPPORTED_ATTRIBUTE' or received_error == 'UNSUPPORTED_COMMAND':
-            # result.warning(PostProcessCheckType.Optional, f'The response contains the error: "{error}".')
+            result.warning(PostProcessCheckType.OPTIONAL,
+                           f'The response contains the error: "{received_error}".')
             return True
 
         return False
 
-    def _response_error_validation(self, response, result):
+    def _response_error_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.IM_STATUS
         error_success = 'The test expects the "{error}" error which occured successfully.'
         error_success_no_error = 'The test expects no error and no error occurred.'
@@ -584,9 +687,9 @@ class TestStep:
         error_unexpected_error = 'The test expects no error but the "{error}" error occured.'
         error_unexpected_success = 'The test expects the "{error}" error but no error occured.'
 
-        expected_error = self.response.get('error') if self.response else None
-
-        received_error = response.get('error')
+        expected_error = expected_response.get(
+            'error') if expected_response else None
+        received_error = received_response.get('error')
 
         if expected_error and received_error and expected_error == received_error:
             result.success(check_type, error_success.format(
@@ -606,14 +709,14 @@ class TestStep:
             # This should not happens
             raise AssertionError('This should not happens.')
 
-    def _response_cluster_error_validation(self, response, result):
+    def _response_cluster_error_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.CLUSTER_STATUS
         error_success = 'The test expects the "{error}" error which occured successfully.'
         error_unexpected_success = 'The test expects the "{error}" error but no error occured.'
         error_wrong_error = 'The test expects the "{error}" error but the "{value}" error occured.'
 
-        expected_error = self.response.get('clusterError')
-        received_error = response.get('clusterError')
+        expected_error = expected_response.get('clusterError')
+        received_error = received_response.get('clusterError')
 
         if expected_error:
             if received_error and expected_error == received_error:
@@ -629,21 +732,27 @@ class TestStep:
             # Nothing is logged here to not be redundant with the generic error checking code.
             pass
 
-    def _response_values_validation(self, response, result):
+    def _response_values_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
         error_success = 'The test expectation "{name} == {value}" is true'
         error_failure = 'The test expectation "{name} == {value}" is false'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
+        error_value_does_not_exist = 'The test expects a value but it does not exists in the response."'
 
-        for value in self.response['values']:
+        for value in expected_response['values']:
             if 'value' not in value:
                 continue
 
             expected_name = 'value'
-            received_value = response.get('value')
-            if not self.is_attribute:
+            if expected_name not in received_response:
+                result.error(
+                    check_type, error_value_does_not_exist)
+                break
+
+            received_value = received_response.get('value')
+            if not self.is_attribute and not self.is_event:
                 expected_name = value.get('name')
-                if received_value is None or expected_name not in received_value:
+                if expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
                         name=expected_name))
                     continue
@@ -678,18 +787,18 @@ class TestStep:
         else:
             return expected_value == received_value
 
-    def _response_constraints_validation(self, response, result):
+    def _response_constraints_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
         error_success = 'Constraints check passed'
         error_failure = 'Constraints check failed'
 
         response_type_name = self._test.response_mapping_name
-        for value in self.response['values']:
+        for value in expected_response['values']:
             if 'constraints' not in value:
                 continue
 
-            received_value = response.get('value')
-            if not self.is_attribute:
+            received_value = received_response.get('value')
+            if not self.is_attribute and not self.is_event:
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
                     received_value = None
@@ -714,17 +823,17 @@ class TestStep:
                 # TODO would be helpful to be more verbose here
                 result.error(check_type, error_failure)
 
-    def _maybe_save_as(self, response, result):
+    def _maybe_save_as(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.SAVE_AS_VARIABLE
         error_success = 'The test save the value "{value}" as {name}.'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
-        for value in self.response['values']:
+        for value in expected_response['values']:
             if 'saveAs' not in value:
                 continue
 
-            received_value = response.get('value')
-            if not self.is_attribute:
+            received_value = received_response.get('value')
+            if not self.is_attribute and not self.is_event:
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
@@ -739,23 +848,26 @@ class TestStep:
             result.success(check_type, error_success.format(
                 value=received_value, name=save_as))
 
-    def _update_placeholder_values(self, container):
-        if not container:
+    def _update_placeholder_values(self, containers):
+        if not containers:
             return
 
-        values = container['values']
+        if not isinstance(containers, list):
+            containers = [containers]
 
-        for idx, item in enumerate(values):
-            if 'value' in item:
-                values[idx]['value'] = self._config_variable_substitution(
-                    item['value'])
+        for container in containers:
+            values = container['values']
+            for idx, item in enumerate(values):
+                if 'value' in item:
+                    values[idx]['value'] = self._config_variable_substitution(
+                        item['value'])
 
-            if 'constraints' in item:
-                for constraint, constraint_value in item['constraints'].items():
-                    values[idx]['constraints'][constraint] = self._config_variable_substitution(
-                        constraint_value)
+                if 'constraints' in item:
+                    for constraint, constraint_value in item['constraints'].items():
+                        values[idx]['constraints'][constraint] = self._config_variable_substitution(
+                            constraint_value)
 
-        container['values'] = values
+            container['values'] = values
 
     def _config_variable_substitution(self, value):
         if type(value) is list:

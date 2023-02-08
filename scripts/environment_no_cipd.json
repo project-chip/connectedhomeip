@@ -3,7 +3,8 @@
         "gn_root": ".",
         "gn_targets": [":python_packages.install"],
         "requirements": ["scripts/requirements.txt"],
-        "constraints": ["scripts/constraints.txt"]
+        "constraints": ["scripts/constraints.txt"],
+        "gn_args": ["chip_crypto=\"boringssl\""]
     },
     "required_submodules": ["third_party/pigweed/repo"],
     "rosetta": "never",

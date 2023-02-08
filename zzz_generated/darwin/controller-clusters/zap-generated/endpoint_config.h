@@ -71,6 +71,15 @@
 
 #define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 
+// clang-format off
+#define GENERATED_EVENT_COUNT 0
+#define GENERATED_EVENTS { \
+}
+
+// clang-format on
+
+#define ZAP_GENERATED_EVENTS_INDEX(index) (&generatedEvents[index])
+
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS
 
@@ -89,6 +98,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Groups (client) */ \
@@ -100,6 +111,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Scenes (client) */ \
@@ -111,6 +124,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: On/Off (client) */ \
@@ -122,6 +137,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: On/off Switch Configuration (client) */ \
@@ -133,6 +150,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Level Control (client) */ \
@@ -144,6 +163,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Binary Input (Basic) (client) */ \
@@ -155,6 +176,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Descriptor (client) */ \
@@ -166,6 +189,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Binding (client) */ \
@@ -177,6 +202,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Access Control (client) */ \
@@ -188,6 +215,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Actions (client) */ \
@@ -199,6 +228,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Basic Information (client) */ \
@@ -210,6 +241,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: OTA Software Update Provider (client) */ \
@@ -221,6 +254,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: OTA Software Update Requestor (client) */ \
@@ -232,6 +267,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Localization Configuration (client) */ \
@@ -243,6 +280,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Time Format Localization (client) */ \
@@ -254,6 +293,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Unit Localization (client) */ \
@@ -265,6 +306,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Power Source Configuration (client) */ \
@@ -276,6 +319,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Power Source (client) */ \
@@ -287,6 +332,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: General Commissioning (client) */ \
@@ -298,6 +345,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Network Commissioning (client) */ \
@@ -309,6 +358,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Diagnostic Logs (client) */ \
@@ -320,6 +371,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: General Diagnostics (client) */ \
@@ -331,6 +384,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Software Diagnostics (client) */ \
@@ -342,6 +397,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Thread Network Diagnostics (client) */ \
@@ -353,6 +410,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: WiFi Network Diagnostics (client) */ \
@@ -364,6 +423,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (client) */ \
@@ -375,6 +436,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Bridged Device Basic Information (client) */ \
@@ -386,6 +449,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Switch (client) */ \
@@ -397,6 +462,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Administrator Commissioning (client) */ \
@@ -408,6 +475,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Operational Credentials (client) */ \
@@ -419,6 +488,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Group Key Management (client) */ \
@@ -430,6 +501,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Fixed Label (client) */ \
@@ -441,6 +514,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: User Label (client) */ \
@@ -452,6 +527,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Boolean State (client) */ \
@@ -463,6 +540,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Mode Select (client) */ \
@@ -474,6 +553,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Door Lock (client) */ \
@@ -485,6 +566,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Window Covering (client) */ \
@@ -496,6 +579,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Barrier Control (client) */ \
@@ -507,6 +592,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Pump Configuration and Control (client) */ \
@@ -518,6 +605,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Thermostat (client) */ \
@@ -529,6 +618,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Fan Control (client) */ \
@@ -540,6 +631,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (client) */ \
@@ -551,6 +644,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Color Control (client) */ \
@@ -562,6 +657,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Ballast Configuration (client) */ \
@@ -573,6 +670,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Illuminance Measurement (client) */ \
@@ -584,6 +683,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Temperature Measurement (client) */ \
@@ -595,6 +696,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Pressure Measurement (client) */ \
@@ -606,6 +709,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Flow Measurement (client) */ \
@@ -617,6 +722,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Relative Humidity Measurement (client) */ \
@@ -628,6 +735,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Occupancy Sensing (client) */ \
@@ -639,6 +748,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Wake on LAN (client) */ \
@@ -650,6 +761,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Channel (client) */ \
@@ -661,6 +774,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Target Navigator (client) */ \
@@ -672,6 +787,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Media Playback (client) */ \
@@ -683,6 +800,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Media Input (client) */ \
@@ -694,6 +813,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Low Power (client) */ \
@@ -705,6 +826,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Keypad Input (client) */ \
@@ -716,6 +839,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Content Launcher (client) */ \
@@ -727,6 +852,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Audio Output (client) */ \
@@ -738,6 +865,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Application Launcher (client) */ \
@@ -749,6 +878,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Application Basic (client) */ \
@@ -760,6 +891,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Account Login (client) */ \
@@ -771,6 +904,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Electrical Measurement (client) */ \
@@ -782,6 +917,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Client Monitoring (client) */ \
@@ -793,6 +930,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Unit Testing (client) */ \
@@ -804,6 +943,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
 }
 

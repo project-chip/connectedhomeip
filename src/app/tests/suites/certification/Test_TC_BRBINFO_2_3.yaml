@@ -213,18 +213,6 @@ tests:
           [1663583922.989709][155023:155023] CHIP:DMG: << from UDP:[fe80::e2a:f0a6:5d44:15b1%wlp3s0]:35251 | 43255988 | [Secure Channel  (0) / Standalone Ack (0x10) / Session = 0 / Exchange = 14682]
       disabled: true
 
-    - label: "DUT reads Location from the TH"
-      PICS: BRBINFO.C.A0006
-      verification: |
-          ./chip-tool bridgeddevicebasic read location 1 3
-
-          Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
-
-
-
-          chip-tool needs to be implemented
-      disabled: true
-
     - label: "DUT reads HardwareVersion from the TH"
       PICS: BRBINFO.C.A0007
       verification: |

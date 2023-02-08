@@ -132,7 +132,10 @@ void InteractionModelEngine::Shutdown()
 
     for (auto & writeHandler : mWriteHandlers)
     {
-        writeHandler.Abort();
+        if (!writeHandler.IsFree())
+        {
+            writeHandler.Close();
+        }
     }
 
     mReportingEngine.Shutdown();
