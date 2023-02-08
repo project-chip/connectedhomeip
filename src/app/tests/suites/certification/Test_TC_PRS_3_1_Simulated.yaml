@@ -185,7 +185,7 @@ tests:
           TH all-clusters-minimal-app does not support optional attributes, if implemted we will get "General error: 0x86 (UNSUPPORTED_ATTRIBUTE)" as output when we read following attributes.
 
 
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
           TH receives the read command and knows this attribute for this cluster and provides a plausable value, DUT processes the values and operates normally
