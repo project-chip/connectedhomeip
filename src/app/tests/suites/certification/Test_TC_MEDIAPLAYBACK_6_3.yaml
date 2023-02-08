@@ -45,7 +45,7 @@ tests:
                 value: 0
 
     - label: "Sends a Seek command"
-      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "Seek"
       arguments:
           values:
@@ -60,7 +60,7 @@ tests:
           "Verify that the media has moved to 10 seconds from the starting point"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0b.Rsp
       arguments:
           values:
               - name: "message"
@@ -71,7 +71,7 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute"
-      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0b.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
@@ -165,7 +165,7 @@ tests:
     - label:
           "Sends a Seek command Position value beyond the furthest valid
           position"
-      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "Seek"
       arguments:
           values:
@@ -179,7 +179,7 @@ tests:
     - label: "verify that the media has not moved."
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0b.Rsp
       arguments:
           values:
               - name: "message"
