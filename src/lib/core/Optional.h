@@ -184,6 +184,8 @@ public:
         return (mHasValue == other.mHasValue) && (!other.mHasValue || (mValue.mData == other.mValue.mData));
     }
     bool operator!=(const Optional & other) const { return !(*this == other); }
+    bool operator==(const T & other) const { return HasValue() && Value() == other; }
+    bool operator!=(const T & other) const { return !(*this == other); }
 
     /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing() { return Optional<T>(); }
