@@ -15,11 +15,11 @@ message FirstCluster {
     CLUSTER_ID = 1;
   }
 
-  // Enums
 
-  // Bitmaps
 
-  // Structs
+
+
+
 
   // Attributes
   /** int16u Type: 6 IsList: 0 FieldId: 1 */
@@ -31,7 +31,5 @@ message FirstCluster {
 
 
 
-  // Commands
 
-  // Events
 }

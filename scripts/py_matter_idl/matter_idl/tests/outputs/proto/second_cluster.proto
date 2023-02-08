@@ -15,11 +15,11 @@ message SecondCluster {
     CLUSTER_ID = 2;
   }
 
-  // Enums
 
-  // Bitmaps
 
-  // Structs
+
+
+
 
   // Attributes
   /** octet_string Type: 5 IsList: 0 FieldId: 123 */
@@ -30,7 +30,5 @@ message SecondCluster {
 
 
 
-  // Commands
 
-  // Events
 }

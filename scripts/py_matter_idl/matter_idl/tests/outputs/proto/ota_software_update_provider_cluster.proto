@@ -17,14 +17,12 @@ message OtaSoftwareUpdateProviderCluster {
 
   // Enums
   enum OTAApplyUpdateAction {
-    
     OTAAUA_PROCEED = 0;
     OTAAUA_AWAIT_NEXT_ACTION = 1;
     OTAAUA_DISCONTINUE = 2;
   }
 
   enum OTADownloadProtocol {
-    
     OTADP_BDXSYNCHRONOUS = 0;
     OTADP_BDXASYNCHRONOUS = 1;
     OTADP_HTTPS = 2;
@@ -32,7 +30,6 @@ message OtaSoftwareUpdateProviderCluster {
   }
 
   enum OTAQueryStatus {
-    
     OTAQS_UPDATE_AVAILABLE = 0;
     OTAQS_BUSY = 1;
     OTAQS_NOT_AVAILABLE = 2;
@@ -40,7 +37,7 @@ message OtaSoftwareUpdateProviderCluster {
   }
 
 
-  // Bitmaps
+
 
   // Structs
 
@@ -50,8 +47,6 @@ message OtaSoftwareUpdateProviderCluster {
     // [(attribute) = {
       // is_subscribable: true,
     // }];
-
-
 
   // Commands
   message QueryImageCommand {
@@ -108,5 +103,5 @@ message OtaSoftwareUpdateProviderCluster {
 }
 
 
-  // Events
+
 }

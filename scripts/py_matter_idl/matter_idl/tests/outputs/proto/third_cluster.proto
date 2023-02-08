@@ -17,7 +17,6 @@ message ThirdCluster {
 
   // Enums
   enum MyEnum {
-    
     ME_UNKNOWN = 0;
     ME_KNOWN = 100;
   }
@@ -31,7 +30,7 @@ message ThirdCluster {
   }
 
 
-  // Structs
+
 
   // Attributes
   /** MyEnum Type: 6 IsList: 0 FieldId: 10 */
@@ -51,7 +50,5 @@ message ThirdCluster {
 
 
 
-  // Commands
 
-  // Events
 }

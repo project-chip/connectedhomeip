@@ -15,16 +15,17 @@ message {{cluster.name}}Cluster {
     CLUSTER_ID = {{cluster.code}};
   }
 
-  // Enums
+{% if cluster.enums %}  // Enums{% endif -%}
 {%-   for entry in cluster.enums %}
   enum {{entry.name}} {
-    {% if (entry.entries[0].code != 0) %}{{"unsupported" | toEnumEntryName(entry.name)}} = 0;{% endif %}
+    {%- if (entry.entries[0].code != 0) %}
+    {{"unsupported" | toEnumEntryName(entry.name)}} = 0;{% endif -%}
     {%-  for field in entry.entries %}
     {{field.name | toEnumEntryName(entry.name)}} = {{field.code}};{%   endfor %}
   }
 {%   endfor %}
 
-  // Bitmaps
+{% if cluster.bitmaps %}  // Bitmaps{% endif -%}
 {%-   for entry in cluster.bitmaps %}
   enum {{entry.name}} {
     {{"unsupported" | toEnumEntryName(entry.name)}} = 0;
@@ -33,7 +34,7 @@ message {{cluster.name}}Cluster {
   }
 {%   endfor %}
 
-  // Structs
+{% if cluster.structs %}  // Structs{% endif -%}
 {%-   for entry in cluster.structs %}{% if not entry.tag %}
   message {{entry.name}} {
     {%-  for field in entry.fields %}
@@ -42,7 +43,7 @@ message {{cluster.name}}Cluster {
   }
 {% endif %}{%   endfor %}
 
-  // Attributes
+{% if cluster.attributes %}  // Attributes{% endif -%}
 {%-   for attr in cluster.attributes %}
   {{attr.definition | toFieldComment}}
   {{attr.definition.data_type.name | toProtobufType}} {{attr.definition.name | toLowerSnakeCase}} = {{attr.definition | toFieldTag()}};
@@ -53,9 +54,9 @@ message {{cluster.name}}Cluster {
       // is_subscribable: true,{% endif %}
     // }];
 
-{%   endfor %}
+{%   endfor -%}
 
-  // Commands
+{%- if cluster.commands %}  // Commands{% endif %}
 {%-   for cmd in cluster.commands %}
   message {{cmd.name}}Command {
     // option (message_type) = MATTER_COMMAND;
@@ -72,7 +73,7 @@ message {{cluster.name}}Cluster {
   }{% endif %}
 {%   endfor %}
 
-  // Events
+{% if cluster.events %}  // Events{% endif %}
 {%-   for entry in cluster.events %}
   message {{entry.name}} {
     // option (message_type) = MATTER_EVENT;
