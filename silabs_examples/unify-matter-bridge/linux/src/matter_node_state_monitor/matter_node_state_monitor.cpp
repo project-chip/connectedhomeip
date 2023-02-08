@@ -200,11 +200,23 @@ void matter_node_state_monitor::display_map(std::ostream & os)
     os << std::setw(columnWidth) << "Unify Unid"
        << "|" << std::setw(columnWidth) << "Unify Endpoint"
        << "|" << std::setw(columnWidth) << "Matter Endpoint\n";
+    os << std::setw(columnWidth) << "------------"
+       << "|" << std::setw(columnWidth) << "--------------"
+       << "|" << std::setw(columnWidth) << "--------------\n";
+    os << std::setw(columnWidth) << "-"
+       << "|" << std::setw(columnWidth) << "-"
+       << "|" << std::setw(columnWidth) << "(Root)  0\n";
+    os << std::setw(columnWidth) << "-"
+       << "|" << std::setw(columnWidth) << "-"
+       << "|" << std::setw(columnWidth) << "(Aggregator)  1\n";
     for (auto ep = bridged_endpoints.begin(); ep != bridged_endpoints.end(); ep++)
     {
         os << std::setw(columnWidth) << ep->second.unify_unid.c_str() << "|" << std::setw(columnWidth)
            << unsigned(ep->second.unify_endpoint) << "|" << std::setw(columnWidth) << ep->second.matter_endpoint << "\n";
     }
+    os << std::setw(columnWidth) << "------------"
+       << "|" << std::setw(columnWidth) << "--------------"
+       << "|" << std::setw(columnWidth) << "--------------\n";
 }
 
 void matter_node_state_monitor::register_dynamic_endpoint(const struct bridged_endpoint & bridge)

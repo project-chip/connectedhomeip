@@ -84,7 +84,7 @@ static sl_status_t groups_map_cli_func(const handle_args_t & arg)
 command_map_t unify_cli_commands = {
     { "commission", { "Open commissioning window", commission_cli_func } },
     { "closecommission", { "Close the commissioning window", close_commission_cli_func } },
-    { "epmap", { "Show endpoint map", epmap_cli_func } },
+    { "endpoint_map", { "Show Unify to Matter endpoint map", epmap_cli_func } },
     { "qr_code_publish", { "Publish Unify Matter Bridge QR code", qr_code_publish_cli_func} },
     { "groups_map", { "Show Matter vs Unify groups map", groups_map_cli_func } },
 };
