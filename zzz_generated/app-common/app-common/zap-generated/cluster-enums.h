@@ -1192,9 +1192,6 @@ enum class CommissioningWindowStatusEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
@@ -1207,10 +1204,6 @@ enum class StatusCode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StatusCode                                                                       = EmberAfStatusCode;
-static StatusCode __attribute__((unused)) kStatusCodekUnknownEnumValue                 = static_cast<StatusCode>(0);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace AdministratorCommissioning
 
 namespace OperationalCredentials {
