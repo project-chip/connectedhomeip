@@ -54,9 +54,11 @@ def toEnumEntryName(enumEntry, enumName):
         enumEntry = enumEntry[1:]
     return prefix + '_' + toUpperSnakeCase(enumEntry)
 
+
 def toProtobufType(zapType: str) -> str:
     """ Convert zap type to protobuf type """
-    u32Types = ["uint32", "enum8", "enum16", "enum32", "bitmap8", "bitmap16", "bitmap32", "cluster_id", "attrib_id", "event_id", "command_id", "endpoint_no", "group_id", "devtype_id", "fabric_idx", "vendor_id", "status_code", "faulttype", "levelcontroloptions", "percent100ths", "percent"]
+    u32Types = ["uint32", "enum8", "enum16", "enum32", "bitmap8", "bitmap16", "bitmap32", "cluster_id", "attrib_id", "event_id", "command_id",
+                "endpoint_no", "group_id", "devtype_id", "fabric_idx", "vendor_id", "status_code", "faulttype", "levelcontroloptions", "percent100ths", "percent"]
     u64Types = ["uint64", "enum64", "bitmap64", "node_id", "fabric_id", "int40u", "int48u", "int56u", "int64u"]
     i32Types = ["int32", "int8s", "int16s", "int24s", "int32s"]
     i64Types = ["int64", "int40s", "int48s", "int56s", "int64s"]
@@ -84,7 +86,6 @@ def toProtobufType(zapType: str) -> str:
         case "boolean":
             return "bool"
 
-
         case "double":
             return "double"
 
@@ -105,7 +106,7 @@ class EncodingDataType:
     DOUBLE = 8
 
     @staticmethod
-    def fromType(protobufType : str):
+    def fromType(protobufType: str):
         match(protobufType):
             case "uint32": return EncodingDataType.UINT
             case "uint64": return EncodingDataType.UINT
@@ -138,7 +139,7 @@ def commandResponseArgs(command: Command, cluster: Cluster):
     return []
 
 
-def toEncodedTag(tag, typeNum : EncodingDataType):
+def toEncodedTag(tag, typeNum: EncodingDataType):
     """ Return the final encoded tag from the given field number and field encoded data type.
         The Matter field type information is encoded into the upper range of the protobuf field 
         tag for stateless translation to Matter TLV. """
