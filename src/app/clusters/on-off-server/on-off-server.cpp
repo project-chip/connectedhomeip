@@ -73,9 +73,13 @@ void OnOffServer::scheduleTimerCallbackMs(EmberEventControl * control, uint32_t 
     {
         ChipLogError(Zcl, "OnOff Server failed to schedule event: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    else
+    {
+        control->status = EMBER_EVENT_MS_TIME;
+    }
 }
 
-void OnOffServer::deactivateEndpointTimerCallback(EmberEventControl * control)
+void OnOffServer::cancelEndpointTimerCallback(EmberEventControl * control)
 {
     if (control->status != EMBER_EVENT_INACTIVE)
     {
@@ -84,10 +88,15 @@ void OnOffServer::deactivateEndpointTimerCallback(EmberEventControl * control)
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, control);
 }
 
-void OnOffServer::deactivateEndpointTimerCallback(EndpointId endpoint)
+void OnOffServer::cancelEndpointTimerCallback(EndpointId endpoint)
 {
     auto control = OnOffServer::getEventControl(endpoint);
-    deactivateEndpointTimerCallback(control);
+    cancelEndpointTimerCallback(control);
+}
+
+void MatterOnOffClusterServerShutdownCallback(EndpointId endpoint)
+{
+    OnOffServer::Instance().cancelEndpointTimerCallback(endpoint);
 }
 
 /**********************************************************
@@ -188,7 +197,12 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
                 Attributes::OffWaitTime::Set(endpoint, 0);
 
                 // Stop timer on the endpoint
-                deactivateEndpointTimerCallback(endpoint);
+                EmberEventControl * event = getEventControl(endpoint);
+                if (event != nullptr)
+                {
+                    cancelEndpointTimerCallback(event);
+                    emberAfOnOffClusterPrintln("On/Toggle Command - Stop Timer");
+                }
             }
 
             Attributes::GlobalSceneControl::Set(endpoint, true);
@@ -625,7 +639,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
             emberAfOnOffClusterPrintln("Timer  Callback - wait Off Time cycle finished");
 
             // Stop timer on the endpoint
-            deactivateEndpointTimerCallback(getEventControl(endpoint));
+            cancelEndpointTimerCallback(getEventControl(endpoint));
         }
     }
 }

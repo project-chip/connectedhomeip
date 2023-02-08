@@ -3398,7 +3398,7 @@ void DoorLockServer::ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t ti
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Color Control Server failed to schedule event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to schedule autorelock: timeout=%" PRIu32 ", status=0x%x", timeoutSec, err.AsInteger());
     }
 }
 
@@ -3756,6 +3756,12 @@ void MatterDoorLockPluginServerInitCallback()
 }
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
+
+void MatterDoorLockClusterServerShutdownCallback(EndpointId endpoint)
+{
+    DeviceLayer::SystemLayer().CancelTimer(DoorLockOnAutoRelockCallback,
+                                           reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
+}
 
 // =============================================================================
 // Timer callbacks

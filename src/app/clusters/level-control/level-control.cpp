@@ -187,7 +187,7 @@ static void scheduleTimerCallbackMs(EndpointId endpoint, uint32_t delayMs)
     }
 }
 
-static void deactivateEndpointTimerCallback(EndpointId endpoint)
+static void cancelEndpointTimerCallback(EndpointId endpoint)
 {
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
@@ -653,7 +653,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     }
 
     // Cancel any currently active command before fiddling with the state.
-    deactivateEndpointTimerCallback(endpoint);
+    cancelEndpointTimerCallback(endpoint);
 
     EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -804,7 +804,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     }
 
     // Cancel any currently active command before fiddling with the state.
-    deactivateEndpointTimerCallback(endpoint);
+    cancelEndpointTimerCallback(endpoint);
 
     status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
     if (status != Status::Success)
@@ -935,7 +935,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     }
 
     // Cancel any currently active command before fiddling with the state.
-    deactivateEndpointTimerCallback(endpoint);
+    cancelEndpointTimerCallback(endpoint);
 
     status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
     if (status != Status::Success)
@@ -1072,7 +1072,7 @@ static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     }
 
     // Cancel any currently active command.
-    deactivateEndpointTimerCallback(endpoint);
+    cancelEndpointTimerCallback(endpoint);
     writeRemainingTime(endpoint, 0);
     status = Status::Success;
 
@@ -1301,6 +1301,11 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     }
 
     emberAfPluginLevelControlClusterServerPostInitCallback(endpoint);
+}
+
+void MatterLevelControlClusterServerShutdownCallback(EndpointId endpoint)
+{
+    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL

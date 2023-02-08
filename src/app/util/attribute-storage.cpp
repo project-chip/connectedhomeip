@@ -39,6 +39,7 @@
 #include <app-common/zap-generated/callback.h>
 
 using namespace chip;
+using namespace chip::app;
 
 //------------------------------------------------------------------------------
 // Globals
@@ -360,6 +361,57 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         {
             ((EmberAfInitFunction) f)(definedEndpoint->endpoint);
         }
+    }
+}
+
+static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+{
+    // Call shutdown callbacks from clusters, mainly for canceling pending timers
+    uint8_t clusterIndex;
+    const EmberAfEndpointType * epType = definedEndpoint->endpointType;
+    for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
+    {
+        const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
+        EmberAfGenericClusterFunction f;
+        f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_SHUTDOWN_FUNCTION);
+        if (f != nullptr)
+        {
+            ((EmberAfInitFunction) f)(definedEndpoint->endpoint);
+        }
+    }
+
+    // Clear out any command handler overrides registered for this
+    // endpoint.
+    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(definedEndpoint->endpoint);
+
+    // Clear out any attribute access overrides registered for this
+    // endpoint.
+    app::AttributeAccessInterface * prev = nullptr;
+    app::AttributeAccessInterface * cur  = gAttributeAccessOverrides;
+    while (cur)
+    {
+        app::AttributeAccessInterface * next = cur->GetNext();
+        if (cur->MatchesEndpoint(definedEndpoint->endpoint))
+        {
+            // Remove it from the list
+            if (prev)
+            {
+                prev->SetNext(next);
+            }
+            else
+            {
+                gAttributeAccessOverrides = next;
+            }
+
+            cur->SetNext(nullptr);
+
+            // Do not change prev in this case.
+        }
+        else
+        {
+            prev = cur;
+        }
+        cur = next;
     }
 }
 
@@ -871,39 +923,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         }
         else
         {
-            // Clear out any command handler overrides registered for this
-            // endpoint.
-            chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(endpoint);
-
-            // Clear out any attribute access overrides registered for this
-            // endpoint.
-            app::AttributeAccessInterface * prev = nullptr;
-            app::AttributeAccessInterface * cur  = gAttributeAccessOverrides;
-            while (cur)
-            {
-                app::AttributeAccessInterface * next = cur->GetNext();
-                if (cur->MatchesEndpoint(endpoint))
-                {
-                    // Remove it from the list
-                    if (prev)
-                    {
-                        prev->SetNext(next);
-                    }
-                    else
-                    {
-                        gAttributeAccessOverrides = next;
-                    }
-
-                    cur->SetNext(nullptr);
-
-                    // Do not change prev in this case.
-                }
-                else
-                {
-                    prev = cur;
-                }
-                cur = next;
-            }
+            shutdownEndpoint(&(emAfEndpoints[index]));
         }
 
         EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);

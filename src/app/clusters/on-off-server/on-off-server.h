@@ -69,6 +69,8 @@ public:
         return HasFeature(endpointId, OnOffFeature::kLighting);
     }
 
+    void cancelEndpointTimerCallback(chip::EndpointId endpoint);
+
 private:
     /**********************************************************
      * Functions Definitions
@@ -85,8 +87,7 @@ private:
     // Matter timer scheduling glue logic
     static void timerCallback(chip::System::Layer *, void * callbackContext);
     void scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs);
-    void deactivateEndpointTimerCallback(EmberEventControl * control);
-    void deactivateEndpointTimerCallback(chip::EndpointId endpoint);
+    void cancelEndpointTimerCallback(EmberEventControl * control);
 
     /**********************************************************
      * Attributes Declaration

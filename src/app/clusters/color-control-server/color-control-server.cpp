@@ -49,9 +49,13 @@ void ColorControlServer::scheduleTimerCallbackMs(EmberEventControl * control, ui
     {
         ChipLogError(Zcl, "Color Control Server failed to schedule event: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    else
+    {
+        control->status = EMBER_EVENT_MS_TIME;
+    }
 }
 
-void ColorControlServer::deactivateEndpointTimerCallback(EmberEventControl * control)
+void ColorControlServer::cancelEndpointTimerCallback(EmberEventControl * control)
 {
     if (control->status != EMBER_EVENT_INACTIVE)
     {
@@ -60,10 +64,10 @@ void ColorControlServer::deactivateEndpointTimerCallback(EmberEventControl * con
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, control);
 }
 
-void ColorControlServer::deactivateEndpointTimerCallback(EndpointId endpoint)
+void ColorControlServer::cancelEndpointTimerCallback(EndpointId endpoint)
 {
     auto control = ColorControlServer::getEventControl(endpoint);
-    deactivateEndpointTimerCallback(control);
+    cancelEndpointTimerCallback(control);
 }
 
 /**********************************************************
@@ -95,7 +99,7 @@ Status ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
     EmberEventControl * event = getEventControl(endpoint);
     VerifyOrReturnError(event != nullptr, Status::UnsupportedEndpoint);
 
-    deactivateEndpointTimerCallback(event);
+    cancelEndpointTimerCallback(event);
     return Status::Success;
 }
 
@@ -2687,6 +2691,11 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     ColorControlServer::Instance().startUpColorTempCommand(endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+}
+
+void MatterColorControlClusterServerShutdownCallback(EndpointId endpoint)
+{
+    ColorControlServer::Instance().cancelEndpointTimerCallback(endpoint);
 }
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP

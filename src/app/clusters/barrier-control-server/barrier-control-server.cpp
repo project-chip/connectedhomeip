@@ -72,7 +72,7 @@ static void scheduleTimerCallbackMs(EndpointId endpoint, uint32_t delayMs)
                                           reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
-static void deactivateEndpointTimerCallback(EndpointId endpoint)
+static void cancelEndpointTimerCallback(EndpointId endpoint)
 {
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
@@ -249,7 +249,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
     {
         emAfPluginBarrierControlServerSetBarrierPosition(endpoint, state.currentPosition);
         setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
-        deactivateEndpointTimerCallback(endpoint);
+        cancelEndpointTimerCallback(endpoint);
     }
     else
     {
@@ -343,10 +343,15 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
                                                             const Commands::BarrierControlStop::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    deactivateEndpointTimerCallback(endpoint);
+    cancelEndpointTimerCallback(endpoint);
     setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
     sendDefaultResponse(commandObj, commandPath, Status::Success);
     return true;
 }
 
 void MatterBarrierControlPluginServerInitCallback() {}
+
+void MatterBarrierControlClusterServerShutdownCallback(EndpointId endpoint)
+{
+    cancelEndpointTimerCallback(endpoint);
+}
