@@ -174,7 +174,6 @@ public abstract class PairingCommand extends MatterCommand
 
     switch (networkType) {
       case NONE:
-      case ETHERNET:
         break;
       case WIFI:
         addArgument("ssid", mSSID, null, false);
@@ -211,7 +210,6 @@ public abstract class PairingCommand extends MatterCommand
         break;
       case ALREADY_DISCOVERED:
         addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
-        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
         addArgument("device-remote-ip", mRemoteAddr, false);
         addArgument("device-remote-port", (short) 0, Short.MAX_VALUE, mRemotePort, null, false);
         break;

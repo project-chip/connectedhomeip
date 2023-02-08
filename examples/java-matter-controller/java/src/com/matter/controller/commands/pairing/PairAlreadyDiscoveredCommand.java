@@ -10,7 +10,7 @@ public final class PairAlreadyDiscoveredCommand extends PairingCommand {
         controller,
         "already-discovered",
         PairingModeType.ALREADY_DISCOVERED,
-        PairingNetworkType.ETHERNET,
+        PairingNetworkType.NONE,
         credsIssue);
   }
 
