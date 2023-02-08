@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os
+import sys
 import unittest
 from dataclasses import dataclass, field
 from typing import List
@@ -123,7 +124,8 @@ class GeneratorTest:
         if self.generator_name.lower() == 'cpp-app':
             return CppApplicationGenerator(storage, idl)
         if self.generator_name.lower() == 'custom':
-            sys.path.append('../examples')
+            sys.path.append(os.path.abspath(
+                os.path.join(os.path.dirname(__file__), '../examples')))
             from matter_idl_plugin import CustomGenerator
             return CustomGenerator(storage, idl)
         else:
