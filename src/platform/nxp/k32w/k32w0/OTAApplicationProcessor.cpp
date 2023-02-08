@@ -108,4 +108,13 @@ CHIP_ERROR OTAApplicationProcessor::AbortAction()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR OTAApplicationProcessor::ExitAction()
+{
+    ReturnErrorOnFailure(ApplyAction());
+
+    // TODO
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip

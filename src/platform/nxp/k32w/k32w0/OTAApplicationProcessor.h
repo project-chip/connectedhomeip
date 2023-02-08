@@ -37,6 +37,7 @@ public:
     CHIP_ERROR Clear() override;
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR AbortAction() override;
+    CHIP_ERROR ExitAction() override;
 
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;

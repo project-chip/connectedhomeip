@@ -59,7 +59,7 @@ struct OTATlvHeader
  * data from two different TLVs, the processor should ensure the remaining
  * data is returned in the block passed as input.
  * The default processors: application, SSBL and factory data are registered
- * in OTAImageProcessorImpl::Init.
+ * in OTAImageProcessorImpl::Init through OtaHookInit.
  * Applications should use OTAImageProcessorImpl::RegisterProcessor
  * to register additional processors.
  */
@@ -72,6 +72,7 @@ public:
     virtual CHIP_ERROR Clear()       = 0;
     virtual CHIP_ERROR ApplyAction() = 0;
     virtual CHIP_ERROR AbortAction() = 0;
+    virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
 
     CHIP_ERROR Process(ByteSpan & block);
     void SetLength(uint32_t length) { mLength = length; }
