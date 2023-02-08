@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -173,6 +173,10 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, arraySize == 0);
+    }
+    else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
+    {
+        // Nothing to check for this one; depends on the endpoint.
     }
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
@@ -404,10 +408,10 @@ void TestReadChunking::TestChunking(nlTestSuite * apSuite, void * apContext)
 
         //
         // Always returns the same number of attributes read (5 + revision +
-        // AttributeList + AcceptedCommandList +
-        // GeneratedCommandList = 9).
+        // AttributeList + EventList + AcceptedCommandList +
+        // GeneratedCommandList = 10).
         //
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 10);
         readCallback.mAttributeCount = 0;
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -581,9 +585,9 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // AcceptedCommandList / GeneratedCommandList / AttributeList attribute are not included in
+        // AcceptedCommandList / GeneratedCommandList / EventList / AttributeList attribute are not included in
         // testClusterAttrsOnEndpoint4.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 4);
 
         // We have received all report data.
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
@@ -607,9 +611,9 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // AcceptedCommandList / GeneratedCommandList / AttributeList attribute are not include in
+        // AcceptedCommandList / GeneratedCommandList / EventList / AttributeList attribute are not included in
         // testClusterAttrsOnEndpoint4.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 4);
 
         // We have received all report data.
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);

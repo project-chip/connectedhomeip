@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -383,12 +383,9 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
                 AttributeId id              = mCluster->attributes[i].attributeId;
                 constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
                 // We are relying on GlobalAttributesNotInMetadata not having
-                // any gaps in their ids here, but for now they do because we
-                // have no EventList support.  So this assert is not quite
-                // right.  There should be a "- 1" on the right-hand side of the
-                // equals sign.
-                static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata),
-                              "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
+                // any gaps in their ids here.
+                static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata) - 1,
+                              "Ids in GlobalAttributesNotInMetadata not consecutive");
                 if (!addedExtraGlobals && id > lastGlobalId)
                 {
                     for (const auto & globalId : GlobalAttributesNotInMetadata)
@@ -405,6 +402,14 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
                 {
                     ReturnErrorOnFailure(encoder.Encode(globalId));
                 }
+            }
+            return CHIP_NO_ERROR;
+        });
+    case EventList::Id:
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            for (size_t i = 0; i < mCluster->eventCount; ++i)
+            {
+                ReturnErrorOnFailure(encoder.Encode(mCluster->eventList[i]));
             }
             return CHIP_NO_ERROR;
         });
