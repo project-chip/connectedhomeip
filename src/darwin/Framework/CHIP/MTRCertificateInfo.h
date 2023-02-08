@@ -34,21 +34,30 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
- * Initializes the receiver with an operational certificate in Matter TLV
- * format.  This can be a node operational certificate, a Matter intermediate
+ * Initializes the receiver with an operational certificate in Matter TLV format.
+ *
+ * This can be a node operational certificate, a Matter intermediate
  * certificate, or a Matter root certificate.
  */
 - (nullable instancetype)initWithTLVBytes:(MTRCertificateTLVBytes)bytes;
 
 /**
- * The issuer distingushed name of the certificate.  This is the subject
- * distinguished name of whatever certificate signed this one.  For a Matter
- * root certificate, issuer will match subject.
+ * The Distinguished Name of the issuer of the certificate.
+ *
+ * For a node operational certificate, the issuer will match the subject of the
+ * root certificate or intermediate certificate that represents the entity that
+ * issued the node operational certificate.
+ *
+ * For an intermediate certificate, the issuer will match the subject of the
+ * root certificate.
+ *
+ * Matter root certificates are self-signed, i.e. the issuer and the subject are
+ * the same.
  */
 @property (readonly) MTRDistinguishedNameInfo * issuer;
 
 /**
- * The subject distinguished name of the certificate.
+ * The Distinguished Name of the entity represented by the certificate.
  */
 @property (readonly) MTRDistinguishedNameInfo * subject;
 
@@ -93,7 +102,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (readonly, nullable) NSNumber * intermediateCACertificateID;
 
 /**
- * The set of CASE Authenticated Tags contained in the DN.  Maybe be non-nil for
+ * The set of CASE Authenticated Tags contained in the DN.  Maybe be non-empty for
  * the subject of a valid node operational certificate.
  */
 @property (readonly) NSSet<NSNumber *> * caseAuthenticatedTags;
