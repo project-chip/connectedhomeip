@@ -132,6 +132,7 @@ public:
     CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id,
                                   SceneTableEntry & entry) override;
     CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id) override;
+    CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx) override;
 
     // SceneHandlers
     CHIP_ERROR registerHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function);
@@ -163,9 +164,9 @@ protected:
     protected:
         DefaultSceneTableImpl & mProvider;
         FabricIndex mFabric = kUndefinedFabricIndex;
-        SceneStorageId mNextSceneId;
-        size_t mSceneCount = 0;
-        size_t mTotalScene = 0;
+        SceneIndex mNextSceneIdx;
+        SceneIndex mSceneIndex = 0;
+        uint8_t mTotalScene    = 0;
     };
     bool IsInitialized() { return (mStorage != nullptr); }
 
@@ -173,6 +174,10 @@ protected:
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
     SceneHandler handlers[CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES];
     uint8_t handlerNum = 0;
+
+private:
+    CHIP_ERROR Find(PersistentStorageDelegate * storage, const FabricIndex & fabric, SceneStorageId target_scene, bool & found,
+                    SceneIndex & idx);
 }; // class DefaultSceneTableImpl
 
 /**

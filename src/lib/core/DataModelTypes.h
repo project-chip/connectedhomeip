@@ -40,6 +40,7 @@ typedef uint32_t EventId;
 typedef uint64_t EventNumber;
 typedef uint64_t FabricId;
 typedef uint8_t FabricIndex;
+typedef uint8_t SceneIndex;
 typedef uint32_t FieldId;
 typedef uint16_t ListIndex;
 typedef uint16_t LocalizedStringIdentifier;
@@ -63,6 +64,7 @@ constexpr ListIndex kInvalidListIndex   = 0xFFFF; // List index is a uint16 thus
 constexpr KeysetId kInvalidKeysetId     = 0xFFFF;
 
 constexpr SceneGroupID kGlobalGroupSceneId = CHIP_CONFIG_SCENES_GLOBAL_SCENE_GROUP_ID;
+constexpr SceneIndex kUndefinedSceneIndex  = 0xff;
 constexpr SceneId kUndefinedSceneId        = CHIP_CONFIG_SCENES_TABLE_NULL_INDEX;
 constexpr SceneId kUnusedEndpointId        = CHIP_CONFIG_SCENES_TABLE_UNUSED_ENDPOINT_ID;
 

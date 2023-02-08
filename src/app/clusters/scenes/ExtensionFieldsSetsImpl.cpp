@@ -112,7 +112,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::insertField(ExtensionFieldsSet & field)
     }
     else
     {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 }
 
