@@ -201,6 +201,42 @@ The `-k/--kvsstore` option in
 selects key-value storage implementation for the Matter's examples. It
 demonstrates how to use the `CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS` variable.
 
+### Storing persistent memory block in external files
+
+The persistent storage is required to store key-value data of the Matter
+examples.
+
+Two storage types are supported:
+
+-   Block device storage: The memory partition is located in `non-secure SRAM`
+-   `TF-M` protected storage: The memory partition is located in
+    `secure QSPI_RAM`
+
+Fast models offers option to load and dump memory content. More details are
+available
+[here](../guides/openiotsdk_platform_overview.md#fast-model-persistent-memory-via-files).
+Depending on the storage implementation, different flags are used in the `FVP`
+options.
+
+For block device storage use:
+
+```
+--dump mps3_board.sram=<file-path>@0:0x0,0x100000
+--data mps3_board.sram=<file-path>@0:0x0
+```
+
+For `TF-M` protected storage use:
+
+```
+--dump mps3_board.qspi_sram=<file-path>@0:0x660000,0x12000
+--data mps3_board.qspi_sram=<file-path>@0:0x660000
+```
+
+_Note_: The `file-path` must exist to use the `--data` option.
+
+[Open IoT SDK build script](../../scripts/examples/openiotsdk_example.sh)
+provides the `-K,--kvsfile` option to use the persistence options listed above.
+
 ## Building
 
 You build using a vscode task or call the script directly from the command line.
