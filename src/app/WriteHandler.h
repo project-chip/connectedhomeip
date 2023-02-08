@@ -70,12 +70,6 @@ public:
     Protocols::InteractionModel::Status OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
                                                        System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
 
-    /*
-     * This forcibly closes the exchange context if a valid one is pointed to and de-initializes the object. Such a situation does
-     * not arise during normal message processing flows that all normally call Close() below.
-     */
-    void Abort();
-
     /**
      *  Clean up state when we are done sending the write response.
      */
@@ -136,7 +130,6 @@ private:
     CHIP_ERROR SendWriteResponse(System::PacketBufferTLVWriter && aMessageWriter);
 
     void MoveToState(const State aTargetState);
-    void ClearState();
     const char * GetStateStr() const;
 
     void DeliverListWriteBegin(const ConcreteAttributePath & aPath);
