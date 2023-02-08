@@ -42,17 +42,20 @@ class CommissioningTest:
         parser.add_argument('command', help="Command name")
         parser.add_argument('-t', '--timeout', help="The program will return with timeout after specified seconds", default='200')
         parser.add_argument('-a', '--address', help="Address of the device")
+        parser.add_argument('-p', '--port', help="Port of the remote device", default='5540')
         parser.add_argument('-s', '--setup-payload', dest='setup_payload',
                             help="Setup Payload (manual pairing code or QR code content)")
         parser.add_argument('-n', '--nodeid', help="The Node ID issued to the device", default='1')
         parser.add_argument('-d', '--discriminator', help="Discriminator of the device", default='3840')
-        parser.add_argument('-p', '--paa-trust-store-path', dest='paa_trust_store_path',
+        parser.add_argument('-c', '--paa-trust-store-path', dest='paa_trust_store_path',
                             help="Path that contains valid and trusted PAA Root Certificates")
 
         args = parser.parse_args(args.split())
 
         self.command_name = args.command
         self.nodeid = args.nodeid
+        self.address = args.address
+        self.port = args.port
         self.setup_payload = args.setup_payload
         self.discriminator = args.discriminator
         self.timeout = args.timeout
@@ -67,11 +70,25 @@ class CommissioningTest:
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
         return java_process.wait()
 
+    def TestCmdAlreadyDiscovered(self, nodeid, setuppin, discriminator, address, port, timeout):
+        java_command = self.command + ['pairing', 'already-discovered', nodeid, setuppin, discriminator, address, port, timeout]
+        logging.info(f"Execute: {java_command}")
+        java_process = subprocess.Popen(
+            java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
+        return java_process.wait()
+
     def RunTest(self):
         if self.command_name == 'onnetwork-long':
-            logging.info("Testing pairing over onnetwork-long")
+            logging.info("Testing pairing onnetwork-long")
             code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
             if code != 0:
-                raise Exception(f"Testing onnetwork-long pairing failed with error {code}")
+                raise Exception(f"Testing pairing onnetwork-long failed with error {code}")
+        elif self.command_name == 'already-discovered':
+            logging.info("Testing pairing already-discovered")
+            code = self.TestCmdAlreadyDiscovered(self.nodeid, self.setup_payload,
+                                                 self.discriminator, self.address, self.port, self.timeout)
+            if code != 0:
+                raise Exception(f"Testing pairing already-discovered failed with error {code}")
         else:
             raise Exception(f"Unsupported command {self.command_name}")

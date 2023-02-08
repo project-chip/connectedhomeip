@@ -51,22 +51,6 @@ public abstract class PairingCommand extends MatterCommand
   private final StringBuffer mDiscoveryFilterInstanceName = new StringBuffer();
   private static Logger logger = Logger.getLogger(PairingCommand.class.getName());
 
-  public long getNodeId() {
-    return mNodeId.get();
-  }
-
-  public int getSetupPINCode() {
-    return mSetupPINCode.get();
-  }
-
-  public int getDiscriminator() {
-    return mDiscriminator.get();
-  }
-
-  public long getTimeoutMillis() {
-    return mTimeoutMillis.get();
-  }
-
   @Override
   public void onConnectDeviceComplete() {
     logger.log(Level.INFO, "onConnectDeviceComplete");
@@ -135,8 +119,28 @@ public abstract class PairingCommand extends MatterCommand
     }
   }
 
+  public long getNodeId() {
+    return mNodeId.get();
+  }
+
   public IPAddress getRemoteAddr() {
     return mRemoteAddr;
+  }
+
+  public int getRemotePort() {
+    return mRemotePort.get();
+  }
+
+  public int getSetupPINCode() {
+    return mSetupPINCode.get();
+  }
+
+  public int getDiscriminator() {
+    return mDiscriminator.get();
+  }
+
+  public long getTimeoutMillis() {
+    return mTimeoutMillis.get();
   }
 
   public PairingCommand(
@@ -200,6 +204,12 @@ public abstract class PairingCommand extends MatterCommand
         break;
       case SOFT_AP:
         AP:
+        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
+        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
+        addArgument("device-remote-ip", mRemoteAddr, false);
+        addArgument("device-remote-port", (short) 0, Short.MAX_VALUE, mRemotePort, null, false);
+        break;
+      case ALREADY_DISCOVERED:
         addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
         addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
         addArgument("device-remote-ip", mRemoteAddr, false);
