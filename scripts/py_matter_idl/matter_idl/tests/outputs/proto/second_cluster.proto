@@ -3,7 +3,7 @@
 
 syntax = "proto3";
 
-package com.chip.proto;
+package com.matter.example.proto;
 
 option java_multiple_files = true;
 
@@ -22,8 +22,8 @@ message SecondCluster {
   // Structs
 
   // Attributes
-  /** octet_string Type: 6 IsList: 0 FieldId: 123 */
-  octet_string some_bytes = 3145851;
+  /** octet_string Type: 5 IsList: 0 FieldId: 123 */
+  bytes some_bytes = 2621563;
     // [(attribute) = {
       // is_subscribable: true,
     // }];

@@ -3,7 +3,7 @@
 
 syntax = "proto3";
 
-package com.chip.proto;
+package com.matter.example.proto;
 
 option java_multiple_files = true;
 
@@ -67,12 +67,12 @@ message OtaSoftwareUpdateProviderCluster {
     repeated OTADownloadProtocol protocols_supported = 3145731;
     /** INT16U Type: 6 IsList: 0 FieldId: 4 */
     optional INT16U hardware_version = 3145732;
-    /** CHAR_STRING Type: 6 IsList: 0 FieldId: 5 */
-    optional CHAR_STRING location = 3145733;
+    /** CHAR_STRING Type: 4 IsList: 0 FieldId: 5 */
+    optional string location = 2097157;
     /** BOOLEAN Type: 3 IsList: 0 FieldId: 6 */
     optional bool requestor_can_consent = 1572870;
-    /** OCTET_STRING Type: 6 IsList: 0 FieldId: 7 */
-    optional OCTET_STRING metadata_for_provider = 3145735;
+    /** OCTET_STRING Type: 5 IsList: 0 FieldId: 7 */
+    optional bytes metadata_for_provider = 2621447;
 }
   
   message QueryImageCommandResponse {
@@ -83,8 +83,8 @@ message OtaSoftwareUpdateProviderCluster {
   message ApplyUpdateRequestCommand {
     // option (message_type) = MATTER_COMMAND;
     
-    /** OCTET_STRING Type: 6 IsList: 0 FieldId: 0 */
-    OCTET_STRING update_token = 3145728;
+    /** OCTET_STRING Type: 5 IsList: 0 FieldId: 0 */
+    bytes update_token = 2621440;
     /** INT32U Type: 6 IsList: 0 FieldId: 1 */
     INT32U new_version = 3145729;
 }
@@ -101,8 +101,8 @@ message OtaSoftwareUpdateProviderCluster {
   message NotifyUpdateAppliedCommand {
     // option (message_type) = MATTER_COMMAND;
     
-    /** OCTET_STRING Type: 6 IsList: 0 FieldId: 0 */
-    OCTET_STRING update_token = 3145728;
+    /** OCTET_STRING Type: 5 IsList: 0 FieldId: 0 */
+    bytes update_token = 2621440;
     /** INT32U Type: 6 IsList: 0 FieldId: 1 */
     INT32U software_version = 3145729;
 }

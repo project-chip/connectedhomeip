@@ -16,9 +16,8 @@ import os
 from typing import List
 
 import jinja2
-from matter_idl import matter_idl_types
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command, DataType, Field, Idl
+from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command, Field, Idl
 
 
 def toUpperSnakeCase(s):
@@ -74,7 +73,13 @@ def toProtobufType(zapType: str) -> str:
         return "int32"
     if zapTypeLower in i64Types:
         return "int64"
-        
+    if zapTypeLower in floatTypes:
+        return "float"
+    if zapTypeLower in stringTypes:
+        return "string"
+    if zapTypeLower in bytesTypes:
+        return "bytes"
+
     match(zapTypeLower):
         case "boolean":
             return "bool"
@@ -87,8 +92,9 @@ def toProtobufType(zapType: str) -> str:
     return zapType
 
 
-# Enum for encoding type into protobuf field tag for stateless translation.
-class DataType:
+# Enum for encoding the type information into protobuf field tag for stateless translation.
+# These values encoded to the upper range of the protobuf field tag.
+class EncodingDataType:
     UINT = 1
     INT = 2
     BOOL = 3
@@ -98,20 +104,20 @@ class DataType:
     FLOAT = 7
     DOUBLE = 8
 
+    @staticmethod
+    def fromType(protobufType : str):
+        match(protobufType):
+            case "uint32": return EncodingDataType.UINT
+            case "uint64": return EncodingDataType.UINT
+            case "int32": return EncodingDataType.INT
+            case "int64": return EncodingDataType.INT
+            case "bool": return EncodingDataType.BOOL
+            case "string": return EncodingDataType.CHAR_STRING
+            case "bytes": return EncodingDataType.OCT_STRING
+            case "float": return EncodingDataType.FLOAT
+            case "double": return EncodingDataType.DOUBLE
 
-def typeToTypeNum(s):
-    match(s):
-        case "uint32": return DataType.UINT
-        case "uint64": return DataType.UINT
-        case "int32": return DataType.INT
-        case "int64": return DataType.INT
-        case "bool": return DataType.BOOL
-        case "string": return DataType.CHAR_STRING
-        case "bytes": return DataType.OCT_STRING
-        case "float": return DataType.FLOAT
-        case "double": return DataType.DOUBLE
-
-    return DataType.STRUCT
+        return EncodingDataType.STRUCT
 
 
 def commandArgs(command: Command, cluster: Cluster):
@@ -132,8 +138,10 @@ def commandResponseArgs(command: Command, cluster: Cluster):
     return []
 
 
-def toTypeEncodedTag(tag, typeNum):
-    """ Encode the type into the upper range of the protobuf field tag for stateless translation. """
+def toEncodedTag(tag, typeNum : EncodingDataType):
+    """ Return the final encoded tag from the given field number and field encoded data type.
+        The Matter field type information is encoded into the upper range of the protobuf field 
+        tag for stateless translation to Matter TLV. """
     tag = (int(typeNum) << 19) | int(tag)
     return tag
 
@@ -150,14 +158,14 @@ def toFieldType(field: Field):
 
 def toFieldTag(field: Field):
     protobufType = toProtobufType(field.data_type.name)
-    typeNum = typeToTypeNum(protobufType)
-    tag = toTypeEncodedTag(field.code, typeNum)
+    typeNum = EncodingDataType.fromType(protobufType)
+    tag = toEncodedTag(field.code, typeNum)
     return tag
 
 
 def toFieldComment(field: Field):
     protobufType = toProtobufType(field.data_type.name)
-    typeNum = typeToTypeNum(protobufType)
+    typeNum = EncodingDataType.fromType(protobufType)
     tagComment = "/** %s Type: %d IsList: %d FieldId: %d */" % (
         field.data_type.name, typeNum, field.is_list, field.code)
     return tagComment
@@ -188,7 +196,7 @@ class CustomGenerator(CodeGenerator):
         # Type helpers
         self.jinja_env.filters['toEnumEntryName'] = toEnumEntryName
         self.jinja_env.filters['toProtobufType'] = toProtobufType
-        self.jinja_env.filters['toTypeEncodedTag'] = toTypeEncodedTag
+        self.jinja_env.filters['toEncodedTag'] = toEncodedTag
 
         # Tag helpers
         self.jinja_env.filters['toFieldTag'] = toFieldTag
