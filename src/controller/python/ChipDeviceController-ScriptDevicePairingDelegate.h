@@ -69,7 +69,7 @@ public:
     Callback::Callback<Controller::OnOpenCommissioningWindow> *
     GetOpenWindowCallback(Controller::CommissioningWindowOpener * context);
     void OnOpenCommissioningWindow(NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
-    void SetExpectingPairingComplete(bool value) {expectingPairingComplete=value;}
+    void SetExpectingPairingComplete(bool value) { expectingPairingComplete=value; }
 
 private:
     DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback                     = nullptr;
@@ -80,7 +80,7 @@ private:
     DevicePairingDelegate_OnCommissioningStatusUpdateFunct mOnCommissioningStatusUpdateCallback = nullptr;
     Callback::Callback<Controller::OnOpenCommissioningWindow> mOpenWindowCallback;
     Controller::CommissioningWindowOpener * mWindowOpener = nullptr;
-    bool expectingPairingComplete = false;
+    bool expectingPairingComplete                         = false;
 };
 
 } // namespace Controller
