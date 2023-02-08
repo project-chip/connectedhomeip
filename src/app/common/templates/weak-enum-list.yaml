@@ -1,6 +1,5 @@
 # Allow-list of enums that we generate as enums, not enum classes.  The goal is
 # to drive this down to 0.
-- AttributeWritePermission
 - BarrierControlBarrierPosition
 - BarrierControlMovingState
 - ColorControlOptions
