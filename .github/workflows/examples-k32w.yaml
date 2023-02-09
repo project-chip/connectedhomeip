@@ -28,7 +28,7 @@ env:
 jobs:
     k32w:
         name: K32W
-        timeout-minutes: 60
+        timeout-minutes: 90
 
         env:
             BUILD_TYPE: gn_k32w
@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.6.35
+            image: connectedhomeip/chip-build-k32w:0.6.36
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -75,10 +75,12 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target k32w-light-no-ble-se05x \
-                      --target k32w-light-no-ota \
-                      --target k32w-lock-low-power-nologs \
-                      --target k32w-contact-low-power-nologs \
-                      --target k32w-shell \
+                      --target k32w-light-crypto-platform-tokenizer \
+                      --target k32w-lock-crypto-platform-tokenizer \
+                      --target k32w-lock-crypto-platform-low-power-nologs \
+                      --target k32w-contact-crypto-platform-tokenizer \
+                      --target k32w-contact-crypto-platform-low-power-nologs \
+                      --target k32w-shell-crypto-platform \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -87,21 +89,21 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w0+release light \
-                    out/artifacts/k32w-light-no-ota/chip-k32w0x-light-example \
+                    out/artifacts/k32w-light-crypto-platform-tokenizer/chip-k32w0x-light-example \
                     /tmp/bloat_reports/
             - name: Get lock size stats
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w0+release lock \
-                    out/artifacts/k32w-lock-low-power-nologs/chip-k32w0x-lock-example \
+                    out/artifacts/k32w-lock-crypto-platform-tokenizer/chip-k32w0x-lock-example \
                     /tmp/bloat_reports/
             - name: Get contact size stats
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w0+release contact \
-                    out/artifacts/k32w-contact-low-power-nologs/chip-k32w0x-contact-example \
+                    out/artifacts/k32w-contact-crypto-platform-tokenizer/chip-k32w0x-contact-example \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v3

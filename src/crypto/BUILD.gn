@@ -32,9 +32,9 @@ if (chip_crypto == "") {
 
 assert(
     chip_crypto == "mbedtls" || chip_crypto == "psa" ||
-        chip_crypto == "openssl" || chip_crypto == "tinycrypt" ||
-        chip_crypto == "boringssl" || chip_crypto == "platform",
-    "Please select a valid crypto implementation: mbedtls, psa, openssl, tinycrypt, boringssl, platform")
+        chip_crypto == "openssl" || chip_crypto == "boringssl" ||
+        chip_crypto == "platform",
+    "Please select a valid crypto implementation: mbedtls, psa, openssl, boringssl, platform")
 
 buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
@@ -130,16 +130,6 @@ if (chip_crypto == "openssl") {
       public_deps += [ "${mbedtls_root}:mbedtls" ]
     }
   }
-} else if (chip_crypto == "tinycrypt") {
-  import("//build_overrides/mbedtls.gni")
-
-  source_set("cryptopal_tinycrypt") {
-    sources = [ "CHIPCryptoPALTinyCrypt.cpp" ]
-    public_deps = [
-      ":public_headers",
-      "${mbedtls_root}:mbedtls",
-    ]
-  }
 }
 
 static_library("crypto") {
@@ -167,8 +157,6 @@ static_library("crypto") {
     public_deps += [ ":cryptopal_openssl" ]
   } else if (chip_crypto == "boringssl") {
     public_deps += [ ":cryptopal_boringssl" ]
-  } else if (chip_crypto == "tinycrypt") {
-    public_deps += [ ":cryptopal_tinycrypt" ]
   } else if (chip_crypto == "platform") {
     # Platform implementation is responsible for bringing their
     # own implementation and dependencies
