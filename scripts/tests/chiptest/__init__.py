@@ -139,7 +139,6 @@ def _GetInDevelopmentTests() -> Set[str]:
         "TestEvents.yaml",
 
         "TestGroupMessaging.yaml",     # Needs group support in repl
-        "TestMultiAdmin.yaml",         # chip-repl hang on command expeted to fail
     }
 
 
