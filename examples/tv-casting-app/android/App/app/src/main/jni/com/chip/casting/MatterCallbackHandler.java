@@ -17,10 +17,18 @@
  */
 package com.chip.casting;
 
+import android.util.Log;
+
 public abstract class MatterCallbackHandler {
+  private static final String TAG = MatterCallbackHandler.class.getSimpleName();
+
   public abstract void handle(MatterError err);
 
-  public final void handle(int errorCode, String errorMessage) {
-    handle(new MatterError(errorCode, errorMessage));
+  private final void handleInternal(int errorCode, String errorMessage) {
+    try {
+      handle(new MatterError(errorCode, errorMessage));
+    } catch (Throwable t) {
+      Log.e(TAG, "MatterCallbackHandler::Caught an unhandled Throwable from the client: " + t);
+    }
   }
 }
