@@ -33,8 +33,6 @@ declare_args() {
 
   kvs_max_entries = 75
 
-  chip_enable_ble_rs911x = false
-
   # Use Silabs factory data provider example.
   # Users can implement their own.
   use_efr32_factory_data_provider = true
@@ -130,6 +128,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/middleware/glib/dmd",
       "${efr32_sdk_root}/platform/base/hal/plugin/psstore",
       "${efr32_sdk_root}/platform/base/hal/plugin/antenna",
+      "${efr32_sdk_root}/protocol/bluetooth/inc/",
       "${efr32_sdk_root}/app/bluetooth/common/in_place_ota_dfu/",
       "${efr32_sdk_root}/app/bluetooth/common/in_place_ota_dfu/config/",
       "${efr32_sdk_root}/util/plugin/plugin-common/fem-control",
@@ -150,7 +149,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/include",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/config",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen",
-      "${efr32_sdk_root}/protocol/bluetooth/inc/",
     ]
 
     if (silabs_family != "mgm24") {
@@ -207,11 +205,8 @@ template("efr32_sdk") {
     if (chip_enable_ble_rs911x) {
       defines += [
         "RSI_BLE_ENABLE=1",
+        "RS91X_BLE_ENABLE=1",
       ]
-    }
-
-    if (chip_enable_ble_rs911x) {
-      defines += [ "RS91X_BLE_ENABLE=1", ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
