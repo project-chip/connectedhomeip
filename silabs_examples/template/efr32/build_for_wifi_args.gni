@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
+import("${chip_root}/config/standalone/args.gni")
 
 efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 chip_enable_openthread = false
-import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
+import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
 chip_enable_ota_requestor = true
-
-pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log"
+app_data_model = "${chip_root}/silabs_examples/template/template_DataModel_config"

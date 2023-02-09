@@ -35,100 +35,11 @@ efr32_project_dir = "${chip_root}/silabs_examples/onoff-plug-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
+import("${examples_plat_dir}/args.gni")
+
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-
-  # Monitor & log memory usage at runtime.
-  enable_heap_monitoring = false
-
-  # Enable Sleepy end device
-  enable_sleepy_device = false
-
-  # OTA timeout in seconds
-  OTA_periodic_query_timeout = 86400
-
-  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
-  use_wf200 = false
-  use_rs911x = false
-  use_rs911x_sockets = false
-  sl_wfx_config_softap = false
-  sl_wfx_config_scan = true
-
-  # Disable LCD on supported devices
-  disable_lcd = false
-
-  # Argument to Disable IPv4 for wifi(rs911)
-  chip_enable_wifi_ipv4 = false
-
-  # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_only = false
-}
-
-declare_args() {
-  # Enables LCD Qr Code on supported devices
-  show_qr_code = !disable_lcd
-}
-
-# qr code cannot be true if lcd is disabled
-assert(!(disable_lcd && show_qr_code))
-
-# Sanity check
-assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_rs911x && chip_enable_openthread))
-assert(!(use_wf200 && chip_enable_openthread))
-if (chip_enable_wifi) {
-  assert(use_rs911x || use_wf200)
-  enable_openthread_cli = false
-  import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
-}
-
-# ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
-if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
-    silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
-  show_qr_code = false
-  disable_lcd = true
-}
-
-# WiFi settings
-if (chip_enable_wifi) {
-  # disabling LCD for MG24 for wifi
-  if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
-    show_qr_code = false
-    disable_lcd = true
-  }
-  wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
-  efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
-
-  if (lwip_ipv4) {
-    efr32_lwip_defs += [
-      "LWIP_IPV4=1",
-      # adds following options to provide
-      # them to .cpp source files
-      # flags ported from lwipopts file
-      # TODO: move lwipopts to one location
-      "LWIP_ARP=1",
-      "LWIP_ICMP=1",
-      "LWIP_IGMP=1",
-      "LWIP_DHCP=1",
-      "LWIP_DNS=0",
-    ]
-  } else {
-    efr32_lwip_defs += [ "LWIP_IPV4=0" ]
-  }
-  if (lwip_ipv6) {
-    efr32_lwip_defs += [ "LWIP_IPV6=1" ]
-  } else {
-    efr32_lwip_defs += [ "LWIP_IPV6=0" ]
-  }
-
-  if (use_rs911x) {
-    wiseconnect_sdk_root =
-        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-    import("${examples_plat_dir}/rs911x/rs911x.gni")
-  } else {
-    import("${examples_plat_dir}/wf200/wf200.gni")
-  }
 }
 
 efr32_sdk("sdk") {
@@ -138,49 +49,24 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/silabs/EFR32",
+    "${chip_root}/src/platform/silabs/efr32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
     "${examples_common_plat_dir}",
   ]
 
-  defines = [
-    "BOARD_ID=${silabs_board}",
-    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
-  ]
+  if (use_wf200) {
+    # TODO efr32_sdk should not need a header from this location
+    include_dirs += [ "${examples_plat_dir}/wf200" ]
+  }
 
+  defines = []
   if (chip_enable_pw_rpc) {
     defines += [
       "HAL_VCOM_ENABLE=1",
       "PW_RPC_ENABLED",
     ]
-  }
-
-  # WiFi Settings
-  if (chip_enable_wifi) {
-    if (use_rs911x) {
-      defines += rs911x_defs
-      include_dirs += rs911x_plat_incs
-    } else if (use_wf200) {
-      defines += wf200_defs
-      include_dirs += wf200_plat_incs
-    }
-
-    if (use_rs911x_sockets) {
-      include_dirs += [ "${examples_plat_dir}/wifi/rsi-sockets" ]
-      defines += rs911x_sock_defs
-    } else {
-      # Using LWIP instead of the native TCP/IP stack
-      defines += efr32_lwip_defs
-    }
-
-    if (sl_wfx_config_softap) {
-      defines += [ "SL_WFX_CONFIG_SOFTAP" ]
-    }
-    if (sl_wfx_config_scan) {
-      defines += [ "SL_WFX_CONFIG_SCAN" ]
-    }
   }
 }
 
@@ -190,104 +76,22 @@ efr32_executable("onoff_plug_app") {
   include_dirs = [ "include" ]
   defines = []
 
+  if (silabs_board == "BRD2704A") {
+    defines += [ "SL_STATUS_LED=0" ]
+  }
+
   sources = [
-    "${examples_common_plat_dir}/heap_4_silabs.c",
-    "${examples_plat_dir}/BaseApplication.cpp",
-    "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
     "src/OnOffPlugManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
 
-  if (use_wstk_leds) {
-    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
-  }
-
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
-      use_wf200 || use_rs911x) {
-    sources += [ "${examples_plat_dir}/uart.cpp" ]
-  }
-
   deps = [
     ":sdk",
-    "${chip_root}/silabs_examples/onoff-plug-app/onoff-plug-common",
-    "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
-  ]
-
-  # OpenThread Settings
-  if (chip_enable_openthread) {
-    deps += [
-      "${chip_root}/third_party/openthread:openthread",
-      "${chip_root}/third_party/openthread:openthread-platform",
-      "${examples_plat_dir}:efr-matter-shell",
+    "${examples_plat_dir}:efr32-common",
+    app_data_model,
     ]
-  }
-
-  if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
-    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
-  }
-
-  # WiFi Settings
-  if (chip_enable_wifi) {
-    if (use_rs911x) {
-      sources += rs911x_src_plat
-
-      # All the stuff from wiseconnect
-      sources += rs911x_src_sapi
-
-      # Apparently - the rsi library needs this (though we may not use use it)
-      sources += rs911x_src_sock
-      include_dirs += rs911x_inc_plat
-
-      if (use_rs911x_sockets) {
-        #
-        # Using native sockets inside RS911x
-        #
-        include_dirs += rs911x_sock_inc
-      } else {
-        #
-        # We use LWIP - not built-in sockets
-        #
-        sources += rs911x_src_lwip
-      }
-    } else if (use_wf200) {
-      sources += wf200_plat_src
-      include_dirs += wf200_plat_incs
-    }
-
-    if (chip_enable_wifi_ipv4) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
-    }
-
-    if (rs91x_wpa3_only) {
-      # TODO: Change this macro once WF200 support is provided
-      defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
-    }
-  }
-
-  if (!disable_lcd) {
-       sources += [
-      "${examples_plat_dir}/display/demo-ui.c",
-      "${examples_plat_dir}/display/lcd.cpp",
-    ]
-
-    include_dirs += [ "${examples_plat_dir}/display" ]
-    defines += [
-      "DISPLAY_ENABLED",
-      "IS_DEMO_LIGHT=1",
-    ]
-    if (show_qr_code) {
-      defines += [ "QR_CODE_ENABLED" ]
-
-      deps += [ "${chip_root}/examples/common/QRCode" ]
-    }
-  }
 
   if (chip_enable_pw_rpc) {
     defines += [
@@ -334,11 +138,6 @@ efr32_executable("onoff_plug_app") {
     ]
   }
 
-  if (enable_heap_monitoring) {
-    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
-    defines += [ "HEAP_MONITORING" ]
-  }
-
   ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
@@ -358,16 +157,6 @@ efr32_executable("onoff_plug_app") {
       "-Wl,--defsym",
       "-Wl,SILABS_WIFI=1",
     ]
-  }
-
-  # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
-  }
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
   }
 
   output_dir = root_out_dir

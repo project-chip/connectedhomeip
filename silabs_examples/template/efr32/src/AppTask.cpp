@@ -20,12 +20,12 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
 
+#ifdef ENABLE_WSTK_LEDS
+#include "LEDWidget.h"
 #include "sl_simple_led_instances.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#endif // ENABLE_WSTK_LEDS
+
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -34,9 +34,6 @@
 
 #include <assert.h>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -44,37 +41,47 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
-#define APP_TASK_PRIORITY 2
-#define APP_EVENT_QUEUE_SIZE 10
-#define EXAMPLE_VENDOR_ID 0xcafe
-
-#define SYSTEM_STATE_LED &sl_led_led0
+#ifdef ENABLE_WSTK_LEDS
+#if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
 #define LIGHT_LED &sl_led_led1
+#else
+#define LIGHT_LED &sl_led_led0
+#endif
+#endif // ENABLE_WSTK_LEDS
+
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#ifdef ENABLE_WSTK_LEDS
+LEDWidget sLightLED;
+#endif // ENABLE_WSTK_LEDS
+
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
+
+/**********************************************************
+ * Identify Callbacks
+ *********************************************************/
 
 namespace {
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
+    ChipLogProgress(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    AppTask::GetAppTask().StopStatusLEDTimer();
+#endif
 }
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 } // namespace
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
 void OnTriggerIdentifyEffect(Identify * identify)
 {
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
@@ -85,6 +92,10 @@ void OnTriggerIdentifyEffect(Identify * identify)
                         identify->mEffectVariant);
         sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    AppTask::GetAppTask().StartStatusLEDTimer();
+#endif
 
     switch (sIdentifyEffect)
     {
@@ -107,61 +118,13 @@ void OnTriggerIdentifyEffect(Identify * identify)
         ChipLogProgress(Zcl, "No identifier effect");
     }
 }
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
 Identify gIdentify = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
     OnTriggerIdentifyEffect,
-};
-#endif 
-/**********************************************************
- * OffWithEffect Callbacks
- *********************************************************/
-
-void OnTriggerOffWithEffect(OnOffEffect * effect)
-{
-    chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
-    uint8_t effectVariant                                      = effect->mEffectVariant;
-
-    // Uses printouts until we can support the effects
-    if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
-    {
-        if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS)
-        {
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS");
-        }
-        else if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE)
-        {
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE");
-        }
-        else if (effectVariant ==
-                 EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS)
-        {
-            ChipLogProgress(Zcl,
-                            "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_"
-                            "IN_12_SECONDS");
-        }
-    }
-    else if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT)
-    {
-        if (effectVariant ==
-            EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND)
-        {
-            ChipLogProgress(
-                Zcl, "EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND");
-        }
-    }
-}
-
-OnOffEffect gEffect = {
-    chip::EndpointId{ 1 },
-    OnTriggerOffWithEffect,
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
-    static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS),
 };
 
 } // namespace
@@ -170,7 +133,6 @@ using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
-
 
 CHIP_ERROR AppTask::Init()
 {
@@ -203,11 +165,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         appError(err);
     }
 
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+    sAppTask.StartStatusLEDTimer();
+#endif
+
     SILABS_LOG("App Task started");
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -215,6 +181,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
     }
 }
+
 void AppTask::OnIdentifyStart(Identify * identify)
 {
     ChipLogProgress(Zcl, "onIdentifyStart");

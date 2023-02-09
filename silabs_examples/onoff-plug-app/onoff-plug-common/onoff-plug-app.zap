@@ -1,5 +1,5 @@
 {
-  "featureLevel": 82,
+  "featureLevel": 90,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -83,7 +83,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "identify time",
+              "name": "IdentifyTime",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -1133,10 +1133,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -1159,10 +1159,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -1657,7 +1657,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "AnnounceOtaProvider",
+              "name": "AnnounceOTAProvider",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -1693,7 +1693,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "DefaultOtaProviders",
+              "name": "DefaultOTAProviders",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -2685,11 +2685,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BootReasons",
+              "name": "BootReason",
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BootReasonEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2985,7 +2985,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "channel",
+              "name": "Channel",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3097,7 +3097,7 @@
               "reportableChange": 0
             },
             {
-              "name": "NeighborTableList",
+              "name": "NeighborTable",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -3113,7 +3113,7 @@
               "reportableChange": 0
             },
             {
-              "name": "RouteTableList",
+              "name": "RouteTable",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -3145,7 +3145,7 @@
               "reportableChange": 0
             },
             {
-              "name": "weighting",
+              "name": "Weighting",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -4071,7 +4071,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "bssid",
+              "name": "BSSID",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -4135,7 +4135,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Rssi",
+              "name": "RSSI",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -4361,7 +4361,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "PHYRateType",
+              "type": "PHYRateEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4585,7 +4585,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -4637,7 +4637,7 @@
           ]
         },
         {
-          "name": "AdministratorCommissioning",
+          "name": "Administrator Commissioning",
           "code": 60,
           "mfgCode": null,
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
@@ -4649,7 +4649,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "CommissioningWindowStatus",
+              "type": "CommissioningWindowStatusEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -5173,7 +5173,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5239,7 +5239,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "label list",
+              "name": "LabelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5365,7 +5365,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "identify time",
+              "name": "IdentifyTime",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5381,7 +5381,7 @@
               "reportableChange": 0
             },
             {
-              "name": "identify type",
+              "name": "IdentifyType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6341,7 +6341,7 @@
               "code": 15,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "LevelControlOptions",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -6679,10 +6679,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -6705,10 +6705,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -8187,7 +8187,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "occupancy",
+              "name": "Occupancy",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8203,7 +8203,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type",
+              "name": "OccupancySensorType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8219,7 +8219,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type bitmap",
+              "name": "OccupancySensorTypeBitmap",
               "code": 2,
               "mfgCode": null,
               "side": "server",

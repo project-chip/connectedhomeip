@@ -20,17 +20,12 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+
+#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#ifdef DISPLAY_ENABLED
-#include "lcd.h"
-#ifdef QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#endif // ENABLE_WSTK_LEDS
+
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -46,15 +41,28 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef ENABLE_WSTK_LEDS
+#if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
 #define ONOFF_LED &sl_led_led1
+#else
+#define ONOFF_LED &sl_led_led0
+#endif
+#endif // ENABLE_WSTK_LEDS
+
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_ONOFF_BUTTON &sl_button_btn1
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
+
+#ifdef ENABLE_WSTK_LEDS
 LEDWidget sOnOffLED;
+#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -84,6 +92,10 @@ void OnTriggerIdentifyEffect(Identify * identify)
                         identify->mEffectVariant);
         sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    AppTask::GetAppTask().StartStatusLEDTimer();
+#endif
 
     switch (sIdentifyEffect)
     {
@@ -145,8 +157,25 @@ CHIP_ERROR AppTask::Init()
 
     PlugMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
+#ifdef ENABLE_WSTK_LEDS
     sOnOffLED.Init(ONOFF_LED);
     sOnOffLED.Set(PlugMgr().IsPlugOn());
+#endif // ENABLE_WSTK_LEDS
+
+// Update the LCD with the Stored value. Show QR Code if not provisioned
+#ifdef DISPLAY_ENABLED
+    GetLCD().WriteDemoUI(PlugMgr().IsLightOn());
+#ifdef QR_CODE_ENABLED
+#ifdef SL_WIFI
+    if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        GetLCD().ShowQRCode(true, true);
+    }
+#endif // QR_CODE_ENABLED
+#endif
 
     return err;
 }
@@ -176,7 +205,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -209,11 +238,12 @@ void AppTask::OnOffActionEventHandler(AppEvent * aEvent)
     OnOffPlugManager::Action_t action;
     CHIP_ERROR err = CHIP_NO_ERROR;
     
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         action = (PlugMgr().IsPlugOn()) ? OnOffPlugManager::OFF_ACTION : OnOffPlugManager::ON_ACTION;
     }
+#endif
     else
     {
         err = APP_ERROR_UNHANDLED_EVENT;
@@ -229,7 +259,7 @@ void AppTask::OnOffActionEventHandler(AppEvent * aEvent)
         }
     }
 }
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
 {
     if (buttonHandle == NULL)
@@ -252,22 +282,27 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
         sAppTask.PostEvent(&button_event);
     }
 }
+#endif
 
 void AppTask::ActionInitiated(OnOffPlugManager::Action_t aAction, int32_t aActor)
 {
     // Action initiated, update the light led
     bool lightOn = aAction == OnOffPlugManager::ON_ACTION;
     SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
+
+#ifdef ENABLE_WSTK_LEDS
     sOnOffLED.Set(lightOn);
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(lightOn);
 #endif
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     if (aActor == AppEvent::kEventType_Button)
     {
         sAppTask.mSyncClusterToButtonAction = true;
     }
+#endif
 }
 
 void AppTask::ActionCompleted(OnOffPlugManager::Action_t aAction)
@@ -281,12 +316,13 @@ void AppTask::ActionCompleted(OnOffPlugManager::Action_t aAction)
     {
         SILABS_LOG("Outlet OFF")
     }
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     if (sAppTask.mSyncClusterToButtonAction)
     {
         chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
+#endif
 }
 
 void AppTask::UpdateClusterState(intptr_t context)
