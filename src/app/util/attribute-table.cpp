@@ -48,12 +48,12 @@ EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, ClusterId clust
         emberAfAllowNetworkWriteAttributeCallback(endpoint, cluster, attributeID, dataPtr, dataType);
     switch (extWritePermission)
     {
-    case EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_DENY_WRITE:
+    case EmberAfAttributeWritePermission::DenyWrite:
         return EMBER_ZCL_STATUS_FAILURE;
-    case EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL:
-    case EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_OF_READ_ONLY:
+    case EmberAfAttributeWritePermission::AllowWriteNormal:
+    case EmberAfAttributeWritePermission::AllowWriteOfReadOnly:
         return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                                  (extWritePermission == EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_OF_READ_ONLY), false);
+                                  (extWritePermission == EmberAfAttributeWritePermission::AllowWriteOfReadOnly), false);
     default:
         return (EmberAfStatus) extWritePermission;
     }

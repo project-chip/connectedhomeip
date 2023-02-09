@@ -24,18 +24,6 @@
 
 // ZCL enums
 
-// Enum for AttributeWritePermission
-enum EmberAfAttributeWritePermission : uint8_t
-{
-    EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_DENY_WRITE               = 0,
-    EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL       = 1,
-    EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_OF_READ_ONLY = 2,
-    EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_UNSUPPORTED_ATTRIBUTE    = 134,
-    EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_INVALID_VALUE            = 135,
-    EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_READ_ONLY                = 136,
-    EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_INVALID_DATA_TYPE        = 141,
-};
-
 // Enum for BarrierControlBarrierPosition
 enum EmberAfBarrierControlBarrierPosition : uint8_t
 {

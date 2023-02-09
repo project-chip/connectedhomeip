@@ -131,7 +131,6 @@ def _GetInDevelopmentTests() -> Set[str]:
        Goal is for this set to become empty.
     """
     return {
-        "TestClusterMultiFabric.yaml",  # Enum mismatch
         "TestGroupMessaging.yaml",     # Needs group support in repl
         "TestMultiAdmin.yaml",         # chip-repl hang on command expeted to fail
     }

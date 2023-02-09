@@ -81,8 +81,12 @@ public class CertTestFragment extends Fragment {
   private void runCertTests(Activity activity) {
     CertTestMatterSuccessFailureCallback successFailureCallback =
         new CertTestMatterSuccessFailureCallback(activity);
-    CertTestMatterSuccessFailureCallbackInteger successFailureCallbackInteger =
-        new CertTestMatterSuccessFailureCallbackInteger(successFailureCallback);
+    CertTestMatterSuccessCallback successCallback =
+        new CertTestMatterSuccessCallback(successFailureCallback);
+    CertTestMatterFailureCallback failureCallback =
+        new CertTestMatterFailureCallback(successFailureCallback);
+    CertTestMatterSuccessCallbackInteger successCallbackInteger =
+        new CertTestMatterSuccessCallbackInteger(successFailureCallback);
     CertTestMatterCallbackHandler callback =
         new CertTestMatterCallbackHandler(successFailureCallback);
 
@@ -269,7 +273,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readApplicationVersion(
-              kContentApp, successFailureCallback, successFailureCallback);
+              kContentApp, successCallback, failureCallback);
         });
 
     runAndWait(
@@ -277,7 +281,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readVendorName(
-              kContentApp, successFailureCallback, successFailureCallback);
+              kContentApp, successCallback, failureCallback);
         });
 
     runAndWait(
@@ -285,7 +289,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readApplicationName(
-              kContentApp, successFailureCallback, successFailureCallback);
+              kContentApp, successCallback, failureCallback);
         });
 
     runAndWait(
@@ -293,7 +297,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readVendorID(
-              kContentApp, successFailureCallbackInteger, successFailureCallbackInteger);
+              kContentApp, successCallbackInteger, failureCallback);
         });
 
     runAndWait(
@@ -301,7 +305,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readProductID(
-              kContentApp, successFailureCallbackInteger, successFailureCallbackInteger);
+              kContentApp, successCallbackInteger, failureCallback);
         });
 
     runAndWait(
@@ -320,7 +324,7 @@ public class CertTestFragment extends Fragment {
                       activity, MatterError.NO_ERROR, "mediaPlayback_subscribeToCurrentState");
                 }
               },
-              successFailureCallback,
+              failureCallback,
               0,
               20,
               new SubscriptionEstablishedCallback() {
@@ -415,8 +419,7 @@ public class CertTestFragment extends Fragment {
     }
   }
 
-  class CertTestMatterSuccessFailureCallback extends FailureCallback
-      implements SuccessCallback<String> {
+  class CertTestMatterSuccessFailureCallback {
     private Activity activity;
     private String testMethod;
     private CountDownLatch cdl;
@@ -433,7 +436,6 @@ public class CertTestFragment extends Fragment {
       this.cdl = cdl;
     }
 
-    @Override
     public void handle(MatterError error) {
       try {
         cdl.countDown();
@@ -446,7 +448,6 @@ public class CertTestFragment extends Fragment {
       }
     }
 
-    @Override
     public void handle(String response) {
       try {
         cdl.countDown();
@@ -460,18 +461,38 @@ public class CertTestFragment extends Fragment {
     }
   }
 
-  class CertTestMatterSuccessFailureCallbackInteger extends FailureCallback
-      implements SuccessCallback<Integer> {
-
+  class CertTestMatterSuccessCallback extends SuccessCallback<String> {
     private CertTestMatterSuccessFailureCallback delegate;
 
-    CertTestMatterSuccessFailureCallbackInteger(CertTestMatterSuccessFailureCallback delegate) {
+    CertTestMatterSuccessCallback(CertTestMatterSuccessFailureCallback delegate) {
       this.delegate = delegate;
     }
 
     @Override
-    public void handle(MatterError error) {
-      delegate.handle(error);
+    public void handle(String response) {
+      delegate.handle(response);
+    }
+  }
+
+  class CertTestMatterFailureCallback extends FailureCallback {
+    private CertTestMatterSuccessFailureCallback delegate;
+
+    CertTestMatterFailureCallback(CertTestMatterSuccessFailureCallback delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void handle(MatterError err) {
+      delegate.handle(err);
+    }
+  }
+
+  class CertTestMatterSuccessCallbackInteger extends SuccessCallback<Integer> {
+
+    private CertTestMatterSuccessFailureCallback delegate;
+
+    CertTestMatterSuccessCallbackInteger(CertTestMatterSuccessFailureCallback delegate) {
+      this.delegate = delegate;
     }
 
     @Override
