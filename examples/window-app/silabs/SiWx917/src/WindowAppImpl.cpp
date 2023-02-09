@@ -532,13 +532,13 @@ void WindowAppImpl::OnButtonChange(uint8_t Btn, uint8_t btnAction)
 {
     WindowApp::Button * btn = static_cast<Button *>((Btn == SIWx917_BTN0) ? sInstance.mButtonUp : sInstance.mButtonDown);
     btn->Press();
-    // since  sl_button_on_change is being called only with button press, calling Release() without condition
+    // since sl_button_on_change is being called only with button press, calling Release() without condition
     btn->Release();
 }
 
 // Silabs button callback from button event ISR
 void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
-    WindowAppImpl * app        = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
+    WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
     app->OnButtonChange(btn, btnAction);
 }
