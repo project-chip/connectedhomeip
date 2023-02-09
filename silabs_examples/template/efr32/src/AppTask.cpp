@@ -60,10 +60,6 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-#ifdef ENABLE_WSTK_LEDS
-LEDWidget sLightLED;
-#endif // ENABLE_WSTK_LEDS
-
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
 /**********************************************************
