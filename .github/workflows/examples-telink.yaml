@@ -120,6 +120,24 @@ jobs:
                     out/telink-tlsr9518adk80d-ota-requestor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: Build example Telink Pump App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d pump-app \
+                    out/telink-tlsr9518adk80d-pump/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build example Telink Pump Controller App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-controller' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d pump-controller-app \
+                    out/telink-tlsr9518adk80d-pump-app/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
             - name: Build example Telink Thermostat App
               run: |
                   ./scripts/run_in_build_env.sh \
