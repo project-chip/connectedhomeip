@@ -224,10 +224,9 @@ else
                 if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
-
-                optArgs+=$1" "
-                shift
-                ;;
+            optArgs+=$1" "
+            shift
+            ;;
         esac
     done
 
