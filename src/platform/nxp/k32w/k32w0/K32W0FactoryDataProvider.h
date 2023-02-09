@@ -37,9 +37,16 @@ namespace DeviceLayer {
 
 #define CHIP_FACTORY_DATA_ERROR(e) ChipError(ChipError::Range::kLastRange, ((uint8_t)ChipError::Range::kLastRange << 2) | e, __FILE__, __LINE__)
 
-#define CHIP_FACTORY_DATA_SHA_CHECK   CHIP_FACTORY_DATA_ERROR(0x01)
-#define CHIP_FACTORY_DATA_HEADER_READ CHIP_FACTORY_DATA_ERROR(0x02)
-#define CHIP_FACTORY_DATA_HASH_ID     CHIP_FACTORY_DATA_ERROR(0x03)
+#define CHIP_FACTORY_DATA_SHA_CHECK           CHIP_FACTORY_DATA_ERROR(0x01)
+#define CHIP_FACTORY_DATA_HEADER_READ         CHIP_FACTORY_DATA_ERROR(0x02)
+#define CHIP_FACTORY_DATA_HASH_ID             CHIP_FACTORY_DATA_ERROR(0x03)
+#define CHIP_FACTORY_DATA_PDM_RESTORE         CHIP_FACTORY_DATA_ERROR(0x04)
+#define CHIP_FACTORY_DATA_NULL                CHIP_FACTORY_DATA_ERROR(0x05)
+#define CHIP_FACTORY_DATA_FLASH_ERASE         CHIP_FACTORY_DATA_ERROR(0x06)
+#define CHIP_FACTORY_DATA_FLASH_PROGRAM       CHIP_FACTORY_DATA_ERROR(0x07)
+#define CHIP_FACTORY_DATA_INTERNAL_FLASH_READ CHIP_FACTORY_DATA_ERROR(0x08)
+#define CHIP_FACTORY_DATA_PDM_SAVE_RECORD     CHIP_FACTORY_DATA_ERROR(0x09)
+#define CHIP_FACTORY_DATA_PDM_READ_RECORD     CHIP_FACTORY_DATA_ERROR(0x0A)
 
 /**
  * @brief This class provides Commissionable data, Device Attestation Credentials,
@@ -110,6 +117,8 @@ public:
 
     CHIP_ERROR Init();
     CHIP_ERROR Validate();
+    CHIP_ERROR Restore();
+    CHIP_ERROR UpdateData(uint8_t* pBuf);
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset=nullptr);
 
     // Custom factory data providers must implement this method in order to define

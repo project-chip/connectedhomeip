@@ -29,13 +29,6 @@ namespace chip {
 using FactoryProvider = DeviceLayer::K32W0FactoryDataProvider;
 using Tags = FactoryProvider::FactoryDataId;
 
-#define CHIP_FACTORY_DATA_NULL                CHIP_FACTORY_DATA_ERROR(0x04)
-#define CHIP_FACTORY_DATA_FLASH_ERASE         CHIP_FACTORY_DATA_ERROR(0x05)
-#define CHIP_FACTORY_DATA_FLASH_PROGRAM       CHIP_FACTORY_DATA_ERROR(0x06)
-#define CHIP_FACTORY_DATA_INTERNAL_FLASH_READ CHIP_FACTORY_DATA_ERROR(0x07)
-#define CHIP_FACTORY_DATA_PDM_SAVE_RECORD     CHIP_FACTORY_DATA_ERROR(0x08)
-#define CHIP_FACTORY_DATA_PDM_READ_RECORD     CHIP_FACTORY_DATA_ERROR(0x09)
-
 /**
  * OTA custom payload that uses Matter TLVs.
  * The custom payload is used when factory data needs updating.
@@ -74,7 +67,6 @@ private:
     CHIP_ERROR Update(uint8_t tag, Optional<ByteSpan>& optional);
 
     CHIP_ERROR Read();
-    CHIP_ERROR Write();
     CHIP_ERROR Backup();
     CHIP_ERROR Restore();
     void ClearBuffer();

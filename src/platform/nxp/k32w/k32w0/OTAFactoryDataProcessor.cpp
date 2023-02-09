@@ -24,9 +24,6 @@
 
 #include "fsl_flash.h"
 #include "PDM.h"
-extern "C" {
-#include "Flash_Adapter.h"
-}
 
 namespace chip {
 
@@ -83,7 +80,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
     SuccessOrExit(error = Update((uint8_t)Tags::kPaiCertificateId, mPayload.mCertPai));
     SuccessOrExit(error = Update((uint8_t)Tags::kCertDeclarationId, mPayload.mCertDeclaration));
 
-    error = Write();
+    error = FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData);
 
 exit:
     if (error != CHIP_NO_ERROR)
@@ -92,7 +89,7 @@ exit:
         error = Restore();
         if (error == CHIP_NO_ERROR)
         {
-            error = Write();
+            error = FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData);
         }
     }
     else
@@ -176,22 +173,6 @@ CHIP_ERROR OTAFactoryDataProcessor::Read()
         ClearBuffer();
         return CHIP_FACTORY_DATA_INTERNAL_FLASH_READ;
     }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTAFactoryDataProcessor::Write()
-{
-    ReturnErrorCodeIf(mFactoryData == nullptr, CHIP_FACTORY_DATA_NULL);
-
-    NV_Init();
-
-    auto status = NV_FlashEraseSector(FactoryProvider::kFactoryDataStart, FactoryProvider::kFactoryDataSize);
-    ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_ERASE);
-
-    FactoryProvider::Header* header = (FactoryProvider::Header*)mFactoryData;
-    status = NV_FlashProgramUnaligned(FactoryProvider::kFactoryDataStart, sizeof(FactoryProvider::Header) + header->size, mFactoryData);
-    ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_PROGRAM);
 
     return CHIP_NO_ERROR;
 }

@@ -36,6 +36,9 @@
 #include <platform/ConfigurationManager.h>
 
 #include "K32W0FactoryDataProvider.h"
+extern "C" {
+#include "Flash_Adapter.h"
+}
 
 #include <cctype>
 
@@ -124,7 +127,9 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
 
 CHIP_ERROR K32W0FactoryDataProvider::Validate()
 {
-    uint8_t sha256Output[SHA256_HASH_SIZE] = {0};
+    uint8_t sha256Output[SHA256_HASH_SIZE] = { 0 };
+
+    ReturnErrorOnFailure(Restore());
 
     auto status =
         OtaUtils_ReadFromInternalFlash((uint16_t)sizeof(Header), kFactoryDataStart, (uint8_t *)&mHeader, NULL, pFunctionEepromRead);
@@ -133,6 +138,51 @@ CHIP_ERROR K32W0FactoryDataProvider::Validate()
 
     SHA256_Hash((uint8_t *)kFactoryDataPayloadStart, mHeader.size, sha256Output);
     ReturnErrorCodeIf(memcmp(sha256Output, mHeader.hash, kHashLen) != 0, CHIP_FACTORY_DATA_SHA_CHECK);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR K32W0FactoryDataProvider::Restore()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    uint16_t backupLength = 0;
+
+    // Check if PDM id related to factory data backup exists.
+    // If it does, it means an external event (such as a power loss)
+    // interrupted the factory data update process and the section
+    // from internal flash is most likely erased and should be restored.
+    if (PDM_bDoesDataExist(kNvmId_FactoryDataBackup, &backupLength))
+    {
+        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
+        buffer.Calloc(kFactoryDataSize);
+        ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+
+        auto status =
+            PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)buffer.Get(), kFactoryDataSize, &backupLength);
+        ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
+
+        error = UpdateData(buffer.Get());
+        if (CHIP_NO_ERROR == error)
+        {
+            PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+        }
+    }
+
+    // TODO: add hook to enable restore customization
+
+    return error;
+}
+
+CHIP_ERROR K32W0FactoryDataProvider::UpdateData(uint8_t* pBuf)
+{
+    NV_Init();
+
+    auto status = NV_FlashEraseSector(kFactoryDataStart, kFactoryDataSize);
+    ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_ERASE);
+
+    Header* header = (Header*)pBuf;
+    status = NV_FlashProgramUnaligned(kFactoryDataStart, sizeof(Header) + header->size, pBuf);
+    ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_PROGRAM);
 
     return CHIP_NO_ERROR;
 }
