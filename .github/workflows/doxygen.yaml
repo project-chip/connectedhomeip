@@ -21,18 +21,18 @@ on:
             - "**.c[cs]?"
             - "**.cxx"
             - "**.cpp"
-            - "**.c++"
+            - "**.c\\+\\+"
             - "**.ii"
             - "**.ixx"
             - "**.ipp"
-            - "**.i++"
+            - "**.i\\+\\+"
             - "**.inl"
             - "**.[hH]"
             - "**.hh"
             - "**.HH"
             - "**.hxx"
             - "**.hpp"
-            - "**.h++"
+            - "**.h\\+\\+"
             - "**.mm"
             - "**.txt"
             - "**.[ido]dl"
@@ -48,18 +48,18 @@ on:
             - "**.c[cs]?"
             - "**.cxx"
             - "**.cpp"
-            - "**.c++"
+            - "**.c\\+\\+"
             - "**.ii"
             - "**.ixx"
             - "**.ipp"
-            - "**.i++"
+            - "**.i\\+\\+"
             - "**.inl"
             - "**.[hH]"
             - "**.hh"
             - "**.HH"
             - "**.hxx"
             - "**.hpp"
-            - "**.h++"
+            - "**.h\\+\\+"
             - "**.mm"
             - "**.txt"
             - "**.[ido]dl"
@@ -80,7 +80,7 @@ jobs:
         name: Build Doxygen
         timeout-minutes: 5
 
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         container:
             image: connectedhomeip/chip-build-doxygen:0.6.35
 
