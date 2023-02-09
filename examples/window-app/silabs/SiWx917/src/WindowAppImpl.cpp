@@ -532,6 +532,7 @@ void WindowAppImpl::OnButtonChange(uint8_t Btn, uint8_t btnAction)
 {
     WindowApp::Button * btn = static_cast<Button *>((Btn == SIWx917_BTN0) ? sInstance.mButtonUp : sInstance.mButtonDown);
     btn->Press();
+    // since  sl_button_on_change is being called only with button press, calling Release() without condition
     btn->Release();
 }
 
