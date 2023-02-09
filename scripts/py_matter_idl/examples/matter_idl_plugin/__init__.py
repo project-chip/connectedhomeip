@@ -104,15 +104,24 @@ class EncodingDataType:
 
     @staticmethod
     def fromType(protobufType: str):
-        if protobufType == "uint32": return EncodingDataType.UINT
-        if protobufType == "uint64": return EncodingDataType.UINT
-        if protobufType == "int32": return EncodingDataType.INT
-        if protobufType == "int64": return EncodingDataType.INT
-        if protobufType == "bool": return EncodingDataType.BOOL
-        if protobufType == "string": return EncodingDataType.CHAR_STRING
-        if protobufType == "bytes": return EncodingDataType.OCT_STRING
-        if protobufType == "float": return EncodingDataType.FLOAT
-        if protobufType == "double": return EncodingDataType.DOUBLE
+        if protobufType == "uint32":
+            return EncodingDataType.UINT
+        if protobufType == "uint64":
+            return EncodingDataType.UINT
+        if protobufType == "int32":
+            return EncodingDataType.INT
+        if protobufType == "int64":
+            return EncodingDataType.INT
+        if protobufType == "bool":
+            return EncodingDataType.BOOL
+        if protobufType == "string":
+            return EncodingDataType.CHAR_STRING
+        if protobufType == "bytes":
+            return EncodingDataType.OCT_STRING
+        if protobufType == "float":
+            return EncodingDataType.FLOAT
+        if protobufType == "double":
+            return EncodingDataType.DOUBLE
 
         # If not a primitive type, it is a named type; assume it is a Struct.
         # NOTE: the actual type may be an Enum or Bitmap.
