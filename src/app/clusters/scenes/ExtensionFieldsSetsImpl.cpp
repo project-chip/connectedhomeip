@@ -29,7 +29,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::Serialize(TLV::TLVWriter & writer) const
     ReturnErrorOnFailure(writer.Put(TagFieldNum(), static_cast<uint8_t>(this->fieldNum)));
     if (!this->is_empty())
     {
-        for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+        for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
             if (!this->EFS[i].is_empty())
             {
@@ -64,7 +64,7 @@ void ExtensionFieldsSetsImpl::Clear()
 {
     if (!this->is_empty())
     {
-        for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+        for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
             this->EFS[i].Clear();
         }
@@ -84,7 +84,7 @@ bool ExtensionFieldsSetsImpl::is_empty() const
 CHIP_ERROR ExtensionFieldsSetsImpl::insertField(ExtensionFieldsSet & field)
 {
     uint8_t idPosition = 0xff, fisrtEmptyPosition = 0xff;
-    for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+    for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
     {
         if (this->EFS[i].ID == field.ID)
         {
@@ -99,12 +99,12 @@ CHIP_ERROR ExtensionFieldsSetsImpl::insertField(ExtensionFieldsSet & field)
     }
 
     // if found, insert at found position, otherwise at first free possition, otherwise return error
-    if (idPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+    if (idPosition < kMaxClusterPerScenes)
     {
         ReturnErrorOnFailure(this->EFS[idPosition] = field);
         return CHIP_NO_ERROR;
     }
-    else if (fisrtEmptyPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+    else if (fisrtEmptyPosition < kMaxClusterPerScenes)
     {
         ReturnErrorOnFailure(this->EFS[fisrtEmptyPosition] = field);
         this->fieldNum++;
@@ -118,7 +118,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::insertField(ExtensionFieldsSet & field)
 
 CHIP_ERROR ExtensionFieldsSetsImpl::getFieldAtPosition(ExtensionFieldsSet & field, uint8_t position)
 {
-    if (position < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+    if (position < kMaxClusterPerScenes)
     {
         ReturnErrorOnFailure(field = this->EFS[position]);
     }
@@ -130,7 +130,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::removeFieldAtPosition(uint8_t position)
 {
     if (!this->is_empty())
     {
-        if (position < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+        if (position < kMaxClusterPerScenes)
         {
             if (!this->EFS[position].is_empty())
             {

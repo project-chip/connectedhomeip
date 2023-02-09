@@ -37,6 +37,55 @@ struct FabricHavingSceneList : public CommonPersistentData::FabricList
 
 static constexpr size_t kPersistentBufferMax = 128;
 
+struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBufferMax>
+{
+    FabricIndex fabric_index = kUndefinedFabricIndex;
+    SceneIndex index         = 0;
+    bool first               = true;
+
+    SceneTableData() : SceneTableEntry() {}
+    SceneTableData(FabricIndex fabric) : fabric_index(fabric) {}
+    SceneTableData(FabricIndex fabric, SceneIndex idx) : fabric_index(fabric), index(idx) {}
+    SceneTableData(FabricIndex fabric, SceneStorageId storageId) : SceneTableEntry(storageId), fabric_index(fabric) {}
+    SceneTableData(FabricIndex fabric, SceneStorageId storageId, SceneData data) :
+        SceneTableEntry(storageId, data), fabric_index(fabric)
+    {}
+
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    {
+        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
+        key = DefaultStorageKeyAllocator::FabricSceneKey(fabric_index, index);
+        return CHIP_NO_ERROR;
+    }
+
+    void Clear() override { storageData.Clear(); }
+
+    CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
+    {
+        TLV::TLVType container;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+
+        ReturnErrorOnFailure(storageId.Serialize(writer));
+        ReturnErrorOnFailure(storageData.Serialize(writer));
+
+        return writer.EndContainer(container);
+    }
+
+    CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
+    {
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
+        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
+
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+
+        ReturnErrorOnFailure(storageId.Deserialize(reader));
+        ReturnErrorOnFailure(storageData.Deserialize(reader));
+
+        return reader.ExitContainer(container);
+    }
+};
+
 /**
  * @brief Linked list of all scenes in a fabric, stored in persistent memory
  *
@@ -50,7 +99,8 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
 
     FabricIndex fabric_index = kUndefinedFabricIndex;
     uint8_t scene_count      = 0;
-    FabricIndex next         = kUndefinedFabricIndex;
+    SceneStorageId scene_map[kMaxScenePerFabric];
+    FabricIndex next = kUndefinedFabricIndex;
 
     FabricSceneData() = default;
     FabricSceneData(FabricIndex fabric) : fabric_index(fabric) {}
@@ -65,7 +115,11 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
     void Clear() override
     {
         scene_count = 0;
-        next        = kUndefinedFabricIndex;
+        for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
+        {
+            scene_map[i].Clear();
+        }
+        next = kUndefinedFabricIndex;
     }
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
@@ -74,6 +128,10 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         ReturnErrorOnFailure(writer.Put(TagSceneCount(), static_cast<uint16_t>(scene_count)));
+        for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
+        {
+            ReturnErrorOnFailure(scene_map[i].Serialize(writer));
+        }
         ReturnErrorOnFailure(writer.Put(TagNext(), static_cast<uint16_t>(next)));
 
         return writer.EndContainer(container);
@@ -89,6 +147,10 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
 
         ReturnErrorOnFailure(reader.Next(TagSceneCount()));
         ReturnErrorOnFailure(reader.Get(scene_count));
+        for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
+        {
+            ReturnErrorOnFailure(scene_map[i].Deserialize(reader));
+        }
         ReturnErrorOnFailure(reader.Next(TagNext()));
         ReturnErrorOnFailure(reader.Get(next));
 
@@ -174,29 +236,39 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         // Fabric not in the list
         return CHIP_ERROR_NOT_FOUND;
     }
-
-    // Check the fabric is registered in the fabrics' linked list
-    CHIP_ERROR Validate(PersistentStorageDelegate * storage) const
+    /// @brief Finds the index where to insert current scene by going through the whole table and looking if the scene is already in
+    /// there and for the first empty index
+    /// @param storage Storage delegate in use
+    /// @param fabric Fabric in use
+    /// @param target_scene Storage Id of scene to store
+    /// @return CHIP_NO_ERROR if managed to find a suitable storage location, false otherwise
+    CHIP_ERROR Find(SceneStorageId target_scene, SceneIndex & idx)
     {
-        FabricHavingSceneList fabric_list;
-        ReturnErrorOnFailure(fabric_list.Load(storage));
+        SceneIndex firstFreeIdx = kUndefinedSceneIndex; // storage index if scene not found
+        uint8_t index           = 0;
 
-        // Existing fabric list, search for existing entry
-        FabricSceneData fabric(fabric_list.first_entry);
-
-        for (size_t i = 0; i < fabric_list.entry_count; i++)
+        while (index < kMaxScenePerFabric)
         {
-            ReturnErrorOnFailure(fabric.Load(storage));
-            if (fabric.fabric_index == this->fabric_index)
+            if (scene_map[index] == target_scene)
             {
-                return CHIP_NO_ERROR;
+                idx = index;
+                return CHIP_NO_ERROR; // return scene at current index if scene found
             }
-            fabric.fabric_index = fabric.next;
+            else if (scene_map[index].sceneEndpointId == kInvalidEndpointId && firstFreeIdx == kUndefinedSceneIndex)
+            {
+                firstFreeIdx = index;
+            }
+            index++;
         }
-        // Fabric not in the list
-        return CHIP_ERROR_NOT_FOUND;
-    }
 
+        if (firstFreeIdx < kMaxScenePerFabric)
+        {
+            idx = firstFreeIdx;
+            return CHIP_ERROR_NOT_FOUND;
+        }
+
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
     CHIP_ERROR Save(PersistentStorageDelegate * storage) override
     {
         ReturnErrorOnFailure(Register(storage));
@@ -208,56 +280,47 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         ReturnErrorOnFailure(Unregister(storage));
         return PersistentData::Delete(storage);
     }
-};
-
-struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBufferMax>
-{
-    static constexpr TLV::Tag TagNext() { return TLV::ContextTag(1); }
-
-    FabricIndex fabric_index = kUndefinedFabricIndex;
-    SceneIndex index         = 0;
-    bool first               = true;
-
-    SceneTableData() : SceneTableEntry() {}
-    SceneTableData(FabricIndex fabric) : fabric_index(fabric) {}
-    SceneTableData(FabricIndex fabric, SceneIndex idx) : fabric_index(fabric), index(idx) {}
-    SceneTableData(FabricIndex fabric, SceneStorageId storageId) : SceneTableEntry(storageId), fabric_index(fabric) {}
-    SceneTableData(FabricIndex fabric, SceneStorageId storageId, SceneData data) :
-        SceneTableEntry(storageId, data), fabric_index(fabric)
-    {}
-
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    CHIP_ERROR SaveScene(PersistentStorageDelegate * storage, const SceneTableEntry & entry)
     {
-        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        key = DefaultStorageKeyAllocator::FabricSceneKey(fabric_index, index);
+        CHIP_ERROR err;
+        SceneTableData scene(fabric_index, entry.storageId, entry.storageData);
+        // Look for empty storage space
+
+        err = this->Find(entry.storageId, scene.index);
+
+        if (CHIP_NO_ERROR == err)
+        {
+
+            return scene.Save(storage);
+        }
+        else if (CHIP_ERROR_NOT_FOUND == err) // If not found, scene.index should be the first free index
+        {
+            scene_count++;
+            scene_map[scene.index] = scene.storageId;
+            ReturnErrorOnFailure(this->Save(storage));
+
+            return scene.Save(storage);
+        }
+
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
+
+    CHIP_ERROR RemoveScene(PersistentStorageDelegate * storage, const SceneStorageId & scene_id)
+    {
+        SceneTableData scene(fabric_index, scene_id);
+        // Look for empty storage space
+
+        VerifyOrReturnError(this->Find(scene_id, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
+        ReturnErrorOnFailure(scene.Delete(storage));
+
+        if (scene_count > 0)
+        {
+            scene_count--;
+            scene_map[scene.index].Clear();
+            ReturnErrorOnFailure(this->Save(storage));
+        }
+
         return CHIP_NO_ERROR;
-    }
-
-    void Clear() override { storageData.Clear(); }
-
-    CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
-    {
-        TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
-
-        ReturnErrorOnFailure(storageId.Serialize(writer));
-        ReturnErrorOnFailure(storageData.Serialize(writer));
-
-        return writer.EndContainer(container);
-    }
-
-    CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
-    {
-        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
-        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
-
-        TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        ReturnErrorOnFailure(storageId.Deserialize(reader));
-        ReturnErrorOnFailure(storageData.Deserialize(reader));
-
-        return reader.ExitContainer(container);
     }
 };
 
@@ -282,48 +345,22 @@ CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, c
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricSceneData fabric(fabric_index);
-    SceneTableData scene(fabric_index);
-    bool foundIndex = false;
-
-    scene.index = 0;
 
     // Load fabric data (defaults to zero)
     CHIP_ERROR err = fabric.Load(mStorage);
     VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
-    scene.storageId   = entry.storageId;
-    scene.storageData = entry.storageData;
-
-    // Look for empty storage space
-    if (CHIP_NO_ERROR == Find(mStorage, fabric_index, entry.storageId, foundIndex, scene.index))
-    {
-        if (foundIndex)
-        {
-            // Existing scene
-            return scene.Save(mStorage);
-        }
-        else if (scene.index < kMaxScenePerFabric)
-        {
-            fabric.scene_count++;
-            ReturnErrorOnFailure(fabric.Save(mStorage));
-
-            return scene.Save(mStorage);
-        }
-    }
-
-    return CHIP_ERROR_INVALID_LIST_LENGTH;
+    return fabric.SaveScene(mStorage, entry);
 }
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
 {
     FabricSceneData fabric(fabric_index);
     SceneTableData scene(fabric_index);
-    bool foundIndex = false;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
-    VerifyOrReturnError(Find(mStorage, fabric_index, scene_id, foundIndex, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
-    VerifyOrReturnError(foundIndex, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(fabric.Find(scene_id, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
 
-    scene.Load(mStorage);
+    ReturnErrorOnFailure(scene.Load(mStorage));
     entry.storageId   = scene.storageId;
     entry.storageData = scene.storageData;
 
@@ -332,23 +369,10 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, S
 CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
 {
     FabricSceneData fabric(fabric_index);
-    SceneTableData scene(fabric_index);
-    bool foundIndex = false;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
 
-    VerifyOrReturnError(Find(mStorage, fabric_index, scene_id, foundIndex, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
-    VerifyOrReturnError(foundIndex, CHIP_ERROR_NOT_FOUND);
-
-    ReturnErrorOnFailure(scene.Delete(mStorage));
-
-    if (fabric.scene_count > 0)
-    {
-        fabric.scene_count--;
-        ReturnErrorOnFailure(fabric.Save(mStorage));
-    }
-
-    return CHIP_NO_ERROR;
+    return fabric.RemoveScene(mStorage, scene_id);
 }
 
 /// @brief This function is meant to provide a way to empty the scene table without knowing any specific scene Id. Outisde of this
@@ -464,14 +488,11 @@ CHIP_ERROR DefaultSceneTableImpl::EFSValuesToCluster(ExtensionFieldsSetsImpl & f
 
             if (!EFS.is_empty())
             {
-                if (!this->handlerListEmpty())
+                for (uint8_t j = 0; j < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; j++)
                 {
-                    for (uint8_t j = 0; j < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; j++)
+                    if (EFS.ID == this->handlers[j].getID())
                     {
-                        if (EFS.ID == this->handlers[j].getID())
-                        {
-                            ReturnErrorOnFailure(this->handlers[j].setClusterEFS(EFS));
-                        }
+                        ReturnErrorOnFailure(this->handlers[j].setClusterEFS(EFS));
                     }
                 }
             }
@@ -484,64 +505,19 @@ CHIP_ERROR DefaultSceneTableImpl::EFSValuesToCluster(ExtensionFieldsSetsImpl & f
 CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
     FabricSceneData fabric(fabric_index);
-
+    SceneIndex idx = 0;
     CHIP_ERROR err = fabric.Load(mStorage);
     VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
-    // Remove scene entries
-    SceneTableData scene(fabric_index);
-    scene.index = 0;
-
-    while (scene.index < kMaxScenePerFabric)
+    while (idx < kMaxScenePerFabric)
     {
-        err = RemoveSceneTableEntryAtPosition(fabric_index, scene.index);
+        err = RemoveSceneTableEntryAtPosition(fabric_index, idx);
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err, err);
-        scene.index++;
+        idx++;
     }
 
     // Remove fabric
     return fabric.Delete(mStorage);
-}
-
-/// @brief Finds the index where to insert current scene by going through the whole table and looking if the scene is already in
-/// there and for the first empty index
-/// @param storage Storage delegate in use
-/// @param fabric Fabric in use
-/// @param target_scene Storage Id of scene to store
-/// @return CHIP_NO_ERROR if managed to find a suitable storage location, false otherwise
-CHIP_ERROR DefaultSceneTableImpl::Find(PersistentStorageDelegate * storage, const FabricIndex & fabric_index,
-                                       SceneStorageId target_scene, bool & found, SceneIndex & idx)
-{
-    CHIP_ERROR err;
-    SceneTableData scene(fabric_index);
-    SceneIndex firstFreeIdx = kUndefinedSceneIndex; // storage index if scene not found
-
-    while (scene.index < kMaxScenePerFabric)
-    {
-        err = scene.Load(mStorage);
-        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
-        if (scene.storageId == target_scene)
-        {
-            found = true;
-            idx   = scene.index;
-            return CHIP_NO_ERROR; // return scene at current index if scene found
-        }
-        // check if index is free and if first free index wasn't found
-        if (err == CHIP_ERROR_NOT_FOUND && firstFreeIdx == kUndefinedSceneIndex)
-        {
-            firstFreeIdx = scene.index;
-        }
-        scene.index++;
-    }
-
-    if (firstFreeIdx < kMaxScenePerFabric)
-    {
-        found = false;
-        idx   = firstFreeIdx;
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_INVALID_LIST_LENGTH;
 }
 
 DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntry(FabricIndex fabric_index)
@@ -554,12 +530,9 @@ DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSce
     mProvider(provider), mFabric(fabric_index)
 {
     FabricSceneData fabric(fabric_index);
-    if (CHIP_NO_ERROR == fabric.Load(provider.mStorage))
-    {
-
-        mTotalScene = fabric.scene_count;
-        mSceneIndex = 0;
-    }
+    ReturnOnFailure(fabric.Load(provider.mStorage));
+    mTotalScene = fabric.scene_count;
+    mSceneIndex = 0;
 }
 
 size_t DefaultSceneTableImpl::SceneEntryIteratorImpl::Count()
@@ -569,25 +542,26 @@ size_t DefaultSceneTableImpl::SceneEntryIteratorImpl::Count()
 
 bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & output)
 {
-    CHIP_ERROR err;
-    VerifyOrReturnError(mSceneIndex < mTotalScene, false);
+    FabricSceneData fabric(mFabric);
+    SceneTableData scene(mFabric);
 
-    SceneTableData scene(mFabric, mSceneIndex);
+    VerifyOrReturnError(fabric.Load(mProvider.mStorage) == CHIP_NO_ERROR, false);
 
     // looks for next available scene
-    while (scene.index < kMaxScenePerFabric)
+    while (mSceneIndex < kMaxScenePerFabric)
     {
-        err = scene.Load(mProvider.mStorage);
-        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, false);
-
-        scene.index++;
-        if (err == CHIP_NO_ERROR)
+        if (fabric.scene_map[mSceneIndex].sceneEndpointId != kInvalidEndpointId)
         {
-            mSceneIndex        = scene.index;
+            scene.index = mSceneIndex;
+            VerifyOrReturnError(scene.Load(mProvider.mStorage) == CHIP_NO_ERROR, false);
             output.storageId   = scene.storageId;
             output.storageData = scene.storageData;
+            mSceneIndex++;
+
             return true;
         }
+
+        mSceneIndex++;
     }
 
     return false;

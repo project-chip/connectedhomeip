@@ -23,6 +23,9 @@
 namespace chip {
 namespace scenes {
 
+static constexpr uint8_t kMaxClusterPerScenes = CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES;
+static constexpr uint8_t kMaxFieldsPerCluster = CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER;
+
 class ExtensionFieldsSets
 {
 public:
