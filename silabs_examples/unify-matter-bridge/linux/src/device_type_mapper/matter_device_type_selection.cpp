@@ -176,12 +176,14 @@ bool matter_clusters_conform_to_device_type(const std::vector<EmberAfCluster> & 
             }
 
             // Agreed to not count scenes as a spec compliant cluster as Matter spec is not sure on how to implement it
-            if (dev_translator.m_spec_compliant && strcmp(matter_device_cluster_data.cluster_name, "Scenes") != 0)
+            if (dev_translator.m_spec_compliant)
             {
                 const int8_t matter_cluster_index =
                     check_if_cluster_in_array_of_clusters(device_cluster_type.value(), matter_cluster_list);
                 if (matter_cluster_index == -1)
                 {
+                    sl_log_warning(LOG_TAG, "Device mandatory cluster %s not found in mapped device clusters",
+                                   matter_device_cluster_data.cluster_name);
                     return false;
                 }
 
@@ -218,6 +220,7 @@ std::vector<cluster_score> compute_device_type_match_score(const std::vector<Emb
     {
         bool device_conformance =
             matter_clusters_conform_to_device_type(matter_cluster_list, matter_device.clusters, dev_translator);
+        sl_log_debug(LOG_TAG, "Device type %s conforms to spec: %s", matter_device.device_type_name, device_conformance ? "True" : "False");
         if (!device_conformance)
         {
             continue;

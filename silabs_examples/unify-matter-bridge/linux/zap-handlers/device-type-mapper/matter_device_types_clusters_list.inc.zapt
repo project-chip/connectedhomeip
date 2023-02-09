@@ -32,8 +32,8 @@ typedef struct {
 static const std::map<chip::DeviceTypeId, DeviceTypeData> matter_device_type_vs_clusters_map = {
 {{#zcl_device_types}}
  {{#if (supportedDeviceTypes label)}} { {{asHex code 4}}, { { {{#zcl_device_type_clusters}}{{#if (filterClusters (asUpperCamelCase clusterName))}} {  "{{asUpperCamelCase clusterName}}", {{isMandatoryCluster}}, 
-    { {{#zcl_device_type_cluster_commands}} {{#if (nameNotNullOrContainsResponse name)}}"{{asUpperCamelCase name}}"{{listComma this}}{{/if}} {{/zcl_device_type_cluster_commands}} }, 
-    { {{#zcl_device_type_cluster_attributes}} {{#if (nameNotNullOrContainsResponse name)}}"{{asUpperCamelCase name}}"{{listComma this}}{{/if}} {{/zcl_device_type_cluster_attributes}} } } {{listComma this}} {{/if}} {{/zcl_device_type_clusters}} }, 
+    { {{#zcl_device_type_cluster_commands}} {{#if (filterCommandsAndAttributes name)}}"{{asUpperCamelCase name}}"{{listComma this}}{{/if}} {{/zcl_device_type_cluster_commands}} }, 
+    { {{#zcl_device_type_cluster_attributes}} {{#if (filterCommandsAndAttributes name)}}"{{asUpperCamelCase name}}"{{listComma this}}{{/if}} {{/zcl_device_type_cluster_attributes}} } } {{listComma this}} {{/if}} {{/zcl_device_type_clusters}} }, 
     "{{cleanDeviceTypeName label}}" } 
     }{{listComma this}}
   {{/if}}

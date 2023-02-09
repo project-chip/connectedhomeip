@@ -127,8 +127,8 @@ int main(int argc, char * argv[])
     }
     VerifyOrDie(ChipLinuxAppInit(__argc__, const_cast<char **>(__argv__)) == 0);
 
-    sl_log_info(LOG_TAG, "Starting Matter Bridge with spec compliance %s", cfg->spec_compliance ? "enabled" : "disabled");
-    device_translator matter_device_translator = device_translator(cfg->spec_compliance);
+    sl_log_info(LOG_TAG, "Starting Matter Bridge with strict device mapping: %s", cfg->strict_device_mapping ? "enabled" : "disabled");
+    device_translator matter_device_translator = device_translator(cfg->strict_device_mapping);
     UnifyEmberInterface ember_interface;
     ClusterEmulator emulator;
     matter_node_state_monitor node_state_monitor(matter_device_translator, emulator, ember_interface);

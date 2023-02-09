@@ -36,7 +36,7 @@
 #define CONFIG_KEY_DISCRIMINATOR_ID "discriminator"
 #define CONFIG_KEY_PIN_ID "pin"
 #define CONFIG_KEY_INTERFACE "interface"
-#define CONFIG_KEY_SPEC_COMPLIANCE "spec_compliance"
+#define CONFIG_KEY_STRICT_DEVICE_MAPPING "strict_device_mapping"
 
 #ifdef __APPLE__
 #define DEFAULT_INTERFACE "en0"
@@ -67,7 +67,7 @@ int matter_bridge_config_init()
     int status = CONFIG_STATUS_OK;
     status |= config_add_string(CONFIG_KEY_INTERFACE, "Ethernet interface to use", DEFAULT_INTERFACE);
     status |= config_add_string(CONFIG_KEY_KVS_PATH, "Matter key value store path", "/var/chip_unify_bridge.kvs");
-    status |= config_add_bool(CONFIG_KEY_SPEC_COMPLIANCE, "Follow spec compliance in device mapping", true);
+    status |= config_add_bool(CONFIG_KEY_STRICT_DEVICE_MAPPING, "Only map devices we are certain conforms to specification", false);
     status |= config_add_int(CONFIG_KEY_VENDOR_ID, "16 bit Vendor ID", 0xFFF1);
     status |= config_add_int(CONFIG_KEY_PRODUCT_ID, "16 bit Product ID", 0x8001);
     status |= config_add_int(CONFIG_KEY_DISCRIMINATOR_ID, "12 bit Discriminator ID", 0xFFE);
@@ -92,7 +92,7 @@ sl_status_t matter_bridge_config_fixt_setup()
     config_status_t status = CONFIG_STATUS_OK;
     config_get_as_string(CONFIG_KEY_INTERFACE, &config.interface);
     config_get_as_string(CONFIG_KEY_KVS_PATH, &config.kvs_path);
-    config_get_as_bool(CONFIG_KEY_SPEC_COMPLIANCE, &config.spec_compliance);
+    config_get_as_bool(CONFIG_KEY_STRICT_DEVICE_MAPPING, &config.strict_device_mapping);
     config.vendor_id     = config_get_int_safe(CONFIG_KEY_VENDOR_ID);
     config.product_id    = config_get_int_safe(CONFIG_KEY_PRODUCT_ID);
     config.discriminator = config_get_int_safe(CONFIG_KEY_DISCRIMINATOR_ID) & 0xFFFFFF;

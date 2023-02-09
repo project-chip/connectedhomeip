@@ -45,10 +45,11 @@ function hardcodedClusterCodeFilter(clusterCode)
   }
 }
 
-function nameNotNullOrContainsResponse(name)
+function filterCommandsAndAttributes(name)
 {
   if (name == null) return false
   if (name.includes("Response")) return false
+  if (name.includes("TriggerEffect")) return false // Filter out TriggerEffect command in Identify cluster
   
   return true
 }
@@ -57,6 +58,7 @@ function filterClusters(label)
 { 
   switch (label) {
     case "Descriptor": return false
+    case "Scenes": return false
   }
   return true
 }
@@ -145,7 +147,7 @@ function stupidLog(label)
 
 exports.stupidLog                               = stupidLog
 exports.listComma                               = listComma
-exports.nameNotNullOrContainsResponse           = nameNotNullOrContainsResponse
+exports.filterCommandsAndAttributes             = filterCommandsAndAttributes
 exports.filterClusters                          = filterClusters
 exports.supportedDeviceTypes                    = supportedDeviceTypes
 exports.cleanDeviceTypeName                     = cleanDeviceTypeName

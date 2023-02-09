@@ -202,15 +202,15 @@ Finally, a multicast command may be sent using the chip-tool.
 ./chip-tool onoff toggle 0xffffffffffff0001 1
 ```
 
-## Running the matter bridge in none specification compliant mode
+## Running the matter bridge in strict device mapping mode 
+By default Unify Matter Bridge tries and map devices that does not necessarily conform to the
+Matter specificaiton.
 
-By default, the matter bridge application only maps devices from the Unify
+To enable a mode where Unify Matter Bridge strictly only maps devices from the Unify
 Controller Language protocol to the Matter protocol that complies with the
-Matter specification.
+Matter specification. You can run the bridge with the command line argument
 
-If you want to try and map devices that does not necessarily conform to the
-Matter specificaiton. You can run the bridge with the command line argument
-`./unify-matter-bridge --spec-compliance false`.
+`./unify-matter-bridge --strict_device_mapping true`.
 
 ## Command Line Arguments
 
@@ -282,9 +282,6 @@ zw-CE7F3772-0008|         |         2
 Note: Endpoint 0(Root) and Endpoint 1(Aggregator) are Bridge itself. They are
 not shown in the epmap. But these endpoints support some clusters as well. For
 e.g. Identify. Where you might want to run chip-tool tests on those endpoints
-
-Note: epmap does not show any bridged endpoints?
-Refer to the '`--spec-compliance`' flag documentation 
 
 For further information on chip-tool tests, refer to the [test suite's README](../../src/app/tests/suites/README.md)
 
