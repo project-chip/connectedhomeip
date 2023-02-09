@@ -316,7 +316,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   # Pigweed does not provide a clang in some configurations.
   if (enable_default_builds) {
     _have_pigweed_clang =
-        host_os != "win" && (host_os != "mac" || host_cpu != "arm64")
+        host_os != "win" && !(host_os == "mac" && host_cpu == "arm64")
   }
 
   declare_args() {
