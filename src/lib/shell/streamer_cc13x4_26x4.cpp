@@ -93,9 +93,9 @@ ssize_t streamer_cc13xx_26xx_write(streamer_t * streamer, const char * buf, size
 }
 
 static streamer_t streamer_cc13xx_26xx = {
-    .init_cb  = streamer_cc13x2_26x2_init,
-    .read_cb  = streamer_cc13x2_26x2_read,
-    .write_cb = streamer_cc13x2_26x2_write,
+    .init_cb  = streamer_cc13xx_26xx_init,
+    .read_cb  = streamer_cc13xx_26xx_read,
+    .write_cb = streamer_cc13xx_26xx_write,
 };
 
 streamer_t * streamer_get()

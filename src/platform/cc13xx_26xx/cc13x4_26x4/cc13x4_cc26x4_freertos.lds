@@ -52,17 +52,8 @@ REGION_ALIAS("REGION_ARM_EXIDX", FLASH);
 REGION_ALIAS("REGION_ARM_EXTAB", FLASH);
 
 SECTIONS {
-    /* BIM header placed at the base of flash by default */
-    PROVIDE (_img_header_base_address =
-        DEFINED(_img_header_base_address) ? _img_header_base_address : 0x0);
- 
-    .oad_image_header (_img_header_base_address) : AT (_img_header_base_address) {
-        KEEP (*(.oad_image_header))
-    } > REGION_TEXT
-
-    /* interrupt vectors shifted to accomodate BIM header */
     PROVIDE (_intvecs_base_address =
-        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x100);
+        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x00);
 
     .resetVecs (_intvecs_base_address) : AT (_intvecs_base_address) {
         KEEP (*(.resetVecs))

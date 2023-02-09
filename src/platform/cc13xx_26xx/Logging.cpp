@@ -35,8 +35,6 @@ extern "C" void cc13xx_26xxVLog(const char * msg, va_list v)
 {
     int ret;
 
-    size_t bytesWritten = 0;
-
     ret = vsnprintf(sDebugUartBuffer, sizeof(sDebugUartBuffer), msg, v);
     if (0 < ret)
     {
@@ -45,7 +43,7 @@ extern "C" void cc13xx_26xxVLog(const char * msg, va_list v)
         sDebugUartBuffer[len - 2] = '\r';
         sDebugUartBuffer[len - 1] = '\n';
 
-        UART2_write(sDebugUartHandle, sDebugUartBuffer, len, &bytesWritten);
+        UART2_write(sDebugUartHandle, sDebugUartBuffer, len, NULL);
     }
 }
 
