@@ -43,7 +43,6 @@ enum class PairingNetworkType
     None,
     WiFi,
     Thread,
-    Network,
 };
 
 class PairingCommand : public CHIPCommand,
@@ -69,7 +68,6 @@ public:
         switch (networkType)
         {
         case PairingNetworkType::None:
-        case PairingNetworkType::Network:
             break;
         case PairingNetworkType::WiFi:
             AddArgument("ssid", &mSSID);
