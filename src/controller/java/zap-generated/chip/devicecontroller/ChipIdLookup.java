@@ -715,6 +715,9 @@ public final class ChipIdLookup {
       if (attributeId == 65529L) {
         return "AcceptedCommandList";
       }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
       if (attributeId == 65532L) {
         return "FeatureMap";
       }
@@ -726,6 +729,12 @@ public final class ChipIdLookup {
     if (clusterId == 45L) {
       if (attributeId == 0L) {
         return "TemperatureUnit";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";

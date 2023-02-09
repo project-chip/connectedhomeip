@@ -354,6 +354,8 @@ typedef void (*CHIPTimeFormatLocalizationClusterGeneratedCommandListAttributeCal
     void *, const chip::app::Clusters::TimeFormatLocalization::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPTimeFormatLocalizationClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::TimeFormatLocalization::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPTimeFormatLocalizationClusterAttributeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::TimeFormatLocalization::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPTimeFormatLocalizationClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::TimeFormatLocalization::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPTimeFormatLocalizationClusterClusterRevisionAttributeCallbackType)(
@@ -361,6 +363,10 @@ typedef void (*CHIPTimeFormatLocalizationClusterClusterRevisionAttributeCallback
 
 typedef void (*CHIPUnitLocalizationClusterTemperatureUnitAttributeCallbackType)(
     void *, chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::TypeInfo::DecodableArgType);
+typedef void (*CHIPUnitLocalizationClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::UnitLocalization::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPUnitLocalizationClusterAcceptedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::UnitLocalization::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPUnitLocalizationClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::UnitLocalization::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPUnitLocalizationClusterFeatureMapAttributeCallbackType)(
