@@ -4,9 +4,9 @@
 > `Fixes #12345` and a brief change description
 >
 > If you do not have an issue number, please have a good description of
-> the problem and the fix. Help the reviewer understand what to expect
+> the problem and the fix. Help the reviewer understand what to expect.
 >
-> Make sure you delete these instructions (to prove you have read them)
+> Make sure you delete these instructions (to prove you have read them).
 >
 > !!!!!!!!!! Instructions end
 
