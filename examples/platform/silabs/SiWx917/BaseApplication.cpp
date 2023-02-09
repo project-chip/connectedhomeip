@@ -37,6 +37,9 @@
 #endif // DISPLAY_ENABLED
 
 #include "SiWx917DeviceDataProvider.h"
+#include "rsi_board.h"
+#include "rsi_chip.h"
+#include "siwx917_utils.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -45,9 +48,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include "rsi_board.h"
-#include "rsi_chip.h"
-#include "siwx917_utils.h"
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
@@ -246,15 +246,13 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
     {
         return;
     }
-
 }
 
-void BaseApplication::FunctionFactoryReset( void )
+void BaseApplication::FunctionFactoryReset(void)
 {
     SILABS_LOG("#################################################################");
     SILABS_LOG("################### Factory reset triggered #####################");
     SILABS_LOG("#################################################################");
-
 
     // Actually trigger Factory Reset
     mFunction = kFunction_NoneSelected;
@@ -354,7 +352,7 @@ void BaseApplication::LightEventHandler()
 
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
 {
-	uint8_t count = FACTORY_RESET_LOOP_COUNT;
+    uint8_t count = FACTORY_RESET_LOOP_COUNT;
 
     // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
     // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
@@ -367,7 +365,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     {
         if ((!mFunctionTimerActive) && (mFunction == kFunction_NoneSelected))
         {
-	    mFunction = kFunction_FactoryReset;
+            mFunction = kFunction_FactoryReset;
 
             // Wait for sometime to determine button is pressed for Factory reset
             // other functionality
@@ -375,8 +373,10 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
         }
     }
 
-    while(!(RSI_NPSSGPIO_GetPin(NPSS_GPIO_0))) {
-        if(count == 0){
+    while (!(RSI_NPSSGPIO_GetPin(NPSS_GPIO_0)))
+    {
+        if (count == 0)
+        {
             FunctionFactoryReset();
             break;
         }
@@ -388,17 +388,18 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
         sStatusLED.Blink(500);
 #endif // ENABLE_WSTK_LEDS
 
-        SILABS_LOG("Factory reset triggering in %d sec release button to cancel",count--);
+        SILABS_LOG("Factory reset triggering in %d sec release button to cancel", count--);
 
         // Delay of 1sec before checking the button status again
         vTaskDelay(1000);
     }
 
-    if (count > 0) {
+    if (count > 0)
+    {
 #ifdef ENABLE_WSTK_LEDS
         sStatusLED.Set(false);
 #endif
-        SILABS_LOG("Factory Reset has been Canceled");    // button held past Timeout wait till button is released
+        SILABS_LOG("Factory Reset has been Canceled"); // button held past Timeout wait till button is released
     }
 
     // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
@@ -416,7 +417,10 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             ConnectivityMgr().SetBLEAdvertisingEnabled(true);
             ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
         }
-        else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
+        else
+        {
+            SILABS_LOG("Network is already provisioned, Ble advertissement not enabled");
+        }
     }
 }
 
