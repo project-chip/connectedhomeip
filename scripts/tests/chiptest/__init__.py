@@ -131,13 +131,6 @@ def _GetInDevelopmentTests() -> Set[str]:
        Goal is for this set to become empty.
     """
     return {
-        # TODO: Event not yet supported:
-        "Test_TC_ACL_2_10.yaml",
-        "Test_TC_ACL_2_7.yaml",
-        "Test_TC_ACL_2_8.yaml",
-        "Test_TC_ACL_2_9.yaml",
-        "TestEvents.yaml",
-
         "TestGroupMessaging.yaml",     # Needs group support in repl
     }
 
