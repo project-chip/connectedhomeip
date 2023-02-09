@@ -299,8 +299,11 @@ class ReadEventAction(BaseAction):
         self._node_id = test_step.node_id
         self._cluster_object = None
         self._request_object = None
-        self._fabric_filtered = True
         self._event_number_filter = test_step.event_number
+        self._fabric_filtered = False
+
+        if test_step.fabric_filtered is not None:
+            self._fabric_filtered = test_step.fabric_filtered
 
         self._request_object = context.data_model_lookup.get_event(self._cluster,
                                                                    self._event_name)
@@ -316,7 +319,8 @@ class ReadEventAction(BaseAction):
         try:
             urgent = 0
             request = [(self._endpoint, self._request_object, urgent)]
-            resp = asyncio.run(dev_ctrl.ReadEvent(self._node_id, events=request, eventNumberFilter=self._event_number_filter))
+            resp = asyncio.run(dev_ctrl.ReadEvent(self._node_id, events=request, eventNumberFilter=self._event_number_filter,
+                                                  fabricFiltered=self._fabric_filtered))
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -480,12 +484,12 @@ class SubscribeEventAction(ReadEventAction):
         self._context = context
         if test_step.min_interval is None:
             raise UnexpectedParsingError(
-                f'SubscribeAttribute action does not have min_interval {self.label}')
+                f'SubscribeEvent action does not have min_interval {self.label}')
         self._min_interval = test_step.min_interval
 
         if test_step.max_interval is None:
             raise UnexpectedParsingError(
-                f'SubscribeAttribute action does not have max_interval {self.label}')
+                f'SubscribeEvent action does not have max_interval {self.label}')
         self._max_interval = test_step.max_interval
 
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
