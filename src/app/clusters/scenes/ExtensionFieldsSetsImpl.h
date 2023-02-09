@@ -29,14 +29,14 @@ struct ExtensionFieldsSet
 {
     static constexpr TLV::Tag TagClusterId() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagEFS() { return TLV::ContextTag(2); }
-    clusterId ID                                                                    = kInvalidClusterId;
-    uint8_t bytesBuffer[CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER] = { 0 };
-    uint8_t usedBytes                                                               = 0;
+    clusterId ID                              = kInvalidClusterId;
+    uint8_t bytesBuffer[kMaxFieldsPerCluster] = { 0 };
+    uint8_t usedBytes                         = 0;
 
     ExtensionFieldsSet() = default;
     ExtensionFieldsSet(clusterId cID, uint8_t * data, uint8_t dataSize) : ID(cID), usedBytes(dataSize)
     {
-        if (dataSize <= CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER)
+        if (dataSize <= kMaxFieldsPerCluster)
         {
             memcpy(bytesBuffer, data, usedBytes);
         }
@@ -65,16 +65,15 @@ struct ExtensionFieldsSet
 
         ReturnErrorOnFailure(reader.Next(TagEFS()));
         ReturnErrorOnFailure(reader.Get(buffer));
-        if (buffer.size() > CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER)
+        if (buffer.size() > kMaxFieldsPerCluster)
         {
-            this->usedBytes = CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER;
+            this->usedBytes = kMaxFieldsPerCluster;
         }
         else
         {
             this->usedBytes = static_cast<uint8_t>(buffer.size());
         }
         memcpy(this->bytesBuffer, buffer.data(), this->usedBytes);
-        // ReturnErrorOnFailure(reader.GetBytes(bytesBuffer, CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER));
 
         return reader.ExitContainer(container);
     }
@@ -82,7 +81,7 @@ struct ExtensionFieldsSet
     void Clear()
     {
         this->ID = kInvalidClusterId;
-        memset(this->bytesBuffer, 0, CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER);
+        memset(this->bytesBuffer, 0, kMaxFieldsPerCluster);
         this->usedBytes = 0;
     }
 
@@ -96,7 +95,7 @@ struct ExtensionFieldsSet
 
     CHIP_ERROR operator=(const ExtensionFieldsSet & other)
     {
-        if (other.usedBytes <= CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER)
+        if (other.usedBytes <= kMaxFieldsPerCluster)
         {
             memcpy(this->bytesBuffer, other.bytesBuffer, other.usedBytes);
         }
@@ -130,7 +129,7 @@ public:
 
     bool operator==(const ExtensionFieldsSetsImpl & other)
     {
-        for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+        for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
             if (!(this->EFS[i] == other.EFS[i]))
             {
@@ -142,7 +141,7 @@ public:
 
     CHIP_ERROR operator=(const ExtensionFieldsSetsImpl & other)
     {
-        for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+        for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
             ReturnErrorOnFailure(this->EFS[i] = other.EFS[i]);
         }
@@ -153,7 +152,7 @@ public:
 
 protected:
     static constexpr TLV::Tag TagFieldNum() { return TLV::ContextTag(1); }
-    ExtensionFieldsSet EFS[CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES];
+    ExtensionFieldsSet EFS[kMaxClusterPerScenes];
     uint8_t fieldNum = 0;
 };
 } // namespace scenes

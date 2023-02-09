@@ -174,10 +174,6 @@ protected:
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
     SceneHandler handlers[CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES];
     uint8_t handlerNum = 0;
-
-private:
-    CHIP_ERROR Find(PersistentStorageDelegate * storage, const FabricIndex & fabric, SceneStorageId target_scene, bool & found,
-                    SceneIndex & idx);
 }; // class DefaultSceneTableImpl
 
 /**
