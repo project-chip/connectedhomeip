@@ -563,8 +563,8 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
     }
     else
     {
-        emberAfLevelControlClusterPrintln("%s STEP %x %x %2x %x %x", "RX level-control:", stepMode, stepSize, transitionTime.Value(),
-                                          optionsMask.Raw(), optionsOverride.Raw());
+        emberAfLevelControlClusterPrintln("%s STEP %x %x %2x %x %x", "RX level-control:", stepMode, stepSize,
+                                          transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
     }
 
     stepHandler(commandPath.mEndpointId, Commands::Step::Id, stepMode, stepSize, transitionTime,
