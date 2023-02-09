@@ -4,7 +4,7 @@ import("//build_overrides/pigweed.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 wifi_sdk_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
-wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
 rs911x_cflags = []
 
 rs911x_src_plat = [
@@ -15,60 +15,58 @@ rs911x_src_plat = [
   "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_timer.c",
   "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_platform_init.c",
   "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_m4.c",
-
-  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_bootup_config.c",
-  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4_rom.c",
-  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_interrupt.c",
+  "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_bootup_config.c",
+  "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4_rom.c",
+  "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_interrupt.c",
 ]
 rs911x_plat_incs = [
   "${wifi_sdk_dir}",
   "${wifi_sdk_dir}/hal",
-  "${wiseconnect_sdk_root}/platforms/si91x/hal/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/hal/inc",
 
-  #  "${wiseconnect_sdk_root}/sapi/include",
   "${chip_root}/src/platform/silabs/SiWx917",
   "${chip_root}/src/platform/silabs/SiWx917/bluetooth",
   "${examples_plat_dir}/SiWx917",
-  "${wiseconnect_sdk_root}/platforms/si91x/hal/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/hal/inc",
 ]
 
 #
 # All the stuff from wiseconnect
 #
 rs911x_src_sapi = [
-  "${wiseconnect_sdk_root}/sapi/wlan/rsi_wlan_apis.c",
-  "${wiseconnect_sdk_root}/sapi/common/rsi_apis_non_rom.c",
-  "${wiseconnect_sdk_root}/sapi/common/rsi_apis_rom.c",
-  "${wiseconnect_sdk_root}/sapi/common/rsi_common_apis.c",
-  "${wiseconnect_sdk_root}/sapi/common/rsi_device_init_apis.c",
+  "${wisemcu_sdk_root}/sapi/wlan/rsi_wlan_apis.c",
+  "${wisemcu_sdk_root}/sapi/common/rsi_apis_non_rom.c",
+  "${wisemcu_sdk_root}/sapi/common/rsi_apis_rom.c",
+  "${wisemcu_sdk_root}/sapi/common/rsi_common_apis.c",
+  "${wisemcu_sdk_root}/sapi/common/rsi_device_init_apis.c",
 
-  #  "${wiseconnect_sdk_root}/sapi/common/rsi_wisemcu_hardware_setup.c",
-  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_frame_rd_wr.c",
-  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_functs.c",
-  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_iface_init.c",
-  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_mem_rd_wr.c",
-  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_reg_rd_wr.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_common.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_device_init.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_driver_event_handlers.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_driver.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_events_rom.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_events.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_iap.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_nwk_rom.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_nwk.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_pkt_mgmt_rom.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_pkt_mgmt.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_queue_rom.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_queue.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_scheduler_rom.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_scheduler.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_setregion_countryinfo.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_timer.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_utils_rom.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_utils.c",
-  "${wiseconnect_sdk_root}/sapi/driver/rsi_wlan.c",
-  "${wiseconnect_sdk_root}/sapi/rtos/freertos_wrapper/rsi_os_wrapper.c",
+  #  "${wisemcu_sdk_root}/sapi/common/rsi_wisemcu_hardware_setup.c",
+  "${wisemcu_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_frame_rd_wr.c",
+  "${wisemcu_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_functs.c",
+  "${wisemcu_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_iface_init.c",
+  "${wisemcu_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_mem_rd_wr.c",
+  "${wisemcu_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_reg_rd_wr.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_common.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_device_init.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_driver_event_handlers.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_driver.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_events_rom.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_events.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_iap.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_nwk_rom.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_nwk.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_pkt_mgmt_rom.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_pkt_mgmt.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_queue_rom.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_queue.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_scheduler_rom.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_scheduler.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_setregion_countryinfo.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_timer.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_utils_rom.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_utils.c",
+  "${wisemcu_sdk_root}/sapi/driver/rsi_wlan.c",
+  "${wisemcu_sdk_root}/sapi/rtos/freertos_wrapper/rsi_os_wrapper.c",
 ]
 
 foreach(src_file, rs911x_src_sapi) {
@@ -89,28 +87,28 @@ rs911x_inc_plat = [
   "${wifi_sdk_dir}",
   "${examples_plat_dir}/SiWx917",
   "${examples_plat_dir}/SiWx917/hal",
-  "${wiseconnect_sdk_root}/sapi/include",
+  "${wisemcu_sdk_root}/sapi/include",
 
   #CCP Platfrom
-  "${wiseconnect_sdk_root}/platforms/si91x/hal/inc",
-  "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/inc",
-  "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/inc",
-  "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/inc",
-  "${wiseconnect_sdk_root}/platforms/si91x/core/chip/inc",
-  "${wiseconnect_sdk_root}/platforms/si91x/core/config",
-  "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/config",
-  "${wiseconnect_sdk_root}/platforms/si91x/drivers/rom_driver/inc",
-  "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver",
-  "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/CMSIS/Driver/Include",
+  "${wisemcu_sdk_root}/platforms/si91x/hal/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325a/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/core/chip/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/core/config",
+  "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/config",
+  "${wisemcu_sdk_root}/platforms/si91x/drivers/rom_driver/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver",
+  "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/CMSIS/Driver/Include",
 
-  "${wiseconnect_sdk_root}/platforms/si91x/core/cmsis",
-  "${wiseconnect_sdk_root}/platforms/si91x/service/system/inc",
+  "${wisemcu_sdk_root}/platforms/si91x/core/cmsis",
+  "${wisemcu_sdk_root}/platforms/si91x/service/system/inc",
 ]
 
 # Apparently - the rsi library needs this
 rs911x_src_sock = [
-  "${wiseconnect_sdk_root}/sapi/network/socket/rsi_socket.c",
-  "${wiseconnect_sdk_root}/sapi/network/socket/rsi_socket_rom.c",
+  "${wisemcu_sdk_root}/sapi/network/socket/rsi_socket.c",
+  "${wisemcu_sdk_root}/sapi/network/socket/rsi_socket_rom.c",
 ]
 rs911x_sock_inc = [ "${wifi_sdk_dir}/rsi-sockets" ]
 

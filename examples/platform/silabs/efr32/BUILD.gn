@@ -49,20 +49,23 @@ import("${silabs_common_plat_dir}/efr32/args.gni")
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_rs911x && chip_enable_openthread))
+assert(!(use_rs9116 && chip_enable_openthread))
+assert(!(use_SiWx917 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 
 if (chip_enable_wifi) {
-  assert(use_rs911x || use_wf200)
+  assert(use_rs9116 || use_wf200 || use_SiWx917)
   enable_openthread_cli = false
   import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
-  if (use_rs911x) {
+  if (use_rs9116) {
     wiseconnect_sdk_root =
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
     import("rs911x/rs911x.gni")
+  } else if (use_SiWx917) {
+    wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+    import("rs911x/rs9117.gni")
   }
-
   if (use_wf200) {
     import("wf200/wf200.gni")
   }
@@ -253,7 +256,7 @@ source_set("efr32-common") {
   }
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
-      use_wf200 || use_rs911x) {
+      use_wf200 || use_rs9116) {
     sources += [ "uart.cpp" ]
   }
 
@@ -284,7 +287,7 @@ source_set("efr32-common") {
   }
 
   if (chip_enable_wifi) {
-    if (use_rs911x) {
+    if (use_rs9116 || use_SiWx917) {
       sources += rs911x_src_plat
 
       # All the stuff from wiseconnect
