@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 ## Usage of custom Factory Data Provider
 
 `K32W0FactoryDataProvider` is the default factory data provider. It implements
