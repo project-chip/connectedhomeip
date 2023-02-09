@@ -6189,7 +6189,7 @@ tests:
           "Verify DUT has (during step 1a) read the NodeLabel attribute from the
           Bridged Device Basic Information cluster on various endpoints ,Verify
           DUT contains the names for the (supported) devices from the above list"
-      PICS: MCORE.DEVLIST.UseDeviceNames
+      PICS: MCORE.DEVLIST.UseDeviceName
       verification: |
           NodeLabel is supported for endpoints 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 
@@ -6994,7 +6994,7 @@ tests:
     - label:
           "Use TH/bridge-app to rename a bridged light (use key b in the console
           to bridge-app to rename Light 1 to Light 1b)"
-      PICS: MCORE.DEVLIST.UseDeviceNames
+      PICS: MCORE.DEVLIST.UseDeviceName
       verification: |
           ./chip-tool bridgeddevicebasic  read node-label 1 3
 
@@ -7072,7 +7072,7 @@ tests:
       disabled: true
 
     - label: "Verify DUT contains the added device in the list of devices"
-      PICS: MCORE.DEVLIST.UseDeviceNames
+      PICS: MCORE.DEVLIST.UseDeviceName
       verification: |
           Verify on TH(bridge-app) Log
 

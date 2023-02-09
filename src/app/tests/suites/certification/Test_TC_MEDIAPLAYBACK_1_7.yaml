@@ -204,7 +204,7 @@ tests:
               contains: [9]
 
     - label: "Read the optional command(Seek) in AcceptedCommandList"
-      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:

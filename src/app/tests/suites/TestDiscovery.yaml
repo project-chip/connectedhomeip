@@ -104,7 +104,7 @@ tests:
     #  Find a way to validate the service type and the service domain
 
     - label: "Check Hostname"
-      PICS: "(WIFI || ETH) && !THREAD"
+      PICS: "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR"
       # On macOS the hostname is the device name and because of it this test is disabled for now.
       disabled: true
       cluster: "DiscoveryCommands"
@@ -119,7 +119,7 @@ tests:
                     isHexString: true
 
     - label: "Check Hostname"
-      PICS: "(!WIFI && !ETH) && THREAD"
+      PICS: "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR"
       # On macOS the hostname is the device name and because of it this test is disabled for now.
       disabled: true
       cluster: "DiscoveryCommands"
@@ -156,7 +156,7 @@ tests:
       command: "FindCommissionableByCommissioningMode"
 
     - label: "Check Vendor ID (_V)"
-      PICS: VENDOR_SUBTYPE
+      PICS: MCORE.SC.VENDOR_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByVendorId"
       arguments:
@@ -167,7 +167,7 @@ tests:
     - label: "Check Device Type ID (_T)"
       # The device type is not broadcasted by the accessory under CI.
       disabled: true
-      PICS: DEVTYPE_SUBTYPE
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"
       arguments:
@@ -189,7 +189,7 @@ tests:
                     maxValue: 4096
 
     - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: VP_KEY
+      PICS: MCORE.SC.VP_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -200,7 +200,7 @@ tests:
     # Maybe it should be a PICS code to differentiate between manufacturer that wants to broadcast the
     # product id ?
     - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: VP_KEY
+      PICS: MCORE.SC.VP_KEY
       optional: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -209,8 +209,8 @@ tests:
               - name: "productId"
                 value: productId
 
-    - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
-      PICS: CRI_COMM_DISCOVERY_KEY
+    - label: "Optional TXT key for MRP Sleepy Idle Interval (SII)"
+      PICS: MCORE.SC.SII_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -219,8 +219,8 @@ tests:
                 constraints:
                     maxValue: 3600000
 
-    - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
-      PICS: CRA_COMM_DISCOVERY_KEY
+    - label: "Optional TXT key for MRP Sleepy Active Interval (SAI)"
+      PICS: MCORE.SC.SAI_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -239,7 +239,7 @@ tests:
 
     - label: "Optional TXT key for device type (DT)"
       disabled: true
-      PICS: DT_KEY
+      PICS: MCORE.SC.DT_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -252,7 +252,7 @@ tests:
                     maxValue: 999
 
     - label: "Optional TXT key for device name (DN)"
-      PICS: DN_KEY
+      PICS: MCORE.SC.DN_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -262,7 +262,7 @@ tests:
                     maxLength: 32
 
     - label: "Optional TXT key for rotating device identifier (RI)"
-      PICS: RI_KEY
+      PICS: MCORE.SC.RI_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -272,7 +272,7 @@ tests:
                     maxValue: 100
 
     - label: "Optional TXT key for pairing hint (PH)"
-      PICS: PH_KEY
+      PICS: MCORE.SC.PH_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -282,7 +282,7 @@ tests:
                     notValue: 0
 
     - label: "Optional TXT key for pairing instructions (PI)"
-      PICS: PI_KEY
+      PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:

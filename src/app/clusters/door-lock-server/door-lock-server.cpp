@@ -380,11 +380,10 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
-    if (!userType.IsNull() &&
-        (userType.Value() < UserTypeEnum::kUnrestrictedUser || userType.Value() > UserTypeEnum::kRemoteOnlyUser))
+    if (userType == UserTypeEnum::kUnknownEnumValue)
     {
         emberAfDoorLockClusterPrintln(
-            "[SetUser] Unable to set the user: user type is out of range [endpointId=%d,userIndex=%d,userType=%u]",
+            "[SetUser] Unable to set the user: user type is unknown [endpointId=%d,userIndex=%d,userType=%u]",
             commandPath.mEndpointId, userIndex, to_underlying(userType.Value()));
 
         sendClusterResponse(commandObj, commandPath, EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -694,10 +693,9 @@ void DoorLockServer::setCredentialCommandHandler(
         return;
     }
 
-    if (!userType.IsNull() &&
-        (userType.Value() < UserTypeEnum::kUnrestrictedUser || userType.Value() > UserTypeEnum::kRemoteOnlyUser))
+    if (userType == UserTypeEnum::kUnknownEnumValue)
     {
-        emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user type is out of range "
+        emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user type is unknown "
                                       "[endpointId=%d,credentialIndex=%d,userType=%u]",
                                       commandPath.mEndpointId, credentialIndex, to_underlying(userType.Value()));
         sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
@@ -3113,9 +3111,9 @@ void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    if (operatingMode > OperatingModeEnum::kPassage || operatingMode < OperatingModeEnum::kNormal)
+    if (operatingMode == OperatingModeEnum::kUnknownEnumValue)
     {
-        emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Unable to add schedule - operating mode is out of range"
+        emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Unable to add schedule - operating mode is unknown"
                                       "[endpointId=%d,scheduleIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32
                                       ", operatingMode=%d]",
                                       endpointId, holidayIndex, localStartTime, localEndTime, to_underlying(operatingMode));
