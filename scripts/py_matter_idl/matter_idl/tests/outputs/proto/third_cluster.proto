@@ -30,25 +30,25 @@ message ThirdCluster {
   }
 
 
-
-
   // Attributes
   /** MyEnum Type: 6 IsList: 0 FieldId: 10 */
   MyEnum some_enum = 3145738;
-    // [(attribute) = {
-      // is_writable : true,
-      // is_subscribable: true,
-    // }];
+    /*
+    [(attribute) = {
+      is_writable : true,
+      is_subscribable: true,
+    }];
+    */
 
 
   /** LevelControlOptions Type: 1 IsList: 0 FieldId: 20 */
   uint32 options = 524308;
-    // [(attribute) = {
-      // is_writable : true,
-      // is_subscribable: true,
-    // }];
+    /*
+    [(attribute) = {
+      is_writable : true,
+      is_subscribable: true,
+    }];
+    */
 
 
-
-
-}
+} // ThirdCluster

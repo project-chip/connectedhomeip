@@ -37,16 +37,18 @@ message OtaSoftwareUpdateProviderCluster {
   }
 
 
-
-
   // Structs
 
   // Attributes
   /** int16u Type: 6 IsList: 0 FieldId: 65533 */
   int16u cluster_revision = 3211261;
-    // [(attribute) = {
-      // is_subscribable: true,
-    // }];
+    /*
+    [(attribute) = {
+      is_subscribable: true,
+    }];
+    */
+
+
 
   // Commands
   message QueryImageCommand {
@@ -68,7 +70,7 @@ message OtaSoftwareUpdateProviderCluster {
     optional bool requestor_can_consent = 1572870;
     /** OCTET_STRING Type: 5 IsList: 0 FieldId: 7 */
     optional bytes metadata_for_provider = 2621447;
-}
+  }
   
   message QueryImageCommandResponse {
     // option (message_type) = MATTER_COMMAND_RESPONSE;
@@ -82,7 +84,7 @@ message OtaSoftwareUpdateProviderCluster {
     bytes update_token = 2621440;
     /** INT32U Type: 6 IsList: 0 FieldId: 1 */
     INT32U new_version = 3145729;
-}
+  }
   
   message ApplyUpdateRequestCommandResponse {
     // option (message_type) = MATTER_COMMAND_RESPONSE;
@@ -100,8 +102,6 @@ message OtaSoftwareUpdateProviderCluster {
     bytes update_token = 2621440;
     /** INT32U Type: 6 IsList: 0 FieldId: 1 */
     INT32U software_version = 3145729;
-}
+  }
 
-
-
-}
+} // OtaSoftwareUpdateProviderCluster
