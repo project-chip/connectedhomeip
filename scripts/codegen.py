@@ -112,26 +112,27 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
-    if generator.startswith('custom'):
-        # check that the plugin path is provided
-        if ':' not in generator:
-            logging.fatal("Custom generator plugin path not provided. Use --generator custom:<path_to_plugin>")
-            sys.exit(1)
-        plugin = generator.split(':', 1)[1]
-        logging.info("Using CustomGenerator at plugin path %s" % plugin)
-        sys.path.append(plugin)
-        generator = 'CUSTOM'
-
-    logging.info("Parsing idl from %s" % idl_path)
-    idl_tree = CreateParser().parse(open(idl_path, "rt").read())
-
     if name_only:
         storage = ListGeneratedFilesStorage()
     else:
         storage = FileSystemGeneratorStorage(output_dir)
 
+    logging.info("Parsing idl from %s" % idl_path)
+    idl_tree = CreateParser().parse(open(idl_path, "rt").read())
+
+    if generator.startswith('custom'):
+        # check that the plugin path is provided
+        if ':' not in generator:
+            logging.fatal("Custom generator plugin path not provided. Use --generator custom:<path_to_plugin>")
+            sys.exit(1)
+        custom_params = generator.split(':')
+        (generator, plugin_path, plugin_module) = custom_params
+        logging.info("Using CustomGenerator at plugin path %s.%s" % (plugin_path, plugin_module))
+        sys.path.append(plugin_path)
+        generator = 'CUSTOM'
+
     logging.info("Running code generator %s" % generator)
-    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree)
+    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module)
     generator.render(dry_run)
 
     if expected_outputs:

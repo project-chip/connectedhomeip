@@ -41,7 +41,9 @@ class CodeGenerator(enum.Enum):
             # Use a package naming convention to find the custom generator:
             # ./matter_idl_plugin/__init__.py defines a subclass of CodeGenerator named CustomGenerator.
             # The plugin is expected to be in the path provided via the `--plugin <path>` cli argument.
-            from matter_idl_plugin import CustomGenerator
+            # Replaces `from plugin_module import CustomGenerator``
+            plugin_module = __import__(kargs['plugin_module'])
+            CustomGenerator = plugin_module.CustomGenerator
             return CustomGenerator(*args, **kargs)
         else:
             raise NameError("Unknown code generator type")

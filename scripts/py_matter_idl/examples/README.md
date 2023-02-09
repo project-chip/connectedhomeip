@@ -5,15 +5,17 @@ data model schemas. To create a custom generator that lives outside of the
 Matter SDK tree, follow the design pattern of
 scripts/py_matter_idl/examples/matter_idl_plugin:
 
-1. Create a directory exactly named "matter_idl_plugin".
+1. Create a directory for your python generator module, for example
+   "matter_idl_plugin".
 2. Add an `__init__.py` under "matter_idl_plugin" implementing a subclass of
    `CodeGenerator` named `CustomGenerator`.
 3. Have `CustomGenerator` load jinja templates, also under the
    "matter_idl_plugin" subdirectory.
 4. Execute the `codegen.py` script passing the path to the parent directory of
-   "matter_idl_plugin" via `--generator custom:<plugin_path>` argument.
+   "matter_idl_plugin" via
+   `--generator custom:<plugin_path>:<plugin_module_name>` argument.
 
 ```
 # From top-of-tree in this example
-./scripts/codegen.py --generator custom:./scripts/py_matter_idl/examples ./src/controller/data_model/controller-clusters.matter
+./scripts/codegen.py --generator custom:./scripts/py_matter_idl/examples:matter_idl_plugin ./src/controller/data_model/controller-clusters.matter
 ```
