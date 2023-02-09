@@ -35,8 +35,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Create a root (self-signed) X.509 DER encoded certificate that has the
  * right fields to be a valid Matter root certificate.
  *
- * If issuerID is nil, a random issuer id is generated.  Otherwise the provided
- * issuer id is used.
+ * If issuerID is not nil, it's unsignedLongLongValue will be used for the
+ * matter-rcac-id attribute in the subject distinguished name of the resulting
+ * certificate.
+ *
+ * If issuerID is nil, a random value will be generated for matter-rcac-id.
  *
  * If fabricID is not nil, it will be included in the subject DN of the
  * certificate.  In this case it must be a valid Matter fabric id.
@@ -54,8 +57,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Create an intermediate X.509 DER encoded certificate that has the
  * right fields to be a valid Matter intermediate certificate.
  *
- * If issuerID is nil, a random issuer id is generated.  Otherwise the provided
- * issuer id is used.
+ * If issuerID is not nil, it's unsignedLongLongValue will be used for the
+ * matter-icac-id attribute in the subject distinguished name of the resulting
+ * certificate.
+ *
+ * If issuerID is nil, a random value will be generated for matter-icac-id.
  *
  * If fabricID is not nil, it will be included in the subject DN of the
  * certificate.  In this case it must be a valid Matter fabric id.
