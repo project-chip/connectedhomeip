@@ -19,8 +19,8 @@
 #include "AppTask.h"
 
 #include "AppConfig.h"
-#include "PumpManager.h"
 #include "ButtonManager.h"
+#include "PumpManager.h"
 
 #include "ThreadUtil.h"
 
@@ -195,9 +195,7 @@ CHIP_ERROR AppTask::Init(void)
 #endif
 
     static CommonCaseDeviceServerInitParams initParams;
-    // static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    // initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);

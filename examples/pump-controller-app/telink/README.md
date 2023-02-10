@@ -1,8 +1,8 @@
 # Matter Telink Pump Controller Example Application
 
 The Telink Pump Controller Example demonstrates how to implement a pump
-controller client device with basic start/stop functionality.
-It uses buttons to test changing the pump state and device states and LEDs to show the state of
+controller client device with basic start/stop functionality. It uses buttons to
+test changing the pump state and device states and LEDs to show the state of
 these changes. This example is inherited from the "lock-app" example but
 modified to simulate a pump device and can be used as a reference for creating
 your own pump application.
@@ -63,7 +63,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Lock control   | Manually triggers the bolt lock state                                                               |
+| Button 2 | Lock control           | Manually triggers the bolt lock state                                                                  |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 

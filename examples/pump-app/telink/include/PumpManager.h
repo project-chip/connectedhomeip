@@ -18,14 +18,10 @@
 
 #pragma once
 
-// #include <app/clusters/door-lock-server/door-lock-server.h>
-// #include <lib/core/ClusterEnums.h>
-// #include <lib/support/ScopedBuffer.h>
-
 #include <zephyr/kernel.h>
 
 #include <cstdint>
-// ????
+
 #include "AppEvent.h"
 
 struct k_timer;
