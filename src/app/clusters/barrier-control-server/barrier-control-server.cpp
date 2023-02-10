@@ -353,5 +353,6 @@ void MatterBarrierControlPluginServerInitCallback() {}
 
 void MatterBarrierControlClusterServerShutdownCallback(EndpointId endpoint)
 {
+    emberAfBarrierControlClusterPrintln("Shuting barrier control server cluster on endpoint %d", endpoint);
     cancelEndpointTimerCallback(endpoint);
 }

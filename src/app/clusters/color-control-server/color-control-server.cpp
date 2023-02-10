@@ -2698,6 +2698,7 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
 
 void MatterColorControlClusterServerShutdownCallback(EndpointId endpoint)
 {
+    emberAfColorControlClusterPrintln("Shuting down color control server cluster on endpoint %d", endpoint);
     ColorControlServer::Instance().cancelEndpointTimerCallback(endpoint);
 }
 
