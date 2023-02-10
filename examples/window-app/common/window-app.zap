@@ -3513,27 +3513,6 @@
           ],
           "events": [
             {
-              "name": "HardwareFaultChange",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "RadioFaultChange",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "NetworkFaultChange",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
               "name": "BootReason",
               "code": 3,
               "mfgCode": null,
@@ -3681,15 +3660,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "events": [
-            {
-              "name": "SoftwareFault",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
             }
           ]
         },
@@ -4824,22 +4794,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "events": [
-            {
-              "name": "ConnectionStatus",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "NetworkFaultChange",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
             }
           ]
         },
