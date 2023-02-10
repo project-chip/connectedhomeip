@@ -51,7 +51,13 @@ private:
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
     void _HandleServerStarted() {}
     void _HandleServerShuttingDown() {}
-    CHIP_ERROR _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    CHIP_ERROR _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0)
+    {
+        ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct };
+        event.CallWorkFunct = { .WorkFunct = workFunct, .Arg = arg };
+        return _PostEvent(&event);
+    }
 
     void _RunEventLoop()
     {
@@ -89,8 +95,17 @@ private:
     {
         switch (event->Type)
         {
+        case DeviceEventType::kNoOp:
+            // Do nothing for no-op events.
+            break;
+
         case DeviceEventType::kChipLambdaEvent:
             event->LambdaEvent();
+            break;
+
+        case DeviceEventType::kCallWorkFunct:
+            // If the event is a "call work function" event, call the specified function.
+            event->CallWorkFunct.WorkFunct(event->CallWorkFunct.Arg);
             break;
 
         default:
@@ -98,7 +113,7 @@ private:
         }
     }
 
-    CHIP_ERROR _ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg) { return _ScheduleWork(workFunct, arg); }
     CHIP_ERROR _PostBackgroundEvent(const ChipDeviceEvent * event) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     void _RunBackgroundEventLoop(void) {}
     CHIP_ERROR _StartBackgroundEventLoopTask(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }

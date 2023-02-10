@@ -42,12 +42,6 @@ constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64(60 * 60 * 2
 
 CHIP_ERROR LayerImplSelect::Init()
 {
-    if (mLayerState.IsInitialized())
-    {
-        // TEMP TestMessagingLayer already initialized the system layer?
-        return CHIP_NO_ERROR;
-    }
-
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();
