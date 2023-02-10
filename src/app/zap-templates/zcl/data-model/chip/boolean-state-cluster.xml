@@ -28,7 +28,7 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="1"/>
     <attribute side="server" code="0x0000" define="STATE_VALUE" type="boolean" writable="false"  default="0" reportable="true" optional="false">StateValue</attribute>
 
-    <event code="0x0000" name="StateChange" priority="info" side="server">
+    <event code="0x0000" name="StateChange" priority="info" side="server" optional="true">
       <description>This event SHALL be generated when the StateValue attribute changes.</description>
       <field id="0" name="StateValue" type="boolean"/>
     </event>
