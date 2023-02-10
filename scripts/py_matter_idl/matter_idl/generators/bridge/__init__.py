@@ -135,7 +135,7 @@ class BridgeGenerator(CodeGenerator):
     Generation of bridge cpp code for matter.
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
         Inintialization is specific for cpp generation and will add
         filters as required by the cpp .jinja templates to function.

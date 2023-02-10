@@ -32,7 +32,7 @@ class CppApplicationGenerator(CodeGenerator):
     Generation of cpp code for application implementation for matter.
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
         Inintialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
