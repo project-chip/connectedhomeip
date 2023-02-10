@@ -53,7 +53,8 @@ functionality can still work fine.
 
 -   Matter
 
-    Activate the Matter environment.
+    Activate the Matter environment. Below command needs to be executed after
+    sourcing `esp-idf/export.sh`.
 
     ```
     $ cd path/to/connectedhomeip
