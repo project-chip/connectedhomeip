@@ -1266,6 +1266,12 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
@@ -1331,6 +1337,12 @@ class ChipClusters:
                 0x00000003: {
                     "attributeName": "UpdateStateProgress",
                     "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
                     "type": "int",
                     "reportable": True,
                 },
@@ -1469,6 +1481,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                     "writable": True,
+                },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
                 },
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
@@ -4529,6 +4547,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
@@ -5522,6 +5546,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
@@ -5605,6 +5635,12 @@ class ChipClusters:
                 0x00000014: {
                     "attributeName": "Scale",
                     "attributeId": 0x00000014,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
                     "type": "int",
                     "reportable": True,
                 },

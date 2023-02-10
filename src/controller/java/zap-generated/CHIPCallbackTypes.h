@@ -309,6 +309,8 @@ typedef void (*CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackTyp
 typedef void (*CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &);
 
+typedef void (*CHIPOtaSoftwareUpdateProviderClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPOtaSoftwareUpdateProviderClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPOtaSoftwareUpdateProviderClusterAttributeListAttributeCallbackType)(
@@ -326,6 +328,8 @@ typedef void (*CHIPOtaSoftwareUpdateRequestorClusterUpdateStateAttributeCallback
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateState::TypeInfo::DecodableArgType);
 typedef void (*CHIPOtaSoftwareUpdateRequestorClusterUpdateStateProgressAttributeCallbackType)(
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::TypeInfo::DecodableArgType);
+typedef void (*CHIPOtaSoftwareUpdateRequestorClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPOtaSoftwareUpdateRequestorClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPOtaSoftwareUpdateRequestorClusterAttributeListAttributeCallbackType)(
@@ -365,6 +369,8 @@ typedef void (*CHIPTimeFormatLocalizationClusterClusterRevisionAttributeCallback
 
 typedef void (*CHIPUnitLocalizationClusterTemperatureUnitAttributeCallbackType)(
     void *, chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::TypeInfo::DecodableArgType);
+typedef void (*CHIPUnitLocalizationClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::UnitLocalization::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPUnitLocalizationClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::UnitLocalization::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPUnitLocalizationClusterAttributeListAttributeCallbackType)(
@@ -1212,6 +1218,8 @@ typedef void (*CHIPThermostatClusterNumberOfWeeklyTransitionsAttributeCallbackTy
     void *, chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterNumberOfDailyTransitionsAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPThermostatClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Thermostat::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPThermostatClusterAttributeListAttributeCallbackType)(
@@ -1459,6 +1467,8 @@ typedef void (*CHIPTemperatureMeasurementClusterMaxMeasuredValueAttributeCallbac
     void *, chip::app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::TypeInfo::DecodableArgType);
 typedef void (*CHIPTemperatureMeasurementClusterToleranceAttributeCallbackType)(
     void *, chip::app::Clusters::TemperatureMeasurement::Attributes::Tolerance::TypeInfo::DecodableArgType);
+typedef void (*CHIPTemperatureMeasurementClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::TemperatureMeasurement::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPTemperatureMeasurementClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::TemperatureMeasurement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPTemperatureMeasurementClusterAttributeListAttributeCallbackType)(
@@ -1486,6 +1496,8 @@ typedef void (*CHIPPressureMeasurementClusterScaledToleranceAttributeCallbackTyp
     void *, chip::app::Clusters::PressureMeasurement::Attributes::ScaledTolerance::TypeInfo::DecodableArgType);
 typedef void (*CHIPPressureMeasurementClusterScaleAttributeCallbackType)(
     void *, chip::app::Clusters::PressureMeasurement::Attributes::Scale::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::PressureMeasurement::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPPressureMeasurementClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::PressureMeasurement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPPressureMeasurementClusterAttributeListAttributeCallbackType)(

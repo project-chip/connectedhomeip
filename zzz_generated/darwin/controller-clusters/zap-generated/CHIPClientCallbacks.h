@@ -128,6 +128,8 @@ typedef void (*BasicInformationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BasicInformationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
@@ -136,6 +138,8 @@ typedef void (*OtaSoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbac
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & data);
+typedef void (*OtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OtaSoftwareUpdateRequestorAttributeListListAttributeCallback)(
@@ -151,6 +155,8 @@ typedef void (*TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback
 typedef void (*TimeFormatLocalizationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TimeFormatLocalizationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*UnitLocalizationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*UnitLocalizationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -353,6 +359,8 @@ typedef void (*PumpConfigurationAndControlAcceptedCommandListListAttributeCallba
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PumpConfigurationAndControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ThermostatGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatAttributeListListAttributeCallback)(void * context,
@@ -387,10 +395,14 @@ typedef void (*IlluminanceMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*IlluminanceMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TemperatureMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TemperatureMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TemperatureMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*PressureMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PressureMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PressureMeasurementAttributeListListAttributeCallback)(
