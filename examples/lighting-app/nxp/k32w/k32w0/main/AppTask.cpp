@@ -18,6 +18,7 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
@@ -57,7 +58,6 @@
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
-#include "CHIPProjectConfig.h"
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -72,9 +72,8 @@ static QueueHandle_t sAppEventQueue;
 static LEDWidget sStatusLED;
 static LEDWidget sLightLED;
 
-static bool sIsThreadProvisioned        = false;
-static bool sHaveBLEConnections         = false;
-static bool sIsDnssdPlatformInitialized = false;
+static bool sIsThreadProvisioned = false;
+static bool sHaveBLEConnections  = false;
 
 static uint32_t eventMask = 0;
 
@@ -138,12 +137,10 @@ CHIP_ERROR AppTask::Init()
 // Initialize device attestation config
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     // Initialize factory data provider
-    ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
-#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
-    SetDeviceInstanceInfoProvider(&mK32W0FactoryDataProvider);
-#endif
-    SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
-    SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
+    SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+    SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+    SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
@@ -152,7 +149,7 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    AppTask::PrintOnboardingInfo();
 #endif
 
     /* HW init leds */
@@ -198,23 +195,11 @@ CHIP_ERROR AppTask::Init()
         K32W_LOG("Get version error");
         assert(err == CHIP_NO_ERROR);
     }
+    uint32_t currentVersion;
+    err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
 
-    K32W_LOG("Current Software Version: %s", currentSoftwareVer);
+    K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (gImageProcessor.IsFirstImageRun())
-    {
-        // If DNS-SD initialization was captured by MatterEventHandler, then
-        // OTA initialization will be started as soon as possible. Otherwise,
-        // a periodic timer is started until the DNS-SD initialization event
-        // is received. Configurable delay: CHIP_DEVICE_CONFIG_INIT_OTA_DELAY
-        AppTask::OnScheduleInitOTA(nullptr, nullptr);
-    }
-    else
-    {
-        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
-    }
-#endif
     return err;
 }
 
@@ -246,6 +231,18 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
+}
+
+void AppTask::PrintOnboardingInfo()
+{
+    chip::PayloadContents payload;
+    CHIP_ERROR err = GetPayloadContents(payload, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    payload.commissioningFlow = chip::CommissioningFlow::kUserActionRequired;
+    PrintOnboardingCodes(payload);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -552,32 +549,6 @@ void AppTask::StartOTAQuery(intptr_t arg)
 {
     GetRequestorInstance()->TriggerImmediateQuery();
 }
-
-void AppTask::PostOTAResume()
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_OTAResume;
-    event.Handler = OTAResumeEventHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appState)
-{
-    if (sIsDnssdPlatformInitialized)
-    {
-        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
-    }
-    else
-    {
-        CHIP_ERROR error = chip::DeviceLayer::SystemLayer().StartTimer(
-            chip::System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_INIT_OTA_DELAY), AppTask::OnScheduleInitOTA, nullptr);
-
-        if (error != CHIP_NO_ERROR)
-        {
-            K32W_LOG("Failed to schedule OTA initialization timer.");
-        }
-    }
-}
 #endif
 
 void AppTask::BleHandler(AppEvent * aEvent)
@@ -630,15 +601,10 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (event->Type == DeviceEventType::kOtaStateChanged && event->OtaStateChanged.newState == kOtaSpaceAvailable)
-    {
-        sAppTask.PostOTAResume();
-    }
-
     if (event->Type == DeviceEventType::kDnssdPlatformInitialized)
     {
         K32W_LOG("Dnssd platform initialized.");
-        sIsDnssdPlatformInitialized = true;
+        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
     }
 #endif
 
@@ -873,19 +839,6 @@ void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t 
     event.LightEvent.Action = aAction;
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
-}
-
-void AppTask::OTAResumeEventHandler(AppEvent * aEvent)
-{
-    if (aEvent->Type == AppEvent::kEventType_OTAResume)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        if (gDownloader.GetState() == OTADownloader::State::kInProgress)
-        {
-            gImageProcessor.TriggerNewRequestForData();
-        }
-#endif
-    }
 }
 
 void AppTask::PostEvent(const AppEvent * aEvent)

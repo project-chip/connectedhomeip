@@ -381,6 +381,8 @@ def BuildK32WTarget():
     target.AppendModifier(name="no-ota", disable_ota=True)
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe("-nologs")
     target.AppendModifier(name="nologs", disable_logs=True)
+    target.AppendModifier(name="crypto-platform", crypto_platform=True)
+    target.AppendModifier(name="tokenizer", tokenizer=True).ExceptIfRe("-nologs")
 
     return target
 

@@ -177,3 +177,46 @@ tests:
                 value: "Enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          TH all-clusters-minimal-app does not support optional attributes, if implemted we will get "General error: 0x86 (UNSUPPORTED_ATTRIBUTE)" as output when we read following attributes.
+
+
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+          TH receives the read command and knows this attribute for this cluster and provides a plausable value, DUT processes the values and operates normally
+
+          ./chip-tool pressuremeasurement read  tolerance 1 1
+          ./chip-tool pressuremeasurement read scaled-value 1 1
+          ./chip-tool pressuremeasurement read  min-scaled-value  1 1
+          ./chip-tool pressuremeasurement read  max-scaled-value  1 1
+          ./chip-tool pressuremeasurement read scaled-tolerance 1 1
+          ./chip-tool pressuremeasurement read scale 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          This cluster doesn't have any writable attributes
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

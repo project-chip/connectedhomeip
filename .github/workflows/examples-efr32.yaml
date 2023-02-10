@@ -110,12 +110,12 @@ jobs:
             out/lock_app_wifi_wf200/BRD4161A/chip-efr32-lock-example.out /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
-      - name: Build example EFR32+RS911x WiFi Lighting app for BRD4161A
+      - name: Build example EFR32+RS9116 WiFi Lighting app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_wifi_rs911x BRD4161A --wifi rs911x
-          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rs911x lighting-app \
-            out/lighting_app_wifi_rs911x/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
+          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_wifi_rs9116 BRD4161A --wifi rs9116
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rs9116 lighting-app \
+            out/lighting_app_wifi_rs9116/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
       - name: Uploading Size Reports

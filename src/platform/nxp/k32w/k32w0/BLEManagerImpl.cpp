@@ -45,6 +45,11 @@
 #include "PWR_Configuration.h"
 #endif
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
+#endif
+
 /*******************************************************************************
  * Local data types
  *******************************************************************************/
@@ -149,6 +154,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     BaseType_t bleAppCreated    = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
     uint16_t attChipRxHandle[1] = { (uint16_t) value_chipoble_rx };
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    uint16_t attChipC3Handle[1] = { (uint16_t) value_chipoble_c3 };
+#endif
+
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Check if BLE stack is initialized
@@ -184,7 +193,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(bleAppCreated == pdPASS, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* BLE Radio Init */
-    XCVR_TemperatureUpdate(BOARD_GetTemperature());
     VerifyOrExit(XCVR_Init(BLE_MODE, DR_2MBPS) == gXcvrSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Create BLE Controller Task */
@@ -209,6 +217,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #endif
 
     GattServer_RegisterHandlesForWriteNotifications(1, attChipRxHandle);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    GattServer_RegisterHandlesForReadNotifications(1, attChipC3Handle);
+#endif
 
     mFlags.Set(Flags::kK32WBLEStackInitialized);
     mFlags.Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? true : false);
@@ -425,11 +436,6 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     return false;
 }
 
-void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
-{
-    BLEMgrImpl().blekw_stop_connection_internal(connObj);
-}
-
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     return blekw_stop_connection_internal(conId);
@@ -466,7 +472,8 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    // Nothing to do
+    BLEMgrImpl().blekw_stop_connection_internal(conId);
+    BLEMgrImpl().RemoveConnection(conId);
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
@@ -810,6 +817,11 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     adv_data[1].aData = advPayload;
 
     adv.aAdStructures = adv_data;
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    ReturnErrorOnFailure(EncodeAdditionalDataTlv());
+#endif
+
     /**************** Prepare scan response data *******************************************/
     scanRsp.cNumAdStructures = BLEKW_SCAN_RSP_MAX_NO;
 
@@ -834,10 +846,11 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     {
         advInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
+    advInterval = (uint16_t)(advInterval * 0.625F);
 
-    adv_params.minInterval = adv_params.maxInterval = (uint16_t)(advInterval / 0.625F);
+    adv_params.minInterval = adv_params.maxInterval = advInterval;
     adv_params.advertisingType                      = gAdvConnectableUndirected_c;
-    adv_params.ownAddressType                       = gBleAddrTypePublic_c;
+    adv_params.ownAddressType                       = gBleAddrTypeRandom_c;
     adv_params.peerAddressType                      = gBleAddrTypePublic_c;
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
     adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t)(gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
@@ -851,12 +864,66 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     else
     {
         ChipLogProgress(DeviceLayer, "Advertising error 0x%x!", err);
+        mFlags.Clear(Flags::kAdvertising);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
 exit:
     return chipErr;
 }
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BitFlags<AdditionalDataFields> dataFields;
+    AdditionalDataPayloadGeneratorParams params;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+
+    err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(params.rotatingDeviceIdLifetimeCounter);
+    SuccessOrExit(err);
+    params.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+    dataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
+    err =
+        AdditionalDataPayloadGenerator().generateAdditionalDataPayload(params, sInstance.c3AdditionalDataBufferHandle, dataFields);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
+    }
+
+    return err;
+}
+
+void BLEManagerImpl::HandleC3ReadRequest(blekw_msg_t * msg)
+{
+    bleResult_t result;
+    blekw_att_read_data_t * att_rd_data = (blekw_att_read_data_t *) msg->data.data;
+    deviceId_t deviceId                 = att_rd_data->device_id;
+    uint16_t handle                     = att_rd_data->handle;
+    uint16_t length                     = sInstance.c3AdditionalDataBufferHandle->DataLength();
+    const uint8_t * data                = (const uint8_t *) sInstance.c3AdditionalDataBufferHandle->Start();
+
+    result = GattDb_WriteAttribute(handle, length, data);
+    if (result != gBleSuccess_c)
+    {
+        ChipLogError(DeviceLayer, "Failed to write C3 characteristic: %d", result);
+    }
+
+    result = GattServer_SendAttributeReadStatus(deviceId, handle, gAttErrCodeNoError_c);
+    if (result != gBleSuccess_c)
+    {
+        ChipLogError(DeviceLayer, "Failed to send response to C3 read request: %d", result);
+    }
+}
+#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
@@ -1002,6 +1069,14 @@ void BLEManagerImpl::bleAppTask(void * p_arg)
             {
                 sInstance.HandleWriteEvent(msg);
             }
+            else if (msg->type == BLE_KW_MSG_ATT_READ)
+            {
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+                blekw_att_read_data_t * att_rd_data = (blekw_att_read_data_t *) msg->data.data;
+                if (value_chipoble_c3 == att_rd_data->handle)
+                    sInstance.HandleC3ReadRequest(msg);
+#endif
+            }
             else if (msg->type == BLE_KW_MSG_FORCE_DISCONNECT)
             {
                 ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
@@ -1011,6 +1086,7 @@ void BLEManagerImpl::bleAppTask(void * p_arg)
                 {
                     ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
                 }
+                sInstance.RemoveConnection(g_device_id);
             }
 
             /* Freed the message from the queue */
@@ -1024,6 +1100,12 @@ void BLEManagerImpl::HandleConnectEvent(blekw_msg_t * msg)
     uint8_t device_id_loc = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", device_id_loc);
 
+#if gClkUseFro32K
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    PWR_DisallowDeviceToSleep();
+#endif
+#endif
+
     g_device_id = device_id_loc;
     blekw_start_connection_timeout();
     sInstance.AddConnection(device_id_loc);
@@ -1035,6 +1117,12 @@ void BLEManagerImpl::HandleConnectionCloseEvent(blekw_msg_t * msg)
 {
     uint8_t device_id_loc = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is disconnected with device: %d.\n", device_id_loc);
+
+#if gClkUseFro32K
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    PWR_AllowDeviceToSleep();
+#endif
+#endif
 
     if (sInstance.RemoveConnection(device_id_loc))
     {

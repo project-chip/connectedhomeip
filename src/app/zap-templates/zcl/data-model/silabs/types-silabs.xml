@@ -23,15 +23,6 @@ limitations under the License.
     <item name="NoSourceFound" value="0x0"/>
     <item name="SourceFound" value="0x1"/>
   </enum>
-  <enum name="AttributeWritePermission" type="ENUM8">
-    <item name="DenyWrite" value="0x00"/>
-    <item name="AllowWriteNormal" value="0x01"/>
-    <item name="AllowWriteOfReadOnly" value="0x02"/>
-    <item name="UnsupportedAttribute" value="0x86"/>
-    <item name="InvalidValue" value="0x87"/>
-    <item name="ReadOnly" value="0x88"/>
-    <item name="InvalidDataType" value="0x8D"/>
-  </enum>
   <struct name="Notification">
     <item name="contentId" type="INT16U"/>
     <item name="statusFeedback" type="ENUM8"/>

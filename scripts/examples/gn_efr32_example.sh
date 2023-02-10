@@ -86,8 +86,10 @@ if [ "$#" == "0" ]; then
             Set a Matter sotfware version string for the Silabs examples
             Used and formatted by default in this script.
             To skip that formatting or use your own version string use --no-version
-        use_rs911x
-            Build wifi example with extension board rs911x. (Default false)
+        use_rs9116
+            Build wifi example with extension board rs9116. (Default false)
+        use_SiWx917
+            Build wifi example with extension board SiWx917. (Default false)
         use_wf200
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
@@ -103,7 +105,7 @@ if [ "$#" == "0" ]; then
         --low-power
             disables all power consuming features for the most power efficient build
             This flag is to be used with --sed
-        --wifi <wf200 | rs911x>
+        --wifi <wf200 | rs9116>
             build wifi example variant for given exansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
@@ -135,15 +137,17 @@ else
         case $1 in
             --wifi)
                 if [ -z "$2" ]; then
-                    echo "--wifi requires rs911x or wf200"
+                    echo "--wifi requires rs9116 or SiWx917 or wf200"
                     exit 1
                 fi
-                if [ "$2" = "rs911x" ]; then
-                    optArgs+="use_rs911x=true "
+                if [ "$2" = "rs9116" ]; then
+                    optArgs+="use_rs9116=true "
+                elif [ "$2" = "SiWx917" ]; then
+                    optArgs+="use_SiWx917=true "
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi rs911x|wf200"
+                    echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
                     exit 1
                 fi
                 USE_WIFI=true
@@ -188,7 +192,7 @@ else
                 shift
                 ;;
             *)
-                if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
 
