@@ -584,7 +584,7 @@ tests:
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.F05
       arguments:
           value: MaxCoolSetpointLimit
-    
+
     #LowerLimit = Max(MinCoolSetpointLimit,(UnoccupiedCoolingSetpoint + MinSetpointDeadBand)) not possible in YAML
     - label:
           "Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(MinCoolSetpointLimit,
