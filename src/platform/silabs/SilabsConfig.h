@@ -64,6 +64,9 @@ namespace Internal {
 // '08' = Matter nvm3 region
 // '72' = the sub region group base offset (Factory, Config, Counter or KVS)
 // '01' = the id offset inside the group.
+constexpr uint32_t kUserNvm3KeyDomainLoLimit    = 0x000000U;
+constexpr uint32_t kUserNvm3KeyDomainHiLimit    = 0x00FFFFU;
+constexpr uint32_t kUserNvm3KeyDomain           = 0x000000U;
 constexpr uint32_t kMatterNvm3KeyDomain  = 0x080000U;
 constexpr uint32_t kMatterNvm3KeyLoLimit = 0x087200U; // Do not modify without Silabs GSDK team approval
 constexpr uint32_t kMatterNvm3KeyHiLimit = 0x087FFFU; // Do not modify without Silabs GSDK team approval
