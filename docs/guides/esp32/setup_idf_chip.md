@@ -70,7 +70,6 @@ source scripts/bootstrap.sh
 Whenever Matter environment is out of date, it can be updated by running above
 command.
 
-
 For MacOS, `gdbgui` python package will not be installed using `bootstrap.sh`
 script as it is restricted only for x64 Linux platforms. It is restricted
 because, building wheels for `gevent` (dependency of `gdbgui`) fails on MacOS.
