@@ -71,9 +71,9 @@ __LOG_LEVELS__ = {
     '--generator',
     default='JAVA',
     help='What code generator to run.  The choices are: '+'|'.join(GENERATORS.keys())+'. ' +
-         'When using custom, provide the plugin path using ' +
-         '`--generator custom:<path_to_plugin>` syntax. The plugin path shall contain a package ' +
-         'named `matter_idl_plugin/__init.py__` that defines a subclass of CodeGenerator named CustomGenerator.')
+         'When using custom, provide the plugin path using `--generator custom:<path_to_plugin>:<plugin_module_name>` syntax. ' +
+    'For example, `--generator custom:./my_plugin:my_plugin_module` will load `./my_plugin/my_plugin_module/__init.py__` ' +
+         'that defines a subclass of CodeGenerator named CustomGenerator.')
 @click.option(
     '--output-dir',
     type=click.Path(exists=False),

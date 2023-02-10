@@ -77,7 +77,7 @@ cpp-app:
         app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
 
-custom:
+custom-example-proto:
     inputs/several_clusters.matter:
         proto/first_cluster.proto: outputs/proto/first_cluster.proto
         proto/second_cluster.proto: outputs/proto/second_cluster.proto

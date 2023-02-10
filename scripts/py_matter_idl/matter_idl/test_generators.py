@@ -123,7 +123,7 @@ class GeneratorTest:
             return BridgeGenerator(storage, idl)
         if self.generator_name.lower() == 'cpp-app':
             return CppApplicationGenerator(storage, idl)
-        if self.generator_name.lower() == 'custom':
+        if self.generator_name.lower() == 'custom-example-proto':
             sys.path.append(os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '../examples')))
             from matter_idl_plugin import CustomGenerator
