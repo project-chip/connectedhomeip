@@ -140,7 +140,7 @@ void DeviceState::ShowUi()
 {
     ImGui::Begin("Light app");
     ImGui::Text("Here is the current ember device state:");
-    ImGui::Checkbox("Test check", &mOnOff);
+    ImGui::Checkbox("Light is ON", &mOnOff);
     ImGui::End();
 
     if (mHasQRCode)
@@ -149,11 +149,10 @@ void DeviceState::ShowUi()
 
         ImDrawList * drawList = ImGui::GetWindowDrawList();
 
-        // constexpr int kModuleSize = 4;
         constexpr int kBorderSize    = 35;
         constexpr int kMinWindowSize = 200;
         const int kQRCodeSize        = qrcodegen_getSize(mQRData);
-        // const int displaySize = (2 * kBorderSize + size) * kModuleSize;
+
         ImVec2 pos  = ImGui::GetWindowPos();
         ImVec2 size = ImGui::GetWindowSize();
 
@@ -264,9 +263,9 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     *window     = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-                               window_flags);
+                                   window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
