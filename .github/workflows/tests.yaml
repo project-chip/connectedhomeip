@@ -306,7 +306,7 @@ jobs:
               run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
-              run: brew install openssl pkg-config coreutils
+              run: brew install coreutils
             - name:
                   Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
@@ -314,14 +314,6 @@ jobs:
                   sudo chown ${USER} /cores || true
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -585,7 +577,7 @@ jobs:
               run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
-              run: brew install openssl pkg-config coreutils
+              run: brew install coreutils
             - name:
                   Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
@@ -593,14 +585,6 @@ jobs:
                   sudo chown ${USER} /cores || true
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
