@@ -369,19 +369,9 @@ jobs:
             #     languages: "cpp"
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform darwin
-            - name: Setup Environment
-              run: brew install openssl pkg-config
             - name: Try to ensure the directory for diagnostic log collection exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
