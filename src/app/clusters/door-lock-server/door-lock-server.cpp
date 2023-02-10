@@ -1743,7 +1743,7 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
             if (credentialInfo.credentialData.data_equal(credentialData))
             {
                 userIndex       = i;
-                credentialIndex = i;
+                credentialIndex = credential.CredentialIndex;
                 userInfo        = user;
                 return true;
             }
