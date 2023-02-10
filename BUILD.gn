@@ -313,11 +313,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_genio_builds = false
   }
 
+  # Pigweed does not provide a clang in some configurations.
+  if (enable_default_builds) {
+    _have_pigweed_clang =
+        host_os != "win" && !(host_os == "mac" && host_cpu == "arm64")
+  }
+
   declare_args() {
-    # Enable building chip with clang.
-    # Disabled on Mac arm64 but note that the "gcc" build uses Apple clang.
-    enable_host_clang_build = enable_default_builds && host_os != "win" &&
-                              (host_os != "mac" || host_cpu != "arm64")
+    # Enable building chip with the pigweed clang.
+    enable_host_clang_build = enable_default_builds && _have_pigweed_clang
 
     # Enable building chip with gcc.
     enable_host_gcc_build = enable_default_builds && host_os != "win"
@@ -332,10 +336,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Enable building chip with clang & boringssl
     enable_host_clang_boringssl_build = false
 
-    # Enable limited testing with clang & boringssl.  On Mac, boringssl does
-    # not compile with ASAN enabled.
+    # Enable limited testing with pigweed clang & boringssl.  On Mac, boringssl
+    # tests do not compile with ASAN enabled.
     enable_host_clang_boringssl_crypto_tests =
-        enable_default_builds && host_os != "win" &&
+        enable_default_builds && _have_pigweed_clang &&
         !(is_asan == true && host_os == "mac")
 
     # Build the chip-cert tool.

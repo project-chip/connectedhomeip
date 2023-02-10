@@ -45,7 +45,8 @@
  @param discoveryRequestSentHandler Handler to call after the Commissioner discovery request has been sent
  */
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
-    discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler;
+      discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler
+    discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData * _Nonnull))discoveredCommissionerHandler;
 
 /*!
  @brief Retrieve a discovered commissioner TV

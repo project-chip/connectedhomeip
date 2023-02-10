@@ -27,6 +27,12 @@ config:
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -53,16 +59,22 @@ tests:
       response:
           saveAs: TH1FabricIndex
 
-    - label:
-          "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
-          node ID N2"
+    - label: "TH1 puts DUT into commissioning mode"
       cluster: "Administrator Commissioning"
-      command: "OpenBasicCommissioningWindow"
+      command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
 
     - label: "TH2 starts a commissioning process with DUT"
       identity: "beta"

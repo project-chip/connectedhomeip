@@ -167,7 +167,7 @@ tests:
       disabled: true
 
     - label: "TH scans and finds the DUT SSID"
-      PICS: MCORE.DD.WIFI && MCORE.DD.IE
+      PICS: MCORE.COM.WIFI && MCORE.DD.IE
       verification: |
           Out of Scope for V1.0
           SoftAP commissioning not currently supported on TH=chip-tool

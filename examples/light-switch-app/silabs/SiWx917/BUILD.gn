@@ -67,10 +67,10 @@ declare_args() {
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_rs911x && chip_enable_openthread))
+assert(!(use_SiWx917 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
-  assert(use_rs911x || use_wf200)
+  assert(use_SiWx917 || use_wf200)
   enable_openthread_cli = false
   import("${chip_root}/src/platform/silabs/SiWx917/wifi_args.gni")
 }
@@ -122,7 +122,6 @@ if (chip_enable_wifi) {
     efr32_lwip_defs += [ "LWIP_IPV6=0" ]
   }
 
-  wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
   import("${examples_plat_dir}/SiWx917/rs911x.gni")
 }
 
@@ -155,7 +154,7 @@ efr32_sdk("sdk") {
 
   # WiFi Settings
   if (chip_enable_wifi) {
-    if (use_rs911x) {
+    if (use_SiWx917) {
       defines += rs911x_defs
       include_dirs += rs911x_plat_incs
     } else if (use_wf200) {
@@ -204,7 +203,7 @@ efr32_executable("light_switch_app") {
   }
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
-      use_wf200 || use_rs911x) {
+      use_wf200 || use_SiWx917) {
     #sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
@@ -234,7 +233,7 @@ efr32_executable("light_switch_app") {
 
   # WiFi Settings
   if (chip_enable_wifi) {
-    if (use_rs911x) {
+    if (use_SiWx917) {
       sources += rs911x_src_plat
 
       # All the stuff from wiseconnect

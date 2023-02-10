@@ -77,6 +77,5 @@
    <xi:include href="draft/onoff-switch-configuration-cluster.xml" />
    <xi:include href="silabs/ha-devices.xml" />
    <xi:include href="silabs/lo-devices.xml" />
-   <xi:include href="silabs/types-silabs.xml" />
    <xi:include href="silabs/zll-devices.xml" />
 </all>

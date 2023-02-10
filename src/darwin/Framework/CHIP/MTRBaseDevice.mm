@@ -2042,23 +2042,47 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 }
 @end
 
+@interface MTREventReport () {
+    NSNumber * _timestampValue;
+}
+@end
+
 @implementation MTREventReport
-- (instancetype)initWithPath:(const ConcreteEventPath &)path
+- (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
                  eventNumber:(NSNumber *)eventNumber
-                    priority:(NSNumber *)priority
-                   timestamp:(NSNumber *)timestamp
+                    priority:(PriorityLevel)priority
+                   timestamp:(const Timestamp &)timestamp
                        value:(id _Nullable)value
                        error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
         _path = [[MTREventPath alloc] initWithPath:path];
         _eventNumber = eventNumber;
-        _priority = priority;
-        _timestamp = timestamp;
+        if (!MTRPriorityLevelIsValid(priority)) {
+            return nil;
+        }
+        _priority = @(MTREventPriorityForValidPriorityLevel(priority));
+        _timestampValue = @(timestamp.mValue);
+        if (timestamp.IsSystem()) {
+            _eventTimeType = MTREventTimeTypeSystemUpTime;
+            _systemUpTime = MTRTimeIntervalForEventTimestampValue(timestamp.mValue);
+        } else if (timestamp.IsEpoch()) {
+            _eventTimeType = MTREventTimeTypeTimestampDate;
+            _timestampDate = [NSDate dateWithTimeIntervalSince1970:MTRTimeIntervalForEventTimestampValue(timestamp.mValue)];
+        } else {
+            return nil;
+        }
         _value = value;
         _error = error;
     }
     return self;
+}
+@end
+
+@implementation MTREventReport (Deprecated)
+- (NSNumber *)timestamp
+{
+    return _timestampValue;
 }
 @end
 
@@ -2093,8 +2117,8 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
 
     [mEventReports addObject:[[MTREventReport alloc] initWithPath:aEventHeader.mPath
                                                       eventNumber:@(aEventHeader.mEventNumber)
-                                                         priority:@((uint8_t) aEventHeader.mPriorityLevel)
-                                                        timestamp:@(aEventHeader.mTimestamp.mValue)
+                                                         priority:aEventHeader.mPriorityLevel
+                                                        timestamp:aEventHeader.mTimestamp
                                                             value:value
                                                             error:error]];
 }

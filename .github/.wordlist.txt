@@ -1384,6 +1384,7 @@ ug
 ui
 uint
 ULA
+Ultrafast
 UNBLUR
 uncommissioned
 Unencrypted

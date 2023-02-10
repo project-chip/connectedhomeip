@@ -34,48 +34,11 @@
 #include <LcdPainter.h>
 #endif
 
-#define SL_SIMPLE_BUTTON_MODE_POLL 0U              ///< BUTTON input capture using polling
-#define SL_SIMPLE_BUTTON_MODE_POLL_AND_DEBOUNCE 1U ///< BUTTON input capture using polling and debouncing
-#define SL_SIMPLE_BUTTON_MODE_INTERRUPT 2U         ///< BUTTON input capture using interrupt
+#define SIWx917_BTN0 0
+#define SIWx917_BTN1 1
 
-#define SL_SIMPLE_BUTTON_DISABLED 2U ///< BUTTON state is disabled
 #define SL_SIMPLE_BUTTON_PRESSED 1U  ///< BUTTON state is pressed
 #define SL_SIMPLE_BUTTON_RELEASED 0U ///< BUTTON state is released
-
-typedef uint8_t sl_button_mode_t;  ///< BUTTON mode
-typedef uint8_t sl_button_state_t; ///< BUTTON state
-typedef struct sl_button sl_button_t;
-
-/// A BUTTON instance
-typedef struct sl_button
-{
-    void * context;                                             ///< The context for this BUTTON instance
-    void (*init)(const sl_button_t * handle);                   ///< Member function to initialize BUTTON instance
-    void (*poll)(const sl_button_t * handle);                   ///< Member function to poll BUTTON
-    void (*enable)(const sl_button_t * handle);                 ///< Member function to enable BUTTON
-    void (*disable)(const sl_button_t * handle);                ///< Member function to disable BUTTON
-    sl_button_state_t (*get_state)(const sl_button_t * handle); ///< Member function to retrieve BUTTON state
-} sl_button;
-
-const sl_button_t sl_button_btn0 = {
-    .context   = NULL,
-    .init      = NULL,
-    .poll      = NULL,
-    .enable    = NULL,
-    .disable   = NULL,
-    .get_state = NULL,
-};
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-
-const sl_button_t sl_button_btn1 = {
-    .context   = NULL,
-    .init      = NULL,
-    .poll      = NULL,
-    .enable    = NULL,
-    .disable   = NULL,
-    .get_state = NULL,
-};
-#define APP_LIGHT_SWITCH &sl_button_btn1
 
 class WindowAppImpl : public WindowApp
 {
@@ -88,8 +51,7 @@ public:
     void Finish() override;
     void PostEvent(const WindowApp::Event & event) override;
     void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId) override;
-    friend void sl_button_on_change(const sl_button_t * handle);
-    void OnButtonChange(const sl_button_t * handle);
+    void OnButtonChange(uint8_t btn, uint8_t btnAction);
 
 protected:
     struct Timer : public WindowApp::Timer

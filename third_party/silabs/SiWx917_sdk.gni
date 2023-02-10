@@ -24,8 +24,7 @@ declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
   sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
-  wiseconnect_sdk_root =
-      "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+  wisemcu_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
   wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
@@ -89,7 +88,7 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F",
       "${examples_plat_dir}/device/inc",
 
-      "${wiseconnect_sdk_root}/sapi/include",
+      "${wisemcu_sdk_root}/sapi/include",
 
       "${chip_root}/examples/platform/SiWx917/SiWx917",
       "${chip_root}/examples/platform/SiWx917/SiWx917/hal",
@@ -211,8 +210,8 @@ template("efr32_sdk") {
       cflags += [ "-mcmse" ]
     }
 
-    if (defined(invoker.use_rs911x)) {
-      if (invoker.use_rs911x == true) {
+    if (defined(invoker.use_SiWx917)) {
+      if (invoker.use_SiWx917 == true) {
         #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
         cflags += invoker.rs911x_cflags
       }
@@ -257,10 +256,6 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/system_RS1xxxx.c",
 
       # Bluetooth
-      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-      "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/clock_update.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_comparator.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_egpio.c",
@@ -276,6 +271,10 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_time_period.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ulpss_clk.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_wwdt.c",
+      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_bt_ble.c",
       "${wisemcu_sdk_root}/third_party/freertos/croutine.c",
       "${wisemcu_sdk_root}/third_party/freertos/event_groups.c",
       "${wisemcu_sdk_root}/third_party/freertos/list.c",
