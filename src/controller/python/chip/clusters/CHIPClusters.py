@@ -73,6 +73,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -157,6 +163,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -287,6 +299,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -399,6 +417,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -447,6 +471,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -657,6 +687,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -712,6 +748,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -777,6 +819,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -819,6 +867,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -889,6 +943,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -1046,6 +1106,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -1210,6 +1276,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -1266,6 +1338,24 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "AcceptedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -1328,6 +1418,24 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "AcceptedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -1376,6 +1484,18 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
                     "type": "int",
                     "reportable": True,
                 },
@@ -1431,6 +1551,18 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -1457,6 +1589,24 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                     "writable": True,
+                },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "AcceptedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
                 },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
@@ -1499,6 +1649,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -1726,6 +1882,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -1815,6 +1977,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -1955,6 +2123,18 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -1993,6 +2173,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -2096,6 +2282,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -2161,6 +2353,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -2586,6 +2784,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -2708,6 +2912,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -2803,6 +3013,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -2935,6 +3151,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -2988,6 +3210,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -3068,6 +3296,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -3207,6 +3441,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -3305,6 +3545,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -3346,6 +3592,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -3394,6 +3646,18 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -3429,6 +3693,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -3512,6 +3782,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -3868,6 +4144,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -4085,6 +4367,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -4157,6 +4445,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -4340,6 +4634,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -4511,6 +4811,24 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "AcceptedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -4621,6 +4939,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -4677,6 +5001,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -5248,6 +5578,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -5380,6 +5716,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -5448,6 +5790,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -5495,6 +5843,24 @@ class ChipClusters:
                 0x00000003: {
                     "attributeName": "Tolerance",
                     "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "AcceptedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -5578,6 +5944,24 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "AcceptedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -5637,6 +6021,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -5702,6 +6092,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -5758,6 +6154,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -5799,6 +6201,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -5880,6 +6288,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -5935,6 +6349,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -6087,6 +6507,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -6164,6 +6590,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -6205,6 +6637,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -6250,6 +6688,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -6327,6 +6771,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -6389,6 +6839,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -6465,6 +6921,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -6554,6 +7016,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -6610,6 +7078,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -6717,6 +7191,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -6792,6 +7272,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },
@@ -7557,6 +8043,12 @@ class ChipClusters:
                 0x0000FFF9: {
                     "attributeName": "AcceptedCommandList",
                     "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFA: {
+                    "attributeName": "EventList",
+                    "attributeId": 0x0000FFFA,
                     "type": "int",
                     "reportable": True,
                 },

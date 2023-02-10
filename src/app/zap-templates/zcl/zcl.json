@@ -12,7 +12,6 @@
     "xmlFile": [
         "access-control-definitions.xml",
         "chip-types.xml",
-        "types-silabs.xml",
         "access-control-cluster.xml",
         "account-login-cluster.xml",
         "administrator-commissioning-cluster.xml",
