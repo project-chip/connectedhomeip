@@ -943,7 +943,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
                               attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
                                    controller:(MTRDeviceController *)controller
-                                   completion:(MTROperationalCertificateIssuedHandler)completion
+                                   completion:(void (^)(MTROperationalCertificateChain * _Nullable info,
+                                                  NSError * _Nullable error))completion
 {
     CSRInfo * oldCSRInfo = [[CSRInfo alloc] initWithNonce:csrInfo.csrNonce
                                                  elements:csrInfo.csrElementsTLV
