@@ -196,7 +196,6 @@ void DeviceState::ShowUi()
             {
                 if (qrcodegen_getModule(mQRData, x, y))
                 {
-                    // FIXME: figure it out
                     ImVec2 placement =
                         ImVec2(pos.x + static_cast<float>(x) * squareSize.x, pos.y + static_cast<float>(y) * squareSize.y);
                     drawList->AddRectFilled(placement, placement + squareSize, IM_COL32_BLACK);
@@ -204,7 +203,6 @@ void DeviceState::ShowUi()
             }
         }
 
-        // FIXME: implement
         ImGui::End();
     }
 }
@@ -214,15 +212,15 @@ void DeviceState::ChipLoopUpdate()
     // This will contain a dimmable light
     static constexpr chip::EndpointId kLightEndpointId = 1;
 
-    // TODO: error checking?
+    // TODO:
+    //    - consider error checking
+    //    - add more attributes to the display (color? brightness?)
     {
         uint8_t value;
         emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::OnOff::Id,
                                    chip::app::Clusters::OnOff::Attributes::OnOff::Id, &value, sizeof(value));
         mOnOff = (value != 0);
     }
-
-    // FIXME: implement
 }
 
 void DeviceState::ChipLoopUpdateCallback(intptr_t self)
@@ -266,9 +264,9 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     *window     = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-                               window_flags);
+                                   window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -349,8 +347,6 @@ void UiLoop()
 }
 
 static std::thread gUiThread;
-
-// FIXME: qr code???
 
 } // namespace
 
