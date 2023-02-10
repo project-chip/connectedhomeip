@@ -91,11 +91,14 @@ void OnOffServer::cancelEndpointTimerCallback(EmberEventControl * control)
 void OnOffServer::cancelEndpointTimerCallback(EndpointId endpoint)
 {
     auto control = OnOffServer::getEventControl(endpoint);
-    cancelEndpointTimerCallback(control);
+    if (control) {
+        cancelEndpointTimerCallback(control);
+    }
 }
 
 void MatterOnOffClusterServerShutdownCallback(EndpointId endpoint)
 {
+    emberAfOnOffClusterPrintln("Shuting down on/off server cluster on endpoint %d", endpoint);
     OnOffServer::Instance().cancelEndpointTimerCallback(endpoint);
 }
 

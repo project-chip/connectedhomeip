@@ -905,10 +905,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
     {
         emAfEndpoints[index].bitmask |= EMBER_AF_ENDPOINT_ENABLED;
     }
-    else
-    {
-        emAfEndpoints[index].bitmask &= EMBER_AF_ENDPOINT_DISABLED;
-    }
 
 #if defined(EZSP_HOST)
     ezspSetEndpointFlags(endpoint, (enable ? EZSP_ENDPOINT_ENABLED : EZSP_ENDPOINT_DISABLED));
@@ -942,6 +938,11 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 
         MatterReportingAttributeChangeCallback(/* endpoint = */ 0, app::Clusters::Descriptor::Id,
                                                app::Clusters::Descriptor::Attributes::PartsList::Id);
+    }
+
+    if (!enable)
+    {
+        emAfEndpoints[index].bitmask &= EMBER_AF_ENDPOINT_DISABLED;
     }
 
     return true;

@@ -1305,6 +1305,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 
 void MatterLevelControlClusterServerShutdownCallback(EndpointId endpoint)
 {
+    emberAfOnOffClusterPrintln("Shuting down level control server cluster on endpoint %d", endpoint);
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 

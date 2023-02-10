@@ -94,7 +94,7 @@ private:
      *********************************************************/
 
     static OnOffServer instance;
-    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
+    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
     chip::System::Clock::Timestamp nextDesiredOnWithTimedOffTimestamp;
 };
 
