@@ -1215,6 +1215,8 @@ server cluster Switch = 59 {
     INT8U totalNumberOfPressesCounted = 1;
   }
 
+  readonly attribute int8u numberOfPositions = 0;
+  readonly attribute int8u currentPosition = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1947,6 +1949,8 @@ endpoint 0 {
   }
 
   server cluster Switch {
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -2079,5 +2083,3 @@ endpoint 1 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
-
