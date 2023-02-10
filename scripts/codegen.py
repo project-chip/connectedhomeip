@@ -120,6 +120,7 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())
 
+    plugin_module = None
     if generator.startswith('custom'):
         # check that the plugin path is provided
         if ':' not in generator:
