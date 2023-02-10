@@ -288,66 +288,84 @@ list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
 )
 
 function(sdk_post_build target)
-    string(REPLACE "_ns" "" APP_NAME ${APP_TARGET})
+    string(REPLACE "_ns" "" APP_NAME ${target})
 if(TFM_SUPPORT)
     include(ConvertElfToBin)
     include(SignTfmImage)
-    target_elf_to_bin(${APP_TARGET})
-    iotsdk_tf_m_sign_image(${APP_TARGET})
-    iotsdk_tf_m_merge_images(${APP_TARGET} 0x10000000 0x38000000 0x28060000)
     ExternalProject_Get_Property(trusted-firmware-m-build BINARY_DIR)
+    target_elf_to_bin(${target})
+    add_custom_command(
+        TARGET
+            ${target}
+        POST_BUILD
+        DEPENDS
+            $<TARGET_FILE_DIR:${target}>/${target}.bin
+        COMMAND
+            # Sign the non-secure (application) image for TF-M bootloader (BL2)"
+            python3 ${BINARY_DIR}/install/image_signing/scripts/wrapper/wrapper.py
+                --layout ${BINARY_DIR}/install/image_signing/layout_files/signing_layout_ns.o
+                -v ${MCUBOOT_IMAGE_VERSION_NS}
+                -k ${BINARY_DIR}/install/image_signing/keys/root-RSA-3072_1.pem
+                --public-key-format full
+                --align 1 --pad --pad-header -H 0x400 -s auto -d "(0, 0.0.0+0)"
+                $<TARGET_FILE_DIR:${target}>/${target}.bin
+                --overwrite-only
+                --measured-boot-record
+                $<TARGET_FILE_DIR:${target}>/${target}_signed.bin
+        VERBATIM
+    )
+    iotsdk_tf_m_merge_images(${target} 0x10000000 0x38000000 0x28060000)
     # Cleanup
     add_custom_command(
         TARGET
-            ${APP_TARGET}
+            ${target}
         POST_BUILD
         DEPENDS
-            $<TARGET_FILE_DIR:${APP_TARGET}>/tfm_s_signed.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_signed.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.hex
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.elf
+            $<TARGET_FILE_DIR:${target}>/${target}.bin
+            $<TARGET_FILE_DIR:${target}>/${target}_signed.bin
+            $<TARGET_FILE_DIR:${target}>/${target}_merged.hex
+            $<TARGET_FILE_DIR:${target}>/${target}_merged.elf
         COMMAND
-            # Copy the TF-M secure elf image
+            # Copy the bootloader and TF-M secure image for debugging purposes
             ${CMAKE_COMMAND} -E copy
+                ${BINARY_DIR}/install/outputs/bl2.elf
                 ${BINARY_DIR}/install/outputs/tfm_s.elf
-                $<TARGET_FILE_DIR:${APP_TARGET}>/
+                $<TARGET_FILE_DIR:${target}>/
         COMMAND
             # Rename output file
             ${CMAKE_COMMAND} -E copy
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.elf
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_NAME}.elf
+                $<TARGET_FILE_DIR:${target}>/${target}_merged.elf
+                $<TARGET_FILE_DIR:${target}>/${APP_NAME}.elf
         COMMAND rm
         ARGS -Rf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/tfm_s_signed.bin 
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_signed.bin 
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.hex
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.elf
+            $<TARGET_FILE_DIR:${target}>/${target}.bin
+            $<TARGET_FILE_DIR:${target}>/${target}_signed.bin 
+            $<TARGET_FILE_DIR:${target}>/${target}_merged.hex
+            $<TARGET_FILE_DIR:${target}>/${target}_merged.elf
         VERBATIM
     )
 else()
     add_custom_command(
         TARGET
-            ${APP_TARGET}
+            ${target}
         POST_BUILD
         DEPENDS
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.elf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map
+            $<TARGET_FILE_DIR:${target}>/${target}.elf
+            $<TARGET_FILE_DIR:${target}>/${target}.map
         COMMAND
             # Rename output elf file
             ${CMAKE_COMMAND} -E copy
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.elf
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_NAME}.elf
+                $<TARGET_FILE_DIR:${target}>/${target}.elf
+                $<TARGET_FILE_DIR:${target}>/${APP_NAME}.elf
         COMMAND
             # Rename output map file
             ${CMAKE_COMMAND} -E copy
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_NAME}.map
+                $<TARGET_FILE_DIR:${target}>/${target}.map
+                $<TARGET_FILE_DIR:${target}>/${APP_NAME}.map
         COMMAND rm
         ARGS -Rf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.elf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map
+            $<TARGET_FILE_DIR:${target}>/${target}.elf
+            $<TARGET_FILE_DIR:${target}>/${target}.map
         VERBATIM
     )
 endif() #TFM_SUPPORT
