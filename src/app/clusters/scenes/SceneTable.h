@@ -45,26 +45,26 @@ public:
         static constexpr TLV::Tag TagFirstSceneID() { return TLV::ContextTag(3); }
 
         // Identifies endpoint to which this scene applies to
-        EndpointId sceneEndpointId = kInvalidEndpointId;
+        EndpointId mSceneEndpointId = kInvalidEndpointId;
         // Identifies group within the scope of the given fabric
-        SceneGroupID sceneGroupId = kGlobalGroupSceneId;
-        SceneId sceneId           = kUndefinedSceneId;
+        SceneGroupID mSceneGroupId = kGlobalGroupSceneId;
+        SceneId mSceneId           = kUndefinedSceneId;
 
         SceneStorageId() = default;
         SceneStorageId(EndpointId endpoint, SceneId id, SceneGroupID groupId = kGlobalGroupSceneId) :
-            sceneEndpointId(endpoint), sceneGroupId(groupId), sceneId(id)
+            mSceneEndpointId(endpoint), mSceneGroupId(groupId), mSceneId(id)
         {}
         SceneStorageId(const SceneStorageId & storageId) :
-            sceneEndpointId(storageId.sceneEndpointId), sceneGroupId(storageId.sceneGroupId), sceneId(storageId.sceneId)
+            mSceneEndpointId(storageId.mSceneEndpointId), mSceneGroupId(storageId.mSceneGroupId), mSceneId(storageId.mSceneId)
         {}
         CHIP_ERROR Serialize(TLV::TLVWriter & writer) const
         {
             TLV::TLVType container;
             ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
 
-            ReturnErrorOnFailure(writer.Put(TagFirstSceneEndpointID(), static_cast<uint16_t>(this->sceneEndpointId)));
-            ReturnErrorOnFailure(writer.Put(TagFirstSceneGroupID(), static_cast<uint16_t>(this->sceneGroupId)));
-            ReturnErrorOnFailure(writer.Put(TagFirstSceneID(), static_cast<uint8_t>(this->sceneId)));
+            ReturnErrorOnFailure(writer.Put(TagFirstSceneEndpointID(), static_cast<uint16_t>(this->mSceneEndpointId)));
+            ReturnErrorOnFailure(writer.Put(TagFirstSceneGroupID(), static_cast<uint16_t>(this->mSceneGroupId)));
+            ReturnErrorOnFailure(writer.Put(TagFirstSceneID(), static_cast<uint8_t>(this->mSceneId)));
 
             return writer.EndContainer(container);
         }
@@ -75,31 +75,31 @@ public:
             ReturnErrorOnFailure(reader.EnterContainer(container));
 
             ReturnErrorOnFailure(reader.Next(TagFirstSceneEndpointID()));
-            ReturnErrorOnFailure(reader.Get(this->sceneEndpointId));
+            ReturnErrorOnFailure(reader.Get(this->mSceneEndpointId));
             ReturnErrorOnFailure(reader.Next(TagFirstSceneGroupID()));
-            ReturnErrorOnFailure(reader.Get(this->sceneGroupId));
+            ReturnErrorOnFailure(reader.Get(this->mSceneGroupId));
             ReturnErrorOnFailure(reader.Next(TagFirstSceneID()));
-            ReturnErrorOnFailure(reader.Get(this->sceneId));
+            ReturnErrorOnFailure(reader.Get(this->mSceneId));
 
             return reader.ExitContainer(container);
         }
 
         void Clear()
         {
-            sceneEndpointId = kInvalidEndpointId;
-            sceneGroupId    = kGlobalGroupSceneId;
-            sceneId         = kUndefinedSceneId;
+            mSceneEndpointId = kInvalidEndpointId;
+            mSceneGroupId    = kGlobalGroupSceneId;
+            mSceneId         = kUndefinedSceneId;
         }
         bool operator==(const SceneStorageId & other)
         {
-            return (this->sceneEndpointId == other.sceneEndpointId && this->sceneGroupId == other.sceneGroupId &&
-                    this->sceneId == other.sceneId);
+            return (this->mSceneEndpointId == other.mSceneEndpointId && this->mSceneGroupId == other.mSceneGroupId &&
+                    this->mSceneId == other.mSceneId);
         }
         void operator=(const SceneStorageId & other)
         {
-            this->sceneEndpointId = other.sceneEndpointId;
-            this->sceneGroupId    = other.sceneGroupId;
-            this->sceneId         = other.sceneId;
+            this->mSceneEndpointId = other.mSceneEndpointId;
+            this->mSceneGroupId    = other.mSceneGroupId;
+            this->mSceneId         = other.mSceneId;
         }
     };
 
@@ -110,31 +110,31 @@ public:
         static constexpr TLV::Tag TagSceneTransitionTime() { return TLV::ContextTag(2); }
         static constexpr TLV::Tag TagSceneTransitionTime100() { return TLV::ContextTag(3); }
 
-        char name[kSceneNameMax]                = { 0 };
-        size_t nameLength                       = 0;
-        SceneTransitionTime sceneTransitionTime = 0;
-        ExtensionFieldsSetsImpl extentsionFieldsSets;
-        TransitionTime100ms transitionTime100 = 0;
-        CharSpan nameSpan;
+        char mName[kSceneNameMax]                = { 0 };
+        size_t mNameLength                       = 0;
+        SceneTransitionTime mSceneTransitionTime = 0;
+        ExtensionFieldsSetsImpl mExtentsionFieldsSets;
+        TransitionTime100ms mTransitionTime100 = 0;
+        CharSpan mNameSpan;
 
         SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0, TransitionTime100ms time100ms = 0) :
-            sceneTransitionTime(time), transitionTime100(time100ms)
+            mSceneTransitionTime(time), mTransitionTime100(time100ms)
         {
             this->SetName(sceneName);
         }
         SceneData(ExtensionFieldsSetsImpl fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
                   TransitionTime100ms time100ms = 0) :
-            sceneTransitionTime(time),
-            transitionTime100(time100ms)
+            mSceneTransitionTime(time),
+            mTransitionTime100(time100ms)
         {
             this->SetName(sceneName);
-            extentsionFieldsSets = fields;
+            mExtentsionFieldsSets = fields;
         }
         SceneData(const SceneData & other) :
-            sceneTransitionTime(other.sceneTransitionTime), transitionTime100(other.transitionTime100)
+            mSceneTransitionTime(other.mSceneTransitionTime), mTransitionTime100(other.mTransitionTime100)
         {
-            this->SetName(other.nameSpan);
-            extentsionFieldsSets = other.extentsionFieldsSets;
+            this->SetName(other.mNameSpan);
+            mExtentsionFieldsSets = other.mExtentsionFieldsSets;
         }
         ~SceneData(){};
 
@@ -144,14 +144,14 @@ public:
             ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
 
             // A 0 size means the name wasn't used so it won't get stored
-            if (!this->nameSpan.empty())
+            if (!this->mNameSpan.empty())
             {
-                ReturnErrorOnFailure(writer.PutString(TagSceneName(), this->nameSpan));
+                ReturnErrorOnFailure(writer.PutString(TagSceneName(), this->mNameSpan));
             }
 
-            ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime(), static_cast<uint16_t>(this->sceneTransitionTime)));
-            ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime100(), static_cast<uint8_t>(this->transitionTime100)));
-            ReturnErrorOnFailure(this->extentsionFieldsSets.Serialize(writer));
+            ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime(), static_cast<uint16_t>(this->mSceneTransitionTime)));
+            ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime100(), static_cast<uint8_t>(this->mTransitionTime100)));
+            ReturnErrorOnFailure(this->mExtentsionFieldsSets.Serialize(writer));
 
             return writer.EndContainer(container);
         }
@@ -168,15 +168,15 @@ public:
             // If there was no error, a name is expected from the storage, if there was an unexpectec TLV element,
             if (currTag == TagSceneName())
             {
-                ReturnErrorOnFailure(reader.Get(this->nameSpan));
-                this->SetName(this->nameSpan);
+                ReturnErrorOnFailure(reader.Get(this->mNameSpan));
+                this->SetName(this->mNameSpan);
                 ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime()));
             }
 
-            ReturnErrorOnFailure(reader.Get(this->sceneTransitionTime));
+            ReturnErrorOnFailure(reader.Get(this->mSceneTransitionTime));
             ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime100()));
-            ReturnErrorOnFailure(reader.Get(this->transitionTime100));
-            ReturnErrorOnFailure(this->extentsionFieldsSets.Deserialize(reader));
+            ReturnErrorOnFailure(reader.Get(this->mTransitionTime100));
+            ReturnErrorOnFailure(this->mExtentsionFieldsSets.Deserialize(reader));
 
             return reader.ExitContainer(container);
         }
@@ -185,38 +185,38 @@ public:
         {
             if (nullptr == sceneName.data())
             {
-                name[0]    = 0;
-                nameLength = 0;
+                mName[0]    = 0;
+                mNameLength = 0;
             }
             else
             {
-                Platform::CopyString(name, sceneName);
-                nameLength = sceneName.size();
+                Platform::CopyString(mName, sceneName);
+                mNameLength = sceneName.size();
             }
-            nameSpan = CharSpan(name, nameLength);
+            mNameSpan = CharSpan(mName, mNameLength);
         }
 
         void Clear()
         {
             this->SetName(CharSpan());
-            sceneTransitionTime = 0;
-            transitionTime100   = 0;
-            extentsionFieldsSets.Clear();
+            mSceneTransitionTime = 0;
+            mTransitionTime100   = 0;
+            mExtentsionFieldsSets.Clear();
         }
 
         bool operator==(const SceneData & other)
         {
-            return (this->nameSpan.data_equal(other.nameSpan) && (this->sceneTransitionTime == other.sceneTransitionTime) &&
-                    (this->transitionTime100 == other.transitionTime100) &&
-                    (this->extentsionFieldsSets == other.extentsionFieldsSets));
+            return (this->mNameSpan.data_equal(other.mNameSpan) && (this->mSceneTransitionTime == other.mSceneTransitionTime) &&
+                    (this->mTransitionTime100 == other.mTransitionTime100) &&
+                    (this->mExtentsionFieldsSets == other.mExtentsionFieldsSets));
         }
 
         void operator=(const SceneData & other)
         {
-            this->SetName(other.nameSpan);
-            this->extentsionFieldsSets = other.extentsionFieldsSets;
-            this->sceneTransitionTime  = other.sceneTransitionTime;
-            this->transitionTime100    = other.transitionTime100;
+            this->SetName(other.mNameSpan);
+            this->mExtentsionFieldsSets = other.mExtentsionFieldsSets;
+            this->mSceneTransitionTime  = other.mSceneTransitionTime;
+            this->mTransitionTime100    = other.mTransitionTime100;
         }
     };
 
@@ -225,24 +225,24 @@ public:
     {
 
         // ID
-        SceneStorageId storageId;
+        SceneStorageId mStorageId;
 
         // DATA
-        SceneData storageData;
+        SceneData mStorageData;
 
         SceneTableEntry() = default;
-        SceneTableEntry(SceneStorageId id) : storageId(id) {}
-        SceneTableEntry(const SceneStorageId id, const SceneData data) : storageId(id), storageData(data) {}
+        SceneTableEntry(SceneStorageId id) : mStorageId(id) {}
+        SceneTableEntry(const SceneStorageId id, const SceneData data) : mStorageId(id), mStorageData(data) {}
 
         bool operator==(const SceneTableEntry & other)
         {
-            return (this->storageId == other.storageId && this->storageData == other.storageData);
+            return (this->mStorageId == other.mStorageId && this->mStorageData == other.mStorageData);
         }
 
         void operator=(const SceneTableEntry & other)
         {
-            this->storageId   = other.storageId;
-            this->storageData = other.storageData;
+            this->mStorageId   = other.mStorageId;
+            this->mStorageData = other.mStorageData;
         }
     };
 
@@ -251,7 +251,7 @@ public:
     virtual ~SceneTable() = default;
 
     // Not copyable
-    SceneTable(const SceneTable &) = delete;
+    SceneTable(const SceneTable &)             = delete;
     SceneTable & operator=(const SceneTable &) = delete;
 
     virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;

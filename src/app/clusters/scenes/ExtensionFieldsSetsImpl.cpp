@@ -26,14 +26,14 @@ CHIP_ERROR ExtensionFieldsSetsImpl::Serialize(TLV::TLVWriter & writer) const
 {
     TLV::TLVType container;
     ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
-    ReturnErrorOnFailure(writer.Put(TagFieldNum(), static_cast<uint8_t>(this->fieldNum)));
+    ReturnErrorOnFailure(writer.Put(TagFieldNum(), static_cast<uint8_t>(this->mFieldNum)));
     if (!this->is_empty())
     {
         for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
-            if (!this->EFS[i].is_empty())
+            if (!this->mEFS[i].is_empty())
             {
-                LogErrorOnFailure(this->EFS[i].Serialize(writer));
+                LogErrorOnFailure(this->mEFS[i].Serialize(writer));
             }
         }
     }
@@ -48,13 +48,13 @@ CHIP_ERROR ExtensionFieldsSetsImpl::Deserialize(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(container));
 
     ReturnErrorOnFailure(reader.Next(TagFieldNum()));
-    ReturnErrorOnFailure(reader.Get(this->fieldNum));
+    ReturnErrorOnFailure(reader.Get(this->mFieldNum));
 
     if (!this->is_empty())
     {
-        for (uint8_t i = 0; i < this->fieldNum; i++)
+        for (uint8_t i = 0; i < this->mFieldNum; i++)
         {
-            ReturnErrorOnFailure(this->EFS[i].Deserialize(reader));
+            ReturnErrorOnFailure(this->mEFS[i].Deserialize(reader));
         }
     }
 
@@ -66,15 +66,15 @@ void ExtensionFieldsSetsImpl::Clear()
     {
         for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
-            this->EFS[i].Clear();
+            this->mEFS[i].Clear();
         }
     }
-    this->fieldNum = 0;
+    this->mFieldNum = 0;
 }
 
 bool ExtensionFieldsSetsImpl::is_empty() const
 {
-    return (this->fieldNum <= 0);
+    return (this->mFieldNum <= 0);
 }
 
 /// @brief Inserts a field set into the array of extension field sets for a scene entry if the same ID is present in the EFS array,
@@ -86,13 +86,13 @@ CHIP_ERROR ExtensionFieldsSetsImpl::insertField(ExtensionFieldsSet & field)
     uint8_t idPosition = 0xff, fisrtEmptyPosition = 0xff;
     for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
     {
-        if (this->EFS[i].ID == field.ID)
+        if (this->mEFS[i].mID == field.mID)
         {
             idPosition = i;
             break;
         }
 
-        if (this->EFS[i].is_empty() && fisrtEmptyPosition == 0xFF)
+        if (this->mEFS[i].is_empty() && fisrtEmptyPosition == 0xFF)
         {
             fisrtEmptyPosition = i;
         }
@@ -101,13 +101,13 @@ CHIP_ERROR ExtensionFieldsSetsImpl::insertField(ExtensionFieldsSet & field)
     // if found, insert at found position, otherwise at first free possition, otherwise return error
     if (idPosition < kMaxClusterPerScenes)
     {
-        ReturnErrorOnFailure(this->EFS[idPosition] = field);
+        ReturnErrorOnFailure(this->mEFS[idPosition] = field);
         return CHIP_NO_ERROR;
     }
     else if (fisrtEmptyPosition < kMaxClusterPerScenes)
     {
-        ReturnErrorOnFailure(this->EFS[fisrtEmptyPosition] = field);
-        this->fieldNum++;
+        ReturnErrorOnFailure(this->mEFS[fisrtEmptyPosition] = field);
+        this->mFieldNum++;
         return CHIP_NO_ERROR;
     }
     else
@@ -120,7 +120,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::getFieldAtPosition(ExtensionFieldsSet & fiel
 {
     if (position < kMaxClusterPerScenes)
     {
-        ReturnErrorOnFailure(field = this->EFS[position]);
+        ReturnErrorOnFailure(field = this->mEFS[position]);
     }
 
     return CHIP_NO_ERROR;
@@ -132,10 +132,10 @@ CHIP_ERROR ExtensionFieldsSetsImpl::removeFieldAtPosition(uint8_t position)
     {
         if (position < kMaxClusterPerScenes)
         {
-            if (!this->EFS[position].is_empty())
+            if (!this->mEFS[position].is_empty())
             {
-                this->EFS[position].Clear();
-                this->fieldNum--;
+                this->mEFS[position].Clear();
+                this->mFieldNum--;
             }
         }
         else

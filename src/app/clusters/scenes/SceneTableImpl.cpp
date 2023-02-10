@@ -58,15 +58,15 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBuffer
         return CHIP_NO_ERROR;
     }
 
-    void Clear() override { storageData.Clear(); }
+    void Clear() override { mStorageData.Clear(); }
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(storageId.Serialize(writer));
-        ReturnErrorOnFailure(storageData.Serialize(writer));
+        ReturnErrorOnFailure(mStorageId.Serialize(writer));
+        ReturnErrorOnFailure(mStorageData.Serialize(writer));
 
         return writer.EndContainer(container);
     }
@@ -79,8 +79,8 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBuffer
         TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
-        ReturnErrorOnFailure(storageId.Deserialize(reader));
-        ReturnErrorOnFailure(storageData.Deserialize(reader));
+        ReturnErrorOnFailure(mStorageId.Deserialize(reader));
+        ReturnErrorOnFailure(mStorageData.Deserialize(reader));
 
         return reader.ExitContainer(container);
     }
@@ -254,7 +254,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
                 idx = index;
                 return CHIP_NO_ERROR; // return scene at current index if scene found
             }
-            else if (scene_map[index].sceneEndpointId == kInvalidEndpointId && firstFreeIdx == kUndefinedSceneIndex)
+            else if (scene_map[index].mSceneEndpointId == kInvalidEndpointId && firstFreeIdx == kUndefinedSceneIndex)
             {
                 firstFreeIdx = index;
             }
@@ -283,10 +283,10 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
     CHIP_ERROR SaveScene(PersistentStorageDelegate * storage, const SceneTableEntry & entry)
     {
         CHIP_ERROR err;
-        SceneTableData scene(fabric_index, entry.storageId, entry.storageData);
+        SceneTableData scene(fabric_index, entry.mStorageId, entry.mStorageData);
         // Look for empty storage space
 
-        err = this->Find(entry.storageId, scene.index);
+        err = this->Find(entry.mStorageId, scene.index);
 
         if (CHIP_NO_ERROR == err)
         {
@@ -296,7 +296,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         else if (CHIP_ERROR_NOT_FOUND == err) // If not found, scene.index should be the first free index
         {
             scene_count++;
-            scene_map[scene.index] = scene.storageId;
+            scene_map[scene.index] = scene.mStorageId;
             ReturnErrorOnFailure(this->Save(storage));
 
             return scene.Save(storage);
@@ -361,8 +361,8 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, S
     VerifyOrReturnError(fabric.Find(scene_id, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
 
     ReturnErrorOnFailure(scene.Load(mStorage));
-    entry.storageId   = scene.storageId;
-    entry.storageData = scene.storageData;
+    entry.mStorageId   = scene.mStorageId;
+    entry.mStorageData = scene.mStorageData;
 
     return CHIP_NO_ERROR;
 }
@@ -490,7 +490,7 @@ CHIP_ERROR DefaultSceneTableImpl::EFSValuesToCluster(ExtensionFieldsSetsImpl & f
             {
                 for (uint8_t j = 0; j < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; j++)
                 {
-                    if (EFS.ID == this->handlers[j].getID())
+                    if (EFS.mID == this->handlers[j].getID())
                     {
                         ReturnErrorOnFailure(this->handlers[j].setClusterEFS(EFS));
                     }
@@ -550,12 +550,12 @@ bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & outpu
     // looks for next available scene
     while (mSceneIndex < kMaxScenePerFabric)
     {
-        if (fabric.scene_map[mSceneIndex].sceneEndpointId != kInvalidEndpointId)
+        if (fabric.scene_map[mSceneIndex].mSceneEndpointId != kInvalidEndpointId)
         {
             scene.index = mSceneIndex;
             VerifyOrReturnError(scene.Load(mProvider.mStorage) == CHIP_NO_ERROR, false);
-            output.storageId   = scene.storageId;
-            output.storageData = scene.storageData;
+            output.mStorageId   = scene.mStorageId;
+            output.mStorageData = scene.mStorageData;
             mSceneIndex++;
 
             return true;

@@ -29,16 +29,16 @@ struct ExtensionFieldsSet
 {
     static constexpr TLV::Tag TagClusterId() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagEFS() { return TLV::ContextTag(2); }
-    clusterId ID                              = kInvalidClusterId;
-    uint8_t bytesBuffer[kMaxFieldsPerCluster] = { 0 };
-    uint8_t usedBytes                         = 0;
+    clusterId mID                              = kInvalidClusterId;
+    uint8_t mBytesBuffer[kMaxFieldsPerCluster] = { 0 };
+    uint8_t mUsedBytes                         = 0;
 
     ExtensionFieldsSet() = default;
-    ExtensionFieldsSet(clusterId cID, uint8_t * data, uint8_t dataSize) : ID(cID), usedBytes(dataSize)
+    ExtensionFieldsSet(clusterId cmID, uint8_t * data, uint8_t dataSize) : mID(cmID), mUsedBytes(dataSize)
     {
         if (dataSize <= kMaxFieldsPerCluster)
         {
-            memcpy(bytesBuffer, data, usedBytes);
+            memcpy(mBytesBuffer, data, mUsedBytes);
         }
     }
     ~ExtensionFieldsSet() = default;
@@ -48,8 +48,8 @@ struct ExtensionFieldsSet
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(writer.Put(TagClusterId(), static_cast<uint16_t>(this->ID)));
-        ReturnErrorOnFailure(writer.PutBytes(TagEFS(), bytesBuffer, usedBytes));
+        ReturnErrorOnFailure(writer.Put(TagClusterId(), static_cast<uint16_t>(this->mID)));
+        ReturnErrorOnFailure(writer.PutBytes(TagEFS(), mBytesBuffer, mUsedBytes));
 
         return writer.EndContainer(container);
     }
@@ -61,50 +61,50 @@ struct ExtensionFieldsSet
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
         ReturnErrorOnFailure(reader.Next(TagClusterId()));
-        ReturnErrorOnFailure(reader.Get(this->ID));
+        ReturnErrorOnFailure(reader.Get(this->mID));
 
         ReturnErrorOnFailure(reader.Next(TagEFS()));
         ReturnErrorOnFailure(reader.Get(buffer));
         if (buffer.size() > kMaxFieldsPerCluster)
         {
-            this->usedBytes = kMaxFieldsPerCluster;
+            this->mUsedBytes = kMaxFieldsPerCluster;
         }
         else
         {
-            this->usedBytes = static_cast<uint8_t>(buffer.size());
+            this->mUsedBytes = static_cast<uint8_t>(buffer.size());
         }
-        memcpy(this->bytesBuffer, buffer.data(), this->usedBytes);
+        memcpy(this->mBytesBuffer, buffer.data(), this->mUsedBytes);
 
         return reader.ExitContainer(container);
     }
 
     void Clear()
     {
-        this->ID = kInvalidClusterId;
-        memset(this->bytesBuffer, 0, kMaxFieldsPerCluster);
-        this->usedBytes = 0;
+        this->mID = kInvalidClusterId;
+        memset(this->mBytesBuffer, 0, kMaxFieldsPerCluster);
+        this->mUsedBytes = 0;
     }
 
-    bool is_empty() const { return (this->usedBytes == 0); }
+    bool is_empty() const { return (this->mUsedBytes == 0); }
 
     bool operator==(const ExtensionFieldsSet & other)
     {
-        return (this->ID == other.ID && !memcmp(this->bytesBuffer, other.bytesBuffer, this->usedBytes) &&
-                this->usedBytes == other.usedBytes);
+        return (this->mID == other.mID && !memcmp(this->mBytesBuffer, other.mBytesBuffer, this->mUsedBytes) &&
+                this->mUsedBytes == other.mUsedBytes);
     }
 
     CHIP_ERROR operator=(const ExtensionFieldsSet & other)
     {
-        if (other.usedBytes <= kMaxFieldsPerCluster)
+        if (other.mUsedBytes <= kMaxFieldsPerCluster)
         {
-            memcpy(this->bytesBuffer, other.bytesBuffer, other.usedBytes);
+            memcpy(this->mBytesBuffer, other.mBytesBuffer, other.mUsedBytes);
         }
         else
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        this->ID        = other.ID;
-        this->usedBytes = other.usedBytes;
+        this->mID        = other.mID;
+        this->mUsedBytes = other.mUsedBytes;
 
         return CHIP_NO_ERROR;
     }
@@ -131,7 +131,7 @@ public:
     {
         for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
-            if (!(this->EFS[i] == other.EFS[i]))
+            if (!(this->mEFS[i] == other.mEFS[i]))
             {
                 return false;
             }
@@ -143,17 +143,17 @@ public:
     {
         for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
-            ReturnErrorOnFailure(this->EFS[i] = other.EFS[i]);
+            ReturnErrorOnFailure(this->mEFS[i] = other.mEFS[i]);
         }
-        fieldNum = other.fieldNum;
+        mFieldNum = other.mFieldNum;
 
         return CHIP_NO_ERROR;
     }
 
 protected:
     static constexpr TLV::Tag TagFieldNum() { return TLV::ContextTag(1); }
-    ExtensionFieldsSet EFS[kMaxClusterPerScenes];
-    uint8_t fieldNum = 0;
+    ExtensionFieldsSet mEFS[kMaxClusterPerScenes];
+    uint8_t mFieldNum = 0;
 };
 } // namespace scenes
 } // namespace chip
