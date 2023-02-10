@@ -71,6 +71,7 @@ StackType_t wfxBLETaskStack[WFX_RSI_TASK_SZ] = { 0 };
 
 using namespace ::chip;
 using namespace ::chip::Ble;
+using namespace ::chip::DeviceLayer::Internal;
 
 void sl_ble_init()
 {
@@ -121,14 +122,14 @@ void sl_ble_event_handling_task(void)
         {
         case RSI_BLE_CONN_EVENT: {
             rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
-            chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectEvent();
+            BLEMgrImpl().HandleConnectEvent();
             WFX_RSI_LOG("%s Module got connected", __func__);
         }
         break;
         case RSI_BLE_DISCONN_EVENT: {
             // event invokes when disconnection was completed
             WFX_RSI_LOG("%s Module got Disconnected", __func__);
-            chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
+            BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
         }
@@ -136,7 +137,7 @@ void sl_ble_event_handling_task(void)
         case RSI_BLE_MTU_EVENT: {
             // event invokes when write/notification events received
             WFX_RSI_LOG("%s RSI_BLE_MTU_EVENT", __func__);
-            chip::DeviceLayer::Internal::BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
+            BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
         }
@@ -144,14 +145,14 @@ void sl_ble_event_handling_task(void)
         case RSI_BLE_GATT_WRITE_EVENT: {
             // event invokes when write/notification events received
             WFX_RSI_LOG("%s RSI_BLE_GATT_WRITE_EVENT", __func__);
-            chip::DeviceLayer::Internal::BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
+            BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
         }
         break;
         case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
             WFX_RSI_LOG("%s indication confirmation", __func__);
-            chip::DeviceLayer::Internal::BLEMgrImpl().HandleTxConfirmationEvent(1);
+            BLEMgrImpl().HandleTxConfirmationEvent(1);
             rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
         }
         break;
