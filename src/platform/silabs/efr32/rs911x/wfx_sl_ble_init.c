@@ -145,7 +145,6 @@ void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconnect, ui
 {
   WFX_RSI_LOG("%s: starting", __func__);
   event_msg.reason = reason;
-  memcpy(event_msg.resp_disconnect,resp_disconnect,sizeof(rsi_ble_event_disconnect_t));
   rsi_ble_app_set_event(RSI_BLE_DISCONN_EVENT);
 }
 
@@ -314,7 +313,6 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
 {
     rsi_ble_req_add_att_t new_att = { 0 };
 
-    memset(&new_att, 0, sizeof(rsi_ble_req_add_att_t));
     //! preparing the attributes
     new_att.serv_handler  = serv_handler;
     new_att.handle        = handle;
