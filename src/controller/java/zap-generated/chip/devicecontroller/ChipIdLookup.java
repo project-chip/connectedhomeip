@@ -643,6 +643,9 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 41L) {
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
       if (attributeId == 65531L) {
         return "AttributeList";
       }
@@ -666,6 +669,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 3L) {
         return "UpdateStateProgress";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -726,6 +732,9 @@ public final class ChipIdLookup {
     if (clusterId == 45L) {
       if (attributeId == 0L) {
         return "TemperatureUnit";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1969,6 +1978,9 @@ public final class ChipIdLookup {
       if (attributeId == 34L) {
         return "NumberOfDailyTransitions";
       }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
       if (attributeId == 65531L) {
         return "AttributeList";
       }
@@ -2338,6 +2350,9 @@ public final class ChipIdLookup {
       if (attributeId == 3L) {
         return "Tolerance";
       }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
       if (attributeId == 65531L) {
         return "AttributeList";
       }
@@ -2376,6 +2391,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 20L) {
         return "Scale";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";

@@ -1717,6 +1717,25 @@ public class ClusterReadMapping {
     readAttributeMap.put("basicInformation", readBasicInformationInteractionInfo);
     Map<String, InteractionInfo> readOtaSoftwareUpdateProviderInteractionInfo =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo>
+        readOtaSoftwareUpdateProviderAcceptedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOtaSoftwareUpdateProviderAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OtaSoftwareUpdateProviderCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.OtaSoftwareUpdateProviderCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOtaSoftwareUpdateProviderClusterAcceptedCommandListAttributeCallback(),
+            readOtaSoftwareUpdateProviderAcceptedCommandListCommandParams);
+    readOtaSoftwareUpdateProviderInteractionInfo.put(
+        "readAcceptedCommandListAttribute",
+        readOtaSoftwareUpdateProviderAcceptedCommandListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOtaSoftwareUpdateProviderAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOtaSoftwareUpdateProviderAttributeListAttributeInteractionInfo =
@@ -1824,6 +1843,25 @@ public class ClusterReadMapping {
     readOtaSoftwareUpdateRequestorInteractionInfo.put(
         "readUpdateStateProgressAttribute",
         readOtaSoftwareUpdateRequestorUpdateStateProgressAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readOtaSoftwareUpdateRequestorAcceptedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOtaSoftwareUpdateRequestorAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.OtaSoftwareUpdateRequestorCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOtaSoftwareUpdateRequestorClusterAcceptedCommandListAttributeCallback(),
+            readOtaSoftwareUpdateRequestorAcceptedCommandListCommandParams);
+    readOtaSoftwareUpdateRequestorInteractionInfo.put(
+        "readAcceptedCommandListAttribute",
+        readOtaSoftwareUpdateRequestorAcceptedCommandListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOtaSoftwareUpdateRequestorAttributeListAttributeInteractionInfo =
@@ -2089,6 +2127,23 @@ public class ClusterReadMapping {
     readUnitLocalizationInteractionInfo.put(
         "readTemperatureUnitAttribute",
         readUnitLocalizationTemperatureUnitAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUnitLocalizationAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUnitLocalizationAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitLocalizationCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.UnitLocalizationCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedUnitLocalizationClusterAcceptedCommandListAttributeCallback(),
+            readUnitLocalizationAcceptedCommandListCommandParams);
+    readUnitLocalizationInteractionInfo.put(
+        "readAcceptedCommandListAttribute",
+        readUnitLocalizationAcceptedCommandListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readUnitLocalizationAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readUnitLocalizationAttributeListAttributeInteractionInfo =
@@ -7699,6 +7754,23 @@ public class ClusterReadMapping {
     readThermostatInteractionInfo.put(
         "readNumberOfDailyTransitionsAttribute",
         readThermostatNumberOfDailyTransitionsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readThermostatAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readThermostatAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.ThermostatCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedThermostatClusterAcceptedCommandListAttributeCallback(),
+            readThermostatAcceptedCommandListCommandParams);
+    readThermostatInteractionInfo.put(
+        "readAcceptedCommandListAttribute",
+        readThermostatAcceptedCommandListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readThermostatAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readThermostatAttributeListAttributeInteractionInfo =
@@ -9319,6 +9391,24 @@ public class ClusterReadMapping {
             readTemperatureMeasurementToleranceCommandParams);
     readTemperatureMeasurementInteractionInfo.put(
         "readToleranceAttribute", readTemperatureMeasurementToleranceAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureMeasurementAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureMeasurementAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureMeasurementCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.TemperatureMeasurementCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTemperatureMeasurementClusterAcceptedCommandListAttributeCallback(),
+            readTemperatureMeasurementAcceptedCommandListCommandParams);
+    readTemperatureMeasurementInteractionInfo.put(
+        "readAcceptedCommandListAttribute",
+        readTemperatureMeasurementAcceptedCommandListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTemperatureMeasurementAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTemperatureMeasurementAttributeListAttributeInteractionInfo =
@@ -9488,6 +9578,23 @@ public class ClusterReadMapping {
             readPressureMeasurementScaleCommandParams);
     readPressureMeasurementInteractionInfo.put(
         "readScaleAttribute", readPressureMeasurementScaleAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPressureMeasurementAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPressureMeasurementAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PressureMeasurementCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.PressureMeasurementCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedPressureMeasurementClusterAcceptedCommandListAttributeCallback(),
+            readPressureMeasurementAcceptedCommandListCommandParams);
+    readPressureMeasurementInteractionInfo.put(
+        "readAcceptedCommandListAttribute",
+        readPressureMeasurementAcceptedCommandListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readPressureMeasurementAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readPressureMeasurementAttributeListAttributeInteractionInfo =
