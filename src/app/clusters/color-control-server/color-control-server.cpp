@@ -67,7 +67,8 @@ void ColorControlServer::cancelEndpointTimerCallback(EmberEventControl * control
 void ColorControlServer::cancelEndpointTimerCallback(EndpointId endpoint)
 {
     auto control = ColorControlServer::getEventControl(endpoint);
-    if (control) {
+    if (control)
+    {
         cancelEndpointTimerCallback(control);
     }
 }

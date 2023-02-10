@@ -405,6 +405,14 @@ typedef void (*EmberAfTickFunction)(chip::EndpointId endpoint);
 typedef void (*EmberAfInitFunction)(chip::EndpointId endpoint);
 
 /**
+ * @brief Type for referring to the shutdown callback for cluster.
+ *
+ * Init function is called when the cluster is shut down, for example
+ * when an endpoint is disabled
+ */
+typedef void (*EmberAfShutdownFunction)(chip::EndpointId endpoint);
+
+/**
  * @brief Type for referring to the attribute changed callback function.
  *
  * This function is called just after an attribute changes.

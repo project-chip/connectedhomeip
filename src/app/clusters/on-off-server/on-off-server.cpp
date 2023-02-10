@@ -91,7 +91,8 @@ void OnOffServer::cancelEndpointTimerCallback(EmberEventControl * control)
 void OnOffServer::cancelEndpointTimerCallback(EndpointId endpoint)
 {
     auto control = OnOffServer::getEventControl(endpoint);
-    if (control) {
+    if (control)
+    {
         cancelEndpointTimerCallback(control);
     }
 }

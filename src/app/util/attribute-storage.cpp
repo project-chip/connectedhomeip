@@ -372,11 +372,10 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
     {
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
-        EmberAfGenericClusterFunction f;
-        f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_SHUTDOWN_FUNCTION);
+        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_SHUTDOWN_FUNCTION);
         if (f != nullptr)
         {
-            ((EmberAfInitFunction) f)(definedEndpoint->endpoint);
+            ((EmberAfShutdownFunction) f)(definedEndpoint->endpoint);
         }
     }
 
