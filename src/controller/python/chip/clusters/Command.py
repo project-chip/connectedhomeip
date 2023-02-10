@@ -116,12 +116,21 @@ class AsyncCommandTransaction:
             self._handleError, status, chipError, None
         )
 
+    def _handleGroupCommandDone(self):
+        self._future.set_result(None)
+
+    def handleGroupCommandDone(self):
+        self._event_loop.call_soon_threadsafe(
+            self._handleGroupCommandDone)
+
 
 _OnCommandSenderResponseCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_uint8, c_void_p, c_uint32)
 _OnCommandSenderErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint8, PyChipError)
 _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
+    None, py_object)
+_OnGroupCommandSenderDoneCallbackFunct = CFUNCTYPE(
     None, py_object)
 
 
@@ -139,6 +148,13 @@ def _OnCommandSenderErrorCallback(closure, imStatus: int, clusterStatus: int, ch
 
 @_OnCommandSenderDoneCallbackFunct
 def _OnCommandSenderDoneCallback(closure):
+    ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
+
+
+@_OnGroupCommandSenderDoneCallbackFunct
+def _OnGroupCommandSenderDoneCallback(closure):
+    # Group commands have no response so we leverage the group command done callback
+    closure.handleGroupCommandDone()
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
@@ -175,6 +191,34 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
         ))
 
 
+def SendGroupCommand(future: Future, eventLoop, groupId: int, devCtrl: c_void_p, payload: ClusterCommand, timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
+    ''' Send a cluster-object encapsulated group command to a device and does the following:
+            - None (on a successful response containing no data)
+            - Raises an exception if any errors are encountered.
+
+        If a valid timedRequestTimeoutMs is provided, a timed interaction will be initiated instead.
+        If a valid interactionTimeoutMs is provided, the interaction will terminate with a CHIP_ERROR_TIMEOUT if a response
+        has not been received within that timeout. If it isn't provided, a sensible value will be automatically computed that
+        accounts for the underlying characteristics of both the transport and the responsiveness of the receiver.
+    '''
+    if payload.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
+        raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
+
+    handle = chip.native.GetLibraryHandle()
+    transaction = AsyncCommandTransaction(future, eventLoop, None)
+
+    payloadTLV = payload.ToTLV()
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+    return builtins.chipStack.Call(
+        lambda: handle.pychip_CommandSender_SendGroupCommand(
+            ctypes.py_object(transaction), c_uint16(groupId), devCtrl,
+            c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs),
+            payload.cluster_id, payload.command_id, payloadTLV, len(payloadTLV),
+            ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs),
+            ctypes.c_uint16(0 if busyWaitMs is None else busyWaitMs),
+        ))
+
+
 def Init():
     handle = chip.native.GetLibraryHandle()
 
@@ -185,8 +229,10 @@ def Init():
 
         setter.Set('pychip_CommandSender_SendCommand',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
+        setter.Set('pychip_CommandSender_SendGroupCommand',
+                   PyChipError, [py_object, c_uint16, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_uint16])
         setter.Set('pychip_CommandSender_InitCallbacks', None, [
-                   _OnCommandSenderResponseCallbackFunct, _OnCommandSenderErrorCallbackFunct, _OnCommandSenderDoneCallbackFunct])
+                   _OnCommandSenderResponseCallbackFunct, _OnCommandSenderErrorCallbackFunct, _OnCommandSenderDoneCallbackFunct, _OnGroupCommandSenderDoneCallbackFunct])
 
     handle.pychip_CommandSender_InitCallbacks(
-        _OnCommandSenderResponseCallback, _OnCommandSenderErrorCallback, _OnCommandSenderDoneCallback)
+        _OnCommandSenderResponseCallback, _OnCommandSenderErrorCallback, _OnCommandSenderDoneCallback, _OnGroupCommandSenderDoneCallback)

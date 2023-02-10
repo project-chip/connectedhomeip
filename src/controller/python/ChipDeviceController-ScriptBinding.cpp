@@ -100,7 +100,7 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptPairingDeviceDiscoveryDelegate sPairingDeviceDiscoveryDelegate;
-chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+chip::Credentials::GroupDataProviderImpl sGroupDataProvider{ 5, 8 };
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -234,6 +234,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
 
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
     PyReturnErrorOnFailure(ToPyChipError(sGroupDataProvider.Init()));
+    Credentials::SetGroupDataProvider(&sGroupDataProvider);
     factoryParams.groupDataProvider = &sGroupDataProvider;
 
     PyReturnErrorOnFailure(ToPyChipError(sPersistentStorageOpCertStore.Init(storageAdapter)));
