@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import enum
+import importlib
 
 from matter_idl.generators.bridge import BridgeGenerator
 from matter_idl.generators.cpp.application import CppApplicationGenerator
@@ -42,7 +43,7 @@ class CodeGenerator(enum.Enum):
             # ./matter_idl_plugin/__init__.py defines a subclass of CodeGenerator named CustomGenerator.
             # The plugin is expected to be in the path provided via the `--plugin <path>` cli argument.
             # Replaces `from plugin_module import CustomGenerator``
-            plugin_module = __import__(kargs['plugin_module'])
+            plugin_module = importlib.import_module(kargs['plugin_module'])
             CustomGenerator = plugin_module.CustomGenerator
             return CustomGenerator(*args, **kargs)
         else:
