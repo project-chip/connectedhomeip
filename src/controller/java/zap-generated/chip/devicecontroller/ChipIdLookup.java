@@ -703,6 +703,9 @@ public final class ChipIdLookup {
       if (attributeId == 65529L) {
         return "AcceptedCommandList";
       }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
       if (attributeId == 65532L) {
         return "FeatureMap";
       }
@@ -726,6 +729,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 65529L) {
         return "AcceptedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
       }
       if (attributeId == 65532L) {
         return "FeatureMap";
@@ -951,6 +957,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 65529L) {
         return "AcceptedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
       }
       if (attributeId == 65532L) {
         return "FeatureMap";
@@ -1575,6 +1584,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 65529L) {
         return "AcceptedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
       }
       if (attributeId == 65532L) {
         return "FeatureMap";
