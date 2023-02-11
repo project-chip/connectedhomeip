@@ -1267,6 +1267,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -1626,6 +1628,7 @@ endpoint 0 {
 
   server cluster Identify {
     ram      attribute identifyTime;
+    ram      attribute identifyType;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
