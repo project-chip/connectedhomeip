@@ -4296,6 +4296,8 @@ endpoint 0 {
   }
 
   server cluster AccessControl {
+    emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
@@ -4306,6 +4308,9 @@ endpoint 0 {
   }
 
   server cluster BasicInformation {
+    emits event StartUp;
+    emits event ShutDown;
+    emits event Leave;
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -4331,6 +4336,9 @@ endpoint 0 {
   }
 
   server cluster OtaSoftwareUpdateRequestor {
+    emits event StateTransition;
+    emits event VersionApplied;
+    emits event DownloadError;
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
@@ -4409,6 +4417,10 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
+    emits event HardwareFaultChange;
+    emits event RadioFaultChange;
+    emits event NetworkFaultChange;
+    emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
@@ -4426,6 +4438,7 @@ endpoint 0 {
   }
 
   server cluster SoftwareDiagnostics {
+    emits event SoftwareFault;
     callback attribute threadMetrics;
     callback attribute currentHeapFree;
     callback attribute currentHeapUsed;
@@ -4435,6 +4448,8 @@ endpoint 0 {
   }
 
   server cluster ThreadNetworkDiagnostics {
+    emits event ConnectionStatus;
+    emits event NetworkFaultChange;
     callback attribute channel;
     callback attribute routingRole;
     callback attribute networkName;
@@ -4503,6 +4518,9 @@ endpoint 0 {
   }
 
   server cluster WiFiNetworkDiagnostics {
+    emits event Disconnection;
+    emits event AssociationFailure;
+    emits event ConnectionStatus;
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;
@@ -4689,6 +4707,8 @@ endpoint 1 {
   }
 
   server cluster Actions {
+    emits event StateChanged;
+    emits event ActionFailed;
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
@@ -4697,6 +4717,7 @@ endpoint 1 {
   }
 
   server cluster PowerSource {
+    emits event BatFaultChange;
     ram      attribute status;
     ram      attribute order default = 2;
     ram      attribute description default = "B2";
@@ -4708,6 +4729,7 @@ endpoint 1 {
   }
 
   server cluster Switch {
+    emits event SwitchLatched;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute multiPressMax default = 2;
@@ -4728,6 +4750,7 @@ endpoint 1 {
   }
 
   server cluster BooleanState {
+    emits event StateChange;
     ram      attribute stateValue;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
@@ -4749,6 +4772,10 @@ endpoint 1 {
   }
 
   server cluster DoorLock {
+    emits event DoorLockAlarm;
+    emits event LockOperation;
+    emits event LockOperationError;
+    emits event LockUserChange;
     ram      attribute lockState default = 2;
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
@@ -4824,6 +4851,18 @@ endpoint 1 {
   }
 
   server cluster PumpConfigurationAndControl {
+    emits event SupplyVoltageLow;
+    emits event SupplyVoltageHigh;
+    emits event PowerMissingPhase;
+    emits event SystemPressureLow;
+    emits event SystemPressureHigh;
+    emits event DryRunning;
+    emits event MotorTemperatureHigh;
+    emits event PumpMotorFatalFailure;
+    emits event ElectronicTemperatureHigh;
+    emits event PumpBlocked;
+    emits event SensorFailure;
+    emits event ElectronicNonFatalFailure;
     ram      attribute maxPressure;
     ram      attribute maxSpeed;
     ram      attribute maxFlow;
@@ -5130,6 +5169,8 @@ endpoint 1 {
   }
 
   server cluster UnitTesting {
+    emits event TestEvent;
+    emits event TestFabricScopedEvent;
     ram      attribute boolean;
     ram      attribute bitmap8;
     ram      attribute bitmap16;

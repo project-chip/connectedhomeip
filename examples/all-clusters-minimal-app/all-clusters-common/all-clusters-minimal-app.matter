@@ -3581,6 +3581,7 @@ endpoint 0 {
   }
 
   server cluster AccessControl {
+    emits event AccessControlEntryChanged;
     callback attribute acl;
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
@@ -3590,6 +3591,7 @@ endpoint 0 {
   }
 
   server cluster BasicInformation {
+    emits event StartUp;
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -3607,6 +3609,9 @@ endpoint 0 {
   }
 
   server cluster OtaSoftwareUpdateRequestor {
+    emits event StateTransition;
+    emits event VersionApplied;
+    emits event DownloadError;
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
@@ -3844,6 +3849,8 @@ endpoint 1 {
   }
 
   server cluster Actions {
+    emits event StateChanged;
+    emits event ActionFailed;
     callback attribute actionList;
     callback attribute endpointLists;
     ram      attribute featureMap;
@@ -3859,6 +3866,7 @@ endpoint 1 {
   }
 
   server cluster Switch {
+    emits event SwitchLatched;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute featureMap default = 1;
@@ -3878,6 +3886,7 @@ endpoint 1 {
   }
 
   server cluster BooleanState {
+    emits event StateChange;
     ram      attribute stateValue;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
@@ -3896,6 +3905,9 @@ endpoint 1 {
   }
 
   server cluster DoorLock {
+    emits event DoorLockAlarm;
+    emits event LockOperation;
+    emits event LockOperationError;
     ram      attribute lockState default = 2;
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
@@ -4101,6 +4113,8 @@ endpoint 1 {
   }
 
   server cluster UnitTesting {
+    emits event TestEvent;
+    emits event TestFabricScopedEvent;
     ram      attribute boolean;
     ram      attribute bitmap8;
     ram      attribute bitmap16;
