@@ -240,7 +240,8 @@ class DeviceType:
 class Endpoint:
     number: int
     device_types: List[DeviceType] = field(default_factory=list)
-    server_clusters: List[ServerClusterInstantiation] = field(default_factory=list)
+    server_clusters: List[ServerClusterInstantiation] = field(
+        default_factory=list)
     client_bindings: List[str] = field(default_factory=list)
 
 

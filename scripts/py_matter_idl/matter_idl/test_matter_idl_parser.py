@@ -526,10 +526,13 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(endpoints=[
-            Endpoint(number=1, server_clusters=[ServerClusterInstantiation(name="Example")]),
+            Endpoint(number=1, server_clusters=[
+                     ServerClusterInstantiation(name="Example")]),
             Endpoint(number=2, server_clusters=[
-               ServerClusterInstantiation(name="Example", events_emitted={"FooBar", "SomeNewEvent"}),
-               ServerClusterInstantiation(name="AnotherExample", events_emitted={"StartUp", "ShutDown"}),
+                ServerClusterInstantiation(name="Example", events_emitted={
+                                           "FooBar", "SomeNewEvent"}),
+                ServerClusterInstantiation(name="AnotherExample", events_emitted={
+                    "StartUp", "ShutDown"}),
             ])
         ])
 
