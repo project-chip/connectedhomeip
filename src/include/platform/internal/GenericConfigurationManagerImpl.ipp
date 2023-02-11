@@ -708,7 +708,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         }
         else
         {
-            ChipLogError(DeviceLayer, "  Product Name: n/a (%" CHIP_ERROR_FORMAT ")", err.Format())
+            ChipLogError(DeviceLayer, "  Product Name: n/a (%" CHIP_ERROR_FORMAT ")", err.Format());
         }
     }
 
