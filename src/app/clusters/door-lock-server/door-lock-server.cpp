@@ -3760,7 +3760,7 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 void MatterDoorLockClusterServerShutdownCallback(EndpointId endpoint)
 {
     emberAfDoorLockClusterPrintln("Shuting door lock server cluster on endpoint %d", endpoint);
-    
+
     DeviceLayer::SystemLayer().CancelTimer(DoorLockServer::DoorLockOnAutoRelockCallback,
                                            reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
