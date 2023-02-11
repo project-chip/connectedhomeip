@@ -344,7 +344,7 @@ EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status)
 EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status)
 {
     // Default Response commands are only sent in response to unicast commands.
-    if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)
+    if ((cmd == NULL) || (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY))
     {
         return EMBER_SUCCESS;
     }
