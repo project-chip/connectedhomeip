@@ -116,14 +116,14 @@ tests:
 
           [1656497453.684077][25847:25853] CHIP:DMG:        status = 0x00 (SUCCESS),
 
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 2 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1656497508.814196][25858:25863] CHIP:TOO:   SetCredentialResponse: {
           [1656497508.814257][25858:25863] CHIP:TOO:     status: 0
           [1656497508.814301][25858:25863] CHIP:TOO:     userIndex: null
-          [1656497508.814343][25858:25863] CHIP:TOO:     nextCredentialIndex: 2
+          [1656497508.814343][25858:25863] CHIP:TOO:     nextCredentialIndex: 3
 
 
 
@@ -152,7 +152,7 @@ tests:
       verification: |
           ./chip-tool doorlock read-event lock-operation 1 1
 
-          Verify " LockOperationType is set to Lock and Event priority is set to CRITICAL" on the TH(Chip-tool) Log:
+          Verify " LockOperationType is set to Lock and Event priority is set to CRITICALi, UserIndex is 1, CredentialIndex is 2" on the TH(Chip-tool) Log:
 
           [1659777214.883129][3089:3094] CHIP:DMG:        SuppressResponse = true,
           [1659777214.883159][3089:3094] CHIP:DMG:        InteractionModelRevision = 1
@@ -170,7 +170,7 @@ tests:
           [1659777214.883675][3089:3094] CHIP:TOO:     Credentials: 1 entries
           [1659777214.883722][3089:3094] CHIP:TOO:       [1]: {
           [1659777214.883744][3089:3094] CHIP:TOO:         CredentialType: 1
-          [1659777214.883764][3089:3094] CHIP:TOO:         CredentialIndex: 1
+          [1659777214.883764][3089:3094] CHIP:TOO:         CredentialIndex: 2
           [1659777214.883784][3089:3094] CHIP:TOO:        }
           [1659777214.883804][3089:3094] CHIP:TOO:    }
       disabled: true
@@ -205,7 +205,7 @@ tests:
       verification: |
           ./chip-tool doorlock read-event lock-operation 1 1
 
-          Verify " LockOperationType is set to Lock and Event priority is set to CRITICAL" on the TH(Chip-tool) Log:
+          Verify " LockOperationType is set to Lock and Event priority is set to CRITICAL, UserIndex is 1, CredentialIndex is 2" on the TH(Chip-tool) Log:
 
           [1659777667.226139][3222:3227] CHIP:DMG: }
           [1659777667.226318][3222:3227] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
@@ -221,7 +221,7 @@ tests:
           [1659777667.226707][3222:3227] CHIP:TOO:     Credentials: 1 entries
           [1659777667.226758][3222:3227] CHIP:TOO:       [1]: {
           [1659777667.226780][3222:3227] CHIP:TOO:         CredentialType: 1
-          [1659777667.226800][3222:3227] CHIP:TOO:         CredentialIndex: 1
+          [1659777667.226800][3222:3227] CHIP:TOO:         CredentialIndex: 2
           [1659777667.226820][3222:3227] CHIP:TOO:        }
           [1659777667.226841][3222:3227] CHIP:TOO:    }
           [1659777667.226944][3222:3227] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
@@ -237,7 +237,7 @@ tests:
           [1659777667.227167][3222:3227] CHIP:TOO:     Credentials: 1 entries
           [1659777667.227193][3222:3227] CHIP:TOO:       [1]: {
           [1659777667.227213][3222:3227] CHIP:TOO:         CredentialType: 1
-          [1659777667.227232][3222:3227] CHIP:TOO:         CredentialIndex: 1
+          [1659777667.227232][3222:3227] CHIP:TOO:         CredentialIndex: 2
           [1659777667.227251][3222:3227] CHIP:TOO:        }
           [1659777667.227325][3222:3227] CHIP:TOO:    }
       disabled: true
@@ -273,7 +273,7 @@ tests:
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 1 1
 
-          Verify " LockOperationType is set to Unlock and Event priority is set to CRITICAL" on the TH(Chip-tool) Log:
+          Verify " LockOperationType is set to Unlock and Event priority is set to CRITICAL, UserIndex and Credentials are set to null" on the TH(Chip-tool) Log:
 
           [1659777833.226970][3243:3248] CHIP:DMG: }
           [1659777833.227194][3243:3248] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0003
@@ -284,14 +284,10 @@ tests:
           [1659777833.227407][3243:3248] CHIP:TOO:     LockOperationType: 0
           [1659777833.227431][3243:3248] CHIP:TOO:     OperationSource: 7
           [1659777833.227453][3243:3248] CHIP:TOO:     OperationError: 1
-          [1659777833.227476][3243:3248] CHIP:TOO:     UserIndex: 0
+          [1659777833.227476][3243:3248] CHIP:TOO:     UserIndex: null
           [1659777833.227498][3243:3248] CHIP:TOO:     FabricIndex: 1
           [1659777833.227523][3243:3248] CHIP:TOO:     SourceNode: 112233
-          [1659777833.227553][3243:3248] CHIP:TOO:     Credentials: 1 entries
-          [1659777833.227604][3243:3248] CHIP:TOO:       [1]: {
-          [1659777833.227629][3243:3248] CHIP:TOO:         CredentialType: 1
-          [1659777833.227651][3243:3248] CHIP:TOO:         CredentialIndex: 0
-          [1659777833.227673][3243:3248] CHIP:TOO:        }
+          [1659777833.227553][3243:3248] CHIP:TOO:     Credentials: null
           [1659777833.227696][3243:3248] CHIP:TOO:    }
       disabled: true
 
@@ -324,7 +320,7 @@ tests:
       verification: |
           ./chip-tool doorlock read-event  lock-operation-error 1 1
 
-          Verify " LockOperationType is set to Lock and Event priority is set to info" on the TH(Chip-tool) Log:
+          Verify " LockOperationType is set to Lock and Event priority is set to info, UserIndex and Credentials are set to null" on the TH(Chip-tool) Log:
 
           [1659777937.333613][3260:3265] CHIP:DMG: }
           [1659777937.333844][3260:3265] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0003
@@ -335,14 +331,10 @@ tests:
           [1659777937.334086][3260:3265] CHIP:TOO:     LockOperationType: 0
           [1659777937.334115][3260:3265] CHIP:TOO:     OperationSource: 7
           [1659777937.334142][3260:3265] CHIP:TOO:     OperationError: 1
-          [1659777937.334170][3260:3265] CHIP:TOO:     UserIndex: 0
+          [1659777937.334170][3260:3265] CHIP:TOO:     UserIndex: null
           [1659777937.334197][3260:3265] CHIP:TOO:     FabricIndex: 1
           [1659777937.334226][3260:3265] CHIP:TOO:     SourceNode: 112233
-          [1659777937.334261][3260:3265] CHIP:TOO:     Credentials: 1 entries
-          [1659777937.334371][3260:3265] CHIP:TOO:       [1]: {
-          [1659777937.334402][3260:3265] CHIP:TOO:         CredentialType: 1
-          [1659777937.334429][3260:3265] CHIP:TOO:         CredentialIndex: 0
-          [1659777937.334456][3260:3265] CHIP:TOO:        }
+          [1659777937.334261][3260:3265] CHIP:TOO:     Credentials: null
           [1659777937.334484][3260:3265] CHIP:TOO:    }
           [1659777937.334614][3260:3265] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0003
           [1659777937.334642][3260:3265] CHIP:TOO:         Event number: 9
@@ -352,14 +344,10 @@ tests:
           [1659777937.334767][3260:3265] CHIP:TOO:     LockOperationType: 1
           [1659777937.334794][3260:3265] CHIP:TOO:     OperationSource: 7
           [1659777937.334821][3260:3265] CHIP:TOO:     OperationError: 1
-          [1659777937.334846][3260:3265] CHIP:TOO:     UserIndex: 0
+          [1659777937.334846][3260:3265] CHIP:TOO:     UserIndex: null
           [1659777937.334873][3260:3265] CHIP:TOO:     FabricIndex: 1
           [1659777937.334899][3260:3265] CHIP:TOO:     SourceNode: 112233
-          [1659777937.334970][3260:3265] CHIP:TOO:     Credentials: 1 entries
-          [1659777937.335008][3260:3265] CHIP:TOO:       [1]: {
-          [1659777937.335036][3260:3265] CHIP:TOO:         CredentialType: 1
-          [1659777937.335063][3260:3265] CHIP:TOO:         CredentialIndex: 0
-          [1659777937.335089][3260:3265] CHIP:TOO:        }
+          [1659777937.334970][3260:3265] CHIP:TOO:     Credentials: null
           [1659777937.335116][3260:3265] CHIP:TOO:    }
       disabled: true
 
@@ -396,7 +384,7 @@ tests:
       verification: |
           ./chip-tool doorlock read-event  lock-user-change 1 1
 
-          Verify " LockDataType is set to UserIndex and Event priority is set to INFO" on the TH(Chip-tool) Log:
+          Verify " LockDataType is set to UserIndex and Event priority is set to INFO, DataIndex is set to 4" on the TH(Chip-tool) Log:
 
           [1659778039.468487][3278:3283] CHIP:DMG: }
           [1659778039.468725][3278:3283] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
@@ -423,7 +411,7 @@ tests:
           [1659778039.469532][3278:3283] CHIP:TOO:     UserIndex: 1
           [1659778039.469557][3278:3283] CHIP:TOO:     FabricIndex: 1
           [1659778039.469582][3278:3283] CHIP:TOO:     SourceNode: 112233
-          [1659778039.469607][3278:3283] CHIP:TOO:     DataIndex: 1
+          [1659778039.469607][3278:3283] CHIP:TOO:     DataIndex: 2
           [1659778039.469632][3278:3283] CHIP:TOO:    }
           [1659778039.469739][3278:3283] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
           [1659778039.469765][3278:3283] CHIP:TOO:         Event number: 10
@@ -497,7 +485,7 @@ tests:
           [1659778136.033669][3293:3298] CHIP:TOO:     UserIndex: 1
           [1659778136.033694][3293:3298] CHIP:TOO:     FabricIndex: 1
           [1659778136.033719][3293:3298] CHIP:TOO:     SourceNode: 112233
-          [1659778136.033744][3293:3298] CHIP:TOO:     DataIndex: 1
+          [1659778136.033744][3293:3298] CHIP:TOO:     DataIndex: 2
           [1659778136.033768][3293:3298] CHIP:TOO:    }
           [1659778136.033902][3293:3298] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
           [1659778136.033931][3293:3298] CHIP:TOO:         Event number: 10
@@ -533,7 +521,7 @@ tests:
           123456 UserIndex as 1 UserStatus as 0 UserType as 0"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       verification: |
-          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 2 }'  1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -555,7 +543,7 @@ tests:
           [1659778601.601785][3414:3419] CHIP:DMG:                        },
           [1659778601.601823][3414:3419] CHIP:DMG:
 
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 2 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with status as SUCCESS" on the TH(Chip-tool) Log:
 
@@ -566,7 +554,7 @@ tests:
           [1658142472.351853][2966:2971] CHIP:TOO:   SetCredentialResponse: {
           [1658142472.351910][2966:2971] CHIP:TOO:     status: 0
           [1658142472.351942][2966:2971] CHIP:TOO:     userIndex: null
-          [1658142472.351983][2966:2971] CHIP:TOO:     nextCredentialIndex: 2
+          [1658142472.351983][2966:2971] CHIP:TOO:     nextCredentialIndex: 3
           [1658142472.352012][2966:2971] CHIP:TOO:    }
       disabled: true
 
@@ -575,7 +563,7 @@ tests:
       verification: |
           ./chip-tool doorlock read-event  lock-user-change 1 1
 
-          Verify "LockDataType is set to PIN and LockUserChange event has priority set as INFO " on the TH(Chip-tool) Log:
+          Verify "LockDataType is set to PIN and LockUserChange event has priority set as INFO, DataIndex is set to 2" on the TH(Chip-tool) Log:
 
           [1658223096.124315][4517:4522] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
           [1658223096.124350][4517:4522] CHIP:TOO:         Event number: 3
@@ -601,14 +589,14 @@ tests:
           [1658223096.125250][4517:4522] CHIP:TOO:     UserIndex: 1
           [1658223096.125281][4517:4522] CHIP:TOO:     FabricIndex: 1
           [1658223096.125312][4517:4522] CHIP:TOO:     SourceNode: 112233
-          [1658223096.125342][4517:4522] CHIP:TOO:     DataIndex: 1
+          [1658223096.125342][4517:4522] CHIP:TOO:     DataIndex: 2
           [1658223096.125372][4517:4522] CHIP:TOO:    }
       disabled: true
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.C26.Rsp
       verification: |
-          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 2 }'  1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
