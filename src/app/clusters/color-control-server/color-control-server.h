@@ -24,6 +24,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <platform/CHIPDeviceConfig.h>
 
 /**********************************************************
  * Defines and Macros
