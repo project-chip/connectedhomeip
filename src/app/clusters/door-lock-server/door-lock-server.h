@@ -182,6 +182,8 @@ public:
 
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
+    static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
+
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
     chip::NodeId getNodeId(const chip::app::CommandHandler * commandObj);
@@ -420,8 +422,6 @@ private:
      * @param timeoutSec    timeout in seconds
      */
     void ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec);
-
-    static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
 
     /**
      * @brief Send generic event
