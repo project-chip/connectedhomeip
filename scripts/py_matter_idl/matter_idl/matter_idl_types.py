@@ -223,6 +223,7 @@ class AttributeInstantiation:
 class ServerClusterInstantiation:
     name: str
     attributes: List[AttributeInstantiation] = field(default_factory=list)
+    events_emitted: List[str] = field(default_factory=set)
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)
