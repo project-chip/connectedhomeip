@@ -253,33 +253,34 @@ class _TestStepWithPlaceholders:
         response_mapping = None
         response_mapping_name = None
 
-        if self.is_attribute:
-            attribute = definitions.get_attribute_by_name(
-                self.cluster, self.attribute)
-            if attribute:
-                attribute_mapping = self._as_mapping(definitions, self.cluster,
-                                                     attribute.definition.data_type.name)
-                argument_mapping = attribute_mapping
-                response_mapping = attribute_mapping
-                response_mapping_name = attribute.definition.data_type.name
-        elif self.is_event:
-            event = definitions.get_event_by_name(
-                self.cluster, self.event)
-            if event:
-                event_mapping = self._as_mapping(definitions, self.cluster,
-                                                 event.name)
-                argument_mapping = event_mapping
-                response_mapping = event_mapping
-                response_mapping_name = event.name
-        else:
-            command = definitions.get_command_by_name(
-                self.cluster, self.command)
-            if command:
-                argument_mapping = self._as_mapping(
-                    definitions, self.cluster, command.input_param)
-                response_mapping = self._as_mapping(
-                    definitions, self.cluster, command.output_param)
-                response_mapping_name = command.output_param
+        if definitions is not None:
+            if self.is_attribute:
+                attribute = definitions.get_attribute_by_name(
+                    self.cluster, self.attribute)
+                if attribute:
+                    attribute_mapping = self._as_mapping(definitions, self.cluster,
+                                                         attribute.definition.data_type.name)
+                    argument_mapping = attribute_mapping
+                    response_mapping = attribute_mapping
+                    response_mapping_name = attribute.definition.data_type.name
+            elif self.is_event:
+                event = definitions.get_event_by_name(
+                    self.cluster, self.event)
+                if event:
+                    event_mapping = self._as_mapping(definitions, self.cluster,
+                                                     event.name)
+                    argument_mapping = event_mapping
+                    response_mapping = event_mapping
+                    response_mapping_name = event.name
+            else:
+                command = definitions.get_command_by_name(
+                    self.cluster, self.command)
+                if command:
+                    argument_mapping = self._as_mapping(
+                        definitions, self.cluster, command.input_param)
+                    response_mapping = self._as_mapping(
+                        definitions, self.cluster, command.output_param)
+                    response_mapping_name = command.output_param
 
         self.argument_mapping = argument_mapping
         self.response_mapping = response_mapping
