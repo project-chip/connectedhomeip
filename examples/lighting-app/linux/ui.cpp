@@ -81,6 +81,9 @@ private:
 
     void InitQRCode();
 
+    // displays a window with the QR Code.
+    void DrawQRCode();
+
     // Run in CHIPMainLoop to access ember in a single threaded
     // fashion
     static void ChipLoopUpdateCallback(intptr_t self);
@@ -152,67 +155,74 @@ void DeviceState::ShowUi()
 
     ImGui::End();
 
-    if (mHasQRCode)
+    DrawQRCode();
+}
+
+void DeviceState::DrawQRCode()
+{
+    if (!mHasQRCode)
     {
-        ImGui::Begin("QR Code.");
+        return;
+    }
 
-        ImDrawList * drawList = ImGui::GetWindowDrawList();
+    ImGui::Begin("QR Code.");
 
-        constexpr int kBorderSize    = 35;
-        constexpr int kMinWindowSize = 200;
-        const int kQRCodeSize        = qrcodegen_getSize(mQRData);
+    ImDrawList * drawList = ImGui::GetWindowDrawList();
 
-        ImVec2 pos  = ImGui::GetWindowPos();
-        ImVec2 size = ImGui::GetWindowSize();
+    constexpr int kBorderSize    = 35;
+    constexpr int kMinWindowSize = 200;
+    const int kQRCodeSize        = qrcodegen_getSize(mQRData);
 
-        if (size.y < kMinWindowSize)
+    ImVec2 pos  = ImGui::GetWindowPos();
+    ImVec2 size = ImGui::GetWindowSize();
+
+    if (size.y < kMinWindowSize)
+    {
+        size = ImVec2(kMinWindowSize, kMinWindowSize);
+        ImGui::SetWindowSize(size);
+    }
+
+    // Fill the entire window white, then figure out borders
+    drawList->AddRectFilled(pos, pos + size, IM_COL32_WHITE);
+
+    // add a border
+    if (size.x >= 2 * kBorderSize && size.y >= 2 * kBorderSize)
+    {
+        size.x -= 2 * kBorderSize;
+        size.y -= 2 * kBorderSize;
+        pos.x += kBorderSize;
+        pos.y += kBorderSize;
+    }
+
+    // create a square rectangle: keep only the smaller side and adjust the
+    // other
+    if (size.x > size.y)
+    {
+        pos.x += (size.x - size.y) / 2;
+        size.x = size.y;
+    }
+    else if (size.y > size.x)
+    {
+        pos.y += (size.y - size.x) / 2;
+        size.y = size.x;
+    }
+
+    const ImVec2 squareSize = ImVec2(size.x / static_cast<float>(kQRCodeSize), size.y / static_cast<float>(kQRCodeSize));
+
+    for (int y = 0; y < kQRCodeSize; ++y)
+    {
+        for (int x = 0; x < kQRCodeSize; ++x)
         {
-            size = ImVec2(kMinWindowSize, kMinWindowSize);
-            ImGui::SetWindowSize(size);
-        }
-
-        // Fill the entire window white, then figure out borders
-        drawList->AddRectFilled(pos, pos + size, IM_COL32_WHITE);
-
-        // add a border
-        if (size.x >= 2 * kBorderSize && size.y >= 2 * kBorderSize)
-        {
-            size.x -= 2 * kBorderSize;
-            size.y -= 2 * kBorderSize;
-            pos.x += kBorderSize;
-            pos.y += kBorderSize;
-        }
-
-        // create a square rectangle: keep only the smaller side and adjust the
-        // other
-        if (size.x > size.y)
-        {
-            pos.x += (size.x - size.y) / 2;
-            size.x = size.y;
-        }
-        else if (size.y > size.x)
-        {
-            pos.y += (size.y - size.x) / 2;
-            size.y = size.x;
-        }
-
-        const ImVec2 squareSize = ImVec2(size.x / static_cast<float>(kQRCodeSize), size.y / static_cast<float>(kQRCodeSize));
-
-        for (int y = 0; y < kQRCodeSize; ++y)
-        {
-            for (int x = 0; x < kQRCodeSize; ++x)
+            if (qrcodegen_getModule(mQRData, x, y))
             {
-                if (qrcodegen_getModule(mQRData, x, y))
-                {
-                    ImVec2 placement =
-                        ImVec2(pos.x + static_cast<float>(x) * squareSize.x, pos.y + static_cast<float>(y) * squareSize.y);
-                    drawList->AddRectFilled(placement, placement + squareSize, IM_COL32_BLACK);
-                }
+                ImVec2 placement =
+                    ImVec2(pos.x + static_cast<float>(x) * squareSize.x, pos.y + static_cast<float>(y) * squareSize.y);
+                drawList->AddRectFilled(placement, placement + squareSize, IM_COL32_BLACK);
             }
         }
-
-        ImGui::End();
     }
+
+    ImGui::End();
 }
 
 void DeviceState::ChipLoopUpdate()
