@@ -375,7 +375,7 @@ tests:
           "TH sends the unlock Door command to the DUT with valid PINCode and
           Verify that DUT sends SUCCESS response to the TH"
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
 
           Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
