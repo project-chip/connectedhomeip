@@ -682,7 +682,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     psa_status_t status                   = PSA_SUCCESS;
     const PSAP256KeypairContext & context = toConstPSAContext(mKeypair);
     const size_t outputSize               = output.Length() == 0 ? output.Capacity() : output.Length();
-    Encoding::BufferWriter bbuf(output, outputSize);
+    Encoding::BufferWriter bbuf(output.Bytes(), outputSize);
     uint8_t privateKey[kP256_PrivateKey_Length];
     size_t privateKeyLength = 0;
 
