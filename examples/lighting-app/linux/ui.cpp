@@ -271,29 +271,15 @@ void DeviceState::ChipLoopUpdate()
 
         // Level Control
         LevelControl::Attributes::CurrentLevel::Get(kLightEndpointId, mCurrentLevel);
-
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
-                             chip::app::Clusters::LevelControl::Attributes::MinLevel::Id, &mMinLevel, sizeof(mMinLevel));
-
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
-                             chip::app::Clusters::LevelControl::Attributes::MaxLevel::Id, &mMaxLevel, sizeof(mMaxLevel));
-
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
-                             chip::app::Clusters::LevelControl::Attributes::RemainingTime::Id,
-                             reinterpret_cast<uint8_t *>(&mLevelRemainingTime10sOfSec), sizeof(mLevelRemainingTime10sOfSec));
+        LevelControl::Attributes::MinLevel::Get(kLightEndpointId, &mMinLevel);
+        LevelControl::Attributes::MaxLevel::Get(kLightEndpointId, &mMaxLevel);
+        LevelControl::Attributes::RemainingTime::Get(kLightEndpointId, &mLevelRemainingTime10sOfSec);
 
         // Color control
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::ColorControl::Id,
-                             chip::app::Clusters::ColorControl::Attributes::CurrentHue::Id, &mColorHue, sizeof(mColorHue));
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::ColorControl::Id,
-                             chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::Id, &mColorSaturation,
-                             sizeof(mColorSaturation));
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::ColorControl::Id,
-                             chip::app::Clusters::ColorControl::Attributes::CurrentX::Id, reinterpret_cast<uint8_t *>(&mColorX),
-                             sizeof(mColorX));
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::ColorControl::Id,
-                             chip::app::Clusters::ColorControl::Attributes::CurrentY::Id, reinterpret_cast<uint8_t *>(&mColorY),
-                             sizeof(mColorY));
+        ColorControl::Attributes::CurrentHue::Get(kLightEndpointId, &mColorHue);
+        ColorControl::Attributes::CurrentSaturation::Get(kLightEndpointId, &mColorSaturation);
+        ColorControl::Attributes::CurrentX::Get(kLightEndpointId, &mColorX);
+        ColorControl::Attributes::CurrentY::Get(kLightEndpointId, &mColorY);
     }
 }
 
