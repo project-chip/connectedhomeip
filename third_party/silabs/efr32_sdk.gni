@@ -197,10 +197,15 @@ template("efr32_sdk") {
           "SL_WFX_USE_SPI",
           "EFX32_RS911X=1",
           "RS911X_WIFI",
-          "SiWx917_WIFI",
           "RSI_WLAN_ENABLE",
           "RSI_SPI_INTERFACE",
           "RSI_WITH_OS",
+        ]
+      } else if { use_SiWx917 )
+        defines += [
+        #Added this flag Only for SiWx917 NCP Board.
+        #TODO: Remove this when rsi_wlan_ext_stats is implemented in Wisemcu SDK.
+          "SiWx917_WIFI",
         ]
       } else if (use_wf200) {
         defines += [
