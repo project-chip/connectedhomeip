@@ -22,5 +22,4 @@ public enum PairingNetworkType {
   NONE,
   WIFI,
   THREAD,
-  ETHERNET;
 }

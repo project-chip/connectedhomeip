@@ -36,7 +36,6 @@ public:
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
-    void TriggerNewRequestForData();
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
     void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
 
@@ -48,7 +47,7 @@ private:
     static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
-    static void HandleBlockEraseComplete(uint32_t);
+    static void HandleBlockEraseComplete(uint32_t context);
 
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
@@ -64,7 +63,6 @@ private:
     OTAImageHeaderParser mHeaderParser;
     MutableByteSpan mBlock;
     const char * mImageFile = nullptr;
-    uint32_t mSoftwareVersion;
 };
 
 } // namespace chip

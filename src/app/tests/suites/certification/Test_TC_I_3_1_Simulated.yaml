@@ -483,3 +483,33 @@ tests:
                 value: "Enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          There is no optional attribute for this cluster
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          This cluster doesn't have any writable attributes
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

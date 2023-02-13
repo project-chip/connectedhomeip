@@ -14,7 +14,7 @@ namespace Clusters {
 namespace {{asUpperCamelCase name}} {
 {{#zcl_enums}}
 
-{{#if (isWeaklyTypedEnum label)}}
+{{#if (isInConfigList label "WeakEnums")}}
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -30,7 +30,7 @@ k{{asUpperCamelCase label}} = {{asHex value 2}},
 // enum value. This specific should never be transmitted.
 kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
 };
-{{#if (isWeaklyTypedEnum label)}}
+{{#if (isInConfigList label "WeakEnums")}}
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using {{asType label}} = EmberAf{{asType label}};
 static {{asType label}} __attribute__((unused)) k{{asType label}}kUnknownEnumValue = static_cast<{{asType label}}>({{first_unused_enum_value mode="first_unused"}});

@@ -54,8 +54,8 @@ m_int_sector_size      = 512;
 /* first 8K: SSBL, next 8K: SSBL update region */
 m_app_start            = DEFINED(__app_load_address__) ? __app_load_address__ : 0x0;
 
-/* PSECT: 8.5K */
-m_psect_size           = 0x2200;
+/* flash_config: 8.5K */
+m_flash_config_size           = 0x2200;
 
 /* sizeof(BOOT_BLOCK_T) + sizeof(IMAGE_CERT_T) + SIGNATURE_LEN + alignment = 1024 bytes */
 m_app_meta_data        = 0x400;
@@ -67,7 +67,7 @@ m_factory_data_size    = 0x800;
 m_ssbl_size            = 0x4000;
 
 /* default app size, without OTA */
-m_app_default_size     = m_int_flash_size - m_psect_size - m_app_meta_data - m_factory_data_size;
+m_app_default_size     = m_int_flash_size - m_flash_config_size - m_app_meta_data - m_factory_data_size;
 
 m_app_size     = DEFINED(__app_stated_size__) ? __app_stated_size__ : m_app_default_size;
 
@@ -99,7 +99,12 @@ NV_STORAGE_SECTOR_SIZE    = m_ext_flash_sector_size;
 NV_STORAGE_START_ADDRESS  = m_ext_flash_size - 1;
 NV_STORAGE_END_ADDRESS    = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
 
-FACTORY_DATA_START_ADDRESS = m_int_flash_size - m_psect_size - m_app_meta_data - m_factory_data_size;
+INT_STORAGE_START         = m_int_flash_size - 1;
+INT_STORAGE_SIZE          = m_int_flash_size;
+INT_STORAGE_END           = 0x00000000;
+INT_STORAGE_SECTOR_SIZE   = m_int_sector_size;
+
+FACTORY_DATA_START_ADDRESS = m_int_flash_size - m_flash_config_size - m_factory_data_size;
 FACTORY_DATA_END_ADDRESS   = FACTORY_DATA_START_ADDRESS + m_factory_data_size - 1;
 
 __ram_vector_table__      = 1;
@@ -365,4 +370,7 @@ SECTIONS
 
      __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
      __FACTORY_DATA_SIZE = m_factory_data_size;
+     
+     ASSERT(((m_app_start + m_app_size + m_app_meta_data + m_factory_data_size + m_flash_config_size) <= m_int_flash_size),
+              "Internal flash capacity exceeded")
 }

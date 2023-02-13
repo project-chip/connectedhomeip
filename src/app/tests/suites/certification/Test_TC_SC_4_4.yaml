@@ -16,7 +16,7 @@
 name: 15.4.4. [TC-SC-4.4] Discovery [DUT as Controller]
 
 PICS:
-    - PICS_MCORE_ROLE_CONTROLLER
+    - MCORE.ROLE.CONTROLLER
 
 config:
     nodeId: 0x12344321

@@ -10,7 +10,7 @@
 {{#zcl_enums}}
 {{#unless (isStrEqual label "Status")}}
 {{#unless (isStrEqual label "ReportingDirection")}}
-{{#if (isWeaklyTypedEnum label)}}
+{{#if (isInConfigList label "WeakEnums")}}
 
 // Enum for {{label}}
 enum EmberAf{{asType label}} : {{asUnderlyingZclType name}} {

@@ -16,6 +16,8 @@
  */
 
 #import "MTROTAProviderDelegateBridge.h"
+#import "MTRBaseClusters.h"
+#import "MTRCommandPayloadsObjC.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "NSDataSpanConversion.h"

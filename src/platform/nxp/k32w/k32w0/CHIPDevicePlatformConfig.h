@@ -177,3 +177,5 @@
 #endif
 
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+
+#include <platform/nxp/k32w/common/CHIPDevicePlatformRamStorageConfig.h>

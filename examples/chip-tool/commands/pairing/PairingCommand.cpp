@@ -75,6 +75,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
+    case PairingMode::AlreadyDiscovered:
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
+        break;
     }
 
     return err;

@@ -131,16 +131,7 @@ def _GetInDevelopmentTests() -> Set[str]:
        Goal is for this set to become empty.
     """
     return {
-        # TODO: Event not yet supported:
-        "Test_TC_ACL_2_10.yaml",
-        "Test_TC_ACL_2_7.yaml",
-        "Test_TC_ACL_2_8.yaml",
-        "Test_TC_ACL_2_9.yaml",
-        "TestEvents.yaml",
-
-        "TestClusterMultiFabric.yaml",  # Enum mismatch
         "TestGroupMessaging.yaml",     # Needs group support in repl
-        "TestMultiAdmin.yaml",         # chip-repl hang on command expeted to fail
     }
 
 
