@@ -251,7 +251,7 @@ public:
     virtual ~SceneTable() = default;
 
     // Not copyable
-    SceneTable(const SceneTable &)             = delete;
+    SceneTable(const SceneTable &) = delete;
     SceneTable & operator=(const SceneTable &) = delete;
 
     virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;
