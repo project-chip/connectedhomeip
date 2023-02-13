@@ -87,8 +87,14 @@ set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/../../common/screen-framework/include/"
                      "${CMAKE_SOURCE_DIR}/../../../src/lib/support"
-                     "${IDF_PATH}/components/freertos/include/freertos"
 )
+
+if (${IDF_VERSION_MAJOR} LESS 5)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/include/freertos")
+else()
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos")
+endif()
+
 set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed"

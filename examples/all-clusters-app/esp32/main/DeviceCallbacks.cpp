@@ -92,8 +92,7 @@ Identify gIdentify1 = {
 void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                                                      uint8_t type, uint16_t size, uint8_t * value)
 {
-    ESP_LOGI(TAG,
-             "PostAttributeChangeCallback - Cluster ID: '0x%04" PRIx32 "', EndPoint ID: '0x%02x' , Attribute ID: '0x%04" PRIx32 "'",
+    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%" PRIx32 "', EndPoint ID: '0x%x' , Attribute ID: '0x%" PRIx32 "'",
              clusterId, endpointId, attributeId);
 
     switch (clusterId)
@@ -125,7 +124,7 @@ void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointI
 {
     using namespace app::Clusters::OnOff::Attributes;
 
-    VerifyOrExit(attributeId == OnOff::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04" PRIx32 "'", attributeId));
+    VerifyOrExit(attributeId == OnOff::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
@@ -143,7 +142,7 @@ void AppDeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpoi
     bool onOffState    = mEndpointOnOffState[endpointId - 1];
     uint8_t brightness = onOffState ? *value : 0;
 
-    VerifyOrExit(attributeId == CurrentLevel::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04" PRIx32 "'", attributeId));
+    VerifyOrExit(attributeId == CurrentLevel::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
@@ -161,7 +160,7 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
     using namespace app::Clusters::ColorControl::Attributes;
 
     VerifyOrExit(attributeId == CurrentHue::Id || attributeId == CurrentSaturation::Id,
-                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04" PRIx32 "'", attributeId));
+                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (endpointId == 1)
     {
