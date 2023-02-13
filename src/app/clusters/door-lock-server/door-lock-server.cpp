@@ -1743,7 +1743,7 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
             if (credentialInfo.credentialData.data_equal(credentialData))
             {
                 userIndex       = i;
-                credentialIndex = i;
+                credentialIndex = credential.CredentialIndex;
                 userInfo        = user;
                 return true;
             }
@@ -3060,9 +3060,10 @@ LockDataTypeEnum DoorLockServer::credentialTypeToLockDataType(CredentialTypeEnum
     case CredentialTypeEnum::kFingerprint:
         return LockDataTypeEnum::kFingerprint;
     case CredentialTypeEnum::kFingerVein:
-        return LockDataTypeEnum::kFingerprint;
+        return LockDataTypeEnum::kFingerVein;
     case CredentialTypeEnum::kFace:
-        // So far there's no distinct data type for face credentials
+        // So far there's no distinct data type for face credentials.
+        // See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6272
         return LockDataTypeEnum::kUnspecified;
     case CredentialTypeEnum::kUnknownEnumValue:
         return LockDataTypeEnum::kUnspecified;

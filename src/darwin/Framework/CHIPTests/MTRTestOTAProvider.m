@@ -16,21 +16,20 @@
 
 #import "MTRTestOTAProvider.h"
 
-@interface MTRTestOTAProvider ()
-@end
-
 @implementation MTRTestOTAProvider
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
-                       completion:(MTRQueryImageCompletionHandler)completion
+                       completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completion
 {
 }
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
                                    params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                               completion:(MTRApplyUpdateRequestCompletionHandler)completion
+                               completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion
 {
 }
 
@@ -60,7 +59,7 @@
                       blockSize:(NSNumber * _Nonnull)blockSize
                      blockIndex:(NSNumber * _Nonnull)blockIndex
                     bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
-                     completion:(MTRBDXQueryCompletionHandler)completion
+                     completion:(void (^)(NSData * _Nullable data, BOOL isEOF))completion
 {
 }
 

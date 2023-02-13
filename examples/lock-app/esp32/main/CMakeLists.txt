@@ -68,7 +68,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/door-lock-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
-                     PRIV_REQUIRES bt chip QRCode)
+                     PRIV_REQUIRES bt chip QRCode nvs_flash driver)
 add_dependencies(${COMPONENT_LIB} app-codegen)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
@@ -185,7 +185,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/lock"
-                      PRIV_REQUIRES chip QRCode bt)
+                      PRIV_REQUIRES chip QRCode bt nvs_flash driver)
 
 add_dependencies(${COMPONENT_LIB} app-codegen)
 

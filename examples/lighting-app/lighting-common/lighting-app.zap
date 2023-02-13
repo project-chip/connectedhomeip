@@ -4540,7 +4540,42 @@
           "mfgCode": null,
           "define": "SWITCH_CLUSTER",
           "side": "client",
-          "enabled": 0
+          "enabled": 0,
+          "attributes": [
+
+            {
+              "name": "NumberOfPositions",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPosition",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
         },
         {
           "name": "Switch",
@@ -4550,6 +4585,38 @@
           "side": "server",
           "enabled": 1,
           "attributes": [
+            {
+              "name": "NumberOfPositions",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPosition",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
             {
               "name": "FeatureMap",
               "code": 65532,

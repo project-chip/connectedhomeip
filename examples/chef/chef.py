@@ -321,6 +321,8 @@ def main() -> int:
                       help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
     parser.add_option("-p", "--pid", dest="pid", type=int,
                       help="specifies the Product ID. Default is 0x8000", metavar="PID", default=0x8000)
+    parser.add_option("-P", "--pname", dest="pname", type=str, metavar="PRODUCT_NAME",
+                      help="specifies the Product Name. Default is TEST_PRODUCT", default="TEST_PRODUCT")
     parser.add_option("", "--rpc_console", help="Opens PW RPC Console",
                       action="store_true", dest="do_rpc_console")
     parser.add_option("-y", "--tty", help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
@@ -626,6 +628,7 @@ def main() -> int:
                 f.write(textwrap.dedent(f"""\
                         set(CONFIG_DEVICE_VENDOR_ID {options.vid})
                         set(CONFIG_DEVICE_PRODUCT_ID {options.pid})
+                        set(CONFIG_DEVICE_PRODUCT_NAME \"{options.pname}\")
                         set(CONFIG_ENABLE_PW_RPC {"1" if options.do_rpc else "0"})
                         set(SAMPLE_NAME {options.sample_device_type_name})
                         set(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING \"{sw_ver_string}\")"""))
@@ -716,7 +719,7 @@ def main() -> int:
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_config_network_layer_ble = false',
-                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
+                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]',
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
@@ -763,6 +766,7 @@ def main() -> int:
             if sw_ver_string:
                 linux_args.append(
                     f'chip_device_config_device_software_version_string = "{sw_ver_string}"')
+
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
                 f.write("\n".join(linux_args))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:

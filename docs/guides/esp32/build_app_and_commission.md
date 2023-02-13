@@ -53,9 +53,8 @@ functionality can still work fine.
 
 -   Matter
 
-    Before running any other build command, the scripts/activate.sh environment
-    setup script should be sourced at the top level. This script set up a Python
-    environment with libraries used to build and test.
+    Activate the Matter environment. Below command needs to be executed after
+    sourcing `esp-idf/export.sh`.
 
     ```
     $ cd path/to/connectedhomeip
@@ -82,7 +81,7 @@ functionality can still work fine.
 -   Set the Matter target to build
 
     ```
-    $ idf.py set-target (Matter)
+    $ idf.py set-target (target chip)
     ```
 
     All the example applications supports target chips: esp32, esp32s3, esp32c3

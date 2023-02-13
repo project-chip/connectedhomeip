@@ -1324,9 +1324,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeE
     case EnumType::kPin:
     case EnumType::kRfid:
     case EnumType::kFingerprint:
+    case EnumType::kFingerVein:
         return val;
     default:
-        return static_cast<EnumType>(9);
+        return static_cast<EnumType>(10);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperationTypeEnum val)

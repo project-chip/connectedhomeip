@@ -8,7 +8,7 @@
                 "mac-arm64",
                 "windows-amd64"
             ],
-            "tags": ["version:2@v2023.02.03-nightly.1"]
+            "tags": ["version:2@v2023.02.09-nightly.1"]
         }
     ]
 }
