@@ -74,8 +74,9 @@ private:
     uint8_t mQRData[kMaxQRBufferSize] = { 0 };
 
     // light data:
-    bool mLightIsOn       = false;
-    uint8_t mCurrentLevel = 0;
+    bool mLightIsOn                      = false;
+    uint8_t mCurrentLevel                = 0;
+    uint16_t mLevelRemainingTime10sOfSec = 0;
 
     // Updates the data (run in the chip event loop)
     void ChipLoopUpdate();
@@ -155,7 +156,8 @@ void DeviceState::ShowUi()
     }
 
     ImGui::Text("Level Control:");
-    ImGui::Text("    Current Level: %d", mCurrentLevel);
+    ImGui::Text("    Current Level:          %d", mCurrentLevel);
+    ImGui::Text("    Remaining Time (1/10s): %d", mLevelRemainingTime10sOfSec);
 
     ImGui::End();
 
@@ -246,6 +248,10 @@ void DeviceState::ChipLoopUpdate()
         emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
                                    chip::app::Clusters::LevelControl::Attributes::CurrentLevel::Id, &mCurrentLevel,
                                    sizeof(mCurrentLevel));
+
+        emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
+                                   chip::app::Clusters::LevelControl::Attributes::RemainingTime::Id,
+                                   reinterpret_cast<uint8_t *>(&mLevelRemainingTime10sOfSec), sizeof(mLevelRemainingTime10sOfSec));
     }
 }
 
