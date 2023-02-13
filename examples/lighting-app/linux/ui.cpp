@@ -25,6 +25,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
@@ -45,6 +46,9 @@ namespace example {
 namespace Ui {
 
 namespace {
+
+using namespace chip::app::Clusters;
+using chip::app::DataModel::Nullable;
 
 std::atomic<bool> gUiRunning{ false };
 
@@ -77,9 +81,9 @@ private:
     // OnOff
     bool mLightIsOn = false;
     // Level
-    uint8_t mMinLevel                    = 0;
-    uint8_t mMaxLevel                    = 0;
-    uint8_t mCurrentLevel                = 0;
+    uint8_t mMinLevel = 0;
+    uint8_t mMaxLevel = 0;
+    Nullable<uint8_t> mCurrentLevel;
     uint16_t mLevelRemainingTime10sOfSec = 0;
     // Color control
     uint8_t mColorHue        = 0;
@@ -166,7 +170,14 @@ void DeviceState::ShowUi()
 
     ImGui::Text("Level Control:");
     ImGui::Text("    MIN Level:              %d", mMinLevel);
-    ImGui::Text("    Current Level:          %d", mCurrentLevel);
+    if (mCurrentLevel.IsNull())
+    {
+        ImGui::Text("    Current Level:          NULL");
+    }
+    else
+    {
+        ImGui::Text("    Current Level:          %d", mCurrentLevel.Value());
+    }
     ImGui::Text("    MAX Level:              %d", mMaxLevel);
     ImGui::Text("    Remaining Time (1/10s): %d", mLevelRemainingTime10sOfSec);
 
@@ -256,15 +267,10 @@ void DeviceState::ChipLoopUpdate()
     // TODO:
     //    - consider error checking
     {
-        uint8_t value;
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OnOff::Attributes::OnOff::Id,
-                             &value, sizeof(value));
-        mLightIsOn = (value != 0);
+        OnOff::Attributes::OnOff::Get(kLightEndpointId, &mLightIsOn);
 
         // Level Control
-        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
-                             chip::app::Clusters::LevelControl::Attributes::CurrentLevel::Id, &mCurrentLevel,
-                             sizeof(mCurrentLevel));
+        LevelControl::Attributes::CurrentLevel::Get(kLightEndpointId, mCurrentLevel);
 
         emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
                              chip::app::Clusters::LevelControl::Attributes::MinLevel::Id, &mMinLevel, sizeof(mMinLevel));
@@ -332,9 +338,9 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     *window     = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-                               window_flags);
+                                   window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
