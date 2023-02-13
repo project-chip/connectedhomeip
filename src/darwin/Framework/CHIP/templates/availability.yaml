@@ -6651,3 +6651,14 @@
               - EventList
           FaultInjection:
               - EventList
+      enum values:
+          DoorLock:
+              LockDataTypeEnum:
+                  - FingerVein
+  removed:
+      enum values:
+          DoorLock:
+              DlLockDataType:
+                  # This value never existed for this enum name so, don't start
+                  # exposing it.  It's exposed for LockDataTypeEnum
+                  - FingerVein
