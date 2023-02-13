@@ -69,7 +69,7 @@ static void TestCliSetMatterNodeStateMonitor(nlTestSuite * inSuite, void * aCont
     matter_data_storage m_matter_data_storage;
     Test::MockGroupTranslator mGroupTranslator(m_matter_data_storage);
     set_mapping_display_instance(test_matter_node_state_monitor, mGroupTranslator);
-    NL_TEST_ASSERT(inSuite, (uic_stdin_handle_command("epmap") == SL_STATUS_OK));
+    NL_TEST_ASSERT(inSuite, (uic_stdin_handle_command("endpoint_map") == SL_STATUS_OK));
     NL_TEST_ASSERT(inSuite, (uic_stdin_handle_command("groups_map") == SL_STATUS_OK));
 }
 
