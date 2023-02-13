@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,21 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-config("qrcode-common_config") {
-  include_dirs = [ "repo/c" ]
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-  cflags = [ "-Wno-type-limits" ]
-}
+import("${chip_root}/src/platform/device.gni")
 
-static_library("QRCode") {
-  output_name = "libqrcode-common"
-
-  sources = [
-    "repo/c/qrcodegen.c",
-    "repo/c/qrcodegen.h",
-  ]
-
-  public_configs = [ ":qrcode-common_config" ]
-
-  output_dir = "${root_out_dir}/lib"
+declare_args() {
+  # Enable UI functionality for example apps
+  chip_examples_enable_imgui_ui = false
 }
