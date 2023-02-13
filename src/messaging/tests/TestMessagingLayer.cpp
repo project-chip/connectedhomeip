@@ -142,6 +142,26 @@ void CheckExchangeOutgoingMessagesFail(nlTestSuite * inSuite, void * inContext)
     ec->Close();
 }
 
+/**
+ * Tests that the Exchange Context APIs do not crash if delayed calls are made after the Exchange Context is
+ * closed.
+ */
+void CheckExchangeContextDoesNotCrashWhenDelayedCallsOccurAfterClose(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    // Create an Exchange Context.
+    ExchangeContext * ec = ctx.NewExchangeToAlice(&mockSolicitedAppDelegate);
+
+    // Close the Exchange Context.
+    ec->Close();
+
+    // Call public APIs to verify that they do not crash or fail the test.
+    NL_TEST_ASSERT(inSuite, ec->StartResponseTimer() == CHIP_ERROR_INTERNAL);
+    ec->CancelResponseTimer();
+    ec->AbortAllOtherCommunicationOnFabric();
+}
+
 // Test Suite
 
 /**

@@ -211,7 +211,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         else
         {
 #endif
-            err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId, IsInitiator(),
+            err = mDispatch.SendMessage(mExchangeMgr->GetSessionManager(), mSession.Get().Value(), mExchangeId, IsInitiator(),
                                         GetReliableMessageContext(), reliableTransmissionRequested, protocolId, msgType,
                                         std::move(msgBuf));
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -444,7 +444,14 @@ void ExchangeContext::OnSessionReleased()
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
 {
-    System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
+    // Verify that the Session Manager is still alive. Note that host applications may stop the chip::Server
+    // at any time, which will tear down the Session Manager, Exchange Manager, and Exchange Context. Note
+    // that at the time of writing (2023/02/09) the SessionManager pointer, if non-null, is guaranteed to be
+    // valid because it is allocated in the parent Server class.
+    SessionManager * sessionManager = mExchangeMgr->GetSessionManager();
+    VerifyOrReturnError(sessionManager, CHIP_ERROR_INTERNAL);
+
+    System::Layer * lSystemLayer = sessionManager->SystemLayer();
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen
@@ -456,7 +463,14 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
 
 void ExchangeContext::CancelResponseTimer()
 {
-    System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
+    // Verify that the Session Manager is still alive. Note that host applications may stop the chip::Server
+    // at any time, which will tear down the Session Manager, Exchange Manager, and Exchange Context. Note
+    // that at the time of writing (2023/02/09) the SessionManager pointer, if non-null, is guaranteed to be
+    // valid because it is allocated in the parent Server class.
+    SessionManager * sessionManager = mExchangeMgr->GetSessionManager();
+    VerifyOrReturn(sessionManager);
+
+    System::Layer * lSystemLayer = sessionManager->SystemLayer();
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen
@@ -642,7 +656,15 @@ void ExchangeContext::AbortAllOtherCommunicationOnFabric()
 
     SetIgnoreSessionRelease(true);
 
-    GetExchangeMgr()->GetSessionManager()->ExpireAllSessionsForFabric(mSession->GetFabricIndex());
+    // Host applications may stop the chip::Server at any time, which will tear down the Session Manager, Exchange Manager,
+    // and Exchange Context. In that case, there isn't anything to abort and we may safely early-return.
+    //
+    // Note that at the time of writing (2023/02/09) the SessionManager pointer, if non-null, is guaranteed to be valid
+    // because it is allocated in the parent Server class.
+    SessionManager * sessionManager = mExchangeMgr->GetSessionManager();
+    VerifyOrReturn(sessionManager);
+
+    sessionManager->ExpireAllSessionsForFabric(mSession->GetFabricIndex());
 
     mSession.GrabExpiredSession(session.Value());
 
