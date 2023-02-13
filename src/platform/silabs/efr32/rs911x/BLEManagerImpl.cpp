@@ -63,7 +63,7 @@ extern rsi_ble_event_conn_status_t conn_event_to_app;
 extern sl_wfx_msg_t event_msg;
 
 StaticTask_t rsiBLETaskStruct;
-rsi_semaphore_handle_t sl_ble_init_sem;
+rsi_semaphore_handle_t sl_rs_ble_init_sem;
 rsi_semaphore_handle_t sl_ble_event_sem;
 
 /* wfxRsi Task will use as its stack */
@@ -106,7 +106,7 @@ void sl_ble_event_handling_task(void)
     WFX_RSI_LOG("%s starting", __func__);
 
     //! This semaphore is waiting for wifi module initialization.
-    rsi_semaphore_wait(&sl_ble_init_sem, 0);
+    rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
 
     sl_ble_init();
 
@@ -231,7 +231,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    rsi_semaphore_create(&sl_ble_init_sem, 0);
+    rsi_semaphore_create(&sl_rs_ble_init_sem, 0);
     rsi_semaphore_create(&sl_ble_event_sem, 0);
     ChipLogProgress(DeviceLayer, "%s Start ", __func__);
 
@@ -471,6 +471,7 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     // Nothing to do
 }
 
+//TODO: Need to add RSI BLE STATUS codes
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
     switch (bleErr)
@@ -589,7 +590,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     result = rsi_ble_set_advertise_data(advData, index);
     if (result != SL_STATUS_OK)
     {
-        err = MapBLEError(result);
+    //    err = MapBLEError(result);
         ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() failed: %ld", result);
         ExitNow();
     }
@@ -598,7 +599,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: %ld", result);
     }
 
-    err = MapBLEError(result);
+   // err = MapBLEError(result);
 
     ChipLogProgress(DeviceLayer, "ConfigureAdvertisingData End");
 exit:
@@ -615,7 +616,10 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // If already advertising, stop it, before changing values
     if (mFlags.Has(Flags::kAdvertising))
     {
-        // sl_bt_advertiser_stop(advertising_set_handle);
+        status = rsi_ble_stop_advertising();
+        if (status != RSI_SUCCESS) {
+           ChipLogProgress(DeviceLayer,"advertising failed to stop, with status = 0x%lx ", status);
+        }
     }
     else
     {
@@ -656,11 +660,15 @@ exit:
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+    int32_t status = 0;
     if (mFlags.Has(Flags::kAdvertising))
     {
         mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        status = rsi_ble_stop_advertising();
+        if (status != RSI_SUCCESS) {
+           ChipLogProgress(DeviceLayer,"advertising failed to stop, with status = 0x%lx" , status);
+        }
         advertising_set_handle = 0xff;
         CancelBleAdvTimeoutTimer();
     }
@@ -703,7 +711,6 @@ void BLEManagerImpl::HandleConnectEvent(void)
     AddConnection(event_msg.connectionHandle, event_msg.bondingHandle);
 }
 
-// TODO:: Implementation need to be done.
 void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
 {
     uint8_t connHandle = 1;
@@ -759,7 +766,6 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
     }
 }
 
-//TODO:: Need to implement this
 void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -780,14 +786,14 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
         // whether the client is enabling or disabling indications.
         {
             event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
-            event.CHIPoBLESubscribe.ConId = 1;
+            event.CHIPoBLESubscribe.ConId = 1; //TODO:: To be replaced by device mac address
             err                           = PlatformMgr().PostEvent(&event);
         }
     }
     else
     {
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
-        event.CHIPoBLESubscribe.ConId = 1;
+        event.CHIPoBLESubscribe.ConId = 1;  //TODO:: To be replaced by device mac address
         err                           = PlatformMgr().PostEvent(&event);
     }
 }

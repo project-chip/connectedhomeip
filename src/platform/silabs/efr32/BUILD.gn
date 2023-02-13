@@ -65,7 +65,6 @@ static_library("efr32") {
     "${silabs_platform_dir}/SystemPlatformConfig.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-#    "BLEManagerImpl.cpp",
     "ConfigurationManagerImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
     "PlatformManagerImpl.cpp",

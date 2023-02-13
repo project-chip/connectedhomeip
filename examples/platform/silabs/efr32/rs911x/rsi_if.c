@@ -74,7 +74,7 @@ bool is_wifi_disconnection_event = false;
 uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
 
 #if (RS91X_BLE_ENABLE)
-extern rsi_semaphore_handle_t sl_ble_init_sem;
+extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
 #endif
 
 /*
@@ -404,7 +404,7 @@ static int32_t wfx_rsi_init(void)
 #endif
 
 #if (RS91X_BLE_ENABLE)
-     rsi_semaphore_post(&sl_ble_init_sem);
+     rsi_semaphore_post(&sl_rs_ble_init_sem);
 #endif
 
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
