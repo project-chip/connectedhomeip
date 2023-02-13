@@ -269,14 +269,6 @@ enum EmberAfSecurityType : uint8_t
     EMBER_ZCL_SECURITY_TYPE_WPA3        = 5,
 };
 
-// Enum for StatusCode
-enum EmberAfStatusCode : uint8_t
-{
-    EMBER_ZCL_STATUS_CODE_BUSY                 = 2,
-    EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR = 3,
-    EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN      = 4,
-};
-
 // Enum for StepMode
 enum EmberAfStepMode : uint8_t
 {

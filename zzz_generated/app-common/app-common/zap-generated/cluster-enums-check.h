@@ -1034,17 +1034,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AdministratorCommission
     using EnumType = AdministratorCommissioning::StatusCode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kBusy:
     case EnumType::kPAKEParameterError:
     case EnumType::kWindowNotOpen:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_STATUS_CODE_BUSY:
-    case EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR:
-    case EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(0);
