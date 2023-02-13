@@ -30,9 +30,12 @@ but it could be modified to support all factory data fields.
 '''
 
 import argparse
+import glob
+import json
 import logging
 import os
 import sys
+from jsonschema import validate
 
 import ota_image_tool
 from chip.tlv import TLVWriter
@@ -48,8 +51,9 @@ sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../../../../src/app/'))
 
 
-OTA_FACTORY_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_factory_tlv_temp.bin")
-OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_app_tlv_temp.bin")
+OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
+OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
+OTA_FACTORY_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_factory_tlv.bin")
 
 
 class TAG:
@@ -57,6 +61,11 @@ class TAG:
     BOOTLOADER = 2
     FACTORY_DATA = 3
 
+def write_to_temp(path: str, payload: bytearray):
+    with open(path, "wb") as _handle:
+        _handle.write(payload)
+
+    logging.info(f"Data payload size for {path.split('/')[-1]}: {len(payload)}")
 
 def generate_header(tag: int, length: int):
     header = bytearray(tag.to_bytes(4, "little"))
@@ -84,10 +93,7 @@ def generate_factory_data(args: object):
         payload = generate_header(TAG.FACTORY_DATA, len(writer.encoding))
         payload += writer.encoding
 
-    with open(OTA_FACTORY_TLV_TEMP, "wb") as _handle:
-        _handle.write(payload)
-
-    logging.info(f"Factory data payload size: {len(payload)}")
+    write_to_temp(OTA_FACTORY_TLV_TEMP, payload)
 
 
 def generate_app(args: object):
@@ -98,15 +104,58 @@ def generate_app(args: object):
     file_size = os.path.getsize(args.app_input_file)
     payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor
 
-    with open(OTA_APP_TLV_TEMP, "wb") as _handle:
-        _handle.write(payload)
-
-    logging.info(f"Application payload size: {len(payload)}")
+    write_to_temp(OTA_APP_TLV_TEMP, payload)
 
 
 def generate_bootloader(args: object):
-    # TODO
-    pass
+    version = args.bl_version.to_bytes(4, "little")
+    versionStr = bytearray(args.bl_version_str, "ascii") + bytearray(64 - len(args.bl_version_str))
+    buildDate = bytearray(args.bl_build_date, "ascii") + bytearray(64 - len(args.bl_build_date))
+    loadAddr = args.bl_load_addr.to_bytes(4, "little")
+    descriptor = version + versionStr + buildDate + loadAddr
+    file_size = os.path.getsize(args.bootloader_input_file)
+    payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor
+
+    write_to_temp(OTA_BOOTLOADER_TLV_TEMP, payload)
+
+def validate_json(data: str):
+    with open(os.path.join(os.path.dirname(__file__), 'ota_payload.schema'), 'r') as fd:
+        payload_schema = json.load(fd)
+
+    try:
+        validate(instance=data, schema=payload_schema)
+        logging.info("JSON data is valid")
+    except jsonschema.exceptions.ValidationError as err:
+        logging.error(f"JSON data is invalid: {err}")
+        sys.exit(1)
+
+def generate_custom_tlvs(data):
+    """
+    Generate custom OTA payload from a JSON object following a predefined schema.
+    The payload is written in a temporary file that will be appended to args.input_files.
+    """
+    input_files = []
+
+    payload = bytearray()
+    descriptor = bytearray()
+    iteration = 0
+    for entry in data["inputs"]:
+        if "descriptor" in entry:
+            for field in entry["descriptor"]:
+                if isinstance(field["value"], str):
+                    descriptor += bytearray(field["value"], "ascii") + bytearray(field["length"] - len(field["value"]))
+                elif isinstance(field["value"], int):
+                    descriptor += bytearray(field["value"].to_bytes(field["length"], "little"))
+        file_size = os.path.getsize(entry["path"])
+        payload = generate_header(entry["tag"], len(descriptor) + file_size) + descriptor
+
+        temp_output = os.path.join(os.path.dirname(__file__), "ota_temp_custom_tlv_" + str(iteration) + ".bin")
+        write_to_temp(temp_output, payload)
+
+        input_files += [temp_output, entry["path"]]
+        iteration += 1
+
+    return input_files
 
 
 def show_payload(args: object):
@@ -121,6 +170,12 @@ def create_image(args: object):
     ota_image_tool.validate_header_attributes(args)
     input_files = list()
 
+    if args.json:
+        with open(args.json, 'r') as fd:
+            data = json.load(fd)
+        validate_json(data)
+        input_files += generate_custom_tlvs(data)
+
     if args.factory_data:
         generate_factory_data(args)
         input_files += [OTA_FACTORY_TLV_TEMP]
@@ -128,14 +183,15 @@ def create_image(args: object):
     if args.app_input_file is not None:
         generate_app(args)
         input_files += [OTA_APP_TLV_TEMP, args.app_input_file]
-    print(input_files)
+
+    logging.info("Input files used:")
+    [logging.info(f"- {_file}") for _file in input_files]
+
     args.input_files = input_files
     ota_image_tool.generate_image(args)
 
-    if args.factory_data:
-        os.remove(OTA_FACTORY_TLV_TEMP)
-    if args.app_input_file is not None:
-        os.remove(OTA_APP_TLV_TEMP)
+    for filename in glob.glob(os.path.dirname(__file__) + "/ota_temp_*"):
+        os.remove(filename)
 
 
 def main():
@@ -208,6 +264,9 @@ def main():
                                help="[path] Password to decode DAC Key if available")
     create_parser.add_argument("--pai_cert", type=PaiCert,
                                help="[path] Path to PAI certificate in DER format")
+
+    # Path to input JSON file which describe custom TLVs
+    create_parser.add_argument('--json', help="[path] Path to the JSON describing custom TLVs")
 
     show_parser = subcommands.add_parser('show', help='Show OTA image info')
     show_parser.add_argument('image_file', help='Path to OTA image file')

@@ -1,0 +1,51 @@
+{
+    "inputs": [
+        {
+            "tag": 1,
+            "descriptor": [
+                {
+                    "name": "app_version",
+                    "length": 4,
+                    "value": 1000
+                },
+                {
+                    "name": "app_version_str",
+                    "length": 64,
+                    "value": "AppTestVersion"
+                },
+                {
+                    "name": "build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "/home/marius/bitbucket/connectedhomeip/scripts/tools/nxp/ota/examples/binary_example.bin"
+        },
+        {
+            "tag": 2,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1000
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                },
+                {
+                    "name": "ssbl_load_address",
+                    "length": 4,
+                    "value": 0
+                }
+            ],
+            "path": "/home/marius/bitbucket/connectedhomeip/scripts/tools/nxp/ota/examples/factory_data.bin"
+        }
+    ]
+}

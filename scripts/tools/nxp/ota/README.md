@@ -22,12 +22,9 @@ processors (application, bootloader and factory data) by setting
 
 ## Usage
 
-TODO: add more options
-
-Example:
-
+Example (factory data + app + SSBL update):
 ```
-python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256 -fd --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der -app ~/binaries/ota_update/chip-k32w0x-light-example-50000.bin --app-version 50000 --app-version-str "50000_test" --app-build-date "$DATE" ~/binaries/ota_update/chip-k32w0x-light-example-50000.bin $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.ota
+python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256 -fd --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der -app ~/binaries/ota_update/chip-k32w0x-light-example-50000.bin --app-version 50000 --app-version-str "50000_test" --app-build-date "$DATE" --bootloader-input-file ~/binaries/ota_update/new_ssbl.bin --bl-version 50000 --bl-version-str "50000_ssbl_test" --bl-build-date "$DATE" --bl-load-addr 0 ~/binaries/ota_update/chip-k32w0x-light-example-50000.bin $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.ota
 ```
 
 Example (only factory data update):
@@ -39,9 +36,7 @@ python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn
 ## Default processors
 
 The default processors for K32W0 are already implemented in:
-
--   `OTAApplicationProcessor` for application update.
--   TODO: `OTABootloaderProcessor` for SSBL update.
+-   `OTAFirmwareProcessor` for application/SSBL update.
 -   `OTAFactoryDataProcessor` for factory data update.
 
 ## Implementing custom processors
@@ -58,6 +53,7 @@ public:
     virtual CHIP_ERROR Clear() = 0;
     virtual CHIP_ERROR ApplyAction() = 0;
     virtual CHIP_ERROR AbortAction() = 0;
+    virtual CHIP_ERROR ExitAction();
 
     CHIP_ERROR Process(ByteSpan & block);
 protected:
@@ -65,6 +61,9 @@ protected:
 };
 
 ```
+`ExitAction` is optional and should be implemented by the processors that want to execute an action
+after all data has been transferred, but before `HandleApply` is called. This is useful in the context
+of multiple TLVs transferred in a single OTA process.
 
 Note that `ProcessInternal` should return:
 
@@ -109,6 +108,11 @@ private:
     Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 ```
+
+### Custom payload
+When defining a custom processor, a user is able to also specify the custom format of the TLV by creating a JSON file based on the `ota_payload.schema`.
+The tool offers support for describing multiple TLVs in the same JSON file. Please see the `examples/ota_payload_example.json` for a basic example.
+Option `--json` must be used to specify the path to the JSON file.
 
 ## Factory data update
 
