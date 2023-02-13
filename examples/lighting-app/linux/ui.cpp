@@ -26,7 +26,6 @@
 #include <setup_payload/SetupPayload.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/attribute-storage.h>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
