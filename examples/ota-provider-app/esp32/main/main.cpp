@@ -26,7 +26,6 @@
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <OTAProviderCommands.h>
@@ -89,7 +88,7 @@ static void InitServer(intptr_t context)
         chip::Protocols::BDX::Id, bdxOtaSender);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(error));
+        ESP_LOGE(TAG, "RegisterUnsolicitedMessageHandler failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
@@ -114,7 +113,7 @@ static void InitServer(intptr_t context)
     }
     size_t total = 0, used = 0;
     err = esp_spiffs_info(NULL, &total, &used);
-    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+    ESP_LOGI(TAG, "Partition size: total: %u, used: %u", total, used);
     char otaImagePath[kMaxImagePathlen];
     memset(otaImagePath, 0, sizeof(otaImagePath));
     snprintf(otaImagePath, sizeof(otaImagePath), "/fs/%s", otaFilename);
@@ -129,7 +128,7 @@ static void InitServer(intptr_t context)
     fseek(otaImageFile, 0, SEEK_END);
     otaImageLen = ftell(otaImageFile);
     rewind(otaImageFile);
-    ESP_LOGI(TAG, "The OTA image size: %d", otaImageLen);
+    ESP_LOGI(TAG, "The OTA image size: %" PRIu32, otaImageLen);
     if (otaImageLen > 0)
     {
         otaProvider.SetQueryImageStatus(OTAQueryStatus::kUpdateAvailable);
@@ -203,12 +202,12 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
     size_t size_read = fread(blockBuf->Start(), 1, size, otaImageFile);
     if (size_read != size)
     {
-        ESP_LOGE(TAG, "Failed to read %d bytes from %s", size, otaFilename);
+        ESP_LOGE(TAG, "Failed to read %u bytes from %s", size, otaFilename);
         size  = 0;
         isEof = false;
         return CHIP_ERROR_READ_FAILED;
     }
-    ESP_LOGI(TAG, "Read %d bytes from %s", size, otaFilename);
+    ESP_LOGI(TAG, "Read %u bytes from %s", size, otaFilename);
     return CHIP_NO_ERROR;
 }
 
@@ -253,7 +252,7 @@ extern "C" void app_main()
     CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 

@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCluster.h>
+#import <Matter/MTRDefines.h>
 
 @class MTRSetupPayload;
 @class MTRDeviceController;

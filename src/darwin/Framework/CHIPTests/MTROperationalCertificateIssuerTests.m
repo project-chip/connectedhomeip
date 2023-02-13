@@ -91,7 +91,8 @@ static MTRTestKeys * sTestKeys = nil;
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
                               attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
                                    controller:(MTRDeviceController *)controller
-                                   completion:(MTROperationalCertificateIssuedHandler)completion
+                                   completion:(void (^)(MTROperationalCertificateChain * _Nullable info,
+                                                  NSError * _Nullable error))completion
 {
     XCTAssertNotNil(csrInfo);
     XCTAssertNotNil(attestationInfo);
