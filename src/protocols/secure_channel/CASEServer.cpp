@@ -154,6 +154,10 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
 
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCASEFailed(err);
+    }
     PrepareForSessionEstablishment();
 }
 
@@ -161,6 +165,10 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCASEComplete();
+    }
     PrepareForSessionEstablishment(session->GetPeer());
 }
 } // namespace chip

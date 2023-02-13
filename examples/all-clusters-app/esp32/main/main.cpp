@@ -89,6 +89,11 @@ public:
     }
     void OnCommissioningWindowOpened() override { pairingWindowLED.Set(true); }
     void OnCommissioningWindowClosed() override { pairingWindowLED.Set(false); }
+    void OnPASEStarted() override { ESP_LOGI(TAG, "PASE started"); }
+    void OnPASEComplete() override { ESP_LOGI(TAG, "PASE established successfully"); }
+    void OnPASEFailed(CHIP_ERROR err) override { ESP_LOGE(TAG, "PASE failed err= %" CHIP_ERROR_FORMAT, err.Format()); }
+    void OnCASEComplete() override { ESP_LOGI(TAG, "CASE established successfully"); }
+    void OnCASEFailed(CHIP_ERROR err) override { ESP_LOGE(TAG, "CASE failed err= %" CHIP_ERROR_FORMAT, err.Format()); }
 };
 
 AppCallbacks sCallbacks;

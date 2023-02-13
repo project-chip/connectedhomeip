@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/server/AppDelegate.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/GroupDataProvider.h>
 #include <messaging/ExchangeDelegate.h>
@@ -56,6 +57,8 @@ public:
                                              Credentials::CertificateValidityPolicy * policy,
                                              Credentials::GroupDataProvider * responderGroupDataProvider);
 
+    void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished(const SessionHandle & session) override;
@@ -92,6 +95,7 @@ private:
     CASESession mPairingSession;
     SessionManager * mSessionManager = nullptr;
 
+    AppDelegate * mAppDelegate                          = nullptr;
     FabricTable * mFabrics                              = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
 

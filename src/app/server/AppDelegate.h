@@ -21,6 +21,7 @@
  */
 
 #pragma once
+#include <lib/core/CHIPError.h>
 
 class AppDelegate
 {
@@ -39,4 +40,9 @@ public:
      */
     virtual void OnCommissioningWindowOpened() {}
     virtual void OnCommissioningWindowClosed() {}
+    virtual void OnPASEStarted() {}
+    virtual void OnPASEFailed(CHIP_ERROR err) {}
+    virtual void OnPASEComplete() {}
+    virtual void OnCASEFailed(CHIP_ERROR err) {}
+    virtual void OnCASEComplete() {}
 };

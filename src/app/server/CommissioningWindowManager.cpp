@@ -127,6 +127,10 @@ void CommissioningWindowManager::Cleanup()
 void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnPASEFailed(err);
+    }
     HandleFailedAttempt(err);
 }
 
@@ -162,6 +166,10 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
     // As per specifications, section 5.5: Commissioning Flows
     constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
     DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnPASEStarted();
+    }
 }
 
 void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & session)
@@ -172,6 +180,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     if (mAppDelegate != nullptr)
     {
         mAppDelegate->OnCommissioningSessionStarted();
+        mAppDelegate->OnPASEComplete();
     }
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));

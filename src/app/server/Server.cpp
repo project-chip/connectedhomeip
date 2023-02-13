@@ -298,6 +298,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
+    mCASEServer.SetAppDelegate(initParams.appDelegate);
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
                                                     mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
