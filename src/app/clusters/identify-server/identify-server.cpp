@@ -239,7 +239,7 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
         identify->mOnEffectIdentifier(identify);
     }
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 

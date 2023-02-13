@@ -245,7 +245,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterPlayCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -269,7 +269,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterPauseCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -293,7 +293,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterStopCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -317,7 +317,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterFastForwardCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -341,7 +341,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterPreviousCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -365,7 +365,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterRewindCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -391,7 +391,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterSkipBackwardCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -416,7 +416,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterSkipForwardCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -441,7 +441,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterSeekCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -465,7 +465,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterNextCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -489,7 +489,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfMediaPlaybackClusterStartOverCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;

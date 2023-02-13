@@ -422,7 +422,7 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
     if (!SupportsUSR(commandPath.mEndpointId))
     {
         emberAfDoorLockClusterPrintln("[GetUser] User management is not supported [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
         return;
     }
 
@@ -431,7 +431,7 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
     {
         emberAfDoorLockClusterPrintln("[GetUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]", userIndex,
                                       maxNumberOfUsers);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -512,7 +512,7 @@ exit:
     {
         ChipLogError(Zcl, "[GetUser] Command processing failed [endpointId=%d,userIndex=%d,err=\"%s\"]", commandPath.mEndpointId,
                      userIndex, err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 }
 
@@ -524,7 +524,7 @@ void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * command
     if (!SupportsUSR(commandPath.mEndpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearUser] User management is not supported [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
         return;
     }
 
@@ -533,7 +533,7 @@ void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * command
     {
         ChipLogError(Zcl, "[ClearUser] Unable to get the fabric IDX [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
                      userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -542,7 +542,7 @@ void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * command
     {
         ChipLogError(Zcl, "[ClearUser] Unable to get the source node index [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
                      userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -551,7 +551,7 @@ void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * command
     {
         emberAfDoorLockClusterPrintln("[ClearUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]",
                                       userIndex, maxNumberOfUsers);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -575,7 +575,7 @@ void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * command
         {
             ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", i, status);
 
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            commandObj->AddStatus(commandPath, Status::Failure);
             return;
         }
     }
@@ -584,7 +584,7 @@ void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * command
     sendRemoteLockUserChange(commandPath.mEndpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kClear, sourceNodeId,
                              fabricIdx, 0xFFFE, 0xFFFE);
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 void DoorLockServer::setCredentialCommandHandler(
@@ -597,7 +597,7 @@ void DoorLockServer::setCredentialCommandHandler(
     if (kUndefinedFabricIndex == fabricIdx)
     {
         ChipLogError(Zcl, "[SetCredential] Unable to get the fabric IDX [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -605,7 +605,7 @@ void DoorLockServer::setCredentialCommandHandler(
     if (chip::kUndefinedNodeId == sourceNodeId)
     {
         ChipLogError(Zcl, "[SetCredential] Unable to get the source node index [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -621,7 +621,7 @@ void DoorLockServer::setCredentialCommandHandler(
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Credential type is not supported [endpointId=%d,credentialType=%u]",
                                       commandPath.mEndpointId, to_underlying(credentialType));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
         return;
     }
 
@@ -757,7 +757,7 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         emberAfDoorLockClusterPrintln("[GetCredentialStatus] Credential type is not supported [endpointId=%d,credentialType=%u"
                                       "]",
                                       commandPath.mEndpointId, to_underlying(credentialType));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
         return;
     }
 
@@ -775,7 +775,7 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
                                       "[endpointId=%d,credentialIndex=%d,credentialType=%u,creator=%u,modifier=%u]",
                                       commandPath.mEndpointId, credentialIndex, to_underlying(credentialType),
                                       credentialInfo.createdBy, credentialInfo.lastModifiedBy);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -791,7 +791,7 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
                          "[GetCredentialStatus] Database possibly corrupted - credential exists without user assigned "
                          "[endpointId=%d,credentialType=%u,credentialIndex=%d]",
                          commandPath.mEndpointId, to_underlying(credentialType), credentialIndex);
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            commandObj->AddStatus(commandPath, Status::Failure);
             return;
         }
     }
@@ -849,14 +849,14 @@ void DoorLockServer::clearCredentialCommandHandler(
     auto modifier = getFabricIndex(commandObj);
     if (kUndefinedFabricIndex == modifier)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
     auto sourceNodeId = getNodeId(commandObj);
     if (chip::kUndefinedNodeId == sourceNodeId)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -890,7 +890,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
     if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -900,7 +900,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
     if (kUndefinedFabricIndex == fabricIdx)
     {
         ChipLogError(Zcl, "[SetWeekDaySchedule] Unable to get the fabric IDX [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -908,7 +908,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
     if (chip::kUndefinedNodeId == sourceNodeId)
     {
         ChipLogError(Zcl, "[SetWeekDaySchedule] Unable to get the source node index [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -917,7 +917,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln(
             "[SetWeekDaySchedule] Unable to add schedule - index out of range [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
             endpointId, weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -926,7 +926,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add schedule - user does not exist "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d]",
                                       endpointId, weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -945,7 +945,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add schedule - daysMask is out of range "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%x]",
                                       endpointId, weekDayIndex, userIndex, daysMask.Raw());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -955,7 +955,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add schedule - start time out of range "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                                       endpointId, weekDayIndex, userIndex, startHour, startMinute, endHour, endMinute);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -964,7 +964,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add schedule - invalid time "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                                       endpointId, weekDayIndex, userIndex, startHour, startMinute, endHour, endMinute);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -976,7 +976,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
                      "[SetWeekDaySchedule] Unable to add schedule - internal error "
                      "[endpointId=%d,weekDayIndex=%d,userIndex=%d,status=%u]",
                      endpointId, weekDayIndex, userIndex, to_underlying(status));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -987,7 +987,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kWeekDaySchedule, DataOperationTypeEnum::kAdd, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(weekDayIndex));
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 void DoorLockServer::getWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
@@ -998,7 +998,7 @@ void DoorLockServer::getWeekDayScheduleCommandHandler(chip::app::CommandHandler 
     if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1041,7 +1041,7 @@ void DoorLockServer::clearWeekDayScheduleCommandHandler(chip::app::CommandHandle
     if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1051,7 +1051,7 @@ void DoorLockServer::clearWeekDayScheduleCommandHandler(chip::app::CommandHandle
     if (kUndefinedFabricIndex == fabricIdx)
     {
         ChipLogError(Zcl, "[ClearWeekDaySchedule] Unable to get the fabric IDX [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1059,7 +1059,7 @@ void DoorLockServer::clearWeekDayScheduleCommandHandler(chip::app::CommandHandle
     if (chip::kUndefinedNodeId == sourceNodeId)
     {
         ChipLogError(Zcl, "[ClearWeekDaySchedule] Unable to get the source node index [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1068,7 +1068,7 @@ void DoorLockServer::clearWeekDayScheduleCommandHandler(chip::app::CommandHandle
         emberAfDoorLockClusterPrintln(
             "[ClearWeekDaySchedule] User or WeekDay index is out of range [endpointId=%d,weekDayIndex=%d,userIndex=%d]", endpointId,
             weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1076,7 +1076,7 @@ void DoorLockServer::clearWeekDayScheduleCommandHandler(chip::app::CommandHandle
     {
         emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] User does not exist [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
                                       endpointId, weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1100,14 +1100,14 @@ void DoorLockServer::clearWeekDayScheduleCommandHandler(chip::app::CommandHandle
         emberAfDoorLockClusterPrintln(
             "[ClearWeekDaySchedule] Unable to clear the user schedules - app error [endpointId=%d,userIndex=%d,status=%u]",
             endpointId, userIndex, to_underlying(clearStatus));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kWeekDaySchedule, DataOperationTypeEnum::kClear, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(weekDayIndex));
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
@@ -1118,7 +1118,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
     if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1128,7 +1128,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
     if (kUndefinedFabricIndex == fabricIdx)
     {
         ChipLogError(Zcl, "[SetYearDaySchedule] Unable to get the fabric IDX [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1136,7 +1136,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
     if (chip::kUndefinedNodeId == sourceNodeId)
     {
         ChipLogError(Zcl, "[SetYearDaySchedule] Unable to get the source node index [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1145,7 +1145,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln(
             "[SetYearDaySchedule] Unable to add schedule - index out of range [endpointId=%d,yearDayIndex=%d,userIndex=%d]",
             endpointId, yearDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1154,7 +1154,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln("[SetYearDaySchedule] Unable to add schedule - user does not exist "
                                       "[endpointId=%d,yearDayIndex=%d,userIndex=%d]",
                                       endpointId, yearDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1164,7 +1164,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
                                       "[endpointId=%d,yearDayIndex=%d,userIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32
                                       "]",
                                       endpointId, yearDayIndex, userIndex, localStartTime, localEndTime);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1176,7 +1176,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
                      "[SetYearDaySchedule] Unable to add schedule - internal error "
                      "[endpointId=%d,yearDayIndex=%d,userIndex=%d,status=%u]",
                      endpointId, yearDayIndex, userIndex, to_underlying(status));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1187,7 +1187,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kYearDaySchedule, DataOperationTypeEnum::kAdd, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(yearDayIndex));
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 void DoorLockServer::getYearDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
@@ -1198,7 +1198,7 @@ void DoorLockServer::getYearDayScheduleCommandHandler(chip::app::CommandHandler 
     if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[GetYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
     emberAfDoorLockClusterPrintln("[GetYearDaySchedule] incoming command [endpointId=%d]", endpointId);
@@ -1240,7 +1240,7 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
     if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
     emberAfDoorLockClusterPrintln("[ClearYearDaySchedule] incoming command [endpointId=%d]", endpointId);
@@ -1249,7 +1249,7 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
     if (kUndefinedFabricIndex == fabricIdx)
     {
         ChipLogError(Zcl, "[ClearYearDaySchedule] Unable to get the fabric IDX [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1257,7 +1257,7 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
     if (chip::kUndefinedNodeId == sourceNodeId)
     {
         ChipLogError(Zcl, "[ClearYearDaySchedule] Unable to get the source node index [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1266,7 +1266,7 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
         emberAfDoorLockClusterPrintln(
             "[ClearYearDaySchedule] User or YearDay index is out of range [endpointId=%d,yearDayIndex=%d,userIndex=%d]", endpointId,
             yearDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1274,7 +1274,7 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
     {
         emberAfDoorLockClusterPrintln("[ClearYearDaySchedule] User does not exist [endpointId=%d,yearDayIndex=%d,userIndex=%d]",
                                       endpointId, yearDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -1298,14 +1298,14 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
         emberAfDoorLockClusterPrintln(
             "[ClearYearDaySchedule] Unable to clear the user schedules - app error [endpointId=%d,userIndex=%d,status=%u]",
             endpointId, userIndex, to_underlying(clearStatus));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kYearDaySchedule, DataOperationTypeEnum::kClear, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(yearDayIndex));
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 chip::BitFlags<DoorLockFeature> DoorLockServer::GetFeatures(chip::EndpointId endpointId)
@@ -3098,7 +3098,7 @@ void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler 
     if (!SupportsHolidaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -3109,7 +3109,7 @@ void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln(
             "[SetHolidaySchedule] Unable to add schedule - index out of range [endpointId=%d,scheduleIndex=%d]", endpointId,
             holidayIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -3118,7 +3118,7 @@ void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler 
         emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Unable to add schedule - schedule ends earlier than starts"
                                       "[endpointId=%d,scheduleIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32 "]",
                                       endpointId, holidayIndex, localStartTime, localEndTime);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -3128,7 +3128,7 @@ void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler 
                                       "[endpointId=%d,scheduleIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32
                                       ", operatingMode=%d]",
                                       endpointId, holidayIndex, localStartTime, localEndTime, to_underlying(operatingMode));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -3138,7 +3138,7 @@ void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler 
     {
         ChipLogError(Zcl, "[SetHolidaySchedule] Unable to add schedule - internal error [endpointId=%d,scheduleIndex=%d,status=%u]",
                      endpointId, holidayIndex, to_underlying(status));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
@@ -3147,7 +3147,7 @@ void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler 
                                   ",operatingMode=%d]",
                                   endpointId, holidayIndex, localStartTime, localEndTime, to_underlying(operatingMode));
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 void DoorLockServer::getHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
@@ -3158,7 +3158,7 @@ void DoorLockServer::getHolidayScheduleCommandHandler(chip::app::CommandHandler 
     {
         emberAfDoorLockClusterPrintln("[GetHolidaySchedule] Ignore command (not supported) [endpointId=%d,scheduleIndex=%d]",
                                       endpointId, holidayIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
     emberAfDoorLockClusterPrintln("[GetHolidaySchedule] incoming command [endpointId=%d,scheduleIndex=%d]", endpointId,
@@ -3191,7 +3191,7 @@ void DoorLockServer::clearHolidayScheduleCommandHandler(chip::app::CommandHandle
     if (!SupportsHolidaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
     emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] incoming command [endpointId=%d,scheduleIndex=%d]", endpointId,
@@ -3201,7 +3201,7 @@ void DoorLockServer::clearHolidayScheduleCommandHandler(chip::app::CommandHandle
     {
         emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] Holiday index is out of range [endpointId=%d,scheduleIndex=%d]",
                                       endpointId, holidayIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -3225,10 +3225,10 @@ void DoorLockServer::clearHolidayScheduleCommandHandler(chip::app::CommandHandle
         emberAfDoorLockClusterPrintln(
             "[ClearHolidaySchedule] Unable to clear the user schedules - app error [endpointId=%d,scheduleIndex=%d,status=%u]",
             endpointId, holidayIndex, to_underlying(clearStatus));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 bool DoorLockServer::RemoteOperationEnabled(chip::EndpointId endpointId) const

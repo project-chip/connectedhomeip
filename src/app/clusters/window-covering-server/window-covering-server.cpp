@@ -660,7 +660,7 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
         emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
     }
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 
     return true;
 }
@@ -691,7 +691,7 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
 
     Delegate * delegate = GetDelegate(endpoint);
     if (delegate)
@@ -755,7 +755,7 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
         (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
     }
 
-    return EMBER_SUCCESS == emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return EMBER_SUCCESS == commandObj->AddStatus(commandPath, Status::Success);
 }
 
 /**
@@ -791,12 +791,12 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
         {
             emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
         }
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
     }
     else
     {
         emberAfWindowCoveringClusterPrint("Err Device is not PA LF");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
 }
@@ -835,17 +835,17 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
             {
                 emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
             }
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+            commandObj->AddStatus(commandPath, Status::Success);
         }
         else
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            commandObj->AddStatus(commandPath, Status::ConstraintError);
         }
     }
     else
     {
         emberAfWindowCoveringClusterPrint("Err Device is not PA LF");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
 }
@@ -883,12 +883,12 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
         {
             emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
         }
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
     }
     else
     {
         emberAfWindowCoveringClusterPrint("Err Device is not PA TL");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
 }
@@ -927,17 +927,17 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
             {
                 emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
             }
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+            commandObj->AddStatus(commandPath, Status::Success);
         }
         else
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            commandObj->AddStatus(commandPath, Status::ConstraintError);
         }
     }
     else
     {
         emberAfWindowCoveringClusterPrint("Err Device is not PA TL");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
 }

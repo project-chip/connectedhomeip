@@ -125,7 +125,7 @@ exit:
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterGetSetupPINCallback error: %s", err.AsString());
 
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;

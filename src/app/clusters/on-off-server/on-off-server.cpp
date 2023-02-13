@@ -415,7 +415,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
 
     if (!SupportsLightingApplications(endpoint))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
         return true;
     }
 

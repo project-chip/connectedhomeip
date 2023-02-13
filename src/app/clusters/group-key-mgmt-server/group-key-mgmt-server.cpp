@@ -296,7 +296,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
 
     if (nullptr == provider || nullptr == fabric)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -305,7 +305,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     CHIP_ERROR err = fabric->GetCompressedFabricIdBytes(compressed_fabric_id);
     if (CHIP_NO_ERROR != err)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -314,7 +314,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     {
         // If the EpochKey0 field is null or its associated EpochStartTime0 field is null,
         // then this command SHALL fail with an INVALID_COMMAND
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
@@ -333,7 +333,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         {
             // If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL contain
             // a later epoch start time than the epoch start time found in the EpochStartTime0 field.
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+            commandObj->AddStatus(commandPath, Status::InvalidCommand);
             return true;
         }
         keyset.epoch_keys[1].start_time = commandData.groupKeySet.epochStartTime1.Value();
@@ -352,7 +352,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
             // * The EpochKey1 field SHALL NOT be null
             // * Its associated EpochStartTime1 field SHALL contain a later epoch start time
             //   than the epoch start time found in the EpochStartTime0 field.
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+            commandObj->AddStatus(commandPath, Status::InvalidCommand);
             return true;
         }
         keyset.epoch_keys[2].start_time = commandData.groupKeySet.epochStartTime2.Value();
@@ -391,7 +391,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
 
     if (nullptr == provider)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -399,7 +399,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     if (CHIP_NO_ERROR != provider->GetKeySet(fabric, commandData.groupKeySetID, keyset))
     {
         // KeySet ID not found
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        commandObj->AddStatus(commandPath, Status::NotFound);
         return true;
     }
 
@@ -517,14 +517,14 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
 
     if (nullptr == provider)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
     auto keysIt = provider->IterateKeySets(fabric);
     if (nullptr == keysIt)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 

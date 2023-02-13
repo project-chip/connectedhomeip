@@ -301,7 +301,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfApplicationLauncherClusterLaunchAppCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -390,7 +390,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -475,7 +475,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;

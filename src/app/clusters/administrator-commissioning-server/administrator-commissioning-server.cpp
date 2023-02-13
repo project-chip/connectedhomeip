@@ -199,7 +199,7 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     {
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
         ChipLogProgress(Zcl, "Commissioning window is now closed");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
     }
     return true;
 }

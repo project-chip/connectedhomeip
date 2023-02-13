@@ -220,7 +220,7 @@ exit:
     // If isDelegateNull, no one will call responder, so HasSentResponse will be false
     if (!responder.HasSentResponse())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -256,7 +256,7 @@ exit:
     // If isDelegateNull, no one will call responder, so HasSentResponse will be false
     if (!responder.HasSentResponse())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;

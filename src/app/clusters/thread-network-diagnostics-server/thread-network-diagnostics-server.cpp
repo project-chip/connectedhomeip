@@ -139,7 +139,7 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandl
                                                                const Commands::ResetCounts::DecodableType & commandData)
 {
     ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 

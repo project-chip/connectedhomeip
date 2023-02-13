@@ -762,7 +762,7 @@ bool ColorControlServer::moveHueCommand(EndpointId endpoint, uint8_t moveMode, u
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -771,7 +771,7 @@ bool ColorControlServer::moveHueCommand(EndpointId endpoint, uint8_t moveMode, u
 
     if (moveMode == EMBER_ZCL_HUE_MOVE_MODE_STOP)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -830,7 +830,7 @@ bool ColorControlServer::moveHueCommand(EndpointId endpoint, uint8_t moveMode, u
     }
     else
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidAction);
         return true;
     }
     colorHueTransitionState->stepsRemaining = TRANSITION_TIME_1S;
@@ -879,7 +879,7 @@ bool ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, uin
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -904,7 +904,7 @@ bool ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, uin
     // this and report a malformed packet.
     if (!isEnhanced && (hue > MAX_HUE_VALUE))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidAction);
         return true;
     }
 
@@ -942,7 +942,7 @@ bool ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, uin
         direction = MOVE_MODE_DOWN;
         break;
     default:
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidAction);
         return true;
     }
 
@@ -1045,13 +1045,13 @@ bool ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, uint
     // this and report a malformed packet.
     if ((!isEnhanced && hue > MAX_HUE_VALUE) || saturation > MAX_SATURATION_VALUE)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidAction);
         return true;
     }
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1147,7 +1147,7 @@ bool ColorControlServer::stepHueCommand(EndpointId endpoint, uint8_t stepMode, u
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1161,7 +1161,7 @@ bool ColorControlServer::stepHueCommand(EndpointId endpoint, uint8_t stepMode, u
 
     if (stepMode == MOVE_MODE_STOP)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1246,7 +1246,7 @@ bool ColorControlServer::moveSaturationCommand(const app::ConcreteCommandPath & 
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1257,7 +1257,7 @@ bool ColorControlServer::moveSaturationCommand(const app::ConcreteCommandPath & 
 
     if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_STOP || rate == 0)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1326,7 +1326,7 @@ bool ColorControlServer::moveToSaturationCommand(const app::ConcreteCommandPath 
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1339,7 +1339,7 @@ bool ColorControlServer::moveToSaturationCommand(const app::ConcreteCommandPath 
     // this and report a malformed packet.
     if (saturation > MAX_SATURATION_VALUE)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidAction);
         return true;
     }
 
@@ -1393,7 +1393,7 @@ bool ColorControlServer::stepSaturationCommand(const app::ConcreteCommandPath & 
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1409,7 +1409,7 @@ bool ColorControlServer::stepSaturationCommand(const app::ConcreteCommandPath & 
 
     if (stepMode == MOVE_MODE_STOP)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1468,7 +1468,7 @@ bool ColorControlServer::colorLoopCommand(const app::ConcreteCommandPath & comma
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1555,7 +1555,7 @@ bool ColorControlServer::colorLoopCommand(const app::ConcreteCommandPath & comma
         }
         else
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+            commandObj->AddStatus(commandPath, Status::InvalidAction);
             return true;
         }
     }
@@ -1714,7 +1714,7 @@ bool ColorControlServer::moveToColorCommand(const app::ConcreteCommandPath & com
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1776,7 +1776,7 @@ bool ColorControlServer::moveColorCommand(const app::ConcreteCommandPath & comma
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1788,7 +1788,7 @@ bool ColorControlServer::moveColorCommand(const app::ConcreteCommandPath & comma
 
     if (rateX == 0 && rateY == 0)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -1875,7 +1875,7 @@ bool ColorControlServer::stepColorCommand(const app::ConcreteCommandPath & comma
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -2189,7 +2189,7 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -2201,13 +2201,13 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
 
     if (moveMode == MOVE_MODE_STOP)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
     if (rate == 0)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
@@ -2278,7 +2278,7 @@ bool ColorControlServer::moveToColorTempCommand(const app::ConcreteCommandPath &
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -2308,7 +2308,7 @@ bool ColorControlServer::stepColorTempCommand(const app::ConcreteCommandPath & c
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -2325,7 +2325,7 @@ bool ColorControlServer::stepColorTempCommand(const app::ConcreteCommandPath & c
 
     if (stepMode == MOVE_MODE_STOP)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
