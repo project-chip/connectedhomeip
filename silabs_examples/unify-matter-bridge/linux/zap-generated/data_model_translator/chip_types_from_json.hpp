@@ -111,6 +111,13 @@ inline std::optional<chip::BitMask<Groups::GroupClusterFeature>> from_json(const
 
 /***************************** Bitmap Converters **************/
 template <>
+inline std::optional<chip::BitMask<Scenes::SceneFeatures>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Scenes::SceneFeatures> r;
+    r.SetField(Scenes::SceneFeatures::kSceneNames, obj.value("SceneNames FIXME", false));
+    return r;
+}
+template <>
 inline std::optional<chip::BitMask<Scenes::ScenesCopyMode>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Scenes::ScenesCopyMode> r;
@@ -131,13 +138,6 @@ inline std::optional<chip::BitMask<OnOff::OnOffFeature>> from_json(const nlohman
 {
     chip::BitMask<OnOff::OnOffFeature> r;
     r.SetField(OnOff::OnOffFeature::kLighting, obj.value("Lighting FIXME", false));
-    return r;
-}
-template <>
-inline std::optional<chip::BitMask<OnOff::SceneFeatures>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<OnOff::SceneFeatures> r;
-    r.SetField(OnOff::SceneFeatures::kSceneNames, obj.value("SceneNames FIXME", false));
     return r;
 }
 
@@ -255,6 +255,19 @@ inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json& val
 }
 /***************************** Bitmap Converters **************/
 template <>
+inline std::optional<chip::BitMask<DoorLock::DaysMaskMap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<DoorLock::DaysMaskMap> r;
+    r.SetField(DoorLock::DaysMaskMap::kSunday, obj.value("Sunday FIXME", false));
+    r.SetField(DoorLock::DaysMaskMap::kMonday, obj.value("Monday FIXME", false));
+    r.SetField(DoorLock::DaysMaskMap::kTuesday, obj.value("Tuesday FIXME", false));
+    r.SetField(DoorLock::DaysMaskMap::kWednesday, obj.value("Wednesday FIXME", false));
+    r.SetField(DoorLock::DaysMaskMap::kThursday, obj.value("Thursday FIXME", false));
+    r.SetField(DoorLock::DaysMaskMap::kFriday, obj.value("Friday FIXME", false));
+    r.SetField(DoorLock::DaysMaskMap::kSaturday, obj.value("Saturday FIXME", false));
+    return r;
+}
+template <>
 inline std::optional<chip::BitMask<DoorLock::DlCredentialRuleMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlCredentialRuleMask> r;
@@ -270,19 +283,6 @@ inline std::optional<chip::BitMask<DoorLock::DlCredentialRulesSupport>> from_jso
     r.SetField(DoorLock::DlCredentialRulesSupport::kSingle, obj.value("Single FIXME", false));
     r.SetField(DoorLock::DlCredentialRulesSupport::kDual, obj.value("Dual FIXME", false));
     r.SetField(DoorLock::DlCredentialRulesSupport::kTri, obj.value("Tri FIXME", false));
-    return r;
-}
-template <>
-inline std::optional<chip::BitMask<DoorLock::DlDaysMaskMap>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<DoorLock::DlDaysMaskMap> r;
-    r.SetField(DoorLock::DlDaysMaskMap::kSunday, obj.value("Sun", false));
-    r.SetField(DoorLock::DlDaysMaskMap::kMonday, obj.value("Mon", false));
-    r.SetField(DoorLock::DlDaysMaskMap::kTuesday, obj.value("Tue", false));
-    r.SetField(DoorLock::DlDaysMaskMap::kWednesday, obj.value("Wed", false));
-    r.SetField(DoorLock::DlDaysMaskMap::kThursday, obj.value("Thu", false));
-    r.SetField(DoorLock::DlDaysMaskMap::kFriday, obj.value("Fri", false));
-    r.SetField(DoorLock::DlDaysMaskMap::kSaturday, obj.value("Sat", false));
     return r;
 }
 template <>
@@ -432,33 +432,33 @@ template <>
 inline std::optional<chip::BitMask<DoorLock::DoorLockFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DoorLockFeature> r;
-    r.SetField(DoorLock::DoorLockFeature::kPINCredentials, obj.value("PINCredentials FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kRFIDCredentials, obj.value("RFIDCredentials FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kFingerCredentials, obj.value("FingerCredentials FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kPinCredential, obj.value("PIN Credential FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kRfidCredential, obj.value("RFID Credential FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kFingerCredentials, obj.value("Finger Credentials FIXME", false));
     r.SetField(DoorLock::DoorLockFeature::kLogging, obj.value("Logging FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kWeekDaySchedules, obj.value("WeekDaySchedules FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kDoorPositionSensor, obj.value("DoorPositionSensor FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kFaceCredentials, obj.value("FaceCredentials FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kCredentialsOTA, obj.value("CredentialsOTA FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kUsersManagement, obj.value("UsersManagement FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kNotifications, obj.value("Notifications FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kYearDaySchedules, obj.value("YearDaySchedules FIXME", false));
-    r.SetField(DoorLock::DoorLockFeature::kHolidaySchedules, obj.value("HolidaySchedules FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kWeekDayAccessSchedules, obj.value("Week Day Access Schedules FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kDoorPositionSensor, obj.value("Door Position Sensor FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kFaceCredentials, obj.value("Face Credentials FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kCredentialsOverTheAirAccess, obj.value("Credentials Over-the-Air Access FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kUser, obj.value("User FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kNotification, obj.value("Notification FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kYearDayAccessSchedules, obj.value("Year Day Access Schedules FIXME", false));
+    r.SetField(DoorLock::DoorLockFeature::kHolidaySchedules, obj.value("Holiday Schedules FIXME", false));
     return r;
 }
 
 template <>
-inline std::optional<DoorLock::DlAlarmCode> from_json(const nlohmann::json& value)
+inline std::optional<DoorLock::AlarmCodeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, DoorLock::DlAlarmCode> table = {
-        { "LockJammed FIXME", DoorLock::DlAlarmCode::kLockJammed },
-        { "LockFactoryReset FIXME", DoorLock::DlAlarmCode::kLockFactoryReset },
-        { "LockRadioPowerCycled FIXME", DoorLock::DlAlarmCode::kLockRadioPowerCycled },
-        { "WrongCodeEntryLimit FIXME", DoorLock::DlAlarmCode::kWrongCodeEntryLimit },
-        { "FrontEsceutcheonRemoved FIXME", DoorLock::DlAlarmCode::kFrontEsceutcheonRemoved },
-        { "DoorForcedOpen FIXME", DoorLock::DlAlarmCode::kDoorForcedOpen },
-        { "DoorAjar FIXME", DoorLock::DlAlarmCode::kDoorAjar },
-        { "ForcedUser FIXME", DoorLock::DlAlarmCode::kForcedUser },
+    const std::map<std::string, DoorLock::AlarmCodeEnum> table = {
+        { "LockJammed FIXME", DoorLock::AlarmCodeEnum::kLockJammed },
+        { "LockFactoryReset FIXME", DoorLock::AlarmCodeEnum::kLockFactoryReset },
+        { "LockRadioPowerCycled FIXME", DoorLock::AlarmCodeEnum::kLockRadioPowerCycled },
+        { "WrongCodeEntryLimit FIXME", DoorLock::AlarmCodeEnum::kWrongCodeEntryLimit },
+        { "FrontEsceutcheonRemoved FIXME", DoorLock::AlarmCodeEnum::kFrontEsceutcheonRemoved },
+        { "DoorForcedOpen FIXME", DoorLock::AlarmCodeEnum::kDoorForcedOpen },
+        { "DoorAjar FIXME", DoorLock::AlarmCodeEnum::kDoorAjar },
+        { "ForcedUser FIXME", DoorLock::AlarmCodeEnum::kForcedUser },
     };
 
     auto i = table.find(value);
@@ -469,12 +469,12 @@ inline std::optional<DoorLock::DlAlarmCode> from_json(const nlohmann::json& valu
     }
 }
 template <>
-inline std::optional<DoorLock::DlCredentialRule> from_json(const nlohmann::json& value)
+inline std::optional<DoorLock::CredentialRuleEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, DoorLock::DlCredentialRule> table = {
-        { "Single FIXME", DoorLock::DlCredentialRule::kSingle },
-        { "Double FIXME", DoorLock::DlCredentialRule::kDouble },
-        { "Tri FIXME", DoorLock::DlCredentialRule::kTri },
+    const std::map<std::string, DoorLock::CredentialRuleEnum> table = {
+        { "Single FIXME", DoorLock::CredentialRuleEnum::kSingle },
+        { "Dual FIXME", DoorLock::CredentialRuleEnum::kDual },
+        { "Tri FIXME", DoorLock::CredentialRuleEnum::kTri },
     };
 
     auto i = table.find(value);
@@ -485,15 +485,15 @@ inline std::optional<DoorLock::DlCredentialRule> from_json(const nlohmann::json&
     }
 }
 template <>
-inline std::optional<DoorLock::DlCredentialType> from_json(const nlohmann::json& value)
+inline std::optional<DoorLock::CredentialTypeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, DoorLock::DlCredentialType> table = {
-        { "ProgrammingPIN FIXME", DoorLock::DlCredentialType::kProgrammingPIN },
-        { "PIN FIXME", DoorLock::DlCredentialType::kPin },
-        { "RFID FIXME", DoorLock::DlCredentialType::kRfid },
-        { "Fingerprint FIXME", DoorLock::DlCredentialType::kFingerprint },
-        { "FingerVein FIXME", DoorLock::DlCredentialType::kFingerVein },
-        { "Face FIXME", DoorLock::DlCredentialType::kFace },
+    const std::map<std::string, DoorLock::CredentialTypeEnum> table = {
+        { "ProgrammingPIN FIXME", DoorLock::CredentialTypeEnum::kProgrammingPIN },
+        { "PIN FIXME", DoorLock::CredentialTypeEnum::kPin },
+        { "RFID FIXME", DoorLock::CredentialTypeEnum::kRfid },
+        { "Fingerprint FIXME", DoorLock::CredentialTypeEnum::kFingerprint },
+        { "FingerVein FIXME", DoorLock::CredentialTypeEnum::kFingerVein },
+        { "Face FIXME", DoorLock::CredentialTypeEnum::kFace },
     };
 
     auto i = table.find(value);
@@ -504,70 +504,12 @@ inline std::optional<DoorLock::DlCredentialType> from_json(const nlohmann::json&
     }
 }
 template <>
-inline std::optional<DoorLock::DlDataOperationType> from_json(const nlohmann::json& value)
+inline std::optional<DoorLock::DataOperationTypeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, DoorLock::DlDataOperationType> table = {
-        { "Add FIXME", DoorLock::DlDataOperationType::kAdd },
-        { "Clear FIXME", DoorLock::DlDataOperationType::kClear },
-        { "Modify FIXME", DoorLock::DlDataOperationType::kModify },
-    };
-
-    auto i = table.find(value);
-    if (i != table.end()) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-template <>
-inline std::optional<DoorLock::DlDoorState> from_json(const nlohmann::json& value)
-{
-    const std::map<std::string, DoorLock::DlDoorState> table = {
-        { "Open", DoorLock::DlDoorState::kDoorOpen },
-        { "Closed", DoorLock::DlDoorState::kDoorClosed },
-        { "ErrorJammed", DoorLock::DlDoorState::kDoorJammed },
-        { "ErrorForcedOpen", DoorLock::DlDoorState::kDoorForcedOpen },
-        { "ErrorUnspecified", DoorLock::DlDoorState::kDoorUnspecifiedError },
-        { "Undefined", DoorLock::DlDoorState::kDoorAjar },
-    };
-
-    auto i = table.find(value);
-    if (i != table.end()) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-template <>
-inline std::optional<DoorLock::DlLockDataType> from_json(const nlohmann::json& value)
-{
-    const std::map<std::string, DoorLock::DlLockDataType> table = {
-        { "Unspecified FIXME", DoorLock::DlLockDataType::kUnspecified },
-        { "ProgrammingCode FIXME", DoorLock::DlLockDataType::kProgrammingCode },
-        { "UserIndex FIXME", DoorLock::DlLockDataType::kUserIndex },
-        { "WeekDaySchedule FIXME", DoorLock::DlLockDataType::kWeekDaySchedule },
-        { "YearDaySchedule FIXME", DoorLock::DlLockDataType::kYearDaySchedule },
-        { "HolidaySchedule FIXME", DoorLock::DlLockDataType::kHolidaySchedule },
-        { "PIN FIXME", DoorLock::DlLockDataType::kPin },
-        { "RFID FIXME", DoorLock::DlLockDataType::kRfid },
-        { "Fingerprint FIXME", DoorLock::DlLockDataType::kFingerprint },
-    };
-
-    auto i = table.find(value);
-    if (i != table.end()) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-template <>
-inline std::optional<DoorLock::DlLockOperationType> from_json(const nlohmann::json& value)
-{
-    const std::map<std::string, DoorLock::DlLockOperationType> table = {
-        { "Lock FIXME", DoorLock::DlLockOperationType::kLock },
-        { "Unlock FIXME", DoorLock::DlLockOperationType::kUnlock },
-        { "NonAccessUserEvent FIXME", DoorLock::DlLockOperationType::kNonAccessUserEvent },
-        { "ForcedUserEvent FIXME", DoorLock::DlLockOperationType::kForcedUserEvent },
+    const std::map<std::string, DoorLock::DataOperationTypeEnum> table = {
+        { "Add FIXME", DoorLock::DataOperationTypeEnum::kAdd },
+        { "Clear FIXME", DoorLock::DataOperationTypeEnum::kClear },
+        { "Modify FIXME", DoorLock::DataOperationTypeEnum::kModify },
     };
 
     auto i = table.find(value);
@@ -618,65 +560,6 @@ inline std::optional<DoorLock::DlLockType> from_json(const nlohmann::json& value
     }
 }
 template <>
-inline std::optional<DoorLock::DlOperatingMode> from_json(const nlohmann::json& value)
-{
-    const std::map<std::string, DoorLock::DlOperatingMode> table = {
-        { "Normal FIXME", DoorLock::DlOperatingMode::kNormal },
-        { "Vacation FIXME", DoorLock::DlOperatingMode::kVacation },
-        { "Privacy FIXME", DoorLock::DlOperatingMode::kPrivacy },
-        { "NoRemoteLockUnlock FIXME", DoorLock::DlOperatingMode::kNoRemoteLockUnlock },
-        { "Passage FIXME", DoorLock::DlOperatingMode::kPassage },
-    };
-
-    auto i = table.find(value);
-    if (i != table.end()) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-template <>
-inline std::optional<DoorLock::DlOperationError> from_json(const nlohmann::json& value)
-{
-    const std::map<std::string, DoorLock::DlOperationError> table = {
-        { "Unspecified FIXME", DoorLock::DlOperationError::kUnspecified },
-        { "InvalidCredential FIXME", DoorLock::DlOperationError::kInvalidCredential },
-        { "DisabledUserDenied FIXME", DoorLock::DlOperationError::kDisabledUserDenied },
-        { "Restricted FIXME", DoorLock::DlOperationError::kRestricted },
-        { "InsufficientBattery FIXME", DoorLock::DlOperationError::kInsufficientBattery },
-    };
-
-    auto i = table.find(value);
-    if (i != table.end()) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-template <>
-inline std::optional<DoorLock::DlOperationSource> from_json(const nlohmann::json& value)
-{
-    const std::map<std::string, DoorLock::DlOperationSource> table = {
-        { "Unspecified FIXME", DoorLock::DlOperationSource::kUnspecified },
-        { "Manual FIXME", DoorLock::DlOperationSource::kManual },
-        { "ProprietaryRemote FIXME", DoorLock::DlOperationSource::kProprietaryRemote },
-        { "Keypad FIXME", DoorLock::DlOperationSource::kKeypad },
-        { "Auto FIXME", DoorLock::DlOperationSource::kAuto },
-        { "Button FIXME", DoorLock::DlOperationSource::kButton },
-        { "Schedule FIXME", DoorLock::DlOperationSource::kSchedule },
-        { "Remote FIXME", DoorLock::DlOperationSource::kRemote },
-        { "RFID FIXME", DoorLock::DlOperationSource::kRfid },
-        { "Biometric FIXME", DoorLock::DlOperationSource::kBiometric },
-    };
-
-    auto i = table.find(value);
-    if (i != table.end()) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-template <>
 inline std::optional<DoorLock::DlStatus> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlStatus> table = {
@@ -687,45 +570,6 @@ inline std::optional<DoorLock::DlStatus> from_json(const nlohmann::json& value)
         { "InvalidField FIXME", DoorLock::DlStatus::kInvalidField },
         { "ResourceExhausted FIXME", DoorLock::DlStatus::kResourceExhausted },
         { "NotFound FIXME", DoorLock::DlStatus::kNotFound },
-    };
-
-    auto i = table.find(value);
-    if (i != table.end()) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-template <>
-inline std::optional<DoorLock::DlUserStatus> from_json(const nlohmann::json& value)
-{
-    const std::map<std::string, DoorLock::DlUserStatus> table = {
-        { "Available FIXME", DoorLock::DlUserStatus::kAvailable },
-        { "OccupiedEnabled FIXME", DoorLock::DlUserStatus::kOccupiedEnabled },
-        { "OccupiedDisabled FIXME", DoorLock::DlUserStatus::kOccupiedDisabled },
-    };
-
-    auto i = table.find(value);
-    if (i != table.end()) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-template <>
-inline std::optional<DoorLock::DlUserType> from_json(const nlohmann::json& value)
-{
-    const std::map<std::string, DoorLock::DlUserType> table = {
-        { "UnrestrictedUser FIXME", DoorLock::DlUserType::kUnrestrictedUser },
-        { "YearDayScheduleUser FIXME", DoorLock::DlUserType::kYearDayScheduleUser },
-        { "WeekDayScheduleUser FIXME", DoorLock::DlUserType::kWeekDayScheduleUser },
-        { "ProgrammingUser FIXME", DoorLock::DlUserType::kProgrammingUser },
-        { "NonAccessUser FIXME", DoorLock::DlUserType::kNonAccessUser },
-        { "ForcedUser FIXME", DoorLock::DlUserType::kForcedUser },
-        { "DisposableUser FIXME", DoorLock::DlUserType::kDisposableUser },
-        { "ExpiringUser FIXME", DoorLock::DlUserType::kExpiringUser },
-        { "ScheduleRestrictedUser FIXME", DoorLock::DlUserType::kScheduleRestrictedUser },
-        { "RemoteOnlyUser FIXME", DoorLock::DlUserType::kRemoteOnlyUser },
     };
 
     auto i = table.find(value);
@@ -836,6 +680,162 @@ inline std::optional<DoorLock::DoorLockUserType> from_json(const nlohmann::json&
         return std::nullopt;
     }
 }
+template <>
+inline std::optional<DoorLock::DoorStateEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, DoorLock::DoorStateEnum> table = {
+        { "DoorOpen FIXME", DoorLock::DoorStateEnum::kDoorOpen },
+        { "DoorClosed FIXME", DoorLock::DoorStateEnum::kDoorClosed },
+        { "DoorJammed FIXME", DoorLock::DoorStateEnum::kDoorJammed },
+        { "DoorForcedOpen FIXME", DoorLock::DoorStateEnum::kDoorForcedOpen },
+        { "DoorUnspecifiedError FIXME", DoorLock::DoorStateEnum::kDoorUnspecifiedError },
+        { "DoorAjar FIXME", DoorLock::DoorStateEnum::kDoorAjar },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<DoorLock::LockDataTypeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, DoorLock::LockDataTypeEnum> table = {
+        { "Unspecified FIXME", DoorLock::LockDataTypeEnum::kUnspecified },
+        { "ProgrammingCode FIXME", DoorLock::LockDataTypeEnum::kProgrammingCode },
+        { "UserIndex FIXME", DoorLock::LockDataTypeEnum::kUserIndex },
+        { "WeekDaySchedule FIXME", DoorLock::LockDataTypeEnum::kWeekDaySchedule },
+        { "YearDaySchedule FIXME", DoorLock::LockDataTypeEnum::kYearDaySchedule },
+        { "HolidaySchedule FIXME", DoorLock::LockDataTypeEnum::kHolidaySchedule },
+        { "PIN FIXME", DoorLock::LockDataTypeEnum::kPin },
+        { "RFID FIXME", DoorLock::LockDataTypeEnum::kRfid },
+        { "Fingerprint FIXME", DoorLock::LockDataTypeEnum::kFingerprint },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<DoorLock::LockOperationTypeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, DoorLock::LockOperationTypeEnum> table = {
+        { "Lock FIXME", DoorLock::LockOperationTypeEnum::kLock },
+        { "Unlock FIXME", DoorLock::LockOperationTypeEnum::kUnlock },
+        { "NonAccessUserEvent FIXME", DoorLock::LockOperationTypeEnum::kNonAccessUserEvent },
+        { "ForcedUserEvent FIXME", DoorLock::LockOperationTypeEnum::kForcedUserEvent },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<DoorLock::OperatingModeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, DoorLock::OperatingModeEnum> table = {
+        { "Normal FIXME", DoorLock::OperatingModeEnum::kNormal },
+        { "Vacation FIXME", DoorLock::OperatingModeEnum::kVacation },
+        { "Privacy FIXME", DoorLock::OperatingModeEnum::kPrivacy },
+        { "NoRemoteLockUnlock FIXME", DoorLock::OperatingModeEnum::kNoRemoteLockUnlock },
+        { "Passage FIXME", DoorLock::OperatingModeEnum::kPassage },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<DoorLock::OperationErrorEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, DoorLock::OperationErrorEnum> table = {
+        { "Unspecified FIXME", DoorLock::OperationErrorEnum::kUnspecified },
+        { "InvalidCredential FIXME", DoorLock::OperationErrorEnum::kInvalidCredential },
+        { "DisabledUserDenied FIXME", DoorLock::OperationErrorEnum::kDisabledUserDenied },
+        { "Restricted FIXME", DoorLock::OperationErrorEnum::kRestricted },
+        { "InsufficientBattery FIXME", DoorLock::OperationErrorEnum::kInsufficientBattery },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<DoorLock::OperationSourceEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, DoorLock::OperationSourceEnum> table = {
+        { "Unspecified FIXME", DoorLock::OperationSourceEnum::kUnspecified },
+        { "Manual FIXME", DoorLock::OperationSourceEnum::kManual },
+        { "ProprietaryRemote FIXME", DoorLock::OperationSourceEnum::kProprietaryRemote },
+        { "Keypad FIXME", DoorLock::OperationSourceEnum::kKeypad },
+        { "Auto FIXME", DoorLock::OperationSourceEnum::kAuto },
+        { "Button FIXME", DoorLock::OperationSourceEnum::kButton },
+        { "Schedule FIXME", DoorLock::OperationSourceEnum::kSchedule },
+        { "Remote FIXME", DoorLock::OperationSourceEnum::kRemote },
+        { "RFID FIXME", DoorLock::OperationSourceEnum::kRfid },
+        { "Biometric FIXME", DoorLock::OperationSourceEnum::kBiometric },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<DoorLock::UserStatusEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, DoorLock::UserStatusEnum> table = {
+        { "Available FIXME", DoorLock::UserStatusEnum::kAvailable },
+        { "OccupiedEnabled FIXME", DoorLock::UserStatusEnum::kOccupiedEnabled },
+        { "OccupiedDisabled FIXME", DoorLock::UserStatusEnum::kOccupiedDisabled },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<DoorLock::UserTypeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, DoorLock::UserTypeEnum> table = {
+        { "UnrestrictedUser FIXME", DoorLock::UserTypeEnum::kUnrestrictedUser },
+        { "YearDayScheduleUser FIXME", DoorLock::UserTypeEnum::kYearDayScheduleUser },
+        { "WeekDayScheduleUser FIXME", DoorLock::UserTypeEnum::kWeekDayScheduleUser },
+        { "ProgrammingUser FIXME", DoorLock::UserTypeEnum::kProgrammingUser },
+        { "NonAccessUser FIXME", DoorLock::UserTypeEnum::kNonAccessUser },
+        { "ForcedUser FIXME", DoorLock::UserTypeEnum::kForcedUser },
+        { "DisposableUser FIXME", DoorLock::UserTypeEnum::kDisposableUser },
+        { "ExpiringUser FIXME", DoorLock::UserTypeEnum::kExpiringUser },
+        { "ScheduleRestrictedUser FIXME", DoorLock::UserTypeEnum::kScheduleRestrictedUser },
+        { "RemoteOnlyUser FIXME", DoorLock::UserTypeEnum::kRemoteOnlyUser },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
 /***************************** Bitmap Converters **************/
 
 /***************************** Bitmap Converters **************/
@@ -850,15 +850,15 @@ inline std::optional<chip::BitMask<Thermostat::DayOfWeek>> from_json(const nlohm
     r.SetField(Thermostat::DayOfWeek::kThursday, obj.value("Thursday", false));
     r.SetField(Thermostat::DayOfWeek::kFriday, obj.value("Friday", false));
     r.SetField(Thermostat::DayOfWeek::kSaturday, obj.value("Saturday", false));
-    r.SetField(Thermostat::DayOfWeek::kAwayOrVacation, obj.value("AwayOrVacation", false));
+    r.SetField(Thermostat::DayOfWeek::kAway, obj.value("AwayOrVacation", false));
     return r;
 }
 template <>
 inline std::optional<chip::BitMask<Thermostat::ModeForSequence>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Thermostat::ModeForSequence> r;
-    r.SetField(Thermostat::ModeForSequence::kHeatSetpointFieldPresent, obj.value("Heat", false));
-    r.SetField(Thermostat::ModeForSequence::kCoolSetpointFieldPresent, obj.value("Cool", false));
+    r.SetField(Thermostat::ModeForSequence::kHeatSetpointPresent, obj.value("Heat", false));
+    r.SetField(Thermostat::ModeForSequence::kCoolSetpointPresent, obj.value("Cool", false));
     return r;
 }
 template <>
@@ -868,9 +868,9 @@ inline std::optional<chip::BitMask<Thermostat::ThermostatFeature>> from_json(con
     r.SetField(Thermostat::ThermostatFeature::kHeating, obj.value("Heating FIXME", false));
     r.SetField(Thermostat::ThermostatFeature::kCooling, obj.value("Cooling FIXME", false));
     r.SetField(Thermostat::ThermostatFeature::kOccupancy, obj.value("Occupancy FIXME", false));
-    r.SetField(Thermostat::ThermostatFeature::kSchedule, obj.value("Schedule FIXME", false));
+    r.SetField(Thermostat::ThermostatFeature::kScheduleConfiguration, obj.value("ScheduleConfiguration FIXME", false));
     r.SetField(Thermostat::ThermostatFeature::kSetback, obj.value("Setback FIXME", false));
-    r.SetField(Thermostat::ThermostatFeature::kAutomode, obj.value("Automode FIXME", false));
+    r.SetField(Thermostat::ThermostatFeature::kAutoMode, obj.value("AutoMode FIXME", false));
     return r;
 }
 
@@ -878,9 +878,9 @@ template <>
 inline std::optional<Thermostat::SetpointAdjustMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, Thermostat::SetpointAdjustMode> table = {
-        { "Heat", Thermostat::SetpointAdjustMode::kHeatSetpoint },
-        { "Cool", Thermostat::SetpointAdjustMode::kCoolSetpoint },
-        { "Both", Thermostat::SetpointAdjustMode::kHeatAndCoolSetpoints },
+        { "Heat", Thermostat::SetpointAdjustMode::kHeat },
+        { "Cool", Thermostat::SetpointAdjustMode::kCool },
+        { "Both", Thermostat::SetpointAdjustMode::kBoth },
     };
 
     auto i = table.find(value);
@@ -933,9 +933,11 @@ inline std::optional<Thermostat::ThermostatSystemMode> from_json(const nlohmann:
         { "Auto", Thermostat::ThermostatSystemMode::kAuto },
         { "Cool", Thermostat::ThermostatSystemMode::kCool },
         { "Heat", Thermostat::ThermostatSystemMode::kHeat },
-        { "EmergencyHeating", Thermostat::ThermostatSystemMode::kEmergencyHeating },
+        { "EmergencyHeating", Thermostat::ThermostatSystemMode::kEmergencyHeat },
         { "Precooling", Thermostat::ThermostatSystemMode::kPrecooling },
         { "FanOnly", Thermostat::ThermostatSystemMode::kFanOnly },
+        { "Dry", Thermostat::ThermostatSystemMode::kDry },
+        { "Sleep", Thermostat::ThermostatSystemMode::kSleep },
     };
 
     auto i = table.find(value);
@@ -950,7 +952,7 @@ template <>
 inline std::optional<chip::BitMask<FanControl::FanControlFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<FanControl::FanControlFeature> r;
-    r.SetField(FanControl::FanControlFeature::kMultiSpeed, obj.value("MultiSpeed FIXME", false));
+    r.SetField(FanControl::FanControlFeature::kMultiSpeed, obj.value("Multi-Speed FIXME", false));
     r.SetField(FanControl::FanControlFeature::kAuto, obj.value("Auto FIXME", false));
     r.SetField(FanControl::FanControlFeature::kRocking, obj.value("Rocking FIXME", false));
     r.SetField(FanControl::FanControlFeature::kWind, obj.value("Wind FIXME", false));
@@ -969,16 +971,16 @@ template <>
 inline std::optional<chip::BitMask<FanControl::WindSettingMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<FanControl::WindSettingMask> r;
-    r.SetField(FanControl::WindSettingMask::kSleepWind, obj.value("SleepWind FIXME", false));
-    r.SetField(FanControl::WindSettingMask::kNaturalWind, obj.value("NaturalWind FIXME", false));
+    r.SetField(FanControl::WindSettingMask::kSleepWind, obj.value("Sleep Wind FIXME", false));
+    r.SetField(FanControl::WindSettingMask::kNaturalWind, obj.value("Natural Wind FIXME", false));
     return r;
 }
 template <>
 inline std::optional<chip::BitMask<FanControl::WindSupportMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<FanControl::WindSupportMask> r;
-    r.SetField(FanControl::WindSupportMask::kSleepWind, obj.value("SleepWind FIXME", false));
-    r.SetField(FanControl::WindSupportMask::kNaturalWind, obj.value("NaturalWind FIXME", false));
+    r.SetField(FanControl::WindSupportMask::kSleepWind, obj.value("Sleep Wind FIXME", false));
+    r.SetField(FanControl::WindSupportMask::kNaturalWind, obj.value("Natural Wind FIXME", false));
     return r;
 }
 
@@ -1156,7 +1158,7 @@ template <>
 inline std::optional<ColorControl::SaturationMoveMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::SaturationMoveMode> table = {
-        { "stop FIXME", ColorControl::SaturationMoveMode::kStop },
+        { "Stop FIXME", ColorControl::SaturationMoveMode::kStop },
         { "Up FIXME", ColorControl::SaturationMoveMode::kUp },
         { "Down FIXME", ColorControl::SaturationMoveMode::kDown },
     };
@@ -1207,7 +1209,7 @@ template <>
 inline std::optional<chip::BitMask<PressureMeasurement::PressureFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<PressureMeasurement::PressureFeature> r;
-    r.SetField(PressureMeasurement::PressureFeature::kExt, obj.value("EXT FIXME", false));
+    r.SetField(PressureMeasurement::PressureFeature::kExtended, obj.value("Extended FIXME", false));
     return r;
 }
 

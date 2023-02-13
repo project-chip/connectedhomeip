@@ -1368,11 +1368,11 @@ namespace matter_bridge {
             namespace DoorState {
 
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint,
-                    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState>& value)
+                    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum>& value)
                 {
                     attribute_state_cache& cache = attribute_state_cache::get_instance();
 
-                    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlDoorState>;
+                    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DoorStateEnum>;
                     Traits::StorageType temp_storage;
 
                     if (cache.get<Traits::StorageType>(endpoint, temp_storage)) {
@@ -1386,10 +1386,10 @@ namespace matter_bridge {
                 }
 
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint,
-                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState>& value)
+                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum>& value)
                 {
                     attribute_state_cache& cache = attribute_state_cache::get_instance();
-                    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlDoorState>;
+                    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DoorStateEnum>;
                     Traits::StorageType storageValue;
                     if (value.HasValidValue()) {
                         Traits::WorkingToStorage(value.Value(), storageValue);
@@ -1992,11 +1992,11 @@ namespace matter_bridge {
 
             namespace OperatingMode {
 
-                EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, chip::app::Clusters::DoorLock::DlOperatingMode& value)
+                EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum& value)
                 {
                     attribute_state_cache& cache = attribute_state_cache::get_instance();
 
-                    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlOperatingMode>;
+                    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::OperatingModeEnum>;
                     Traits::StorageType temp_storage;
 
                     if (cache.get<Traits::StorageType>(endpoint, temp_storage)) {
@@ -2009,10 +2009,10 @@ namespace matter_bridge {
                     }
                 }
 
-                EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const chip::app::Clusters::DoorLock::DlOperatingMode& value)
+                EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const chip::app::Clusters::DoorLock::OperatingModeEnum& value)
                 {
                     attribute_state_cache& cache = attribute_state_cache::get_instance();
-                    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlOperatingMode>;
+                    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::OperatingModeEnum>;
                     Traits::StorageType storageValue;
                     Traits::WorkingToStorage(value, storageValue);
                     cache.set(endpoint, storageValue);
@@ -8093,7 +8093,7 @@ namespace matter_bridge {
 
             } // namespace OccupancySensorTypeBitmap
 
-            namespace PirOccupiedToUnoccupiedDelay {
+            namespace PIROccupiedToUnoccupiedDelay {
 
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, uint16_t& value)
                 {
@@ -8122,9 +8122,9 @@ namespace matter_bridge {
                     return EMBER_ZCL_STATUS_SUCCESS;
                 }
 
-            } // namespace PirOccupiedToUnoccupiedDelay
+            } // namespace PIROccupiedToUnoccupiedDelay
 
-            namespace PirUnoccupiedToOccupiedDelay {
+            namespace PIRUnoccupiedToOccupiedDelay {
 
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, uint16_t& value)
                 {
@@ -8153,9 +8153,9 @@ namespace matter_bridge {
                     return EMBER_ZCL_STATUS_SUCCESS;
                 }
 
-            } // namespace PirUnoccupiedToOccupiedDelay
+            } // namespace PIRUnoccupiedToOccupiedDelay
 
-            namespace PirUnoccupiedToOccupiedThreshold {
+            namespace PIRUnoccupiedToOccupiedThreshold {
 
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, uint8_t& value)
                 {
@@ -8184,7 +8184,7 @@ namespace matter_bridge {
                     return EMBER_ZCL_STATUS_SUCCESS;
                 }
 
-            } // namespace PirUnoccupiedToOccupiedThreshold
+            } // namespace PIRUnoccupiedToOccupiedThreshold
 
             namespace UltrasonicOccupiedToUnoccupiedDelay {
 

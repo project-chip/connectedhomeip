@@ -118,9 +118,10 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath& aPath
         jsn["IdentifyTime"] = to_json(value);
         break;
     }
-        // identify type is not supported by UCL
+        // IdentifyType is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -244,6 +245,7 @@ CHIP_ERROR GroupsAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
         // NameSupport is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -397,6 +399,7 @@ CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
         // LastConfiguredBy is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -622,6 +625,7 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath& aPath, A
     }
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -913,6 +917,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath& a
     }
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -1159,7 +1164,7 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
             UN::ActuatorEnabled::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
-        case MN::DoorState::Id: { // type is DlDoorState
+        case MN::DoorState::Id: { // type is DoorStateEnum
             MN::DoorState::TypeInfo::Type value;
             UN::DoorState::Get(atr_path, value);
             return aEncoder.Encode(value);
@@ -1259,7 +1264,7 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
             UN::SoundVolume::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
-        case MN::OperatingMode::Id: { // type is DlOperatingMode
+        case MN::OperatingMode::Id: { // type is OperatingModeEnum
             MN::OperatingMode::TypeInfo::Type value;
             UN::OperatingMode::Get(atr_path, value);
             return aEncoder.Encode(value);
@@ -1496,6 +1501,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
     }
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -1569,7 +1575,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
         }
         break;
     }
-        // type is DlDoorState
+        // type is DoorStateEnum
     case MN::DoorState::Id: {
         using T = MN::DoorState::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -1790,7 +1796,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
         }
         break;
     }
-        // type is DlOperatingMode
+        // type is OperatingModeEnum
     case MN::OperatingMode::Id: {
         using T = MN::OperatingMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -2089,6 +2095,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath&
         // barrier position is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -2439,7 +2446,7 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             UN::SetpointChangeAmount::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
-        case MN::SetpointChangeSourceTimestamp::Id: { // type is utc
+        case MN::SetpointChangeSourceTimestamp::Id: { // type is epoch_s
             MN::SetpointChangeSourceTimestamp::TypeInfo::Type value;
             UN::SetpointChangeSourceTimestamp::Get(atr_path, value);
             return aEncoder.Encode(value);
@@ -2772,6 +2779,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
     }
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -3214,7 +3222,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is utc
+        // type is epoch_s
     case MN::SetpointChangeSourceTimestamp::Id: {
         using T = MN::SetpointChangeSourceTimestamp::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3542,13 +3550,14 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath& aPa
         jsn["FanModeSequence"] = to_json(value);
         break;
     }
-        // percent current is not supported by UCL
-        // speed max is not supported by UCL
-        // speed current is not supported by UCL
-        // rock support is not supported by UCL
-        // wind support is not supported by UCL
+        // PercentCurrent is not supported by UCL
+        // SpeedMax is not supported by UCL
+        // SpeedCurrent is not supported by UCL
+        // RockSupport is not supported by UCL
+        // WindSupport is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -3715,6 +3724,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
     }
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -4250,6 +4260,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& a
     }
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -5016,6 +5027,7 @@ CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttrib
         // LightSensorType is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -5209,6 +5221,7 @@ CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttrib
         // Tolerance is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -5419,6 +5432,7 @@ CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttribute
         // Scale is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -5659,6 +5673,7 @@ CHIP_ERROR FlowMeasurementAttributeAccess::Write(const ConcreteDataAttributePath
         // Tolerance is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -5831,12 +5846,13 @@ CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataA
     }
 
     switch (aPath.mAttributeId) {
-        // measured value is not supported by UCL
-        // min measured value is not supported by UCL
-        // max measured value is not supported by UCL
-        // tolerance is not supported by UCL
+        // MeasuredValue is not supported by UCL
+        // MinMeasuredValue is not supported by UCL
+        // MaxMeasuredValue is not supported by UCL
+        // Tolerance is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -5967,19 +5983,19 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath& aPath, At
             UN::OccupancySensorTypeBitmap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
-        case MN::PirOccupiedToUnoccupiedDelay::Id: { // type is int16u
-            MN::PirOccupiedToUnoccupiedDelay::TypeInfo::Type value;
-            UN::PirOccupiedToUnoccupiedDelay::Get(atr_path, value);
+        case MN::PIROccupiedToUnoccupiedDelay::Id: { // type is int16u
+            MN::PIROccupiedToUnoccupiedDelay::TypeInfo::Type value;
+            UN::PIROccupiedToUnoccupiedDelay::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
-        case MN::PirUnoccupiedToOccupiedDelay::Id: { // type is int16u
-            MN::PirUnoccupiedToOccupiedDelay::TypeInfo::Type value;
-            UN::PirUnoccupiedToOccupiedDelay::Get(atr_path, value);
+        case MN::PIRUnoccupiedToOccupiedDelay::Id: { // type is int16u
+            MN::PIRUnoccupiedToOccupiedDelay::TypeInfo::Type value;
+            UN::PIRUnoccupiedToOccupiedDelay::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
-        case MN::PirUnoccupiedToOccupiedThreshold::Id: { // type is int8u
-            MN::PirUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
-            UN::PirUnoccupiedToOccupiedThreshold::Get(atr_path, value);
+        case MN::PIRUnoccupiedToOccupiedThreshold::Id: { // type is int8u
+            MN::PIRUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
+            UN::PIRUnoccupiedToOccupiedThreshold::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::UltrasonicOccupiedToUnoccupiedDelay::Id: { // type is int16u
@@ -6052,26 +6068,26 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
     }
 
     switch (aPath.mAttributeId) {
-    // occupancy is not supported by UCL
-    // occupancy sensor type is not supported by UCL
-    // occupancy sensor type bitmap is not supported by UCL
-    case Attributes::PirOccupiedToUnoccupiedDelay::Id: {
+    // Occupancy is not supported by UCL
+    // OccupancySensorType is not supported by UCL
+    // OccupancySensorTypeBitmap is not supported by UCL
+    case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
 
-        Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo::DecodableType value;
+        Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
         jsn["PIROccupiedToUnoccupiedDelay"] = to_json(value);
         break;
     }
-    case Attributes::PirUnoccupiedToOccupiedDelay::Id: {
+    case Attributes::PIRUnoccupiedToOccupiedDelay::Id: {
 
-        Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo::DecodableType value;
+        Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
         jsn["PIRUnoccupiedToOccupiedDelay"] = to_json(value);
         break;
     }
-    case Attributes::PirUnoccupiedToOccupiedThreshold::Id: {
+    case Attributes::PIRUnoccupiedToOccupiedThreshold::Id: {
 
-        Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType value;
+        Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
         jsn["PIRUnoccupiedToOccupiedThreshold"] = to_json(value);
         break;
@@ -6120,6 +6136,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
     }
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL
@@ -6196,41 +6213,41 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
         break;
     }
         // type is int16u
-    case MN::PirOccupiedToUnoccupiedDelay::Id: {
-        using T = MN::PirOccupiedToUnoccupiedDelay::TypeInfo::Type;
+    case MN::PIROccupiedToUnoccupiedDelay::Id: {
+        using T = MN::PIROccupiedToUnoccupiedDelay::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
         if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "PirOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
-            UN::PirOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
+            sl_log_debug(LOG_TAG, "PIROccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
+            UN::PIROccupiedToUnoccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                MN::PirOccupiedToUnoccupiedDelay::Id);
+                MN::PIROccupiedToUnoccupiedDelay::Id);
         }
         break;
     }
         // type is int16u
-    case MN::PirUnoccupiedToOccupiedDelay::Id: {
-        using T = MN::PirUnoccupiedToOccupiedDelay::TypeInfo::Type;
+    case MN::PIRUnoccupiedToOccupiedDelay::Id: {
+        using T = MN::PIRUnoccupiedToOccupiedDelay::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
         if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "PirUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
-            UN::PirUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
+            sl_log_debug(LOG_TAG, "PIRUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
+            UN::PIRUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                MN::PirUnoccupiedToOccupiedDelay::Id);
+                MN::PIRUnoccupiedToOccupiedDelay::Id);
         }
         break;
     }
         // type is int8u
-    case MN::PirUnoccupiedToOccupiedThreshold::Id: {
-        using T = MN::PirUnoccupiedToOccupiedThreshold::TypeInfo::Type;
+    case MN::PIRUnoccupiedToOccupiedThreshold::Id: {
+        using T = MN::PIRUnoccupiedToOccupiedThreshold::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
         if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "PirUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
-            UN::PirUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
+            sl_log_debug(LOG_TAG, "PIRUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
+            UN::PIRUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                MN::PirUnoccupiedToOccupiedThreshold::Id);
+                MN::PIRUnoccupiedToOccupiedThreshold::Id);
         }
         break;
     }
@@ -7196,6 +7213,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
         // rms voltage swell period phase c is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
+        // EventList is not supported by UCL
         // AttributeList is not supported by UCL
         // FeatureMap is not supported by UCL
         // ClusterRevision is not supported by UCL

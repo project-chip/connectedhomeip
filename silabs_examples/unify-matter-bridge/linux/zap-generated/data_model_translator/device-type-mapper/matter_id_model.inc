@@ -45,7 +45,7 @@ namespace app {
             { "Binding", Binding::Id },
             { "AccessControl", AccessControl::Id },
             { "Actions", Actions::Id },
-            { "Basic", Basic::Id },
+            { "BasicInformation", BasicInformation::Id },
             { "OtaSoftwareUpdateProvider", OtaSoftwareUpdateProvider::Id },
             { "OtaSoftwareUpdateRequestor", OtaSoftwareUpdateRequestor::Id },
             { "LocalizationConfiguration", LocalizationConfiguration::Id },
@@ -62,7 +62,7 @@ namespace app {
             { "WiFiNetworkDiagnostics", WiFiNetworkDiagnostics::Id },
             { "EthernetNetworkDiagnostics", EthernetNetworkDiagnostics::Id },
             { "TimeSynchronization", TimeSynchronization::Id },
-            { "BridgedDeviceBasic", BridgedDeviceBasic::Id },
+            { "BridgedDeviceBasicInformation", BridgedDeviceBasicInformation::Id },
             { "Switch", Switch::Id },
             { "AdministratorCommissioning", AdministratorCommissioning::Id },
             { "OperationalCredentials", OperationalCredentials::Id },
@@ -293,7 +293,7 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace Actions
-        namespace Basic {
+        namespace BasicInformation {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "DataModelRevision", DataModelRevision::Id },
@@ -323,7 +323,7 @@ namespace app {
                     { "ClusterRevision", ClusterRevision::Id }
                 };
             } // namespace Attributes
-        } // namespace Basic
+        } // namespace BasicInformation
         namespace OtaSoftwareUpdateProvider {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -338,7 +338,7 @@ namespace app {
         namespace OtaSoftwareUpdateRequestor {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "DefaultOtaProviders", DefaultOtaProviders::Id },
+                    { "DefaultOTAProviders", DefaultOTAProviders::Id },
                     { "UpdatePossible", UpdatePossible::Id },
                     { "UpdateState", UpdateState::Id },
                     { "UpdateStateProgress", UpdateStateProgress::Id },
@@ -496,7 +496,7 @@ namespace app {
                     { "RebootCount", RebootCount::Id },
                     { "UpTime", UpTime::Id },
                     { "TotalOperationalHours", TotalOperationalHours::Id },
-                    { "BootReasons", BootReasons::Id },
+                    { "BootReason", BootReason::Id },
                     { "ActiveHardwareFaults", ActiveHardwareFaults::Id },
                     { "ActiveRadioFaults", ActiveRadioFaults::Id },
                     { "ActiveNetworkFaults", ActiveNetworkFaults::Id },
@@ -534,8 +534,8 @@ namespace app {
                     { "ExtendedPanId", ExtendedPanId::Id },
                     { "MeshLocalPrefix", MeshLocalPrefix::Id },
                     { "OverrunCount", OverrunCount::Id },
-                    { "NeighborTableList", NeighborTableList::Id },
-                    { "RouteTableList", RouteTableList::Id },
+                    { "NeighborTable", NeighborTable::Id },
+                    { "RouteTable", RouteTable::Id },
                     { "PartitionId", PartitionId::Id },
                     { "Weighting", Weighting::Id },
                     { "DataVersion", DataVersion::Id },
@@ -663,7 +663,7 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace TimeSynchronization
-        namespace BridgedDeviceBasic {
+        namespace BridgedDeviceBasicInformation {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "VendorName", VendorName::Id },
@@ -688,7 +688,7 @@ namespace app {
                     { "ClusterRevision", ClusterRevision::Id }
                 };
             } // namespace Attributes
-        } // namespace BridgedDeviceBasic
+        } // namespace BridgedDeviceBasicInformation
         namespace Switch {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -1137,7 +1137,7 @@ namespace app {
                     { "BallastStatus", BallastStatus::Id },
                     { "MinLevel", MinLevel::Id },
                     { "MaxLevel", MaxLevel::Id },
-                    { "IntrinsicBalanceFactor", IntrinsicBalanceFactor::Id },
+                    { "IntrinsicBallastFactor", IntrinsicBallastFactor::Id },
                     { "BallastFactorAdjustment", BallastFactorAdjustment::Id },
                     { "LampQuantity", LampQuantity::Id },
                     { "LampType", LampType::Id },
@@ -1241,9 +1241,9 @@ namespace app {
                     { "Occupancy", Occupancy::Id },
                     { "OccupancySensorType", OccupancySensorType::Id },
                     { "OccupancySensorTypeBitmap", OccupancySensorTypeBitmap::Id },
-                    { "PirOccupiedToUnoccupiedDelay", PirOccupiedToUnoccupiedDelay::Id },
-                    { "PirUnoccupiedToOccupiedDelay", PirUnoccupiedToOccupiedDelay::Id },
-                    { "PirUnoccupiedToOccupiedThreshold", PirUnoccupiedToOccupiedThreshold::Id },
+                    { "PIROccupiedToUnoccupiedDelay", PIROccupiedToUnoccupiedDelay::Id },
+                    { "PIRUnoccupiedToOccupiedDelay", PIRUnoccupiedToOccupiedDelay::Id },
+                    { "PIRUnoccupiedToOccupiedThreshold", PIRUnoccupiedToOccupiedThreshold::Id },
                     { "UltrasonicOccupiedToUnoccupiedDelay", UltrasonicOccupiedToUnoccupiedDelay::Id },
                     { "UltrasonicUnoccupiedToOccupiedDelay", UltrasonicUnoccupiedToOccupiedDelay::Id },
                     { "UltrasonicUnoccupiedToOccupiedThreshold", UltrasonicUnoccupiedToOccupiedThreshold::Id },
@@ -1692,7 +1692,7 @@ namespace app {
             { "Binding", Binding::Attributes::matter_attribute_id_cluster_map },
             { "AccessControl", AccessControl::Attributes::matter_attribute_id_cluster_map },
             { "Actions", Actions::Attributes::matter_attribute_id_cluster_map },
-            { "Basic", Basic::Attributes::matter_attribute_id_cluster_map },
+            { "BasicInformation", BasicInformation::Attributes::matter_attribute_id_cluster_map },
             { "OtaSoftwareUpdateProvider", OtaSoftwareUpdateProvider::Attributes::matter_attribute_id_cluster_map },
             { "OtaSoftwareUpdateRequestor", OtaSoftwareUpdateRequestor::Attributes::matter_attribute_id_cluster_map },
             { "LocalizationConfiguration", LocalizationConfiguration::Attributes::matter_attribute_id_cluster_map },
@@ -1709,7 +1709,7 @@ namespace app {
             { "WiFiNetworkDiagnostics", WiFiNetworkDiagnostics::Attributes::matter_attribute_id_cluster_map },
             { "EthernetNetworkDiagnostics", EthernetNetworkDiagnostics::Attributes::matter_attribute_id_cluster_map },
             { "TimeSynchronization", TimeSynchronization::Attributes::matter_attribute_id_cluster_map },
-            { "BridgedDeviceBasic", BridgedDeviceBasic::Attributes::matter_attribute_id_cluster_map },
+            { "BridgedDeviceBasicInformation", BridgedDeviceBasicInformation::Attributes::matter_attribute_id_cluster_map },
             { "Switch", Switch::Attributes::matter_attribute_id_cluster_map },
             { "AdministratorCommissioning", AdministratorCommissioning::Attributes::matter_attribute_id_cluster_map },
             { "OperationalCredentials", OperationalCredentials::Attributes::matter_attribute_id_cluster_map },
@@ -1880,13 +1880,13 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace Actions
-        namespace Basic {
+        namespace BasicInformation {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "MfgSpecificPing", MfgSpecificPing::Id }
                 };
             } // namespace Commands
-        } // namespace Basic
+        } // namespace BasicInformation
         namespace OtaSoftwareUpdateProvider {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -1901,7 +1901,7 @@ namespace app {
         namespace OtaSoftwareUpdateRequestor {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "AnnounceOtaProvider", AnnounceOtaProvider::Id }
+                    { "AnnounceOTAProvider", AnnounceOTAProvider::Id }
                 };
             } // namespace Commands
         } // namespace OtaSoftwareUpdateRequestor
@@ -2007,11 +2007,11 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace TimeSynchronization
-        namespace BridgedDeviceBasic {
+        namespace BridgedDeviceBasicInformation {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
-        } // namespace BridgedDeviceBasic
+        } // namespace BridgedDeviceBasicInformation
         namespace Switch {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
@@ -2258,7 +2258,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "Play", Play::Id },
                     { "Pause", Pause::Id },
-                    { "StopPlayback", StopPlayback::Id },
+                    { "Stop", Stop::Id },
                     { "StartOver", StartOver::Id },
                     { "Previous", Previous::Id },
                     { "Next", Next::Id },
@@ -2301,7 +2301,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "LaunchContent", LaunchContent::Id },
                     { "LaunchURL", LaunchURL::Id },
-                    { "LaunchResponse", LaunchResponse::Id }
+                    { "LauncherResponse", LauncherResponse::Id }
                 };
             } // namespace Commands
         } // namespace ContentLauncher
@@ -2352,7 +2352,7 @@ namespace app {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "RegisterClientMonitoring", RegisterClientMonitoring::Id },
-                    { "StayAwakeRequest", StayAwakeRequest::Id }
+                    { "UnregisterClientMonitoring", UnregisterClientMonitoring::Id },
                 };
             } // namespace Commands
         } // namespace ClientMonitoring
@@ -2419,7 +2419,7 @@ namespace app {
             { "Binding", Binding::Commands::matter_command_id_cluster_map },
             { "AccessControl", AccessControl::Commands::matter_command_id_cluster_map },
             { "Actions", Actions::Commands::matter_command_id_cluster_map },
-            { "Basic", Basic::Commands::matter_command_id_cluster_map },
+            { "BasicInformation", BasicInformation::Commands::matter_command_id_cluster_map },
             { "OtaSoftwareUpdateProvider", OtaSoftwareUpdateProvider::Commands::matter_command_id_cluster_map },
             { "OtaSoftwareUpdateRequestor", OtaSoftwareUpdateRequestor::Commands::matter_command_id_cluster_map },
             { "LocalizationConfiguration", LocalizationConfiguration::Commands::matter_command_id_cluster_map },
@@ -2436,7 +2436,7 @@ namespace app {
             { "WiFiNetworkDiagnostics", WiFiNetworkDiagnostics::Commands::matter_command_id_cluster_map },
             { "EthernetNetworkDiagnostics", EthernetNetworkDiagnostics::Commands::matter_command_id_cluster_map },
             { "TimeSynchronization", TimeSynchronization::Commands::matter_command_id_cluster_map },
-            { "BridgedDeviceBasic", BridgedDeviceBasic::Commands::matter_command_id_cluster_map },
+            { "BridgedDeviceBasicInformation", BridgedDeviceBasicInformation::Commands::matter_command_id_cluster_map },
             { "Switch", Switch::Commands::matter_command_id_cluster_map },
             { "AdministratorCommissioning", AdministratorCommissioning::Commands::matter_command_id_cluster_map },
             { "OperationalCredentials", OperationalCredentials::Commands::matter_command_id_cluster_map },

@@ -111,7 +111,7 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "AddGroup"; // "AddGroup";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupId"] = to_json(data.groupId);
+                payload["GroupId"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -127,7 +127,7 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "ViewGroup"; // "ViewGroup";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupId"] = to_json(data.groupId);
+                payload["GroupId"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -149,7 +149,7 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "RemoveGroup"; // "RemoveGroup";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupId"] = to_json(data.groupId);
+                payload["GroupId"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -166,7 +166,7 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "AddGroupIfIdentifying"; // "AddGroupIfIdentifying";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupId"] = to_json(data.groupId);
+                payload["GroupId"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -213,12 +213,12 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "AddScene"; // "AddScene";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneID"] = to_json(data.sceneId);
+                payload["SceneID"] = to_json(data.sceneID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -244,12 +244,12 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "ViewScene"; // "ViewScene";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneID"] = to_json(data.sceneId);
+                payload["SceneID"] = to_json(data.sceneID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -260,12 +260,12 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "RemoveScene"; // "RemoveScene";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneID"] = to_json(data.sceneId);
+                payload["SceneID"] = to_json(data.sceneID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -276,7 +276,7 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "RemoveAllScenes"; // "RemoveAllScenes";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -287,12 +287,12 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "StoreScene"; // "StoreScene";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneID"] = to_json(data.sceneId);
+                payload["SceneID"] = to_json(data.sceneID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -303,12 +303,12 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "RecallScene"; // "RecallScene";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneID"] = to_json(data.sceneId);
+                payload["SceneID"] = to_json(data.sceneID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -326,7 +326,7 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "GetSceneMembership"; // "GetSceneMembership";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -337,12 +337,12 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "EnhancedAddScene"; // "EnhancedAddScene";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneID"] = to_json(data.sceneId);
+                payload["SceneID"] = to_json(data.sceneID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -368,12 +368,12 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
         cmd = "EnhancedViewScene"; // "EnhancedViewScene";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["GroupID"] = to_json(data.groupId);
+                payload["GroupID"] = to_json(data.groupID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneID"] = to_json(data.sceneId);
+                payload["SceneID"] = to_json(data.sceneID);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -389,22 +389,22 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["GroupIdentifierFrom"] = to_json(data.groupIdFrom);
+                payload["GroupIdentifierFrom"] = to_json(data.groupIdentifierFrom);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneIdentifierFrom"] = to_json(data.sceneIdFrom);
+                payload["SceneIdentifierFrom"] = to_json(data.sceneIdentifierFrom);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["GroupIdentifierTo"] = to_json(data.groupIdTo);
+                payload["GroupIdentifierTo"] = to_json(data.groupIdentifierTo);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
             try {
-                payload["SceneIdentifierTo"] = to_json(data.sceneIdTo);
+                payload["SceneIdentifierTo"] = to_json(data.sceneIdentifierTo);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -464,7 +464,7 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         cmd = "OffWithEffect"; // "OffWithEffect";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["EffectIdentifier"] = to_json(data.effectId);
+                payload["EffectIdentifier"] = to_json(data.effectIdentifier);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
@@ -777,9 +777,9 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
         Commands::LockDoor::DecodableType data;
         cmd = "LockDoor"; // "LockDoor";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            if (data.pinCode.HasValue()) {
+            if (data.PINCode.HasValue()) {
                 try {
-                    payload["PINOrRFIDCode"] = to_json(data.pinCode.Value());
+                    payload["PINOrRFIDCode"] = to_json(data.PINCode.Value());
                 } catch (std::exception& ex) {
                     sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
                 }
@@ -790,9 +790,9 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
         Commands::UnlockDoor::DecodableType data;
         cmd = "UnlockDoor"; // "UnlockDoor";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            if (data.pinCode.HasValue()) {
+            if (data.PINCode.HasValue()) {
                 try {
-                    payload["PINOrRFIDCode"] = to_json(data.pinCode.Value());
+                    payload["PINOrRFIDCode"] = to_json(data.PINCode.Value());
                 } catch (std::exception& ex) {
                     sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
                 }
@@ -808,9 +808,9 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
-            if (data.pinCode.HasValue()) {
+            if (data.PINCode.HasValue()) {
                 try {
-                    payload["PINOrRFIDCode"] = to_json(data.pinCode.Value());
+                    payload["PINOrRFIDCode"] = to_json(data.PINCode.Value());
                 } catch (std::exception& ex) {
                     sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
                 }
@@ -1563,7 +1563,7 @@ void ColorControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
         cmd = "MoveToColorTemperature"; // "MoveToColorTemperature";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
             try {
-                payload["ColorTemperatureMireds"] = to_json(data.colorTemperature);
+                payload["ColorTemperatureMireds"] = to_json(data.colorTemperatureMireds);
             } catch (std::exception& ex) {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }

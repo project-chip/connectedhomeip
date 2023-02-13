@@ -28,9 +28,10 @@ namespace unify::matter_bridge {
 /// Attribute Handler for the Identify cluster
 /// Please note that the following attributes are not defined in UCL, and they must be handled
 /// by separate code
-/// - identify type
+/// - IdentifyType
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -64,6 +65,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -97,6 +99,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -130,6 +133,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -164,6 +168,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -196,7 +201,7 @@ private:
 // Skipping Binding
 // Skipping Access Control
 // Skipping Actions
-// Skipping Basic
+// Skipping Basic Information
 // Skipping OTA Software Update Provider
 // Skipping OTA Software Update Requestor
 // Skipping Localization Configuration
@@ -213,9 +218,9 @@ private:
 // Skipping WiFi Network Diagnostics
 // Skipping Ethernet Network Diagnostics
 // Skipping Time Synchronization
-// Skipping Bridged Device Basic
+// Skipping Bridged Device Basic Information
 // Skipping Switch
-// Skipping AdministratorCommissioning
+// Skipping Administrator Commissioning
 // Skipping Operational Credentials
 // Skipping Group Key Management
 // Skipping Fixed Label
@@ -236,6 +241,7 @@ private:
 /// - ExpiringUserTimeout (optional)
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -270,6 +276,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -304,6 +311,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -335,17 +343,18 @@ private:
 /// Attribute Handler for the Fan Control cluster
 /// Please note that the following attributes are not defined in UCL, and they must be handled
 /// by separate code
-/// - percent setting
-/// - percent current
-/// - speed max (optional)
-/// - speed setting (optional)
-/// - speed current (optional)
-/// - rock support (optional)
-/// - rock setting (optional)
-/// - wind support (optional)
-/// - wind setting (optional)
+/// - PercentSetting
+/// - PercentCurrent
+/// - SpeedMax (optional)
+/// - SpeedSetting (optional)
+/// - SpeedCurrent (optional)
+/// - RockSupport (optional)
+/// - RockSetting (optional)
+/// - WindSupport (optional)
+/// - WindSetting (optional)
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -379,6 +388,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -416,6 +426,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -450,6 +461,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -486,6 +498,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -522,6 +535,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -555,6 +569,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -588,6 +603,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -622,6 +638,7 @@ private:
 /// by separate code
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision
@@ -669,6 +686,7 @@ private:
 /// - instantaneous power (optional)
 /// - GeneratedCommandList
 /// - AcceptedCommandList
+/// - EventList
 /// - AttributeList
 /// - FeatureMap
 /// - ClusterRevision

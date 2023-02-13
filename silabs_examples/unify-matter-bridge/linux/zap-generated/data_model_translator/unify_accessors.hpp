@@ -425,7 +425,7 @@ namespace matter_bridge {
         } // namespace Attributes
     } // namespace Actions
 
-    namespace Basic {
+    namespace BasicInformation {
         namespace Attributes {
 
             namespace DataModelRevision {
@@ -534,7 +534,7 @@ namespace matter_bridge {
             } // namespace ClusterRevision
 
         } // namespace Attributes
-    } // namespace Basic
+    } // namespace BasicInformation
 
     namespace OtaSoftwareUpdateProvider {
         namespace Attributes {
@@ -962,10 +962,12 @@ namespace matter_bridge {
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const uint32_t& value);
             } // namespace TotalOperationalHours
 
-            namespace BootReasons {
-                EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, uint8_t& value);
-                EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const uint8_t& value);
-            } // namespace BootReasons
+            namespace BootReason {
+                EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint,
+                    chip::app::Clusters::GeneralDiagnostics::BootReasonEnum& value);
+                EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint,
+                    const chip::app::Clusters::GeneralDiagnostics::BootReasonEnum& value);
+            } // namespace BootReason
 
             namespace TestEventTriggersEnabled {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, bool& value);
@@ -1414,9 +1416,9 @@ namespace matter_bridge {
 
             namespace PHYRate {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint,
-                    chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>& value);
+                    chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum>& value);
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint,
-                    const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>& value);
+                    const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum>& value);
             } // namespace PHYRate
 
             namespace FullDuplex {
@@ -1532,7 +1534,7 @@ namespace matter_bridge {
         } // namespace Attributes
     } // namespace TimeSynchronization
 
-    namespace BridgedDeviceBasic {
+    namespace BridgedDeviceBasicInformation {
         namespace Attributes {
 
             namespace VendorName {
@@ -1621,7 +1623,7 @@ namespace matter_bridge {
             } // namespace ClusterRevision
 
         } // namespace Attributes
-    } // namespace BridgedDeviceBasic
+    } // namespace BridgedDeviceBasicInformation
 
     namespace Switch {
         namespace Attributes {
@@ -1659,9 +1661,9 @@ namespace matter_bridge {
 
             namespace WindowStatus {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint,
-                    chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus& value);
+                    chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum& value);
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint,
-                    const chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus& value);
+                    const chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum& value);
             } // namespace WindowStatus
 
             namespace AdminFabricIndex {
@@ -1909,9 +1911,9 @@ namespace matter_bridge {
 
             namespace DoorState {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint,
-                    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState>& value);
+                    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum>& value);
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint,
-                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState>& value);
+                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum>& value);
             } // namespace DoorState
 
             namespace DoorOpenEvents {
@@ -2012,8 +2014,9 @@ namespace matter_bridge {
             } // namespace SoundVolume
 
             namespace OperatingMode {
-                EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, chip::app::Clusters::DoorLock::DlOperatingMode& value);
-                EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const chip::app::Clusters::DoorLock::DlOperatingMode& value);
+                EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum& value);
+                EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint,
+                    const chip::app::Clusters::DoorLock::OperatingModeEnum& value);
             } // namespace OperatingMode
 
             namespace SupportedOperatingModes {
@@ -3111,10 +3114,10 @@ namespace matter_bridge {
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const uint8_t& value);
             } // namespace MaxLevel
 
-            namespace IntrinsicBalanceFactor {
+            namespace IntrinsicBallastFactor {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, chip::app::DataModel::Nullable<uint8_t>& value);
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const chip::app::DataModel::Nullable<uint8_t>& value);
-            } // namespace IntrinsicBalanceFactor
+            } // namespace IntrinsicBallastFactor
 
             namespace BallastFactorAdjustment {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, chip::app::DataModel::Nullable<uint8_t>& value);
@@ -3397,20 +3400,20 @@ namespace matter_bridge {
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const uint8_t& value);
             } // namespace OccupancySensorTypeBitmap
 
-            namespace PirOccupiedToUnoccupiedDelay {
+            namespace PIROccupiedToUnoccupiedDelay {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, uint16_t& value);
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const uint16_t& value);
-            } // namespace PirOccupiedToUnoccupiedDelay
+            } // namespace PIROccupiedToUnoccupiedDelay
 
-            namespace PirUnoccupiedToOccupiedDelay {
+            namespace PIRUnoccupiedToOccupiedDelay {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, uint16_t& value);
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const uint16_t& value);
-            } // namespace PirUnoccupiedToOccupiedDelay
+            } // namespace PIRUnoccupiedToOccupiedDelay
 
-            namespace PirUnoccupiedToOccupiedThreshold {
+            namespace PIRUnoccupiedToOccupiedThreshold {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, uint8_t& value);
                 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const uint8_t& value);
-            } // namespace PirUnoccupiedToOccupiedThreshold
+            } // namespace PIRUnoccupiedToOccupiedThreshold
 
             namespace UltrasonicOccupiedToUnoccupiedDelay {
                 EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, uint16_t& value);
