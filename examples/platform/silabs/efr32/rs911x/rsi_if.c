@@ -73,7 +73,7 @@ bool is_wifi_disconnection_event = false;
 /* Declare a variable to hold connection time intervals */
 uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
 
-#if (RS91X_BLE_ENABLE)
+#if (RSI_BLE_ENABLE)
 extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
 #endif
 
@@ -344,7 +344,7 @@ static int32_t wfx_rsi_init(void)
         return RSI_ERROR_INVALID_PARAM;
     }
 
-#if (RS91X_BLE_ENABLE)
+#if (RSI_BLE_ENABLE)
     if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS) {
 #else
     if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS) {
@@ -403,7 +403,7 @@ static int32_t wfx_rsi_init(void)
     }
 #endif
 
-#if (RS91X_BLE_ENABLE)
+#if (RSI_BLE_ENABLE)
      rsi_semaphore_post(&sl_rs_ble_init_sem);
 #endif
 

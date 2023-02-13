@@ -205,7 +205,6 @@ template("efr32_sdk") {
     if (chip_enable_ble_rs911x) {
       defines += [
         "RSI_BLE_ENABLE=1",
-        "RS91X_BLE_ENABLE=1",
       ]
     }
 

@@ -57,7 +57,7 @@ struct wfx_rsi
     EventGroupHandle_t events;
     TaskHandle_t drv_task;
     TaskHandle_t wlan_task;
-#ifdef RS91X_BLE_ENABLE
+#ifdef RSI_BLE_ENABLE
     TaskHandle_t ble_task;
 #endif
     uint16_t dev_state;
