@@ -67,16 +67,25 @@ public:
 private:
     static constexpr int kQRCodeVersion   = qrcodegen_VERSION_MAX;
     static constexpr int kMaxQRBufferSize = qrcodegen_BUFFER_LEN_FOR_VERSION(kQRCodeVersion);
+    static constexpr int kMaxColors       = 6; // spec defined maximum
 
     sem_t mChipLoopWaitSemaphore;
 
     bool mHasQRCode                   = false;
     uint8_t mQRData[kMaxQRBufferSize] = { 0 };
 
-    // light data:
-    bool mLightIsOn                      = false;
+    // OnOff
+    bool mLightIsOn = false;
+    // Level
+    uint8_t mMinLevel                    = 0;
+    uint8_t mMaxLevel                    = 0;
     uint8_t mCurrentLevel                = 0;
     uint16_t mLevelRemainingTime10sOfSec = 0;
+    // Color control
+    uint8_t mColorHue        = 0;
+    uint8_t mColorSaturation = 0;
+    uint16_t mColorX         = 0;
+    uint16_t mColorY         = 0;
 
     // Updates the data (run in the chip event loop)
     void ChipLoopUpdate();
@@ -156,8 +165,16 @@ void DeviceState::ShowUi()
     }
 
     ImGui::Text("Level Control:");
+    ImGui::Text("    MIN Level:              %d", mMinLevel);
     ImGui::Text("    Current Level:          %d", mCurrentLevel);
+    ImGui::Text("    MAX Level:              %d", mMaxLevel);
     ImGui::Text("    Remaining Time (1/10s): %d", mLevelRemainingTime10sOfSec);
+
+    ImGui::Text("Color Control:");
+    ImGui::Text("    Current Hue:         %d", mColorHue);
+    ImGui::Text("    Current Saturation:  %d", mColorSaturation);
+    ImGui::Text("    Current X:           %d", mColorX);
+    ImGui::Text("    Current Y:           %d", mColorY);
 
     ImGui::End();
 
@@ -238,20 +255,39 @@ void DeviceState::ChipLoopUpdate()
 
     // TODO:
     //    - consider error checking
-    //    - add more attributes to the display (color? brightness?)
     {
         uint8_t value;
-        emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::OnOff::Id,
-                                   chip::app::Clusters::OnOff::Attributes::OnOff::Id, &value, sizeof(value));
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OnOff::Attributes::OnOff::Id,
+                             &value, sizeof(value));
         mLightIsOn = (value != 0);
 
-        emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
-                                   chip::app::Clusters::LevelControl::Attributes::CurrentLevel::Id, &mCurrentLevel,
-                                   sizeof(mCurrentLevel));
+        // Level Control
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
+                             chip::app::Clusters::LevelControl::Attributes::CurrentLevel::Id, &mCurrentLevel,
+                             sizeof(mCurrentLevel));
 
-        emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
-                                   chip::app::Clusters::LevelControl::Attributes::RemainingTime::Id,
-                                   reinterpret_cast<uint8_t *>(&mLevelRemainingTime10sOfSec), sizeof(mLevelRemainingTime10sOfSec));
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
+                             chip::app::Clusters::LevelControl::Attributes::MinLevel::Id, &mMinLevel, sizeof(mMinLevel));
+
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
+                             chip::app::Clusters::LevelControl::Attributes::MaxLevel::Id, &mMaxLevel, sizeof(mMaxLevel));
+
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
+                             chip::app::Clusters::LevelControl::Attributes::RemainingTime::Id,
+                             reinterpret_cast<uint8_t *>(&mLevelRemainingTime10sOfSec), sizeof(mLevelRemainingTime10sOfSec));
+
+        // Color control
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::ColorControl::Id,
+                             chip::app::Clusters::ColorControl::Attributes::CurrentHue::Id, &mColorHue, sizeof(mColorHue));
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::ColorControl::Id,
+                             chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::Id, &mColorSaturation,
+                             sizeof(mColorSaturation));
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::ColorControl::Id,
+                             chip::app::Clusters::ColorControl::Attributes::CurrentX::Id, reinterpret_cast<uint8_t *>(&mColorX),
+                             sizeof(mColorX));
+        emberAfReadAttribute(kLightEndpointId, chip::app::Clusters::ColorControl::Id,
+                             chip::app::Clusters::ColorControl::Attributes::CurrentY::Id, reinterpret_cast<uint8_t *>(&mColorY),
+                             sizeof(mColorY));
     }
 }
 
