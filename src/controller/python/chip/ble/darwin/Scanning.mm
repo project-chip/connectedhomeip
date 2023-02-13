@@ -105,7 +105,7 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
     ChipLogProgress(Ble, "Scan timeout reached.");
 
     _completeCallback(_context);
-    _errorCallback(_context, CHIP_ERROR_TIMEOUT);
+    _errorCallback(_context, CHIP_ERROR_TIMEOUT.AsInteger());
 
     dispatch_source_cancel(_timer);
     [self.centralManager stopScan];
