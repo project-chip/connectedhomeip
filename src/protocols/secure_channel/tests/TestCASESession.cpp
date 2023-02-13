@@ -1179,6 +1179,8 @@ int CASE_TestSecurePairing_Setup(void * inContext)
  */
 int CASE_TestSecurePairing_Teardown(void * inContext)
 {
+    chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
+
     gPairingServer.Shutdown();
     gCommissionerStorageDelegate.ClearStorage();
     gDeviceStorageDelegate.ClearStorage();
