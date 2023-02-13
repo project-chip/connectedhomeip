@@ -201,7 +201,7 @@ tests:
     # product id ?
     - label: "TXT key for Vendor ID and Product ID (VP)"
       PICS: MCORE.SC.VP_KEY
-      optional: true
+      disabled: true # [TestDiscovery] Enable back TXT key for Vendor ID and Product ID (VP) #25017
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:

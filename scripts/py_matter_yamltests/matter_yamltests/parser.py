@@ -45,7 +45,6 @@ _TEST_SECTION = [
     'verification',
     'nodeId',
     'attribute',
-    'optional',
     'PICS',
     'arguments',
     'response',
@@ -102,7 +101,6 @@ class PostProcessCheckType(Enum):
     CONSTRAINT_VALIDATION = auto()
     SAVE_AS_VARIABLE = auto()
     WAIT_VALIDATION = auto()
-    OPTIONAL = auto()
 
 
 class PostProcessCheck:
@@ -204,7 +202,6 @@ class _TestStepWithPlaceholders:
         _check_valid_keys(test, _TEST_SECTION)
 
         self.label = _value_or_none(test, 'label')
-        self.optional = _value_or_none(test, 'optional')
         self.node_id = _value_or_config(test, 'nodeId', config)
         self.group_id = _value_or_config(test, 'groupId', config)
         self.cluster = _value_or_config(test, 'cluster', config)
@@ -290,15 +287,10 @@ class _TestStepWithPlaceholders:
         self.update_arguments(self.arguments_with_placeholders)
         self.update_responses(self.responses_with_placeholders)
 
-        # Some keywords, such as "optional" and "wait_for" do not support multiple
-        # responses.
-        if len(responses) > 1:
-            if self.optional:
-                raise Exception(
-                    'The "optional" keyword can not be used with multiple expected responses')
-            elif self.wait_for:
-                raise Exception(
-                    'The "wait_for" keyword can not be used with multiple expected responses')
+        # The "wait_for" keyword do not support multiple responses.
+        if len(responses) > 1 and self.wait_for:
+            raise Exception(
+                'The "wait_for" keyword can not be used with multiple expected responses')
 
         # This performs a very basic sanity parse time check of constraints. This parsing happens
         # again inside post processing response since at that time we will have required variables
@@ -481,10 +473,6 @@ class TestStep:
         return self._test.label
 
     @property
-    def optional(self):
-        return self._test.optional
-
-    @property
     def node_id(self):
         return self._test.node_id
 
@@ -555,9 +543,6 @@ class TestStep:
 
         if self.wait_for is not None:
             self._response_cluster_wait_validation(received_responses, result)
-            return result
-
-        if self._skip_post_processing(received_responses, result):
             return result
 
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
@@ -648,36 +633,6 @@ class TestStep:
         if success:
             result.success(check_type, error_success.format(
                 wait_for=self.wait_for, cluster=self.cluster, wait_type=expected_wait_type, endpoint=self.endpoint))
-
-    def _skip_post_processing(self, received_responses, result) -> bool:
-        '''Should we skip perform post processing.
-
-        Currently we only skip post processing if the test step indicates that sent test step
-        invokation was expected to be optionally supported. We confirm that it is optional
-        supported by either validating we got the expected error only then indicate that all
-        other post processing should be skipped.
-        '''
-        if not self.optional:
-            return False
-
-        check_type = PostProcessCheckType.OPTIONAL
-        error_failure_multiple_responses = 'The test expects a single response but got {len(received_responses)} responses.'
-
-        if len(received_responses) > 1:
-            result.error(check_type, error_failure.multiple_responses)
-            return False
-        received_response = received_responses[0]
-
-        received_error = received_response.get('error', None)
-        if received_error is None:
-            return False
-
-        if received_error == 'UNSUPPORTED_ATTRIBUTE' or received_error == 'UNSUPPORTED_COMMAND':
-            result.warning(PostProcessCheckType.OPTIONAL,
-                           f'The response contains the error: "{received_error}".')
-            return True
-
-        return False
 
     def _response_error_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.IM_STATUS

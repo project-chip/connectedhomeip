@@ -220,8 +220,6 @@ class ReadAttributeAction(BaseAction):
         if test_step.fabric_filtered is not None:
             self._fabric_filtered = test_step.fabric_filtered
 
-        self._possibly_unsupported = bool(test_step.optional)
-
         self._cluster_object = context.data_model_lookup.get_cluster(self._cluster)
         if self._cluster_object is None:
             raise UnexpectedParsingError(
@@ -260,11 +258,6 @@ class ReadAttributeAction(BaseAction):
         return self.parse_raw_response(raw_resp)
 
     def parse_raw_response(self, raw_resp) -> _ActionResult:
-        if self._possibly_unsupported and not raw_resp:
-            # We have found an unsupported attribute. TestStep provided did specify that it might be
-            # unsupported, so nothing left to validate. We just return a failure here.
-            return _ActionResult(status=_ActionStatus.ERROR, response=None)
-
         # TODO Currently there are no checks that this indexing won't fail. Need to add some
         # initial validity checks. Coming soon in a future PR.
         resp = raw_resp[self._endpoint][self._cluster_object][self._request_object]
