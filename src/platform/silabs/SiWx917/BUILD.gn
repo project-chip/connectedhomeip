@@ -70,19 +70,18 @@ static_library("SiWx917") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-   # Add platform crypto implementation
+  # Add platform crypto implementation
   if (chip_crypto == "platform") {
     sources += [
-      "CHIPCryptoPALTinyCrypt.cpp",
       "CHIPCryptoPAL.h",
-
+      "CHIPCryptoPALTinyCrypt.cpp",
     ]
     public_deps += [
       "${chip_root}/src/crypto",
       "${mbedtls_root}:mbedtls",
     ]
   }
-  
+
   if (chip_enable_wifi) {
     sources += [
       "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
