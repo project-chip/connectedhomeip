@@ -34,6 +34,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <common/CHIPDeviceManager.h>
+#include <esp_log.h>
 #include <lib/dnssd/Advertiser.h>
 
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
