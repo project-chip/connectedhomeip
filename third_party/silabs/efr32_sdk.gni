@@ -38,7 +38,7 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
-  sleep_time_ms = 3300000  # 55 mins sleep
+  sleep_time_ms = 30000  # 30 seconds sleep
 
   silabs_log_enabled = true
 
