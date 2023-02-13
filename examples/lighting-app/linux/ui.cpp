@@ -74,7 +74,8 @@ private:
     uint8_t mQRData[kMaxQRBufferSize] = { 0 };
 
     // light data:
-    bool mLightIsOn = false;
+    bool mLightIsOn       = false;
+    uint8_t mCurrentLevel = 0;
 
     // Updates the data (run in the chip event loop)
     void ChipLoopUpdate();
@@ -141,17 +142,20 @@ inline ImVec2 operator+(const ImVec2 & a, const ImVec2 & b)
 
 void DeviceState::ShowUi()
 {
-    ImGui::Begin("Light app");
-    ImGui::Text("Here is the current ember device state:");
+    ImGui::Begin("Light app state");
+    ImGui::Text("On-Off:");
 
     if (mLightIsOn)
     {
-        ImGui::Text("Light is ON");
+        ImGui::Text("    Light is ON");
     }
     else
     {
-        ImGui::Text("Light is OFF");
+        ImGui::Text("    Light is OFF");
     }
+
+    ImGui::Text("Level Control:");
+    ImGui::Text("    Current Level: %d", mCurrentLevel);
 
     ImGui::End();
 
@@ -238,6 +242,10 @@ void DeviceState::ChipLoopUpdate()
         emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::OnOff::Id,
                                    chip::app::Clusters::OnOff::Attributes::OnOff::Id, &value, sizeof(value));
         mLightIsOn = (value != 0);
+
+        emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::LevelControl::Id,
+                                   chip::app::Clusters::LevelControl::Attributes::CurrentLevel::Id, &mCurrentLevel,
+                                   sizeof(mCurrentLevel));
     }
 }
 
