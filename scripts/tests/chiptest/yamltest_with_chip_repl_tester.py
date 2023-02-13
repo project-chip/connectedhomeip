@@ -33,7 +33,7 @@ import click
 from chip.ChipStack import *
 from chip.yaml.runner import ReplTestRunner
 from matter_yamltests.definitions import SpecDefinitionsFromPaths
-from matter_yamltests.parser import PostProcessCheckStatus, TestParser
+from matter_yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -100,7 +100,8 @@ def main(setup_code, yaml_path, node_id, pics_file):
             ])
 
             # Parsing YAML test and setting up chip-repl yamltests runner.
-            yaml = TestParser(yaml_path, pics_file, clusters_definitions)
+            parser_config = TestParserConfig(pics_file, clusters_definitions)
+            yaml = TestParser(yaml_path, parser_config)
             runner = ReplTestRunner(
                 clusters_definitions, certificate_authority_manager, dev_ctrl)
 

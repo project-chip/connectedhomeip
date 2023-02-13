@@ -1,5 +1,5 @@
 {
-  "featureLevel": 89,
+  "featureLevel": 90,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1136,6 +1136,15 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "AccessControlEntryChanged",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -1524,6 +1533,15 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "StartUp",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -1809,6 +1827,29 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "StateTransition",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "VersionApplied",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "DownloadError",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -10242,6 +10283,22 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "StateChanged",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ActionFailed",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -11882,6 +11939,15 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "SwitchLatched",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -12199,6 +12265,15 @@
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "StateChange",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -13253,6 +13328,29 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "DoorLockAlarm",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LockOperation",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LockOperationError",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -20896,6 +20994,22 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "TestEvent",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "TestFabricScopedEvent",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         }
       ]
@@ -24872,5 +24986,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ]
+  ],
+  "log": []
 }

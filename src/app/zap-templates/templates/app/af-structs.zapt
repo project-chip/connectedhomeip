@@ -15,7 +15,7 @@
 
 {{#zcl_structs}}
 
-{{#if (isLegacyStruct (asUnderlyingType label))}}
+{{#if (isInConfigList (asUnderlyingType label) "LegacyStructs")}}
 {{#if itemCnt}}
 // Struct for {{label}}
 typedef struct _{{asType label}} {

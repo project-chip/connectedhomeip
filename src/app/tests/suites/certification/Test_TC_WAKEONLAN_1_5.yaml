@@ -55,7 +55,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [65528, 65529, 65531, 65531, 65533]
+              contains: [65528, 65529, 65530, 65531, 65531, 65533]
 
     - label: "Read the optional attribute(MACAddress) in AttributeList"
       PICS: WAKEONLAN.S.A0000

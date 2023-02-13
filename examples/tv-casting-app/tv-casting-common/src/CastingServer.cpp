@@ -112,13 +112,15 @@ CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex f
                                                    mOnConnectionFailureClientCallback);
 }
 
-CHIP_ERROR CastingServer::DiscoverCommissioners()
+CHIP_ERROR CastingServer::DiscoverCommissioners(DeviceDiscoveryDelegate * deviceDiscoveryDelegate)
 {
     TargetVideoPlayerInfo * connectableVideoPlayerList = ReadCachedTargetVideoPlayerInfos();
     if (connectableVideoPlayerList == nullptr || !connectableVideoPlayerList[0].IsInitialized())
     {
         ChipLogProgress(AppServer, "No cached video players found during discovery");
     }
+
+    mCommissionableNodeController.RegisterDeviceDiscoveryDelegate(deviceDiscoveryDelegate);
 
     // Send discover commissioners request
     return mCommissionableNodeController.DiscoverCommissioners(

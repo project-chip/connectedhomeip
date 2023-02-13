@@ -236,7 +236,10 @@ config("silabs-wifi-config") {
 source_set("efr32-common") {
   deps = []
   public_deps = []
-  public_configs = [ ":efr32-common-config" ]
+  public_configs = [
+    ":efr32-common-config",
+    "${efr32_sdk_build_root}:silabs_config",
+  ]
 
   include_dirs = [ "." ]
 

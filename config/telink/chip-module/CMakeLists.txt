@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2022 Project CHIP Authors
+#   Copyright (c) 2022-2023 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -191,6 +191,7 @@ chip_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 chip_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 chip_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
 chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
+chip_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 chip_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 chip_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
@@ -199,6 +200,10 @@ chip_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQU
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
+chip_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
+chip_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
+chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
+chip_gn_arg_bool  ("chip_automation_logging"                FALSE)
 
 if (CONFIG_CHIP_FACTORY_DATA)
     chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")

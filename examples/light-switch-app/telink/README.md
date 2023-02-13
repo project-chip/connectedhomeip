@@ -159,7 +159,7 @@ To perform the unicast binding process, complete the following steps:
 2.  Add a binding table to the Light Switch binding cluster:
 
     ```bash
-    $ ./chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 6}, {"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 8}]' <light-switch-node-id> 1
+    $ ./chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 6}]' <light-switch-node-id> 1
     ```
 
     In this command:
