@@ -2899,23 +2899,32 @@ EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
+    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
+    bool clearedCredential = false;
     for (uint16_t i = 1; i < maxNumberOfCredentials; ++i)
     {
-        auto status = clearCredential(endpointId, modifier, sourceNodeId, credentialType, i, false);
+        status = clearCredential(endpointId, modifier, sourceNodeId, credentialType, i, false);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
             ChipLogError(Zcl,
                          "[clearCredentials] Unable to clear the credential - internal error "
                          "[endpointId=%d,credentialType=%u,credentialIndex=%d,status=%d]",
                          endpointId, to_underlying(credentialType), i, status);
-            return status;
+            goto exit;
         }
+        clearedCredential = true;
     }
 
-    sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DataOperationTypeEnum::kClear, sourceNodeId,
-                             modifier, 0xFFFE, 0xFFFE);
+exit:
+    // Generate the event if we cleared any credentials, even if we then had errors
+    // clearing other ones, so we don't have credentials silently disappearing.
+    if (clearedCredential)
+    {
+        sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DataOperationTypeEnum::kClear,
+                                 sourceNodeId, modifier, 0xFFFE, 0xFFFE);
+    }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return status;
 }
 
 bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
