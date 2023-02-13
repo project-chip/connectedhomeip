@@ -74,7 +74,7 @@ private:
     uint8_t mQRData[kMaxQRBufferSize] = { 0 };
 
     // light data:
-    bool mOnOff = false;
+    bool mLightIsOn = false;
 
     // Updates the data (run in the chip event loop)
     void ChipLoopUpdate();
@@ -140,7 +140,16 @@ void DeviceState::ShowUi()
 {
     ImGui::Begin("Light app");
     ImGui::Text("Here is the current ember device state:");
-    ImGui::Checkbox("Light is ON", &mOnOff);
+
+    if (mLightIsOn)
+    {
+        ImGui::Text("Light is ON");
+    }
+    else
+    {
+        ImGui::Text("Light is OFF");
+    }
+
     ImGui::End();
 
     if (mHasQRCode)
@@ -218,7 +227,7 @@ void DeviceState::ChipLoopUpdate()
         uint8_t value;
         emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::OnOff::Id,
                                    chip::app::Clusters::OnOff::Attributes::OnOff::Id, &value, sizeof(value));
-        mOnOff = (value != 0);
+        mLightIsOn = (value != 0);
     }
 }
 
@@ -263,9 +272,9 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     *window     = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-                               window_flags);
+                                   window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
