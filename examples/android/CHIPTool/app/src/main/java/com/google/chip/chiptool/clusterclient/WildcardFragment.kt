@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ChipIdLookup
 import chip.devicecontroller.ReportCallback
-import chip.devicecontroller.ReportEventCallback
 import chip.devicecontroller.ResubscriptionAttemptCallback
 import chip.devicecontroller.SubscriptionEstablishedCallback
 import chip.devicecontroller.model.ChipAttributePath
@@ -186,7 +186,7 @@ class WildcardFragment : Fragment() {
       setView(dialogView)
     }.create()
 
-    val isFabricFilteredEd = dialogView.findViewById<EditText>(R.id.isFabricFilteredEd)
+    val isFabricFilteredEd = dialogView.findViewById<EditText>(R.id.isFabricFilteredSp)
     dialogView.findViewById<Button>(R.id.readBtn).setOnClickListener {
       scope.launch {
         read(type, isFabricFilteredEd.text.toString().toBoolean())
@@ -204,11 +204,21 @@ class WildcardFragment : Fragment() {
 
     val minIntervalEd = dialogView.findViewById<EditText>(R.id.minIntervalEd)
     val maxIntervalEd = dialogView.findViewById<EditText>(R.id.maxIntervalEd)
-    val keepSubscriptionsEd = dialogView.findViewById<EditText>(R.id.keepSubscriptionsEd)
-    val isFabricFilteredEd = dialogView.findViewById<EditText>(R.id.isFabricFilteredEd)
+    val keepSubscriptionsSp = dialogView.findViewById<Spinner>(R.id.keepSubscriptionsSp)
+    val isFabricFilteredSp = dialogView.findViewById<Spinner>(R.id.isFabricFilteredSp)
     dialogView.findViewById<Button>(R.id.subscribeBtn).setOnClickListener {
       scope.launch {
-        subscribe(type, minIntervalEd.text.toString().toInt(), maxIntervalEd.text.toString().toInt(), keepSubscriptionsEd.text.toString().toBoolean(), isFabricFilteredEd.text.toString().toBoolean())
+        if(minIntervalEd.text.isNotBlank() && maxIntervalEd.text.isNotBlank()) {
+          subscribe(
+            type,
+            minIntervalEd.text.toString().toInt(),
+            maxIntervalEd.text.toString().toInt(),
+            keepSubscriptionsSp.selectedItem.toString().toBoolean(),
+            isFabricFilteredSp.selectedItem.toString().toBoolean()
+          )
+        } else {
+          Log.e(TAG, "minInterval or maxInterval is empty!" )
+        }
         requireActivity().runOnUiThread { dialog.dismiss() }
       }
     }

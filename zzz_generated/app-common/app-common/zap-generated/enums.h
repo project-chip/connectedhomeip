@@ -269,14 +269,6 @@ enum EmberAfSecurityType : uint8_t
     EMBER_ZCL_SECURITY_TYPE_WPA3        = 5,
 };
 
-// Enum for StatusCode
-enum EmberAfStatusCode : uint8_t
-{
-    EMBER_ZCL_STATUS_CODE_BUSY                 = 2,
-    EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR = 3,
-    EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN      = 4,
-};
-
 // Enum for StepMode
 enum EmberAfStepMode : uint8_t
 {
@@ -289,17 +281,6 @@ enum EmberAfTemperatureDisplayMode : uint8_t
 {
     EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_CELSIUS    = 0,
     EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_FAHRENHEIT = 1,
-};
-
-// Enum for WiFiVersionType
-enum EmberAfWiFiVersionType : uint8_t
-{
-    EMBER_ZCL_WI_FI_VERSION_TYPE_A  = 0,
-    EMBER_ZCL_WI_FI_VERSION_TYPE_B  = 1,
-    EMBER_ZCL_WI_FI_VERSION_TYPE_G  = 2,
-    EMBER_ZCL_WI_FI_VERSION_TYPE_N  = 3,
-    EMBER_ZCL_WI_FI_VERSION_TYPE_AC = 4,
-    EMBER_ZCL_WI_FI_VERSION_TYPE_AX = 5,
 };
 
 #define EMBER_AF_APPLICATION_LAUNCHER_FEATURE_APPLICATION_PLATFORM (1)
