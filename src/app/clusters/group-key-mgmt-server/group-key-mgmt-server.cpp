@@ -31,6 +31,7 @@ using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GroupKeyManagement;
+using chip::Protocols::InteractionModel::Status;
 
 //
 // Attributes

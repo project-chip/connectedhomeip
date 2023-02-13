@@ -36,6 +36,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WindowCovering;
+using chip::Protocols::InteractionModel::Status;
 
 #define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
 #define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
@@ -755,7 +756,7 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
         (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
     }
 
-    return EMBER_SUCCESS == commandObj->AddStatus(commandPath, Status::Success);
+    return CHIP_NO_ERROR == commandObj->AddStatus(commandPath, Status::Success);
 }
 
 /**

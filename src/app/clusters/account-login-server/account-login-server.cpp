@@ -41,6 +41,7 @@ using namespace chip::app::Clusters::AccountLogin;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::app::Clusters::AccountLogin::Delegate;
+using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kAccountLoginDeletageTableSize =
     EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -125,7 +126,7 @@ exit:
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterGetSetupPINCallback error: %s", err.AsString());
 
-        commandObj->AddStatus(commandPath, Status::Failure);
+        command->AddStatus(commandPath, Status::Failure);
     }
 
     return true;

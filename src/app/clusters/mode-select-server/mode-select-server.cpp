@@ -40,6 +40,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::Protocols;
+using chip::Protocols::InteractionModel::Status;
 
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
@@ -110,7 +111,7 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
     ModeSelect::Attributes::CurrentMode::Set(endpointId, newMode);
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode successful");
-    commandObj->AddStatus(commandPath, Status::Success);
+    commandHandler->AddStatus(commandPath, Status::Success);
     return true;
 }
 

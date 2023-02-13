@@ -35,6 +35,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
+using chip::Protocols::InteractionModel::Status;
 
 /**********************************************************
  * Attributes Definition

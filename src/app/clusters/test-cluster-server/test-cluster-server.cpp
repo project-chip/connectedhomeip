@@ -41,6 +41,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::app::Clusters::UnitTesting::Commands;
 using namespace chip::app::Clusters::UnitTesting::Attributes;
+using chip::Protocols::InteractionModel::Status;
 
 // The number of elements in the test attribute list
 constexpr uint8_t kAttributeListLength = 4;
@@ -674,7 +675,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
 
 } // namespace
 
-bool emberAfUnitTestingClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                            const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
@@ -720,7 +721,8 @@ bool emberAfUnitTestingClusterTestAddArgumentsCallback(CommandHandler * apComman
 {
     if (commandData.arg1 > UINT8_MAX - commandData.arg2)
     {
-        return commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        apCommandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
     }
 
     TestAddArgumentsResponse::Type responseData;
