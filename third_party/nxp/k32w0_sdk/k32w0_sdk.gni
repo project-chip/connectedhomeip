@@ -437,7 +437,11 @@ template("k32w0_sdk") {
     }
 
     if (chip_enable_ota_default_processors == 1) {
-      defines += [ "CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS=1" ]
+      defines += [
+        "CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS=1",
+        "gOTAAllowCustomStartAddress=1",
+        "gOTAUseCustomOtaEntry=1"
+      ]
     }
 
     if (defined(invoker.defines)) {

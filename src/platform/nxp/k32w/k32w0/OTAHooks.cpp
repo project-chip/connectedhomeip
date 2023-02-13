@@ -20,8 +20,7 @@
 #include <src/include/platform/CHIPDeviceLayer.h>
 
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
-#include <platform/nxp/k32w/k32w0/OTAApplicationProcessor.h>
-#include <platform/nxp/k32w/k32w0/OTABootloaderProcessor.h>
+#include <platform/nxp/k32w/k32w0/OTAFirmwareProcessor.h>
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
 #include <platform/nxp/k32w/k32w0/OTAFactoryDataProcessor.h>
 #endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
@@ -30,15 +29,30 @@
 
 extern "C" void ResetMCU(void);
 
-static chip::OTAApplicationProcessor sApplicationProcessor;
-static chip::OTABootloaderProcessor sBootloaderProcessor;
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+CHIP_ERROR AppProcessDescriptor(void* descriptor)
+{
+    auto appDescriptor = static_cast<chip::OTAFirmwareProcessor::AppDescriptor*>(descriptor);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SsblProcessDescriptor(void* descriptor)
+{
+    return CHIP_NO_ERROR;
+}
 
 extern "C" WEAK CHIP_ERROR OtaHookInit()
 {
-    auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
+    static chip::OTAFirmwareProcessor sApplicationProcessor(sizeof(chip::OTAFirmwareProcessor::AppDescriptor));
+    static chip::OTAFirmwareProcessor sBootloaderProcessor(sizeof(chip::OTAFirmwareProcessor::SsblDescriptor));
+    #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+    static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
+    #endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+
+    sApplicationProcessor.RegisterDescriptorCallback(AppProcessDescriptor);
+    sBootloaderProcessor.RegisterDescriptorCallback(SsblProcessDescriptor);
+
+    auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(1, &sApplicationProcessor));
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(2, &sBootloaderProcessor));
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
@@ -50,6 +64,6 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
 
 extern "C" WEAK void OtaHookReset()
 {
-    OTA_SetNewImageFlag();
+    OTA_CommitCustomEntries();
     ResetMCU();
 }

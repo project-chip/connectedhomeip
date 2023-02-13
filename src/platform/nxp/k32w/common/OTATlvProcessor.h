@@ -27,22 +27,30 @@ namespace chip {
 #define CHIP_ERROR_TLV_PROCESSOR(e)                                                                                                \
     ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
 
-#define CHIP_OTA_TLV_CONTINUE_PROCESSING CHIP_ERROR_TLV_PROCESSOR(0x01)
-#define CHIP_OTA_CHANGE_PROCESSOR CHIP_ERROR_TLV_PROCESSOR(0x02)
-#define CHIP_OTA_PROCESSOR_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x03)
-#define CHIP_OTA_PROCESSOR_ALREADY_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x04)
-#define CHIP_OTA_PROCESSOR_CLIENT_INIT CHIP_ERROR_TLV_PROCESSOR(0x05)
-#define CHIP_OTA_PROCESSOR_MAKE_ROOM CHIP_ERROR_TLV_PROCESSOR(0x06)
-#define CHIP_OTA_PROCESSOR_PUSH_CHUNK CHIP_ERROR_TLV_PROCESSOR(0x07)
-#define CHIP_OTA_PROCESSOR_IMG_AUTH CHIP_ERROR_TLV_PROCESSOR(0x08)
-#define CHIP_OTA_FETCH_ALREADY_SCHEDULED CHIP_ERROR_TLV_PROCESSOR(0x09)
-#define CHIP_OTA_PROCESSOR_IMG_COMMIT CHIP_ERROR_TLV_PROCESSOR(0x0a)
+#define CHIP_OTA_TLV_CONTINUE_PROCESSING       CHIP_ERROR_TLV_PROCESSOR(0x01)
+#define CHIP_OTA_CHANGE_PROCESSOR              CHIP_ERROR_TLV_PROCESSOR(0x02)
+#define CHIP_OTA_PROCESSOR_NOT_REGISTERED      CHIP_ERROR_TLV_PROCESSOR(0x03)
+#define CHIP_OTA_PROCESSOR_ALREADY_REGISTERED  CHIP_ERROR_TLV_PROCESSOR(0x04)
+#define CHIP_OTA_PROCESSOR_CLIENT_INIT         CHIP_ERROR_TLV_PROCESSOR(0x05)
+#define CHIP_OTA_PROCESSOR_MAKE_ROOM           CHIP_ERROR_TLV_PROCESSOR(0x06)
+#define CHIP_OTA_PROCESSOR_PUSH_CHUNK          CHIP_ERROR_TLV_PROCESSOR(0x07)
+#define CHIP_OTA_PROCESSOR_IMG_AUTH            CHIP_ERROR_TLV_PROCESSOR(0x08)
+#define CHIP_OTA_FETCH_ALREADY_SCHEDULED       CHIP_ERROR_TLV_PROCESSOR(0x09)
+#define CHIP_OTA_PROCESSOR_IMG_COMMIT          CHIP_ERROR_TLV_PROCESSOR(0x0A)
+#define CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED   CHIP_ERROR_TLV_PROCESSOR(0x0B)
 
 // Descriptor constants
 constexpr size_t kVersionStringSize = 64;
 constexpr size_t kBuildDateSize     = 64;
 
 constexpr uint16_t requestedOtaMaxBlockSize = 1024;
+
+/**
+ * Used alongside RegisterDescriptorCallback to register
+ * a custom descriptor processing function with a certain
+ * TLV processor.
+ */
+typedef CHIP_ERROR(*ProcessDescriptor)(void* descriptor);
 
 struct OTATlvHeader
 {
@@ -75,6 +83,7 @@ public:
     virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
 
     CHIP_ERROR Process(ByteSpan & block);
+    void RegisterDescriptorCallback(ProcessDescriptor callback) { mCallbackProcessDescriptor = callback; }
     void SetLength(uint32_t length) { mLength = length; }
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
@@ -110,6 +119,7 @@ protected:
     uint32_t mLength          = 0;
     uint32_t mProcessedLength = 0;
     bool mWasSelected         = false;
+    ProcessDescriptor mCallbackProcessDescriptor = nullptr;
 };
 
 /**
