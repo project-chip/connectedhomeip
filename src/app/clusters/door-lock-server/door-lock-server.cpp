@@ -1662,7 +1662,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
         if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
         {
             ChipLogError(Zcl, "[GetCredentialStatus] Unable to get user: app error [userIndex=%d]", i);
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
             return false;
         }
 
@@ -1701,7 +1700,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
         if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
         {
             ChipLogError(Zcl, "[findUserIndexByCredential] Unable to get user: app error [userIndex=%d]", i);
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
             return false;
         }
 
@@ -1725,7 +1723,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
                              "[findUserIndexByCredential] Unable to get credential: app error "
                              "[userIndex=%d,credentialIndex=%d,credentialType=%u]",
                              i, credential.CredentialIndex, to_underlying(credentialType));
-                emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
                 return false;
             }
 
@@ -1736,7 +1733,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
                              "not occupied "
                              "[userIndex=%d,credentialIndex=%d,credentialType=%u]",
                              i, credential.CredentialIndex, to_underlying(credentialType));
-                emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
                 return false;
             }
 
