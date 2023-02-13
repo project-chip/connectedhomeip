@@ -142,7 +142,6 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
             mAccumulator.Clear();
             mAccumulator.Init(sizeof(OTATlvHeader));
 
-            ReturnErrorOnFailure(mCurrentProcessor->ExitAction());
             mCurrentProcessor = nullptr;
         }
         else

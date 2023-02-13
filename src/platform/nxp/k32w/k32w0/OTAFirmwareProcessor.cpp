@@ -88,17 +88,6 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 
 CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
 {
-    if (OTA_CommitImage(NULL) != gOtaSuccess_c)
-    {
-        ChipLogError(SoftwareUpdate, "Failed to commit application image.");
-        return CHIP_OTA_PROCESSOR_IMG_COMMIT;
-    }
-
-    if (OTA_ImageAuthenticate() != gOtaImageAuthPass_c)
-    {
-        ChipLogError(SoftwareUpdate, "Failed to authenticate application image.");
-        return CHIP_OTA_PROCESSOR_IMG_AUTH;
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -113,7 +102,17 @@ CHIP_ERROR OTAFirmwareProcessor::AbortAction()
 
 CHIP_ERROR OTAFirmwareProcessor::ExitAction()
 {
-    ReturnErrorOnFailure(ApplyAction());
+    if (OTA_CommitImage(NULL) != gOtaSuccess_c)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to commit application image.");
+        return CHIP_OTA_PROCESSOR_IMG_COMMIT;
+    }
+
+    if (OTA_ImageAuthenticate() != gOtaImageAuthPass_c)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to authenticate application image.");
+        return CHIP_OTA_PROCESSOR_IMG_AUTH;
+    }
 
     OTA_AddNewImageFlag();
 
