@@ -69,7 +69,9 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "Create new PIN credential and associate it with lock/unlock user, with userIndex != credentialIndex"
+    - label:
+          "Create new PIN credential and associate it with lock/unlock user,
+          with userIndex != credentialIndex"
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -132,11 +134,30 @@ tests:
       event: "LockOperation"
       response:
           - values:
-                - value: { "LockOperationType": 1, "OperationSource": 7, "UserIndex": null, "Credentials": null }
+                - value:
+                      {
+                          "LockOperationType": 1,
+                          "OperationSource": 7,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
           - values:
-                - value: { "LockOperationType": 0, "OperationSource": 7, "UserIndex": null, "Credentials": null }
+                - value:
+                      {
+                          "LockOperationType": 0,
+                          "OperationSource": 7,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
           - values:
-                - value: { "LockOperationType": 1, "OperationSource": 7, "UserIndex": 1, "Credentials": [{ "CredentialType": 1, "CredentialIndex": 2 }] }
+                - value:
+                      {
+                          "LockOperationType": 1,
+                          "OperationSource": 7,
+                          "UserIndex": 1,
+                          "Credentials":
+                              [{ "CredentialType": 1, "CredentialIndex": 2 }],
+                      }
 
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
@@ -154,14 +175,30 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Read the LockOperationError event list; verify null UserIndex and Credentials"
+    - label:
+          "Read the LockOperationError event list; verify null UserIndex and
+          Credentials"
       command: "readEvent"
       event: "LockOperationError"
       response:
           - values:
-                - value: { "LockOperationType": 1, "OperationSource": 7, "OperationError": 1, "UserIndex": null, "Credentials": null }
+                - value:
+                      {
+                          "LockOperationType": 1,
+                          "OperationSource": 7,
+                          "OperationError": 1,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
           - values:
-                - value: { "LockOperationType": 0, "OperationSource": 7, "OperationError": 1, "UserIndex": null, "Credentials": null }
+                - value:
+                      {
+                          "LockOperationType": 0,
+                          "OperationSource": 7,
+                          "OperationError": 1,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
 
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
