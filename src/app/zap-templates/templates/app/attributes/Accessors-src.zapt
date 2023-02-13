@@ -37,7 +37,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
     {{~#if (isString type)}}
     {{~#*inline "lengthType"}}uint{{#if (isShortString type)}}8{{else}}16{{/if}}_t{{/inline}}
     uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, {{>clusterId}}, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, {{>clusterId}}, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAf{{#if (isLongString type)}}Long{{/if}}StringLength(zclString);
     if (length == NumericAttributeTraits<{{>lengthType}}>::kNullValue)
@@ -61,7 +61,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
     using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, {{>clusterId}}, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, {{>clusterId}}, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     {{#if isNullable}}
     if (Traits::IsNullValue(temp))
