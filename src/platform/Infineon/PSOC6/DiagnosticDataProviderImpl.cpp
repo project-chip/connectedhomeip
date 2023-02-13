@@ -260,17 +260,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     /* VHT Capable */
     if (bss_info.vht_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_AC;
+        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType::kAc);
     }
     /* HT Capable */
     else if (bss_info.n_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
+        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType::kN);
     }
     /* 11g Capable */
     else
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_G;
+        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType::kG);
     }
 
 exit:

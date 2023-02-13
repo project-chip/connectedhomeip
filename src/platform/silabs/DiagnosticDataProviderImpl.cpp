@@ -374,7 +374,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
 {
-    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
+    wifiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType::kN);
     return CHIP_NO_ERROR;
 }
 

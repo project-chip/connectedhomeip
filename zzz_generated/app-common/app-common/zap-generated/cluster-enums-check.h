@@ -914,23 +914,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
     using EnumType = WiFiNetworkDiagnostics::WiFiVersionType;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kA:
     case EnumType::kB:
     case EnumType::kG:
     case EnumType::kN:
     case EnumType::kAc:
     case EnumType::kAx:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_A:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_B:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_G:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_N:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_AC:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_AX:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(6);

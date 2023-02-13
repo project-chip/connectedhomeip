@@ -1049,9 +1049,6 @@ enum class WiFiConnectionStatus : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
@@ -1067,10 +1064,6 @@ enum class WiFiVersionType : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WiFiVersionType                                                                  = EmberAfWiFiVersionType;
-static WiFiVersionType __attribute__((unused)) kWiFiVersionTypekUnknownEnumValue       = static_cast<WiFiVersionType>(6);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for WiFiNetworkDiagnosticsFeature
 enum class WiFiNetworkDiagnosticsFeature : uint32_t
