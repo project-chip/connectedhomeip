@@ -66,6 +66,14 @@ jobs:
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -77,6 +85,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Setup Build
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
@@ -173,6 +182,14 @@ jobs:
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -184,6 +201,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Setup and Build Simulated Device
               timeout-minutes: 20
               run: |
@@ -323,9 +341,18 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
+
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 50
               run: |
@@ -372,6 +399,14 @@ jobs:
             - name: Try to ensure the directory for diagnostic log collection exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -383,6 +418,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Setup and Build Simulated Device
               timeout-minutes: 20
               run: |
@@ -462,6 +498,14 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -472,8 +516,8 @@ jobs:
                   name: bootstrap-logs
                   path: |
                       .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log           
+                      .environment/pigweed-venv/*.log
+
             - name: Run Build Coverage
               timeout-minutes: 20
               run: ./scripts/build_coverage.sh
-           

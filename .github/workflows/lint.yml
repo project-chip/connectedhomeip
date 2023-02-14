@@ -54,6 +54,13 @@ jobs:
             # to run
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -128,7 +135,7 @@ jobs:
               if: always()
               run: |
                   git grep -n "PRI.8" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
-                  
+
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
@@ -136,7 +143,7 @@ jobs:
               if: always()
               run: |
                   git grep -n "PRI.16" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
-                  
+
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.

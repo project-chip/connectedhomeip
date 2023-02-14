@@ -36,5 +36,5 @@ chip_config_network_layer_ble = true
 custom_toolchain = "//third_party/connectedhomeip/config/ameba/toolchain:ameba"
 
 pw_build_PIP_CONSTRAINTS =
-    [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
+    [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]
 cpp_standard = "c++17"
