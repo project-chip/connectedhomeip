@@ -200,6 +200,28 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    CustomOtaEntries_t ota_entries;
+    if(gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
+    {
+        if(ota_entries.ota_state == otaApplied)
+        {
+            K32W_LOG("OTA successfully applied");
+        }
+        else
+        {
+            K32W_LOG("OTA failed with status %d", ota_entries.ota_state);
+        }
+        
+        // Clear the entry 
+        OTA_ResetCustomEntries();
+    }
+    else
+    {
+        K32W_LOG("Unable to access OTA entries structure");
+    }
+#endif
+
     return err;
 }
 
