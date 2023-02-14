@@ -3850,8 +3850,6 @@ endpoint 1 {
   }
 
   server cluster Actions {
-    emits event StateChanged;
-    emits event ActionFailed;
     callback attribute actionList;
     callback attribute endpointLists;
     ram      attribute featureMap;
@@ -3867,7 +3865,6 @@ endpoint 1 {
   }
 
   server cluster Switch {
-    emits event SwitchLatched;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute featureMap default = 1;
@@ -3887,7 +3884,6 @@ endpoint 1 {
   }
 
   server cluster BooleanState {
-    emits event StateChange;
     ram      attribute stateValue;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
