@@ -237,9 +237,7 @@ chip_python_wheel_action("chip-core") {
       ]
 
       if (chip_controller) {
-        sources += [
-          "chip/ChipDeviceCtrl.py",
-        ]
+        sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
         sources += [
           "chip/server/__init__.py",
@@ -387,9 +385,9 @@ chip_python_wheel_action("chip-repl") {
     {
       src_dir = "."
       sources = [
-        "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipBluezMgr.py",
-        "chip/ChipReplStartup.py"
+        "chip/ChipCoreBluetoothMgr.py",
+        "chip/ChipReplStartup.py",
       ]
       sources += py_scripts
     },
@@ -424,7 +422,7 @@ chip_python_wheel_action("chip-repl") {
   } else if (current_os == "linux") {
     py_package_reqs += [
       "dbus-python==1.2.18",
-      "pygobject"
+      "pygobject",
     ]
   }
 
