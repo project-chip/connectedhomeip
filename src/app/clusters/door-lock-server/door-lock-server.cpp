@@ -2903,19 +2903,24 @@ EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip
     bool clearedCredential = false;
     for (uint16_t i = 1; i < maxNumberOfCredentials; ++i)
     {
-        status = clearCredential(endpointId, modifier, sourceNodeId, credentialType, i, false);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        EmberAfStatus clearStatus = clearCredential(endpointId, modifier, sourceNodeId, credentialType, i, false);
+        if (EMBER_ZCL_STATUS_SUCCESS != clearStatus)
         {
             ChipLogError(Zcl,
                          "[clearCredentials] Unable to clear the credential - internal error "
                          "[endpointId=%d,credentialType=%u,credentialIndex=%d,status=%d]",
                          endpointId, to_underlying(credentialType), i, status);
-            goto exit;
+            if (status == EMBER_ZCL_STATUS_SUCCESS)
+            {
+                status = clearStatus;
+            }
         }
-        clearedCredential = true;
+        else
+        {
+            clearedCredential = true;
+        }
     }
 
-exit:
     // Generate the event if we cleared any credentials, even if we then had errors
     // clearing other ones, so we don't have credentials silently disappearing.
     if (clearedCredential)
