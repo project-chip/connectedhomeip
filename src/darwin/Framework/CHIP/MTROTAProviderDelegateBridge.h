@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTROTAProviderDelegate.h"
+#import <Matter/MTROTAProviderDelegate.h>
 
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 

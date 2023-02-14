@@ -21,6 +21,7 @@
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
+#include <esp_log.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 BoltLockManager BoltLockManager::sLock;

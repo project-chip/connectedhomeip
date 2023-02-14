@@ -201,7 +201,7 @@ tests:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with status as DUPLICATE or OCCUPIED"
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "CredentialType" : 1, "CredentialIndex" : 1 }' 123456 1 null null  1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 123456 1 null null  1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
 
@@ -227,16 +227,14 @@ tests:
           Set Credential Response command with response as OCCUPIED if the
           CredentialIndex is repeated"
       verification: |
-          Mark as not applicable and proceed to next step
-
-          ./chip-tool doorlock set-credential 0 '{ "CredentialType" : 1, "CredentialIndex" : 1 }' 123457 1 null null 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1}' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
 
           [1660216276.191641][71849:71854] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
           [1660216276.191673][71849:71854] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
           [1660216276.191725][71849:71854] CHIP:TOO:   SetCredentialResponse: {
-          [1660216276.191752][71849:71854] CHIP:TOO:     status: 3
+          [1660216276.191752][71849:71854] CHIP:TOO:     status: 2
           [1660216276.191764][71849:71854] CHIP:TOO:     userIndex: null
           [1660216276.191776][71849:71854] CHIP:TOO:     nextCredentialIndex: 2
           [1660216276.191798][71849:71854] CHIP:TOO:    }
@@ -258,7 +256,7 @@ tests:
       verification: |
           Mark as not applicable and proceed to next step
 
-          ./chip-tool doorlock set-credential 2 '{ "CredentialType" : 1, "CredentialIndex" : 3 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 2 '{ "credentialType" : 1, "credentialIndex" : 3 }' 1234567 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with response as OCCUPIED" on the TH(Chip-tool) Log:
 
