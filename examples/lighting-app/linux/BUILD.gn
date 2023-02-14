@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/third_party/imgui/imgui.gni")
 
 assert(chip_build_tools)
 
@@ -45,6 +46,18 @@ executable("chip-lighting-app") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]
+
+  if (chip_examples_enable_imgui_ui) {
+    deps += [
+      "${chip_root}/examples/common/QRCode",
+      "${chip_root}/third_party/imgui",
+    ]
+
+    sources += [
+      "ui.cpp",
+      "ui.h",
+    ]
+  }
 
   include_dirs = [ "include" ]
 

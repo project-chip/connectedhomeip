@@ -26,6 +26,10 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+#include "ui.h"
+#endif
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -81,7 +85,16 @@ int main(int argc, char * argv[])
     }
 
     LightingMgr().Init();
+
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+    example::Ui::Start();
+#endif
+
     ChipLinuxAppMainLoop();
+
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+    example::Ui::Stop();
+#endif
 
     return 0;
 }

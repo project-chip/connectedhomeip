@@ -16,69 +16,135 @@
  *    limitations under the License.
  */
 #include "AppConfig.h"
+#include "USART.h"
 #include "matter_shell.h"
-
+#include "rsi_rom_egpio.h"
+#include "siwx917_utils.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 #include "assert.h"
 #include "rsi_board.h"
 #include "uart.h"
-#include "uartdrv.h"
 #include <stddef.h>
 #include <string.h>
 
-#if !defined(MIN)
-#define MIN(A, B) ((A) < (B) ? (A) : (B))
-#endif
+extern ARM_DRIVER_USART Driver_USART0;
+static ARM_DRIVER_USART * UARTdrv = &Driver_USART0;
+
+ARM_USART_CAPABILITIES drv_capabilities;
+ARM_USART_STATUS status;
+
+#define BUFFER_SIZE 1
+uint8_t rx_buffer;
+
+#define BAUD_VALUE 115200
 
 #define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
 
+void ARM_USART_SignalEvent(uint32_t event);
+
+void Read_Capabilities(void)
+{
+    drv_capabilities = UARTdrv->GetCapabilities();
+}
+
+void ARM_USART_SignalEvent(uint32_t event)
+{
+    switch (event)
+    {
+    case ARM_USART_EVENT_SEND_COMPLETE:
+        break;
+    case ARM_USART_EVENT_RECEIVE_COMPLETE:
+#ifdef ENABLE_CHIP_SHELL
+        chip::NotifyShellProcessFromISR();
+#endif;
+    case ARM_USART_EVENT_TRANSFER_COMPLETE:
+    case ARM_USART_EVENT_TX_COMPLETE:
+    case ARM_USART_EVENT_TX_UNDERFLOW:
+    case ARM_USART_EVENT_RX_OVERFLOW:
+    case ARM_USART_EVENT_RX_TIMEOUT:
+    case ARM_USART_EVENT_RX_BREAK:
+    case ARM_USART_EVENT_RX_FRAMING_ERROR:
+    case ARM_USART_EVENT_RX_PARITY_ERROR:
+    case ARM_USART_EVENT_CTS:
+    case ARM_USART_EVENT_DSR:
+    case ARM_USART_EVENT_DCD:
+    case ARM_USART_EVENT_RI:
+    }
+}
+
 void uartConsoleInit(void)
 {
-    // UART init is already done
-}
+    int32_t status = 0;
+    Read_Capabilities();
 
-void USART_IRQHandler(void)
-{
-#ifdef ENABLE_CHIP_SHELL
-    chip::NotifyShellProcessFromISR();
-#endif
-#if defined(SL_WIFI)
-    /* TODO */
-#elif !defined(PW_RPC_ENABLED)
-    otSysEventSignalPending();
-#endif
+    status = UARTdrv->Initialize(ARM_USART_SignalEvent);
+    // Setting the GPIO 30 of the radio board (TX)
+    RSI_EGPIO_HostPadsGpioModeEnable(30);
 
-#if (defined(EFR32MG24) || defined(MGM24))
-    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
-#endif
-}
-
-/*
- *   @brief Callback triggered when a UARTDRV DMA buffer is full
- */
-static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount)
-{
-    (void) transferStatus;
-
-    uint8_t writeSize = (transferCount - lastCount);
-    if (RemainingSpace(&sReceiveFifo) >= writeSize)
+    // Initialized board UART
+    DEBUGINIT();
+    if (status != ARM_DRIVER_OK)
     {
-        WriteToFifo(&sReceiveFifo, data + lastCount, writeSize);
-        lastCount = 0;
+        DEBUGOUT("\r\n UART Initialization Failed, Error Code : %d\r\n", status);
+    }
+    else
+    {
+        DEBUGOUT("\r\n UART Initialization Success\r\n");
     }
 
-    UARTDRV_Receive(vcom_handle, data, transferCount, UART_rx_callback);
+    // Power up the UART peripheral
+    status = UARTdrv->PowerControl(ARM_POWER_FULL);
+    if (status != ARM_DRIVER_OK)
+    {
+        DEBUGOUT("\r\n Failed to Set Power to UART, Error Code : %d\r\n", status);
+    }
+    else
+    {
+        DEBUGOUT("\r\n Configured Power to UART \r\n");
+    }
 
-#ifdef ENABLE_CHIP_SHELL
-    chip::NotifyShellProcessFromISR();
-#endif
-#if defined(SL_WIFI)
-    /* TODO */
-#elif !defined(PW_RPC_ENABLED)
-    otSysEventSignalPending();
-#endif
+    // Enable Receiver and Transmitter lines
+    status = UARTdrv->Control(ARM_USART_CONTROL_TX, 1);
+    if (status != ARM_DRIVER_OK)
+    {
+        DEBUGOUT("\r\n Failed to Set  Transmitter lines to UART, Error Code : %d\r\n", status);
+    }
+    else
+    {
+        DEBUGOUT("\r\n Set  Transmitter lines to UART is sucess \r\n");
+    }
+
+    status = UARTdrv->Control(ARM_USART_CONTROL_RX, 1);
+    if (status != ARM_DRIVER_OK)
+    {
+        DEBUGOUT("\r\n Failed to Set  Receiver lines to UART, Error Code : %d \r\n", status);
+    }
+    else
+    {
+        DEBUGOUT("\r\n Set  Receiver lines to UART\r\n");
+    }
+
+    UARTdrv->Control(ARM_USART_MODE_ASYNCHRONOUS | ARM_USART_DATA_BITS_8 | ARM_USART_PARITY_NONE | ARM_USART_STOP_BITS_1 |
+                         ARM_USART_FLOW_CONTROL_NONE,
+                     BAUD_VALUE);
+    if (status != ARM_DRIVER_OK)
+    {
+        DEBUGOUT("\r\n Failed to Receive data , Error Code : %d \r\n", status);
+    }
+    else
+    {
+        DEBUGOUT("\r\n Receives data success  \r\n");
+    }
+
+    // Creating the receive event as a temp buffer
+    // this is not used anywhere
+    status = UARTdrv->Receive(&rx_buffer, 1);
+
+    NVIC_EnableIRQ(USART0_IRQn);
+
+    NVIC_SetPriority(USART0_IRQn, 7);
 }
 
 /*
@@ -88,16 +154,17 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
  */
 int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
 {
+    int32_t status = 0;
     if (Buf == NULL || BufLength < 1)
     {
         return UART_CONSOLE_ERR;
     }
 
-    // Add Terminating char at the end of buffer
-    Buf[BufLength] = '\0';
-
-    Board_UARTPutSTR((uint8_t *) Buf);
-
+    status = UARTdrv->Send(Buf, BufLength);
+    if (status != ARM_DRIVER_OK)
+    {
+        return status;
+    }
     return BufLength;
 }
 
@@ -108,19 +175,16 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
  */
 int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 {
-    uint32_t data;
-
+    int32_t status = 0;
     if (Buf == NULL || NbBytesToRead < 1)
     {
         return UART_CONSOLE_ERR;
     }
-
-    while (--NbBytesToRead >= 0)
+    status = UARTdrv->Receive(Buf, NbBytesToRead);
+    if (status != ARM_DRIVER_OK)
     {
-        data   = Board_UARTGetChar();
-        *Buf++ = (char) data;
+        return status;
     }
-
     return NbBytesToRead;
 }
 

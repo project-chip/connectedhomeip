@@ -45,7 +45,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
 
 @ExperimentalCoroutinesApi
 class DeviceProvisioningFragment : Fragment() {
@@ -74,7 +73,7 @@ class DeviceProvisioningFragment : Fragment() {
     scope = viewLifecycleOwner.lifecycleScope
     deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
     
-    return inflater.inflate(R.layout.single_fragment_container, container, false).apply {
+    return inflater.inflate(R.layout.barcode_fragment, container, false).apply {
       if (savedInstanceState == null) {
         if (deviceInfo.ipAddress != null) {
           pairDeviceWithAddress()
