@@ -102,11 +102,11 @@ CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole rol
 
     mPollFreq    = pollFreq;
     mSystemLayer = layer;
-    ChipLogProgress(BDX, "%s: Start polling for messages", __FUNCTION__);
-    mStopPolling = false;
 
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
 
+    ChipLogProgress(BDX, "Start polling for messages");
+    mStopPolling = false;
     mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
     return CHIP_NO_ERROR;
 }
@@ -114,7 +114,7 @@ CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole rol
 void Responder::ResetTransfer()
 {
     mTransfer.Reset();
-    ChipLogProgress(BDX, "%s: Start polling for messages", __FUNCTION__);
+    ChipLogProgress(BDX, "Stop polling for messages");
     mStopPolling = true;
 }
 
