@@ -30,6 +30,7 @@
 
 #include <app/util/util.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -102,23 +103,23 @@ exit:
 #if CONFIG_LED_TYPE_RMT
 void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
+    using namespace ColorControl::Attributes;
+
     uint8_t hue, saturation;
 
-    VerifyOrExit(attributeId == ColorControl::Attributes::CurrentHue::Id ||
-                     attributeId == ColorControl::Attributes::CurrentSaturation::Id,
+    VerifyOrExit(attributeId == CurrentHue::Id || attributeId == CurrentSaturation::Id,
                  ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%" PRIx32 "'", attributeId));
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
-    if (attributeId == ColorControl::Attributes::CurrentHue::Id)
+    if (attributeId == CurrentHue::Id)
     {
         hue = *value;
-        emberAfReadServerAttribute(endpointId, ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id, &saturation,
-                                   sizeof(uint8_t));
+        CurrentSaturation::Get(&saturation);
     }
     else
     {
         saturation = *value;
-        emberAfReadServerAttribute(endpointId, ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, &hue, sizeof(uint8_t));
+        CurrentHue::Get(&hue);
     }
     AppLED.SetColor(hue, saturation);
 

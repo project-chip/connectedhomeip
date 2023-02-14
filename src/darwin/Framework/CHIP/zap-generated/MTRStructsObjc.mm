@@ -1811,7 +1811,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTimeSynchronizationClusterDstOffsetType
+@implementation MTRTimeSynchronizationClusterDSTOffsetStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1827,7 +1827,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTimeSynchronizationClusterDstOffsetType alloc] init];
+    auto other = [[MTRTimeSynchronizationClusterDSTOffsetStruct alloc] init];
 
     other.offset = self.offset;
     other.validStarting = self.validStarting;
@@ -1845,7 +1845,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTimeSynchronizationClusterTimeZoneType
+@implementation MTRTimeSynchronizationClusterDstOffsetType : MTRTimeSynchronizationClusterDSTOffsetStruct
+@end
+
+@implementation MTRTimeSynchronizationClusterTimeZoneStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1861,7 +1864,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTimeSynchronizationClusterTimeZoneType alloc] init];
+    auto other = [[MTRTimeSynchronizationClusterTimeZoneStruct alloc] init];
 
     other.offset = self.offset;
     other.validAt = self.validAt;
@@ -1877,6 +1880,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTimeSynchronizationClusterTimeZoneType : MTRTimeSynchronizationClusterTimeZoneStruct
 @end
 
 @implementation MTRBridgedDeviceBasicInformationClusterStartUpEvent

@@ -3223,17 +3223,20 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        Integer Status, byte[] LogContent, Long UTCTimeStamp, Long TimeSinceBoot) {
+        Integer Status,
+        byte[] LogContent,
+        Optional<Long> UTCTimeStamp,
+        Optional<Long> TimeSinceBoot) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
       responseValues.put(StatusResponseValue, Status);
       CommandResponseInfo LogContentResponseValue = new CommandResponseInfo("LogContent", "byte[]");
       responseValues.put(LogContentResponseValue, LogContent);
       CommandResponseInfo UTCTimeStampResponseValue =
-          new CommandResponseInfo("UTCTimeStamp", "Long");
+          new CommandResponseInfo("UTCTimeStamp", "Optional<Long>");
       responseValues.put(UTCTimeStampResponseValue, UTCTimeStamp);
       CommandResponseInfo TimeSinceBootResponseValue =
-          new CommandResponseInfo("TimeSinceBoot", "Long");
+          new CommandResponseInfo("TimeSinceBoot", "Optional<Long>");
       responseValues.put(TimeSinceBootResponseValue, TimeSinceBoot);
       callback.onSuccess(responseValues);
     }

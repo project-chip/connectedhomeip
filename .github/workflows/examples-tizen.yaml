@@ -17,6 +17,7 @@ name: Build example - Tizen
 on:
     push:
     pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -63,14 +64,14 @@ jobs:
 
             - name: Build Tizen examples
               run: |
-                ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py \
-                        --enable-flashbundle \
-                        --target tizen-arm-all-clusters \
-                        --target tizen-arm-all-clusters-minimal-no-wifi \
-                        --target tizen-arm-chip-tool-ubsan \
-                        --target tizen-arm-light \
-                        --target tizen-arm-light-no-ble-no-wifi \
-                        build \
-                        --copy-artifacts-to out/artifacts \
-                    "
+                  ./scripts/run_in_build_env.sh \
+                      "./scripts/build/build_examples.py \
+                          --enable-flashbundle \
+                          --target tizen-arm-all-clusters \
+                          --target tizen-arm-all-clusters-minimal-no-wifi \
+                          --target tizen-arm-chip-tool-ubsan \
+                          --target tizen-arm-light \
+                          --target tizen-arm-light-no-ble-no-wifi \
+                          build \
+                          --copy-artifacts-to out/artifacts \
+                      "
