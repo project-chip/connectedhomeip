@@ -493,6 +493,11 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         ChipLogProgress(DeviceLayer, "CHIPoBLE start advertising");
     }
 
+    if (!qvCHIP_IsBleTaskCreated())
+    {
+        qvCHIP_BleTaskCreate();
+    }
+
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
 
@@ -529,6 +534,11 @@ exit:
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err;
+
+    if (qvCHIP_IsBleTaskCreated() && (mNumGAPCons == 0))
+    {
+        qvCHIP_BleTaskDelete();
+    }
 
     err = MapBLEError(qvCHIP_BleStopAdvertising());
     SuccessOrExit(err);
@@ -733,6 +743,11 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
         if (mNumGAPCons > 0)
         {
             mNumGAPCons--;
+        }
+
+        if (qvCHIP_IsBleTaskCreated() && (mNumGAPCons == 0))
+        {
+            qvCHIP_BleTaskDelete();
         }
 
         // If this was a CHIPoBLE connection, release the associated connection state record
