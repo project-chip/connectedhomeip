@@ -591,7 +591,7 @@ public:
 private:
     static constexpr size_t kContextSize = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
 
-    struct alignas(size_t) OpaqueContext
+    struct alignas(uintptr_t) OpaqueContext
     {
         uint8_t mOpaque[kContextSize] = {};
     } mContext;

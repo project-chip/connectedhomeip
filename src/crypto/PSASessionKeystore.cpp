@@ -15,75 +15,76 @@
  *    limitations under the License.
  */
 
-#include <crypto/PSASessionKeystore.h>
+#include "PSASessionKeystore.h"
+
+#include <crypto/CHIPCryptoPALPSA.h>
 
 #include <psa/crypto.h>
 
 namespace chip {
 namespace Crypto {
 
-enum KeyUsage
+namespace {
+
+class AesKeyAttributes
 {
-    kI2RKey                  = 0,
-    kR2IKey                  = 1,
-    kAttestationChallengeKey = 2,
-    kNumSessionKeys          = 3
+public:
+    AesKeyAttributes()
+    {
+        constexpr psa_algorithm_t kAlgorithm = PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8);
+
+        psa_set_key_type(&mAttrs, PSA_KEY_TYPE_AES);
+        psa_set_key_algorithm(&mAttrs, kAlgorithm);
+        psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
+        psa_set_key_bits(&mAttrs, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8);
+    }
+
+    ~AesKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
+
+    const psa_key_attributes_t & Get() { return mAttrs; }
+
+private:
+    psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
 };
+
+} // namespace
 
 CHIP_ERROR PSASessionKeystore::CreateKey(const Aes128KeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
-    constexpr psa_algorithm_t kAlgorithm = PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8);
-    CHIP_ERROR error                     = CHIP_NO_ERROR;
-    psa_status_t status                  = PSA_SUCCESS;
-    psa_key_id_t keyId                   = 0;
-    psa_key_attributes_t attrs           = PSA_KEY_ATTRIBUTES_INIT;
-
     // Destroy the old key if already allocated
     psa_destroy_key(key.As<psa_key_id_t>());
 
-    psa_set_key_type(&attrs, PSA_KEY_TYPE_AES);
-    psa_set_key_algorithm(&attrs, kAlgorithm);
-    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
+    AesKeyAttributes attrs;
+    psa_status_t status = psa_import_key(&attrs.Get(), keyMaterial, sizeof(Aes128KeyByteArray), &key.AsMutable<psa_key_id_t>());
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    status = psa_import_key(&attrs, keyMaterial, sizeof(Aes128KeyByteArray), &keyId);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    key.AsMutable<psa_key_id_t>() = keyId;
-
-exit:
-    psa_reset_key_attributes(&attrs);
-
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PSASessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
                                          Aes128KeyHandle & key)
 {
-    HKDF_sha hkdf;
-    Aes128KeyByteArray sr2k;
+    PsaKdf kdf;
+    ReturnErrorOnFailure(kdf.Init(PSA_ALG_HKDF(PSA_ALG_SHA_256), secret.Span(), salt, info));
 
-    ReturnErrorOnFailure(hkdf.HKDF_SHA256(secret.ConstBytes(), secret.Length(), salt.data(), salt.size(), info.data(), info.size(),
-                                          sr2k, sizeof(Aes128KeyByteArray)));
+    AesKeyAttributes attrs;
 
-    return CreateKey(sr2k, key);
+    return kdf.DeriveKey(attrs.Get(), key.AsMutable<psa_key_id_t>());
 }
 
 CHIP_ERROR PSASessionKeystore::DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info,
                                                  Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                                  AttestationChallenge & attestationChallenge)
 {
-    HKDF_sha hkdf;
-    Aes128KeyByteArray keys[kNumSessionKeys];
-
-    static_assert(AttestationChallenge::Capacity() == sizeof(Aes128KeyByteArray), "Unexpected attestation challenge size");
-
-    ReturnErrorOnFailure(
-        hkdf.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info.data(), info.size(), keys[0], sizeof(keys)));
+    PsaKdf kdf;
+    ReturnErrorOnFailure(kdf.Init(PSA_ALG_HKDF(PSA_ALG_SHA_256), secret, salt, info));
 
     CHIP_ERROR error;
-    SuccessOrExit(error = CreateKey(keys[kI2RKey], i2rKey));
-    SuccessOrExit(error = CreateKey(keys[kR2IKey], r2iKey));
-    memcpy(attestationChallenge.Bytes(), keys[kAttestationChallengeKey], sizeof(Aes128KeyByteArray));
+    AesKeyAttributes attrs;
+
+    SuccessOrExit(error = kdf.DeriveKey(attrs.Get(), i2rKey.AsMutable<psa_key_id_t>()));
+    SuccessOrExit(error = kdf.DeriveKey(attrs.Get(), r2iKey.AsMutable<psa_key_id_t>()));
+    SuccessOrExit(error = kdf.DeriveBytes(MutableByteSpan(attestationChallenge.Bytes(), AttestationChallenge::Capacity())));
 
 exit:
     if (error != CHIP_NO_ERROR)

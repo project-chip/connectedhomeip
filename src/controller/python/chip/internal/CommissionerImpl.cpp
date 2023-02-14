@@ -25,7 +25,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
-#include <crypto/DefaultSessionKeystore.h>
+#include <crypto/RawKeytSessionKeystore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
@@ -99,7 +99,7 @@ ScriptDevicePairingDelegate gPairingDelegate;
 chip::Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore gPersistentStorageOpCertStore;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
-chip::Crypto::DefaultSessionKeystore gSessionKeystore;
+chip::Crypto::RawKeySessionKeystore gSessionKeystore;
 
 } // namespace
 

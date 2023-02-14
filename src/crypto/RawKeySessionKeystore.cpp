@@ -17,6 +17,8 @@
 
 #include <crypto/RawKeySessionKeystore.h>
 
+#include <lib/support/BufferReader.h>
+
 namespace chip {
 namespace Crypto {
 
@@ -25,14 +27,6 @@ using HKDF_sha_crypto = HKDF_shaHSM;
 #else
 using HKDF_sha_crypto = HKDF_sha;
 #endif
-
-enum KeyUsage
-{
-    kI2RKey                  = 0,
-    kR2IKey                  = 1,
-    kAttestationChallengeKey = 2,
-    kNumSessionKeys          = 3
-};
 
 CHIP_ERROR RawKeySessionKeystore::CreateKey(const Aes128KeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
@@ -54,18 +48,17 @@ CHIP_ERROR RawKeySessionKeystore::DeriveSessionKeys(const ByteSpan & secret, con
                                                     AttestationChallenge & attestationChallenge)
 {
     HKDF_sha_crypto hkdf;
-    Aes128KeyByteArray keys[kNumSessionKeys];
+    uint8_t keyMaterial[2 * sizeof(Aes128KeyByteArray) + AttestationChallenge::Capacity()];
 
-    static_assert(AttestationChallenge::Capacity() == sizeof(Aes128KeyByteArray), "Unexpected attestation challenge size");
+    ReturnErrorOnFailure(hkdf.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info.data(), info.size(),
+                                          keyMaterial, sizeof(keyMaterial)));
 
-    ReturnErrorOnFailure(
-        hkdf.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info.data(), info.size(), keys[0], sizeof(keys)));
+    Encoding::LittleEndian::Reader reader(keyMaterial, sizeof(keyMaterial));
 
-    memcpy(i2rKey.AsMutable<Aes128KeyByteArray>(), keys[kI2RKey], sizeof(Aes128KeyByteArray));
-    memcpy(r2iKey.AsMutable<Aes128KeyByteArray>(), keys[kR2IKey], sizeof(Aes128KeyByteArray));
-    memcpy(attestationChallenge.Bytes(), keys[kAttestationChallengeKey], sizeof(Aes128KeyByteArray));
-
-    return CHIP_NO_ERROR;
+    return reader.ReadBytes(i2rKey.AsMutable<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray))
+        .ReadBytes(r2iKey.AsMutable<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray))
+        .ReadBytes(attestationChallenge.Bytes(), AttestationChallenge::Capacity())
+        .StatusCode();
 }
 
 void RawKeySessionKeystore::DestroyKey(Aes128KeyHandle & key)

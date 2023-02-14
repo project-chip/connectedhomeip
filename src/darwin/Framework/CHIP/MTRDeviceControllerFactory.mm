@@ -39,8 +39,8 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
@@ -72,7 +72,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (readonly) MTRPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 @property (readonly) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
-@property (readonly) Crypto::DefaultSessionKeystore * sessionKeystore;
+@property (readonly) Crypto::RawKeySessionKeystore * sessionKeystore;
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
 // our group data provider impl.  We initialize this store correctly on every
 // controller startup, so don't need to actually persist it.
@@ -118,7 +118,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
 
-    _sessionKeystore = new chip::Crypto::DefaultSessionKeystore();
+    _sessionKeystore = new chip::Crypto::RawKeySessionKeystore();
     if ([self checkForInitError:(_sessionKeystore != nullptr) logMsg:kErrorSessionKeystoreInit]) {
         return nil;
     }
