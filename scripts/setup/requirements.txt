@@ -57,7 +57,7 @@ watchdog
 build==0.8.0
 mypy==0.971
 mypy-protobuf==3.2.0
-protobuf==3.20.1
+protobuf==3.20.2
 types-protobuf==3.19.22
 
 # scripts/tools/memory
