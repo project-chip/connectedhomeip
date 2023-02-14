@@ -293,7 +293,7 @@ def getGlobalTemplatesTargets():
         generate_subdir = example_name
 
         # Special casing lighting app because separate folders
-        if example_name == "lighting-app":
+        if example_name == "lighting-app" or example_name == "lock-app":
             if 'nxp' in str(filepath):
                 generate_subdir = f"{example_name}/nxp"
 

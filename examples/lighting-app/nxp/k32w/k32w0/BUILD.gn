@@ -23,6 +23,10 @@ import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
+declare_args() {
+  chip_software_version = 0
+}
+
 if (chip_pw_tokenizer_logging) {
   import("//build_overrides/pigweed.gni")
   import("$dir_pw_tokenizer/database.gni")
@@ -50,6 +54,7 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/app/project_include",
     "${k32w0_platform_dir}/app/support",
     "${k32w0_platform_dir}/util/include",
+    "${k32w0_platform_dir}/common",
   ]
 
   if (chip_with_se05x == 1) {
@@ -61,6 +66,12 @@ k32w0_sdk("sdk") {
     defines += [ "BUILD_RELEASE=0" ]
   } else {
     defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  if (chip_software_version != 0) {
+    defines += [
+      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
+    ]
   }
 }
 
@@ -80,6 +91,18 @@ k32w0_executable("light_app") {
   ]
 
   public = [ "${chip_root}/src/platform/nxp/k32w/k32w0/DefaultTestEventTriggerDelegate.h" ]
+
+  if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
+    sources += [
+      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.cpp",
+      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
+    ]
+
+    defines = [
+      "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
+      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3",
+    ]
+  }
 
   deps = [
     ":sdk",
@@ -109,7 +132,10 @@ k32w0_executable("light_app") {
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
+  ]
 
   if (chip_enable_ota_requestor) {
     ldflags += [

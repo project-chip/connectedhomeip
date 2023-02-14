@@ -124,6 +124,11 @@ void Cleanup()
     // TODO(16968): Lifecycle management of storage-using components like GroupDataProvider, etc
 }
 
+void StopSignalHandler(int signal)
+{
+    DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -389,6 +394,8 @@ void ChipLinuxAppMainLoop()
 
     ApplicationInit();
 
+    signal(SIGTERM, StopSignalHandler);
+    signal(SIGINT, StopSignalHandler);
     DeviceLayer::PlatformMgr().RunEventLoop();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

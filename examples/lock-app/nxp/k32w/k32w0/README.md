@@ -29,8 +29,10 @@ network.
     -   [Detokenizer script](#detokenizer-script)
     -   [Notes](#notes)
     -   [Known issues](#known-issues-1)
--   [Tinycrypt ECC operations](#tinycrypt-ecc-operations)
+-   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
     -   [Building steps](#building-steps)
+-   [Tinycrypt ECC library](#tinycrypt-ecc-library)
+    -   [Building steps](#building-steps-1)
 -   [Low power](#low-power)
 
     -   [Known issues](#known-issues-2)
@@ -171,18 +173,18 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Download
-    [K32W0 SDK 2.6.7](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_7_K32W061DK6.zip).
+    [K32W061DK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
 
     -   without Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_7_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_9_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"tinycrypt\" chip_with_se05x=0 chip_pw_tokenizer_logging=true mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\""
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ $NXP_K32W0_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
@@ -196,6 +198,10 @@ to zero. The argument chip_with_OM15082 is set to zero by default.
 
 In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
+
+In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
+running oscillator as a clock source. In this case one must set the use_fro_32k
+argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 install the recommanded packages (python version > 3, pip3, pycrypto,
@@ -222,6 +228,30 @@ The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
 
 See
 [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+
+There are factory data generated binaries available in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.
+These are based on the DAC, PAI and PAA certificates found in
+scripts/tools/nxp/demo_generated_certs folder. The demo_factory_data_dut1.bin
+uses the DAC certificate and private key found in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data/dac/dut1
+folder. The demo_factory_data_dut2.bin uses the DAC certificate and private key
+found in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data/dac/dut2
+folder. These two factory data binaries can be used for testing topologies with
+2 DUTS. They contain the corresponding DACs/PAIs generated using
+generate_nxp_chip_factory_bin.py script. The discriminator is 14014 and the
+passcode is 1000. These demo certificates are working with the CDs installed in
+CHIPProjectConfig.h.
+
+Regarding factory data provider, there are two options:
+
+-   use the default factory data provider: `K32W0FactoryDataProvider` by setting
+    `chip_with_factory_data=1` in the gn build command.
+-   use a custom factory data provider: please see
+    [Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md).
+    This can be enabled when `chip_with_factory_data=1` by setting
+    `use_custom_factory_provider=1` in the gn build command.
 
 ## Flashing and debugging
 
@@ -298,21 +328,28 @@ If run, closed and rerun with the serial option on the same serial port, the
 detokenization script will get stuck and not show any logs. The solution is to
 unplug and plug the board and then rerun the script.
 
-## Tinycrypt ECC operations
+## NXP Ultrafast P256 ECC Library
 
 ### Building steps
 
-Note: This solution is temporary.
+By default, the application builds with NXP Ultrafast P256 ECC Library. To build
+with this library, use the following arguments:
 
-In order to use the tinycrypt ecc operations, use the following build arguments:
+-   Build without Secure element (_chip_with_se05x=0_) and with crypto platform
+    (_chip_crypto=\"platform\"_).
 
--   Build without Secure element (_chip_with_se05x=0_), with tinycrypt enabled
-    (_chip_crypto=\"tinycrypt\"_) and with the `NXPmicro/mbedtls` library
-    (_mbedtls_repo=`\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"`_).
+To stop using Ultrafast P256 ECC Library, simply build with
+_chip_crypto=\"mbedtls\"_ or with Tinycrypt.
 
-To disable tinycrypt ecc operations, simply build with _chip_crypto=\"mbedtls\"_
-and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls
-implementation from `NXPmicro/mbedtls` library will be used.
+## Tinycrypt ECC library
+
+### Building steps
+
+In order to use the Tinycrypt ECC library, use the following build arguments:
+
+-   Build without Secure element (_chip_with_se05x=0_), with crypto platform
+    (_chip_crypto=\"platform\"_) and with tinycrypt selected
+    (_chip_crypto_flavor=\"tinycrypt\"_).
 
 ## Low power
 

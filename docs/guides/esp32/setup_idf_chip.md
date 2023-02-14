@@ -57,22 +57,30 @@ step.
 -   [Linux](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#installing-prerequisites-on-linux)
 -   [macOS](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#installing-prerequisites-on-macos)
 
-### Prepare for building
+### Bootstrap Matter environment
 
-Before running any other build command, the `scripts/activate.sh` environment
-setup script should be sourced at the top level. This script takes care of
-downloading GN, ninja, and setting up a Python environment with libraries used
-to build and test.
-
-```
-source scripts/activate.sh
-```
-
-If this script says the environment is out of date, it can be updated by
-running:
+Execute the below command to bootstrap Matter environment. This script takes
+care of downloading GN, ninja, and setting up a Python environment with
+libraries used to build and test.
 
 ```
 source scripts/bootstrap.sh
+```
+
+Whenever Matter environment is out of date, it can be updated by running above
+command.
+
+For MacOS, `gdbgui` python package will not be installed using `bootstrap.sh`
+script as it is restricted only for x64 Linux platforms. It is restricted
+because, building wheels for `gevent` (dependency of `gdbgui`) fails on MacOS.
+
+Please run the below commands after every bootstrapping.
+
+Workaround is to install `gdbgui` wheels as binary:
+
+```
+python3 -m pip install -c scripts/constraints.txt --no-cache --prefer-binary gdbgui==0.13.2.0
+deactivate
 ```
 
 ---

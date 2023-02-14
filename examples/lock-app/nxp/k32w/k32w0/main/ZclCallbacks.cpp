@@ -29,40 +29,16 @@
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
+using namespace ::chip::app::Clusters::DoorLock;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
+                                            OperationErrorEnum & err)
 {
-    if (path.mClusterId != OnOff::Id)
-    {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mClusterId));
-        return;
-    }
-
-    if (path.mAttributeId != OnOff::Attributes::OnOff::Id)
-    {
-        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mAttributeId));
-        return;
-    }
-
-    BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
+    return BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
 }
 
-/** @brief OnOff Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- * TODO Issue #3841
- * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
- * attributes to the default value.
- * The logic here expects something similar to the deprecated Plugins callback
- * emberAfPluginOnOffClusterServerPostInitCallback.
- *
- */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
+                                              OperationErrorEnum & err)
 {
-    GetAppTask().UpdateClusterState();
+    return BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
 }

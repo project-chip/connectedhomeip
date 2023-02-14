@@ -914,23 +914,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
     using EnumType = WiFiNetworkDiagnostics::WiFiVersionType;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kA:
     case EnumType::kB:
     case EnumType::kG:
     case EnumType::kN:
     case EnumType::kAc:
     case EnumType::kAx:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_A:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_B:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_G:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_N:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_AC:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_AX:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(6);
@@ -1034,17 +1023,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AdministratorCommission
     using EnumType = AdministratorCommissioning::StatusCode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kBusy:
     case EnumType::kPAKEParameterError:
     case EnumType::kWindowNotOpen:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_STATUS_CODE_BUSY:
-    case EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR:
-    case EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(0);
@@ -1324,9 +1305,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeE
     case EnumType::kPin:
     case EnumType::kRfid:
     case EnumType::kFingerprint:
+    case EnumType::kFingerVein:
         return val;
     default:
-        return static_cast<EnumType>(9);
+        return static_cast<EnumType>(10);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperationTypeEnum val)

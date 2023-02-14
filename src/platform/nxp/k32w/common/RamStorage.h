@@ -19,7 +19,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "pdm_ram_storage_glue.h"
+#include "PDM.h"
 #include "ram_storage.h"
 
 namespace chip {
@@ -33,20 +33,26 @@ namespace Internal {
 class RamStorage
 {
 public:
-    using Buffer = ramBufferDescriptor *;
+    using Buffer = ramBufferDescriptor;
 
-    static CHIP_ERROR Init(uint16_t aNvmId, uint16_t aInitialSize);
-    static void FreeBuffer();
-    static Buffer GetBuffer() { return sBuffer; }
+    static constexpr uint16_t kRamBufferInitialSize = 512;
 
-    static CHIP_ERROR Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength);
-    static CHIP_ERROR Write(uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
-    static CHIP_ERROR Delete(uint16_t aKey, int aIndex);
+    RamStorage(uint16_t aPdmId) : mPdmId(aPdmId), mBuffer(nullptr) {}
+
+    CHIP_ERROR Init(uint16_t aInitialSize);
+    void FreeBuffer();
+    Buffer * GetBuffer() const { return mBuffer; }
+    CHIP_ERROR Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength) const;
+    CHIP_ERROR Write(uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
+    CHIP_ERROR Delete(uint16_t aKey, int aIndex);
+    void OnFactoryReset();
 
 private:
-    static CHIP_ERROR MapStatusToChipError(rsError rsStatus);
+    CHIP_ERROR MapStatusToChipError(rsError rsStatus) const;
+    CHIP_ERROR MapPdmStatusToChipError(PDM_teStatus status) const;
 
-    static Buffer sBuffer;
+    uint16_t mPdmId;
+    Buffer * mBuffer;
 };
 
 } // namespace Internal

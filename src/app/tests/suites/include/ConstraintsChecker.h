@@ -246,10 +246,23 @@ protected:
         return true;
     }
 
-    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value && !std::is_pointer<U>::value, int> = 0>
+    template <typename T, typename U,
+              std::enable_if_t<std::is_enum<T>::value && !std::is_enum<U>::value && !std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMinValue(const char * itemName, T current, U expected)
     {
         return CheckConstraintMinValue(itemName, chip::to_underlying(current), expected);
+    }
+
+    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value && std::is_enum<U>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * itemName, T current, U expected)
+    {
+        return CheckConstraintMinValue(itemName, chip::to_underlying(current), chip::to_underlying(expected));
+    }
+
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value && std::is_enum<U>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * itemName, T current, U expected)
+    {
+        return CheckConstraintMinValue(itemName, current, chip::to_underlying(expected));
     }
 
     template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
@@ -309,10 +322,23 @@ protected:
         return true;
     }
 
-    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value && !std::is_pointer<U>::value, int> = 0>
+    template <typename T, typename U,
+              std::enable_if_t<std::is_enum<T>::value && !std::is_enum<U>::value && !std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
     {
         return CheckConstraintMaxValue(itemName, chip::to_underlying(current), expected);
+    }
+
+    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value && std::is_enum<U>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
+    {
+        return CheckConstraintMaxValue(itemName, chip::to_underlying(current), chip::to_underlying(expected));
+    }
+
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value && std::is_enum<U>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
+    {
+        return CheckConstraintMaxValue(itemName, current, chip::to_underlying(expected));
     }
 
     template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>

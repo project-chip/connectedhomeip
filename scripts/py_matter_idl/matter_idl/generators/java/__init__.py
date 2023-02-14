@@ -13,15 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldQuality, Command, DataType
-from matter_idl import matter_idl_types
-from matter_idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext
-from typing import Union, List, Set
-from stringcase import capitalcase
-
 import enum
 import logging
+from typing import List, Set, Union
+
+from matter_idl import matter_idl_types
+from matter_idl.generators import CodeGenerator, GeneratorStorage
+from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
+                                         ParseDataType, TypeLookupContext)
+from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl
+from stringcase import capitalcase
 
 
 def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, None]:
@@ -348,7 +349,7 @@ class JavaGenerator(CodeGenerator):
     Generation of java code for matter.
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
         Inintialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.

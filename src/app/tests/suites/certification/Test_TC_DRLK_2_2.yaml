@@ -236,7 +236,7 @@ tests:
           Repeat this step PIXIT.DRLK.WrongCodeEntryLimit times and Verify that
           DUT sends failure response to the TH"
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 1234568
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 1234568
 
           Verify " DUT sends failure response" on the TH(Chip-tool) Log:
 
@@ -276,7 +276,7 @@ tests:
           "TH sends an Unlock Door Command from User1 to the DUT with the valid
           PINCode and verify the DUT response"
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
           Verify " DUT sends failure response" on the TH(Chip-tool) Log:
 
@@ -316,7 +316,7 @@ tests:
           [1661767967.006958][131055:131060] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0031 DataVersion: 683420143
           [1661767967.006988][131055:131060] CHIP:TOO:   UserCodeTemporaryDisableTime: 10
 
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
           Verify " DUT sends success response" on the TH(Chip-tool) Log:
 

@@ -20,6 +20,7 @@ import("//build_overrides/openthread.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 
 declare_args() {
@@ -38,9 +39,19 @@ declare_args() {
   chip_with_ntag = 1
   chip_with_high_power = 0
   chip_with_factory_data = 0
+  use_fro_32k = 0
+  use_custom_factory_provider = 0
+  chip_crypto_flavor = "NXP-Ultrafast-P256"
+  chip_reduce_ssbl_size = false
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
+
+if (chip_crypto == "platform") {
+  assert(chip_crypto_flavor == "tinycrypt" ||
+             chip_crypto_flavor == "NXP-Ultrafast-P256",
+         "choose tinycrypt or NXP-Ultrafast-P256 as crypto platform")
+}
 
 # Defines an k32w SDK build target.
 #
@@ -66,11 +77,16 @@ template("k32w0_sdk") {
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
   assert(chip_with_low_power == 0 ||
-             (invoker.chip_detail_logging == false &&
-                  invoker.chip_progress_logging == false &&
-                  invoker.chip_automation_logging == false &&
-                  invoker.chip_error_logging == false),
+             (chip_logging == false &&
+                  (invoker.chip_detail_logging == false &&
+                       invoker.chip_progress_logging == false &&
+                       invoker.chip_automation_logging == false &&
+                       invoker.chip_error_logging == false)),
          "Please disable all logs when low power is enabled!")
+
+  assert(
+      use_custom_factory_provider == 0 || chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using custom factory provider.")
 
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
@@ -117,7 +133,14 @@ template("k32w0_sdk") {
   print("device:", device)
   print("board:", board)
   print("ntag:", chip_with_ntag)
-  print("high power:", chip_with_high_power)
+  print("increased TX power:", chip_with_high_power)
+  print("FRO32k: ", use_fro_32k)
+  print("low power: ", chip_with_low_power)
+
+  if (chip_crypto == "platform") {
+    print("ECC crypto lib: ", chip_crypto_flavor)
+  }
+
   device_lowercase = string_replace(board, "dk6", "")
 
   sdk_target_name = target_name
@@ -132,6 +155,15 @@ template("k32w0_sdk") {
     # headers are not fatal.  Therefore don't add them directly to include_dirs;
     # we will add them to cflags below instead.
     _sdk_include_dirs = []
+
+    # Directories specified with -isystem options are scanned in left-to-right order.
+    # sha256_alt.h is present in both these paths, but the one from port/matter will
+    # be selected, which is intended. Both paths are needed, because some header
+    # files are not overwritten (e.g. aes_alt.h).
+    _sdk_include_dirs += [
+      "${k32w0_sdk_root}/middleware/mbedtls/port/matter",
+      "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk",
+    ]
 
     if (chip_with_DK6) {
       if (chip_with_low_power != 0) {
@@ -164,7 +196,6 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/devices/${device}/utilities",
       "${k32w0_sdk_root}/devices/${device}/utilities/debug_console",
       "${k32w0_sdk_root}/devices/${device}/utilities/str",
-      "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk",
       "${k32w0_sdk_root}/middleware/wireless/ble_controller/interface",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/gatt_db",
@@ -209,9 +240,15 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}//middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_matter_cm4_noFP.a",
       "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Sched.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM_extFlash.a",
-      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
     ]
+
+    if (chip_crypto == "platform" &&
+        chip_crypto_flavor == "NXP-Ultrafast-P256") {
+      libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4_dspext.a" ]
+    } else {
+      libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a" ]
+    }
 
     defines = [
       "gPWR_CpuClk_48MHz=1",
@@ -238,6 +275,8 @@ template("k32w0_sdk") {
       "gOtaVerifyWrite_d=0",
       "gExternalFlashIsCiphered_d=1",
       "PDM_USE_DYNAMIC_MEMORY=1",
+      "PDM_SAVE_IDLE=1",
+      "PDM_ENCRYPTION=1",
       "gBootData_None_c=1",
       "PROGRAM_PAGE_SZ=256",
       "configFRTOS_MEMORY_SCHEME=4",
@@ -265,7 +304,20 @@ template("k32w0_sdk") {
       "HEAP_SIZE=gTotalHeapSize_c",
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
+      "gSecLibUseSha256Alt_d=1",
+      "gOTA_UseSecLibAes=1",
     ]
+
+    if (chip_crypto == "platform" &&
+        chip_crypto_flavor == "NXP-Ultrafast-P256") {
+      defines += [ "EC_P256_DSPEXT=1" ]
+    }
+
+    if (use_fro_32k == 1) {
+      defines += [ "gClkUseFro32K=1" ]
+    } else {
+      defines += [ "gClkUseFro32K=0" ]
+    }
 
     if (chip_mdns == "platform") {
       defines += [
@@ -323,10 +375,8 @@ template("k32w0_sdk") {
         "cPWR_UsePowerDownMode=1",
         "cPWR_FullPowerDownMode=1",
         "DBG_PostStepTickAssess=0",
-        "gApp_SystemClockCalibration=1",
         "gPWR_FreqScalingWFI=0",
         "mAppUseTickLessMode_c=1",
-        "App_SuppressTickInStopMode=0",
         "cPWR_DiscardRunningTimerForPowerDown=1",
         "K32W_LOG_ENABLED=0",
         "gUartDebugConsole_d=0",
@@ -466,6 +516,7 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/framework/RNG/Source/RNG.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Reset/Reset.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/SecLib.c",
+      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/SecLib_ecp256_sw.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SerialManager/Source/SerialManager.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SerialManager/Source/UART_Serial_Adapter.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c",

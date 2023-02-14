@@ -80,18 +80,6 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::TriggerNewRequestForData()
-{
-    if (mDownloader)
-    {
-        // The chip lock needs to be taken here to avoid having race conditions
-        // when trying to read attributes during OTA transfer. See https://github.com/project-chip/connectedhomeip/issues/18327
-        PlatformMgr().LockChipStack();
-        this->mDownloader->FetchNextData();
-        PlatformMgr().UnlockChipStack();
-    }
-}
-
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
@@ -122,7 +110,6 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
     ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
     ReturnErrorOnFailure(error);
     mParams.totalFileBytes = header.mPayloadSize;
-    mSoftwareVersion       = header.mSoftwareVersion;
     mHeaderParser.Clear();
 
     return CHIP_NO_ERROR;
@@ -193,13 +180,14 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Failed to process OTA image header");
-        imageProcessor->mDownloader->EndDownload(error);
+        ChipLogError(SoftwareUpdate, "Failed to process OTA image header: cancel image update.");
+        GetRequestorInstance()->CancelImageUpdate();
         return;
     }
 
+    uint32_t param = reinterpret_cast<uint32_t>(imageProcessor);
     /* Will start an erase of 4K if necessary */
-    if (gOtaSuccess_c == OTA_MakeHeadRoomForNextBlock(imageProcessor->mBlock.size(), HandleBlockEraseComplete, 0))
+    if (gOtaSuccess_c == OTA_MakeHeadRoomForNextBlock(imageProcessor->mBlock.size(), HandleBlockEraseComplete, param))
     {
         if (gOtaSuccess_c ==
             OTA_PushImageChunk(imageProcessor->mBlock.data(), (uint16_t) imageProcessor->mBlock.size(), NULL, NULL))
@@ -212,21 +200,34 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
-    bool firstRun = false;
-
-    if (CHIP_NO_ERROR == K32WConfig::ReadConfigValue(K32WConfig::kConfigKey_FirstRunOfOTAImage, firstRun))
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
     {
-        return firstRun;
+        return false;
     }
 
-    return false;
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
-    bool firstRun = false;
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
 
-    return K32WConfig::WriteConfigValue(K32WConfig::kConfigKey_FirstRunOfOTAImage, firstRun);
+    uint32_t currentVersion;
+    uint32_t targetVersion = requestor->GetTargetVersion();
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    if (currentVersion != targetVersion)
+    {
+        ChipLogError(SoftwareUpdate, "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32,
+                     currentVersion, targetVersion);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
@@ -281,24 +282,18 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     OTA_CommitImage(NULL);
     if (OTA_ImageAuthenticate() == gOtaImageAuthPass_c)
     {
-        if (CHIP_NO_ERROR == K32WConfig::WriteConfigValueSync(K32WConfig::kConfigKey_FirstRunOfOTAImage, firstRun))
-        {
-            ChipLogProgress(SoftwareUpdate, "OTA image authentication success. Device will reboot with the new image!");
-            // Set the necessary information to inform the SSBL that a new image is available
-            // and trigger the actual device reboot after some time, to take into account
-            // queued actions, e.g. sending events to a subscription
-            SystemLayer().StartTimer(
-                chip::System::Clock::Milliseconds32(CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
-                [](chip::System::Layer *, void *) { OTA_SetNewImageFlag(); }, nullptr);
-        }
-        else
-        {
-            ChipLogProgress(SoftwareUpdate, "Failed to write kConfigKey_FirstRunOfOTAImage key.");
-        }
+        ChipLogProgress(SoftwareUpdate, "OTA image authentication success. Device will reboot with the new image!");
+        // Set the necessary information to inform the SSBL that a new image is available
+        // and trigger the actual device reboot after some time, to take into account
+        // queued actions, e.g. sending events to a subscription
+        SystemLayer().StartTimer(
+            chip::System::Clock::Milliseconds32(CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
+            [](chip::System::Layer *, void *) { OTA_SetNewImageFlag(); }, nullptr);
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "Image authentication error.");
+        ChipLogError(SoftwareUpdate, "Image authentication error: cancel image update.");
+        GetRequestorInstance()->CancelImageUpdate();
     }
 }
 
@@ -313,19 +308,16 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::HandleBlockEraseComplete(uint32_t)
+void OTAImageProcessorImpl::HandleBlockEraseComplete(uint32_t context)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    ChipDeviceEvent otaChange;
-    otaChange.Type                     = DeviceEventType::kOtaStateChanged;
-    otaChange.OtaStateChanged.newState = kOtaSpaceAvailable;
-    error                              = PlatformMgr().PostEvent(&otaChange);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Error while posting OtaChange event");
-    }
+    CHIP_ERROR error      = CHIP_NO_ERROR;
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    SystemLayer().ScheduleLambda([imageProcessor] {
+        if (imageProcessor->mDownloader)
+        {
+            imageProcessor->mDownloader->FetchNextData();
+        }
+    });
 }
 
 } // namespace chip
