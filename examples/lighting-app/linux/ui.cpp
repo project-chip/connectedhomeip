@@ -229,10 +229,11 @@ void DeviceState::ShowUi()
     ImGui::Text("Color Control:");
     ImGui::Indent();
     const char * mode = // based on ColorMode attribute: spec 3.2.7.9
-        (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION) ? "Hue/Saturation"
-        : (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)          ? "X/Y"
-        : (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE)                ? "Temperature/Mireds"
-                                                                                : "UNKNOWN";
+        (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION)
+        ? "Hue/Saturation"
+        : (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)
+            ? "X/Y"
+            : (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE) ? "Temperature/Mireds" : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
 
@@ -398,9 +399,9 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     *window     = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-                                   window_flags);
+                               window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
