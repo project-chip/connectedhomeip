@@ -132,6 +132,11 @@ public:
     void ResetState()
     {
         assertChipStackLockedByCurrentThread();
+        if (mNodeId.HasValue()) {
+            ChipLogProgress(Controller, "Resetting state for OTA Provider for node id %llu", mNodeId.Value());
+        } else {
+            ChipLogProgress(Controller, "Resetting state for OTA Provider");
+        }
         if (mSystemLayer) {
             mSystemLayer->CancelTimer(HandleBdxInitReceivedTimeoutExpired, this);
         }
@@ -678,7 +683,6 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     handler->AddResponse(cachedCommandPath, protocolNotSupportedResponse);
                 }
                 handle.Release();
-                gOtaSender.ResetState();
             }
 
                           errorHandler:^(NSError *) {
