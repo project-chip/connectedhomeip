@@ -79,7 +79,7 @@ Please run the below commands after every bootstrapping.
 Workaround is to install `gdbgui` wheels as binary:
 
 ```
-python3 -m pip install -c scripts/constraints.txt --no-cache --prefer-binary gdbgui==0.13.2.0
+python3 -m pip install -c scripts/setup/constraints.txt --no-cache --prefer-binary gdbgui==0.13.2.0
 deactivate
 ```
 

@@ -142,6 +142,11 @@ endpoint {{endpointId}} {
       {{#if (isServer side)}}
 
   server cluster {{asUpperCamelCase name}} {
+    {{#user_cluster_events}}
+      {{#if included}}
+    emits event {{name}};
+      {{/if}}
+    {{/user_cluster_events}} 
     {{#user_cluster_attributes}}
       {{#if included}}
         {{~#if (is_str_equal storageOption "NVM")}}

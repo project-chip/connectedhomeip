@@ -27,13 +27,13 @@ public:
 class AlarmEventData : public EventData
 {
 public:
-    DlAlarmCode alarmCode;
+    AlarmCodeEnum alarmCode;
 };
 
 class DoorStateEventData : public EventData
 {
 public:
-    DlDoorState doorState;
+    DoorStateEnum doorState;
 };
 
 CHIP_ERROR RegisterLockEvents();

@@ -601,7 +601,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     /* get boolean state attribute value */
     (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
 
-    ChipLogProgress(NotSpecified, "emberAfReadAttribute : %d", stateValueAttrValue);
+    ChipLogProgress(NotSpecified, "StateValue::Get : %d", stateValueAttrValue);
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     sContactSensorLED.Set(stateValueAttrValue);
 #endif

@@ -58,7 +58,7 @@ tests:
                   },
                   {
                       FabricIndex: 1,
-                      Privilege: 3,
+                      Privilege: 4,
                       AuthMode: 3,
                       Subjects: [0x0103],
                       Targets: null,

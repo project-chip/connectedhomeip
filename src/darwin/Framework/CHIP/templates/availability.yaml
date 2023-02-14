@@ -6503,7 +6503,7 @@
                   HeatSetpointPresent: HeatSetpointFieldPresent
                   CoolSetpointPresent: CoolSetpointFieldPresent
 
-- release: "Future"
+- release: "First after major API revamp"
   versions: "future"
   introduced:
       global attributes:
@@ -6565,6 +6565,7 @@
               - EventList
           TimeSynchronization:
               - EventList
+              - DSTOffset
           BridgedDeviceBasicInformation:
               - EventList
           Switch:
@@ -6651,10 +6652,32 @@
               - EventList
           FaultInjection:
               - EventList
+      structs:
+          TimeSynchronization:
+              - DSTOffsetStruct
+              - TimeZoneStruct
+      struct fields:
+          TimeSynchronization:
+              DSTOffsetStruct:
+                  - offset
+                  - validStarting
+                  - validUntil
+              TimeZoneStruct:
+                  - offset
+                  - validAt
+                  - name
       enum values:
           DoorLock:
               LockDataTypeEnum:
                   - FingerVein
+  deprecated:
+      attributes:
+          TimeSynchronization:
+              - DstOffset
+      structs:
+          TimeSynchronization:
+              - DstOffsetType
+              - TimeZoneType
   removed:
       enum values:
           DoorLock:
@@ -6662,3 +6685,11 @@
                   # This value never existed for this enum name so, don't start
                   # exposing it.  It's exposed for LockDataTypeEnum
                   - FingerVein
+  renames:
+      structs:
+          TimeSynchronization:
+              DSTOffsetStruct: DstOffsetType
+              TimeZoneStruct: TimeZoneType
+      attributes:
+          TimeSynchronization:
+              DSTOffset: DstOffset

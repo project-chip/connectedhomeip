@@ -124,10 +124,18 @@ void Cleanup()
     // TODO(16968): Lifecycle management of storage-using components like GroupDataProvider, etc
 }
 
+// TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
+
+// when the shell is enabled, don't intercept signals since it prevents the user from
+// using expected commands like CTRL-C to quit the application. (see issue #17845)
+// We should stop using signals for those faults, and move to a different notification
+// means, like a pipe. (see issue #19114)
+#if !defined(ENABLE_CHIP_SHELL)
 void StopSignalHandler(int signal)
 {
-    DeviceLayer::PlatformMgr().StopEventLoopTask();
+    Server::GetInstance().DispatchShutDownAndStopEventLoop();
 }
+#endif // !defined(ENABLE_CHIP_SHELL)
 
 } // namespace
 
@@ -394,8 +402,10 @@ void ChipLinuxAppMainLoop()
 
     ApplicationInit();
 
-    signal(SIGTERM, StopSignalHandler);
+#if !defined(ENABLE_CHIP_SHELL)
     signal(SIGINT, StopSignalHandler);
+    signal(SIGTERM, StopSignalHandler);
+#endif // !defined(ENABLE_CHIP_SHELL)
     DeviceLayer::PlatformMgr().RunEventLoop();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

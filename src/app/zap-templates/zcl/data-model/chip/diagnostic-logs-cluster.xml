@@ -53,8 +53,8 @@ limitations under the License.
             <description>Response to the RetrieveLogsRequest</description>
             <arg name="Status" type="LogsStatus"/>
             <arg name="LogContent" type="OCTET_STRING"/>
-            <arg name="UTCTimeStamp" type="epoch_s"/>
-            <arg name="TimeSinceBoot" type="INT32U"/>
+            <arg name="UTCTimeStamp" type="epoch_us" optional="true"/>
+            <arg name="TimeSinceBoot" type="systime_us" optional="true"/>
         </command>
     </cluster>
 </configurator>

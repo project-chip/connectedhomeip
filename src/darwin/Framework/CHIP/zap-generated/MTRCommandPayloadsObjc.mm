@@ -3484,9 +3484,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _logContent = [NSData data];
 
-        _utcTimeStamp = @(0);
+        _utcTimeStamp = nil;
 
-        _timeSinceBoot = @(0);
+        _timeSinceBoot = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3527,12 +3527,12 @@ NS_ASSUME_NONNULL_BEGIN
     return self.logContent;
 }
 
-- (void)setTimeStamp:(NSNumber * _Nonnull)timeStamp
+- (void)setTimeStamp:(NSNumber * _Nullable)timeStamp
 {
     self.utcTimeStamp = timeStamp;
 }
 
-- (NSNumber * _Nonnull)timeStamp
+- (NSNumber * _Nullable)timeStamp
 {
     return self.utcTimeStamp;
 }

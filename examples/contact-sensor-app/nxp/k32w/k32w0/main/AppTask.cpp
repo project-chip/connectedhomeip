@@ -623,7 +623,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (event->Type == DeviceEventType::kDnssdPlatformInitialized)
+    if (event->Type == DeviceEventType::kDnssdInitialized)
     {
         K32W_LOG("Dnssd platform initialized.");
         PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
