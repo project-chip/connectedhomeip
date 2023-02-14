@@ -74,7 +74,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         PLAT_LOG("## Operational network enabled");
         break;
 
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
         PLAT_LOG("## Dnssd platform initialized");
         break;
 

@@ -378,7 +378,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
 {
     switch (event.Type)
     {
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
         // Platform DNS-SD implementation uses kPlatformDnssdInitialized event to signal that it's ready.
         if (!mIsDnssdReady)
         {
@@ -402,6 +402,8 @@ void Server::CheckServerReadyEvent()
     // are ready, and emit the 'server ready' event if so.
     if (mIsDnssdReady)
     {
+        ChipLogError(AppServer, "Server initialization complete");
+
         ChipDeviceEvent event = { .Type = DeviceEventType::kServerReady };
         PlatformMgr().PostEventOrDie(&event);
     }
