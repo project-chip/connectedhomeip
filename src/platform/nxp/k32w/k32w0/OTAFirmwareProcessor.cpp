@@ -32,9 +32,12 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_OTA_PROCESSOR_CLIENT_INIT);
 
     auto offset = OTA_GetCurrentEepromAddressOffset();
-    offset = ((offset + 0x10000-1)/0x10000) * 0x10000;
-    otaResult_t res = OTA_SetStartEepromOffset(offset);
+    if(offset != 0)
+    {
+        offset += 1;
+    }
 
+    ReturnErrorCodeIf(OTA_UTILS_IMAGE_INVALID_ADDR == OTA_SetStartEepromOffset(offset), CHIP_ERROR_INTERNAL);
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - mDescriptorSize), CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -95,6 +98,8 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
 CHIP_ERROR OTAFirmwareProcessor::AbortAction()
 {
     OTA_CancelImage();
+    OTA_ResetCustomEntries();
+    OTA_SetStartEepromOffset(0);
     Clear();
 
     return CHIP_NO_ERROR;
