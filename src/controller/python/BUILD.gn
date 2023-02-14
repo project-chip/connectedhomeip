@@ -196,7 +196,6 @@ chip_python_wheel_action("chip-core") {
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
         "chip/ChipCommissionableNodeCtrl.py",
-        "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipStack.py",
         "chip/FabricAdmin.py",
         "chip/__init__.py",
@@ -239,8 +238,6 @@ chip_python_wheel_action("chip-core") {
 
       if (chip_controller) {
         sources += [
-          "chip-device-ctrl.py",
-          "chip-repl.py",
           "chip/ChipDeviceCtrl.py",
         ]
       } else {
@@ -305,12 +302,6 @@ chip_python_wheel_action("chip-core") {
     "pycrypto",
     "ecdsa",
   ]
-
-  if (current_os == "mac") {
-    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
-  } else if (current_os == "linux") {
-    py_package_reqs += [ "pygobject" ]
-  }
 
   if (current_cpu == "x64") {
     cpu_tag = "x86_64"
@@ -395,7 +386,11 @@ chip_python_wheel_action("chip-repl") {
   py_manifest_files = [
     {
       src_dir = "."
-      sources = [ "chip/ChipReplStartup.py" ]
+      sources = [
+        "chip/ChipCoreBluetoothMgr.py",
+        "chip/ChipBluezMgr.py",
+        "chip/ChipReplStartup.py"
+      ]
       sources += py_scripts
     },
     {
@@ -423,6 +418,15 @@ chip_python_wheel_action("chip-repl") {
     "ipykernel",
     "mobly",
   ]
+
+  if (current_os == "mac") {
+    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
+  } else if (current_os == "linux") {
+    py_package_reqs += [
+      "dbus-python==1.2.18",
+      "pygobject"
+    ]
+  }
 
   py_package_name = "${chip_python_package_prefix}-repl"
   py_package_output = string_replace(py_package_name, "-", "_")
