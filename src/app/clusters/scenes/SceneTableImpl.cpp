@@ -254,7 +254,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
                 idx = index;
                 return CHIP_NO_ERROR; // return scene at current index if scene found
             }
-            else if (scene_map[index].mSceneEndpointId == kInvalidEndpointId && firstFreeIdx == kUndefinedSceneIndex)
+            if (scene_map[index].mSceneEndpointId == kInvalidEndpointId && firstFreeIdx == kUndefinedSceneIndex)
             {
                 firstFreeIdx = index;
             }
@@ -293,7 +293,8 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
 
             return scene.Save(storage);
         }
-        else if (CHIP_ERROR_NOT_FOUND == err) // If not found, scene.index should be the first free index
+
+        if (CHIP_ERROR_NOT_FOUND == err) // If not found, scene.index should be the first free index
         {
             scene_count++;
             scene_map[scene.index] = scene.mStorageId;
@@ -404,6 +405,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fa
 /// @return CHIP_ERROR_BUFFER_TO_SMALL if couldn't insert the handler, otherwise CHIP_NO_ERROR
 CHIP_ERROR DefaultSceneTableImpl::registerHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function)
 {
+    CHIP_ERROR err     = CHIP_ERROR_INVALID_LIST_LENGTH;
     uint8_t idPosition = 0xff, fisrtEmptyPosition = 0xff;
     for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
     {
@@ -422,20 +424,16 @@ CHIP_ERROR DefaultSceneTableImpl::registerHandler(ClusterId ID, clusterFieldsHan
     if (idPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
     {
         this->handlers[idPosition].initSceneHandler(ID, get_function, set_function);
-        return CHIP_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     else if (fisrtEmptyPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
     {
         this->handlers[fisrtEmptyPosition].initSceneHandler(ID, get_function, set_function);
         this->handlerNum++;
-        return CHIP_NO_ERROR;
-    }
-    else
-    {
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
+        err = CHIP_NO_ERROR;
     }
 
-    return CHIP_ERROR_INVALID_LIST_LENGTH;
+    return err;
 }
 
 CHIP_ERROR DefaultSceneTableImpl::unregisterHandler(uint8_t position)

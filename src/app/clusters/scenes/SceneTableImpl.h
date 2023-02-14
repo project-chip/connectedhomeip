@@ -34,25 +34,25 @@ typedef CHIP_ERROR (*clusterFieldsHandle)(ExtensionFieldsSet & fields);
 class SceneHandler
 {
 public:
-    SceneHandler(ClusterId Id = kInvalidClusterId, clusterFieldsHandle getClusterEFS = nullptr,
-                 clusterFieldsHandle setClusterEFS = nullptr)
+    SceneHandler(ClusterId Id = kInvalidClusterId, clusterFieldsHandle getEFSHandle = nullptr,
+                 clusterFieldsHandle setEFSHandle = nullptr)
     {
-        if (getClusterEFS != nullptr && setClusterEFS != nullptr && Id != kInvalidClusterId)
+        if (getEFSHandle != nullptr && setEFSHandle != nullptr && Id != kInvalidClusterId)
         {
-            getEFS      = getClusterEFS;
-            setEFS      = setClusterEFS;
+            getEFS      = getEFSHandle;
+            setEFS      = setEFSHandle;
             cID         = Id;
             initialized = true;
         }
     };
     ~SceneHandler(){};
 
-    void initSceneHandler(ClusterId Id, clusterFieldsHandle getClusterEFS, clusterFieldsHandle setClusterEFS)
+    void initSceneHandler(ClusterId Id, clusterFieldsHandle getEFSHandle, clusterFieldsHandle setEFSHandle)
     {
-        if (getClusterEFS != nullptr && setClusterEFS != nullptr && Id != kInvalidClusterId)
+        if (getEFSHandle != nullptr && setEFSHandle != nullptr && Id != kInvalidClusterId)
         {
-            getEFS      = getClusterEFS;
-            setEFS      = setClusterEFS;
+            getEFS      = getEFSHandle;
+            setEFS      = setEFSHandle;
             cID         = Id;
             initialized = true;
         }
