@@ -17,6 +17,7 @@ name: Build example - EFR32
 on:
   push:
   pull_request:
+  merge_group:
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -65,10 +66,10 @@ jobs:
       - name: Bootstrap cache
         uses: actions/cache@v3
         with:
-            key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-            path: |
-                .environment
-                build_overrides/pigweed_environment.gni
+          key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+          path: |
+            .environment
+            build_overrides/pigweed_environment.gni
       - name: Bootstrap
         timeout-minutes: 25
         run: scripts/build/gn_bootstrap.sh
