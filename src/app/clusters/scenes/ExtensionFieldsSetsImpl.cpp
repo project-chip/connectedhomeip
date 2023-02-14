@@ -83,6 +83,7 @@ bool ExtensionFieldsSetsImpl::is_empty() const
 /// @return CHIP_NO_ERROR if insertion worked, CHIP_ERROR_BUFFER_TOO_SMALL if the array is already full
 CHIP_ERROR ExtensionFieldsSetsImpl::insertField(ExtensionFieldsSet & field)
 {
+    CHIP_ERROR err     = CHIP_ERROR_INVALID_LIST_LENGTH;
     uint8_t idPosition = 0xff, fisrtEmptyPosition = 0xff;
     for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
     {
@@ -102,18 +103,16 @@ CHIP_ERROR ExtensionFieldsSetsImpl::insertField(ExtensionFieldsSet & field)
     if (idPosition < kMaxClusterPerScenes)
     {
         ReturnErrorOnFailure(this->mEFS[idPosition] = field);
-        return CHIP_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     else if (fisrtEmptyPosition < kMaxClusterPerScenes)
     {
         ReturnErrorOnFailure(this->mEFS[fisrtEmptyPosition] = field);
         this->mFieldNum++;
-        return CHIP_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
-    }
+
+    return err;
 }
 
 CHIP_ERROR ExtensionFieldsSetsImpl::getFieldAtPosition(ExtensionFieldsSet & field, uint8_t position)

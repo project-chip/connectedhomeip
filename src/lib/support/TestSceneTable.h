@@ -24,11 +24,36 @@ namespace chip {
 
 namespace SceneTesting {
 
-using FabricIndex     = chip::FabricIndex;
-using SceneTableEntry = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
-using SceneTableImpl  = chip::scenes::DefaultSceneTableImpl;
-using SceneStorageId  = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
-using SceneData       = chip::scenes::DefaultSceneTableImpl::SceneData;
+using FabricIndex        = chip::FabricIndex;
+using SceneTableEntry    = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
+using SceneTableImpl     = chip::scenes::DefaultSceneTableImpl;
+using SceneStorageId     = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
+using SceneData          = chip::scenes::DefaultSceneTableImpl::SceneData;
+using ExtensionFieldsSet = chip::scenes::ExtensionFieldsSet;
+
+static const ExtensionFieldsSet onOffEFS1        = ExtensionFieldsSet(0x0006, (uint8_t *) "1", 1);
+static const ExtensionFieldsSet levelControlEFS1 = ExtensionFieldsSet(0x0008, (uint8_t *) "511", 3);
+
+static CHIP_ERROR test_on_off_from_cluster_callback(ExtensionFieldsSet & fields)
+{
+    ReturnErrorOnFailure(fields = onOffEFS1);
+    return CHIP_NO_ERROR;
+}
+static CHIP_ERROR test_on_off_to_cluster_callback(ExtensionFieldsSet & fields)
+{
+    VerifyOrReturnError(fields == onOffEFS1, CHIP_ERROR_WRITE_FAILED);
+    return CHIP_NO_ERROR;
+}
+static CHIP_ERROR test_level_control_from_cluster_callback(ExtensionFieldsSet & fields)
+{
+    ReturnErrorOnFailure(fields = levelControlEFS1);
+    return CHIP_NO_ERROR;
+}
+static CHIP_ERROR test_level_control_to_cluster_callback(ExtensionFieldsSet & fields)
+{
+    VerifyOrReturnError(fields == levelControlEFS1, CHIP_ERROR_WRITE_FAILED);
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR scene_store_test(SceneTableImpl * provider, FabricIndex fabric_index, SceneTableEntry & entry)
 {
@@ -36,9 +61,9 @@ CHIP_ERROR scene_store_test(SceneTableImpl * provider, FabricIndex fabric_index,
     SceneTableEntry temp;
 
     LogErrorOnFailure(provider->SetSceneTableEntry(fabric_index, entry));
-    LogErrorOnFailure(provider->GetSceneTableEntry(fabric_index, entry.storageId, temp));
-    VerifyOrReturnError(temp.storageId == entry.storageId, CHIP_ERROR_WRITE_FAILED);
-    VerifyOrReturnError(temp.storageData == entry.storageData, CHIP_ERROR_WRITE_FAILED);
+    LogErrorOnFailure(provider->GetSceneTableEntry(fabric_index, entry.mStorageId, temp));
+    VerifyOrReturnError(temp.mStorageId == entry.mStorageId, CHIP_ERROR_WRITE_FAILED);
+    VerifyOrReturnError(temp.mStorageData == entry.mStorageData, CHIP_ERROR_WRITE_FAILED);
 
     return err;
 }
@@ -55,13 +80,13 @@ CHIP_ERROR scene_iterator_test(SceneTableImpl * provider, FabricIndex fabric_ind
         VerifyOrReturnError(iterator->Count() == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
         VerifyOrReturnError(iterator->Next(temp), CHIP_ERROR_INVALID_ACCESS_TOKEN);
-        VerifyOrReturnError(temp.storageId == entry1.storageId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(temp.mStorageId == entry1.mStorageId, CHIP_ERROR_INVALID_ARGUMENT);
 
         VerifyOrReturnError(iterator->Next(temp), CHIP_ERROR_INVALID_ACCESS_TOKEN);
-        VerifyOrReturnError(temp.storageId == entry2.storageId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(temp.mStorageId == entry2.mStorageId, CHIP_ERROR_INVALID_ARGUMENT);
 
         VerifyOrReturnError(iterator->Next(temp), CHIP_ERROR_INVALID_ACCESS_TOKEN);
-        VerifyOrReturnError(temp.storageId == entry3.storageId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(temp.mStorageId == entry3.mStorageId, CHIP_ERROR_INVALID_ARGUMENT);
 
         // Iterator should return false here
         VerifyOrReturnError(iterator->Next(temp) == false, CHIP_ERROR_INVALID_ACCESS_TOKEN);
@@ -78,21 +103,21 @@ CHIP_ERROR scene_remove_test(SceneTableImpl * provider, FabricIndex fabric_index
     CHIP_ERROR err = CHIP_NO_ERROR;
     SceneTableEntry temp;
 
-    LogErrorOnFailure(provider->RemoveSceneTableEntry(fabric_index, entry2.storageId));
+    LogErrorOnFailure(provider->RemoveSceneTableEntry(fabric_index, entry2.mStorageId));
 
     auto * iterator = provider->IterateSceneEntry(fabric_index);
     VerifyOrReturnError(iterator->Count() == 2, CHIP_ERROR_INVALID_ARGUMENT);
     iterator->Next(temp);
-    VerifyOrReturnError(temp.storageId == entry1.storageId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(temp.mStorageId == entry1.mStorageId, CHIP_ERROR_INVALID_ARGUMENT);
     iterator->Release();
 
-    LogErrorOnFailure(provider->RemoveSceneTableEntry(fabric_index, entry1.storageId));
+    LogErrorOnFailure(provider->RemoveSceneTableEntry(fabric_index, entry1.mStorageId));
     iterator = provider->IterateSceneEntry(fabric_index);
     VerifyOrReturnError(iterator->Count() == 1, CHIP_ERROR_INVALID_ARGUMENT);
     iterator->Next(temp);
-    VerifyOrReturnError(temp.storageId == entry3.storageId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(temp.mStorageId == entry3.mStorageId, CHIP_ERROR_INVALID_ARGUMENT);
 
-    LogErrorOnFailure(provider->RemoveSceneTableEntry(fabric_index, entry3.storageId));
+    LogErrorOnFailure(provider->RemoveSceneTableEntry(fabric_index, entry3.mStorageId));
     iterator = provider->IterateSceneEntry(fabric_index);
     VerifyOrReturnError(iterator->Count() == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -112,17 +137,30 @@ CHIP_ERROR TestSceneData(SceneTableImpl * provider, FabricIndex fabric_index)
     static const SceneStorageId sceneId3(1, 0xCC, 0x102);
 
     // Scene data
-    static const SceneData sceneData1("Scene #1");
-    static const SceneData sceneData2("Scene #2", 2, 5);
-    static const SceneData sceneData3("Scene #3", 25);
+    static const SceneData sceneData1(CharSpan("Scene #1", sizeof("Scene #1")));
+    static const SceneData sceneData2(CharSpan("Scene #2", sizeof("Scene #2")), 2, 5);
+    static const SceneData sceneData3(CharSpan(), 25);
+
     // Scenes
     SceneTableEntry scene1(sceneId1, sceneData1);
     SceneTableEntry scene2(sceneId2, sceneData2);
     SceneTableEntry scene3(sceneId3, sceneData3);
 
+    err = provider->registerHandler(onOffEFS1.mID, &test_on_off_from_cluster_callback, &test_on_off_to_cluster_callback);
+    LogErrorOnFailure(err);
+    err = provider->registerHandler(levelControlEFS1.mID, &test_level_control_from_cluster_callback,
+                                    &test_level_control_to_cluster_callback);
+    LogErrorOnFailure(err);
+    err = provider->EFSValuesFromCluster(scene1.mStorageData.mExtentsionFieldsSets);
+    LogErrorOnFailure(err);
+
     // Tests
     err = scene_store_test(provider, fabric_index, scene1);
     LogErrorOnFailure(err);
+
+    err = provider->EFSValuesToCluster(scene1.mStorageData.mExtentsionFieldsSets);
+    LogErrorOnFailure(err);
+
     err = scene_store_test(provider, fabric_index, scene2);
     LogErrorOnFailure(err);
     err = scene_store_test(provider, fabric_index, scene3);
