@@ -19,6 +19,7 @@
 
 #include <Options.h> // examples/platform/linux/Options.h
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -373,12 +374,12 @@ void UiLoop()
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
             {
-                chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+                chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
             }
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
                 event.window.windowID == SDL_GetWindowID(window))
             {
-                chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+                chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
             }
         }
 
