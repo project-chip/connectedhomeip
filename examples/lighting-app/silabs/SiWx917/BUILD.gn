@@ -99,7 +99,8 @@ if (chip_enable_wifi) {
     ]
   }
   if (chip_default_wifi_psk != "") {
-    assert(chip_default_wifi_ssid != "", "ssid can't be null if psk is provided")
+    assert(chip_default_wifi_ssid != "",
+           "ssid can't be null if psk is provided")
     defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
 
