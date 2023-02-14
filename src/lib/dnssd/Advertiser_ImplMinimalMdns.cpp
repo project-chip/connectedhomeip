@@ -337,7 +337,7 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
     // is true.  But we don't handle updates to our set of interfaces right now,
     // so rely on the logic in this function to shut down and restart the
     // GlobalMinimalMdnsServer to handle that.
-    GlobalMinimalMdnsServer::Server().Shutdown();
+    GlobalMinimalMdnsServer::Server().ShutdownEndpoints();
 
     if (!mIsInitialized)
     {
