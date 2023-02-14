@@ -43,6 +43,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/LockTracker.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
@@ -105,6 +106,7 @@ static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BU
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
     ChipLogProgress(AppServer, "Server initializing...");
+    assertChipStackLockedByCurrentThread();
 
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
@@ -461,6 +463,7 @@ void Server::ScheduleFactoryReset()
 
 void Server::Shutdown()
 {
+    assertChipStackLockedByCurrentThread();
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
