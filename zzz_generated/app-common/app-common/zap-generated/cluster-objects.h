@@ -10254,7 +10254,7 @@ struct TypeInfo
 } // namespace EthernetNetworkDiagnostics
 namespace TimeSynchronization {
 namespace Structs {
-namespace DstOffsetType {
+namespace DSTOffsetStruct {
 enum class Fields
 {
     kOffset        = 0,
@@ -10278,8 +10278,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace DstOffsetType
-namespace TimeZoneType {
+} // namespace DSTOffsetStruct
+namespace TimeZoneStruct {
 enum class Fields
 {
     kOffset  = 0,
@@ -10303,7 +10303,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace TimeZoneType
+} // namespace TimeZoneStruct
 } // namespace Structs
 
 namespace Commands {
@@ -10423,31 +10423,31 @@ struct TypeInfo
 namespace TimeZone {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeZone::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TimeZone
-namespace DstOffset {
+namespace DSTOffset {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::DecodableType>;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::DecodableType> &;
+        chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DstOffset::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DSTOffset::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace DstOffset
+} // namespace DSTOffset
 namespace LocalTime {
 struct TypeInfo
 {
@@ -10537,7 +10537,7 @@ struct TypeInfo
         Attributes::TrustedTimeNodeId::TypeInfo::DecodableType trustedTimeNodeId;
         Attributes::DefaultNtp::TypeInfo::DecodableType defaultNtp;
         Attributes::TimeZone::TypeInfo::DecodableType timeZone;
-        Attributes::DstOffset::TypeInfo::DecodableType dstOffset;
+        Attributes::DSTOffset::TypeInfo::DecodableType DSTOffset;
         Attributes::LocalTime::TypeInfo::DecodableType localTime;
         Attributes::TimeZoneDatabase::TypeInfo::DecodableType timeZoneDatabase = static_cast<bool>(0);
         Attributes::NtpServerPort::TypeInfo::DecodableType ntpServerPort;

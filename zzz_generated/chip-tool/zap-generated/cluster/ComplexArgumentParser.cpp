@@ -498,6 +498,37 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::Cre
     ComplexArgumentParser::Finalize(request.credentialIndex);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DSTOffsetStruct.offset", "offset", value.isMember("offset")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DSTOffsetStruct.validStarting", "validStarting",
+                                                                  value.isMember("validStarting")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("DSTOffsetStruct.validUntil", "validUntil", value.isMember("validUntil")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "offset");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.offset, value["offset"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "validStarting");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.validStarting, value["validStarting"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "validUntil");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.validUntil, value["validUntil"]));
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.offset);
+    ComplexArgumentParser::Finalize(request.validStarting);
+    ComplexArgumentParser::Finalize(request.validUntil);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                                         Json::Value & value)
 {
@@ -570,37 +601,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::UnitTesting::Structs::DoubleNestedStructList::Type & request)
 {
     ComplexArgumentParser::Finalize(request.a);
-}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DstOffsetType.offset", "offset", value.isMember("offset")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("DstOffsetType.validStarting", "validStarting", value.isMember("validStarting")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("DstOffsetType.validUntil", "validUntil", value.isMember("validUntil")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "offset");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.offset, value["offset"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "validStarting");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.validStarting, value["validStarting"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "validUntil");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.validUntil, value["validUntil"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.offset);
-    ComplexArgumentParser::Finalize(request.validStarting);
-    ComplexArgumentParser::Finalize(request.validUntil);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Actions::Structs::EndpointListStruct::Type & request,
@@ -2160,13 +2160,13 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::SoftwareDiagnostics::S
     ComplexArgumentParser::Finalize(request.stackSize);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request,
+                                        chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TimeZoneType.offset", "offset", value.isMember("offset")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TimeZoneType.validAt", "validAt", value.isMember("validAt")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TimeZoneStruct.offset", "offset", value.isMember("offset")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TimeZoneStruct.validAt", "validAt", value.isMember("validAt")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "offset");
@@ -2184,7 +2184,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.offset);
     ComplexArgumentParser::Finalize(request.validAt);
