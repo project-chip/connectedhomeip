@@ -1642,9 +1642,6 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
-    emits event HardwareFaultChange;
-    emits event RadioFaultChange;
-    emits event NetworkFaultChange;
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
@@ -1673,8 +1670,6 @@ endpoint 0 {
   }
 
   server cluster ThreadNetworkDiagnostics {
-    emits event ConnectionStatus;
-    emits event NetworkFaultChange;
     callback attribute channel;
     callback attribute routingRole;
     callback attribute networkName;
@@ -1848,7 +1843,6 @@ endpoint 1 {
 
   server cluster Actions {
     emits event StateChanged;
-    emits event ActionFailed;
     callback attribute actionList;
     callback attribute endpointLists;
     ram      attribute setupURL default = "https://example.com";
