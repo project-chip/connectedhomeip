@@ -25,9 +25,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/attribute-storage.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -45,6 +43,9 @@ namespace example {
 namespace Ui {
 
 namespace {
+
+using namespace chip::app::Clusters;
+using chip::app::DataModel::Nullable;
 
 std::atomic<bool> gUiRunning{ false };
 
@@ -67,19 +68,33 @@ public:
 private:
     static constexpr int kQRCodeVersion   = qrcodegen_VERSION_MAX;
     static constexpr int kMaxQRBufferSize = qrcodegen_BUFFER_LEN_FOR_VERSION(kQRCodeVersion);
+    static constexpr int kMaxColors       = 6; // spec defined maximum
 
     sem_t mChipLoopWaitSemaphore;
 
     bool mHasQRCode                   = false;
     uint8_t mQRData[kMaxQRBufferSize] = { 0 };
 
-    // light data:
-    bool mOnOff = false;
+    // OnOff
+    bool mLightIsOn = false;
+    // Level
+    uint8_t mMinLevel = 0;
+    uint8_t mMaxLevel = 0;
+    Nullable<uint8_t> mCurrentLevel;
+    uint16_t mLevelRemainingTime10sOfSec = 0;
+    // Color control
+    uint8_t mColorHue        = 0;
+    uint8_t mColorSaturation = 0;
+    uint16_t mColorX         = 0;
+    uint16_t mColorY         = 0;
 
     // Updates the data (run in the chip event loop)
     void ChipLoopUpdate();
 
     void InitQRCode();
+
+    // displays a window with the QR Code.
+    void DrawQRCode();
 
     // Run in CHIPMainLoop to access ember in a single threaded
     // fashion
@@ -138,72 +153,107 @@ inline ImVec2 operator+(const ImVec2 & a, const ImVec2 & b)
 
 void DeviceState::ShowUi()
 {
-    ImGui::Begin("Light app");
-    ImGui::Text("Here is the current ember device state:");
-    ImGui::Checkbox("Light is ON", &mOnOff);
+    ImGui::Begin("Light app state");
+    ImGui::Text("On-Off:");
+
+    if (mLightIsOn)
+    {
+        ImGui::Text("    Light is ON");
+    }
+    else
+    {
+        ImGui::Text("    Light is OFF");
+    }
+
+    ImGui::Text("Level Control:");
+    ImGui::Text("    MIN Level:              %d", mMinLevel);
+    if (mCurrentLevel.IsNull())
+    {
+        ImGui::Text("    Current Level:          NULL");
+    }
+    else
+    {
+        ImGui::Text("    Current Level:          %d", mCurrentLevel.Value());
+    }
+    ImGui::Text("    MAX Level:              %d", mMaxLevel);
+    ImGui::Text("    Remaining Time (1/10s): %d", mLevelRemainingTime10sOfSec);
+
+    ImGui::Text("Color Control:");
+    ImGui::Text("    Current Hue:         %d", mColorHue);
+    ImGui::Text("    Current Saturation:  %d", mColorSaturation);
+    ImGui::Text("    Current X:           %d", mColorX);
+    ImGui::Text("    Current Y:           %d", mColorY);
+
     ImGui::End();
 
-    if (mHasQRCode)
+    DrawQRCode();
+}
+
+void DeviceState::DrawQRCode()
+{
+    if (!mHasQRCode)
     {
-        ImGui::Begin("QR Code.");
+        return;
+    }
 
-        ImDrawList * drawList = ImGui::GetWindowDrawList();
+    ImGui::Begin("QR Code.");
 
-        constexpr int kBorderSize    = 35;
-        constexpr int kMinWindowSize = 200;
-        const int kQRCodeSize        = qrcodegen_getSize(mQRData);
+    ImDrawList * drawList = ImGui::GetWindowDrawList();
 
-        ImVec2 pos  = ImGui::GetWindowPos();
-        ImVec2 size = ImGui::GetWindowSize();
+    constexpr int kBorderSize    = 35;
+    constexpr int kMinWindowSize = 200;
+    const int kQRCodeSize        = qrcodegen_getSize(mQRData);
 
-        if (size.y < kMinWindowSize)
+    ImVec2 pos  = ImGui::GetWindowPos();
+    ImVec2 size = ImGui::GetWindowSize();
+
+    if (size.y < kMinWindowSize)
+    {
+        size = ImVec2(kMinWindowSize, kMinWindowSize);
+        ImGui::SetWindowSize(size);
+    }
+
+    // Fill the entire window white, then figure out borders
+    drawList->AddRectFilled(pos, pos + size, IM_COL32_WHITE);
+
+    // add a border
+    if (size.x >= 2 * kBorderSize && size.y >= 2 * kBorderSize)
+    {
+        size.x -= 2 * kBorderSize;
+        size.y -= 2 * kBorderSize;
+        pos.x += kBorderSize;
+        pos.y += kBorderSize;
+    }
+
+    // create a square rectangle: keep only the smaller side and adjust the
+    // other
+    if (size.x > size.y)
+    {
+        pos.x += (size.x - size.y) / 2;
+        size.x = size.y;
+    }
+    else if (size.y > size.x)
+    {
+        pos.y += (size.y - size.x) / 2;
+        size.y = size.x;
+    }
+
+    const ImVec2 squareSize = ImVec2(size.x / static_cast<float>(kQRCodeSize), size.y / static_cast<float>(kQRCodeSize));
+
+    for (int y = 0; y < kQRCodeSize; ++y)
+    {
+        for (int x = 0; x < kQRCodeSize; ++x)
         {
-            size = ImVec2(kMinWindowSize, kMinWindowSize);
-            ImGui::SetWindowSize(size);
-        }
-
-        // Fill the entire window white, then figure out borders
-        drawList->AddRectFilled(pos, pos + size, IM_COL32_WHITE);
-
-        // add a border
-        if (size.x >= 2 * kBorderSize && size.y >= 2 * kBorderSize)
-        {
-            size.x -= 2 * kBorderSize;
-            size.y -= 2 * kBorderSize;
-            pos.x += kBorderSize;
-            pos.y += kBorderSize;
-        }
-
-        // create a square rectangle: keep only the smaller side and adjust the
-        // other
-        if (size.x > size.y)
-        {
-            pos.x += (size.x - size.y) / 2;
-            size.x = size.y;
-        }
-        else if (size.y > size.x)
-        {
-            pos.y += (size.y - size.x) / 2;
-            size.y = size.x;
-        }
-
-        const ImVec2 squareSize = ImVec2(size.x / static_cast<float>(kQRCodeSize), size.y / static_cast<float>(kQRCodeSize));
-
-        for (int y = 0; y < kQRCodeSize; ++y)
-        {
-            for (int x = 0; x < kQRCodeSize; ++x)
+            if (qrcodegen_getModule(mQRData, x, y))
             {
-                if (qrcodegen_getModule(mQRData, x, y))
-                {
-                    ImVec2 placement =
-                        ImVec2(pos.x + static_cast<float>(x) * squareSize.x, pos.y + static_cast<float>(y) * squareSize.y);
-                    drawList->AddRectFilled(placement, placement + squareSize, IM_COL32_BLACK);
-                }
+                ImVec2 placement =
+                    ImVec2(pos.x + static_cast<float>(x) * squareSize.x, pos.y + static_cast<float>(y) * squareSize.y);
+                drawList->AddRectFilled(placement, placement + squareSize, IM_COL32_BLACK);
             }
         }
-
-        ImGui::End();
     }
+
+    ImGui::End();
 }
 
 void DeviceState::ChipLoopUpdate()
@@ -213,12 +263,20 @@ void DeviceState::ChipLoopUpdate()
 
     // TODO:
     //    - consider error checking
-    //    - add more attributes to the display (color? brightness?)
     {
-        uint8_t value;
-        emberAfReadServerAttribute(kLightEndpointId, chip::app::Clusters::OnOff::Id,
-                                   chip::app::Clusters::OnOff::Attributes::OnOff::Id, &value, sizeof(value));
-        mOnOff = (value != 0);
+        OnOff::Attributes::OnOff::Get(kLightEndpointId, &mLightIsOn);
+
+        // Level Control
+        LevelControl::Attributes::CurrentLevel::Get(kLightEndpointId, mCurrentLevel);
+        LevelControl::Attributes::MinLevel::Get(kLightEndpointId, &mMinLevel);
+        LevelControl::Attributes::MaxLevel::Get(kLightEndpointId, &mMaxLevel);
+        LevelControl::Attributes::RemainingTime::Get(kLightEndpointId, &mLevelRemainingTime10sOfSec);
+
+        // Color control
+        ColorControl::Attributes::CurrentHue::Get(kLightEndpointId, &mColorHue);
+        ColorControl::Attributes::CurrentSaturation::Get(kLightEndpointId, &mColorSaturation);
+        ColorControl::Attributes::CurrentX::Get(kLightEndpointId, &mColorX);
+        ColorControl::Attributes::CurrentY::Get(kLightEndpointId, &mColorY);
     }
 }
 
