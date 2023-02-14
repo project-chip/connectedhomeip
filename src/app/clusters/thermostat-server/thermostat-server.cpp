@@ -393,7 +393,7 @@ int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoin
     // min/max are user imposed min/max
 
     // Note that the limits are initialized above per the spec limits
-    // if they are not present emberAfReadAttribute() will not update the value so the defaults are used
+    // if they are not present Get() will not update the value so the defaults are used
     EmberAfStatus status;
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
@@ -464,7 +464,7 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
     // min/max are user imposed min/max
 
     // Note that the limits are initialized above per the spec limits
-    // if they are not present emberAfReadAttribute() will not update the value so the defaults are used
+    // if they are not present Get() will not update the value so the defaults are used
     EmberAfStatus status;
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
