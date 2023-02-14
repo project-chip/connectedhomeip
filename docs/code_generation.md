@@ -22,7 +22,7 @@ The selection of enabled clusters and files is done using
 [ZAP](https://github.com/project-chip/zap). You can download a recent release of
 zap from its [releases page](https://github.com/project-chip/zap/releases). It
 is recommended to download a release that is in sync with the currently in use
-version by the SDK (see `scripts/zap.json` and
+version by the SDK (see `scripts/setup/zap.json` and
 `scripts/tools/zap/zap_execution.py` for the minimum supported version).
 
 Beyond basic zap file selection, there are also `.json` zap settings that define
@@ -37,8 +37,8 @@ There are only two such files currently in use:
 ### Installing zap and environment variables
 
 ZAP is generally installed as a third-party tool via CIPD during the build
-environment bootstrap (see `scripts/zap.json`), which makes `zap-cli` available
-in `$PATH` when running in a build environment.
+environment bootstrap (see `scripts/setup/zap.json`), which makes `zap-cli`
+available in `$PATH` when running in a build environment.
 
 **NOTE**: zap packages are currently NOT available for `arm64` (like when
 compiling on Raspberry PI.). In these cases one should check out zap from source

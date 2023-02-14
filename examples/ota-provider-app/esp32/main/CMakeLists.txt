@@ -55,7 +55,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       EXCLUDE_SRCS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/ota-provider-app/ota-provider-common/BdxOtaSender.cpp"
-                      PRIV_REQUIRES chip QRCode bt console spiffs)
+                      PRIV_REQUIRES chip QRCode bt console spiffs spi_flash nvs_flash)
 
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")

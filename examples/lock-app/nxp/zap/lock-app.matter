@@ -1006,6 +1006,7 @@ server cluster DoorLock = 257 {
     kPin = 6;
     kRfid = 7;
     kFingerprint = 8;
+    kFingerVein = 9;
   }
 
   enum LockOperationTypeEnum : ENUM8 {

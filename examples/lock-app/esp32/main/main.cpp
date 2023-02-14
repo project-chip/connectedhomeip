@@ -20,7 +20,6 @@
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
-#include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
@@ -36,8 +35,6 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-
-#include <lib/support/ErrorStr.h>
 
 #if CONFIG_ENABLE_PW_RPC
 #include "PigweedLogger.h"
@@ -82,7 +79,7 @@ static void InitServer(intptr_t context)
     CHIP_ERROR error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
 
@@ -114,7 +111,7 @@ extern "C" void app_main()
     CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 

@@ -14748,11 +14748,12 @@ class DoorLock(Cluster):
             kPin = 0x06
             kRfid = 0x07
             kFingerprint = 0x08
+            kFingerVein = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 9,
+            kUnknownEnumValue = 10,
 
         class LockOperationTypeEnum(MatterIntEnum):
             kLock = 0x00

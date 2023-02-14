@@ -44,6 +44,14 @@ jobs:
               run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               run: brew install python@3.9
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -55,6 +63,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Block zap-cli from being used
               # xcodebuild is NOT expected to require zap-cli
               run: scripts/run_in_build_env.sh 'mv $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli.moved'

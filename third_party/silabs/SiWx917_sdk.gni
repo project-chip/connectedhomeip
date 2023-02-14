@@ -129,6 +129,7 @@ template("efr32_sdk") {
       "TINYCRYPT_PRIMITIVES",
       "OPTIMIZE_TINYCRYPT_ASM",
       "RS91X_BLE_ENABLE=1",
+      "__error_t_defined",
     ]
 
     if (use_system_view) {
@@ -190,7 +191,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/uartdrv/inc",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
-        "${efr32_sdk_root}/platform/common/errno/inc",
       ]
     }
 
@@ -283,6 +283,10 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/third_party/freertos/stream_buffer.c",
       "${wisemcu_sdk_root}/third_party/freertos/tasks.c",
       "${wisemcu_sdk_root}/third_party/freertos/timers.c",
+
+      # USART
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
 
       # mbedtls
       "${chip_root}/third_party/mbedtls/repo/library/aes.c",
