@@ -1160,6 +1160,8 @@ int CASE_TestSecurePairing_Setup(void * inContext)
 {
     chip::Platform::MemoryInit();
 
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+
     CHIP_ERROR err = CASETestSecurePairingSetup(inContext);
     if (err != CHIP_NO_ERROR)
     {
@@ -1186,6 +1188,7 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
     gCommissionerFabrics.DeleteAllFabrics();
     gDeviceFabrics.DeleteAllFabrics();
     static_cast<TestContext *>(inContext)->Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
     return SUCCESS;
 }
 
