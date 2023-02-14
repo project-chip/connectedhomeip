@@ -37,6 +37,7 @@
 
 // Qorvo CHIP library
 #include "qvCHIP.h"
+#include "qvIO.h"
 
 // CHIP includes
 #include <lib/support/CHIPMem.h>
@@ -94,6 +95,10 @@ void Application_Init(void)
 #if defined(GP_APP_DIVERSITY_CLEARBOX_TESTING_HOOK_APPLICATION_INIT)
     GP_CLEARBOX_TESTING_APPLICATION_INIT_HOOK;
 #endif
+
+    /* Initialize IO */
+    qvIO_Init();
+
 #if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
     gpAppFramework_Reset_Init();
 #endif
