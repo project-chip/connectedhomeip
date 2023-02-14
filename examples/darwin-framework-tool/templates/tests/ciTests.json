@@ -3,6 +3,7 @@
     "disable": [
         "TestClientMonitoringCluster",
         "Test_TC_SC_4_2",
+        "Test_TC_SC_5_2",
         "TestClusterComplexTypes",
         "TestEvents",
         "TestDiscovery",

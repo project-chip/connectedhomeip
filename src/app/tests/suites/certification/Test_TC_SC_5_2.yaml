@@ -76,11 +76,11 @@ tests:
                     {
                         GroupKeySetID: 0x01a3,
                         GroupKeySecurityPolicy: 0,
-                        EpochKey0: "0xd0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime0: 2220000,
-                        EpochKey1: "0xd1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime1: 2220001,
-                        EpochKey2: "0xd2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 2220002,
                     }
 
@@ -90,7 +90,11 @@ tests:
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
-          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+              ]
 
     - label: "TH sends RemoveAllGroups command"
       command: "RemoveAllGroups"
@@ -102,39 +106,64 @@ tests:
               - name: GroupID
                 value: 0x0103
               - name: GroupName
-                value: "Test Group"
+                value: "Test Group 0103"
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0103
 
-    - label: "TH sends ViewGroup command using group messaging"
+    - label:
+          "TH sends AddGroup command again but using group messaging (0x0103)"
+      groupId: 0x0103
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: "Test Group 0101"
+
+    # Give the group AddGroup time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for AddGroup"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "TH sends ViewGroup command"
       PICS: G.S.F00
       command: "ViewGroup"
-      groupId: 0x0103
       arguments:
           values:
               - name: GroupID
-                value: 0x0103
+                value: 0x0101
       response:
           values:
               - name: Status
                 value: 0
               - name: GroupID
-                value: 0x0103
+                value: 0x0101
               - name: GroupName
-                value: "Test Group"
+                value: "Test Group 0101"
 
-    - label: "TH sends ViewGroup command using group messaging"
+    - label: "TH sends ViewGroup command"
       PICS: "!(G.S.F00)"
       command: "ViewGroup"
-      groupId: 0x0103
       arguments:
           values:
               - name: GroupID
-                value: 0x0103
+                value: 0x0101
       response:
           values:
               - name: Status
                 value: 0
               - name: GroupID
-                value: 0x0103
+                value: 0x0101
               - name: GroupName
                 value: ""
 
