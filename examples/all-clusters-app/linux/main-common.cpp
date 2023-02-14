@@ -31,7 +31,6 @@
 #include <new>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
-#include <signal.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
@@ -60,44 +59,6 @@ LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
 chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
-
-// TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
-
-// when the shell is enabled, don't intercept signals since it prevents the user from
-// using expected commands like CTRL-C to quit the application. (see issue #17845)
-// We should stop using signals for those faults, and move to a different notification
-// means, like a pipe. (see issue #19114)
-#if !defined(ENABLE_CHIP_SHELL)
-void OnRebootSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
-    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
-    // running process to terminate with different reasons.
-    BootReasonType bootReason = BootReasonType::kUnspecified;
-    switch (signum)
-    {
-    case SIGINT:
-        bootReason = BootReasonType::kSoftwareReset;
-        break;
-    default:
-        IgnoreUnusedVariable(bootReason);
-        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
-        chipDie();
-        break;
-    }
-
-    Server::GetInstance().DispatchShutDownAndStopEventLoop();
-}
-
-void SetupSignalHandlers()
-{
-    // sigaction is not used here because Tsan interceptors seems to
-    // never dispatch the signals on darwin.
-    signal(SIGINT, OnRebootSignalHandler);
-}
-#endif // !defined(ENABLE_CHIP_SHELL)
 
 } // namespace
 
@@ -187,10 +148,6 @@ Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(k
 
 void ApplicationInit()
 {
-#if !defined(ENABLE_CHIP_SHELL)
-    SetupSignalHandlers();
-#endif // !defined(ENABLE_CHIP_SHELL)
-
     (void) kNetworkCommissioningEndpointMain;
     // Enable secondary endpoint only when we need it, this should be applied to all platforms.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
