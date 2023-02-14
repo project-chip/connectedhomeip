@@ -44,9 +44,11 @@ public:
     emulate(const node_state_monitor::cluster & unify_cluster, matter_cluster_builder & cluster_builder) override
     {
         // Add IdentifyType attribute to the matter cluster
-        cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), Identify::Attributes::IdentifyType::Id,
-                                                                       1, ZAP_TYPE(ENUM8),
-                                                                       ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
+        cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                         Identify::Attributes::IdentifyType::Id,
+                                                                         1,
+                                                                         ZAP_TYPE(ENUM8),
+                                                                         ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)});
 
         return CHIP_NO_ERROR;
     }

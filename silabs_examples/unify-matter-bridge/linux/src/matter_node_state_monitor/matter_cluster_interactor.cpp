@@ -34,22 +34,43 @@ static void append_bridged_clusters(unify::matter_bridge::matter_endpoint_builde
 {
 
     auto descriptor_cluster = endpoint_builder.register_cluster(chip::app::Clusters::Descriptor::Id);
-    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Descriptor::Attributes::DeviceTypeList::Id, 
-                                                                      kDescriptorAttributeArraySize, ZCL_ARRAY_ATTRIBUTE_TYPE, 0 });
-    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Descriptor::Attributes::ServerList::Id, 
-                                                                      kDescriptorAttributeArraySize, ZCL_ARRAY_ATTRIBUTE_TYPE, 0 });
-    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Descriptor::Attributes::ClientList::Id, 
-                                                                      kDescriptorAttributeArraySize, ZCL_ARRAY_ATTRIBUTE_TYPE, 0 });
-    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Descriptor::Attributes::PartsList::Id,
-                                                                      kDescriptorAttributeArraySize, ZCL_ARRAY_ATTRIBUTE_TYPE, 0 });
-    descriptor_cluster.attributes.emplace_back(
-        EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Globals::Attributes::ClusterRevision::Id, 2, ZCL_INT16U_ATTRIBUTE_TYPE, 0 });
+    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                        chip::app::Clusters::Descriptor::Attributes::DeviceTypeList::Id,
+                                                                        kDescriptorAttributeArraySize,
+                                                                        ZCL_ARRAY_ATTRIBUTE_TYPE,
+                                                                        0});
+    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                        chip::app::Clusters::Descriptor::Attributes::ServerList::Id,
+                                                                        kDescriptorAttributeArraySize,
+                                                                        ZCL_ARRAY_ATTRIBUTE_TYPE,
+                                                                        0});
+    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                        chip::app::Clusters::Descriptor::Attributes::ClientList::Id,
+                                                                        kDescriptorAttributeArraySize,
+                                                                        ZCL_ARRAY_ATTRIBUTE_TYPE,
+                                                                        0});
+    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                        chip::app::Clusters::Descriptor::Attributes::PartsList::Id,
+                                                                        kDescriptorAttributeArraySize,
+                                                                        ZCL_ARRAY_ATTRIBUTE_TYPE,
+                                                                        0});
+    descriptor_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                        chip::app::Clusters::Globals::Attributes::ClusterRevision::Id,
+                                                                        2,
+                                                                        ZCL_INT16U_ATTRIBUTE_TYPE,
+                                                                        0});
 
     auto fixed_label_cluster = endpoint_builder.register_cluster(chip::app::Clusters::FixedLabel::Id);
-    fixed_label_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::FixedLabel::Attributes::LabelList::Id,
-                                                                       kFixedLabelAttributeArraySize, ZCL_ARRAY_ATTRIBUTE_TYPE, 0 });
-    fixed_label_cluster.attributes.emplace_back(
-        EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Globals::Attributes::ClusterRevision::Id, 2, ZCL_INT16U_ATTRIBUTE_TYPE, 0 });
+    fixed_label_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                         chip::app::Clusters::FixedLabel::Attributes::LabelList::Id,
+                                                                         kFixedLabelAttributeArraySize,
+                                                                         ZCL_ARRAY_ATTRIBUTE_TYPE,
+                                                                         0});
+    fixed_label_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                         chip::app::Clusters::Globals::Attributes::ClusterRevision::Id,
+                                                                         2,
+                                                                         ZCL_INT16U_ATTRIBUTE_TYPE,
+                                                                         0});
 }
 
 } // namespace
@@ -109,17 +130,26 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
             {
                 attr_type_size type_size = get_attribute_type_size(cluster_id.value(), attribute_id.value());
                 //TODO we should have the unify node state monitor detect if attributes are writable 
-                cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{
-                     ZAP_EMPTY_DEFAULT(), attribute_id.value(), type_size.attrSize, type_size.attrType, ATTRIBUTE_MASK_EXTERNAL_STORAGE | ATTRIBUTE_MASK_WRITABLE });
+                cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                                 attribute_id.value(),
+                                                                                 type_size.attrSize,
+                                                                                 type_size.attrType,
+                                                                                 ATTRIBUTE_MASK_EXTERNAL_STORAGE | ATTRIBUTE_MASK_WRITABLE});
             }
         }
         if (cluster_name == "Basic")
         {
             basic_cluster_is_supported = true;
-            cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{
-                ZAP_EMPTY_DEFAULT(), chip::app::Clusters::BasicInformation::Attributes::NodeLabel::Id, kNodeLabelSize, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, 0 });
-            cluster_builder.attributes.emplace_back(
-                EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::BasicInformation::Attributes::Reachable::Id, 1, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 0 });
+            cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                             chip::app::Clusters::BasicInformation::Attributes::NodeLabel::Id,
+                                                                             kNodeLabelSize,
+                                                                             ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
+                                                                             0});
+            cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                             chip::app::Clusters::BasicInformation::Attributes::Reachable::Id,
+                                                                             1,
+                                                                             ZCL_BOOLEAN_ATTRIBUTE_TYPE,
+                                                                             0});
         }
 
         emulator.add_emulated_commands_and_attributes(cluster, cluster_builder);
@@ -127,14 +157,26 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
     if (!basic_cluster_is_supported)
     {
         auto bridged_cluster = endpoint_builder.register_cluster(chip::app::Clusters::BridgedDeviceBasicInformation::Id);
-        bridged_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id,
-                                                                       kNodeLabelSize, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, 0 });
-        bridged_cluster.attributes.emplace_back(
-            EmberAfAttributeMetadata{ chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id , ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, 0, ZAP_EMPTY_DEFAULT() });
-        bridged_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::FeatureMap::Id,
-                                                                       4, ZCL_BITMAP32_ATTRIBUTE_TYPE, 0 });
-        bridged_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ClusterRevision::Id,
-                                                                          2, ZCL_INT16U_ATTRIBUTE_TYPE, 0 });
+        bridged_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                         chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id,
+                                                                         kNodeLabelSize,
+                                                                         ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
+                                                                         0});
+        bridged_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                         chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id,
+                                                                         1,
+                                                                         ZCL_BOOLEAN_ATTRIBUTE_TYPE,
+                                                                         0});
+        bridged_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                         chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::FeatureMap::Id,
+                                                                         4,
+                                                                         ZCL_BITMAP32_ATTRIBUTE_TYPE,
+                                                                         0});
+        bridged_cluster.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                         chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ClusterRevision::Id,
+                                                                         2,
+                                                                         ZCL_INT16U_ATTRIBUTE_TYPE,
+                                                                         0});
     }
     append_bridged_clusters(endpoint_builder);
 }

@@ -125,10 +125,16 @@ void ClusterEmulator::add_emulated_commands_and_attributes(const node_state_moni
                                                            matter_cluster_builder & cluster_builder)
 {
     // We always need to add the feature map and cluster
-    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
-                                                                   4,  ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
-    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Globals::Attributes::ClusterRevision::Id,
-                                                                   2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
+    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                     chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
+                                                                     4,
+                                                                     ZAP_TYPE(BITMAP32),
+                                                                     ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)});
+    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
+                                                                     chip::app::Clusters::Globals::Attributes::ClusterRevision::Id,
+                                                                     2,
+                                                                     ZAP_TYPE(INT16U),
+                                                                     ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)});
 
     // Add emulation for commands and attributes for the cluster
     auto it = cluster_emulators_string_map.find(unify_cluster.cluster_name);
