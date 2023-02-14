@@ -53,25 +53,27 @@ bool ColorControlServer::HasFeature(chip::EndpointId endpoint, ColorControlFeatu
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
 
-EmberAfStatus ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
+Status ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
 {
     EmberEventControl * event = getEventControl(endpoint);
-    VerifyOrReturnError(event != nullptr, EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrReturnError(event != nullptr, Status::UnsupportedEndpoint);
 
     emberEventControlSetInactive(event);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Status::Success;
 }
 
-bool ColorControlServer::stopMoveStepCommand(EndpointId endpoint, uint8_t optionsMask, uint8_t optionsOverride)
+bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                             uint8_t optionsMask, uint8_t optionsOverride)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
 
     if (shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
         status = stopAllColorTransitions(endpoint);
     }
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -756,13 +758,13 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
 
     uint8_t currentHue          = 0;
     uint16_t currentEnhancedHue = 0;
-    EmberAfStatus status        = EMBER_ZCL_STATUS_SUCCESS;
+    Status status               = Status::Success;
 
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
-    VerifyOrExit(colorHueTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorSaturationTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -850,7 +852,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -874,15 +876,15 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    uint16_t currentHue  = 0;
+    Status status       = Status::Success;
+    uint16_t currentHue = 0;
     uint8_t direction;
 
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
-    VerifyOrExit(colorHueTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorSaturationTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -998,7 +1000,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1023,16 +1025,16 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    uint16_t currentHue  = 0;
-    uint16_t halfWay     = isEnhanced ? HALF_MAX_UINT16T : HALF_MAX_UINT8T;
+    Status status       = Status::Success;
+    uint16_t currentHue = 0;
+    uint16_t halfWay    = isEnhanced ? HALF_MAX_UINT16T : HALF_MAX_UINT8T;
     bool moveUp;
 
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
 
-    VerifyOrExit(colorSaturationTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorHueTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (isEnhanced)
     {
@@ -1126,7 +1128,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1150,13 +1152,13 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
 
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
-    VerifyOrExit(colorHueTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorSaturationTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1237,7 +1239,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1249,13 +1251,13 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
     EndpointId endpoint    = commandPath.mEndpointId;
-    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
+    Status status          = Status::Success;
 
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
-    VerifyOrExit(colorHueTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorSaturationTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1307,7 +1309,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1329,13 +1331,13 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     uint8_t optionsMask     = commandData.optionsMask;
     uint8_t optionsOverride = commandData.optionsOverride;
     EndpointId endpoint     = commandPath.mEndpointId;
-    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    Status status           = Status::Success;
 
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
-    VerifyOrExit(colorHueTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorSaturationTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1382,7 +1384,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1395,14 +1397,14 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     uint8_t optionsMask       = commandData.optionsMask;
     uint8_t optionsOverride   = commandData.optionsOverride;
     EndpointId endpoint       = commandPath.mEndpointId;
-    EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
+    Status status             = Status::Success;
     uint8_t currentSaturation = 0;
 
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
-    VerifyOrExit(colorHueTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorSaturationTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1457,7 +1459,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     emberEventControlSetDelayMS(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1472,12 +1474,12 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
     uint8_t optionsMask       = commandData.optionsMask;
     uint8_t optionsOverride   = commandData.optionsOverride;
     EndpointId endpoint       = commandPath.mEndpointId;
-    EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
+    Status status             = Status::Success;
     uint8_t isColorLoopActive = 0;
     uint8_t deactiveColorLoop = 0;
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
-    VerifyOrExit(colorHueTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1574,7 +1576,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
     }
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1717,13 +1719,13 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     uint8_t optionsMask     = commandData.optionsMask;
     uint8_t optionsOverride = commandData.optionsOverride;
     EndpointId endpoint     = commandPath.mEndpointId;
-    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    Status status           = Status::Success;
 
     Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
     Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
 
-    VerifyOrExit(colorXTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorYTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorXTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorYTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1767,7 +1769,7 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     emberEventControlSetDelayMS(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1779,13 +1781,13 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     uint8_t optionsMask     = commandData.optionsMask;
     uint8_t optionsOverride = commandData.optionsOverride;
     EndpointId endpoint     = commandPath.mEndpointId;
-    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    Status status           = Status::Success;
 
     Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
     Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
 
-    VerifyOrExit(colorXTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorYTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorXTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorYTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1860,7 +1862,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     emberEventControlSetDelayMS(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -1878,13 +1880,13 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     uint16_t colorX         = 0;
     uint16_t colorY         = 0;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
 
     Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
     Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
 
-    VerifyOrExit(colorXTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(colorYTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorXTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(colorYTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1934,7 +1936,7 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     emberEventControlSetDelayMS(configureXYEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -2002,12 +2004,12 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransit
  * @param colorTemperature
  * @param transitionTime
  */
-EmberAfStatus ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime)
+Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime)
 {
     EndpointId endpoint = aEndpoint;
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
-    VerifyOrReturnError(colorTempTransitionState != nullptr, EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrReturnError(colorTempTransitionState != nullptr, Status::UnsupportedEndpoint);
 
     uint16_t temperatureMin = MIN_TEMPERATURE_VALUE;
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &temperatureMin);
@@ -2049,7 +2051,7 @@ EmberAfStatus ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t
 
     // kick off the state machine
     emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Status::Success;
 }
 
 /**
@@ -2192,13 +2194,13 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     uint8_t optionsMask              = commandData.optionsMask;
     uint8_t optionsOverride          = commandData.optionsOverride;
     EndpointId endpoint              = commandPath.mEndpointId;
-    EmberAfStatus status             = EMBER_ZCL_STATUS_SUCCESS;
+    Status status                    = Status::Success;
     uint16_t tempPhysicalMin         = MIN_TEMPERATURE_VALUE;
     uint16_t tempPhysicalMax         = MAX_TEMPERATURE_VALUE;
     uint16_t transitionTime;
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
-    VerifyOrExit(colorTempTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorTempTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -2276,7 +2278,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -2295,9 +2297,9 @@ bool ColorControlServer::moveToColorTempCommand(app::CommandHandler * commandObj
         return true;
     }
 
-    EmberAfStatus error = moveToColorTemp(endpoint, colorTemperature, transitionTime);
+    Status error = moveToColorTemp(endpoint, colorTemperature, transitionTime);
 
-    emberAfSendImmediateDefaultResponse(error);
+    commandObj->AddStatus(commandPath, error);
     return true;
 }
 
@@ -2312,12 +2314,12 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     uint8_t optionsMask              = commandData.optionsMask;
     uint8_t optionsOverride          = commandData.optionsOverride;
     EndpointId endpoint              = commandPath.mEndpointId;
-    EmberAfStatus status             = EMBER_ZCL_STATUS_SUCCESS;
+    Status status                    = Status::Success;
     uint16_t tempPhysicalMin         = MIN_TEMPERATURE_VALUE;
     uint16_t tempPhysicalMax         = MAX_TEMPERATURE_VALUE;
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
-    VerifyOrExit(colorTempTransitionState != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+    VerifyOrExit(colorTempTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -2395,7 +2397,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -2639,7 +2641,7 @@ void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint
 bool emberAfColorControlClusterStopMoveStepCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::StopMoveStep::DecodableType & commandData)
 {
-    return ColorControlServer::Instance().stopMoveStepCommand(commandPath.mEndpointId, commandData.optionsMask,
+    return ColorControlServer::Instance().stopMoveStepCommand(commandObj, commandPath, commandData.optionsMask,
                                                               commandData.optionsOverride);
 }
 

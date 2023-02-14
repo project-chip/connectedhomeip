@@ -22,6 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /**********************************************************
  * Defines and Macros
@@ -130,8 +131,9 @@ public:
     static ColorControlServer & Instance();
 
     bool HasFeature(chip::EndpointId endpoint, ColorControlFeature feature);
-    EmberAfStatus stopAllColorTransitions(chip::EndpointId endpoint);
-    bool stopMoveStepCommand(chip::EndpointId, uint8_t optionsMask, uint8_t optionsOverride);
+    chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
+    bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                             uint8_t optionsMask, uint8_t optionsOverride);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
     bool moveHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -220,7 +222,8 @@ private:
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState * getTempTransitionState(chip::EndpointId endpoint);
-    EmberAfStatus moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime);
+    chip::Protocols::InteractionModel::Status moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature,
+                                                              uint16_t transitionTime);
     uint16_t getTemperatureCoupleToLevelMin(chip::EndpointId endpoint);
     EmberEventControl * configureTempEventControl(chip::EndpointId);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP

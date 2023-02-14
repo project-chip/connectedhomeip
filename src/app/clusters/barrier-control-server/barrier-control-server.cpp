@@ -32,6 +32,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BarrierControl;
+using chip::Protocols::InteractionModel::Status;
 
 typedef struct
 {
@@ -258,9 +259,9 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
 // -----------------------------------------------------------------------------
 // Handling commands
 
-static void sendDefaultResponse(EmberAfStatus status)
+static void sendDefaultResponse(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, Status status)
 {
-    if (emberAfSendImmediateDefaultResponse(status) != EMBER_SUCCESS)
+    if (commandObj->AddStatus(commandPath, status) != CHIP_NO_ERROR)
     {
         emberAfBarrierControlClusterPrintln("Failed to send default response");
     }
@@ -272,21 +273,21 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
 {
     auto & percentOpen = commandData.percentOpen;
 
-    EndpointId endpoint  = commandPath.mEndpointId;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
 
     emberAfBarrierControlClusterPrintln("RX: GoToPercentCallback p=%d", percentOpen);
 
     if (isRemoteLockoutOn(endpoint))
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
     else if (percentOpen > 100 // "100" means "100%", so greater than that is invalid
              || (!emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint) &&
                  percentOpen != EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_CLOSED &&
                  percentOpen != EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN))
     {
-        status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        status = Status::ConstraintError;
     }
     else
     {
@@ -307,7 +308,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         }
     }
 
-    sendDefaultResponse(status);
+    sendDefaultResponse(commandObj, commandPath, status);
 
     return true;
 }
@@ -319,7 +320,7 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
     EndpointId endpoint = commandPath.mEndpointId;
     emberAfDeactivateServerTick(endpoint, BarrierControl::Id);
     setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
-    sendDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    sendDefaultResponse(commandObj, commandPath, Status::Success);
     return true;
 }
 

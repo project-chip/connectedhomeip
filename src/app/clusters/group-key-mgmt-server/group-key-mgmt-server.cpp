@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -374,11 +375,10 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     }
 
     // Send response
-    EmberStatus status =
-        emberAfSendImmediateDefaultResponse(CHIP_NO_ERROR == err ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    if (EMBER_SUCCESS != status)
+    err = commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
+    if (CHIP_NO_ERROR != err)
     {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite failed: 0x%x", status);
+        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return true;
 }
@@ -451,9 +451,9 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData)
 
 {
-    auto fabric          = commandObj->GetAccessingFabricIndex();
-    auto * provider      = GetGroupDataProvider();
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    auto fabric     = commandObj->GetAccessingFabricIndex();
+    auto * provider = GetGroupDataProvider();
+    Status status   = Status::Failure;
 
     if (nullptr != provider)
     {
@@ -461,19 +461,19 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
         CHIP_ERROR err = provider->RemoveKeySet(fabric, commandData.groupKeySetID);
         if (CHIP_ERROR_KEY_NOT_FOUND == err)
         {
-            status = EMBER_ZCL_STATUS_NOT_FOUND;
+            status = Status::NotFound;
         }
         else if (CHIP_NO_ERROR == err)
         {
-            status = EMBER_ZCL_STATUS_SUCCESS;
+            status = Status::Success;
         }
     }
 
     // Send response
-    EmberStatus send_status = emberAfSendImmediateDefaultResponse(status);
-    if (EMBER_SUCCESS != send_status)
+    CHIP_ERROR send_err = commandObj->AddStatus(commandPath, status);
+    if (CHIP_NO_ERROR != send_err)
     {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetRemove failed: 0x%x", send_status);
+        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetRemove failed: %" CHIP_ERROR_FORMAT, send_err.Format());
     }
     return true;
 }

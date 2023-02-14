@@ -521,19 +521,6 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
 EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status);
 
 /**
- * @brief Sends a default response to a cluster command using the
- * current command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
-
-/**
  * @brief Access to client API APS frame.
  */
 EmberApsFrame * emberAfGetCommandApsFrame(void);

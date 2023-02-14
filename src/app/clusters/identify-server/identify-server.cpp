@@ -28,6 +28,7 @@
 
 #include <app/util/af.h>
 #include <app/util/common.h>
+#include <app/util/error-mapping.h>
 #include <array>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -204,9 +205,9 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const a
     auto & identifyTime = commandData.identifyTime;
 
     // cmd Identify
-    return EMBER_SUCCESS ==
-        emberAfSendImmediateDefaultResponse(
-               Clusters::Identify::Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime));
+    commandObj->AddStatus(commandPath,
+                          ToInteractionModelStatus(Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime)));
+    return true;
 }
 
 bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
