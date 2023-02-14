@@ -125,17 +125,16 @@ void ClusterEmulator::add_emulated_commands_and_attributes(const node_state_moni
                                                            matter_cluster_builder & cluster_builder)
 {
     // We always need to add the feature map and cluster
-    cluster_builder.attributes.push_back(EmberAfAttributeMetadata{ ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                                   4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() });
-    cluster_builder.attributes.push_back(EmberAfAttributeMetadata{ ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID,
-                                                                   ZCL_INT16U_ATTRIBUTE_TYPE, 2,
-                                                                   ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() });
+    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
+                                                                   4,  ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
+    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(), chip::app::Clusters::Globals::Attributes::ClusterRevision::Id,
+                                                                   2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
 
     // Add emulation for commands and attributes for the cluster
     auto it = cluster_emulators_string_map.find(unify_cluster.cluster_name);
     if (it != cluster_emulators_string_map.end())
     {
-        sl_log_debug(LOG_TAG, "%s emualtor is updateing the desciptor ", it->second->emulated_cluster_name());
+        sl_log_debug(LOG_TAG, "%s emulator is updating the descriptor ", it->second->emulated_cluster_name());
 
         auto emulated_result = it->second->emulate(unify_cluster, cluster_builder);
 
@@ -190,9 +189,9 @@ CHIP_ERROR ClusterEmulator::read_attribute(const ConcreteReadAttributePath & aPa
     sl_log_debug(LOG_TAG, "Reading attribute %d", aPath.mAttributeId);
     switch (aPath.mAttributeId)
     {
-    case ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID: // Cluster Revision
+    case chip::app::Clusters::Globals::Attributes::ClusterRevision::Id: // Cluster Revision
         return aEncoder.Encode(this->read_cluster_revision(aPath));
-    case ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID: // FeatureMap
+    case chip::app::Clusters::Globals::Attributes::FeatureMap::Id: // FeatureMap
         return aEncoder.Encode(this->read_feature_map_revision(aPath));
     case 0xFFFE: // EventList
         return aEncoder.Encode(0);

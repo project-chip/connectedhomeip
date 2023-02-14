@@ -601,7 +601,7 @@ static void TestColorControlCommandMoveSaturation(nlTestSuite * sSuite, void * a
     Clusters::ColorControl::Commands::MoveSaturation::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::ColorControl::Commands::MoveSaturation::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Commands/MoveSaturation",
-        R"({"MoveMode":"stop FIXME","OptionsMask":0,"OptionsOverride":0,"Rate":0})", request);
+        R"({"MoveMode":"Stop FIXME","OptionsMask":0,"OptionsOverride":0,"Rate":0})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 

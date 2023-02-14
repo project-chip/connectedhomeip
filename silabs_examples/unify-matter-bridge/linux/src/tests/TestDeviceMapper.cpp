@@ -442,7 +442,7 @@ void TestDeviceMapperGetClusterId(nlTestSuite * inSuite, void * aContext)
     // 1 Test the correct cluster id is returned
     std::string cluster_name                  = "Basic";
     std::optional<chip::ClusterId> cluster_id = dev_translator.get_cluster_id(cluster_name);
-    check_optional_value(inSuite, cluster_id, chip::app::Clusters::BridgedDeviceBasic::Id);
+    check_optional_value(inSuite, cluster_id, chip::app::Clusters::BridgedDeviceBasicInformation::Id);
 
     // 2 Test no cluster id is returned on unkonwn cluster
     cluster_name = "Unknown";

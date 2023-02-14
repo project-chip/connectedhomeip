@@ -66,7 +66,7 @@ static void TestAddGroupCommand(nlTestSuite * inSuite, void * aContext)
     gGroupsProvider.Init();
     chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
     Clusters::Groups::Commands::AddGroup::Type request;
-    request.groupId   = 1;
+    request.groupID   = 1;
     request.groupName = chip::CharSpan::fromCharString("test_group_1");
     Clusters::Groups::Commands::AddGroupResponse::DecodableType response;
     CHIP_ERROR err = ctx.command_test<Clusters::Groups::Commands::AddGroup::Type>(
@@ -79,7 +79,7 @@ static void TestRemoveGroupCommand(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(aContext);
     Clusters::Groups::Commands::RemoveGroup::Type request_remove;
-    request_remove.groupId = 1;
+    request_remove.groupID = 1;
     Clusters::Groups::Commands::RemoveGroupResponse::DecodableType response_remove;
     CHIP_ERROR err = ctx.command_test<Clusters::Groups::Commands::RemoveGroup::Type>(
         inSuite, "ucl/by-unid/zw-0x0002/ep2/Groups/Commands/RemoveGroup", R"({"GroupId":1})", request_remove, response_remove);
@@ -90,7 +90,7 @@ static void TestRemoveAllGroupsCommand(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(aContext);
     Clusters::Groups::Commands::AddGroup::Type request;
-    request.groupId   = 2;
+    request.groupID   = 2;
     request.groupName = chip::CharSpan::fromCharString("test_group_2");
     Clusters::Groups::Commands::AddGroupResponse::DecodableType response;
     CHIP_ERROR err = ctx.command_test<Clusters::Groups::Commands::AddGroup::Type>(

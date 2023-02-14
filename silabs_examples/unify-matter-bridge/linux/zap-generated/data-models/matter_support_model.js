@@ -21,6 +21,7 @@ exports.model = {
       1 : "IdentifyType",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -32,7 +33,7 @@ exports.model = {
       0 : {
         name : "AddGroup",
         arguments : [
-          "GroupId",
+          "GroupID",
           "GroupName",
         ],
       },
@@ -40,20 +41,20 @@ exports.model = {
         name : "AddGroupResponse",
         arguments : [
           "Status",
-          "GroupId",
+          "GroupID",
         ],
       },
       1 : {
         name : "ViewGroup",
         arguments : [
-          "GroupId",
+          "GroupID",
         ],
       },
       1 : {
         name : "ViewGroupResponse",
         arguments : [
           "Status",
-          "GroupId",
+          "GroupID",
           "GroupName",
         ],
       },
@@ -73,14 +74,14 @@ exports.model = {
       3 : {
         name : "RemoveGroup",
         arguments : [
-          "GroupId",
+          "GroupID",
         ],
       },
       3 : {
         name : "RemoveGroupResponse",
         arguments : [
           "Status",
-          "GroupId",
+          "GroupID",
         ],
       },
       4 : {
@@ -92,7 +93,7 @@ exports.model = {
       5 : {
         name : "AddGroupIfIdentifying",
         arguments : [
-          "GroupId",
+          "GroupID",
           "GroupName",
         ],
       },
@@ -101,6 +102,7 @@ exports.model = {
       0 : "NameSupport",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -112,8 +114,8 @@ exports.model = {
       0 : {
         name : "AddScene",
         arguments : [
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
           "TransitionTime",
           "SceneName",
           "ExtensionFieldSets",
@@ -123,23 +125,23 @@ exports.model = {
         name : "AddSceneResponse",
         arguments : [
           "Status",
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
         ],
       },
       1 : {
         name : "ViewScene",
         arguments : [
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
         ],
       },
       1 : {
         name : "ViewSceneResponse",
         arguments : [
           "Status",
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
           "TransitionTime",
           "SceneName",
           "ExtensionFieldSets",
@@ -148,58 +150,58 @@ exports.model = {
       2 : {
         name : "RemoveScene",
         arguments : [
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
         ],
       },
       2 : {
         name : "RemoveSceneResponse",
         arguments : [
           "Status",
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
         ],
       },
       3 : {
         name : "RemoveAllScenes",
         arguments : [
-          "GroupId",
+          "GroupID",
         ],
       },
       3 : {
         name : "RemoveAllScenesResponse",
         arguments : [
           "Status",
-          "GroupId",
+          "GroupID",
         ],
       },
       4 : {
         name : "StoreScene",
         arguments : [
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
         ],
       },
       4 : {
         name : "StoreSceneResponse",
         arguments : [
           "Status",
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
         ],
       },
       5 : {
         name : "RecallScene",
         arguments : [
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
           "TransitionTime",
         ],
       },
       6 : {
         name : "GetSceneMembership",
         arguments : [
-          "GroupId",
+          "GroupID",
         ],
       },
       6 : {
@@ -207,15 +209,15 @@ exports.model = {
         arguments : [
           "Status",
           "Capacity",
-          "GroupId",
+          "GroupID",
           "SceneList",
         ],
       },
       64 : {
         name : "EnhancedAddScene",
         arguments : [
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
           "TransitionTime",
           "SceneName",
           "ExtensionFieldSets",
@@ -225,23 +227,23 @@ exports.model = {
         name : "EnhancedAddSceneResponse",
         arguments : [
           "Status",
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
         ],
       },
       65 : {
         name : "EnhancedViewScene",
         arguments : [
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
         ],
       },
       65 : {
         name : "EnhancedViewSceneResponse",
         arguments : [
           "Status",
-          "GroupId",
-          "SceneId",
+          "GroupID",
+          "SceneID",
           "TransitionTime",
           "SceneName",
           "ExtensionFieldSets",
@@ -251,18 +253,18 @@ exports.model = {
         name : "CopyScene",
         arguments : [
           "Mode",
-          "GroupIdFrom",
-          "SceneIdFrom",
-          "GroupIdTo",
-          "SceneIdTo",
+          "GroupIdentifierFrom",
+          "SceneIdentifierFrom",
+          "GroupIdentifierTo",
+          "SceneIdentifierTo",
         ],
       },
       66 : {
         name : "CopySceneResponse",
         arguments : [
           "Status",
-          "GroupIdFrom",
-          "SceneIdFrom",
+          "GroupIdentifierFrom",
+          "SceneIdentifierFrom",
         ],
       },
     },
@@ -275,6 +277,7 @@ exports.model = {
       5 : "LastConfiguredBy",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -304,7 +307,7 @@ exports.model = {
       64 : {
         name : "OffWithEffect",
         arguments : [
-          "EffectId",
+          "EffectIdentifier",
           "EffectVariant",
         ],
       },
@@ -331,6 +334,7 @@ exports.model = {
       16387 : "StartUpOnOff",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -344,6 +348,7 @@ exports.model = {
       16 : "SwitchActions",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -446,6 +451,7 @@ exports.model = {
       16384 : "StartUpCurrentLevel",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -466,6 +472,7 @@ exports.model = {
       256 : "ApplicationType",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -477,6 +484,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -492,6 +500,7 @@ exports.model = {
       3 : "PartsList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -504,6 +513,7 @@ exports.model = {
       0 : "Binding",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -520,6 +530,7 @@ exports.model = {
       4 : "AccessControlEntriesPerFabric",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -624,13 +635,14 @@ exports.model = {
       2 : "SetupURL",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
     },
   },
   40 : {
-    name : "Basic",
+    name : "BasicInformation",
     commands : {
       0 : {
         name : "MfgSpecificPing",
@@ -662,6 +674,7 @@ exports.model = {
       19 : "CapabilityMinima",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -673,8 +686,8 @@ exports.model = {
       0 : {
         name : "QueryImage",
         arguments : [
-          "VendorId",
-          "ProductId",
+          "VendorID",
+          "ProductID",
           "SoftwareVersion",
           "ProtocolsSupported",
           "HardwareVersion",
@@ -721,6 +734,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -730,10 +744,10 @@ exports.model = {
     name : "OtaSoftwareUpdateRequestor",
     commands : {
       0 : {
-        name : "AnnounceOtaProvider",
+        name : "AnnounceOTAProvider",
         arguments : [
-          "ProviderNodeId",
-          "VendorId",
+          "ProviderNodeID",
+          "VendorID",
           "AnnouncementReason",
           "MetadataForNode",
           "Endpoint",
@@ -741,12 +755,13 @@ exports.model = {
       },
     },
     attributes : {
-      0 : "DefaultOtaProviders",
+      0 : "DefaultOTAProviders",
       1 : "UpdatePossible",
       2 : "UpdateState",
       3 : "UpdateStateProgress",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -760,6 +775,7 @@ exports.model = {
       1 : "SupportedLocales",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -774,6 +790,7 @@ exports.model = {
       2 : "SupportedCalendarTypes",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -786,6 +803,7 @@ exports.model = {
       0 : "TemperatureUnit",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -798,6 +816,7 @@ exports.model = {
       0 : "Sources",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -840,6 +859,7 @@ exports.model = {
       30 : "ActiveBatChargeFaults",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -899,6 +919,7 @@ exports.model = {
       4 : "SupportsConcurrentConnection",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -988,6 +1009,7 @@ exports.model = {
       7 : "LastConnectErrorValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1008,8 +1030,8 @@ exports.model = {
         name : "RetrieveLogsResponse",
         arguments : [
           "Status",
-          "Content",
-          "TimeStamp",
+          "LogContent",
+          "UTCTimeStamp",
           "TimeSinceBoot",
         ],
       },
@@ -1017,6 +1039,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1038,13 +1061,14 @@ exports.model = {
       1 : "RebootCount",
       2 : "UpTime",
       3 : "TotalOperationalHours",
-      4 : "BootReasons",
+      4 : "BootReason",
       5 : "ActiveHardwareFaults",
       6 : "ActiveRadioFaults",
       7 : "ActiveNetworkFaults",
       8 : "TestEventTriggersEnabled",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1067,6 +1091,7 @@ exports.model = {
       3 : "CurrentHeapHighWatermark",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1090,8 +1115,8 @@ exports.model = {
       4 : "ExtendedPanId",
       5 : "MeshLocalPrefix",
       6 : "OverrunCount",
-      7 : "NeighborTableList",
-      8 : "RouteTableList",
+      7 : "NeighborTable",
+      8 : "RouteTable",
       9 : "PartitionId",
       10 : "Weighting",
       11 : "DataVersion",
@@ -1148,6 +1173,7 @@ exports.model = {
       62 : "ActiveNetworkFaultsList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1179,6 +1205,7 @@ exports.model = {
       12 : "OverrunCount",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1206,6 +1233,7 @@ exports.model = {
       8 : "TimeSinceReset",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1236,13 +1264,14 @@ exports.model = {
       9 : "NtpServerPort",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
     },
   },
   57 : {
-    name : "BridgedDeviceBasic",
+    name : "BridgedDeviceBasicInformation",
     commands : {},
     attributes : {
       1 : "VendorName",
@@ -1262,6 +1291,7 @@ exports.model = {
       18 : "UniqueID",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1276,6 +1306,7 @@ exports.model = {
       2 : "MultiPressMax",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1288,7 +1319,7 @@ exports.model = {
         name : "OpenCommissioningWindow",
         arguments : [
           "CommissioningTimeout",
-          "PAKEVerifier",
+          "PAKEPasscodeVerifier",
           "Discriminator",
           "Iterations",
           "Salt",
@@ -1313,6 +1344,7 @@ exports.model = {
       2 : "AdminVendorId",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1331,7 +1363,7 @@ exports.model = {
         name : "AttestationResponse",
         arguments : [
           "AttestationElements",
-          "Signature",
+          "AttestationSignature",
         ],
       },
       2 : {
@@ -1400,7 +1432,7 @@ exports.model = {
       11 : {
         name : "AddTrustedRootCertificate",
         arguments : [
-          "RootCertificate",
+          "RootCACertificate",
         ],
       },
     },
@@ -1413,6 +1445,7 @@ exports.model = {
       5 : "CurrentFabricIndex",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1465,6 +1498,7 @@ exports.model = {
       3 : "MaxGroupKeysPerFabric",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1477,6 +1511,7 @@ exports.model = {
       0 : "LabelList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1489,6 +1524,7 @@ exports.model = {
       0 : "LabelList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1500,6 +1536,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1511,6 +1548,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1522,6 +1560,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1534,6 +1573,7 @@ exports.model = {
       0 : "StateValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1558,6 +1598,7 @@ exports.model = {
       5 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1569,20 +1610,20 @@ exports.model = {
       0 : {
         name : "LockDoor",
         arguments : [
-          "PinCode",
+          "PINCode",
         ],
       },
       1 : {
         name : "UnlockDoor",
         arguments : [
-          "PinCode",
+          "PINCode",
         ],
       },
       3 : {
         name : "UnlockWithTimeout",
         arguments : [
           "Timeout",
-          "PinCode",
+          "PINCode",
         ],
       },
       11 : {
@@ -1694,7 +1735,7 @@ exports.model = {
           "OperationType",
           "UserIndex",
           "UserName",
-          "UserUniqueId",
+          "UserUniqueID",
           "UserStatus",
           "UserType",
           "CredentialRule",
@@ -1711,7 +1752,7 @@ exports.model = {
         arguments : [
           "UserIndex",
           "UserName",
-          "UserUniqueId",
+          "UserUniqueID",
           "UserStatus",
           "UserType",
           "CredentialRule",
@@ -1808,6 +1849,7 @@ exports.model = {
       53 : "ExpiringUserTimeout",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1884,6 +1926,7 @@ exports.model = {
       26 : "SafetyStatus",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1918,6 +1961,7 @@ exports.model = {
       10 : "BarrierPosition",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -1952,6 +1996,7 @@ exports.model = {
       33 : "ControlMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2051,6 +2096,7 @@ exports.model = {
       71 : "ACCapacityformat",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2073,6 +2119,7 @@ exports.model = {
       10 : "WindSetting",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2087,6 +2134,7 @@ exports.model = {
       2 : "ScheduleProgrammingVisibility",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2194,7 +2242,7 @@ exports.model = {
       10 : {
         name : "MoveToColorTemperature",
         arguments : [
-          "ColorTemperature",
+          "ColorTemperatureMireds",
           "TransitionTime",
           "OptionsMask",
           "OptionsOverride",
@@ -2337,6 +2385,7 @@ exports.model = {
       16400 : "StartUpColorTemperatureMireds",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2351,7 +2400,7 @@ exports.model = {
       2 : "BallastStatus",
       16 : "MinLevel",
       17 : "MaxLevel",
-      20 : "IntrinsicBalanceFactor",
+      20 : "IntrinsicBallastFactor",
       21 : "BallastFactorAdjustment",
       32 : "LampQuantity",
       48 : "LampType",
@@ -2362,6 +2411,7 @@ exports.model = {
       53 : "LampBurnHoursTripPoint",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2378,6 +2428,7 @@ exports.model = {
       4 : "LightSensorType",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2393,6 +2444,7 @@ exports.model = {
       3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2413,6 +2465,7 @@ exports.model = {
       20 : "Scale",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2428,6 +2481,7 @@ exports.model = {
       3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2443,6 +2497,7 @@ exports.model = {
       3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2455,9 +2510,9 @@ exports.model = {
       0 : "Occupancy",
       1 : "OccupancySensorType",
       2 : "OccupancySensorTypeBitmap",
-      16 : "PirOccupiedToUnoccupiedDelay",
-      17 : "PirUnoccupiedToOccupiedDelay",
-      18 : "PirUnoccupiedToOccupiedThreshold",
+      16 : "PIROccupiedToUnoccupiedDelay",
+      17 : "PIRUnoccupiedToOccupiedDelay",
+      18 : "PIRUnoccupiedToOccupiedThreshold",
       32 : "UltrasonicOccupiedToUnoccupiedDelay",
       33 : "UltrasonicUnoccupiedToOccupiedDelay",
       34 : "UltrasonicUnoccupiedToOccupiedThreshold",
@@ -2466,6 +2521,7 @@ exports.model = {
       50 : "PhysicalContactUnoccupiedToOccupiedThreshold",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2478,6 +2534,7 @@ exports.model = {
       0 : "MACAddress",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2519,6 +2576,7 @@ exports.model = {
       2 : "CurrentChannel",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2547,6 +2605,7 @@ exports.model = {
       1 : "CurrentTarget",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2568,7 +2627,7 @@ exports.model = {
         ],
       },
       2 : {
-        name : "StopPlayback",
+        name : "Stop",
         arguments : [
 
         ],
@@ -2639,6 +2698,7 @@ exports.model = {
       6 : "SeekRangeStart",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2678,6 +2738,7 @@ exports.model = {
       1 : "CurrentInput",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2696,6 +2757,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2720,6 +2782,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2745,7 +2808,7 @@ exports.model = {
         ],
       },
       2 : {
-        name : "LaunchResponse",
+        name : "LauncherResponse",
         arguments : [
           "Status",
           "Data",
@@ -2757,6 +2820,7 @@ exports.model = {
       1 : "SupportedStreamingProtocols",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2784,6 +2848,7 @@ exports.model = {
       1 : "CurrentOutput",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2824,6 +2889,7 @@ exports.model = {
       1 : "CurrentApp",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2843,6 +2909,7 @@ exports.model = {
       7 : "AllowedVendorList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -2880,6 +2947,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -3054,6 +3122,7 @@ exports.model = {
       2583 : "RmsVoltageSwellPeriodPhaseC",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -3070,6 +3139,13 @@ exports.model = {
         ],
       },
       1 : {
+        name : "UnregisterClientMonitoring",
+        arguments : [
+          "ClientNodeId",
+          "ICid",
+        ],
+      },
+      2 : {
         name : "StayAwakeRequest",
         arguments : [
 
@@ -3083,6 +3159,7 @@ exports.model = {
       3 : "ExpectedClients",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -3437,6 +3514,7 @@ exports.model = {
       16426 : "WriteOnlyInt8u",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -3467,6 +3545,7 @@ exports.model = {
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
+      65530 : "EventList",
       65531 : "AttributeList",
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
@@ -3474,6 +3553,18 @@ exports.model = {
   },
 
   enums : {
+    "AccessControlEntryAuthModeEnum" : [
+      "Pase",
+      "Case",
+      "Group",
+    ], //
+    "AccessControlEntryPrivilegeEnum" : [
+      "View",
+      "ProxyView",
+      "Operate",
+      "Manage",
+      "Administer",
+    ], //
     "ActionErrorEnum" : [
       "Unknown",
       "Interrupted",
@@ -3493,14 +3584,15 @@ exports.model = {
       "Notification",
       "Alarm",
     ], //
-    "AmiRegistrationState" : [
-      "Unregistered",
-      "JoiningNetwork",
-      "JoinedNetwork",
-      "SubmittedRegistrationRequest",
-      "RegistrationRejected",
-      "Registered",
-      "RegisterationNotPossible",
+    "AlarmCodeEnum" : [
+      "LockJammed",
+      "LockFactoryReset",
+      "LockRadioPowerCycled",
+      "WrongCodeEntryLimit",
+      "FrontEsceutcheonRemoved",
+      "DoorForcedOpen",
+      "DoorAjar",
+      "ForcedUser",
     ], //
     "AnonymousDataState" : [
       "NoSourceFound",
@@ -3523,20 +3615,6 @@ exports.model = {
       "AuthenticationFailed",
       "SsidNotFound",
     ], //
-    "AttributeWritePermission" : [
-      "DenyWrite",
-      "AllowWriteNormal",
-      "AllowWriteOfReadOnly",
-      "UnsupportedAttribute",
-      "InvalidValue",
-      "ReadOnly",
-      "InvalidDataType",
-    ], //
-    "AuthMode" : [
-      "Pase",
-      "Case",
-      "Group",
-    ], //
     "BarrierControlBarrierPosition" : [
       "Closed",
       "Open",
@@ -3548,7 +3626,7 @@ exports.model = {
       "Opening",
     ], //
     "BatChargeFault" : [
-      "Unspecfied",
+      "Unspecified",
       "AmbientTooHot",
       "AmbientTooCold",
       "BatteryTooHot",
@@ -3582,17 +3660,7 @@ exports.model = {
       "UserReplaceable",
       "FactoryReplaceable",
     ], //
-    "BatterySize" : [
-      "NoBattery",
-      "BuiltIn",
-      "Other",
-      "Aa",
-      "Aaa",
-      "C",
-      "D",
-      "Unknown",
-    ], //
-    "BootReasonType" : [
+    "BootReasonEnum" : [
       "Unspecified",
       "PowerOnReboot",
       "BrownOutReset",
@@ -3703,9 +3771,9 @@ exports.model = {
       "F5",
       "Data",
     ], //
-    "CecedSpecificationVersion" : [
-      "CompliantWithV10NotCertified",
-      "CompliantWithV10Certified",
+    "CertificateChainTypeEnum" : [
+      "DACCertificate",
+      "PAICertificate",
     ], //
     "ChangeTypeEnum" : [
       "Changed",
@@ -3741,45 +3809,26 @@ exports.model = {
       "NoFailSafe",
       "BusyWithOtherAdmin",
     ], //
-    "CommissioningWindowStatus" : [
+    "CommissioningWindowStatusEnum" : [
       "WindowNotOpen",
       "EnhancedWindowOpen",
       "BasicWindowOpen",
+    ], //
+    "ConnectionStatusEnum" : [
+      "Connected",
+      "NotConnected",
     ], //
     "ContentLaunchStatusEnum" : [
       "Success",
       "UrlNotAvailable",
       "AuthFailed",
     ], //
-    "DataQualityId" : [
-      "AllDataCertified",
-      "OnlyInstantaneousPowerNotCertified",
-      "OnlyCumulatedConsumptionNotCertified",
-      "NotCertifiedData",
-    ], //
-    "DehumidifcationLockout" : [
-      "NotAllowed",
-      "Allowed",
-    ], //
-    "DeviceStatus2Structure" : [
-      "IrisSymptomCode",
-    ], //
-    "DlAlarmCode" : [
-      "LockJammed",
-      "LockFactoryReset",
-      "LockRadioPowerCycled",
-      "WrongCodeEntryLimit",
-      "FrontEsceutcheonRemoved",
-      "DoorForcedOpen",
-      "DoorAjar",
-      "ForcedUser",
-    ], //
-    "DlCredentialRule" : [
+    "CredentialRuleEnum" : [
       "Single",
-      "Double",
+      "Dual",
       "Tri",
     ], //
-    "DlCredentialType" : [
+    "CredentialTypeEnum" : [
       "ProgrammingPIN",
       "Pin",
       "Rfid",
@@ -3787,35 +3836,13 @@ exports.model = {
       "FingerVein",
       "Face",
     ], //
-    "DlDataOperationType" : [
+    "DataOperationTypeEnum" : [
       "Add",
       "Clear",
       "Modify",
     ], //
-    "DlDoorState" : [
-      "DoorOpen",
-      "DoorClosed",
-      "DoorJammed",
-      "DoorForcedOpen",
-      "DoorUnspecifiedError",
-      "DoorAjar",
-    ], //
-    "DlLockDataType" : [
-      "Unspecified",
-      "ProgrammingCode",
-      "UserIndex",
-      "WeekDaySchedule",
-      "YearDaySchedule",
-      "HolidaySchedule",
-      "Pin",
-      "Rfid",
-      "Fingerprint",
-    ], //
-    "DlLockOperationType" : [
-      "Lock",
-      "Unlock",
-      "NonAccessUserEvent",
-      "ForcedUserEvent",
+    "DeviceStatus2Structure" : [
+      "IrisSymptomCode",
     ], //
     "DlLockState" : [
       "NotFullyLocked",
@@ -3835,32 +3862,6 @@ exports.model = {
       "DeadLatch",
       "DoorFurniture",
     ], //
-    "DlOperatingMode" : [
-      "Normal",
-      "Vacation",
-      "Privacy",
-      "NoRemoteLockUnlock",
-      "Passage",
-    ], //
-    "DlOperationError" : [
-      "Unspecified",
-      "InvalidCredential",
-      "DisabledUserDenied",
-      "Restricted",
-      "InsufficientBattery",
-    ], //
-    "DlOperationSource" : [
-      "Unspecified",
-      "Manual",
-      "ProprietaryRemote",
-      "Keypad",
-      "Auto",
-      "Button",
-      "Schedule",
-      "Remote",
-      "Rfid",
-      "Biometric",
-    ], //
     "DlStatus" : [
       "Success",
       "Failure",
@@ -3869,23 +3870,6 @@ exports.model = {
       "InvalidField",
       "ResourceExhausted",
       "NotFound",
-    ], //
-    "DlUserStatus" : [
-      "Available",
-      "OccupiedEnabled",
-      "OccupiedDisabled",
-    ], //
-    "DlUserType" : [
-      "UnrestrictedUser",
-      "YearDayScheduleUser",
-      "WeekDayScheduleUser",
-      "ProgrammingUser",
-      "NonAccessUser",
-      "ForcedUser",
-      "DisposableUser",
-      "ExpiringUser",
-      "ScheduleRestrictedUser",
-      "RemoteOnlyUser",
     ], //
     "DoorLockEventSource" : [
       "Keypad",
@@ -3986,6 +3970,14 @@ exports.model = {
       "ErrorForcedOpen",
       "ErrorUnspecified",
     ], //
+    "DoorStateEnum" : [
+      "DoorOpen",
+      "DoorClosed",
+      "DoorJammed",
+      "DoorForcedOpen",
+      "DoorUnspecifiedError",
+      "DoorAjar",
+    ], //
     "EndProductType" : [
       "RollerShade",
       "RomanShade",
@@ -4024,22 +4016,6 @@ exports.model = {
       "ColorTemperature",
       "EnhancedCurrentHueAndCurrentSaturation",
     ], //
-    "FanMode" : [
-      "Off",
-      "Low",
-      "Medium",
-      "High",
-      "On",
-      "Auto",
-      "Smart",
-    ], //
-    "FanModeSequence" : [
-      "LowMedHigh",
-      "LowHigh",
-      "LowMedHighAuto",
-      "LowHighAuto",
-      "OnAuto",
-    ], //
     "FanModeSequenceType" : [
       "OffLowMedHigh",
       "OffLowHigh",
@@ -4064,29 +4040,6 @@ exports.model = {
       "ChipFault",
       "CertFault",
     ], //
-    "GenericDeviceType" : [
-      "Incandescent",
-      "SpotlightHalogen",
-      "HalogenBulb",
-      "Cfl",
-      "LinearFlourescent",
-      "LedBulb",
-      "SpotlightLed",
-      "LedStrip",
-      "LedTube",
-      "GenericIndoorFixture",
-      "GenericOutdoorFixture",
-      "PendantFixture",
-      "FloorStandingFixture",
-      "GenericController",
-      "WallSwitch",
-      "PortableRemoteController",
-      "MotionOrLightSensor",
-      "GenericActuator",
-      "PluginUnit",
-      "RetrofitActuator",
-      "Unspecified",
-    ], //
     "GranularityEnum" : [
       "NoTimeGranularity",
       "MinutesGranularity",
@@ -4098,7 +4051,7 @@ exports.model = {
       "TrustFirst",
       "CacheAndSync",
     ], //
-    "HardwareFaultType" : [
+    "HardwareFaultEnum" : [
       "Unspecified",
       "Radio",
       "Sensor",
@@ -4163,7 +4116,7 @@ exports.model = {
       "Usb",
       "Other",
     ], //
-    "InterfaceType" : [
+    "InterfaceTypeEnum" : [
       "Unspecified",
       "WiFi",
       "Ethernet",
@@ -4183,17 +4136,29 @@ exports.model = {
       "LevelFourLockout",
       "LevelfiveLockout",
     ], //
-    "LevelStatus" : [
-      "OnTarget",
-      "BelowTarget",
-      "AboveTarget",
-    ], //
     "LightSensorType" : [
       "Photodiode",
       "Cmos",
     ], //
     "LineupInfoTypeEnum" : [
       "Mso",
+    ], //
+    "LockDataTypeEnum" : [
+      "Unspecified",
+      "ProgrammingCode",
+      "UserIndex",
+      "WeekDaySchedule",
+      "YearDaySchedule",
+      "HolidaySchedule",
+      "Pin",
+      "Rfid",
+      "Fingerprint",
+    ], //
+    "LockOperationTypeEnum" : [
+      "Lock",
+      "Unlock",
+      "NonAccessUserEvent",
+      "ForcedUserEvent",
     ], //
     "LogsIntent" : [
       "EndUserSupport",
@@ -4218,15 +4183,6 @@ exports.model = {
       "NotActive",
       "SpeedOutOfRange",
       "SeekOutOfRange",
-    ], //
-    "MeterTypeId" : [
-      "UtilityPrimaryMeter",
-      "UtilityProductionMeter",
-      "UtilitySecondaryMeter",
-      "PrivatePrimaryMeter",
-      "PrivateProductionMeter",
-      "PrivateSecondaryMeters",
-      "GenericMeter",
     ], //
     "MetricTypeEnum" : [
       "Pixels",
@@ -4257,11 +4213,23 @@ exports.model = {
       "HardwareFailure",
       "NetworkJammed",
     ], //
-    "NetworkFaultType" : [
+    "NetworkFaultEnum" : [
       "Unspecified",
       "HardwareFailure",
       "NetworkJammed",
       "ConnectionFailed",
+    ], //
+    "NodeOperationalCertStatusEnum" : [
+      "Ok",
+      "InvalidPublicKey",
+      "InvalidNodeOpId",
+      "InvalidNOC",
+      "MissingCsr",
+      "TableFull",
+      "InvalidAdminSubject",
+      "FabricConflict",
+      "LabelConflict",
+      "InvalidFabricIndex",
     ], //
     "OTAAnnouncementReason" : [
       "SimpleAnnouncement",
@@ -4330,17 +4298,31 @@ exports.model = {
       "Normal",
       "Configure",
     ], //
-    "OperationalCertStatus" : [
-      "Success",
-      "InvalidPublicKey",
-      "InvalidNodeOpId",
-      "InvalidNOC",
-      "MissingCsr",
-      "TableFull",
-      "InvalidAdminSubject",
-      "FabricConflict",
-      "LabelConflict",
-      "InvalidFabricIndex",
+    "OperatingModeEnum" : [
+      "Normal",
+      "Vacation",
+      "Privacy",
+      "NoRemoteLockUnlock",
+      "Passage",
+    ], //
+    "OperationErrorEnum" : [
+      "Unspecified",
+      "InvalidCredential",
+      "DisabledUserDenied",
+      "Restricted",
+      "InsufficientBattery",
+    ], //
+    "OperationSourceEnum" : [
+      "Unspecified",
+      "Manual",
+      "ProprietaryRemote",
+      "Keypad",
+      "Auto",
+      "Button",
+      "Schedule",
+      "Remote",
+      "Rfid",
+      "Biometric",
     ], //
     "OutputTypeEnum" : [
       "Hdmi",
@@ -4350,17 +4332,17 @@ exports.model = {
       "Internal",
       "Other",
     ], //
-    "PHYRateType" : [
-      "10m",
-      "100m",
-      "1000m",
-      "25g",
-      "5g",
-      "10g",
-      "40g",
-      "100g",
-      "200g",
-      "400g",
+    "PHYRateEnum" : [
+      "Rate10M",
+      "Rate100M",
+      "Rate1G",
+      "Rate25g",
+      "Rate5G",
+      "Rate10G",
+      "Rate40G",
+      "Rate100G",
+      "Rate200G",
+      "Rate400G",
     ], //
     "ParameterEnum" : [
       "Actor",
@@ -4376,12 +4358,7 @@ exports.model = {
       "Sport",
       "SportsTeam",
       "Type",
-    ], //
-    "PhysicalEnvironment" : [
-      "Unspecified",
-      "FirstProfileSpecifiedValue",
-      "LastProfileSpecifiedValue",
-      "Unknown",
+      "Video",
     ], //
     "PlaybackStateEnum" : [
       "Playing",
@@ -4389,58 +4366,11 @@ exports.model = {
       "NotPlaying",
       "Buffering",
     ], //
-    "PowerProfileState" : [
-      "PowerProfileWaitingToStart",
-      "PowerProfileStarted",
-      "EnergyPhaseRunning",
-      "EnergyPhaseEnded",
-      "EnergyPhaseWaitingToStart",
-      "EnergyPhaseStarted",
-      "PowerProfileEnded",
-      "ProfileReadyForScheduling",
-      "PowerProfileScheduled",
-    ], //
-    "PowerSource" : [
-      "Unknown",
-      "SinglePhaseMains",
-      "ThreePhaseMains",
-      "Battery",
-      "DcSource",
-      "EmergencyMainsConstantPower",
-      "EmergencyMainsTransferSwitch",
-      "BatteryBackup",
-    ], //
     "PowerSourceStatus" : [
-      "Unspecfied",
+      "Unspecified",
       "Active",
       "Standby",
       "Unavailable",
-    ], //
-    "Privilege" : [
-      "View",
-      "ProxyView",
-      "Operate",
-      "Manage",
-      "Administer",
-    ], //
-    "ProductCode" : [
-      "ManufacturerDefined",
-      "IternationalArticleNumber",
-      "GlobalTradeItemNumber",
-      "UniversalProductCode",
-      "StockKeepingUnit",
-    ], //
-    "ProductTypeId" : [
-      "WhiteGoods",
-      "Dishwasher",
-      "TumbleDryer",
-      "WasherDryer",
-      "WashingMachine",
-      "Hobs",
-      "InductionHobs",
-      "Oven",
-      "ElectricalOven",
-      "RefrigeratorFreezer",
     ], //
     "PumpControlMode" : [
       "ConstantSpeed",
@@ -4456,7 +4386,7 @@ exports.model = {
       "Maximum",
       "Local",
     ], //
-    "RadioFaultType" : [
+    "RadioFaultEnum" : [
       "Unspecified",
       "WiFiFault",
       "CellularFault",
@@ -4469,14 +4399,6 @@ exports.model = {
       "Indoor",
       "Outdoor",
       "IndoorOutdoor",
-    ], //
-    "RelativeHumidityDisplay" : [
-      "NotDisplayed",
-      "Displayed",
-    ], //
-    "RelativeHumidityMode" : [
-      "MeasureLocally",
-      "UpdatedOverTheNetwork",
     ], //
     "RemoteEnableFlags" : [
       "Disabled",
@@ -4511,29 +4433,15 @@ exports.model = {
       "Wpa3",
     ], //
     "SetpointAdjustMode" : [
-      "HeatSetpoint",
-      "CoolSetpoint",
-      "HeatAndCoolSetpoints",
+      "Heat",
+      "Cool",
+      "Both",
     ], //
     "SimpleEnum" : [
       "Unspecified",
       "ValueA",
       "ValueB",
       "ValueC",
-    ], //
-    "SquawkLevel" : [
-      "LowLevel",
-      "MediumLevel",
-      "HighLevel",
-      "VeryHighLevel",
-    ], //
-    "SquawkMode" : [
-      "SystemIsArmed",
-      "SystemIsDisarmed",
-    ], //
-    "SquawkStobe" : [
-      "NoStrobe",
-      "UseStrobe",
     ], //
     "StartOfWeek" : [
       "Sunday",
@@ -4544,46 +4452,6 @@ exports.model = {
       "Friday",
       "Saturday",
     ], //
-    "StartUpOnOffValue" : [
-      "SetToOff",
-      "SetToOn",
-      "SetToToggle",
-    ], //
-    "Status" : [
-      "Success",
-      "Failure",
-      "NotAuthorized",
-      "MalformedCommand",
-      "UnsupCommand",
-      "UnsupGeneralCommand",
-      "UnsupManufClusterCommand",
-      "UnsupManufGeneralCommand",
-      "InvalidField",
-      "UnsupportedAttribute",
-      "InvalidValue",
-      "ReadOnly",
-      "InsufficientSpace",
-      "DuplicateExists",
-      "NotFound",
-      "UnreportableAttribute",
-      "InvalidDataType",
-      "InvalidSelector",
-      "WriteOnly",
-      "InconsistentStartupState",
-      "DefinedOutOfBand",
-      "ActionDenied",
-      "Timeout",
-      "Abort",
-      "InvalidImage",
-      "WaitForData",
-      "NoImageAvailable",
-      "RequireMoreImage",
-      "NotificationPending",
-      "HardwareFailure",
-      "SoftwareFailure",
-      "UnsupportedCluster",
-      "LimitReached",
-    ], //
     "StatusCode" : [
       "Busy",
       "PAKEParameterError",
@@ -4592,16 +4460,6 @@ exports.model = {
     "StepMode" : [
       "Up",
       "Down",
-    ], //
-    "SwitchActions" : [
-      "On",
-      "Off",
-      "Toggle",
-    ], //
-    "SwitchType" : [
-      "Toggle",
-      "Momentary",
-      "MultiFunction",
     ], //
     "TargetNavigatorStatusEnum" : [
       "Success",
@@ -4639,13 +4497,11 @@ exports.model = {
       "Auto",
       "Cool",
       "Heat",
-      "EmergencyHeating",
+      "EmergencyHeat",
       "Precooling",
       "FanOnly",
-    ], //
-    "ThreadConnectionStatus" : [
-      "Connected",
-      "NotConnected",
+      "Dry",
+      "Sleep",
     ], //
     "TimeEncoding" : [
       "Relative",
@@ -4683,18 +4539,22 @@ exports.model = {
       "ProjectorScreen",
       "Unknown",
     ], //
-    "WarningMode" : [
-      "Stop",
-      "Burglar",
-      "Fire",
-      "Emergency",
-      "PolicePanic",
-      "FirePanic",
-      "EmergencyPanic",
+    "UserStatusEnum" : [
+      "Available",
+      "OccupiedEnabled",
+      "OccupiedDisabled",
     ], //
-    "WarningStobe" : [
-      "NoStrobe",
-      "UseStrobe",
+    "UserTypeEnum" : [
+      "UnrestrictedUser",
+      "YearDayScheduleUser",
+      "WeekDayScheduleUser",
+      "ProgrammingUser",
+      "NonAccessUser",
+      "ForcedUser",
+      "DisposableUser",
+      "ExpiringUser",
+      "ScheduleRestrictedUser",
+      "RemoteOnlyUser",
     ], //
     "WiFiBand" : [
       "2g4",
@@ -4708,12 +4568,12 @@ exports.model = {
       "NotConnected",
     ], //
     "WiFiVersionType" : [
-      "80211a",
-      "80211b",
-      "80211g",
-      "80211n",
-      "80211ac",
-      "80211ax",
+      "A",
+      "B",
+      "G",
+      "N",
+      "Ac",
+      "Ax",
     ], //
     "WiredCurrentType" : [
       "Ac",
@@ -4727,19 +4587,11 @@ exports.model = {
   },
 
   bitmaps : {
-    "AlarmMask" : {
-      1 : "GeneralHwFault",
-      2 : "GeneralSwFault",
-    },
     "ApplicationLauncherFeature" : {
       1 : "ApplicationPlatform",
     },
     "AudioOutputFeature" : {
       1 : "NameUpdates",
-    },
-    "BallastStatus" : {
-      1 : "NonOperational",
-      2 : "LampNotInSocket",
     },
     "BarrierControlCapabilities" : {
       1 : "PartialBarrier",
@@ -4749,9 +4601,6 @@ exports.model = {
       2 : "TemperDetected",
       4 : "FailedCommunication",
       8 : "PositionFailure",
-    },
-    "BatteryAlarmMask" : {
-      1 : "VoltageTooLow",
     },
     "Bitmap16MaskMap" : {
       1 : "MaskVal1",
@@ -4836,11 +4685,16 @@ exports.model = {
       16 : "Thursday",
       32 : "Friday",
       64 : "Saturday",
-      128 : "AwayOrVacation",
+      128 : "Away",
     },
-    "DeviceTempAlarmMask" : {
-      1 : "TooLow",
-      2 : "TooHigh",
+    "DaysMaskMap" : {
+      1 : "Sunday",
+      2 : "Monday",
+      4 : "Tuesday",
+      8 : "Wednesday",
+      16 : "Thursday",
+      32 : "Friday",
+      64 : "Saturday",
     },
     "DlCredentialRuleMask" : {
       1 : "Single",
@@ -4851,15 +4705,6 @@ exports.model = {
       1 : "Single",
       2 : "Dual",
       4 : "Tri",
-    },
-    "DlDaysMaskMap" : {
-      1 : "Sunday",
-      2 : "Monday",
-      4 : "Tuesday",
-      8 : "Wednesday",
-      16 : "Thursday",
-      32 : "Friday",
-      64 : "Saturday",
     },
     "DlDefaultConfigurationRegister" : {
       1 : "EnableLocalProgrammingEnabled",
@@ -4954,23 +4799,18 @@ exports.model = {
       64 : "Saturday",
     },
     "DoorLockFeature" : {
-      1 : "PINCredentials",
-      2 : "RFIDCredentials",
+      1 : "PinCredential",
+      2 : "RfidCredential",
       4 : "FingerCredentials",
       8 : "Logging",
-      16 : "WeekDaySchedules",
+      16 : "WeekDayAccessSchedules",
       32 : "DoorPositionSensor",
       64 : "FaceCredentials",
-      128 : "CredentialsOTA",
-      256 : "UsersManagement",
-      512 : "Notifications",
-      1024 : "YearDaySchedules",
+      128 : "CredentialsOverTheAirAccess",
+      256 : "User",
+      512 : "Notification",
+      1024 : "YearDayAccessSchedules",
       2048 : "HolidaySchedules",
-    },
-    "EnergyFormatting" : {
-      7 : "NumberOfDigitsToTheRightOfTheDecimalPoint",
-      120 : "NumberOfDigitsToTheLeftOfTheDecimalPoint",
-      128 : "SuppressLeadingZeros",
     },
     "EthernetNetworkDiagnosticsFeature" : {
       1 : "PacketCounts",
@@ -4992,25 +4832,10 @@ exports.model = {
     "GroupClusterFeature" : {
       1 : "GroupNames",
     },
-    "IasZoneStatus" : {
-      1 : "Alarm1",
-      2 : "Alarm2",
-      4 : "Tamper",
-      8 : "Battery",
-      16 : "SupervisionReports",
-      32 : "RestoreReports",
-      64 : "Trouble",
-      128 : "Ac",
-      256 : "Test",
-      512 : "BatteryDefect",
-    },
     "KeypadInputFeature" : {
       1 : "NavigationKeyCodes",
       2 : "LocationKeys",
       4 : "NumberKeys",
-    },
-    "LampAlarmMode" : {
-      1 : "LampBurnHours",
     },
     "LevelControlFeature" : {
       1 : "OnOff",
@@ -5020,11 +4845,6 @@ exports.model = {
     "LevelControlOptions" : {
       1 : "ExecuteIfOff",
       2 : "CoupleColorTempToLevel",
-    },
-    "MainsAlarmMask" : {
-      1 : "VoltageTooLow",
-      2 : "VoltageTooHigh",
-      4 : "MainsPowerSupplyLost",
     },
     "MediaInputFeature" : {
       1 : "NameUpdates",
@@ -5040,8 +4860,8 @@ exports.model = {
       8 : "LedFeedback",
     },
     "ModeForSequence" : {
-      1 : "HeatSetpointFieldPresent",
-      2 : "CoolSetpointFieldPresent",
+      1 : "HeatSetpointPresent",
+      2 : "CoolSetpointPresent",
     },
     "ModeSelectFeature" : {
       1 : "Deponoff",
@@ -5077,7 +4897,16 @@ exports.model = {
       8 : "Replaceable",
     },
     "PressureFeature" : {
-      1 : "Ext",
+      1 : "Extended",
+    },
+    "PumpFeature" : {
+      1 : "ConstantPressure",
+      2 : "CompensatedPressure",
+      4 : "ConstantFlow",
+      8 : "ConstantSpeed",
+      16 : "ConstantTemperature",
+      32 : "Automatic",
+      64 : "Local",
     },
     "PumpStatus" : {
       1 : "DeviceFault",
@@ -5115,12 +4944,6 @@ exports.model = {
     "ScenesCopyMode" : {
       1 : "CopyAllScenes",
     },
-    "ShadeClosureStatus" : {
-      1 : "Operational",
-      2 : "Adjusting",
-      4 : "Opening",
-      8 : "MotorOpening",
-    },
     "SimpleBitmap" : {
       1 : "ValueA",
       2 : "ValueB",
@@ -5128,11 +4951,6 @@ exports.model = {
     },
     "SoftwareDiagnosticsFeature" : {
       1 : "WaterMarks",
-    },
-    "SquawkInfo" : {
-      240 : "Mode",
-      8 : "Strobe",
-      3 : "Level",
     },
     "StartTime" : {
       63 : "Minutes",
@@ -5150,35 +4968,13 @@ exports.model = {
       8 : "MomentarySwitchLongPress",
       16 : "MomentarySwitchMultiPress",
     },
-    "ThermostatAlarmMask" : {
-      1 : "InitializationFailure",
-      2 : "HardwareFailure",
-      4 : "SelfcalibrationFailure",
-    },
     "ThermostatFeature" : {
       1 : "Heating",
       2 : "Cooling",
       4 : "Occupancy",
-      8 : "Schedule",
+      8 : "ScheduleConfiguration",
       16 : "Setback",
-      32 : "Automode",
-    },
-    "ThermostatOccupancy" : {
-      1 : "Occupied",
-    },
-    "ThermostatRunningState" : {
-      1 : "HeatStateOn",
-      2 : "CoolStateOn",
-      4 : "FanStateOn",
-      8 : "HeatSecondStageStateOn",
-      16 : "CoolSecondStageStateOn",
-      32 : "FanSecondStageStateOn",
-      64 : "FanThirdStageStateOn",
-    },
-    "ThermostatSensing" : {
-      1 : "LocalTempSensedRemotely",
-      2 : "OutdoorTempSensedRemotely",
-      4 : "OccupancySensedRemotely",
+      32 : "AutoMode",
     },
     "ThreadNetworkDiagnosticsFeature" : {
       1 : "PacketCounts",
@@ -5186,19 +4982,8 @@ exports.model = {
       4 : "MLECounts",
       8 : "MACCounts",
     },
-    "TimeStatusMask" : {
-      1 : "MasterClock",
-      2 : "Synchronized",
-      4 : "MasterZoneDst",
-      8 : "Superseding",
-    },
     "UnitLocalizationFeature" : {
       1 : "TemperatureUnit",
-    },
-    "WarningInfo" : {
-      240 : "Mode",
-      12 : "Strobe",
-      3 : "SirenLevel",
     },
     "WiFiNetworkDiagnosticsFeature" : {
       1 : "PacketCounts",
@@ -5206,7 +4991,7 @@ exports.model = {
     },
     "WiFiSecurity" : {
       1 : "Unencrypted",
-      2 : "WepPersonal",
+      2 : "Wep",
       4 : "WpaPersonal",
       8 : "Wpa2Personal",
       16 : "Wpa3Personal",

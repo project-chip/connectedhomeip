@@ -37,12 +37,12 @@ public:
         cluster_builder.outgoing_commands.clear();
 
         // Add GroupsType attribute to the matter cluster
-        cluster_builder.attributes.push_back({ Groups::Attributes::NameSupport::Id, ZAP_TYPE(BITMAP8),
-                                                                       1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) , ZAP_SIMPLE_DEFAULT(128) });
-        cluster_builder.attributes.push_back({ Groups::Attributes::ClusterRevision::Id, ZAP_TYPE(INT16U),
-                                                                       2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_SIMPLE_DEFAULT(4) });
-        cluster_builder.attributes.push_back({ Groups::Attributes::FeatureMap::Id, ZAP_TYPE(INT16U),
-                                                                       2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_SIMPLE_DEFAULT(1) });
+        cluster_builder.attributes.push_back({ ZAP_SIMPLE_DEFAULT(128), Groups::Attributes::NameSupport::Id,
+                                                                       1, ZAP_TYPE(BITMAP8), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
+        cluster_builder.attributes.push_back({ ZAP_SIMPLE_DEFAULT(4), Groups::Attributes::ClusterRevision::Id, 
+                                                                       2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
+        cluster_builder.attributes.push_back({ ZAP_SIMPLE_DEFAULT(1), Groups::Attributes::FeatureMap::Id,
+                                                                       2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
 
 
 
@@ -58,7 +58,7 @@ public:
                                                      Groups::Commands::GetGroupMembershipResponse::Id,
                                                      Groups::Commands::RemoveGroupResponse::Id,
                                                  });
-
+        
         return CHIP_NO_ERROR;
     }
 };

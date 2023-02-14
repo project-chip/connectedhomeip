@@ -116,6 +116,7 @@ namespace app {
                     { "IdentifyType", IdentifyType::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -128,6 +129,7 @@ namespace app {
                     { "NameSupport", NameSupport::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -145,6 +147,7 @@ namespace app {
                     { "LastConfiguredBy", LastConfiguredBy::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -161,6 +164,7 @@ namespace app {
                     { "StartUpOnOff", StartUpOnOff::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -174,6 +178,7 @@ namespace app {
                     { "SwitchActions", SwitchActions::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -199,6 +204,7 @@ namespace app {
                     { "StartUpCurrentLevel", StartUpCurrentLevel::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -219,6 +225,7 @@ namespace app {
                     { "ApplicationType", ApplicationType::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -230,6 +237,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -245,6 +253,7 @@ namespace app {
                     { "PartsList", PartsList::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -257,6 +266,7 @@ namespace app {
                     { "Binding", Binding::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -273,6 +283,7 @@ namespace app {
                     { "AccessControlEntriesPerFabric", AccessControlEntriesPerFabric::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -287,6 +298,7 @@ namespace app {
                     { "SetupURL", SetupURL::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -318,6 +330,7 @@ namespace app {
                     { "CapabilityMinima", CapabilityMinima::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -329,6 +342,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -344,6 +358,7 @@ namespace app {
                     { "UpdateStateProgress", UpdateStateProgress::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -357,6 +372,7 @@ namespace app {
                     { "SupportedLocales", SupportedLocales::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -371,6 +387,7 @@ namespace app {
                     { "SupportedCalendarTypes", SupportedCalendarTypes::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -383,6 +400,7 @@ namespace app {
                     { "TemperatureUnit", TemperatureUnit::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -395,6 +413,7 @@ namespace app {
                     { "Sources", Sources::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -437,6 +456,7 @@ namespace app {
                     { "ActiveBatChargeFaults", ActiveBatChargeFaults::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -453,6 +473,7 @@ namespace app {
                     { "SupportsConcurrentConnection", SupportsConcurrentConnection::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -472,6 +493,7 @@ namespace app {
                     { "LastConnectErrorValue", LastConnectErrorValue::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -483,6 +505,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -503,6 +526,7 @@ namespace app {
                     { "TestEventTriggersEnabled", TestEventTriggersEnabled::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -518,6 +542,7 @@ namespace app {
                     { "CurrentHeapHighWatermark", CurrentHeapHighWatermark::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -592,6 +617,7 @@ namespace app {
                     { "ActiveNetworkFaultsList", ActiveNetworkFaultsList::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -616,6 +642,7 @@ namespace app {
                     { "OverrunCount", OverrunCount::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -636,6 +663,7 @@ namespace app {
                     { "TimeSinceReset", TimeSinceReset::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -657,6 +685,7 @@ namespace app {
                     { "NtpServerPort", NtpServerPort::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -683,6 +712,7 @@ namespace app {
                     { "UniqueID", UniqueID::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -697,6 +727,7 @@ namespace app {
                     { "MultiPressMax", MultiPressMax::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -711,6 +742,7 @@ namespace app {
                     { "AdminVendorId", AdminVendorId::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -728,6 +760,7 @@ namespace app {
                     { "CurrentFabricIndex", CurrentFabricIndex::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -743,6 +776,7 @@ namespace app {
                     { "MaxGroupKeysPerFabric", MaxGroupKeysPerFabric::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -755,6 +789,7 @@ namespace app {
                     { "LabelList", LabelList::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -767,6 +802,7 @@ namespace app {
                     { "LabelList", LabelList::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -778,6 +814,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -789,6 +826,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -800,6 +838,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -812,6 +851,7 @@ namespace app {
                     { "StateValue", StateValue::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -829,6 +869,7 @@ namespace app {
                     { "OnMode", OnMode::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -876,6 +917,7 @@ namespace app {
                     { "ExpiringUserTimeout", ExpiringUserTimeout::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -909,6 +951,7 @@ namespace app {
                     { "SafetyStatus", SafetyStatus::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -930,6 +973,7 @@ namespace app {
                     { "BarrierPosition", BarrierPosition::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -964,6 +1008,7 @@ namespace app {
                     { "ControlMode", ControlMode::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1024,6 +1069,7 @@ namespace app {
                     { "ACCapacityformat", ACCapacityformat::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1046,6 +1092,7 @@ namespace app {
                     { "WindSetting", WindSetting::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1060,6 +1107,7 @@ namespace app {
                     { "ScheduleProgrammingVisibility", ScheduleProgrammingVisibility::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1123,6 +1171,7 @@ namespace app {
                     { "StartUpColorTemperatureMireds", StartUpColorTemperatureMireds::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1148,6 +1197,7 @@ namespace app {
                     { "LampBurnHoursTripPoint", LampBurnHoursTripPoint::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1164,6 +1214,7 @@ namespace app {
                     { "LightSensorType", LightSensorType::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1179,6 +1230,7 @@ namespace app {
                     { "Tolerance", Tolerance::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1199,6 +1251,7 @@ namespace app {
                     { "Scale", Scale::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1214,6 +1267,7 @@ namespace app {
                     { "Tolerance", Tolerance::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1229,6 +1283,7 @@ namespace app {
                     { "Tolerance", Tolerance::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1252,6 +1307,7 @@ namespace app {
                     { "PhysicalContactUnoccupiedToOccupiedThreshold", PhysicalContactUnoccupiedToOccupiedThreshold::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1264,6 +1320,7 @@ namespace app {
                     { "MACAddress", MACAddress::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1278,6 +1335,7 @@ namespace app {
                     { "CurrentChannel", CurrentChannel::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1291,6 +1349,7 @@ namespace app {
                     { "CurrentTarget", CurrentTarget::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1309,6 +1368,7 @@ namespace app {
                     { "SeekRangeStart", SeekRangeStart::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1322,6 +1382,7 @@ namespace app {
                     { "CurrentInput", CurrentInput::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1333,6 +1394,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1344,6 +1406,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1357,6 +1420,7 @@ namespace app {
                     { "SupportedStreamingProtocols", SupportedStreamingProtocols::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1370,6 +1434,7 @@ namespace app {
                     { "CurrentOutput", CurrentOutput::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1383,6 +1448,7 @@ namespace app {
                     { "CurrentApp", CurrentApp::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1402,6 +1468,7 @@ namespace app {
                     { "AllowedVendorList", AllowedVendorList::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1413,6 +1480,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1552,6 +1620,7 @@ namespace app {
                     { "RmsVoltageSwellPeriodPhaseC", RmsVoltageSwellPeriodPhaseC::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1567,6 +1636,7 @@ namespace app {
                     { "ExpectedClients", ExpectedClients::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1660,6 +1730,7 @@ namespace app {
                     { "WriteOnlyInt8u", WriteOnlyInt8u::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -1671,6 +1742,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
@@ -2353,6 +2425,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "RegisterClientMonitoring", RegisterClientMonitoring::Id },
                     { "UnregisterClientMonitoring", UnregisterClientMonitoring::Id },
+                    { "StayAwakeRequest", StayAwakeRequest::Id }
                 };
             } // namespace Commands
         } // namespace ClientMonitoring

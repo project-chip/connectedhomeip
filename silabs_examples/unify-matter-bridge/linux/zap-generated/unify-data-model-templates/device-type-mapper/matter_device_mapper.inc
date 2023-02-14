@@ -33,7 +33,7 @@ namespace app {
     namespace Clusters {
 
         static const std::unordered_map<std::string, chip::ClusterId> unify_cluster_id_map {
-            { "Basic", BridgedDeviceBasic::Id },
+            { "Basic", BridgedDeviceBasicInformation::Id },
             { "Identify", Identify::Id },
             { "Groups", Groups::Id },
             { "Scenes", Scenes::Id },
@@ -56,7 +56,7 @@ namespace app {
 
         // Attribute mapping Unify->Matter conversion
         // Attribute structure for each cluster
-        namespace BridgedDeviceBasic {
+        namespace BridgedDeviceBasicInformation {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
                     { "ApplicationVersion", VendorName::Id },
@@ -379,9 +379,9 @@ namespace app {
                     { "Occupancy", Occupancy::Id },
                     { "OccupancySensorType", OccupancySensorType::Id },
                     { "OccupancySensorTypeBitmap", OccupancySensorTypeBitmap::Id },
-                    { "PIROccupiedToUnoccupiedDelay", PirOccupiedToUnoccupiedDelay::Id },
-                    { "PIRUnoccupiedToOccupiedDelay", PirUnoccupiedToOccupiedDelay::Id },
-                    { "PIRUnoccupiedToOccupiedThreshold", PirUnoccupiedToOccupiedThreshold::Id },
+                    { "PIROccupiedToUnoccupiedDelay", PIROccupiedToUnoccupiedDelay::Id },
+                    { "PIRUnoccupiedToOccupiedDelay", PIRUnoccupiedToOccupiedDelay::Id },
+                    { "PIRUnoccupiedToOccupiedThreshold", PIRUnoccupiedToOccupiedThreshold::Id },
                     { "UltrasonicOccupiedToUnoccupiedDelay", UltrasonicOccupiedToUnoccupiedDelay::Id },
                     { "UltrasonicUnoccupiedToOccupiedDelay", UltrasonicUnoccupiedToOccupiedDelay::Id },
                     { "UltrasonicUnoccupiedToOccupiedThreshold", UltrasonicUnoccupiedToOccupiedThreshold::Id },
@@ -526,7 +526,7 @@ namespace app {
 
         // Global map of each clusters attributes
         static const std::unordered_map<std::string, std::unordered_map<std::string, chip::AttributeId>> unify_to_matter_attribute_id_map {
-            { "Basic", BridgedDeviceBasic::Attributes::unify_to_matter_attribute_id_cluster_map },
+            { "Basic", BridgedDeviceBasicInformation::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "Identify", Identify::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "Groups", Groups::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "Scenes", Scenes::Attributes::unify_to_matter_attribute_id_cluster_map },
@@ -549,7 +549,7 @@ namespace app {
 
         // Command mapping Unify->Matter conversion
         // Command structure for each cluster
-        namespace BridgedDeviceBasic {
+        namespace BridgedDeviceBasicInformation {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {};
             } // namespace Commands
@@ -759,7 +759,7 @@ namespace app {
 
         // Global map of each clusters commands
         static const std::unordered_map<std::string, std::unordered_map<std::string, chip::CommandId>> unify_to_matter_command_id_map {
-            { "Basic", BridgedDeviceBasic::Commands::unify_to_matter_command_id_cluster_map },
+            { "Basic", BridgedDeviceBasicInformation::Commands::unify_to_matter_command_id_cluster_map },
             { "Identify", Identify::Commands::unify_to_matter_command_id_cluster_map },
             { "Groups", Groups::Commands::unify_to_matter_command_id_cluster_map },
             { "Scenes", Scenes::Commands::unify_to_matter_command_id_cluster_map },

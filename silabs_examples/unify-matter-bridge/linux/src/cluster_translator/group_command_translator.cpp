@@ -70,14 +70,14 @@ void GroupClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         {
             // Checking if the Endpoint is already a part of the GroupID
             GroupDataProvider * provider = GetGroupDataProvider();
-            if (provider->HasEndpoint(fabric_index, addGroupData.groupId, ctxt.mRequestPath.mEndpointId))
+            if (provider->HasEndpoint(fabric_index, addGroupData.groupID, ctxt.mRequestPath.mEndpointId))
             {
                 break;
             }
             // Checking if the GroupId has already entry
             GroupDataProvider::GroupInfo group_info;
-            group_translator::matter_group group = { addGroupData.groupId, fabric_index };
-            if (CHIP_NO_ERROR != provider->GetGroupInfo(fabric_index, addGroupData.groupId, group_info))
+            group_translator::matter_group group = { addGroupData.groupID, fabric_index };
+            if (CHIP_NO_ERROR != provider->GetGroupInfo(fabric_index, addGroupData.groupID, group_info))
             {
                 if (!m_group_translator.add_matter_group(group))
                 {
@@ -100,7 +100,7 @@ void GroupClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         CHIP_ERROR TLVError = DataModel::Decode(tlv, removeGroupData);
         if (CHIP_ERROR::IsSuccess(TLVError))
         {
-            group_translator::matter_group group     = { removeGroupData.groupId, fabric_index };
+            group_translator::matter_group group     = { removeGroupData.groupID, fabric_index };
             std::optional<unify_group_t> unify_group = m_group_translator.get_unify_group(group);
             if (unify_group.has_value())
             {

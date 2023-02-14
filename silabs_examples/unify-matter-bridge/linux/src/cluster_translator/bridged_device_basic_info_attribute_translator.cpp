@@ -33,8 +33,8 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::BridgedDeviceBasic;
-using namespace chip::app::Clusters::BridgedDeviceBasic::Attributes;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation::Attributes;
 using namespace unify::matter_bridge;
 
 constexpr uint32_t ATTRIBUTE_ID_INVALID = 0xFFFFFFFF;
@@ -59,7 +59,7 @@ const static std::unordered_map<std::string, uint32_t> basic_information_map{
 BridgedDeviceBasicInfoAttributeAccess::BridgedDeviceBasicInfoAttributeAccess(matter_node_state_monitor & node_state_monitor,
                                                                              UnifyMqtt & unify_mqtt,
                                                                              device_translator & dev_translator) :
-    attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::BridgedDeviceBasic::Id,
+    attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::BridgedDeviceBasicInformation::Id,
                                    "attr_translator_BridgedDeviceBasic")
 
 {
@@ -69,7 +69,7 @@ BridgedDeviceBasicInfoAttributeAccess::BridgedDeviceBasicInfoAttributeAccess(mat
 
 CHIP_ERROR BridgedDeviceBasicInfoAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aPath.mClusterId != BridgedDeviceBasic::Id)
+    if (aPath.mClusterId != BridgedDeviceBasicInformation::Id)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -154,7 +154,7 @@ CHIP_ERROR BridgedDeviceBasicInfoAttributeAccess::Read(const ConcreteReadAttribu
 
 CHIP_ERROR BridgedDeviceBasicInfoAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    if (aPath.mClusterId != BridgedDeviceBasic::Id)
+    if (aPath.mClusterId != BridgedDeviceBasicInformation::Id)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -195,7 +195,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(const bridged_endpo
         {
             return;
         }
-        attrpath = ConcreteAttributePath(matter_endpoint, BridgedDeviceBasic::Id, attribute_id);
+        attrpath = ConcreteAttributePath(matter_endpoint, BridgedDeviceBasicInformation::Id, attribute_id);
 
         switch (attribute_id)
         {
@@ -203,7 +203,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(const bridged_endpo
             std::string value = unify_value;
             std::vector<uint8_t> value_vec(value.begin(), value.end());
             attribute_state_cache::get_instance().set<std::string>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, VendorName::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, VendorName::Id);
             break;
         }
         case VendorID::Id: {
@@ -211,68 +211,68 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(const bridged_endpo
             // considering that manufacturer name is publish on unify side
             uint16_t unspecified_vendor = chip::VendorId::NotSpecified;
             attribute_state_cache::get_instance().set<uint16_t>(attrpath, unspecified_vendor);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, VendorID::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, VendorID::Id);
             break;
         }
         case ProductName::Id: {
             std::string value = unify_value;
             std::vector<uint8_t> value_vec(value.begin(), value.end());
             attribute_state_cache::get_instance().set<std::string>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, ProductName::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, ProductName::Id);
             break;
         }
         case HardwareVersion::Id: {
             uint16_t value = unify_value;
             attribute_state_cache::get_instance().set<uint16_t>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, HardwareVersion::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, HardwareVersion::Id);
             break;
         }
         case HardwareVersionString::Id: {
             std::string value = unify_value;
             std::vector<uint8_t> value_vec(value.begin(), value.end());
             attribute_state_cache::get_instance().set<std::string>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, HardwareVersionString::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, HardwareVersionString::Id);
             break;
         }
         case SoftwareVersion::Id: {
             uint32_t value = unify_value;
             attribute_state_cache::get_instance().set<uint16_t>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, SoftwareVersion::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, SoftwareVersion::Id);
             break;
         }
         case SoftwareVersionString::Id: {
             std::string value = unify_value;
             std::vector<uint8_t> value_vec(value.begin(), value.end());
             attribute_state_cache::get_instance().set<std::string>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, SoftwareVersionString::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, SoftwareVersionString::Id);
             break;
         }
         case ManufacturingDate::Id: {
             std::string value = unify_value;
             std::vector<uint8_t> value_vec(value.begin(), value.end());
             attribute_state_cache::get_instance().set<std::string>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, ManufacturingDate::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, ManufacturingDate::Id);
             break;
         }
         case ProductURL::Id: {
             std::string value = unify_value;
             std::vector<uint8_t> value_vec(value.begin(), value.end());
             attribute_state_cache::get_instance().set<std::string>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, ProductURL::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, ProductURL::Id);
             break;
         }
         case ProductLabel::Id: {
             std::string value = unify_value;
             std::vector<uint8_t> value_vec(value.begin(), value.end());
             attribute_state_cache::get_instance().set<std::string>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, ProductLabel::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, ProductLabel::Id);
             break;
         }
         case SerialNumber::Id: {
             std::string value = unify_value;
             std::vector<uint8_t> value_vec(value.begin(), value.end());
             attribute_state_cache::get_instance().set<std::string>(attrpath, value);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, SerialNumber::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, SerialNumber::Id);
         }
         }
     }
@@ -286,9 +286,9 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(const bridged_endpo
             // parse the name or location attribute state value
             std::string name = unify_value;
             std::vector<uint8_t> name_vec(name.begin(), name.end());
-            attrpath = ConcreteAttributePath(matter_endpoint, BridgedDeviceBasic::Id, NodeLabel::Id);
+            attrpath = ConcreteAttributePath(matter_endpoint, BridgedDeviceBasicInformation::Id, NodeLabel::Id);
             attribute_state_cache::get_instance().set<std::string>(attrpath, name);
-            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasic::Id, NodeLabel::Id);
+            MatterReportingAttributeChangeCallback(matter_endpoint, BridgedDeviceBasicInformation::Id, NodeLabel::Id);
         }
     }
 }
@@ -299,12 +299,12 @@ void BridgedDeviceBasicInfoAttributeAccess::unify_node_reachable_state_update(co
     /// A node has changed its reachable state
     if (state == matter_node_state_monitor::update_t::NODE_STATE_CHANGED)
     {
-        ConcreteAttributePath attr_path = ConcreteAttributePath(ep.matter_endpoint, BridgedDeviceBasic::Id, Reachable::Id);
+        ConcreteAttributePath attr_path = ConcreteAttributePath(ep.matter_endpoint, BridgedDeviceBasicInformation::Id, Reachable::Id);
 
         Reachable::TypeInfo::Type node_reachable_state = ep.reachable;
         attribute_state_cache::get_instance().set<Reachable::TypeInfo::Type>(attr_path, node_reachable_state);
 
-        MatterReportingAttributeChangeCallback(ep.matter_endpoint, BridgedDeviceBasic::Id, Reachable::Id);
+        MatterReportingAttributeChangeCallback(ep.matter_endpoint, BridgedDeviceBasicInformation::Id, Reachable::Id);
 
         // update the ReachableChanged Event
         Events::ReachableChanged::Type event{ node_reachable_state };

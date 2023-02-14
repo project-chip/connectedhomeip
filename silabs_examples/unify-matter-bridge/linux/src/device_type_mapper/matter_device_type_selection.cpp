@@ -113,7 +113,7 @@ bool compare_attributes(const EmberAfAttributeMetadata * attributes, const uint1
 
         if (!required_attribute_found)
         {
-            sl_log_debug(LOG_TAG, "Attribute %s not found in cluster %s", required_attribute.c_str(),
+            sl_log_debug(LOG_TAG, "Attribute %s:%d not found in cluster %s", required_attribute.c_str(), attribute_id.value(),
                          required_cluster_name.c_str());
             return false;
         }

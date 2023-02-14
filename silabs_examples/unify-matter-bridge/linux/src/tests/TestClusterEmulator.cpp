@@ -56,8 +56,8 @@ static void TestClusterEmulatorEmulationClusterRevisionAndFeatureMap(nlTestSuite
     NL_TEST_ASSERT(inSuite, matter_onoff_cluster.clusterId == chip::app::Clusters::OnOff::Id);
 
     // Test the emulated attributes and commands
-    chip::AttributeId emulated_attribute_feature_map = ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID;
-    chip::AttributeId cluster_revision_attribute_id  = ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID;
+    chip::AttributeId emulated_attribute_feature_map = chip::app::Clusters::OnOff::Attributes::FeatureMap::Id;
+    chip::AttributeId cluster_revision_attribute_id  = chip::app::Clusters::OnOff::Attributes::ClusterRevision::Id;
     bool feature_map_found                           = false;
     bool cluster_revision_found                      = false;
 
@@ -84,7 +84,7 @@ static void TestClusterEmulatorEmulationClusterRevisionAndFeatureMap(nlTestSuite
 
     // Test reading the emulated feature map and cluster revision
     auto attribute_id_path =
-        chip::app::ConcreteAttributePath(0, chip::app::Clusters::OnOff::Id, ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID);
+        chip::app::ConcreteAttributePath(0, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OnOff::Attributes::FeatureMap::Id);
     chip::DataVersion dataVersion            = 0;
     chip::app::AttributeValueEncoder encoder = setupEncoder(1, attribute_id_path, dataVersion);
 
@@ -92,7 +92,7 @@ static void TestClusterEmulatorEmulationClusterRevisionAndFeatureMap(nlTestSuite
     NL_TEST_ASSERT(inSuite, emulator.read_attribute(attribute_id_path, encoder) != CHIP_NO_ERROR);
 
     auto revision_attribute_id_path =
-        chip::app::ConcreteAttributePath(0, chip::app::Clusters::OnOff::Id, ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID);
+        chip::app::ConcreteAttributePath(0, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OnOff::Attributes::ClusterRevision::Id);
     chip::DataVersion revisionDataVersion             = 0;
     chip::app::AttributeValueEncoder revision_encoder = setupEncoder(1, attribute_id_path, revisionDataVersion);
 
@@ -124,7 +124,7 @@ static void TestClusterEmulatorIdentify(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(inSuite, identify_cluster.clusterId == chip::app::Clusters::Identify::Id);
 
     // Test the emulated attribute Identify Type
-    chip::AttributeId identify_type_id = ZCL_IDENTIFY_TYPE_ATTRIBUTE_ID;
+    chip::AttributeId identify_type_id = chip::app::Clusters::Identify::Attributes::IdentifyType::Id;
 
     chip::app::ConcreteAttributePath aPath = { 0, chip::app::Clusters::Identify::Id, identify_type_id };
     NL_TEST_ASSERT(inSuite, emulator.is_attribute_emulated(aPath));
