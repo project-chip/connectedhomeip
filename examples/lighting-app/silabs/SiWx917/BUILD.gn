@@ -59,10 +59,10 @@ declare_args() {
   rs91x_wpa3_only = false
 
   #default WiFi SSID
-  ssid = ""
+  chip_default_wifi_ssid = ""
 
   #default Wifi Password
-  psk = ""
+  chip_default_wifi_psk = ""
 }
 
 # Sanity check
@@ -92,15 +92,16 @@ if (chip_enable_wifi) {
     disable_lcd = true
   }
 
-  if (ssid != "") {
+  if (chip_default_wifi_ssid != "") {
     defines += [
       "CHIP_ONNETWORK_PAIRING = 1",
-      "CHIP_WIFI_SSID = $ssid",
+      "CHIP_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
     ]
   }
-  if (psk != "") {
-    assert(ssid != "", "ssid can't be null if psk is provided")
-    defines += [ "CHIP_WIFI_PSK = $psk" ]
+  if (chip_default_wifi_psk != "") {
+    assert(chip_default_wifi_ssid != "",
+           "ssid can't be null if psk is provided")
+    defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
 
   wifi_sdk_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
