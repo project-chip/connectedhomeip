@@ -133,7 +133,8 @@ public:
     {
         assertChipStackLockedByCurrentThread();
         if (mNodeId.HasValue()) {
-            ChipLogProgress(Controller, "Resetting state for OTA Provider for node id %llu", mNodeId.Value());
+            ChipLogProgress(
+                Controller, "Resetting state for OTA Provider; no longer providing an update for node id %llu", mNodeId.Value());
         } else {
             ChipLogProgress(Controller, "Resetting state for OTA Provider");
         }
