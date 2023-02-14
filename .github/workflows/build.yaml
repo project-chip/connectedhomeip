@@ -17,6 +17,7 @@ name: Builds
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
@@ -27,7 +28,6 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
         timeout-minutes: 85
@@ -221,18 +221,18 @@ jobs:
               env:
                   LSAN_OPTIONS: detect_leaks=1
               run: |
-                    for BUILD_TYPE in asan tsan ubsan; do
-                        case $BUILD_TYPE in
-                            "asan") GN_ARGS='is_clang=true is_asan=true';;
-                            "msan") GN_ARGS='is_clang=true is_msan=true';;
-                            "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
-                            "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
-                        esac
+                  for BUILD_TYPE in asan tsan ubsan; do
+                      case $BUILD_TYPE in
+                          "asan") GN_ARGS='is_clang=true is_asan=true';;
+                          "msan") GN_ARGS='is_clang=true is_msan=true';;
+                          "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
+                          "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
+                      esac
 
-                        rm -rf ./out/sanitizers
-                        BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
-                        BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
-                    done
+                      rm -rf ./out/sanitizers
+                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                      BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
+                  done
             - name: Ensure codegen is done for sanitize
               timeout-minutes: 45
               run: |
@@ -370,9 +370,9 @@ jobs:
             - name: Run Python Setup Payload Generator Test
               timeout-minutes: 10
               run: |
-                scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
-                scripts/run_in_build_env.sh 'pip3 install -r src/setup_payload/python/requirements.txt'
-                scripts/run_in_build_env.sh 'python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool'
+                  scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
+                  scripts/run_in_build_env.sh 'pip3 install -r src/setup_payload/python/requirements.txt'
+                  scripts/run_in_build_env.sh 'python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool'
 
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
