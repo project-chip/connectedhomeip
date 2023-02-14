@@ -30,7 +30,8 @@
 
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 
@@ -82,6 +83,7 @@ bool ThreadStackManagerImpl::IsInitialized()
 } // namespace chip
 
 using namespace ::chip::DeviceLayer;
+using namespace ::chip;
 
 /**
  * Glue function called directly by the OpenThread stack when tasklet processing work
@@ -111,3 +113,14 @@ extern "C" void otPlatFree(void * aPtr)
 {
     CHIPPlatformMemoryFree(aPtr);
 }
+
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+CHIP_ERROR ThreadStackManagerImpl::_RequestSEDFastPollingMode(bool onOff)
+{
+    (void) onOff;
+
+    ChipLogError(DeviceLayer, "Polling config is not supported on this platform");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif

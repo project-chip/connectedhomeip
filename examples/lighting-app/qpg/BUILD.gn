@@ -87,6 +87,7 @@ qpg_executable("lighting_app") {
   ]
 
   defines = [ "GP_APP_DIVERSITY_POWERCYCLECOUNTING" ]
+
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",

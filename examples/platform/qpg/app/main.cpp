@@ -190,7 +190,11 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
+#if CONFIG_CHIP_THREAD_SSED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
+#elif CHIP_DEVICE_CONFIG_ENABLE_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#elif CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);

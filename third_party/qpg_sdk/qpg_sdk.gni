@@ -30,6 +30,9 @@ declare_args() {
 
   # an option to disable referencing qorvo object archive files (*.a)
   qpg_sdk_include_platform_libs = true
+
+  # Enable Sleepy end device
+  enable_sleepy_device = false
 }
 
 assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")
@@ -57,6 +60,7 @@ template("qpg_sdk") {
   config("${sdk_target_name}_config") {
     include_dirs = []
     libs = []
+    defines = []
 
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
@@ -86,10 +90,28 @@ template("qpg_sdk") {
       "-Wno-shadow",
     ]
 
+    # Inherit defines from invoker (i.e. examples app)
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
-  }
+
+    if (defined(invoker.enable_sleepy_device)) {
+      if (invoker.enable_sleepy_device) {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SED=1" ]
+      } else {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SED=0" ]
+        if (invoker.chip_openthread_ftd) {
+          defines += [
+            "CHIP_DEVICE_CONFIG_THREAD_FTD=1",
+          ]
+        } else {
+          defines += [
+            "CHIP_DEVICE_CONFIG_THREAD_FTD=0",
+          ]
+        }
+      }
+    }
+}
 
   source_set(sdk_target_name) {
     sources = [
