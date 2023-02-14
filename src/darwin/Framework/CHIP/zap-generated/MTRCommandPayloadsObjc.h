@@ -2837,9 +2837,9 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @property (nonatomic, copy) NSData * _Nonnull logContent API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull utcTimeStamp API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy) NSNumber * _Nullable utcTimeStamp API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull timeSinceBoot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSNumber * _Nullable timeSinceBoot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2864,7 +2864,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSData * _Nonnull content API_DEPRECATED(
     "Please use logContent", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull timeStamp API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nullable timeStamp API_DEPRECATED(
     "Please use utcTimeStamp", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 

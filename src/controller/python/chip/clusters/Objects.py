@@ -7845,14 +7845,14 @@ class DiagnosticLogs(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=DiagnosticLogs.Enums.LogsStatus),
                             ClusterObjectFieldDescriptor(Label="logContent", Tag=1, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="UTCTimeStamp", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeSinceBoot", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="UTCTimeStamp", Tag=2, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="timeSinceBoot", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             status: 'DiagnosticLogs.Enums.LogsStatus' = 0
             logContent: 'bytes' = b""
-            UTCTimeStamp: 'uint' = 0
-            timeSinceBoot: 'uint' = 0
+            UTCTimeStamp: 'typing.Optional[uint]' = None
+            timeSinceBoot: 'typing.Optional[uint]' = None
 
 
     class Attributes:
