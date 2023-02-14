@@ -17,9 +17,17 @@
  */
 
 #include "DiscoverCommissionablesCommand.h"
+#include <commands/common/RemoteDataModelLogger.h>
 #include <lib/support/BytesToHex.h>
 
 using namespace ::chip;
+
+void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+{
+    nodeData.LogDetail();
+    LogErrorOnFailure(RemoteDataModelLogger::LogDiscoveredNodeData(nodeData));
+    SetCommandExitStatus(CHIP_NO_ERROR);
+}
 
 CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 {
@@ -28,7 +36,37 @@ CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
     return CurrentCommissioner().DiscoverCommissionableNodes(filter);
 }
 
-void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+CHIP_ERROR DiscoverCommissionableByShortDiscriminatorCommand::RunCommand()
 {
-    nodeData.LogDetail();
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kShortDiscriminator, mDiscriminator);
+    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR DiscoverCommissionableByLongDiscriminatorCommand::RunCommand()
+{
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kLongDiscriminator, mDiscriminator);
+    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR DiscoverCommissionableByCommissioningModeCommand::RunCommand()
+{
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kCommissioningMode);
+    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR DiscoverCommissionableByVendorIdCommand::RunCommand()
+{
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kVendorId, mVendorId);
+    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR DiscoverCommissionableByDeviceTypeCommand::RunCommand()
+{
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kDeviceType, mDeviceType);
+    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
 }
