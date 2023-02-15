@@ -31,6 +31,9 @@ config:
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -69,6 +72,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=1"
@@ -276,6 +287,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label:
           "TH_CR1 starts a commissioning process with DUT_CE before the timeout

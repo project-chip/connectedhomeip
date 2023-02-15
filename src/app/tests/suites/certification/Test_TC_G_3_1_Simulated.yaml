@@ -23,9 +23,22 @@ config:
     endpoint: 1
 
 tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
     - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+      PICS: PICS_SKIP_SAMPLE_APP
+      verification: |
+          Commission DUT to TH
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "DUT reads NameSupport attribute value from TH"
       PICS: G.C.A0000
