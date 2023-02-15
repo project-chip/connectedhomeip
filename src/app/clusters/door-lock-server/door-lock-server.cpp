@@ -1662,7 +1662,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
         if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
         {
             ChipLogError(Zcl, "[GetCredentialStatus] Unable to get user: app error [userIndex=%d]", i);
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
             return false;
         }
 
@@ -1701,7 +1700,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
         if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
         {
             ChipLogError(Zcl, "[findUserIndexByCredential] Unable to get user: app error [userIndex=%d]", i);
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
             return false;
         }
 
@@ -1725,7 +1723,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
                              "[findUserIndexByCredential] Unable to get credential: app error "
                              "[userIndex=%d,credentialIndex=%d,credentialType=%u]",
                              i, credential.CredentialIndex, to_underlying(credentialType));
-                emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
                 return false;
             }
 
@@ -1736,7 +1733,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
                              "not occupied "
                              "[userIndex=%d,credentialIndex=%d,credentialType=%u]",
                              i, credential.CredentialIndex, to_underlying(credentialType));
-                emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
                 return false;
             }
 
@@ -2899,23 +2895,37 @@ EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
+    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
+    bool clearedCredential = false;
     for (uint16_t i = 1; i < maxNumberOfCredentials; ++i)
     {
-        auto status = clearCredential(endpointId, modifier, sourceNodeId, credentialType, i, false);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        EmberAfStatus clearStatus = clearCredential(endpointId, modifier, sourceNodeId, credentialType, i, false);
+        if (EMBER_ZCL_STATUS_SUCCESS != clearStatus)
         {
             ChipLogError(Zcl,
                          "[clearCredentials] Unable to clear the credential - internal error "
                          "[endpointId=%d,credentialType=%u,credentialIndex=%d,status=%d]",
                          endpointId, to_underlying(credentialType), i, status);
-            return status;
+            if (status == EMBER_ZCL_STATUS_SUCCESS)
+            {
+                status = clearStatus;
+            }
+        }
+        else
+        {
+            clearedCredential = true;
         }
     }
 
-    sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DataOperationTypeEnum::kClear, sourceNodeId,
-                             modifier, 0xFFFE, 0xFFFE);
+    // Generate the event if we cleared any credentials, even if we then had errors
+    // clearing other ones, so we don't have credentials silently disappearing.
+    if (clearedCredential)
+    {
+        sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DataOperationTypeEnum::kClear,
+                                 sourceNodeId, modifier, 0xFFFE, 0xFFFE);
+    }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return status;
 }
 
 bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,

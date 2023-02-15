@@ -123,11 +123,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                    uint8_t * dataPtr, uint16_t readLength);
 
-// For now, just define emberAfReadServerAttribute to emberAfReadAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfReadServerAttribute emberAfReadAttribute
-
 /**
  * @brief this function returns the size of the ZCL data in bytes.
  *

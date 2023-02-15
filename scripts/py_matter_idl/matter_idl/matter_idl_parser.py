@@ -318,6 +318,11 @@ class MatterIdlTransformer(Transformer):
         meta = None if self.skip_meta else ParseMetaData(meta)
         return AttributeInstantiation(parse_meta=meta, name=id, storage=storage, default=default)
 
+    @v_args(meta=True, inline=True)
+    def endpoint_emitted_event(self, meta, id):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return id
+
     def ESCAPED_STRING(self, s):
         # handle escapes, skip the start and end quotes
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
@@ -366,9 +371,18 @@ class MatterIdlTransformer(Transformer):
         return AddBindingToEndpointTransform(id)
 
     @v_args(meta=True, inline=True)
-    def endpoint_server_cluster(self, meta, id, *attributes):
+    def endpoint_server_cluster(self, meta, id, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return AddServerClusterToEndpointTransform(ServerClusterInstantiation(parse_meta=meta, name=id, attributes=list(attributes)))
+
+        attributes = []
+        events = set()
+
+        for item in content:
+            if isinstance(item, AttributeInstantiation):
+                attributes.append(item)
+            else:
+                events.add(item)
+        return AddServerClusterToEndpointTransform(ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events))
 
     @v_args(inline=True, meta=True)
     def cluster(self, meta, side, name, code, *content):

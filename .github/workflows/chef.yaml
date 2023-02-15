@@ -17,6 +17,7 @@ name: Build Chef CI examples on all platforms
 on:
     push:
     pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -126,4 +127,4 @@ jobs:
             - name: CI Examples NRFConnect
               shell: bash
               run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"

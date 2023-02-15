@@ -17,73 +17,12 @@ import copy
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
-import yaml
-
 from . import fixes
 from .constraints import get_constraints, is_typed_constraint
 from .definitions import SpecDefinitions
+from .errors import TestStepError, TestStepKeyError, TestStepValueNameError
 from .pics_checker import PICSChecker
-
-_TESTS_SECTION = [
-    'name',
-    'config',
-    'tests',
-    'PICS',
-]
-
-_TEST_SECTION = [
-    'label',
-    'cluster',
-    'command',
-    'disabled',
-    'event',
-    'eventNumber',
-    'endpoint',
-    'identity',
-    'fabricFiltered',
-    'groupId',
-    'verification',
-    'nodeId',
-    'attribute',
-    'PICS',
-    'arguments',
-    'response',
-    'minInterval',
-    'maxInterval',
-    'timedInteractionTimeoutMs',
-    'busyWaitMs',
-    'wait',
-]
-
-_TEST_ARGUMENTS_SECTION = [
-    'values',
-    'value',
-]
-
-_TEST_RESPONSE_SECTION = [
-    'value',
-    'values',
-    'error',
-    'clusterError',
-    'constraints',
-    'type',
-    'hasMasksSet',
-    'contains',
-    'saveAs'
-]
-
-_ATTRIBUTE_COMMANDS = [
-    'readAttribute',
-    'writeAttribute',
-    'subscribeAttribute',
-    'waitForReport',
-]
-
-_EVENT_COMMANDS = [
-    'readEvent',
-    'subscribeEvent',
-    'waitForReport',
-]
+from .yaml_loader import YamlLoader
 
 
 class PostProcessCheckStatus(Enum):
@@ -167,13 +106,6 @@ class PostProcessResponseResult:
         self.entries.append(log)
 
 
-def _check_valid_keys(section, valid_keys_dict):
-    if section:
-        for key in section:
-            if key not in valid_keys_dict:
-                raise KeyError(f'Unknown key: {key}')
-
-
 def _value_or_none(data, key):
     return data[key] if key in data else None
 
@@ -199,8 +131,6 @@ class _TestStepWithPlaceholders:
 
         self._parsing_config_variable_storage = config
 
-        _check_valid_keys(test, _TEST_SECTION)
-
         self.label = _value_or_none(test, 'label')
         self.node_id = _value_or_config(test, 'nodeId', config)
         self.group_id = _value_or_config(test, 'groupId', config)
@@ -221,13 +151,10 @@ class _TestStepWithPlaceholders:
         self.wait_for = _value_or_none(test, 'wait')
         self.event_number = _value_or_none(test, 'eventNumber')
 
-        self.is_attribute = self.attribute and (
-            self.command in _ATTRIBUTE_COMMANDS or self.wait_for in _ATTRIBUTE_COMMANDS)
-        self.is_event = self.event and (
-            self.command in _EVENT_COMMANDS or self.wait_for in _EVENT_COMMANDS)
+        self.is_attribute = self.__is_attribute_command()
+        self.is_event = self.__is_event_command()
 
         arguments = _value_or_none(test, 'arguments')
-        _check_valid_keys(arguments, _TEST_ARGUMENTS_SECTION)
         self._convert_single_value_to_values(arguments)
         self.arguments_with_placeholders = arguments
 
@@ -245,7 +172,6 @@ class _TestStepWithPlaceholders:
             responses = [responses]
 
         for response in responses:
-            _check_valid_keys(response, _TEST_RESPONSE_SECTION)
             self._convert_single_value_to_values(response)
         self.responses_with_placeholders = responses
 
@@ -288,11 +214,6 @@ class _TestStepWithPlaceholders:
         self.update_arguments(self.arguments_with_placeholders)
         self.update_responses(self.responses_with_placeholders)
 
-        # The "wait_for" keyword do not support multiple responses.
-        if len(responses) > 1 and self.wait_for:
-            raise Exception(
-                'The "wait_for" keyword can not be used with multiple expected responses')
-
         # This performs a very basic sanity parse time check of constraints. This parsing happens
         # again inside post processing response since at that time we will have required variables
         # to substitute in. This parsing check here has value since some test can take a really
@@ -324,7 +245,7 @@ class _TestStepWithPlaceholders:
                 # Nothing to do for those keys.
                 pass
             else:
-                raise KeyError(f'Unknown key: {key}')
+                raise TestStepKeyError(item, key)
 
         container['values'] = [value]
 
@@ -365,12 +286,8 @@ class _TestStepWithPlaceholders:
                 else:
                     target_key = value['name']
                     if mapping_type.get(target_key) is None:
-                        for candidate_key in mapping_type:
-                            if candidate_key.lower() == target_key.lower():
-                                raise KeyError(
-                                    f'"{self.label}": Unknown key: "{target_key}". Did you mean "{candidate_key}" ?')
-                        raise KeyError(
-                            f'"{self.label}": Unknown key: "{target_key}". Candidates are: "{[ key for key in mapping_type]}".')
+                        raise TestStepValueNameError(
+                            value, target_key, [key for key in mapping_type])
                     mapping = mapping_type[target_key]
 
                 if key == 'value':
@@ -402,6 +319,8 @@ class _TestStepWithPlaceholders:
                 if key == 'FabricIndex' or key == 'fabricIndex':
                     rv[key] = value[key]  # int64u
                 else:
+                    if not mapping_type.get(key):
+                        raise TestStepKeyError(value, key)
                     mapping = mapping_type[key]
                     rv[key] = self._update_value_with_definition(
                         value[key], mapping)
@@ -427,6 +346,25 @@ class _TestStepWithPlaceholders:
                 value = bool(value)
 
         return value
+
+    def __is_attribute_command(self) -> bool:
+        commands = {
+            'readAttribute',
+            'writeAttribute',
+            'subscribeAttribute',
+            'waitForReport',
+        }
+
+        return self.attribute and (self.command in commands or self.wait_for in commands)
+
+    def __is_event_command(self) -> bool:
+        commands = {
+            'readEvent',
+            'subscribeEvent',
+            'waitForReport',
+        }
+
+        return self.event and (self.command in commands or self.wait_for in commands)
 
 
 class TestStep:
@@ -879,14 +817,18 @@ class YamlTests:
     def __init__(self, parsing_config_variable_storage: dict, definitions: SpecDefinitions, pics_checker: PICSChecker, tests: dict):
         self._parsing_config_variable_storage = parsing_config_variable_storage
         enabled_tests = []
-        for test in tests:
-            test_with_placeholders = _TestStepWithPlaceholders(
-                test, self._parsing_config_variable_storage, definitions, pics_checker)
-            if test_with_placeholders.is_enabled:
-                enabled_tests.append(test_with_placeholders)
+        try:
+            for step_index, step in enumerate(tests):
+                test_with_placeholders = _TestStepWithPlaceholders(
+                    step, self._parsing_config_variable_storage, definitions, pics_checker)
+                if test_with_placeholders.is_enabled:
+                    enabled_tests.append(test_with_placeholders)
+        except TestStepError as e:
+            e.update_context(step, step_index)
+            raise
+
         fixes.try_update_yaml_node_id_test_runner_state(
             enabled_tests, self._parsing_config_variable_storage)
-
         self._runtime_config_variable_storage = copy.deepcopy(
             parsing_config_variable_storage)
         self._tests = enabled_tests
@@ -915,15 +857,23 @@ class TestParserConfig:
 
 class TestParser:
     def __init__(self, test_file: str, parser_config: TestParserConfig = TestParserConfig()):
-        data = self.__load_yaml(test_file)
+        yaml_loader = YamlLoader()
+        name, pics, config, tests = yaml_loader.load(test_file)
 
-        _check_valid_keys(data, _TESTS_SECTION)
+        self.__apply_config_override(config, parser_config.config_override)
+        self.__apply_legacy_config(config)
 
-        self.name = _value_or_none(data, 'name')
-        self.PICS = _value_or_none(data, 'PICS')
+        self.name = name
+        self.PICS = pics
+        self.tests = YamlTests(
+            config,
+            parser_config.definitions,
+            PICSChecker(parser_config.pics),
+            tests
+        )
 
-        config = data.get('config', {})
-        for key, value in parser_config.config_override.items():
+    def __apply_config_override(self, config, config_override):
+        for key, value in config_override.items():
             if value is None:
                 continue
 
@@ -931,29 +881,15 @@ class TestParser:
                 config[key]['defaultValue'] = value
             else:
                 config[key] = value
-        self._parsing_config_variable_storage = config
 
+    def __apply_legacy_config(self, config):
         # These are a list of "KnownVariables". These are defaults the codegen used to use. This
         # is added for legacy support of tests that expect to uses these "defaults".
-        self.__populate_default_config_if_missing('nodeId', 0x12345)
-        self.__populate_default_config_if_missing('endpoint', '')
-        self.__populate_default_config_if_missing('cluster', '')
-        self.__populate_default_config_if_missing('timeout', '90')
+        self.__apply_legacy_config_if_missing(config, 'nodeId', 0x12345)
+        self.__apply_legacy_config_if_missing(config, 'endpoint', '')
+        self.__apply_legacy_config_if_missing(config, 'cluster', '')
+        self.__apply_legacy_config_if_missing(config, 'timeout', 90)
 
-        pics_checker = PICSChecker(parser_config.pics)
-        tests = _value_or_none(data, 'tests')
-        self.tests = YamlTests(
-            self._parsing_config_variable_storage, parser_config.definitions, pics_checker, tests)
-
-    def __populate_default_config_if_missing(self, key, value):
-        if key not in self._parsing_config_variable_storage:
-            self._parsing_config_variable_storage[key] = value
-
-    def __load_yaml(self, test_file):
-        with open(test_file) as f:
-            loader = yaml.FullLoader
-            loader = fixes.try_add_yaml_support_for_scientific_notation_without_dot(
-                loader)
-
-            return yaml.load(f, Loader=loader)
-        return None
+    def __apply_legacy_config_if_missing(self, config, key, value):
+        if key not in config:
+            config[key] = value

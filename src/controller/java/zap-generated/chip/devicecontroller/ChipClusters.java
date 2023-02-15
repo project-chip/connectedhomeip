@@ -7225,7 +7225,11 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface RetrieveLogsResponseCallback {
-      void onSuccess(Integer status, byte[] logContent, Long UTCTimeStamp, Long timeSinceBoot);
+      void onSuccess(
+          Integer status,
+          byte[] logContent,
+          Optional<Long> UTCTimeStamp,
+          Optional<Long> timeSinceBoot);
 
       void onError(Exception error);
     }
