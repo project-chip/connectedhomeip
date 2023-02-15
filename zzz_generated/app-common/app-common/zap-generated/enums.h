@@ -237,17 +237,6 @@ enum EmberAfSaturationStepMode : uint8_t
     EMBER_ZCL_SATURATION_STEP_MODE_DOWN = 3,
 };
 
-// Enum for SecurityType
-enum EmberAfSecurityType : uint8_t
-{
-    EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED = 0,
-    EMBER_ZCL_SECURITY_TYPE_NONE        = 1,
-    EMBER_ZCL_SECURITY_TYPE_WEP         = 2,
-    EMBER_ZCL_SECURITY_TYPE_WPA         = 3,
-    EMBER_ZCL_SECURITY_TYPE_WPA2        = 4,
-    EMBER_ZCL_SECURITY_TYPE_WPA3        = 5,
-};
-
 // Enum for StepMode
 enum EmberAfStepMode : uint8_t
 {

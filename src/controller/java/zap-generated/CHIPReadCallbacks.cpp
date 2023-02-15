@@ -12790,7 +12790,7 @@ CHIPWiFiNetworkDiagnosticsSecurityTypeAttributeCallback::~CHIPWiFiNetworkDiagnos
 }
 
 void CHIPWiFiNetworkDiagnosticsSecurityTypeAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12857,7 +12857,7 @@ CHIPWiFiNetworkDiagnosticsWiFiVersionAttributeCallback::~CHIPWiFiNetworkDiagnost
 }
 
 void CHIPWiFiNetworkDiagnosticsWiFiVersionAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

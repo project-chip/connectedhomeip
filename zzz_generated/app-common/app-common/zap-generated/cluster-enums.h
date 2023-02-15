@@ -976,8 +976,8 @@ enum class ThreadNetworkDiagnosticsFeature : uint32_t
 
 namespace WiFiNetworkDiagnostics {
 
-// Enum for AssociationFailureCause
-enum class AssociationFailureCause : uint8_t
+// Enum for AssociationFailureCauseEnum
+enum class AssociationFailureCauseEnum : uint8_t
 {
     kUnknown              = 0x00,
     kAssociationFailed    = 0x01,
@@ -990,11 +990,20 @@ enum class AssociationFailureCause : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for SecurityType
-enum class SecurityType : uint8_t
+// Enum for ConnectionStatusEnum
+enum class ConnectionStatusEnum : uint8_t
+{
+    kConnected    = 0x00,
+    kNotConnected = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for SecurityTypeEnum
+enum class SecurityTypeEnum : uint8_t
 {
     kUnspecified = 0x00,
     kNone        = 0x01,
@@ -1008,25 +1017,9 @@ enum class SecurityType : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SecurityType                                                                         = EmberAfSecurityType;
-static SecurityType __attribute__((unused)) kSecurityTypekUnknownEnumValue                 = static_cast<SecurityType>(6);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Enum for WiFiConnectionStatus
-enum class WiFiConnectionStatus : uint8_t
-{
-    kConnected    = 0x00,
-    kNotConnected = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
-// Enum for WiFiVersionType
-enum class WiFiVersionType : uint8_t
+// Enum for WiFiVersionEnum
+enum class WiFiVersionEnum : uint8_t
 {
     kA  = 0x00,
     kB  = 0x01,
