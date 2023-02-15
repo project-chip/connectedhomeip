@@ -20,16 +20,103 @@
 
 #include "../common/CHIPCommand.h"
 
-class DiscoverCommissionablesCommand : public CHIPCommand, public chip::Controller::DeviceDiscoveryDelegate
+class DiscoverCommissionablesCommandBase : public CHIPCommand, public chip::Controller::DeviceDiscoveryDelegate
 {
 public:
-    DiscoverCommissionablesCommand(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("commissionables", credsIssuerConfig)
+    DiscoverCommissionablesCommandBase(const char * name, CredentialIssuerCommands * credsIssuerConfig) :
+        CHIPCommand(name, credsIssuerConfig)
     {}
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     /////////// CHIPCommand Interface /////////
-    CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
+};
+
+class DiscoverCommissionablesCommand : public DiscoverCommissionablesCommandBase
+{
+public:
+    DiscoverCommissionablesCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        DiscoverCommissionablesCommandBase("commissionables", credsIssuerConfig)
+    {}
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+};
+
+class DiscoverCommissionableByShortDiscriminatorCommand : public DiscoverCommissionablesCommandBase
+{
+public:
+    DiscoverCommissionableByShortDiscriminatorCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        DiscoverCommissionablesCommandBase("find-commissionable-by-short-discriminator", credsIssuerConfig)
+    {
+        AddArgument("value", 0, UINT16_MAX, &mDiscriminator);
+    }
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+private:
+    uint16_t mDiscriminator;
+};
+
+class DiscoverCommissionableByLongDiscriminatorCommand : public DiscoverCommissionablesCommandBase
+{
+public:
+    DiscoverCommissionableByLongDiscriminatorCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        DiscoverCommissionablesCommandBase("find-commissionable-by-long-discriminator", credsIssuerConfig)
+    {
+        AddArgument("value", 0, UINT16_MAX, &mDiscriminator);
+    }
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+private:
+    uint16_t mDiscriminator;
+};
+
+class DiscoverCommissionableByCommissioningModeCommand : public DiscoverCommissionablesCommandBase
+{
+public:
+    DiscoverCommissionableByCommissioningModeCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        DiscoverCommissionablesCommandBase("find-commissionable-by-commissioning-mode", credsIssuerConfig)
+    {}
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+};
+
+class DiscoverCommissionableByVendorIdCommand : public DiscoverCommissionablesCommandBase
+{
+public:
+    DiscoverCommissionableByVendorIdCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        DiscoverCommissionablesCommandBase("find-commissionable-by-vendor-id", credsIssuerConfig)
+    {
+        AddArgument("value", 0, UINT16_MAX, &mVendorId);
+    }
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+private:
+    uint16_t mVendorId;
+};
+
+class DiscoverCommissionableByDeviceTypeCommand : public DiscoverCommissionablesCommandBase
+{
+public:
+    DiscoverCommissionableByDeviceTypeCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        DiscoverCommissionablesCommandBase("find-commissionable-by-device-type", credsIssuerConfig)
+    {
+        AddArgument("value", 0, UINT16_MAX, &mDeviceType);
+    }
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+private:
+    // TODO: possibly 32-bit - see spec issue #3226
+    uint16_t mDeviceType;
 };
