@@ -424,7 +424,7 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
     auto credentialIndex = static_cast<unsigned>(credential - pinCredentials.begin());
     auto user = std::find_if(mLockUsers.begin(), mLockUsers.end(), [credential, credentialIndex](const LockUserInfo & u) {
         return std::any_of(u.credentials.begin(), u.credentials.end(), [&credential, credentialIndex](const CredentialStruct & c) {
-            return c.CredentialIndex == credentialIndex && c.CredentialType == to_underlying(credential->credentialType);
+            return c.credentialIndex == credentialIndex && c.credentialType == credential->credentialType;
         });
     });
     if (user == mLockUsers.end())

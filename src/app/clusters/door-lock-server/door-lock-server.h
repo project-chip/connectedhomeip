@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -56,7 +55,8 @@ using chip::app::Clusters::DoorLock::UserTypeEnum;
 using chip::app::DataModel::List;
 using chip::app::DataModel::Nullable;
 
-using LockOpCredentials = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
+using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
+using LockOpCredentials = CredentialStruct;
 
 typedef bool (*RemoteLockOpHandler)(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
                                     OperationErrorEnum & err);

@@ -29,10 +29,3 @@
 #include <protocols/interaction_model/Constants.h>
 
 #include "enums.h"
-
-// Struct for CredentialStruct
-typedef struct _CredentialStruct
-{
-    uint8_t CredentialType;
-    uint16_t CredentialIndex;
-} CredentialStruct;
