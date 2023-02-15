@@ -334,23 +334,6 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status)
-{
-    // Default Response commands are only sent in response to unicast commands.
-    if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)
-    {
-        return EMBER_SUCCESS;
-    }
-
-    if (!chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
-    {
-        // Caller is not responding to anything!
-        return EMBER_ERR_FATAL;
-    }
-
-    return EMBER_SUCCESS;
-}
-
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
 {
     data[index]     = (uint8_t)(((x)) & 0xFF);

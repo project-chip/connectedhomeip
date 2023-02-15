@@ -205,12 +205,6 @@ void AppDeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpoi
     }
 }
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
-
 void AppDeviceCallbacksDelegate::OnIPv4ConnectivityEstablished()
 {
     wifiLED.Set(true);
