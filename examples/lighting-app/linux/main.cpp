@@ -97,7 +97,7 @@ void UiAppMainLoopImplementation::RunMainLoop()
 
     // StopEventLoop will stop the loop below. It is called
     // from within SignalSafeStopMainLoop below and
-    // UI knows how to stop both itself and the chip main loop.
+    // UI knows how to stop itself if windows are closed.
     example::Ui::EventLoop();
 
     // Stop the chip main loop as well. This is expected to
