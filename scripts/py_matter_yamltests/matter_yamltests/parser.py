@@ -49,10 +49,11 @@ class PostProcessCheck:
     it was successful or not.
     '''
 
-    def __init__(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str):
+    def __init__(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str, exception=None):
         self.state = state
         self.category = category
         self.message = message
+        self.exception = exception
 
     def is_success(self) -> bool:
         return self.state == PostProcessCheckStatus.SUCCESS
@@ -88,9 +89,10 @@ class PostProcessResponseResult:
         self._insert(PostProcessCheckStatus.WARNING, category, message)
         self.warnings += 1
 
-    def error(self, category: PostProcessCheckType, message: str):
+    def error(self, category: PostProcessCheckType, message: str, exception: TestStepError = None):
         '''Adds an error entry that occured when post processing response to results.'''
-        self._insert(PostProcessCheckStatus.ERROR, category, message)
+        self._insert(PostProcessCheckStatus.ERROR,
+                     category, message, exception)
         self.errors += 1
 
     def is_success(self):
@@ -101,8 +103,8 @@ class PostProcessResponseResult:
     def is_failure(self):
         return self.errors != 0
 
-    def _insert(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str):
-        log = PostProcessCheck(state, category, message)
+    def _insert(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str, exception: Exception = None):
+        log = PostProcessCheck(state, category, message, exception)
         self.entries.append(log)
 
 
@@ -376,8 +378,9 @@ class TestStep:
     and saves any variables that might be required but test step that have yet to be executed.
     '''
 
-    def __init__(self, test: _TestStepWithPlaceholders, runtime_config_variable_storage: dict):
+    def __init__(self, test: _TestStepWithPlaceholders, step_index: int, runtime_config_variable_storage: dict):
         self._test = test
+        self._step_index = step_index
         self._runtime_config_variable_storage = runtime_config_variable_storage
         self.arguments = copy.deepcopy(test.arguments_with_placeholders)
         self.responses = copy.deepcopy(test.responses_with_placeholders)
@@ -390,6 +393,10 @@ class TestStep:
                 self._test.event_number)
             test.update_arguments(self.arguments)
             test.update_responses(self.responses)
+
+    @property
+    def step_index(self):
+        return self._step_index
 
     @property
     def is_enabled(self):
@@ -711,11 +718,13 @@ class TestStep:
 
             constraints = get_constraints(value['constraints'])
 
-            if all([constraint.is_met(received_value, response_type_name) for constraint in constraints]):
-                result.success(check_type, error_success)
-            else:
-                # TODO would be helpful to be more verbose here
-                result.error(check_type, error_failure)
+            for constraint in constraints:
+                try:
+                    constraint.validate(received_value, response_type_name)
+                    result.success(check_type, error_success)
+                except TestStepError as e:
+                    e.update_context(expected_response, self.step_index)
+                    result.error(check_type, error_failure, e)
 
     def _maybe_save_as(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.SAVE_AS_VARIABLE
@@ -841,7 +850,8 @@ class YamlTests:
     def __next__(self) -> TestStep:
         if self._index < self.count:
             test = self._tests[self._index]
-            test_step = TestStep(test, self._runtime_config_variable_storage)
+            test_step = TestStep(test, self._index + 1,
+                                 self._runtime_config_variable_storage)
             self._index += 1
             return test_step
 
