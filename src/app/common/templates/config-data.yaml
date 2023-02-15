@@ -27,7 +27,6 @@ WeakEnums:
     - RoutingRole
     - SaturationMoveMode
     - SaturationStepMode
-    - SecurityType
     - StepMode
     - TemperatureDisplayMode
 

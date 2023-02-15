@@ -101,12 +101,12 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiBssId(AttributeValueEncoder & aEnco
 CHIP_ERROR WiFiDiagosticsAttrAccess::ReadSecurityType(AttributeValueEncoder & aEncoder)
 {
     Attributes::SecurityType::TypeInfo::Type securityType;
-    uint8_t value = 0;
+    SecurityTypeEnum value = SecurityTypeEnum::kUnspecified;
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetWiFiSecurityType(value) == CHIP_NO_ERROR)
     {
-        securityType.SetNonNull(static_cast<WiFiNetworkDiagnostics::SecurityType>(value));
-        ChipLogProgress(Zcl, "The current type of Wi-Fi security used: %d", value);
+        securityType.SetNonNull(value);
+        ChipLogProgress(Zcl, "The current type of Wi-Fi security used: %d", to_underlying(value));
     }
     else
     {
@@ -123,7 +123,7 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiVersion(AttributeValueEncoder & aEn
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetWiFiVersion(value) == CHIP_NO_ERROR)
     {
-        version.SetNonNull(static_cast<WiFiNetworkDiagnostics::WiFiVersionType>(value));
+        version.SetNonNull(static_cast<WiFiNetworkDiagnostics::WiFiVersionEnum>(value));
         ChipLogProgress(Zcl, "The current 802.11 standard version in use by the Node: %d", value);
     }
     else
@@ -261,7 +261,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
     {
         ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected");
 
-        Events::AssociationFailure::Type event{ static_cast<AssociationFailureCause>(associationFailureCause), status };
+        Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
@@ -280,7 +280,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
     {
         ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
 
-        Events::ConnectionStatus::Type event{ static_cast<WiFiConnectionStatus>(connectionStatus) };
+        Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
             // If WiFi Network Diagnostics cluster is implemented on this endpoint
