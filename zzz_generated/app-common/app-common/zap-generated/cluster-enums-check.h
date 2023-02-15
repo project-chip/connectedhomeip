@@ -1771,6 +1771,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(IlluminanceMeasurement:
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(OccupancySensing::OccupancySensorTypeEnum val)
+{
+    using EnumType = OccupancySensing::OccupancySensorTypeEnum;
+    switch (val)
+    {
+    case EnumType::kPir:
+    case EnumType::kUltrasonic:
+    case EnumType::kPIRAndUltrasonic:
+    case EnumType::kPhysicalContact:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelStatusEnum val)
 {
     using EnumType = Channel::ChannelStatusEnum;

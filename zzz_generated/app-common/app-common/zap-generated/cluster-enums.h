@@ -2335,7 +2335,36 @@ namespace FlowMeasurement {} // namespace FlowMeasurement
 
 namespace RelativeHumidityMeasurement {} // namespace RelativeHumidityMeasurement
 
-namespace OccupancySensing {} // namespace OccupancySensing
+namespace OccupancySensing {
+
+// Enum for OccupancySensorTypeEnum
+enum class OccupancySensorTypeEnum : uint8_t
+{
+    kPir              = 0x00,
+    kUltrasonic       = 0x01,
+    kPIRAndUltrasonic = 0x02,
+    kPhysicalContact  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for OccupancyBitmap
+enum class OccupancyBitmap : uint8_t
+{
+    kOccupied = 0x1,
+};
+
+// Bitmap for OccupancySensorTypeBitmap
+enum class OccupancySensorTypeBitmap : uint8_t
+{
+    kPir             = 0x1,
+    kUltrasonic      = 0x2,
+    kPhysicalContact = 0x4,
+};
+} // namespace OccupancySensing
 
 namespace WakeOnLan {} // namespace WakeOnLan
 
