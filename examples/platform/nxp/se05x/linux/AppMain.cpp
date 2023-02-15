@@ -361,7 +361,7 @@ struct CommonCaseDeviceServerInitParams_Se05x : public CommonCaseDeviceServerIni
 
 #endif
 
-void ChipLinuxAppMainLoop(AppMainLoopImplementation *impl)
+void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 {
 #ifdef ENABLE_HSM_EC_KEY
     static CommonCaseDeviceServerInitParams_Se05x initParams;
