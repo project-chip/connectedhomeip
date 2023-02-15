@@ -134,7 +134,7 @@ public:
         assertChipStackLockedByCurrentThread();
         if (mNodeId.HasValue() && mFabricIndex.HasValue()) {
             ChipLogProgress(Controller,
-                "Resetting state for OTA Provider; no longer providing an update for node id 0x" ChipLogFormatX64 "fabric index %u",
+                "Resetting state for OTA Provider; no longer providing an update for node id 0x" ChipLogFormatX64 ", fabric index %u",
                 ChipLogValueX64(mNodeId.Value()), mFabricIndex.Value());
         } else {
             ChipLogProgress(Controller, "Resetting state for OTA Provider");
