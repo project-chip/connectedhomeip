@@ -31,7 +31,7 @@
 int ChipLinuxAppInit(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
 
 /**
- * A main loop implementation descripts how an application main loop is to be
+ * A main loop implementation describes how an application main loop is to be
  * run:
  *    - how to execute the main loop
  *    - what to do to stop it (inside a signal handler - CTRL+C is captured
