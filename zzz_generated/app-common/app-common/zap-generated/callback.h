@@ -20,7 +20,6 @@
 // Prevent multiple inclusion
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
