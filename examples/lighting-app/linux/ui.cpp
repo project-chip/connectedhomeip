@@ -367,7 +367,7 @@ void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
 void Init()
 {
     // Init inside the "main" thread, so that it can access globals
-    // proparly (for QR code and such)
+    // properly (for QR code and such)
     gDeviceState.Init();
 }
 
