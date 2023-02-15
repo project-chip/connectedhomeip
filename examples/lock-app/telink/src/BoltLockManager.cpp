@@ -81,8 +81,8 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
 bool BoltLockManager::GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                     EmberAfPluginDoorLockCredentialInfo & credential) const
 {
-    ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetCredential [credentialIndex=%u,credentialType=%u]",
-                    credentialIndex, to_underlying(credentialType));
+    ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetCredential [credentialIndex=%u,credentialType=%u]", credentialIndex,
+                    to_underlying(credentialType));
 
     if (to_underlying(credentialType) >= mCredentials.size())
     {
@@ -114,29 +114,26 @@ bool BoltLockManager::GetCredential(uint16_t credentialIndex, CredentialTypeEnum
     credential.modificationSource = DlAssetSource::kMatterIM;
     credential.lastModifiedBy     = credentialInStorage.modifiedBy;
 
-    ChipLogDetail(Zcl, "Found occupied credential [index=%u,type=%u,dataSize=%u,createdBy=%u,modifiedBy=%u]",
-                  credentialIndex, to_underlying(credential.credentialType),
-                  static_cast<unsigned int>(credential.credentialData.size()), credential.createdBy, credential.lastModifiedBy);
+    ChipLogDetail(Zcl, "Found occupied credential [index=%u,type=%u,dataSize=%u,createdBy=%u,modifiedBy=%u]", credentialIndex,
+                  to_underlying(credential.credentialType), static_cast<unsigned int>(credential.credentialData.size()),
+                  credential.createdBy, credential.lastModifiedBy);
 
     return true;
-
 }
 
 bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
                                     DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                     const ByteSpan & credentialData)
 {
-    ChipLogProgress(
-        Zcl,
-        "Lock App: LockEndpoint::SetCredential "
-        "[credentialIndex=%u,credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%u,modifier=%u]",
-        credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
-        static_cast<unsigned int>(credentialData.size()), creator, modifier);
+    ChipLogProgress(Zcl,
+                    "Lock App: LockEndpoint::SetCredential "
+                    "[credentialIndex=%u,credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%u,modifier=%u]",
+                    credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
+                    static_cast<unsigned int>(credentialData.size()), creator, modifier);
 
     if (to_underlying(credentialType) >= mCredentials.capacity())
     {
-        ChipLogError(Zcl, "Cannot set the credential - type out of range [type=%d]",
-                     to_underlying(credentialType));
+        ChipLogError(Zcl, "Cannot set the credential - type out of range [type=%d]", to_underlying(credentialType));
         return false;
     }
 
@@ -164,9 +161,8 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
     credentialInStorage.credentialDataSize = credentialData.size();
 
-    ChipLogProgress(Zcl, "Successfully set the credential [index=%d,credentialType=%u,creator=%u,modifier=%u]",
-                    credentialIndex, to_underlying(credentialType), credentialInStorage.createdBy,
-                    credentialInStorage.modifiedBy);
+    ChipLogProgress(Zcl, "Successfully set the credential [index=%d,credentialType=%u,creator=%u,modifier=%u]", credentialIndex,
+                    to_underlying(credentialType), credentialInStorage.createdBy, credentialInStorage.modifiedBy);
 
     return true;
 }
@@ -188,8 +184,7 @@ bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationE
 
     if (credential == pinCredentials.end())
     {
-        ChipLogDetail(Zcl,
-                      "Lock App: specified PIN code was not found in the database");
+        ChipLogDetail(Zcl, "Lock App: specified PIN code was not found in the database");
 
         err = OperationErrorEnum::kInvalidCredential;
         return false;
@@ -228,7 +223,7 @@ void BoltLockManager::ActuatorTimerEventHandler(k_timer * timer)
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = static_cast<BoltLockManager *>(k_timer_user_data_get(timer));
-    event.Handler            = (EventHandler)BoltLockManager::ActuatorAppEventHandler;
+    event.Handler            = (EventHandler) BoltLockManager::ActuatorAppEventHandler;
     GetAppTask().PostEvent(&event);
 }
 
