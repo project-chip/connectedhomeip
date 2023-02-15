@@ -25,6 +25,7 @@
 #include <zephyr/kernel.h>
 
 #include <cstdint>
+#include <vector>
 
 // Maximum number of credentials per user supported by lock
 #define CONFIG_LOCK_NUM_CREDENTIALS_PER_USER (2)
@@ -32,6 +33,11 @@
 #define CONFIG_LOCK_NUM_USERS (5)
 // Maximum number of credentials supported by lock
 #define CONFIG_LOCK_NUM_CREDENTIALS (10)
+
+struct LockCredentialInfo;
+
+#define CONFIG_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE (20)
+#define CONFIG_LOCK_CREDENTIAL_INFO_MAX_TYPES (6)
 
 class AppEvent;
 
@@ -77,7 +83,8 @@ public:
     bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
     bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const chip::ByteSpan & secret);
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                       const chip::ByteSpan & credentialData);
 
     bool ValidatePIN(const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err) const;
 
@@ -99,8 +106,16 @@ private:
     UserData mUserData[CONFIG_LOCK_NUM_USERS];
     EmberAfPluginDoorLockUserInfo mUsers[CONFIG_LOCK_NUM_USERS] = {};
 
-    CredentialData mCredentialData[CONFIG_LOCK_NUM_CREDENTIALS];
-    EmberAfPluginDoorLockCredentialInfo mCredentials[CONFIG_LOCK_NUM_CREDENTIALS] = {};
+    struct LockCredentialInfo
+    {
+        DlCredentialStatus status;
+        CredentialTypeEnum credentialType;
+        chip::FabricIndex createdBy;
+        chip::FabricIndex modifiedBy;
+        uint8_t credentialData[CONFIG_LOCK_CREDENTIAL_INFO_MAX_TYPES];
+        size_t credentialDataSize;
+    };
+    std::vector<std::vector<LockCredentialInfo>> mCredentials;
 
     static BoltLockManager sLock;
 };
