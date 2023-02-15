@@ -2138,7 +2138,6 @@ endpoint 0 {
   }
 
   server cluster SoftwareDiagnostics {
-    emits event SoftwareFault;
     callback attribute threadMetrics;
     callback attribute currentHeapFree;
     callback attribute currentHeapUsed;
@@ -2148,8 +2147,6 @@ endpoint 0 {
   }
 
   server cluster ThreadNetworkDiagnostics {
-    emits event ConnectionStatus;
-    emits event NetworkFaultChange;
     callback attribute channel;
     callback attribute routingRole;
     callback attribute networkName;
