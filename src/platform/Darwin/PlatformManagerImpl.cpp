@@ -109,7 +109,11 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
                 dispatch_suspend(mWorkQueue);
                 mIsWorkQueueSuspended         = true;
                 mIsWorkQueueSuspensionPending = false;
-                dispatch_semaphore_signal(mRunLoopSem);
+
+                // only dispatch if event loop not already stopped
+                if (mRunLoopSem != nullptr) {
+                    dispatch_semaphore_signal(mRunLoopSem);
+                }
             });
         }
     }

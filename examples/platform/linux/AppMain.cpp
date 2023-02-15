@@ -331,7 +331,7 @@ exit:
     return 0;
 }
 
-void ChipLinuxAppMainLoop()
+void ChipLinuxAppMainLoop(void(*mainLoop)()) 
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
@@ -406,7 +406,12 @@ void ChipLinuxAppMainLoop()
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);
 #endif // !defined(ENABLE_CHIP_SHELL)
-    DeviceLayer::PlatformMgr().RunEventLoop();
+
+    if (mainLoop != nullptr) {
+        mainLoop();
+    } else {
+        DeviceLayer::PlatformMgr().RunEventLoop();
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ShutdownCommissioner();

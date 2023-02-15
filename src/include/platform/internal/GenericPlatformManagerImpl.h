@@ -64,6 +64,7 @@ protected:
     CHIP_ERROR _StartBackgroundEventLoopTask(void);
     CHIP_ERROR _StopBackgroundEventLoopTask();
     void _DispatchEvent(const ChipDeviceEvent * event);
+    bool _IsServerRunning() const { return mServerStarted; }
 
     // ===== Support methods that can be overridden by the implementation subclass.
 
@@ -72,7 +73,8 @@ protected:
     static void HandleMessageLayerActivityChanged(bool messageLayerIsActive);
 
 private:
-    bool mMsgLayerWasActive;
+    bool mMsgLayerWasActive = false;
+    bool mServerStarted = false;
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };

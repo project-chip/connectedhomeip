@@ -290,6 +290,11 @@ void DeviceState::ChipLoopUpdateCallback(intptr_t self)
 
 void DeviceState::UpdateState()
 {
+    if (!chip::DeviceLayer::PlatformMgr().IsServerRunning()) {
+        gUiRunning = false; // main loop stopped, stop UI as well
+        return;
+    }
+
     chip::DeviceLayer::PlatformMgr().ScheduleWork(&ChipLoopUpdateCallback, reinterpret_cast<intptr_t>(this));
     // ensure update is done when existing
     if (sem_trywait(&mChipLoopWaitSemaphore) != 0)
@@ -312,15 +317,11 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     }
 
 #if defined(__APPLE__)
-    // GL 3.2 Core + GLSL 150
-    constexpr const char *kGlVersion = "#version 150";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #else
-    // GL 3.0 + GLSL 130
-    constexpr const char *kGlVersion = "#version 130";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -353,7 +354,7 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(*window, *gl_context);
-    ImGui_ImplOpenGL3_Init(kGlVersion);
+    ImGui_ImplOpenGL3_Init();
 }
 
 void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
@@ -367,8 +368,22 @@ void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_Quit();
 }
 
-void UiLoop()
+void DispatchChipShutDown(intptr_t) 
 {
+    chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
+}
+
+} // namespace
+
+void Init() {
+    // Init inside the "main" thread, so that it can access globals
+    // proparly (for QR code and such)
+    gDeviceState.Init();
+}
+
+void EventLoop()
+{
+    gUiRunning = true;
     SDL_GLContext gl_context;
     SDL_Window * window = nullptr;
 
@@ -382,14 +397,11 @@ void UiLoop()
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT)
+            if ((event.type == SDL_QUIT) ||
+                (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                event.window.windowID == SDL_GetWindowID(window)))
             {
-                chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
-            }
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                event.window.windowID == SDL_GetWindowID(window))
-            {
-                chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
+                chip::DeviceLayer::PlatformMgr().ScheduleWork(&DispatchChipShutDown, 0);
             }
         }
 
@@ -414,25 +426,9 @@ void UiLoop()
     ChipLogProgress(AppServer, "UI thread Stopped...");
 }
 
-static std::thread gUiThread;
-
-} // namespace
-
-void Start()
-{
-    // Init inside the "main" thread, so that it can access globals
-    // proparly (for QR code and such)
-    gDeviceState.Init();
-
-    gUiRunning = true;
-    std::thread uiThread(&UiLoop);
-    gUiThread.swap(uiThread);
-}
-
 void Stop()
 {
     gUiRunning = false;
-    gUiThread.join();
 }
 
 } // namespace Ui

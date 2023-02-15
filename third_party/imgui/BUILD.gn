@@ -28,10 +28,8 @@ config("imgui_config") {
     include_dirs += [ "/usr/local/include/SDL2" ]
     defines += [ "_THREAD_SAFE" ]
     ldflags = [
-      "-framework",
-      "OpenGL",
-      "-framework",
-      "CoreFoundation",
+     "-framework",
+     "OpenGL",
     ]
   } else {
     # Linux defaults
@@ -64,12 +62,11 @@ source_set("imgui") {
   ]
 
   # FUTURE: SDL2 libs should be from `sdl2-config --libs`
-  libs = [ "SDL2" ]
+  libs = [ "SDL2", "dl" ]
 
   if (current_os == "linux") {
     libs += [
       "GL",
-      "dl",
     ]
   }
 

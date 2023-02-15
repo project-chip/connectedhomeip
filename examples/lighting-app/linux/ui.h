@@ -20,9 +20,16 @@
 namespace example {
 namespace Ui {
 
-void Start();
+// MUST be called from within the main thread, to access CHIP global
+// data
+void Init();
 
-void Stop();
+// MAC requires this to be run from the main event loop. Linux supports
+// running this from a thread
+void EventLoop();
+
+// Flags the UI Event loop to stop
+void StopEventLoop();
 
 } // namespace Ui
 } // namespace example

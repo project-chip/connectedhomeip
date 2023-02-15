@@ -77,6 +77,22 @@ void ApplicationInit()
 #endif
 }
 
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+void UiEventLoop() {
+    // Guaranteed to be on the main task (no chip event loop started yet)
+    example::Ui::Init();
+
+    // Platform event loop will be on a separate thread,
+    // while the event UI loop will be on the main thread.
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask(); 
+
+    // TODO: catch main loop stop and stop UI event loop.
+
+    example::Ui::EventLoop();
+}
+
+#endif
+
 int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)
@@ -87,14 +103,12 @@ int main(int argc, char * argv[])
     LightingMgr().Init();
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-    example::Ui::Start();
-#endif
-
+    ChipLinuxAppMainLoop(&UiEventLoop);
+#else
     ChipLinuxAppMainLoop();
-
-#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-    example::Ui::Stop();
 #endif
+
+
 
     return 0;
 }

@@ -28,7 +28,15 @@
 #include "Options.h"
 
 int ChipLinuxAppInit(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
-void ChipLinuxAppMainLoop();
+
+/**
+ * Start up the Linux app and use the provided main loop for event processing.
+ * If not specified, it will use `DeviceLayer::PlatformMgr().RunEventLoop();`
+ * 
+ * The event loop is assumed to have some form of RunEventLoop or chip main task
+ * manangement.
+ */
+void ChipLinuxAppMainLoop(void(*mainLoop)() = nullptr);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
