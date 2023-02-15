@@ -13,13 +13,7 @@ import chip.devicecontroller.OpenCommissioningCallback
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import kotlinx.android.synthetic.main.multi_admin_client_fragment.discriminatorEd
-import kotlinx.android.synthetic.main.multi_admin_client_fragment.timeoutEd
-import kotlinx.android.synthetic.main.multi_admin_client_fragment.multiAdminClusterCommandStatus
-import kotlinx.android.synthetic.main.multi_admin_client_fragment.setupPinCodeEd
-import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.basicCommissioningMethodBtn
-import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.enhancedCommissioningMethodBtn
-import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.revokeBtn
+import com.google.chip.chiptool.databinding.MultiAdminClientFragmentBinding
 import kotlinx.coroutines.*
 
 class MultiAdminClientFragment : Fragment() {
@@ -30,23 +24,27 @@ class MultiAdminClientFragment : Fragment() {
 
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
+  private var _binding: MultiAdminClientFragmentBinding? = null
+  private val binding get() = _binding!!
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    _binding = MultiAdminClientFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
 
-    return inflater.inflate(R.layout.multi_admin_client_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+    deviceController.setCompletionListener(ChipControllerCallback())
 
-      addressUpdateFragment =
-        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+    addressUpdateFragment =
+      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-      basicCommissioningMethodBtn.setOnClickListener { scope.launch { sendBasicCommissioningCommandClick() } }
-      enhancedCommissioningMethodBtn.setOnClickListener { scope.launch { sendEnhancedCommissioningCommandClick() } }
-      revokeBtn.setOnClickListener { scope.launch { sendRevokeCommandClick() } }
-    }
+    binding.basicCommissioningMethodBtn.setOnClickListener { scope.launch { sendBasicCommissioningCommandClick() } }
+    binding.enhancedCommissioningMethodBtn.setOnClickListener { scope.launch { sendEnhancedCommissioningCommandClick() } }
+    binding.revokeBtn.setOnClickListener { scope.launch { sendRevokeCommandClick() } }
+
+    return binding.root
   }
 
   override fun onStart() {
@@ -55,9 +53,14 @@ class MultiAdminClientFragment : Fragment() {
     val testDiscriminator = "3840"
     val testSetupPinCode = 20202021L
     val testDuration = 180
-    discriminatorEd.setText(testDiscriminator)
-    setupPinCodeEd.setText(testSetupPinCode.toString())
-    timeoutEd.setText(testDuration.toString())
+    binding.discriminatorEd.setText(testDiscriminator)
+    binding.setupPinCodeEd.setText(testSetupPinCode.toString())
+    binding.timeoutEd.setText(testDuration.toString())
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -81,7 +84,7 @@ class MultiAdminClientFragment : Fragment() {
   }
 
   private suspend fun sendBasicCommissioningCommandClick() {
-    val testDuration = timeoutEd.text.toString().toInt()
+    val testDuration = binding.timeoutEd.text.toString().toInt()
     deviceController.openPairingWindowCallback(
       ChipClient.getConnectedDevicePointer(
         requireContext(),
@@ -100,13 +103,13 @@ class MultiAdminClientFragment : Fragment() {
   }
 
   private suspend fun sendEnhancedCommissioningCommandClick() {
-    val testDuration = timeoutEd.text.toString().toInt()
+    val testDuration = binding.timeoutEd.text.toString().toInt()
     val testIteration = 1000
     val devicePointer =
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
     deviceController.openPairingWindowWithPINCallback(
       devicePointer, testDuration, testIteration.toLong(),
-      discriminatorEd.text.toString().toInt(), setupPinCodeEd.text.toString().toULong().toLong(),
+      binding.discriminatorEd.text.toString().toInt(), binding.setupPinCodeEd.text.toString().toULong().toLong(),
       object:OpenCommissioningCallback {
         override fun onError(status: Int, deviceId: Long) {
           showMessage("OpenCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
@@ -141,7 +144,7 @@ class MultiAdminClientFragment : Fragment() {
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
-      multiAdminClusterCommandStatus.text = msg
+      binding.multiAdminClusterCommandStatus.text = msg
     }
   }
 

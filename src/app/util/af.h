@@ -106,11 +106,6 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-// For now, just define emberAfWriteServerAttribute to emberAfWriteAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfWriteServerAttribute emberAfWriteAttribute
-
 /**
  * @brief Read the attribute value, performing all the checks.
  *
@@ -519,19 +514,6 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
  * sending the response.
  */
 EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status);
-
-/**
- * @brief Sends a default response to a cluster command using the
- * current command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
 
 /**
  * @brief Access to client API APS frame.

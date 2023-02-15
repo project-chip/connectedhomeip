@@ -14388,10 +14388,18 @@ void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
         response.logContent = [NSData dataWithBytes:data.logContent.data() length:data.logContent.size()];
     }
     {
-        response.utcTimeStamp = [NSNumber numberWithUnsignedInt:data.UTCTimeStamp];
+        if (data.UTCTimeStamp.HasValue()) {
+            response.utcTimeStamp = [NSNumber numberWithUnsignedLongLong:data.UTCTimeStamp.Value()];
+        } else {
+            response.utcTimeStamp = nil;
+        }
     }
     {
-        response.timeSinceBoot = [NSNumber numberWithUnsignedInt:data.timeSinceBoot];
+        if (data.timeSinceBoot.HasValue()) {
+            response.timeSinceBoot = [NSNumber numberWithUnsignedLongLong:data.timeSinceBoot.Value()];
+        } else {
+            response.timeSinceBoot = nil;
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -17387,15 +17395,15 @@ void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscription
     }
 }
 
-void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsIntent value)
+void MTRDiagnosticLogsClusterIntentEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::IntentEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDiagnosticLogsClusterIntentEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17410,8 +17418,8 @@ void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsIntent> & value)
+void MTRNullableDiagnosticLogsClusterIntentEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::IntentEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17422,7 +17430,7 @@ void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDiagnosticLogsClusterIntentEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17437,15 +17445,15 @@ void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsStatus value)
+void MTRDiagnosticLogsClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDiagnosticLogsClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17460,8 +17468,8 @@ void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsStatus> & value)
+void MTRNullableDiagnosticLogsClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17472,7 +17480,7 @@ void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDiagnosticLogsClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17487,15 +17495,15 @@ void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol value)
+void MTRDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17510,8 +17518,8 @@ void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol> & value)
+void MTRNullableDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17522,7 +17530,7 @@ void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

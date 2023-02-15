@@ -74,6 +74,11 @@ void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * cr
     commands_list clusterCommands = {
         make_unique<Resolve>(credsIssuerConfig),
         make_unique<DiscoverCommissionablesCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByShortDiscriminatorCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByLongDiscriminatorCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByCommissioningModeCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByVendorIdCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByDeviceTypeCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };
 

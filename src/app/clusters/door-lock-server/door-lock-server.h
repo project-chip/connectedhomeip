@@ -30,6 +30,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
 #define DOOR_LOCK_SERVER_ENDPOINT 1
@@ -219,10 +220,11 @@ private:
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
                              const Nullable<CredentialRuleEnum> & credentialRule);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
-                            uint16_t userIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
-                            uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
+                                                        chip::NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
+                                                        chip::NodeId sourceNodeId, uint16_t userIndex,
+                                                        const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
 
     bool clearFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
@@ -252,11 +254,13 @@ private:
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
                               uint16_t userIndex, const Nullable<UserStatusEnum> & userStatus, Nullable<UserTypeEnum> userType);
 
-    EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
-                                  CredentialTypeEnum credentialType, uint16_t credentialIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId);
-    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
-                                   CredentialTypeEnum credentialType);
+    chip::Protocols::InteractionModel::Status clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                              chip::NodeId sourceNodeId, CredentialTypeEnum credentialType,
+                                                              uint16_t credentialIndex, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                               chip::NodeId sourceNodeId);
+    chip::Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                               chip::NodeId sourceNodeId, CredentialTypeEnum credentialType);
 
     bool clearFabricFromCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
                                     chip::FabricIndex fabricToRemove);

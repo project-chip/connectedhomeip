@@ -23,7 +23,7 @@ using namespace chip;
 bool emberAfGroupsClusterAddGroupResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId)
 {
     emberAfGroupsClusterPrintln("RX: AddGroupResponse 0x%x, 0x%2x", status, groupId);
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 
@@ -33,7 +33,7 @@ bool emberAfGroupsClusterViewGroupResponseCallback(app::CommandHandler * command
     emberAfGroupsClusterPrint("RX: ViewGroupResponse 0x%x, 0x%2x, \"", status, groupId);
     emberAfGroupsClusterPrintString(groupName);
     emberAfGroupsClusterPrintln("\"");
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 
@@ -47,13 +47,13 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(app::CommandHandler 
         emberAfGroupsClusterPrint(" [0x%2x]", emberAfGetInt16u(groupList + (i << 1), 0, 2));
     }
     emberAfGroupsClusterPrintln("%s", "");
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 
 bool emberAfGroupsClusterRemoveGroupResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId)
 {
     emberAfGroupsClusterPrintln("RX: RemoveGroupResponse 0x%x, 0x%2x", status, groupId);
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }

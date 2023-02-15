@@ -8042,8 +8042,8 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
  * @brief Diagnostic Logs Cluster RetrieveLogsResponse Command callback (from server)
  */
 bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t Status, chip::ByteSpan LogContent, uint32_t UTCTimeStamp,
-                                                              uint32_t TimeSinceBoot);
+                                                              uint8_t Status, chip::ByteSpan LogContent, uint64_t UTCTimeStamp,
+                                                              uint64_t TimeSinceBoot);
 /**
  * @brief General Diagnostics Cluster TestEventTrigger Command callback (from client)
  */

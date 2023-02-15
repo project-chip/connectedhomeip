@@ -25,6 +25,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/error-mapping.h>
 #include <app/util/util.h>
 
 #include <app/reporting/reporting.h>
@@ -50,6 +51,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LevelControl;
+using chip::Protocols::InteractionModel::Status;
 
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint);
@@ -99,18 +101,19 @@ static EmberAfLevelControlState stateTable[kLevelControlStateTableSize];
 
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
-static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
-                                        app::DataModel::Nullable<uint16_t> transitionTimeDs,
-                                        chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride, uint16_t storedLevel);
-static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMode, app::DataModel::Nullable<uint8_t> rate,
+static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
+                                 app::DataModel::Nullable<uint16_t> transitionTimeDs,
+                                 chip::Optional<BitMask<LevelControlOptions>> optionsMask,
+                                 chip::Optional<BitMask<LevelControlOptions>> optionsOverride, uint16_t storedLevel);
+static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint8_t moveMode,
+                        app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<LevelControlOptions>> optionsMask,
+                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
+static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint8_t stepMode,
+                        uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
                         chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
-static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMode, uint8_t stepSize,
-                        app::DataModel::Nullable<uint16_t> transitionTimeDs,
+static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                         chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
-static void stopHandler(EndpointId endpoint, CommandId commandId, chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
 
 static void setOnOffValue(EndpointId endpoint, bool onOff);
@@ -459,12 +462,12 @@ bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * command
                                           optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    EmberAfStatus status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevel::Id, level, transitionTime,
-                                              Optional<BitMask<LevelControlOptions>>(optionsMask),
-                                              Optional<BitMask<LevelControlOptions>>(optionsOverride),
-                                              INVALID_STORED_LEVEL); // Don't revert to the stored level
+    Status status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevel::Id, level, transitionTime,
+                                       Optional<BitMask<LevelControlOptions>>(optionsMask),
+                                       Optional<BitMask<LevelControlOptions>>(optionsOverride),
+                                       INVALID_STORED_LEVEL); // Don't revert to the stored level
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
 
     return true;
 }
@@ -489,12 +492,12 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
                                           transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    EmberAfStatus status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
-                                              Optional<BitMask<LevelControlOptions>>(optionsMask),
-                                              Optional<BitMask<LevelControlOptions>>(optionsOverride),
-                                              INVALID_STORED_LEVEL); // Don't revert to the stored level
+    Status status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
+                                       Optional<BitMask<LevelControlOptions>>(optionsMask),
+                                       Optional<BitMask<LevelControlOptions>>(optionsOverride),
+                                       INVALID_STORED_LEVEL); // Don't revert to the stored level
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
 
     return true;
 }
@@ -518,7 +521,7 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
                                           optionsOverride.Raw());
     }
 
-    moveHandler(commandPath.mEndpointId, Commands::Move::Id, moveMode, rate, Optional<BitMask<LevelControlOptions>>(optionsMask),
+    moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<LevelControlOptions>>(optionsMask),
                 Optional<BitMask<LevelControlOptions>>(optionsOverride));
     return true;
 }
@@ -542,8 +545,8 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
                                           optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    moveHandler(commandPath.mEndpointId, Commands::MoveWithOnOff::Id, moveMode, rate,
-                Optional<BitMask<LevelControlOptions>>(optionsMask), Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<LevelControlOptions>>(optionsMask),
+                Optional<BitMask<LevelControlOptions>>(optionsOverride));
     return true;
 }
 
@@ -567,8 +570,8 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
                                           transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    stepHandler(commandPath.mEndpointId, Commands::Step::Id, stepMode, stepSize, transitionTime,
-                Optional<BitMask<LevelControlOptions>>(optionsMask), Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<LevelControlOptions>>(optionsMask),
+                Optional<BitMask<LevelControlOptions>>(optionsOverride));
     return true;
 }
 
@@ -592,8 +595,8 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
                                           transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    stepHandler(commandPath.mEndpointId, Commands::StepWithOnOff::Id, stepMode, stepSize, transitionTime,
-                Optional<BitMask<LevelControlOptions>>(optionsMask), Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<LevelControlOptions>>(optionsMask),
+                Optional<BitMask<LevelControlOptions>>(optionsOverride));
     return true;
 }
 
@@ -604,7 +607,7 @@ bool emberAfLevelControlClusterStopCallback(app::CommandHandler * commandObj, co
     auto & optionsOverride = commandData.optionsOverride;
 
     emberAfLevelControlClusterPrintln("%s STOP", "RX level-control:");
-    stopHandler(commandPath.mEndpointId, Commands::Stop::Id, Optional<BitMask<LevelControlOptions>>(optionsMask),
+    stopHandler(commandObj, commandPath, Optional<BitMask<LevelControlOptions>>(optionsMask),
                 Optional<BitMask<LevelControlOptions>>(optionsOverride));
     return true;
 }
@@ -615,50 +618,49 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * comma
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
     emberAfLevelControlClusterPrintln("%s STOP_WITH_ON_OFF", "RX level-control:");
-    stopHandler(commandPath.mEndpointId, Commands::StopWithOnOff::Id, Optional<BitMask<LevelControlOptions>>(optionsMask),
+    stopHandler(commandObj, commandPath, Optional<BitMask<LevelControlOptions>>(optionsMask),
                 Optional<BitMask<LevelControlOptions>>(optionsOverride));
     return true;
 }
 
-static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
-                                        app::DataModel::Nullable<uint16_t> transitionTimeDs,
-                                        chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride, uint16_t storedLevel)
+static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
+                                 app::DataModel::Nullable<uint16_t> transitionTimeDs,
+                                 chip::Optional<BitMask<LevelControlOptions>> optionsMask,
+                                 chip::Optional<BitMask<LevelControlOptions>> optionsOverride, uint16_t storedLevel)
 {
     EmberAfLevelControlState * state = getState(endpoint);
-    EmberAfStatus status;
     app::DataModel::Nullable<uint8_t> currentLevel;
     uint8_t actualStepSize;
 
     if (state == nullptr)
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Status::Failure;
     }
 
     if (level > EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL)
     {
-        return EMBER_ZCL_STATUS_INVALID_COMMAND;
+        return Status::InvalidCommand;
     }
 
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return Status::Success;
     }
 
     // Cancel any currently active command before fiddling with the state.
     deactivate(endpoint);
 
-    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
+    EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
-        return status;
+        return app::ToInteractionModelStatus(status);
     }
 
     if (currentLevel.IsNull())
     {
         emberAfLevelControlClusterPrintln("ERR: Current Level is null");
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Status::Failure;
     }
 
     state->commandId = commandId;
@@ -690,7 +692,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
         }
         if (currentLevel.Value() == state->moveToLevel)
         {
-            return EMBER_ZCL_STATUS_SUCCESS;
+            return Status::Success;
         }
         state->increasing = true;
         actualStepSize    = static_cast<uint8_t>(state->moveToLevel - currentLevel.Value());
@@ -717,7 +719,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
                 emberAfLevelControlClusterPrintln("ERR: reading on/off transition time %x", status);
-                return status;
+                return app::ToInteractionModelStatus(status);
             }
 
             // Transition time comes in (or is stored, in the case of On/Off Transition
@@ -759,7 +761,6 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
-    status = EMBER_ZCL_STATUS_SUCCESS;
 
 #ifdef EMBER_AF_PLUGIN_ON_OFF
     // Check that the received MoveToLevelWithOnOff produces a On action and that the onoff support the lighting featuremap
@@ -770,44 +771,47 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     }
 #endif // EMBER_AF_PLUGIN_ON_OFF
 
-    return status;
+    return Status::Success;
 }
 
-static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMode, app::DataModel::Nullable<uint8_t> rate,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsMask,
+static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint8_t moveMode,
+                        app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+    CommandId commandId = commandPath.mCommandId;
+
     EmberAfLevelControlState * state = getState(endpoint);
-    EmberAfStatus status;
+    Status status;
     app::DataModel::Nullable<uint8_t> currentLevel;
     uint8_t difference;
 
     if (state == nullptr)
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
         goto send_default_response;
     }
 
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
-        status = EMBER_ZCL_STATUS_SUCCESS;
+        status = Status::Success;
         goto send_default_response;
     }
 
     // Cancel any currently active command before fiddling with the state.
     deactivate(endpoint);
 
-    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
+    if (status != Status::Success)
     {
-        emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+        emberAfLevelControlClusterPrintln("ERR: reading current level %x", to_underlying(status));
         goto send_default_response;
     }
 
     if (currentLevel.IsNull())
     {
         emberAfLevelControlClusterPrintln("ERR: Current Level is null");
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
 
         goto send_default_response;
     }
@@ -829,7 +833,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
         difference         = static_cast<uint8_t>(currentLevel.Value() - state->minLevel);
         break;
     default:
-        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
+        status = Status::InvalidCommand;
         goto send_default_response;
     }
 
@@ -845,7 +849,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
         }
         if (currentLevel.Value() == state->moveToLevel)
         {
-            status = EMBER_ZCL_STATUS_SUCCESS;
+            status = Status::Success;
             goto send_default_response;
         }
     }
@@ -856,10 +860,10 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     if (rate.IsNull())
     {
         app::DataModel::Nullable<uint8_t> defaultMoveRate;
-        status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
-        if (status != EMBER_ZCL_STATUS_SUCCESS || defaultMoveRate.IsNull())
+        status = app::ToInteractionModelStatus(Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate));
+        if (status != Status::Success || defaultMoveRate.IsNull())
         {
-            emberAfLevelControlClusterPrintln("ERR: reading default move rate %x", status);
+            emberAfLevelControlClusterPrintln("ERR: reading default move rate %x", to_underlying(status));
             state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
         }
         else
@@ -867,7 +871,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
             // nonsensical case, means "don't move", so we're done
             if (defaultMoveRate.Value() == 0)
             {
-                status = EMBER_ZCL_STATUS_SUCCESS;
+                status = Status::Success;
                 goto send_default_response;
             }
             state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate.Value();
@@ -894,48 +898,51 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
-    status = EMBER_ZCL_STATUS_SUCCESS;
+    status = Status::Success;
 
 send_default_response:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
 }
 
-static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMode, uint8_t stepSize,
-                        app::DataModel::Nullable<uint16_t> transitionTimeDs,
+static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint8_t stepMode,
+                        uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
                         chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+    CommandId commandId = commandPath.mCommandId;
+
     EmberAfLevelControlState * state = getState(endpoint);
-    EmberAfStatus status;
+    Status status;
     app::DataModel::Nullable<uint8_t> currentLevel;
     uint8_t actualStepSize = stepSize;
 
     if (state == nullptr)
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
         goto send_default_response;
     }
 
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
-        status = EMBER_ZCL_STATUS_SUCCESS;
+        status = Status::Success;
         goto send_default_response;
     }
 
     // Cancel any currently active command before fiddling with the state.
     deactivate(endpoint);
 
-    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
+    if (status != Status::Success)
     {
-        emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+        emberAfLevelControlClusterPrintln("ERR: reading current level %x", to_underlying(status));
         goto send_default_response;
     }
 
     if (currentLevel.IsNull())
     {
         emberAfLevelControlClusterPrintln("ERR: Current Level is null");
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
 
         goto send_default_response;
     }
@@ -971,7 +978,7 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
         }
         break;
     default:
-        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
+        status = Status::InvalidCommand;
         goto send_default_response;
     }
 
@@ -987,7 +994,7 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
         }
         if (currentLevel.Value() == state->moveToLevel)
         {
-            status = EMBER_ZCL_STATUS_SUCCESS;
+            status = Status::Success;
             goto send_default_response;
         }
     }
@@ -1031,37 +1038,41 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
-    status = EMBER_ZCL_STATUS_SUCCESS;
+    status = Status::Success;
 
 send_default_response:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
 }
 
-static void stopHandler(EndpointId endpoint, CommandId commandId, chip::Optional<BitMask<LevelControlOptions>> optionsMask,
+static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                        chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+    CommandId commandId = commandPath.mCommandId;
+
     EmberAfLevelControlState * state = getState(endpoint);
-    EmberAfStatus status;
+    Status status;
 
     if (state == nullptr)
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
         goto send_default_response;
     }
 
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
-        status = EMBER_ZCL_STATUS_SUCCESS;
+        status = Status::Success;
         goto send_default_response;
     }
 
     // Cancel any currently active command.
     deactivate(endpoint);
     writeRemainingTime(endpoint, 0);
-    status = EMBER_ZCL_STATUS_SUCCESS;
+    status = Status::Success;
 
 send_default_response:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
 }
 
 // Follows 07-5123-04 (ZigBee Cluster Library doc), section 3.10.2.1.1.

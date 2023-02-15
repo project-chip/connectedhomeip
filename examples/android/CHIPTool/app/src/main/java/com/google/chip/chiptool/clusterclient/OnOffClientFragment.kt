@@ -18,18 +18,10 @@ import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.databinding.OnOffClientFragmentBinding
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import kotlinx.android.synthetic.main.on_off_client_fragment.commandStatusTv
-import kotlinx.android.synthetic.main.on_off_client_fragment.levelBar
-import kotlinx.android.synthetic.main.on_off_client_fragment.reportStatusTv
-import kotlinx.android.synthetic.main.on_off_client_fragment.view.levelBar
-import kotlinx.android.synthetic.main.on_off_client_fragment.view.offBtn
-import kotlinx.android.synthetic.main.on_off_client_fragment.view.onBtn
-import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
-import kotlinx.android.synthetic.main.on_off_client_fragment.view.showSubscribeDialogBtn
-import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -41,43 +33,52 @@ class OnOffClientFragment : Fragment() {
 
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
+  private var _binding: OnOffClientFragmentBinding? = null
+  private val binding get() = _binding!!
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    _binding = OnOffClientFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
 
-    return inflater.inflate(R.layout.on_off_client_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+    deviceController.setCompletionListener(ChipControllerCallback())
 
-      addressUpdateFragment =
-        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+    addressUpdateFragment =
+      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-      onBtn.setOnClickListener { scope.launch { sendOnCommandClick() } }
-      offBtn.setOnClickListener { scope.launch { sendOffCommandClick() } }
-      toggleBtn.setOnClickListener { scope.launch { sendToggleCommandClick() } }
-      readBtn.setOnClickListener { scope.launch { sendReadOnOffClick() } }
-      showSubscribeDialogBtn.setOnClickListener { showSubscribeDialog() }
+    binding.onBtn.setOnClickListener { scope.launch { sendOnCommandClick() } }
+    binding.offBtn.setOnClickListener { scope.launch { sendOffCommandClick() } }
+    binding.toggleBtn.setOnClickListener { scope.launch { sendToggleCommandClick() } }
+    binding.readBtn.setOnClickListener { scope.launch { sendReadOnOffClick() } }
+    binding.showSubscribeDialogBtn.setOnClickListener { showSubscribeDialog() }
 
-      levelBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+    binding.levelBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+      override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
 
-        }
+      }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        }
+      override fun onStartTrackingTouch(seekBar: SeekBar?) {
+      }
 
-        override fun onStopTrackingTouch(seekBar: SeekBar?) {
-          Toast.makeText(
-            requireContext(),
-            "Level is: " + levelBar.progress,
-            Toast.LENGTH_SHORT
-          ).show()
-          scope.launch { sendLevelCommandClick() }
-        }
-      })
-    }
+      override fun onStopTrackingTouch(seekBar: SeekBar?) {
+        Toast.makeText(
+          requireContext(),
+          "Level is: " + binding.levelBar.progress,
+          Toast.LENGTH_SHORT
+        ).show()
+        scope.launch { sendLevelCommandClick() }
+      }
+    })
+
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   private suspend fun sendReadOnOffClick() {
@@ -177,7 +178,7 @@ class OnOffClientFragment : Fragment() {
         Log.e(TAG, "MoveToLevel command failure", ex)
       }
 
-    }, levelBar.progress, 0, 0, 0)
+    }, binding.levelBar.progress, 0, 0, 0)
   }
 
   private suspend fun sendOnCommandClick() {
@@ -229,13 +230,13 @@ class OnOffClientFragment : Fragment() {
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
-      commandStatusTv.text = msg
+      binding.commandStatusTv.text = msg
     }
   }
 
   private fun showReportMessage(msg: String) {
     requireActivity().runOnUiThread {
-      reportStatusTv.text = msg
+      binding.reportStatusTv.text = msg
     }
   }
 
