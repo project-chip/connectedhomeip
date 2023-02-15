@@ -55,6 +55,7 @@ static constexpr size_t kApplicationLauncherDelegateTableSize =
 using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
 using chip::app::Clusters::ApplicationLauncher::Delegate;
 using ApplicationStatusEnum = app::Clusters::ApplicationBasic::ApplicationStatusEnum;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -301,7 +302,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfApplicationLauncherClusterLaunchAppCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        command->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -390,7 +391,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        command->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -475,7 +476,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        command->AddStatus(commandPath, Status::Failure);
     }
 
     return true;

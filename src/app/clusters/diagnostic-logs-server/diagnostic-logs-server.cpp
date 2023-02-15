@@ -111,9 +111,7 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType & commandData)
 {
-    // TODO: Shouldn't the default "no-op" impl return some sort of error?
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
     return true;
 }
 

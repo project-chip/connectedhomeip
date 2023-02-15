@@ -334,11 +334,6 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status)
-{
-    return emberAfSendDefaultResponse(emberAfCurrentCommand(), status);
-}
-
 EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status)
 {
     // Default Response commands are only sent in response to unicast commands.

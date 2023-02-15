@@ -41,6 +41,7 @@ using namespace chip::app::Clusters::AccountLogin;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::app::Clusters::AccountLogin::Delegate;
+using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kAccountLoginDeletageTableSize =
     EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -125,7 +126,7 @@ exit:
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterGetSetupPINCallback error: %s", err.AsString());
 
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        command->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -136,7 +137,7 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     EndpointId endpoint          = commandPath.mEndpointId;
-    EmberAfStatus status         = EMBER_ZCL_STATUS_SUCCESS;
+    Status status                = Status::Success;
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
     auto & setupPin              = commandData.setupPIN;
 
@@ -145,42 +146,42 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
 
     if (!delegate->HandleLogin(tempAccountIdentifier, setupPin))
     {
-        status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
+        status = Status::UnsupportedAccess;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterLoginCallback error: %s", err.AsString());
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
-    emberAfSendImmediateDefaultResponse(status);
+    command->AddStatus(commandPath, status);
     return true;
 }
 
 bool emberAfAccountLoginClusterLogoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::Logout::DecodableType & commandData)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    EndpointId endpoint  = commandPath.mEndpointId;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (!delegate->HandleLogout())
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterLogoutCallback error: %s", err.AsString());
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
