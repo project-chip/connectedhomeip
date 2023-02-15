@@ -42,7 +42,7 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
 {
     HandleCommand<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType>(
         handlerContext, [&](auto & _u, auto & payload) {
-            if (payload.requestedProtocol == chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol::kUnknownEnumValue)
+            if (payload.requestedProtocol == chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum::kUnknownEnumValue)
             {
                 handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
                                                          chip::Protocols::InteractionModel::Status::InvalidCommand);
@@ -51,11 +51,11 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
 
             switch (payload.intent)
             {
-            case chip::app::Clusters::DiagnosticLogs::LogsIntent::kEndUserSupport: {
+            case chip::app::Clusters::DiagnosticLogs::IntentEnum::kEndUserSupport: {
                 chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::Type response;
                 if (mBuffer.IsEmpty())
                 {
-                    response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
+                    response.status = chip::app::Clusters::DiagnosticLogs::StatusEnum::kNoLogs;
                     handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
                     break;
                 }
@@ -67,7 +67,7 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 chip::Platform::ScopedMemoryBuffer<uint8_t> buf;
                 if (!buf.Calloc(logSize))
                 {
-                    response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kBusy;
+                    response.status = chip::app::Clusters::DiagnosticLogs::StatusEnum::kBusy;
                     handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
                     break;
                 }
@@ -80,25 +80,25 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
 
                 auto timestamp = chip::System::Clock::Milliseconds32(timeFromBuffer);
 
-                response.status     = chip::app::Clusters::DiagnosticLogs::LogsStatus::kSuccess;
+                response.status     = chip::app::Clusters::DiagnosticLogs::StatusEnum::kSuccess;
                 response.logContent = chip::ByteSpan(buf.Get() + sizeof(timeFromBuffer), logSize - sizeof(timeFromBuffer));
                 response.timeSinceBoot.SetValue(chip::System::Clock::Microseconds64(timestamp).count());
                 handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
-            case chip::app::Clusters::DiagnosticLogs::LogsIntent::kNetworkDiag: {
+            case chip::app::Clusters::DiagnosticLogs::IntentEnum::kNetworkDiag: {
                 chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::Type response;
-                response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
+                response.status = chip::app::Clusters::DiagnosticLogs::StatusEnum::kNoLogs;
                 handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
-            case chip::app::Clusters::DiagnosticLogs::LogsIntent::kCrashLogs: {
+            case chip::app::Clusters::DiagnosticLogs::IntentEnum::kCrashLogs: {
                 chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::Type response;
-                response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
+                response.status = chip::app::Clusters::DiagnosticLogs::StatusEnum::kNoLogs;
                 handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
-            case chip::app::Clusters::DiagnosticLogs::LogsIntent::kUnknownEnumValue: {
+            case chip::app::Clusters::DiagnosticLogs::IntentEnum::kUnknownEnumValue: {
                 handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
                                                          chip::Protocols::InteractionModel::Status::InvalidCommand);
                 break;

@@ -2802,8 +2802,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @property (nonatomic, copy) NSNumber * _Nonnull requestedProtocol API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull transferFileDesignator API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    ;
+@property (nonatomic, copy) NSString * _Nullable transferFileDesignator MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
