@@ -90,7 +90,7 @@ class ClusterInteractionFragment : Fragment() {
   private fun showFragment(fragment: Fragment) {
     val fragmentTransaction = requireActivity().supportFragmentManager
       .beginTransaction()
-      .replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
+      .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
     fragmentTransaction.addToBackStack(null)
     fragmentTransaction.commit()
   }
