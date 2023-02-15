@@ -114,12 +114,12 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
     if (attributeId == CurrentHue::Id)
     {
         hue = *value;
-        CurrentSaturation::Get(&saturation);
+        CurrentSaturation::Get(endpointId, &saturation);
     }
     else
     {
         saturation = *value;
-        CurrentHue::Get(&hue);
+        CurrentHue::Get(endpointId, &hue);
     }
     AppLED.SetColor(hue, saturation);
 
