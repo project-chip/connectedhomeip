@@ -390,7 +390,8 @@ inline void PlatformManager::RemoveEventHandler(EventHandlerFunct handler, intpt
     static_cast<ImplClass *>(this)->_RemoveEventHandler(handler, arg);
 }
 
-inline bool PlatformManager::IsServerRunning() const {
+inline bool PlatformManager::IsServerRunning() const
+{
     return static_cast<const ImplClass *>(this)->_IsServerRunning();
 }
 

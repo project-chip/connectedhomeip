@@ -79,8 +79,9 @@ void TizenServiceAppMain::AppTerminated()
     ChipLogProgress(NotSpecified, "Tizen app terminated");
 }
 
-static void TizenMainLoopWrapper() {
-   ChipLinuxAppMainLoop();
+static void TizenMainLoopWrapper()
+{
+    ChipLinuxAppMainLoop();
 }
 
 void TizenServiceAppMain::AppControl(app_control_h app_control)

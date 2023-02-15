@@ -78,13 +78,14 @@ void ApplicationInit()
 }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-void UiEventLoop() {
+void UiEventLoop()
+{
     // Guaranteed to be on the main task (no chip event loop started yet)
     example::Ui::Init();
 
     // Platform event loop will be on a separate thread,
     // while the event UI loop will be on the main thread.
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask(); 
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
     // TODO: catch main loop stop and stop UI event loop.
 
@@ -107,8 +108,6 @@ int main(int argc, char * argv[])
 #else
     ChipLinuxAppMainLoop();
 #endif
-
-
 
     return 0;
 }

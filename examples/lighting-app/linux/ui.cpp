@@ -290,7 +290,8 @@ void DeviceState::ChipLoopUpdateCallback(intptr_t self)
 
 void DeviceState::UpdateState()
 {
-    if (!chip::DeviceLayer::PlatformMgr().IsServerRunning()) {
+    if (!chip::DeviceLayer::PlatformMgr().IsServerRunning())
+    {
         gUiRunning = false; // main loop stopped, stop UI as well
         return;
     }
@@ -336,8 +337,7 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    *window     = SDL_CreateWindow("Light UI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-                               window_flags);
+    *window     = SDL_CreateWindow("Light UI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -368,14 +368,15 @@ void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_Quit();
 }
 
-void DispatchChipShutDown(intptr_t) 
+void DispatchChipShutDown(intptr_t)
 {
     chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
 }
 
 } // namespace
 
-void Init() {
+void Init()
+{
     // Init inside the "main" thread, so that it can access globals
     // proparly (for QR code and such)
     gDeviceState.Init();
@@ -399,7 +400,7 @@ void EventLoop()
             ImGui_ImplSDL2_ProcessEvent(&event);
             if ((event.type == SDL_QUIT) ||
                 (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                event.window.windowID == SDL_GetWindowID(window)))
+                 event.window.windowID == SDL_GetWindowID(window)))
             {
                 chip::DeviceLayer::PlatformMgr().ScheduleWork(&DispatchChipShutDown, 0);
             }

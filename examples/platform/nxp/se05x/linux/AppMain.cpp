@@ -361,7 +361,7 @@ struct CommonCaseDeviceServerInitParams_Se05x : public CommonCaseDeviceServerIni
 
 #endif
 
-void ChipLinuxAppMainLoop(void(*mainLoop)()) 
+void ChipLinuxAppMainLoop(void (*mainLoop)())
 {
 #ifdef ENABLE_HSM_EC_KEY
     static CommonCaseDeviceServerInitParams_Se05x initParams;
@@ -435,9 +435,12 @@ void ChipLinuxAppMainLoop(void(*mainLoop)())
 
     ApplicationInit();
 
-    if (mainLoop != nullptr) {
+    if (mainLoop != nullptr)
+    {
         mainLoop();
-    } else {
+    }
+    else
+    {
         DeviceLayer::PlatformMgr().RunEventLoop();
     }
 

@@ -74,7 +74,7 @@ protected:
 
 private:
     bool mMsgLayerWasActive = false;
-    bool mServerStarted = false;
+    bool mServerStarted     = false;
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };

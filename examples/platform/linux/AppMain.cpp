@@ -331,7 +331,7 @@ exit:
     return 0;
 }
 
-void ChipLinuxAppMainLoop(void(*mainLoop)()) 
+void ChipLinuxAppMainLoop(void (*mainLoop)())
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
@@ -407,9 +407,12 @@ void ChipLinuxAppMainLoop(void(*mainLoop)())
     signal(SIGTERM, StopSignalHandler);
 #endif // !defined(ENABLE_CHIP_SHELL)
 
-    if (mainLoop != nullptr) {
+    if (mainLoop != nullptr)
+    {
         mainLoop();
-    } else {
+    }
+    else
+    {
         DeviceLayer::PlatformMgr().RunEventLoop();
     }
 
