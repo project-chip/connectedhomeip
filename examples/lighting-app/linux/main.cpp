@@ -99,11 +99,14 @@ void UiAppMainLoopImplementation::RunMainLoop()
     // from within SignalSafeStopMainLoop below and
     // UI knows how to stop both itself and the chip main loop.
     example::Ui::EventLoop();
+
+    // Stop the chip main loop as well. This is expected to
+    // wait for the task to finish.
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 void UiAppMainLoopImplementation::SignalSafeStopMainLoop()
 {
-    chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
     example::Ui::StopEventLoop();
 }
 
