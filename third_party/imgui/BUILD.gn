@@ -30,6 +30,8 @@ config("imgui_config") {
     ldflags = [
       "-framework",
       "OpenGL",
+      "-framework",
+      "CoreFoundation",
     ]
   } else {
     # Linux defaults
@@ -62,8 +64,6 @@ source_set("imgui") {
   ]
 
   # FUTURE: SDL2 libs should be from `sdl2-config --libs`
-  #         Also different platforms may require different seettings (e.g. on mac this
-  #         seems to need `-framework OpenGl -framework CoreFoundation`
   libs = [ "SDL2" ]
 
   if (current_os == "linux") {
