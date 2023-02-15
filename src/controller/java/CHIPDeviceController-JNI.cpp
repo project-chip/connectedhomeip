@@ -1337,9 +1337,9 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
     jobject endpointIdObj = env->CallObjectMethod(attributePath, getEndpointIdMethod);
     VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
     jobject clusterIdObj = env->CallObjectMethod(attributePath, getClusterIdMethod);
-    VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(clusterIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
     jobject attributeIdObj = env->CallObjectMethod(attributePath, getAttributeIdMethod);
-    VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(attributeIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint32_t endpointId = 0;
     ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
@@ -1455,7 +1455,7 @@ CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard)
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, idType, "name", "()Ljava/lang/String;", &nameMethod));
 
     jstring typeNameString = static_cast<jstring>(env->CallObjectMethod(idType, nameMethod));
-    VerifyOrReturnError(idType != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    VerifyOrReturnError(typeNameString != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
     JniUtfString typeNameJniString(env, typeNameString);
 
     isWildcard = strncmp(typeNameJniString.c_str(), "WILDCARD", 8) == 0;
