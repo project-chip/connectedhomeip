@@ -17,6 +17,7 @@ name: Build example - BouffaloLab
 on:
   push:
   pull_request:
+  merge_group:
   workflow_dispatch:
 
 concurrency:
@@ -55,7 +56,14 @@ jobs:
         env:
           GH_CONTEXT: ${{ toJson(github) }}
         run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
-      
+
+      - name: Bootstrap cache
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+          path: |
+            .environment
+            build_overrides/pigweed_environment.gni
       - name: Bootstrap
         timeout-minutes: 25
         run: scripts/build/gn_bootstrap.sh
@@ -67,6 +75,7 @@ jobs:
           path: |
             .environment/gn_out/.ninja_log
             .environment/pigweed-venv/*.log
+
       - name: Build example BL602 Lighting App
         timeout-minutes: 30
         run: |

@@ -53,6 +53,12 @@
 #define WLAN_DRIVER_TASK_PRIORITY 2
 #define MAX_JOIN_RETRIES_COUNT 5
 
+// WLAN retry time intervals in milli seconds
+#define WLAN_MAX_RETRY_TIMER_MS 30000
+#define WLAN_MIN_RETRY_TIMER_MS 1000
+#define WLAN_RETRY_TIMER_MS 5000
+#define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
+
 // WLAN related Macros
 #define ETH_FRAME 0
 #define CMP_SUCCESS 0
@@ -276,6 +282,8 @@ void * wfx_rsi_alloc_pkt(void);
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif /* RS911X_WIFI */
+
+void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 
 #ifdef __cplusplus
 }

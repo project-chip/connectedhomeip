@@ -138,9 +138,10 @@ public:
     }
     virtual ~ServerBase();
 
-    /// Closes all currently open endpoints
+    /// Closes all currently open endpoints and resets the 'initialized' flag
     void Shutdown();
 
+    void ShutdownEndpoints();
     void ShutdownEndpoint(EndpointInfo & aEndpoint);
 
     /// Listen on the given interfaces/address types.
@@ -206,6 +207,7 @@ private:
 #if INET_CONFIG_ENABLE_IPV4
     chip::Inet::IPAddress mIpv4BroadcastAddress;
 #endif
+    bool mIsInitialized = false;
 };
 
 // The PoolImpl impl is used as a base class because its destructor must be called after ServerBase's destructor.

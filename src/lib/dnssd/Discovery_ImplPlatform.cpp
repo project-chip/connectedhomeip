@@ -399,7 +399,7 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
 
         // Post an event that will start advertising
         DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdPlatformInitialized;
+        event.Type = DeviceLayer::DeviceEventType::kDnssdInitialized;
 
         CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
         if (error != CHIP_NO_ERROR)

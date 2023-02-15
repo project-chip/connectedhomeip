@@ -45,11 +45,11 @@ class SelectActionFragment : Fragment() {
       scanQrBtn.setOnClickListener { getCallback()?.handleScanQrCodeClicked() }
       provisionWiFiCredentialsBtn.apply {
         isEnabled = hasLocationPermission()
-        setOnClickListener { getCallback()?.onProvisionWiFiCredentialsClicked() }
+        setOnClickListener { getCallback()?.handleProvisionWiFiCredentialsClicked() }
       }
       provisionThreadCredentialsBtn.apply {
         isEnabled = hasLocationPermission()
-        setOnClickListener { getCallback()?.onProvisionThreadCredentialsClicked() }
+        setOnClickListener { getCallback()?.handleProvisionThreadCredentialsClicked() }
       }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
       sensorClustersBtn.setOnClickListener { getCallback()?.handleSensorClicked() }
@@ -58,7 +58,7 @@ class SelectActionFragment : Fragment() {
       basicClusterBtn.setOnClickListener { getCallback()?.handleBasicClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
       clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
-      provisionCustomFlowBtn.setOnClickListener{  getCallback()?.handleCustomFlowClicked() }
+      provisionCustomFlowBtn.setOnClickListener{  getCallback()?.handleProvisionCustomFlowClicked() }
       wildcardBtn.setOnClickListener { getCallback()?.handleWildcardClicked() }
       unpairDeviceBtn.setOnClickListener{ getCallback()?.handleUnpairDeviceClicked() }
     }
@@ -134,10 +134,6 @@ class SelectActionFragment : Fragment() {
   interface Callback {
     /** Notifies listener of Scan QR code button click. */
     fun handleScanQrCodeClicked()
-    /** Notifies listener of provision-WiFi-credentials button click. */
-    fun onProvisionWiFiCredentialsClicked()
-    /** Notifies listener of provision-Thread-credentials button click. */
-    fun onProvisionThreadCredentialsClicked()
     /** Notifies listener of Light On/Off & Level Cluster button click. */
     fun handleOnOffClicked()
     /** Notifies listener of Sensor Clusters button click. */
@@ -156,8 +152,12 @@ class SelectActionFragment : Fragment() {
     fun handleClusterInteractionClicked()
     /** Notifies listener of wildcard button click. */
     fun handleWildcardClicked()
+    /** Notifies listener of provision-WiFi-credentials button click. */
+    fun handleProvisionWiFiCredentialsClicked()
+    /** Notifies listener of provision-Thread-credentials button click. */
+    fun handleProvisionThreadCredentialsClicked()
     /** Notifies listener of provision-custom-flow button click. */
-    fun handleCustomFlowClicked()
+    fun handleProvisionCustomFlowClicked()
     /** Notifies listener of unpair button click. */
     fun handleUnpairDeviceClicked()
   }
