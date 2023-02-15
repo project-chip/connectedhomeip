@@ -44,6 +44,10 @@ public:
     /**
      * Execute main loop. Generally should have at least some
      * `DeviceLayer::PlatformMgr().RunEventLoop();` or equivalent setup
+     *
+     * This is expected to RUN and BLOCK until SignalSafeStopMainLoop is
+     * called or some internal close logic is run (e.g. a UI may
+     * stop when the window close button is clicked.)
      */
     virtual void RunMainLoop() = 0;
 
