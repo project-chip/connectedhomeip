@@ -193,7 +193,6 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_HandleServerStarted()
 {
-    mServerStarted                                    = true;
     PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
 
     if (platformManagerDelegate != nullptr)
@@ -214,7 +213,6 @@ void GenericPlatformManagerImpl<ImplClass>::_HandleServerShuttingDown()
     {
         platformManagerDelegate->OnShutDown();
     }
-    mServerStarted = false;
 }
 
 template <class ImplClass>

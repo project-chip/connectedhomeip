@@ -78,7 +78,15 @@ void ApplicationInit()
 }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-void UiEventLoop()
+
+class UiAppMainLoopImplementation : public AppMainLoopImplementation
+{
+public:
+    void RunMainLoop() override;
+    void SignalSafeStopMainLoop() override;
+};
+
+void UiAppMainLoopImplementation::RunMainLoop()
 {
     // Guaranteed to be on the main task (no chip event loop started yet)
     example::Ui::Init();
@@ -90,6 +98,12 @@ void UiEventLoop()
     // TODO: catch main loop stop and stop UI event loop.
 
     example::Ui::EventLoop();
+}
+
+void UiAppMainLoopImplementation::SignalSafeStopMainLoop()
+{
+    chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
+    example::Ui::StopEventLoop();
 }
 
 #endif
@@ -104,7 +118,8 @@ int main(int argc, char * argv[])
     LightingMgr().Init();
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-    ChipLinuxAppMainLoop(&UiEventLoop);
+    UiAppMainLoopImplementation loop;
+    ChipLinuxAppMainLoop(&loop);
 #else
     ChipLinuxAppMainLoop();
 #endif

@@ -290,23 +290,13 @@ void DeviceState::ChipLoopUpdateCallback(intptr_t self)
 
 void DeviceState::UpdateState()
 {
-    if (!chip::DeviceLayer::PlatformMgr().IsServerRunning())
-    {
-        gUiRunning = false; // main loop stopped, stop UI as well
-        return;
-    }
-
     chip::DeviceLayer::PlatformMgr().ScheduleWork(&ChipLoopUpdateCallback, reinterpret_cast<intptr_t>(this));
     // ensure update is done when existing
-    if (sem_timedwait(&mChipLoopWaitSemaphore) != 0)
+    if (sem_trywait(&mChipLoopWaitSemaphore) != 0)
     {
         if (!gUiRunning.load())
         {
             // UI should stop, no need to wait, probably chip main loop is stopped
-            return;
-        }
-        if (!chip::DeviceLayer::PlatformMgr().IsServerRunning())
-        {
             return;
         }
         std::this_thread::yield();
@@ -340,7 +330,7 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     *window     = SDL_CreateWindow("Light UI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
@@ -372,11 +362,6 @@ void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_Quit();
 }
 
-void DispatchChipShutDown(intptr_t)
-{
-    chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
-}
-
 } // namespace
 
 void Init()
@@ -406,7 +391,8 @@ void EventLoop()
                 (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
                  event.window.windowID == SDL_GetWindowID(window)))
             {
-                chip::DeviceLayer::PlatformMgr().ScheduleWork(&DispatchChipShutDown, 0);
+                StopEventLoop();
+                chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
             }
         }
 
@@ -431,7 +417,7 @@ void EventLoop()
     ChipLogProgress(AppServer, "UI thread Stopped...");
 }
 
-void Stop()
+void StopEventLoop()
 {
     gUiRunning = false;
 }

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/server/Server.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissionerDiscoveryController.h>
 #include <lib/core/CHIPError.h>
@@ -30,13 +31,45 @@
 int ChipLinuxAppInit(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
 
 /**
- * Start up the Linux app and use the provided main loop for event processing.
- * If not specified, it will use `DeviceLayer::PlatformMgr().RunEventLoop();`
- *
- * The event loop is assumed to have some form of RunEventLoop or chip main task
- * manangement.
+ * A main loop implementation descripts how an application main loop is to be
+ * run:
+ *    - how to execute the main loop
+ *    - what to do to stop it (inside a signal handler - CTRL+C is captured
+ *      by the main loop function)
  */
-void ChipLinuxAppMainLoop(void (*mainLoop)() = nullptr);
+class AppMainLoopImplementation
+{
+public:
+    virtual ~AppMainLoopImplementation() = default;
+    /**
+     * Execute main loop. Generally should have at least some
+     * `DeviceLayer::PlatformMgr().RunEventLoop();` or equivalent setup
+     */
+    virtual void RunMainLoop() = 0;
+
+    /**
+     * Stop the above `RunMainLoop` function.
+     *
+     * Generally should contain at least a
+     *    Server::GetInstance().DispatchShutDownAndStopEventLoop()
+     */
+    virtual void SignalSafeStopMainLoop() = 0;
+};
+
+class DefaultAppMainLoopImplementation : public AppMainLoopImplementation
+{
+public:
+    void RunMainLoop() override { chip::DeviceLayer::PlatformMgr().RunEventLoop(); }
+    void SignalSafeStopMainLoop() override { chip::Server::GetInstance().DispatchShutDownAndStopEventLoop(); }
+};
+
+/**
+ * Start up the Linux app and use the provided main loop for event processing.
+ *
+ * If no main loop implementation is provided, an equivalent of
+ * DefaultAppMainLoopImplementation will be used.
+ */
+void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl = nullptr);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

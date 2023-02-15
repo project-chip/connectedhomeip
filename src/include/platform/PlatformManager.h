@@ -116,11 +116,6 @@ public:
     PlatformManagerDelegate * GetDelegate() const { return mDelegate; }
 
     /**
-     * Figure out if the event processing loop is running.
-     */
-    bool IsServerRunning() const;
-
-    /**
      * Should be called after initializing all layers of the Matter stack to
      * run all needed post-startup actions.
      */
@@ -388,11 +383,6 @@ inline CHIP_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, in
 inline void PlatformManager::RemoveEventHandler(EventHandlerFunct handler, intptr_t arg)
 {
     static_cast<ImplClass *>(this)->_RemoveEventHandler(handler, arg);
-}
-
-inline bool PlatformManager::IsServerRunning() const
-{
-    return static_cast<const ImplClass *>(this)->_IsServerRunning();
 }
 
 inline void PlatformManager::HandleServerStarted()
