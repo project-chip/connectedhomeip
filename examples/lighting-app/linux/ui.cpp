@@ -298,9 +298,7 @@ void DeviceState::UpdateState()
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(&ChipLoopUpdateCallback, reinterpret_cast<intptr_t>(this));
     // ensure update is done when existing
-    struct timespec ts = { 0 };
-    ts.tv_nsec         = 50000000; // 50 ms
-    if (sem_timedwait(&mChipLoopWaitSemaphore, &ts) != 0)
+    if (sem_timedwait(&mChipLoopWaitSemaphore) != 0)
     {
         if (!gUiRunning.load())
         {
