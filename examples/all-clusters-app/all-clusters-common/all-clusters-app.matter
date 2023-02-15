@@ -4449,8 +4449,6 @@ endpoint 0 {
   }
 
   server cluster ThreadNetworkDiagnostics {
-    emits event ConnectionStatus;
-    emits event NetworkFaultChange;
     callback attribute channel;
     callback attribute routingRole;
     callback attribute networkName;
@@ -4708,8 +4706,6 @@ endpoint 1 {
   }
 
   server cluster Actions {
-    emits event StateChanged;
-    emits event ActionFailed;
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
@@ -4751,7 +4747,6 @@ endpoint 1 {
   }
 
   server cluster BooleanState {
-    emits event StateChange;
     ram      attribute stateValue;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
@@ -4852,18 +4847,6 @@ endpoint 1 {
   }
 
   server cluster PumpConfigurationAndControl {
-    emits event SupplyVoltageLow;
-    emits event SupplyVoltageHigh;
-    emits event PowerMissingPhase;
-    emits event SystemPressureLow;
-    emits event SystemPressureHigh;
-    emits event DryRunning;
-    emits event MotorTemperatureHigh;
-    emits event PumpMotorFatalFailure;
-    emits event ElectronicTemperatureHigh;
-    emits event PumpBlocked;
-    emits event SensorFailure;
-    emits event ElectronicNonFatalFailure;
     ram      attribute maxPressure;
     ram      attribute maxSpeed;
     ram      attribute maxFlow;
