@@ -95,8 +95,9 @@ void UiAppMainLoopImplementation::RunMainLoop()
     // while the event UI loop will be on the main thread.
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
-    // StopEventLoop should be used to stop the loop below.
-    // Assumed to be called externally (if ever).
+    // StopEventLoop will stop the loop below. It is called
+    // from within SignalSafeStopMainLoop below and
+    // UI knows how to stop both itself and the chip main loop.
     example::Ui::EventLoop();
 }
 
