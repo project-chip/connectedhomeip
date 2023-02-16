@@ -14,9 +14,9 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
@@ -72,12 +72,12 @@ static_library("efr32") {
 
   if (chip_enable_ble_rs911x) {
     sources += [
-        "rs911x/BLEManagerImpl.cpp",
-        "rs911x/wfx_sl_ble_init.h",
-        "rs911x/wfx_sl_ble_init.c",
-        "rs911x/rsi_ble_config.h",
-      ]
-    } else {
+      "rs911x/BLEManagerImpl.cpp",
+      "rs911x/rsi_ble_config.h",
+      "rs911x/wfx_sl_ble_init.c",
+      "rs911x/wfx_sl_ble_init.h",
+    ]
+  } else {
     sources += [ "BLEManagerImpl.cpp" ]
   }
 

@@ -34,7 +34,6 @@
 extern "C" {
 #endif
 #include "FreeRTOS.h"
-#include <stdbool.h>
 #include "event_groups.h"
 #include "task.h"
 #include "timers.h"
@@ -43,6 +42,7 @@ extern "C" {
 #include "wfx_sl_ble_init.h"
 #include <rsi_driver.h>
 #include <rsi_utils.h>
+#include <stdbool.h>
 #ifdef __cplusplus
 }
 #endif
@@ -208,8 +208,8 @@ namespace {
 #define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 30ms
 #define BLE_CONFIG_MAX_INTERVAL (80) // Time = Value x 1.25 ms = 100ms
 #define BLE_CONFIG_LATENCY (0)
-#define BLE_CONFIG_TIMEOUT (100) // Time = Value x 10 ms = 1s
-#define BLE_CONFIG_MIN_CE_LENGTH (0) // Leave to min value
+#define BLE_CONFIG_TIMEOUT (100)          // Time = Value x 10 ms = 1s
+#define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 #define BLE__DEFAULT_TIMER_PERIOD 1
@@ -471,7 +471,7 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     // Nothing to do
 }
 
-//TODO: Need to add RSI BLE STATUS codes
+// TODO: Need to add RSI BLE STATUS codes
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
     switch (bleErr)
@@ -590,7 +590,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     result = rsi_ble_set_advertise_data(advData, index);
     if (result != SL_STATUS_OK)
     {
-    //    err = MapBLEError(result);
+        //    err = MapBLEError(result);
         ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() failed: %ld", result);
         ExitNow();
     }
@@ -599,7 +599,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: %ld", result);
     }
 
-   // err = MapBLEError(result);
+    // err = MapBLEError(result);
 
     ChipLogProgress(DeviceLayer, "ConfigureAdvertisingData End");
 exit:
@@ -617,8 +617,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     if (mFlags.Has(Flags::kAdvertising))
     {
         status = rsi_ble_stop_advertising();
-        if (status != RSI_SUCCESS) {
-           ChipLogProgress(DeviceLayer,"advertising failed to stop, with status = 0x%lx ", status);
+        if (status != RSI_SUCCESS)
+        {
+            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx ", status);
         }
     }
     else
@@ -666,8 +667,9 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
         status = rsi_ble_stop_advertising();
-        if (status != RSI_SUCCESS) {
-           ChipLogProgress(DeviceLayer,"advertising failed to stop, with status = 0x%lx" , status);
+        if (status != RSI_SUCCESS)
+        {
+            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
         }
         advertising_set_handle = 0xff;
         CancelBleAdvTimeoutTimer();
@@ -768,7 +770,7 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     bool isIndicationEnabled = false;
     ChipDeviceEvent event;
 
@@ -786,14 +788,14 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
         // whether the client is enabling or disabling indications.
         {
             event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
-            event.CHIPoBLESubscribe.ConId = 1; //TODO:: To be replaced by device mac address
+            event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
             err                           = PlatformMgr().PostEvent(&event);
         }
     }
     else
     {
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
-        event.CHIPoBLESubscribe.ConId = 1;  //TODO:: To be replaced by device mac address
+        event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
         err                           = PlatformMgr().PostEvent(&event);
     }
 }
@@ -933,10 +935,7 @@ exit:
 }
 
 // TODO:: Need the
-void BLEManagerImpl::HandleC3ReadRequest(void)
-{
-
-}
+void BLEManagerImpl::HandleC3ReadRequest(void) {}
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 
 uint8_t BLEManagerImpl::GetTimerHandle(uint8_t connectionHandle, bool allocate)

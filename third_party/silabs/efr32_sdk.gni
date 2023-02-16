@@ -159,7 +159,9 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      _include_dirs += [ "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/include" ]
+      _include_dirs += [
+        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/include",
+      ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -198,9 +200,7 @@ template("efr32_sdk") {
     ]
 
     if (chip_enable_ble_rs911x) {
-      defines += [
-        "RSI_BLE_ENABLE=1",
-      ]
+      defines += [ "RSI_BLE_ENABLE=1" ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
@@ -671,18 +671,18 @@ template("efr32_sdk") {
 
     if (chip_enable_ble_rs911x) {
       sources += [
-        "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
         "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
         "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
         "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+        "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
       ]
     } else {
       sources += [
-      "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
-      "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_rtos_adaptation.c",
-      "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
-      "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
-      "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_connection_config.c",
+        "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
+        "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_rtos_adaptation.c",
+        "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
+        "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
+        "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_connection_config.c",
       ]
     }
 

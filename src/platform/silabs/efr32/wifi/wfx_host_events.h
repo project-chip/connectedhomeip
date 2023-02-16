@@ -21,10 +21,10 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "semphr.h"
-#include "task.h"
-#include "timers.h"
 #include "sl_wfx_cmd_api.h"
 #include "sl_wfx_constants.h"
+#include "task.h"
+#include "timers.h"
 
 typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
 {

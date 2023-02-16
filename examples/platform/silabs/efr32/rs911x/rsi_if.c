@@ -321,7 +321,7 @@ static int32_t wfx_rsi_init(void)
     status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
     if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
     {
-         WFX_RSI_LOG("%s: error: RSI Driver initialization failed with status: %02x", __func__, status);
+        WFX_RSI_LOG("%s: error: RSI Driver initialization failed with status: %02x", __func__, status);
         return status;
     }
 
@@ -345,9 +345,11 @@ static int32_t wfx_rsi_init(void)
     }
 
 #if (RSI_BLE_ENABLE)
-    if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS) {
+    if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS)
+    {
 #else
-    if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS) {
+    if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS)
+    {
 #endif
         WFX_RSI_LOG("%s: error: Initialize WiSeConnect failed with status: %02x", __func__, status);
         return status;
@@ -404,7 +406,7 @@ static int32_t wfx_rsi_init(void)
 #endif
 
 #if (RSI_BLE_ENABLE)
-     rsi_semaphore_post(&sl_rs_ble_init_sem);
+    rsi_semaphore_post(&sl_rs_ble_init_sem);
 #endif
 
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
