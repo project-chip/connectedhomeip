@@ -42,13 +42,6 @@ static void test_thread(void * argument)
         goto exit;
     }
 
-    err = DeviceLayer::PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogAutomation("Chip stack initialization failed: %s", err.AsString());
-        goto exit;
-    }
-
     ChipLogAutomation("Open IoT SDK unit-tests run...");
     status = RunRegisteredUnitTests();
     ChipLogAutomation("Test status: %d", status);
