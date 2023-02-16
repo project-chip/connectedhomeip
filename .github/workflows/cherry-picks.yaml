@@ -24,7 +24,7 @@ jobs:
               with:
                   fetch-depth: 0
             - name: Cherry-Pick into sve branch
-              uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
+              uses: carloscastrojumo/github-cherry-pick-action@v1.0.9
               with:
                   token: ${{ secrets.MATTER_PAT }}
                   branch: sve-2
