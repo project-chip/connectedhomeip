@@ -388,10 +388,18 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
         return;
     }
 
+#if defined(__APPLE__)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+#else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
+
 #ifdef SDL_HINT_IME_SHOW_UI
     SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 #endif
@@ -400,8 +408,7 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    *window     = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-                               window_flags);
+    *window     = SDL_CreateWindow("Light UI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -414,13 +421,11 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    // ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(*window, *gl_context);
-    ImGui_ImplOpenGL3_Init("#version 130");
+    ImGui_ImplOpenGL3_Init();
 }
 
 void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
@@ -434,8 +439,18 @@ void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_Quit();
 }
 
-void UiLoop()
+} // namespace
+
+void Init()
 {
+    // Init inside the "main" thread, so that it can access globals
+    // properly (for QR code and such)
+    gDeviceState.Init();
+}
+
+void EventLoop()
+{
+    gUiRunning = true;
     SDL_GLContext gl_context;
     SDL_Window * window = nullptr;
 
@@ -449,14 +464,11 @@ void UiLoop()
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT)
+            if ((event.type == SDL_QUIT) ||
+                (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                 event.window.windowID == SDL_GetWindowID(window)))
             {
-                chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
-            }
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                event.window.windowID == SDL_GetWindowID(window))
-            {
-                chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
+                StopEventLoop();
             }
         }
 
@@ -481,25 +493,9 @@ void UiLoop()
     ChipLogProgress(AppServer, "UI thread Stopped...");
 }
 
-static std::thread gUiThread;
-
-} // namespace
-
-void Start()
-{
-    // Init inside the "main" thread, so that it can access globals
-    // proparly (for QR code and such)
-    gDeviceState.Init();
-
-    gUiRunning = true;
-    std::thread uiThread(&UiLoop);
-    gUiThread.swap(uiThread);
-}
-
-void Stop()
+void StopEventLoop()
 {
     gUiRunning = false;
-    gUiThread.join();
 }
 
 } // namespace Ui

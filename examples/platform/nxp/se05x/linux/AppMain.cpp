@@ -361,7 +361,7 @@ struct CommonCaseDeviceServerInitParams_Se05x : public CommonCaseDeviceServerIni
 
 #endif
 
-void ChipLinuxAppMainLoop()
+void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 {
 #ifdef ENABLE_HSM_EC_KEY
     static CommonCaseDeviceServerInitParams_Se05x initParams;
@@ -435,7 +435,14 @@ void ChipLinuxAppMainLoop()
 
     ApplicationInit();
 
-    DeviceLayer::PlatformMgr().RunEventLoop();
+    if (impl != nullptr)
+    {
+        impl->RunMainLoop();
+    }
+    else
+    {
+        DeviceLayer::PlatformMgr().RunEventLoop();
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ShutdownCommissioner();
