@@ -124,8 +124,8 @@ void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const EmberBin
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
-        offwitheffectCommand.effectIdentifier = static_cast<EmberAfOnOffEffectIdentifier>(data->args[0]);
-        offwitheffectCommand.effectVariant    = static_cast<EmberAfOnOffDelayedAllOffEffectVariant>(data->args[1]);
+        offwitheffectCommand.effectIdentifier = static_cast<Clusters::OnOff::OnOffEffectIdentifier>(data->args[0]);
+        offwitheffectCommand.effectVariant    = static_cast<Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          offwitheffectCommand, onSuccess, onFailure);
         break;
@@ -136,7 +136,7 @@ void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const EmberBin
         break;
 
     case Clusters::OnOff::Commands::OnWithTimedOff::Id:
-        onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(data->args[0]);
+        onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<Clusters::OnOff::OnOffControl>>(data->args[0]);
         onwithtimedoffCommand.onTime       = static_cast<uint16_t>(data->args[1]);
         onwithtimedoffCommand.offWaitTime  = static_cast<uint16_t>(data->args[2]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
@@ -171,8 +171,8 @@ void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const EmberBindi
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
-        offwitheffectCommand.effectIdentifier = static_cast<EmberAfOnOffEffectIdentifier>(data->args[0]);
-        offwitheffectCommand.effectVariant    = static_cast<EmberAfOnOffDelayedAllOffEffectVariant>(data->args[1]);
+        offwitheffectCommand.effectIdentifier = static_cast<Clusters::OnOff::OnOffEffectIdentifier>(data->args[0]);
+        offwitheffectCommand.effectVariant    = static_cast<Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand);
         break;
 
@@ -181,7 +181,7 @@ void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const EmberBindi
         break;
 
     case Clusters::OnOff::Commands::OnWithTimedOff::Id:
-        onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(data->args[0]);
+        onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<Clusters::OnOff::OnOffControl>>(data->args[0]);
         onwithtimedoffCommand.onTime       = static_cast<uint16_t>(data->args[1]);
         onwithtimedoffCommand.offWaitTime  = static_cast<uint16_t>(data->args[2]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand);
