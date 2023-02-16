@@ -87,7 +87,7 @@ class _ConstraintType(BaseConstraint):
             success = True
         elif self._type == 'vendor_id' and type(value) is int:
             success = value >= 0 and value <= 0xFFFF
-        elif self._type == 'device_type_id' and type(value) is int:
+        elif self._type == 'devtype_id' and type(value) is int:
             success = value >= 0 and value <= 0xFFFFFFFF
         elif self._type == 'cluster_id' and type(value) is int:
             success = value >= 0 and value <= 0xFFFFFFFF

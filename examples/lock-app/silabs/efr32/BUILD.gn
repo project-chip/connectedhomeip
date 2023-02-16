@@ -82,6 +82,10 @@ efr32_executable("lock_app") {
     "src/main.cpp",
   ]
 
+  if (chip_build_libshell) {
+    sources += [ "src/EventHandlerLibShell.cpp" ]
+  }
+
   deps = [
     ":sdk",
     "${examples_plat_dir}:efr32-common",
