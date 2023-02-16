@@ -101,17 +101,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffDelayedAllO
     using EnumType = OnOff::OnOffDelayedAllOffEffectVariant;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kFadeToOffIn0p8Seconds:
     case EnumType::kNoFade:
     case EnumType::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS:
-    case EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE:
-    case EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -122,13 +114,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffDyingLightE
     using EnumType = OnOff::OnOffDyingLightEffectVariant;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(1);
@@ -139,15 +125,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffEffectIdent
     using EnumType = OnOff::OnOffEffectIdentifier;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kDelayedAllOff:
     case EnumType::kDyingLight:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF:
-    case EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);

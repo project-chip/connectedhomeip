@@ -183,27 +183,6 @@ enum EmberAfNetworkFaultEnum : uint8_t
     EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED = 3,
 };
 
-// Enum for OnOffDelayedAllOffEffectVariant
-enum EmberAfOnOffDelayedAllOffEffectVariant : uint8_t
-{
-    EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS                                        = 0,
-    EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE                                                           = 1,
-    EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS = 2,
-};
-
-// Enum for OnOffDyingLightEffectVariant
-enum EmberAfOnOffDyingLightEffectVariant : uint8_t
-{
-    EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND = 0,
-};
-
-// Enum for OnOffEffectIdentifier
-enum EmberAfOnOffEffectIdentifier : uint8_t
-{
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF = 0,
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT     = 1,
-};
-
 // Enum for PHYRateEnum
 enum EmberAfPHYRateEnum : uint8_t
 {
