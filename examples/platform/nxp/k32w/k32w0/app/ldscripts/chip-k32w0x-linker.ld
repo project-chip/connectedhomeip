@@ -81,10 +81,11 @@ MEMORY
 }
 
 /* Define a symbol for the top of each memory region */
-__top_RAM1      = MEM_RAM1_BASE + MEM_RAM1_SIZE; /* 64K bytes */
+__top_RAM1 = MEM_RAM1_BASE + MEM_RAM1_SIZE; /* 64K bytes */
 
-/* To be improved. At this moment the second RAM bank is dedicated entirely to heap + stack. */
-HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0x10000;
+/* The second RAM bank is dedicated entirely to heap + stack. */
+HEAP_SIZE = MEM_RAM1_SIZE - STACK_SIZE;
+ASSERT(((HEAP_SIZE + STACK_SIZE) == MEM_RAM1_SIZE), "Heap size + stack size should total RAM1 size.");
 
 /* set external flash properties - external flash is present on the DK6 board */
 m_ext_flash_size          = 0x00100000;
@@ -96,7 +97,8 @@ NVMSectorCountLink        = 63;
 NV_STORAGE_SIZE           = NVMSectorCountLink * m_ext_flash_sector_size;
 NV_STORAGE_MAX_SECTORS    = NVMSectorCountLink;
 NV_STORAGE_SECTOR_SIZE    = m_ext_flash_sector_size;
-NV_STORAGE_START_ADDRESS  = m_ext_flash_size - 1;
+/* Reserve one sector from top of external flash for custom OTA entry. */
+NV_STORAGE_START_ADDRESS  = m_ext_flash_size - m_ext_flash_sector_size - 1;
 NV_STORAGE_END_ADDRESS    = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
 
 INT_STORAGE_START         = m_int_flash_size - 1;
@@ -376,9 +378,10 @@ SECTIONS
 
     __StackLimit = _vStackTop - STACK_SIZE;
 
-     __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
-     __FACTORY_DATA_SIZE = m_factory_data_size;
+    __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
+    __FACTORY_DATA_SIZE = m_factory_data_size;
      
-     ASSERT(((m_app_start + m_app_size + m_app_meta_data + m_factory_data_size + m_flash_config_size) <= m_int_flash_size),
-              "Internal flash capacity exceeded")
+    ASSERT(((m_app_start + m_app_size + m_app_meta_data + m_factory_data_size + m_flash_config_size) <= m_int_flash_size),
+            "Internal flash capacity exceeded")
+
 }
