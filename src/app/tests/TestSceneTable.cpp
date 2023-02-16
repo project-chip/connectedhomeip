@@ -272,6 +272,8 @@ void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
     SceneTableEntry scene;
     auto * iterator = sceneTable->IterateSceneEntry(kFabric1);
 
+    NL_TEST_ASSERT(aSuite, iterator != nullptr);
+
     if (iterator)
     {
         NL_TEST_ASSERT(aSuite, iterator->Count() == 8);
@@ -311,6 +313,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, iterator->Count() == 7);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene10);
+    iterator->Release();
 
     // Adde scene in middle, a spot should have been freed
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene9));
@@ -318,6 +321,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, iterator->Count() == 8);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId9, scene));
     NL_TEST_ASSERT(aSuite, scene == scene9);
+    iterator->Release();
 
     // Remove the recently added scene 9
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene9.mStorageId));
@@ -325,6 +329,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, iterator->Count() == 7);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene10);
+    iterator->Release();
 
     // Remove first
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene1.mStorageId));
@@ -332,6 +337,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, iterator->Count() == 6);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene2);
+    iterator->Release();
 
     // Remove Next
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene3.mStorageId));
@@ -341,36 +347,42 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, scene == scene2);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene4);
+    iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene2.mStorageId));
     iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 4);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene4);
+    iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene4.mStorageId));
     iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 3);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene6);
+    iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene6.mStorageId));
     iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 2);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene7);
+    iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene7.mStorageId));
     iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 1);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene12);
+    iterator->Release();
 
     // Remove last
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene8.mStorageId));
     iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 0);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene) == false);
+    iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->RemoveSceneTableEntry(kFabric1, scene8.mStorageId));
 
