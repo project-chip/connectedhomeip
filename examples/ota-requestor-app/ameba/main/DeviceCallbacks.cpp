@@ -33,6 +33,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
+#include <route_hook/ameba_route_hook.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/logging/Constants.h>
@@ -63,12 +64,25 @@ void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 }
 #endif
 
+
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     switch (event->Type)
     {
     case DeviceEventType::kInternetConnectivityChange:
         OnInternetConnectivityChange(event);
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        ChipLogProgress(DeviceLayer, "CHIPoBLE Connection Established");
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        ChipLogProgress(DeviceLayer, "CHIPoBLE Connection Closed");
+        break;
+
+    case DeviceEventType::kCHIPoBLEAdvertisingChange:
+        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising has changed");
         break;
 
     case DeviceEventType::kInterfaceIpAddressChanged:
@@ -81,6 +95,15 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
         }
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            ChipLogProgress(DeviceLayer, "Initializing route hook...");
+            ameba_route_hook_init();
+        }
+        break;
+
+    case DeviceEventType::kCommissioningComplete:
+        ChipLogProgress(DeviceLayer, "Commissioning Complete");
         break;
     }
 }
