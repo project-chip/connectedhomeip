@@ -1409,7 +1409,7 @@ typedef struct
  * @brief Returns the elapsed time between two 32 bit values.
  *   Result may not be valid if the time samples differ by more than 2147483647
  */
-#define elapsedTimeInt32u(oldTime, newTime) ((uint32_t) ((uint32_t) (newTime) - (uint32_t) (oldTime)))
+#define elapsedTimeInt32u(oldTime, newTime) ((uint32_t)((uint32_t)(newTime) - (uint32_t)(oldTime)))
 
 /**
  * @brief The overhead of the ZDO response.
