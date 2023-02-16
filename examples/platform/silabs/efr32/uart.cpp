@@ -28,7 +28,9 @@ extern "C" {
 #include "sl_uartdrv_instances.h"
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
 #include "spi_multiplex.h"
+#endif /* EFR32MG24 && WF200_WIFI */
 #endif
 #ifdef SL_CATALOG_UARTDRV_USART_PRESENT
 #include "sl_uartdrv_usart_vcom_config.h"
@@ -308,7 +310,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
 #endif /* EFR32MG24 && WF200_WIFI */
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-        sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
 
     if (ECODE_EMDRV_UARTDRV_OK == ecode_status)

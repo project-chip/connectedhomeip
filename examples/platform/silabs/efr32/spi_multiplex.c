@@ -15,8 +15,11 @@
  *    limitations under the License.
  */
 
-#include "spi_multiplex.h"
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
 #include "sl_wfx.h"
+#endif /* EFR32MG24 && WF200_WIFI */
+
+#include "spi_multiplex.h"
 #include "dmadrv.h"
 #include "em_bus.h"
 #include "em_cmu.h"
