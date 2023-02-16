@@ -344,22 +344,6 @@ typedef struct
     uint16_t endpointSize;
 } EmberAfEndpointType;
 
-#ifdef EZSP_HOST
-typedef EzspDecisionId EmberAfTcLinkKeyRequestPolicy;
-typedef EzspDecisionId EmberAfAppLinkKeyRequestPolicy;
-#define EMBER_AF_ALLOW_TC_KEY_REQUESTS EZSP_ALLOW_TC_KEY_REQUESTS_AND_SEND_CURRENT_KEY
-#define EMBER_AF_DENY_TC_KEY_REQUESTS EZSP_DENY_TC_KEY_REQUESTS
-#define EMBER_AF_ALLOW_APP_KEY_REQUESTS EZSP_ALLOW_APP_KEY_REQUESTS
-#define EMBER_AF_DENY_APP_KEY_REQUESTS EZSP_DENY_APP_KEY_REQUESTS
-#else
-typedef EmberTcLinkKeyRequestPolicy EmberAfTcLinkKeyRequestPolicy;
-typedef EmberAppLinkKeyRequestPolicy EmberAfAppLinkKeyRequestPolicy;
-#define EMBER_AF_ALLOW_TC_KEY_REQUESTS EMBER_ALLOW_TC_LINK_KEY_REQUEST_AND_SEND_CURRENT_KEY
-#define EMBER_AF_DENY_TC_KEY_REQUESTS EMBER_DENY_TC_LINK_KEY_REQUESTS
-#define EMBER_AF_ALLOW_APP_KEY_REQUESTS EMBER_ALLOW_APP_LINK_KEY_REQUEST
-#define EMBER_AF_DENY_APP_KEY_REQUESTS EMBER_DENY_APP_LINK_KEY_REQUESTS
-#endif
-
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum EmberAfEndpointBitmask;
 #else
@@ -1142,37 +1126,6 @@ typedef struct
     uint16_t messageLength;
     bool broadcast;
 } EmberAfMessageStruct;
-
-/**
- * @brief A data struct for a link key backup.
- *
- * Each entry notes the EUI64 of the device it is paired to and the key data.
- *   This key may be hashed and not the actual link key currently in use.
- */
-
-typedef struct
-{
-    EmberEUI64 deviceId;
-    EmberKeyData key;
-} EmberAfLinkKeyBackupData;
-
-/**
- * @brief A data struct for all the trust center backup data.
- *
- * The 'keyList' pointer must point to an array and 'maxKeyListLength'
- * must be populated with the maximum number of entries the array can hold.
- *
- * Functions that modify this data structure will populate 'keyListLength'
- * indicating how many keys were actually written into 'keyList'.
- */
-
-typedef struct
-{
-    EmberEUI64 extendedPanId;
-    uint8_t keyListLength;
-    uint8_t maxKeyListLength;
-    EmberAfLinkKeyBackupData * keyList;
-} EmberAfTrustCenterBackupData;
 
 /**
  * @brief The length of the hardware tag in the Ember Bootloader Query

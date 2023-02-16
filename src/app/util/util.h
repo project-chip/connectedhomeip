@@ -24,16 +24,6 @@
 // void userAssert (int file, int line);                   // declaration
 // #define USER_ASSERT(file, line) userAssert(file, line)  // definition
 
-#if defined(NO_ASSERT)
-#define SLAB_ASSERT(expr)
-#else
-#if defined(USER_ASSERT)
-#define SLAB_ASSERT(expr) ((expr) ? ((void) 0) : USER_ASSERT(__FILE__, __LINE__))
-#else
-#define SLAB_ASSERT(expr) ((expr) ? ((void) 0) : slabAssert(__FILE__, __LINE__))
-#endif // USER_ASSERT
-#endif // NO_ASSERT
-
 // This controls the type of response. Normally The library sends an automatic
 // response (if appropriate) on the same PAN. The reply can be disabled by
 // calling emberAfSetNoReplyForNextMessage.
@@ -114,8 +104,6 @@ void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
 void emberAfStackDown(void);
 
-void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
-
 /**
  * Retrieves the difference between the two passed values.
  * This function assumes that the two values have the same endianness.
@@ -189,58 +177,6 @@ uint16_t emberAfStrnlen(const uint8_t * string, uint16_t maxLength);
  */
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
                                 uint8_t appendingCharsLen);
-
-EmberStatus emAfValidateChannelPages(uint8_t page, uint8_t channel);
-
-/* @brief A Silicon Labs assert function
- *
- * This function is provided to call an assert function in the application code.
- * It starts an infinite loop that provokes the watchdog to fire.
- *
- * @param file - the source file that calls this assert
- * @param line - the line that calls this assert
- *
- * @return void
- *
- */
-void slabAssert(const char * file, int line);
-
-/* @brief Get the page number from an 8-bit encoded channel-page
- *
- * The top three bits denote the page number, like this:
- *   000x xxxx = page 0
- *   100x xxxx = page 28
- *   101x xxxx = page 29
- *   110x xxxx = page 30
- *   111x xxxx = page 31
- *
- * @param chanPg - 8-bit encoded channel and page
- *
- * @return page number (0, 28-31, 0xFF if invalid)
- */
-uint8_t emberAfGetPageFrom8bitEncodedChanPg(uint8_t chanPg);
-
-/* @brief Get the channel number from an 8-bit encoded channel-page
- *
- * The bottom 5 bits denote the channel within the page.
- *
- * Provided for symmetry with the above emberAfGetPageFrom8bitEncodedChanPg().
- * It simply masks the bottom 5 bits.
- *
- * @param chanPg - 8-bit encoded channel and page
- *
- * @return channel number (0-8, 0-26, 11-26, depending on the page)
- */
-uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
-
-/* @brief Make an 8-bit encoded channel-page from channel and page arguments
- *
- * @param page
- * @param channel
- *
- * @return 8-bit encoded channel-page, 0xFF if invalid
- */
-uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
