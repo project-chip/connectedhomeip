@@ -12,6 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from .clusters.commissioner_commands import CommissionerCommands
 from .clusters.delay_commands import DelayCommands
 from .clusters.log_commands import LogCommands
 from .clusters.system_commands import SystemCommands
@@ -46,6 +47,7 @@ class PseudoClusters:
 
 def get_default_pseudo_clusters() -> PseudoClusters:
     clusters = [
+        CommissionerCommands(),
         DelayCommands(),
         LogCommands(),
         SystemCommands()
