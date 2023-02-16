@@ -44,6 +44,9 @@ class AppEvent;
 class BoltLockManager
 {
 public:
+    BoltLockManager() :
+        mCredentials(CONFIG_LOCK_CREDENTIAL_INFO_MAX_TYPES, std::vector<LockCredentialInfo>(CONFIG_LOCK_NUM_CREDENTIALS + 1))
+    {}
     static constexpr size_t kMaxCredentialLength = 128;
 
     enum class State : uint8_t
