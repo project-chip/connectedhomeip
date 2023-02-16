@@ -19,7 +19,6 @@
 #include "level-control.h"
 
 // this file contains all the common includes for clusters in the util
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>

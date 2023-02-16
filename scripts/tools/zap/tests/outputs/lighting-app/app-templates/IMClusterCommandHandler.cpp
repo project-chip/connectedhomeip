@@ -20,7 +20,6 @@
 #include <cinttypes>
 #include <cstdint>
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
