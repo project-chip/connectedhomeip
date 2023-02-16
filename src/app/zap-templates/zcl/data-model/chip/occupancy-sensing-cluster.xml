@@ -17,6 +17,26 @@ limitations under the License.
 <configurator>
   <domain name="Measurement &amp; Sensing"/>
 
+  <bitmap name="OccupancyBitmap" type="BITMAP8">
+    <cluster code="0x0406"/>
+    <field name="Occupied" mask="0x1"/>
+  </bitmap>
+
+  <enum name="OccupancySensorTypeEnum" type="ENUM8">
+    <cluster code="0x0406"/>
+    <item name="PIR" value="0x0"/>
+    <item name="Ultrasonic" value="0x1"/>
+    <item name="PIRAndUltrasonic" value="0x2"/>
+    <item name="PhysicalContact" value="0x3"/>
+  </enum>
+
+  <bitmap name="OccupancySensorTypeBitmap" type="BITMAP8">
+    <cluster code="0x0406"/>
+    <field name="PIR" mask="0x01"/>
+    <field name="Ultrasonic" mask="0x02"/>
+    <field name="PhysicalContact" mask="0x04"/>
+  </bitmap>
+
   <cluster>
     <name>Occupancy Sensing</name>
     <domain>Measurement &amp; Sensing</domain>
@@ -29,9 +49,9 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
-    <attribute side="server" code="0x0000" define="OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" reportable="true" optional="false">Occupancy</attribute>
-    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>
-    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="BITMAP8" min="0x00" max="0x07" writable="false" optional="false">OccupancySensorTypeBitmap</attribute>
+    <attribute side="server" code="0x0000" define="OCCUPANCY" type="OccupancyBitmap" min="0x00" max="0x01" writable="false" reportable="true" optional="false">Occupancy</attribute>
+    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="OccupancySensorTypeEnum" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>
+    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="OccupancySensorTypeBitmap" min="0x00" max="0x07" writable="false" optional="false">OccupancySensorTypeBitmap</attribute>
 
     <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
       <description>PIROccupiedToUnoccupiedDelay</description>

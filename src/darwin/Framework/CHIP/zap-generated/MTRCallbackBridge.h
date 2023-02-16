@@ -478,6 +478,10 @@ typedef void (*IlluminanceMeasurementClusterLightSensorTypeAttributeCallback)(
     void *, chip::app::Clusters::IlluminanceMeasurement::LightSensorType);
 typedef void (*NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorType> &);
+typedef void (*OccupancySensingClusterOccupancySensorTypeEnumAttributeCallback)(
+    void *, chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum);
+typedef void (*NullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum> &);
 typedef void (*ChannelClusterChannelStatusEnumAttributeCallback)(void *, chip::app::Clusters::Channel::ChannelStatusEnum);
 typedef void (*NullableChannelClusterChannelStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelStatusEnum> &);
@@ -1060,6 +1064,10 @@ typedef void (*RelativeHumidityMeasurementEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*RelativeHumidityMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OccupancySensingOccupancyAttributeCallback)(void *,
+                                                           chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>);
+typedef void (*OccupancySensingOccupancySensorTypeBitmapAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>);
 typedef void (*OccupancySensingGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OccupancySensingAcceptedCommandListListAttributeCallback)(
@@ -10177,6 +10185,69 @@ public:
     void OnSubscriptionEstablished();
     using MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROccupancySensingOccupancyAttributeCallbackBridge : public MTRCallbackBridge<OccupancySensingOccupancyAttributeCallback>
+{
+public:
+    MTROccupancySensingOccupancyAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OccupancySensingOccupancyAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROccupancySensingOccupancyAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<OccupancySensingOccupancyAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> value);
+};
+
+class MTROccupancySensingOccupancyAttributeCallbackSubscriptionBridge : public MTROccupancySensingOccupancyAttributeCallbackBridge
+{
+public:
+    MTROccupancySensingOccupancyAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action,
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROccupancySensingOccupancyAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROccupancySensingOccupancyAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROccupancySensingOccupancyAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge
+    : public MTRCallbackBridge<OccupancySensingOccupancySensorTypeBitmapAttributeCallback>
+{
+public:
+    MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OccupancySensingOccupancySensorTypeBitmapAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<OccupancySensingOccupancySensorTypeBitmapAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> value);
+};
+
+class MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackSubscriptionBridge
+    : public MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge
+{
+public:
+    MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -20457,6 +20528,77 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OccupancySensingClusterOccupancySensorTypeEnumAttributeCallback>
+{
+public:
+    MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OccupancySensingClusterOccupancySensorTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<OccupancySensingClusterOccupancySensorTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum value);
+};
+
+class MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge
+{
+public:
+    MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum> & value);
+};
+
+class MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

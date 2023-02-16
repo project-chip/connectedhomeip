@@ -2321,9 +2321,26 @@ server cluster RelativeHumidityMeasurement = 1029 {
 }
 
 server cluster OccupancySensing = 1030 {
-  readonly attribute bitmap8 occupancy = 0;
-  readonly attribute enum8 occupancySensorType = 1;
-  readonly attribute bitmap8 occupancySensorTypeBitmap = 2;
+  enum OccupancySensorTypeEnum : ENUM8 {
+    kPir = 0;
+    kUltrasonic = 1;
+    kPIRAndUltrasonic = 2;
+    kPhysicalContact = 3;
+  }
+
+  bitmap OccupancyBitmap : BITMAP8 {
+    kOccupied = 0x1;
+  }
+
+  bitmap OccupancySensorTypeBitmap : BITMAP8 {
+    kPir = 0x1;
+    kUltrasonic = 0x2;
+    kPhysicalContact = 0x4;
+  }
+
+  readonly attribute OccupancyBitmap occupancy = 0;
+  readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
+  readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   attribute access(write: manage) int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) int8u PIRUnoccupiedToOccupiedThreshold = 18;

@@ -20691,9 +20691,9 @@ namespace Attributes {
 namespace Occupancy {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
@@ -20703,9 +20703,9 @@ struct TypeInfo
 namespace OccupancySensorType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum;
+    using DecodableType    = chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum;
+    using DecodableArgType = chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorType::Id; }
@@ -20715,9 +20715,9 @@ struct TypeInfo
 namespace OccupancySensorTypeBitmap {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorTypeBitmap::Id; }
@@ -20877,9 +20877,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Occupancy::TypeInfo::DecodableType occupancy                                       = static_cast<uint8_t>(0);
-        Attributes::OccupancySensorType::TypeInfo::DecodableType occupancySensorType                   = static_cast<uint8_t>(0);
-        Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap       = static_cast<uint8_t>(0);
+        Attributes::Occupancy::TypeInfo::DecodableType occupancy =
+            static_cast<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>(0);
+        Attributes::OccupancySensorType::TypeInfo::DecodableType occupancySensorType =
+            static_cast<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum>(0);
+        Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap =
+            static_cast<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>(0);
         Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::DecodableType PIROccupiedToUnoccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::DecodableType PIRUnoccupiedToOccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType PIRUnoccupiedToOccupiedThreshold =
