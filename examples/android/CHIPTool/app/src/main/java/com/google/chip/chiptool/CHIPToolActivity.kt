@@ -123,42 +123,6 @@ class CHIPToolActivity :
     showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, networkCredentials))
   }
 
-  override fun handleScanQrCodeClicked() {
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
-
-  override fun handleClusterInteractionClicked() {
-    showFragment(ClusterInteractionFragment.newInstance())
-  }
-
-  override fun handleWildcardClicked() {
-    showFragment(WildcardFragment.newInstance())
-  }
-
-  override fun handleOnOffClicked() {
-    showFragment(OnOffClientFragment.newInstance())
-  }
-
-  override fun handleSensorClicked() {
-    showFragment(SensorClientFragment.newInstance())
-  }
-
-  override fun handleMultiAdminClicked() {
-    showFragment(MultiAdminClientFragment.newInstance())
-  }
-
-  override fun handleOpCredClicked() {
-    showFragment(OpCredClientFragment.newInstance())
-  }
-
-  override fun handleBasicClicked() {
-    showFragment(BasicClientFragment.newInstance())
-  }
-
-  override fun handleAttestationTestClicked() {
-    showFragment(AttestationTestFragment.newInstance())
-  }
-
   override fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo) {
     showFragment(CHIPLedgerDetailsFragment.newInstance(deviceInfo))
   }
@@ -168,22 +132,8 @@ class CHIPToolActivity :
     startActivity(redirectIntent)
   }
 
-  override fun handleProvisionWiFiCredentialsClicked() {
-    networkType = ProvisionNetworkType.WIFI
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
-
-  override fun handleProvisionThreadCredentialsClicked() {
-    networkType = ProvisionNetworkType.THREAD
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
-
-  override fun handleProvisionCustomFlowClicked() {
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
-
-  override fun handleUnpairDeviceClicked() {
-    showFragment(UnpairDeviceFragment.newInstance())
+  override fun SetNetworkType(type: ProvisionNetworkType) {
+    networkType = type
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
