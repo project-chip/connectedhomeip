@@ -68,3 +68,5 @@ ClustersWithPreAttributeChangeFunctions:
     - Mode Select
     - Fan Control
     - Thermostat
+
+ClustersWithShutdownFunctions: []
