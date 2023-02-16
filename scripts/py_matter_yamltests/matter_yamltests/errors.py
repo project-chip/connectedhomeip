@@ -41,8 +41,11 @@ class TestStepError(Exception):
     def tag_key_with_error(self, content, target_key):
         self.__tag_key(content, target_key, _ERROR_START_TAG, _ERROR_END_TAG)
 
+    def untag_keys_with_error(self, content):
+        self.__untag_keys(content, _ERROR_START_TAG, _ERROR_END_TAG)
+
     def __tag_key(self, content, target_key, tag_start, tag_end):
-        # This method replace the key for the dictionary with the tag provided while preserving the order of the dictionary
+        """This method replaces the key for the dictionary with the tag provided while preserving the order of the dictionary."""
         reversed_dictionary = {}
 
         # Build a reversed dictionary, tagging the target key.
@@ -53,7 +56,25 @@ class TestStepError(Exception):
             else:
                 reversed_dictionary[key] = value
 
-        # Revert back the the dictionary to the original order.
+        # Revert back the dictionary to the original order.
+        for _ in range(len(reversed_dictionary)):
+            key, value = reversed_dictionary.popitem()
+            content[key] = value
+
+    def __untag_keys(self, content, tag_start, tag_end):
+        """This method replaces the tagged key for the dictionary with the original key while preserving the order of the dictionary."""
+        reversed_dictionary = {}
+
+        # Build a reversed dictionary, untagging the tagged key.
+        for _ in range(len(content)):
+            key, value = content.popitem()
+            if key.startswith(tag_start) and key.endswith(tag_end):
+                reversed_dictionary[key.replace(
+                    tag_start, '').replace(tag_end, '')] = value
+            else:
+                reversed_dictionary[key] = value
+
+        # Revert back the dictionary to the original order.
         for _ in range(len(reversed_dictionary)):
             key, value = reversed_dictionary.popitem()
             content[key] = value
