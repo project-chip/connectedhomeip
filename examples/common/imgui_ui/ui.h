@@ -19,6 +19,8 @@
 #include <AppMain.h>
 #include <imgui_ui/windows/window.h>
 
+#include <semaphore.h>
+
 #include <list>
 #include <memory>
 
@@ -33,7 +35,8 @@ namespace Ui {
 class ImguiUi : public AppMainLoopImplementation
 {
 public:
-    virtual ~ImguiUi() = default;
+    ImguiUi() { sem_init(&mChipLoopWaitSemaphore, 0 /* shared */, 0); }
+    virtual ~ImguiUi() { sem_destroy(&mChipLoopWaitSemaphore); }
 
     void AddWindow(std::unique_ptr<Window> window) { mWindows.push_back(std::move(window)); }
 
@@ -52,7 +55,10 @@ private:
     // to CHIP API calls)
     void ChipLoopStateUpdate();
 
+    sem_t mChipLoopWaitSemaphore;
     std::list<std::unique_ptr<Window>> mWindows;
+
+    static void ChipLoopUpdateCallback(intptr_t self);
 };
 
 } // namespace Ui

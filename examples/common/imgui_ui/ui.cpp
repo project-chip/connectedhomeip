@@ -25,6 +25,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <atomic>
+#include <thread>
 
 namespace example {
 namespace Ui {
@@ -60,7 +61,7 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     *window     = SDL_CreateWindow("Light UI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
@@ -189,10 +190,26 @@ void ImguiUi::Render()
     }
 }
 
+void ImguiUi::ChipLoopUpdateCallback(intptr_t self)
+{
+    ImguiUi * _this = reinterpret_cast<ImguiUi *>(self);
+    _this->ChipLoopStateUpdate();
+    sem_post(&_this->mChipLoopWaitSemaphore); // notify complete
+}
+
 void ImguiUi::UpdateState()
 {
-    chip::DeviceLayer::StackLock lock;
-    ChipLoopStateUpdate();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(&ChipLoopUpdateCallback, reinterpret_cast<intptr_t>(this));
+    // ensure update is done when existing
+    if (sem_trywait(&mChipLoopWaitSemaphore) != 0)
+    {
+        if (!gUiRunning.load())
+        {
+            // UI should stop, no need to wait, probably chip main loop is stopped
+            return;
+        }
+        std::this_thread::yield();
+    }
 }
 
 } // namespace Ui
