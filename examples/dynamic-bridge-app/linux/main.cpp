@@ -20,8 +20,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app-common/zap-generated/af-structs.h>
-
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>

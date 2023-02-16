@@ -108,11 +108,6 @@ jobs:
               # does not enforce that the content is understood (that part is covered by parser
               # unit tests)
               #
-              # Also note ordering: global attributes are parsed first because other XML files may
-              # reference these.
-              #
-              # TODO: some multipass/postprocess may be more appropriate to allow any ordering of
-              #       things.
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/py_matter_idl/matter_idl/xml_parser.py \

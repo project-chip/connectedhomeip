@@ -678,13 +678,13 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     {
         for (uint8_t j = 0; j < kMaxCredentialsPerUser; j++)
         {
-            if (mLockCredentials[mCredentials[i][j].CredentialIndex - 1].credentialType != CredentialTypeEnum::kPin ||
-                mLockCredentials[mCredentials[i][j].CredentialIndex - 1].status == DlCredentialStatus::kAvailable)
+            if (mLockCredentials[mCredentials[i][j].credentialIndex - 1].credentialType != CredentialTypeEnum::kPin ||
+                mLockCredentials[mCredentials[i][j].credentialIndex - 1].status == DlCredentialStatus::kAvailable)
             {
                 continue;
             }
 
-            if (mLockCredentials[mCredentials[i][j].CredentialIndex - 1].credentialData.data_equal(pin.Value()) &&
+            if (mLockCredentials[mCredentials[i][j].credentialIndex - 1].credentialData.data_equal(pin.Value()) &&
                 mLockUsers[i].userStatus != UserStatusEnum::kOccupiedDisabled)
             {
                 ChipLogDetail(

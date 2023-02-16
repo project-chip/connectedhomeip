@@ -42,12 +42,6 @@ namespace {
 static LowPowerManager lowPowerManager;
 } // namespace
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
-
 void OnIdentifyStart(::Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");

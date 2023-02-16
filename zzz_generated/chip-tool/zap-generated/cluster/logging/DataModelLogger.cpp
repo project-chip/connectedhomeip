@@ -8634,17 +8634,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case OccupancySensing::Attributes::Occupancy::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Occupancy", 1, value);
         }
         case OccupancySensing::Attributes::OccupancySensorType::Id: {
-            uint8_t value;
+            chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupancySensorType", 1, value);
         }
         case OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupancySensorTypeBitmap", 1, value);
         }

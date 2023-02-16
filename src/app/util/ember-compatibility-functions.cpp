@@ -174,21 +174,6 @@ void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandP
     currentCommandObject = command;
 }
 
-bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
-{
-    if (currentCommandObject == nullptr)
-    {
-        // We have no idea what we're supposed to respond to.
-        return false;
-    }
-
-    chip::app::ConcreteCommandPath commandPath(imCompatibilityEmberApsFrame.destinationEndpoint,
-                                               imCompatibilityEmberApsFrame.clusterId, imCompatibilityEmberAfCluster.commandId);
-
-    CHIP_ERROR err = currentCommandObject->AddStatus(commandPath, ToInteractionModelStatus(status));
-    return CHIP_NO_ERROR == err;
-}
-
 void ResetEmberAfObjects()
 {
     emAfCurrentCommand   = nullptr;

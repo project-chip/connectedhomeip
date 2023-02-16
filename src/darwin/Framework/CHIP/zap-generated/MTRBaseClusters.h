@@ -21697,6 +21697,23 @@ typedef NS_OPTIONS(uint32_t, MTRPressureMeasurementPressureFeature) {
     = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTROccupancySensingOccupancySensorType) {
+    MTROccupancySensingOccupancySensorTypePIR MTR_NEWLY_AVAILABLE = 0x00,
+    MTROccupancySensingOccupancySensorTypeUltrasonic MTR_NEWLY_AVAILABLE = 0x01,
+    MTROccupancySensingOccupancySensorTypePIRAndUltrasonic MTR_NEWLY_AVAILABLE = 0x02,
+    MTROccupancySensingOccupancySensorTypePhysicalContact MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTROccupancySensingOccupancyBitmap) {
+    MTROccupancySensingOccupancyBitmapOccupied MTR_NEWLY_AVAILABLE = 0x1,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTROccupancySensingOccupancySensorTypeBitmap) {
+    MTROccupancySensingOccupancySensorTypeBitmapPIR MTR_NEWLY_AVAILABLE = 0x1,
+    MTROccupancySensingOccupancySensorTypeBitmapUltrasonic MTR_NEWLY_AVAILABLE = 0x2,
+    MTROccupancySensingOccupancySensorTypeBitmapPhysicalContact MTR_NEWLY_AVAILABLE = 0x4,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRChannelStatus) {
     MTRChannelStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRChannelStatusMultipleMatches API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,

@@ -23103,7 +23103,7 @@ class OccupancySensing(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="occupancy", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="occupancySensorType", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="occupancySensorType", Tag=0x00000001, Type=OccupancySensing.Enums.OccupancySensorTypeEnum),
                 ClusterObjectFieldDescriptor(Label="occupancySensorTypeBitmap", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="PIROccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
@@ -23123,7 +23123,7 @@ class OccupancySensing(Cluster):
             ])
 
     occupancy: 'uint' = None
-    occupancySensorType: 'uint' = None
+    occupancySensorType: 'OccupancySensing.Enums.OccupancySensorTypeEnum' = None
     occupancySensorTypeBitmap: 'uint' = None
     PIROccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
     PIRUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
@@ -23141,6 +23141,27 @@ class OccupancySensing(Cluster):
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
+    class Enums:
+        class OccupancySensorTypeEnum(MatterIntEnum):
+            kPir = 0x00
+            kUltrasonic = 0x01
+            kPIRAndUltrasonic = 0x02
+            kPhysicalContact = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
+
+
+    class Bitmaps:
+        class OccupancyBitmap(IntFlag):
+            kOccupied = 0x1
+
+        class OccupancySensorTypeBitmap(IntFlag):
+            kPir = 0x1
+            kUltrasonic = 0x2
+            kPhysicalContact = 0x4
 
 
 
@@ -23174,9 +23195,9 @@ class OccupancySensing(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=OccupancySensing.Enums.OccupancySensorTypeEnum)
 
-            value: 'uint' = 0
+            value: 'OccupancySensing.Enums.OccupancySensorTypeEnum' = 0
 
         @dataclass
         class OccupancySensorTypeBitmap(ClusterAttributeDescriptor):

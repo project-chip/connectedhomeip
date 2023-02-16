@@ -27,6 +27,7 @@
 #include <setup_payload/SetupPayload.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums.h>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -78,16 +79,20 @@ private:
 
     // OnOff
     bool mLightIsOn = false;
+
     // Level
     uint8_t mMinLevel = 0;
     uint8_t mMaxLevel = 0;
     Nullable<uint8_t> mCurrentLevel;
     uint16_t mLevelRemainingTime10sOfSec = 0;
+
     // Color control
-    uint8_t mColorHue        = 0;
-    uint8_t mColorSaturation = 0;
-    uint16_t mColorX         = 0;
-    uint16_t mColorY         = 0;
+    uint8_t mColorMode               = EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION;
+    uint8_t mColorHue                = 0;
+    uint8_t mColorSaturation         = 0;
+    uint16_t mColorX                 = 0;
+    uint16_t mColorY                 = 0;
+    uint16_t mColorTemperatureMireds = 0;
 
     // Updates the data (run in the chip event loop)
     void ChipLoopUpdate();
@@ -103,6 +108,39 @@ private:
 };
 
 DeviceState gDeviceState;
+
+/*
+ * Converts HSV with assumption that V == 100% into a IMGui color vector
+ */
+ImVec4 HueSaturationToColor(float hueDegrees, float saturationPercent)
+{
+    saturationPercent /= 100.0f;
+
+    float x = saturationPercent * static_cast<float>(1 - fabs(fmod(hueDegrees / 60, 2) - 1));
+
+    if (hueDegrees < 60)
+    {
+        return ImVec4(saturationPercent, x, 0, 1.0f);
+    }
+    if (hueDegrees < 120)
+    {
+        return ImVec4(x, saturationPercent, 0, 1.0f);
+    }
+    if (hueDegrees < 180)
+    {
+        return ImVec4(0, saturationPercent, x, 1.0f);
+    }
+    if (hueDegrees < 240)
+    {
+        return ImVec4(0, x, saturationPercent, 1.0f);
+    }
+    if (hueDegrees < 300)
+    {
+        return ImVec4(x, 0, saturationPercent, 1.0f);
+    }
+
+    return ImVec4(saturationPercent, 0, x, 1.0f);
+}
 
 void DeviceState::Init()
 {
@@ -155,35 +193,71 @@ inline ImVec2 operator+(const ImVec2 & a, const ImVec2 & b)
 void DeviceState::ShowUi()
 {
     ImGui::Begin("Light app state");
-    ImGui::Text("On-Off:");
 
+    ImGui::Text("On-Off:");
+    ImGui::Indent();
     if (mLightIsOn)
     {
-        ImGui::Text("    Light is ON");
+        ImGui::Text("Light is ON");
     }
     else
     {
-        ImGui::Text("    Light is OFF");
+        ImGui::Text("Light is OFF");
     }
+
+    // bright yellow vs dark yellow on/off view
+    ImGui::ColorButton("LightIsOn", mLightIsOn ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImVec4(0.3f, 0.3f, 0.0f, 1.0f),
+                       0 /* ImGuiColorEditFlags_* */, ImVec2(80, 80));
+    ImGui::Unindent();
 
     ImGui::Text("Level Control:");
-    ImGui::Text("    MIN Level:              %d", mMinLevel);
+    ImGui::Indent();
+    ImGui::Text("Remaining Time (1/10s): %d", mLevelRemainingTime10sOfSec);
+    ImGui::Text("MIN Level:              %d", mMinLevel);
+    ImGui::Text("MAX Level:              %d", mMaxLevel);
     if (mCurrentLevel.IsNull())
     {
-        ImGui::Text("    Current Level:          NULL");
+        ImGui::Text("Current Level: NULL");
     }
     else
     {
-        ImGui::Text("    Current Level:          %d", mCurrentLevel.Value());
+        int levelValue = mCurrentLevel.Value();
+        ImGui::SliderInt("Current Level", &levelValue, mMinLevel, mMaxLevel);
     }
-    ImGui::Text("    MAX Level:              %d", mMaxLevel);
-    ImGui::Text("    Remaining Time (1/10s): %d", mLevelRemainingTime10sOfSec);
+    ImGui::Unindent();
 
     ImGui::Text("Color Control:");
-    ImGui::Text("    Current Hue:         %d", mColorHue);
-    ImGui::Text("    Current Saturation:  %d", mColorSaturation);
-    ImGui::Text("    Current X:           %d", mColorX);
-    ImGui::Text("    Current Y:           %d", mColorY);
+    ImGui::Indent();
+    const char * mode = // based on ColorMode attribute: spec 3.2.7.9
+        (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION)
+        ? "Hue/Saturation"
+        : (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)
+            ? "X/Y"
+            : (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE) ? "Temperature/Mireds" : "UNKNOWN";
+
+    ImGui::Text("Mode: %s", mode);
+
+    if (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION)
+    {
+        const float hueDegrees        = (mColorHue * 360.0f) / 254.0f;
+        const float saturationPercent = 100.0f * (mColorSaturation / 254.0f);
+
+        ImGui::Text("Current Hue:        %d (%f deg)", mColorHue, hueDegrees);
+        ImGui::Text("Current Saturation: %d (%f %%)", mColorSaturation, saturationPercent);
+
+        ImGui::ColorButton("LightColor", HueSaturationToColor(hueDegrees, saturationPercent), 0 /* ImGuiColorEditFlags_* */,
+                           ImVec2(80, 80));
+    }
+    else if (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)
+    {
+        ImGui::Text("Current X: %d", mColorX);
+        ImGui::Text("Current Y: %d", mColorY);
+    }
+    else if (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE)
+    {
+        ImGui::Text("Color Temperature Mireds: %d", mColorTemperatureMireds);
+    }
+    ImGui::Unindent();
 
     ImGui::End();
 
@@ -274,10 +348,13 @@ void DeviceState::ChipLoopUpdate()
         LevelControl::Attributes::RemainingTime::Get(kLightEndpointId, &mLevelRemainingTime10sOfSec);
 
         // Color control
+        ColorControl::Attributes::ColorMode::Get(kLightEndpointId, &mColorMode);
+
         ColorControl::Attributes::CurrentHue::Get(kLightEndpointId, &mColorHue);
         ColorControl::Attributes::CurrentSaturation::Get(kLightEndpointId, &mColorSaturation);
         ColorControl::Attributes::CurrentX::Get(kLightEndpointId, &mColorX);
         ColorControl::Attributes::CurrentY::Get(kLightEndpointId, &mColorY);
+        ColorControl::Attributes::ColorTemperatureMireds::Get(kLightEndpointId, &mColorTemperatureMireds);
     }
 }
 

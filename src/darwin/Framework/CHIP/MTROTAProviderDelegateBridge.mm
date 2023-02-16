@@ -49,8 +49,13 @@ constexpr uint32_t kMaxBDXURILen = 256;
 // we just double the timeout to give enough time for the BDX init to come in a reasonable amount of time.
 constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Seconds16(10 * 60);
 
-// Time in seconds after which the requestor should retry calling query image if busy status is receieved
-constexpr uint32_t kDelayedActionTimeSeconds = 120;
+// Time in seconds after which the requestor should retry calling query image if
+// busy status is receieved.  The spec minimum is 2 minutes, but in practice OTA
+// generally takes a lot longer than that and devices only retry a few times
+// before giving up.  Default to 10 minutes for now, until we have a better
+// system of computing an expected completion time for the currently-running
+// OTA.
+constexpr uint32_t kDelayedActionTimeSeconds = 600;
 
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
 constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
@@ -132,6 +137,14 @@ public:
     void ResetState()
     {
         assertChipStackLockedByCurrentThread();
+        if (mNodeId.HasValue() && mFabricIndex.HasValue()) {
+            ChipLogProgress(Controller,
+                "Resetting state for OTA Provider; no longer providing an update for node id 0x" ChipLogFormatX64
+                ", fabric index %u",
+                ChipLogValueX64(mNodeId.Value()), mFabricIndex.Value());
+        } else {
+            ChipLogProgress(Controller, "Resetting state for OTA Provider");
+        }
         if (mSystemLayer) {
             mSystemLayer->CancelTimer(HandleBdxInitReceivedTimeoutExpired, this);
         }
@@ -678,7 +691,6 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     handler->AddResponse(cachedCommandPath, protocolNotSupportedResponse);
                 }
                 handle.Release();
-                gOtaSender.ResetState();
             }
 
                           errorHandler:^(NSError *) {
