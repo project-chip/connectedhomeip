@@ -148,9 +148,9 @@ void ImguiUi::RunMainLoop()
     // while the event UI loop will be on the main thread.
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
-    // StopEventLoop will stop the loop below. It is called
-    // from within SignalSafeStopMainLoop below and
-    // UI knows how to stop itself if windows are closed.
+    // SignalSafeStopMainLoop will stop this loop below
+    // or the loop exits by itself when processing a SDL
+    // exit (generally by clicking the window close icon).
     EventLoop(this);
 
     // Stop the chip main loop as well. This is expected to
