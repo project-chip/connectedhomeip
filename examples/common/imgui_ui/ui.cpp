@@ -174,6 +174,7 @@ void ImguiUi::ChipLoopStateUpdate()
 
 void ImguiUi::ChipLoopLoadInitialState()
 {
+    assertChipStackLockedByCurrentThread();
     for (auto it = mWindows.begin(); it != mWindows.end(); it++)
     {
         (*it)->LoadInitialState();
