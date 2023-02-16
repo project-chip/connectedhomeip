@@ -308,7 +308,9 @@ class ClusterDetailFragment : Fragment() {
     val callbackItem =
       inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
     callbackItem.clusterCallbackNameTv.text = variableNameType.name
-    callbackItem.clusterCallbackDataTv.text = if (response.javaClass == ByteArray::class.java) {
+    callbackItem.clusterCallbackDataTv.text = if (response == null) {
+       "null"
+    }else if (response.javaClass == ByteArray::class.java) {
       (response as ByteArray).decodeToString()
     } else {
       response.toString()
