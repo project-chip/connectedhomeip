@@ -393,7 +393,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
             if (effect != nullptr && effect->mOffWithEffectTrigger != nullptr)
             {
                 effect->mEffectIdentifier = effectId;
-                effect->mEffectVariant    = to_underlying(effectVariant);
+                effect->mEffectVariant    = effectVariant;
 
                 effect->mOffWithEffectTrigger(effect);
             }
