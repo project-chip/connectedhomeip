@@ -452,6 +452,20 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
     gSystemLayer.HandleEvents();
 #endif
 
+    // Process whatever has been queued via the platform manager so far, if it
+    // accepts events.
+    {
+        auto stopEventLoop = [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); };
+        CHIP_ERROR err     = chip::DeviceLayer::PlatformMgr().ScheduleWork(stopEventLoop, 0);
+        // If ScheduleWork fails, the platform manager is not accepting events
+        // and there is no work to be done, plus doing RunEventLoop would simply
+        // block forever, since we did not schedule our stopWork lambda.
+        if (err == CHIP_NO_ERROR)
+        {
+            chip::DeviceLayer::PlatformMgr().RunEventLoop();
+        }
+    }
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (gSystemLayer.IsInitialized())
     {
