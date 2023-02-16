@@ -31,6 +31,8 @@
 #include <app/util/config.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <zap-generated/gen_config.h>
+
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
 #define DOOR_LOCK_SERVER_ENDPOINT 1
 #endif

@@ -24,6 +24,8 @@
 #include <app/util/basic-types.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <zap-generated/gen_config.h>
+
 /**********************************************************
  * Defines and Macros
  *********************************************************/

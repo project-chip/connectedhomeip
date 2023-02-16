@@ -24,6 +24,8 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
+#include <zap-generated/gen_config.h>
+
 using namespace chip;
 
 static constexpr size_t kLevelManagerTableSize = EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;

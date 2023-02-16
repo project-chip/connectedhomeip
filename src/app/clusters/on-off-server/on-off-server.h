@@ -23,6 +23,8 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
+#include <zap-generated/gen_config.h>
+
 using chip::app::Clusters::OnOff::OnOffFeature;
 
 /**********************************************************

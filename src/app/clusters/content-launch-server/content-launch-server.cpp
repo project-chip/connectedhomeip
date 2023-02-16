@@ -30,6 +30,8 @@
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <zap-generated/gen_config.h>
+
 #include <list>
 
 using namespace chip;

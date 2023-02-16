@@ -30,6 +30,8 @@
 #include <lib/support/TypeTraits.h>
 #include <string.h>
 
+#include <zap-generated/gen_config.h>
+
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES

@@ -33,6 +33,8 @@
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+       //
+#include <zap-generated/gen_config.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;

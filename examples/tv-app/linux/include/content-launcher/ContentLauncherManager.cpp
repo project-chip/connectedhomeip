@@ -19,6 +19,8 @@
 #include "ContentLauncherManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 
+#include <zap-generated/gen_config.h>
+
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters;

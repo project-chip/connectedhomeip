@@ -31,6 +31,8 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <zap-generated/gen_config.h>
+
 using namespace chip;
 using namespace chip::app::Clusters::LowPower;
 
