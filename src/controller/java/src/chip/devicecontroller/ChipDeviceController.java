@@ -20,6 +20,7 @@ package chip.devicecontroller;
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import java.util.ArrayList;
@@ -599,6 +600,23 @@ public class ChipDeviceController {
         isFabricFiltered);
   }
 
+  /** Read the given attribute/event path with isFabricFiltered flag. */
+  public void write(
+      WriteAttributesCallback callback,
+      long devicePtr,
+      List<AttributeWriteRequest> attributeList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
+    write(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributeList,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
   /**
    * Converts a given X.509v3 certificate into a Matter certificate.
    *
@@ -645,6 +663,14 @@ public class ChipDeviceController {
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
       boolean isFabricFiltered);
+
+  private native void write(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<AttributeWriteRequest> attributeList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
 
   private native long newDeviceController(ControllerParams params);
 
