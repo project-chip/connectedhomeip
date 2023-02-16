@@ -1259,6 +1259,8 @@ endpoint 0 {
   }
 
   server cluster AccessControl {
+    emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
     callback attribute attributeList;
@@ -1267,6 +1269,9 @@ endpoint 0 {
   }
 
   server cluster BasicInformation {
+    emits event StartUp;
+    emits event ShutDown;
+    emits event Leave;
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -1291,6 +1296,9 @@ endpoint 0 {
   }
 
   server cluster OtaSoftwareUpdateRequestor {
+    emits event StateTransition;
+    emits event VersionApplied;
+    emits event DownloadError;
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
@@ -1341,6 +1349,7 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
+    emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;

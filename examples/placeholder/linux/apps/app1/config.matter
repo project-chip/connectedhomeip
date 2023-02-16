@@ -3008,6 +3008,9 @@ endpoint 0 {
   }
 
   server cluster BasicInformation {
+    emits event StartUp;
+    emits event ShutDown;
+    emits event Leave;
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -3109,6 +3112,7 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
+    emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
@@ -3132,6 +3136,9 @@ endpoint 0 {
   }
 
   server cluster WiFiNetworkDiagnostics {
+    emits event Disconnection;
+    emits event AssociationFailure;
+    emits event ConnectionStatus;
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;
