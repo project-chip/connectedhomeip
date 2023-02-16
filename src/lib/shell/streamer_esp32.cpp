@@ -121,7 +121,7 @@ ssize_t streamer_esp32_read(streamer_t * streamer, char * buf, size_t len)
 
 ssize_t streamer_esp32_write(streamer_t * streamer, const char * buf, size_t len)
 {
-#if CONFIG_ESP_CONSOLE_UART_DEFAULT || defined CONFIG_ESP_CONSOLE_UART_CUSTOM
+#if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
     return uart_write_bytes(CONFIG_ESP_CONSOLE_UART_NUM, buf, len);
 #endif
 #if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
