@@ -28,7 +28,9 @@ project_dir = "${chip_root}/examples/window-app"
 efr32_project_dir = "${project_dir}/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
-src_plat_dir = "${chip_root}/src/platform/silabs/efr32"
+if (chip_enable_ble_rs911x) {
+  src_plat_dir = "${chip_root}/src/platform/silabs/efr32"
+}
 
 import("${examples_plat_dir}/args.gni")
 
@@ -58,7 +60,11 @@ efr32_sdk("sdk") {
 
   if (chip_enable_ble_rs911x) {
     # TODO efr32_sdk should not need a header from this location
-    include_dirs += [ "${src_plat_dir}/rs911x" ]
+    include_dirs += [
+      "${src_plat_dir}/rs911x",
+      "${examples_plat_dir}/rs911x",
+      "${examples_plat_dir}/rs911x/hal",
+    ]
   }
 }
 

@@ -159,11 +159,7 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      _include_dirs += [
-        "${chip_root}/examples/platform/silabs/efr32/rs911x",
-        "${chip_root}/examples/platform/silabs/efr32/rs911x/hal",
-        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/include",
-      ]
+      _include_dirs += [ "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/include" ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
