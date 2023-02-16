@@ -679,7 +679,7 @@ namespace app {
                     { "TrustedTimeNodeId", TrustedTimeNodeId::Id },
                     { "DefaultNtp", DefaultNtp::Id },
                     { "TimeZone", TimeZone::Id },
-                    { "DstOffset", DstOffset::Id },
+                    { "DSTOffset", DSTOffset::Id },
                     { "LocalTime", LocalTime::Id },
                     { "TimeZoneDatabase", TimeZoneDatabase::Id },
                     { "NtpServerPort", NtpServerPort::Id },

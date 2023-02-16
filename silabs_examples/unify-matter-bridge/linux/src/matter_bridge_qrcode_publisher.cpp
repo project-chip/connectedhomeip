@@ -34,7 +34,7 @@ void QRCodePublisher::device_event(const chip::DeviceLayer::ChipDeviceEvent * ev
   
   sl_log_debug(LOG_TAG, "device_event:%u", (unsigned int)event->Type);
   switch(event->Type) {
-    case chip::DeviceLayer::DeviceEventType::kDnssdPlatformInitialized:
+    case chip::DeviceLayer::DeviceEventType::kDnssdInitialized:
       if(chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen()) {
         QRCodePublisher* qr = reinterpret_cast<QRCodePublisher*>(ptr);
         qr->publish();

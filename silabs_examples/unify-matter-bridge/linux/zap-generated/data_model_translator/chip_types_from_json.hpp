@@ -712,6 +712,7 @@ inline std::optional<DoorLock::LockDataTypeEnum> from_json(const nlohmann::json&
         { "PIN FIXME", DoorLock::LockDataTypeEnum::kPin },
         { "RFID FIXME", DoorLock::LockDataTypeEnum::kRfid },
         { "Fingerprint FIXME", DoorLock::LockDataTypeEnum::kFingerprint },
+        { "FingerVein FIXME", DoorLock::LockDataTypeEnum::kFingerVein },
     };
 
     auto i = table.find(value);

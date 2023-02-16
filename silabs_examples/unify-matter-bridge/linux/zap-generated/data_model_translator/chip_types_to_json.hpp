@@ -755,6 +755,8 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::LockDataTypeE
         return "RFID FIXME";
     case LockDataTypeEnum::kFingerprint:
         return "Fingerprint FIXME";
+    case LockDataTypeEnum::kFingerVein:
+        return "FingerVein FIXME";
     default:
         return "{}";
     }
