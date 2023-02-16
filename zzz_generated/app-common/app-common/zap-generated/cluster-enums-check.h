@@ -627,9 +627,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::W
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::LogsIntent val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::IntentEnum val)
 {
-    using EnumType = DiagnosticLogs::LogsIntent;
+    using EnumType = DiagnosticLogs::IntentEnum;
     switch (val)
     {
     case EnumType::kEndUserSupport:
@@ -640,9 +640,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::LogsInt
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::LogsStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::StatusEnum val)
 {
-    using EnumType = DiagnosticLogs::LogsStatus;
+    using EnumType = DiagnosticLogs::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -655,9 +655,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::LogsSta
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::LogsTransferProtocol val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::TransferProtocolEnum val)
 {
-    using EnumType = DiagnosticLogs::LogsTransferProtocol;
+    using EnumType = DiagnosticLogs::TransferProtocolEnum;
     switch (val)
     {
     case EnumType::kResponsePayload:

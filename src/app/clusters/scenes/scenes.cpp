@@ -25,6 +25,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage-null-handling.h>
+#include <app/util/error-mapping.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -408,7 +409,6 @@ bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, c
     // value of TransitionTime.
 
     EmberAfStatus status;
-    EmberStatus sendStatus = EMBER_SUCCESS;
     emberAfScenesClusterPrintln("RX: RecallScene 0x%2x, 0x%x", groupId, sceneId);
     status = emberAfScenesClusterRecallSavedSceneCallback(fabricIndex, emberAfCurrentEndpoint(), groupId, sceneId);
 #ifdef EMBER_AF_PLUGIN_ZLL_SCENES_SERVER
@@ -417,10 +417,10 @@ bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, c
         emberAfPluginZllScenesServerRecallSceneZllExtensions(emberAfCurrentEndpoint());
     }
 #endif
-    sendStatus = emberAfSendImmediateDefaultResponse(status);
-    if (EMBER_SUCCESS != sendStatus)
+    CHIP_ERROR sendErr = commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
+    if (CHIP_NO_ERROR != sendErr)
     {
-        emberAfScenesClusterPrintln("Scenes: failed to send %s: 0x%x", "default_response", sendStatus);
+        emberAfScenesClusterPrintln("Scenes: failed to send %s: %" CHIP_ERROR_FORMAT, "status_response", sendErr.Format());
     }
     return true;
 }

@@ -33,7 +33,6 @@ namespace app {
 namespace Compatibility {
 
 void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandPath & commandPath);
-bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status);
 void ResetEmberAfObjects();
 
 } // namespace Compatibility

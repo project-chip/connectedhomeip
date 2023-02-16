@@ -22,6 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventHeader.h>
 #include <app/MessageDef/StatusIB.h>
+#include <lib/dnssd/Resolver.h>
 
 class RemoteDataModelLoggerDelegate
 {
@@ -39,5 +40,6 @@ CHIP_ERROR LogEventAsJSON(const chip::app::EventHeader & header, chip::TLV::TLVR
 CHIP_ERROR LogErrorAsJSON(const chip::app::EventHeader & header, const chip::app::StatusIB & status);
 CHIP_ERROR LogErrorAsJSON(const CHIP_ERROR & error);
 CHIP_ERROR LogGetCommissionerNodeId(chip::NodeId value);
+CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeData);
 void SetDelegate(RemoteDataModelLoggerDelegate * delegate);
 }; // namespace RemoteDataModelLogger

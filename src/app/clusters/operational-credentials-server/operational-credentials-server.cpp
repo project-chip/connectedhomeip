@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include <access/AccessControl.h>
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>

@@ -771,8 +771,8 @@ enum class WiFiSecurity : uint8_t
 
 namespace DiagnosticLogs {
 
-// Enum for LogsIntent
-enum class LogsIntent : uint8_t
+// Enum for IntentEnum
+enum class IntentEnum : uint8_t
 {
     kEndUserSupport = 0x00,
     kNetworkDiag    = 0x01,
@@ -784,8 +784,8 @@ enum class LogsIntent : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for LogsStatus
-enum class LogsStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess   = 0x00,
     kExhausted = 0x01,
@@ -799,8 +799,8 @@ enum class LogsStatus : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for LogsTransferProtocol
-enum class LogsTransferProtocol : uint8_t
+// Enum for TransferProtocolEnum
+enum class TransferProtocolEnum : uint8_t
 {
     kResponsePayload = 0x00,
     kBdx             = 0x01,

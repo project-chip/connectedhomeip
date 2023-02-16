@@ -7196,7 +7196,7 @@ public class ChipClusters {
         RetrieveLogsResponseCallback callback,
         Integer intent,
         Integer requestedProtocol,
-        byte[] transferFileDesignator) {
+        Optional<String> transferFileDesignator) {
       retrieveLogsRequest(
           chipClusterPtr, callback, intent, requestedProtocol, transferFileDesignator, null);
     }
@@ -7205,7 +7205,7 @@ public class ChipClusters {
         RetrieveLogsResponseCallback callback,
         Integer intent,
         Integer requestedProtocol,
-        byte[] transferFileDesignator,
+        Optional<String> transferFileDesignator,
         int timedInvokeTimeoutMs) {
       retrieveLogsRequest(
           chipClusterPtr,
@@ -7221,7 +7221,7 @@ public class ChipClusters {
         RetrieveLogsResponseCallback Callback,
         Integer intent,
         Integer requestedProtocol,
-        byte[] transferFileDesignator,
+        Optional<String> transferFileDesignator,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface RetrieveLogsResponseCallback {

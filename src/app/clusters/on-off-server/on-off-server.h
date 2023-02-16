@@ -48,14 +48,14 @@ public:
 
     static OnOffServer & Instance();
 
-    bool offCommand(const chip::app::ConcreteCommandPath & commandPath);
-    bool onCommand(const chip::app::ConcreteCommandPath & commandPath);
-    bool toggleCommand(const chip::app::ConcreteCommandPath & commandPath);
+    bool offCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    bool onCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    bool toggleCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
     void initOnOffServer(chip::EndpointId endpoint);
     bool offWithEffectCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                               const chip::app::Clusters::OnOff::Commands::OffWithEffect::DecodableType & commandData);
     bool OnWithRecallGlobalSceneCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
-    bool OnWithTimedOffCommand(const chip::app::ConcreteCommandPath & commandPath,
+    bool OnWithTimedOffCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
     EmberAfStatus getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue);

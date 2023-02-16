@@ -1210,13 +1210,13 @@ server cluster NetworkCommissioning = 49 {
 }
 
 server cluster DiagnosticLogs = 50 {
-  enum LogsIntent : ENUM8 {
+  enum IntentEnum : ENUM8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
     kCrashLogs = 2;
   }
 
-  enum LogsStatus : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kExhausted = 1;
     kNoLogs = 2;
@@ -1224,7 +1224,7 @@ server cluster DiagnosticLogs = 50 {
     kDenied = 4;
   }
 
-  enum LogsTransferProtocol : ENUM8 {
+  enum TransferProtocolEnum : ENUM8 {
     kResponsePayload = 0;
     kBdx = 1;
   }
@@ -1237,9 +1237,9 @@ server cluster DiagnosticLogs = 50 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct RetrieveLogsRequestRequest {
-    LogsIntent intent = 0;
-    LogsTransferProtocol requestedProtocol = 1;
-    OCTET_STRING<32> transferFileDesignator = 2;
+    IntentEnum intent = 0;
+    TransferProtocolEnum requestedProtocol = 1;
+    optional CHAR_STRING<32> transferFileDesignator = 2;
   }
 
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
@@ -4449,8 +4449,6 @@ endpoint 0 {
   }
 
   server cluster ThreadNetworkDiagnostics {
-    emits event ConnectionStatus;
-    emits event NetworkFaultChange;
     callback attribute channel;
     callback attribute routingRole;
     callback attribute networkName;
@@ -4708,8 +4706,6 @@ endpoint 1 {
   }
 
   server cluster Actions {
-    emits event StateChanged;
-    emits event ActionFailed;
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
@@ -4751,7 +4747,6 @@ endpoint 1 {
   }
 
   server cluster BooleanState {
-    emits event StateChange;
     ram      attribute stateValue;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
@@ -4852,18 +4847,6 @@ endpoint 1 {
   }
 
   server cluster PumpConfigurationAndControl {
-    emits event SupplyVoltageLow;
-    emits event SupplyVoltageHigh;
-    emits event PowerMissingPhase;
-    emits event SystemPressureLow;
-    emits event SystemPressureHigh;
-    emits event DryRunning;
-    emits event MotorTemperatureHigh;
-    emits event PumpMotorFatalFailure;
-    emits event ElectronicTemperatureHigh;
-    emits event PumpBlocked;
-    emits event SensorFailure;
-    emits event ElectronicNonFatalFailure;
     ram      attribute maxPressure;
     ram      attribute maxSpeed;
     ram      attribute maxFlow;

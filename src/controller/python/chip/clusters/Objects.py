@@ -7777,7 +7777,7 @@ class DiagnosticLogs(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class LogsIntent(MatterIntEnum):
+        class IntentEnum(MatterIntEnum):
             kEndUserSupport = 0x00
             kNetworkDiag = 0x01
             kCrashLogs = 0x02
@@ -7787,7 +7787,7 @@ class DiagnosticLogs(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
 
-        class LogsStatus(MatterIntEnum):
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kExhausted = 0x01
             kNoLogs = 0x02
@@ -7799,7 +7799,7 @@ class DiagnosticLogs(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 5,
 
-        class LogsTransferProtocol(MatterIntEnum):
+        class TransferProtocolEnum(MatterIntEnum):
             kResponsePayload = 0x00
             kBdx = 0x01
             # All received enum values that are not listed above will be mapped
@@ -7823,14 +7823,14 @@ class DiagnosticLogs(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="intent", Tag=0, Type=DiagnosticLogs.Enums.LogsIntent),
-                            ClusterObjectFieldDescriptor(Label="requestedProtocol", Tag=1, Type=DiagnosticLogs.Enums.LogsTransferProtocol),
-                            ClusterObjectFieldDescriptor(Label="transferFileDesignator", Tag=2, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="intent", Tag=0, Type=DiagnosticLogs.Enums.IntentEnum),
+                            ClusterObjectFieldDescriptor(Label="requestedProtocol", Tag=1, Type=DiagnosticLogs.Enums.TransferProtocolEnum),
+                            ClusterObjectFieldDescriptor(Label="transferFileDesignator", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            intent: 'DiagnosticLogs.Enums.LogsIntent' = 0
-            requestedProtocol: 'DiagnosticLogs.Enums.LogsTransferProtocol' = 0
-            transferFileDesignator: 'bytes' = b""
+            intent: 'DiagnosticLogs.Enums.IntentEnum' = 0
+            requestedProtocol: 'DiagnosticLogs.Enums.TransferProtocolEnum' = 0
+            transferFileDesignator: 'typing.Optional[str]' = None
 
         @dataclass
         class RetrieveLogsResponse(ClusterCommand):
@@ -7843,13 +7843,13 @@ class DiagnosticLogs(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=DiagnosticLogs.Enums.LogsStatus),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=DiagnosticLogs.Enums.StatusEnum),
                             ClusterObjectFieldDescriptor(Label="logContent", Tag=1, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="UTCTimeStamp", Tag=2, Type=typing.Optional[uint]),
                             ClusterObjectFieldDescriptor(Label="timeSinceBoot", Tag=3, Type=typing.Optional[uint]),
                     ])
 
-            status: 'DiagnosticLogs.Enums.LogsStatus' = 0
+            status: 'DiagnosticLogs.Enums.StatusEnum' = 0
             logContent: 'bytes' = b""
             UTCTimeStamp: 'typing.Optional[uint]' = None
             timeSinceBoot: 'typing.Optional[uint]' = None

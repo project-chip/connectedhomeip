@@ -7733,9 +7733,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
-    LogsIntent intent                      = static_cast<LogsIntent>(0);
-    LogsTransferProtocol requestedProtocol = static_cast<LogsTransferProtocol>(0);
-    chip::ByteSpan transferFileDesignator;
+    IntentEnum intent                      = static_cast<IntentEnum>(0);
+    TransferProtocolEnum requestedProtocol = static_cast<TransferProtocolEnum>(0);
+    Optional<chip::CharSpan> transferFileDesignator;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -7750,9 +7750,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
-    LogsIntent intent                      = static_cast<LogsIntent>(0);
-    LogsTransferProtocol requestedProtocol = static_cast<LogsTransferProtocol>(0);
-    chip::ByteSpan transferFileDesignator;
+    IntentEnum intent                      = static_cast<IntentEnum>(0);
+    TransferProtocolEnum requestedProtocol = static_cast<TransferProtocolEnum>(0);
+    Optional<chip::CharSpan> transferFileDesignator;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RetrieveLogsRequest
@@ -7772,7 +7772,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
-    LogsStatus status = static_cast<LogsStatus>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     chip::ByteSpan logContent;
     Optional<uint64_t> UTCTimeStamp;
     Optional<uint64_t> timeSinceBoot;
@@ -7790,7 +7790,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
-    LogsStatus status = static_cast<LogsStatus>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     chip::ByteSpan logContent;
     Optional<uint64_t> UTCTimeStamp;
     Optional<uint64_t> timeSinceBoot;
