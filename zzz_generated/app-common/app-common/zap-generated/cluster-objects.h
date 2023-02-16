@@ -1978,8 +1978,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    OnOffEffectIdentifier effectIdentifier        = static_cast<OnOffEffectIdentifier>(0);
-    OnOffDelayedAllOffEffectVariant effectVariant = static_cast<OnOffDelayedAllOffEffectVariant>(0);
+    OnOffEffectIdentifier effectIdentifier = static_cast<OnOffEffectIdentifier>(0);
+    uint8_t effectVariant                  = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -1994,8 +1994,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    OnOffEffectIdentifier effectIdentifier        = static_cast<OnOffEffectIdentifier>(0);
-    OnOffDelayedAllOffEffectVariant effectVariant = static_cast<OnOffDelayedAllOffEffectVariant>(0);
+    OnOffEffectIdentifier effectIdentifier = static_cast<OnOffEffectIdentifier>(0);
+    uint8_t effectVariant                  = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OffWithEffect

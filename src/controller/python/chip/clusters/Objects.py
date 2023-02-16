@@ -1384,11 +1384,11 @@ class OnOff(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="effectIdentifier", Tag=0, Type=OnOff.Enums.OnOffEffectIdentifier),
-                            ClusterObjectFieldDescriptor(Label="effectVariant", Tag=1, Type=OnOff.Enums.OnOffDelayedAllOffEffectVariant),
+                            ClusterObjectFieldDescriptor(Label="effectVariant", Tag=1, Type=uint),
                     ])
 
             effectIdentifier: 'OnOff.Enums.OnOffEffectIdentifier' = 0
-            effectVariant: 'OnOff.Enums.OnOffDelayedAllOffEffectVariant' = 0
+            effectVariant: 'uint' = 0
 
         @dataclass
         class OnWithRecallGlobalScene(ClusterCommand):
