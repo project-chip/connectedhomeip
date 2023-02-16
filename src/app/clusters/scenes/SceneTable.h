@@ -34,7 +34,7 @@ static constexpr uint8_t kMaxScenePerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
 class SceneTable
 {
 public:
-    static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
+    static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
     static constexpr size_t kSceneNameMax = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
 
     /// @brief struct used to identify a scene in storage by 3 ids, endpoint, group and scene
