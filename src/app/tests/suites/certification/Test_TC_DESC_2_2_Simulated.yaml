@@ -27,19 +27,6 @@ tests:
     #  cluster: "DelayCommands"
     #  command: "WaitForCommissioning"
 
-    - label: "Wait for the device to be commissioned"
-      PICS: PICS_SKIP_SAMPLE_APP
-      verification: |
-          Commission DUT to TH
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
-
     - label: "DUT reads DeviceTypeList from TH."
       PICS: DESC.C.A0000
       wait: "readAttribute"
