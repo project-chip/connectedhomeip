@@ -13,13 +13,7 @@
  ******************************************************************************/
 #include "app/data-model/NullObject.h"
 #include "zcl_global_types.hpp"
-
-template <typename T>
-struct is_nullable : std::false_type {};
-
-template <typename T>
-struct is_nullable<chip::app::DataModel::Nullable<T>> : std::true_type {};
-
+#include "chip_type_traits.hpp"
 
 // Default translation
 template <typename T>
@@ -52,7 +46,7 @@ std::optional<chip::Span<const char>> inline from_json(const nlohmann::json & va
   template<> inline std::optional<chip::BitMask<{{asUpperCamelCase parent.label}}::{{label}}>> from_json(const nlohmann::json& obj) {
     chip::BitMask<{{asUpperCamelCase parent.label}}::{{label}}> r;
     {{#zcl_bitmap_items}}
-    r.SetField({{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}}, obj.value("{{unifyBitmapValName this}}",false)); 
+    r.SetField({{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}}, obj.value("{{unifyBitmapValName this}}",false));
     {{/zcl_bitmap_items}}
     return r;
   }
@@ -61,7 +55,7 @@ std::optional<chip::Span<const char>> inline from_json(const nlohmann::json & va
 
     {{#zcl_enums}}
 template<> inline std::optional<{{asUpperCamelCase parent.label}}::{{label}}> from_json(const nlohmann::json& value) {
-    const std::map< std::string, {{asUpperCamelCase parent.label}}::{{label}}> 
+    const std::map< std::string, {{asUpperCamelCase parent.label}}::{{label}}>
         table = {
         {{#zcl_enum_items}}
             { "{{unifyEnumValName this}}" , {{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}} },

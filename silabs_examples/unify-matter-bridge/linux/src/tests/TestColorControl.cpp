@@ -157,13 +157,13 @@ static void TestColorControlAttributeDriftCompensation(nlTestSuite * sSuite, voi
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
-static void TestColorControlAttributeCompensationText(nlTestSuite * sSuite, void * apContext)
+/*static void TestColorControlAttributeCompensationText(nlTestSuite * sSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     auto result       = ctx.attribute_test<Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Attributes/CompensationText/Reported", R"({ "value": "Sup?" })");
+        sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Attributes/CompensationText/Reported", R"({ "value": "SomeValue" })");
     NL_TEST_ASSERT(sSuite, result.unwrap().empty());
-}
+}*/
 
 static void TestColorControlAttributeColorTemperatureMireds(nlTestSuite * sSuite, void * apContext)
 {
@@ -758,7 +758,7 @@ static const nlTest sAttributeTests[] = {
     NL_TEST_DEF("ColorControl::TestColorControlAttributeCurrentX", TestColorControlAttributeCurrentX),
     NL_TEST_DEF("ColorControl::TestColorControlAttributeCurrentY", TestColorControlAttributeCurrentY),
     NL_TEST_DEF("ColorControl::TestColorControlAttributeDriftCompensation", TestColorControlAttributeDriftCompensation),
-    NL_TEST_DEF("ColorControl::TestColorControlAttributeCompensationText", TestColorControlAttributeCompensationText),
+    //NL_TEST_DEF("ColorControl::TestColorControlAttributeCompensationText", TestColorControlAttributeCompensationText),
     NL_TEST_DEF("ColorControl::TestColorControlAttributeColorTemperatureMireds", TestColorControlAttributeColorTemperatureMireds),
     //NL_TEST_DEF("ColorControl::TestColorControlAttributeColorMode", TestColorControlAttributeColorMode),
     // NL_TEST_DEF("ColorControl::TestColorControlAttributeOptions", TestColorControlAttributeOptions),

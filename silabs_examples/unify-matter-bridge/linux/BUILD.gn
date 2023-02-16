@@ -71,7 +71,6 @@ static_library("unify-matter-bridge-lib") {
     "zap-generated/data_model_translator/attribute_translator.cpp",
     "zap-generated/data_model_translator/attribute_type_size.cpp",
     "zap-generated/data_model_translator/command_translator.cpp",
-    "zap-generated/data_model_translator/unify_accessors.cpp",
   ]
 
   public_deps = [
@@ -90,6 +89,7 @@ static_library("unify-matter-bridge-lib") {
     configs += [ ":coverage" ]
   }
 }
+
 
 executable("unify-matter-bridge") {
   sources = [ "src/matter_bridge_main.cpp" ]

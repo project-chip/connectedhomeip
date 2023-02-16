@@ -121,14 +121,16 @@ private:
             } catch (const nlohmann::json::parse_error & e)
             {
                 sl_log_warning(LOG_TAG,
-                               "It was not possible to parse incoming attribute state "
-                               "update since the message payload is not json, %s\n",
+                               "Error parsing attribute %s reported value for %s/ep%s "
+                               "as the payload does not appear to be correct JSON, %s\n",
+                               attribute.c_str(), unid.c_str(), endpoint_id.c_str(),
                                e.what());
             } catch (const nlohmann::json::type_error & e)
             {
                 sl_log_warning(LOG_TAG,
-                               "It was not possible to parse incoming attribute state update since "
-                               "the value of different type or key is not present, %s\n%s\n",
+                               "Error parsing attribute %s reported value for %s/ep%s "
+                               "as the value is of different type or key is unknown to us, %s\n%s\n",
+                               attribute.c_str(), unid.c_str(), endpoint_id.c_str(),
                                e.what(), msg.c_str());
             }
         }

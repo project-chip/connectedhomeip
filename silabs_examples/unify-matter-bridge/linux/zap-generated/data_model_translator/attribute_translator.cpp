@@ -36,7 +36,6 @@ using namespace unify::matter_bridge;
 
 #include "chip_types_from_json.hpp"
 #include "chip_types_to_json.hpp"
-#include "unify_accessors.hpp"
 
 CHIP_ERROR
 IdentifyAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
@@ -63,23 +62,27 @@ IdentifyAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
         switch (aPath.mAttributeId) {
         case MN::IdentifyTime::Id: { // type is int16u
             MN::IdentifyTime::TypeInfo::Type value;
-            UN::IdentifyTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::IdentifyType::Id: { // type is enum8
             MN::IdentifyType::TypeInfo::Type value;
-            UN::IdentifyType::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -166,7 +169,7 @@ void IdentifyAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "IdentifyTime attribute value is %s", unify_value.dump().c_str());
-            UN::IdentifyTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::IdentifyTime::Id);
         }
         break;
@@ -199,18 +202,21 @@ GroupsAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
         switch (aPath.mAttributeId) {
         case MN::NameSupport::Id: { // type is bitmap8
             MN::NameSupport::TypeInfo::Type value;
-            UN::NameSupport::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -290,7 +296,7 @@ void GroupsAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NameSupport attribute value is %s", unify_value.dump().c_str());
-            UN::NameSupport::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Groups::Id, MN::NameSupport::Id);
         }
         break;
@@ -323,43 +329,51 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
         switch (aPath.mAttributeId) {
         case MN::SceneCount::Id: { // type is int8u
             MN::SceneCount::TypeInfo::Type value;
-            UN::SceneCount::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CurrentScene::Id: { // type is int8u
             MN::CurrentScene::TypeInfo::Type value;
-            UN::CurrentScene::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CurrentGroup::Id: { // type is group_id
             MN::CurrentGroup::TypeInfo::Type value;
-            UN::CurrentGroup::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SceneValid::Id: { // type is boolean
             MN::SceneValid::TypeInfo::Type value;
-            UN::SceneValid::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NameSupport::Id: { // type is bitmap8
             MN::NameSupport::TypeInfo::Type value;
-            UN::NameSupport::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::LastConfiguredBy::Id: { // type is node_id
             MN::LastConfiguredBy::TypeInfo::Type value;
-            UN::LastConfiguredBy::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -444,7 +458,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SceneCount attribute value is %s", unify_value.dump().c_str());
-            UN::SceneCount::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneCount::Id);
         }
         break;
@@ -456,7 +470,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentScene attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentScene::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentScene::Id);
         }
         break;
@@ -468,7 +482,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentGroup attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentGroup::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentGroup::Id);
         }
         break;
@@ -480,7 +494,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SceneValid attribute value is %s", unify_value.dump().c_str());
-            UN::SceneValid::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneValid::Id);
         }
         break;
@@ -492,7 +506,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NameSupport attribute value is %s", unify_value.dump().c_str());
-            UN::NameSupport::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::NameSupport::Id);
         }
         break;
@@ -504,7 +518,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LastConfiguredBy attribute value is %s", unify_value.dump().c_str());
-            UN::LastConfiguredBy::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::LastConfiguredBy::Id);
         }
         break;
@@ -537,38 +551,45 @@ OnOffAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValu
         switch (aPath.mAttributeId) {
         case MN::OnOff::Id: { // type is boolean
             MN::OnOff::TypeInfo::Type value;
-            UN::OnOff::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::GlobalSceneControl::Id: { // type is boolean
             MN::GlobalSceneControl::TypeInfo::Type value;
-            UN::GlobalSceneControl::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OnTime::Id: { // type is int16u
             MN::OnTime::TypeInfo::Type value;
-            UN::OnTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OffWaitTime::Id: { // type is int16u
             MN::OffWaitTime::TypeInfo::Type value;
-            UN::OffWaitTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::StartUpOnOff::Id: { // type is OnOffStartUpOnOff
             MN::StartUpOnOff::TypeInfo::Type value;
-            UN::StartUpOnOff::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -670,7 +691,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint* ep, const st
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnOff attribute value is %s", unify_value.dump().c_str());
-            UN::OnOff::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OnOff::Id);
         }
         break;
@@ -682,7 +703,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint* ep, const st
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "GlobalSceneControl attribute value is %s", unify_value.dump().c_str());
-            UN::GlobalSceneControl::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::GlobalSceneControl::Id);
         }
         break;
@@ -694,7 +715,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint* ep, const st
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnTime attribute value is %s", unify_value.dump().c_str());
-            UN::OnTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OnTime::Id);
         }
         break;
@@ -706,7 +727,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint* ep, const st
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OffWaitTime attribute value is %s", unify_value.dump().c_str());
-            UN::OffWaitTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OffWaitTime::Id);
         }
         break;
@@ -718,7 +739,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint* ep, const st
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartUpOnOff attribute value is %s", unify_value.dump().c_str());
-            UN::StartUpOnOff::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::StartUpOnOff::Id);
         }
         break;
@@ -751,83 +772,99 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
         switch (aPath.mAttributeId) {
         case MN::CurrentLevel::Id: { // type is int8u
             MN::CurrentLevel::TypeInfo::Type value;
-            UN::CurrentLevel::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RemainingTime::Id: { // type is int16u
             MN::RemainingTime::TypeInfo::Type value;
-            UN::RemainingTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinLevel::Id: { // type is int8u
             MN::MinLevel::TypeInfo::Type value;
-            UN::MinLevel::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxLevel::Id: { // type is int8u
             MN::MaxLevel::TypeInfo::Type value;
-            UN::MaxLevel::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CurrentFrequency::Id: { // type is int16u
             MN::CurrentFrequency::TypeInfo::Type value;
-            UN::CurrentFrequency::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinFrequency::Id: { // type is int16u
             MN::MinFrequency::TypeInfo::Type value;
-            UN::MinFrequency::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxFrequency::Id: { // type is int16u
             MN::MaxFrequency::TypeInfo::Type value;
-            UN::MaxFrequency::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Options::Id: { // type is LevelControlOptions
             MN::Options::TypeInfo::Type value;
-            UN::Options::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OnOffTransitionTime::Id: { // type is int16u
             MN::OnOffTransitionTime::TypeInfo::Type value;
-            UN::OnOffTransitionTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OnLevel::Id: { // type is int8u
             MN::OnLevel::TypeInfo::Type value;
-            UN::OnLevel::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OnTransitionTime::Id: { // type is int16u
             MN::OnTransitionTime::TypeInfo::Type value;
-            UN::OnTransitionTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OffTransitionTime::Id: { // type is int16u
             MN::OffTransitionTime::TypeInfo::Type value;
-            UN::OffTransitionTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DefaultMoveRate::Id: { // type is int8u
             MN::DefaultMoveRate::TypeInfo::Type value;
-            UN::DefaultMoveRate::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::StartUpCurrentLevel::Id: { // type is int8u
             MN::StartUpCurrentLevel::TypeInfo::Type value;
-            UN::StartUpCurrentLevel::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -962,7 +999,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentLevel attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentLevel::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::CurrentLevel::Id);
         }
         break;
@@ -974,7 +1011,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RemainingTime attribute value is %s", unify_value.dump().c_str());
-            UN::RemainingTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::RemainingTime::Id);
         }
         break;
@@ -986,7 +1023,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinLevel attribute value is %s", unify_value.dump().c_str());
-            UN::MinLevel::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MinLevel::Id);
         }
         break;
@@ -998,7 +1035,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxLevel attribute value is %s", unify_value.dump().c_str());
-            UN::MaxLevel::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MaxLevel::Id);
         }
         break;
@@ -1010,7 +1047,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentFrequency attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentFrequency::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::CurrentFrequency::Id);
         }
         break;
@@ -1022,7 +1059,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinFrequency attribute value is %s", unify_value.dump().c_str());
-            UN::MinFrequency::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MinFrequency::Id);
         }
         break;
@@ -1034,7 +1071,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxFrequency attribute value is %s", unify_value.dump().c_str());
-            UN::MaxFrequency::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MaxFrequency::Id);
         }
         break;
@@ -1046,7 +1083,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Options attribute value is %s", unify_value.dump().c_str());
-            UN::Options::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::Options::Id);
         }
         break;
@@ -1058,7 +1095,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnOffTransitionTime attribute value is %s", unify_value.dump().c_str());
-            UN::OnOffTransitionTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnOffTransitionTime::Id);
         }
         break;
@@ -1070,7 +1107,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnLevel attribute value is %s", unify_value.dump().c_str());
-            UN::OnLevel::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnLevel::Id);
         }
         break;
@@ -1082,7 +1119,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnTransitionTime attribute value is %s", unify_value.dump().c_str());
-            UN::OnTransitionTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnTransitionTime::Id);
         }
         break;
@@ -1094,7 +1131,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OffTransitionTime attribute value is %s", unify_value.dump().c_str());
-            UN::OffTransitionTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OffTransitionTime::Id);
         }
         break;
@@ -1106,7 +1143,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DefaultMoveRate attribute value is %s", unify_value.dump().c_str());
-            UN::DefaultMoveRate::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::DefaultMoveRate::Id);
         }
         break;
@@ -1118,7 +1155,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartUpCurrentLevel attribute value is %s", unify_value.dump().c_str());
-            UN::StartUpCurrentLevel::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::StartUpCurrentLevel::Id);
         }
         break;
@@ -1151,193 +1188,231 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
         switch (aPath.mAttributeId) {
         case MN::LockState::Id: { // type is DlLockState
             MN::LockState::TypeInfo::Type value;
-            UN::LockState::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::LockType::Id: { // type is DlLockType
             MN::LockType::TypeInfo::Type value;
-            UN::LockType::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActuatorEnabled::Id: { // type is boolean
             MN::ActuatorEnabled::TypeInfo::Type value;
-            UN::ActuatorEnabled::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DoorState::Id: { // type is DoorStateEnum
             MN::DoorState::TypeInfo::Type value;
-            UN::DoorState::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DoorOpenEvents::Id: { // type is int32u
             MN::DoorOpenEvents::TypeInfo::Type value;
-            UN::DoorOpenEvents::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DoorClosedEvents::Id: { // type is int32u
             MN::DoorClosedEvents::TypeInfo::Type value;
-            UN::DoorClosedEvents::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OpenPeriod::Id: { // type is int16u
             MN::OpenPeriod::TypeInfo::Type value;
-            UN::OpenPeriod::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfTotalUsersSupported::Id: { // type is int16u
             MN::NumberOfTotalUsersSupported::TypeInfo::Type value;
-            UN::NumberOfTotalUsersSupported::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfPINUsersSupported::Id: { // type is int16u
             MN::NumberOfPINUsersSupported::TypeInfo::Type value;
-            UN::NumberOfPINUsersSupported::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfRFIDUsersSupported::Id: { // type is int16u
             MN::NumberOfRFIDUsersSupported::TypeInfo::Type value;
-            UN::NumberOfRFIDUsersSupported::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfWeekDaySchedulesSupportedPerUser::Id: { // type is int8u
             MN::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::Type value;
-            UN::NumberOfWeekDaySchedulesSupportedPerUser::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfYearDaySchedulesSupportedPerUser::Id: { // type is int8u
             MN::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::Type value;
-            UN::NumberOfYearDaySchedulesSupportedPerUser::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfHolidaySchedulesSupported::Id: { // type is int8u
             MN::NumberOfHolidaySchedulesSupported::TypeInfo::Type value;
-            UN::NumberOfHolidaySchedulesSupported::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxPINCodeLength::Id: { // type is int8u
             MN::MaxPINCodeLength::TypeInfo::Type value;
-            UN::MaxPINCodeLength::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinPINCodeLength::Id: { // type is int8u
             MN::MinPINCodeLength::TypeInfo::Type value;
-            UN::MinPINCodeLength::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxRFIDCodeLength::Id: { // type is int8u
             MN::MaxRFIDCodeLength::TypeInfo::Type value;
-            UN::MaxRFIDCodeLength::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinRFIDCodeLength::Id: { // type is int8u
             MN::MinRFIDCodeLength::TypeInfo::Type value;
-            UN::MinRFIDCodeLength::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CredentialRulesSupport::Id: { // type is DlCredentialRuleMask
             MN::CredentialRulesSupport::TypeInfo::Type value;
-            UN::CredentialRulesSupport::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfCredentialsSupportedPerUser::Id: { // type is int8u
             MN::NumberOfCredentialsSupportedPerUser::TypeInfo::Type value;
-            UN::NumberOfCredentialsSupportedPerUser::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Language::Id: { // type is char_string
             MN::Language::TypeInfo::Type value;
-            UN::Language::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::LEDSettings::Id: { // type is int8u
             MN::LEDSettings::TypeInfo::Type value;
-            UN::LEDSettings::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AutoRelockTime::Id: { // type is int32u
             MN::AutoRelockTime::TypeInfo::Type value;
-            UN::AutoRelockTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SoundVolume::Id: { // type is int8u
             MN::SoundVolume::TypeInfo::Type value;
-            UN::SoundVolume::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OperatingMode::Id: { // type is OperatingModeEnum
             MN::OperatingMode::TypeInfo::Type value;
-            UN::OperatingMode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SupportedOperatingModes::Id: { // type is DlSupportedOperatingModes
             MN::SupportedOperatingModes::TypeInfo::Type value;
-            UN::SupportedOperatingModes::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DefaultConfigurationRegister::Id: { // type is DlDefaultConfigurationRegister
             MN::DefaultConfigurationRegister::TypeInfo::Type value;
-            UN::DefaultConfigurationRegister::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::EnableLocalProgramming::Id: { // type is boolean
             MN::EnableLocalProgramming::TypeInfo::Type value;
-            UN::EnableLocalProgramming::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::EnableOneTouchLocking::Id: { // type is boolean
             MN::EnableOneTouchLocking::TypeInfo::Type value;
-            UN::EnableOneTouchLocking::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::EnableInsideStatusLED::Id: { // type is boolean
             MN::EnableInsideStatusLED::TypeInfo::Type value;
-            UN::EnableInsideStatusLED::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::EnablePrivacyModeButton::Id: { // type is boolean
             MN::EnablePrivacyModeButton::TypeInfo::Type value;
-            UN::EnablePrivacyModeButton::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::LocalProgrammingFeatures::Id: { // type is DlLocalProgrammingFeatures
             MN::LocalProgrammingFeatures::TypeInfo::Type value;
-            UN::LocalProgrammingFeatures::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::WrongCodeEntryLimit::Id: { // type is int8u
             MN::WrongCodeEntryLimit::TypeInfo::Type value;
-            UN::WrongCodeEntryLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UserCodeTemporaryDisableTime::Id: { // type is int8u
             MN::UserCodeTemporaryDisableTime::TypeInfo::Type value;
-            UN::UserCodeTemporaryDisableTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SendPINOverTheAir::Id: { // type is boolean
             MN::SendPINOverTheAir::TypeInfo::Type value;
-            UN::SendPINOverTheAir::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RequirePINforRemoteOperation::Id: { // type is boolean
             MN::RequirePINforRemoteOperation::TypeInfo::Type value;
-            UN::RequirePINforRemoteOperation::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ExpiringUserTimeout::Id: { // type is int16u
             MN::ExpiringUserTimeout::TypeInfo::Type value;
-            UN::ExpiringUserTimeout::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -1546,7 +1621,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LockState attribute value is %s", unify_value.dump().c_str());
-            UN::LockState::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockState::Id);
         }
         break;
@@ -1558,7 +1633,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LockType attribute value is %s", unify_value.dump().c_str());
-            UN::LockType::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockType::Id);
         }
         break;
@@ -1570,7 +1645,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActuatorEnabled attribute value is %s", unify_value.dump().c_str());
-            UN::ActuatorEnabled::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ActuatorEnabled::Id);
         }
         break;
@@ -1582,7 +1657,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DoorState attribute value is %s", unify_value.dump().c_str());
-            UN::DoorState::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorState::Id);
         }
         break;
@@ -1594,7 +1669,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DoorOpenEvents attribute value is %s", unify_value.dump().c_str());
-            UN::DoorOpenEvents::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorOpenEvents::Id);
         }
         break;
@@ -1606,7 +1681,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DoorClosedEvents attribute value is %s", unify_value.dump().c_str());
-            UN::DoorClosedEvents::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorClosedEvents::Id);
         }
         break;
@@ -1618,7 +1693,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OpenPeriod attribute value is %s", unify_value.dump().c_str());
-            UN::OpenPeriod::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::OpenPeriod::Id);
         }
         break;
@@ -1630,7 +1705,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfTotalUsersSupported attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfTotalUsersSupported::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::NumberOfTotalUsersSupported::Id);
         }
@@ -1643,7 +1718,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfPINUsersSupported attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfPINUsersSupported::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::NumberOfPINUsersSupported::Id);
         }
         break;
@@ -1655,7 +1730,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfRFIDUsersSupported attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfRFIDUsersSupported::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::NumberOfRFIDUsersSupported::Id);
         }
@@ -1668,7 +1743,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfWeekDaySchedulesSupportedPerUser attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfWeekDaySchedulesSupportedPerUser::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::NumberOfWeekDaySchedulesSupportedPerUser::Id);
         }
@@ -1681,7 +1756,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfYearDaySchedulesSupportedPerUser attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfYearDaySchedulesSupportedPerUser::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::NumberOfYearDaySchedulesSupportedPerUser::Id);
         }
@@ -1694,7 +1769,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfHolidaySchedulesSupported attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfHolidaySchedulesSupported::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::NumberOfHolidaySchedulesSupported::Id);
         }
@@ -1707,7 +1782,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxPINCodeLength attribute value is %s", unify_value.dump().c_str());
-            UN::MaxPINCodeLength::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MaxPINCodeLength::Id);
         }
         break;
@@ -1719,7 +1794,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinPINCodeLength attribute value is %s", unify_value.dump().c_str());
-            UN::MinPINCodeLength::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MinPINCodeLength::Id);
         }
         break;
@@ -1731,7 +1806,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxRFIDCodeLength attribute value is %s", unify_value.dump().c_str());
-            UN::MaxRFIDCodeLength::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MaxRFIDCodeLength::Id);
         }
         break;
@@ -1743,7 +1818,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinRFIDCodeLength attribute value is %s", unify_value.dump().c_str());
-            UN::MinRFIDCodeLength::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MinRFIDCodeLength::Id);
         }
         break;
@@ -1755,7 +1830,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Language attribute value is %s", unify_value.dump().c_str());
-            UN::Language::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::Language::Id);
         }
         break;
@@ -1767,7 +1842,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LEDSettings attribute value is %s", unify_value.dump().c_str());
-            UN::LEDSettings::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LEDSettings::Id);
         }
         break;
@@ -1779,7 +1854,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AutoRelockTime attribute value is %s", unify_value.dump().c_str());
-            UN::AutoRelockTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::AutoRelockTime::Id);
         }
         break;
@@ -1791,7 +1866,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SoundVolume attribute value is %s", unify_value.dump().c_str());
-            UN::SoundVolume::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SoundVolume::Id);
         }
         break;
@@ -1803,7 +1878,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OperatingMode attribute value is %s", unify_value.dump().c_str());
-            UN::OperatingMode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::OperatingMode::Id);
         }
         break;
@@ -1815,7 +1890,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SupportedOperatingModes attribute value is %s", unify_value.dump().c_str());
-            UN::SupportedOperatingModes::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SupportedOperatingModes::Id);
         }
         break;
@@ -1827,7 +1902,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DefaultConfigurationRegister attribute value is %s", unify_value.dump().c_str());
-            UN::DefaultConfigurationRegister::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::DefaultConfigurationRegister::Id);
         }
@@ -1840,7 +1915,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnableLocalProgramming attribute value is %s", unify_value.dump().c_str());
-            UN::EnableLocalProgramming::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableLocalProgramming::Id);
         }
         break;
@@ -1852,7 +1927,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnableOneTouchLocking attribute value is %s", unify_value.dump().c_str());
-            UN::EnableOneTouchLocking::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableOneTouchLocking::Id);
         }
         break;
@@ -1864,7 +1939,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnableInsideStatusLED attribute value is %s", unify_value.dump().c_str());
-            UN::EnableInsideStatusLED::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableInsideStatusLED::Id);
         }
         break;
@@ -1876,7 +1951,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnablePrivacyModeButton attribute value is %s", unify_value.dump().c_str());
-            UN::EnablePrivacyModeButton::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnablePrivacyModeButton::Id);
         }
         break;
@@ -1888,7 +1963,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "WrongCodeEntryLimit attribute value is %s", unify_value.dump().c_str());
-            UN::WrongCodeEntryLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::WrongCodeEntryLimit::Id);
         }
         break;
@@ -1900,7 +1975,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UserCodeTemporaryDisableTime attribute value is %s", unify_value.dump().c_str());
-            UN::UserCodeTemporaryDisableTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::UserCodeTemporaryDisableTime::Id);
         }
@@ -1913,7 +1988,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SendPINOverTheAir attribute value is %s", unify_value.dump().c_str());
-            UN::SendPINOverTheAir::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SendPINOverTheAir::Id);
         }
         break;
@@ -1925,7 +2000,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RequirePINforRemoteOperation attribute value is %s", unify_value.dump().c_str());
-            UN::RequirePINforRemoteOperation::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::RequirePINforRemoteOperation::Id);
         }
@@ -1959,63 +2034,75 @@ BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attr
         switch (aPath.mAttributeId) {
         case MN::BarrierMovingState::Id: { // type is enum8
             MN::BarrierMovingState::TypeInfo::Type value;
-            UN::BarrierMovingState::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierSafetyStatus::Id: { // type is bitmap16
             MN::BarrierSafetyStatus::TypeInfo::Type value;
-            UN::BarrierSafetyStatus::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierCapabilities::Id: { // type is bitmap8
             MN::BarrierCapabilities::TypeInfo::Type value;
-            UN::BarrierCapabilities::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierOpenEvents::Id: { // type is int16u
             MN::BarrierOpenEvents::TypeInfo::Type value;
-            UN::BarrierOpenEvents::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierCloseEvents::Id: { // type is int16u
             MN::BarrierCloseEvents::TypeInfo::Type value;
-            UN::BarrierCloseEvents::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierCommandOpenEvents::Id: { // type is int16u
             MN::BarrierCommandOpenEvents::TypeInfo::Type value;
-            UN::BarrierCommandOpenEvents::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierCommandCloseEvents::Id: { // type is int16u
             MN::BarrierCommandCloseEvents::TypeInfo::Type value;
-            UN::BarrierCommandCloseEvents::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierOpenPeriod::Id: { // type is int16u
             MN::BarrierOpenPeriod::TypeInfo::Type value;
-            UN::BarrierOpenPeriod::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierClosePeriod::Id: { // type is int16u
             MN::BarrierClosePeriod::TypeInfo::Type value;
-            UN::BarrierClosePeriod::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::BarrierPosition::Id: { // type is int8u
             MN::BarrierPosition::TypeInfo::Type value;
-            UN::BarrierPosition::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -2140,7 +2227,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierMovingState attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierMovingState::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierMovingState::Id);
         }
         break;
@@ -2152,7 +2239,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierSafetyStatus attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierSafetyStatus::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierSafetyStatus::Id);
         }
         break;
@@ -2164,7 +2251,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierCapabilities attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierCapabilities::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierCapabilities::Id);
         }
         break;
@@ -2176,7 +2263,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierOpenEvents attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierOpenEvents::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierOpenEvents::Id);
         }
         break;
@@ -2188,7 +2275,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierCloseEvents attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierCloseEvents::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierCloseEvents::Id);
         }
         break;
@@ -2200,7 +2287,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierCommandOpenEvents attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierCommandOpenEvents::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id,
                 MN::BarrierCommandOpenEvents::Id);
         }
@@ -2213,7 +2300,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierCommandCloseEvents attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierCommandCloseEvents::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id,
                 MN::BarrierCommandCloseEvents::Id);
         }
@@ -2226,7 +2313,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierOpenPeriod attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierOpenPeriod::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierOpenPeriod::Id);
         }
         break;
@@ -2238,7 +2325,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierClosePeriod attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierClosePeriod::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierClosePeriod::Id);
         }
         break;
@@ -2250,7 +2337,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep,
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierPosition attribute value is %s", unify_value.dump().c_str());
-            UN::BarrierPosition::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierPosition::Id);
         }
         break;
@@ -2283,258 +2370,309 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
         switch (aPath.mAttributeId) {
         case MN::LocalTemperature::Id: { // type is int16s
             MN::LocalTemperature::TypeInfo::Type value;
-            UN::LocalTemperature::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OutdoorTemperature::Id: { // type is int16s
             MN::OutdoorTemperature::TypeInfo::Type value;
-            UN::OutdoorTemperature::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Occupancy::Id: { // type is bitmap8
             MN::Occupancy::TypeInfo::Type value;
-            UN::Occupancy::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AbsMinHeatSetpointLimit::Id: { // type is int16s
             MN::AbsMinHeatSetpointLimit::TypeInfo::Type value;
-            UN::AbsMinHeatSetpointLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AbsMaxHeatSetpointLimit::Id: { // type is int16s
             MN::AbsMaxHeatSetpointLimit::TypeInfo::Type value;
-            UN::AbsMaxHeatSetpointLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AbsMinCoolSetpointLimit::Id: { // type is int16s
             MN::AbsMinCoolSetpointLimit::TypeInfo::Type value;
-            UN::AbsMinCoolSetpointLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AbsMaxCoolSetpointLimit::Id: { // type is int16s
             MN::AbsMaxCoolSetpointLimit::TypeInfo::Type value;
-            UN::AbsMaxCoolSetpointLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PICoolingDemand::Id: { // type is int8u
             MN::PICoolingDemand::TypeInfo::Type value;
-            UN::PICoolingDemand::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PIHeatingDemand::Id: { // type is int8u
             MN::PIHeatingDemand::TypeInfo::Type value;
-            UN::PIHeatingDemand::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::HVACSystemTypeConfiguration::Id: { // type is bitmap8
             MN::HVACSystemTypeConfiguration::TypeInfo::Type value;
-            UN::HVACSystemTypeConfiguration::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::LocalTemperatureCalibration::Id: { // type is int8s
             MN::LocalTemperatureCalibration::TypeInfo::Type value;
-            UN::LocalTemperatureCalibration::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OccupiedCoolingSetpoint::Id: { // type is int16s
             MN::OccupiedCoolingSetpoint::TypeInfo::Type value;
-            UN::OccupiedCoolingSetpoint::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OccupiedHeatingSetpoint::Id: { // type is int16s
             MN::OccupiedHeatingSetpoint::TypeInfo::Type value;
-            UN::OccupiedHeatingSetpoint::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UnoccupiedCoolingSetpoint::Id: { // type is int16s
             MN::UnoccupiedCoolingSetpoint::TypeInfo::Type value;
-            UN::UnoccupiedCoolingSetpoint::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UnoccupiedHeatingSetpoint::Id: { // type is int16s
             MN::UnoccupiedHeatingSetpoint::TypeInfo::Type value;
-            UN::UnoccupiedHeatingSetpoint::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinHeatSetpointLimit::Id: { // type is int16s
             MN::MinHeatSetpointLimit::TypeInfo::Type value;
-            UN::MinHeatSetpointLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxHeatSetpointLimit::Id: { // type is int16s
             MN::MaxHeatSetpointLimit::TypeInfo::Type value;
-            UN::MaxHeatSetpointLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinCoolSetpointLimit::Id: { // type is int16s
             MN::MinCoolSetpointLimit::TypeInfo::Type value;
-            UN::MinCoolSetpointLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxCoolSetpointLimit::Id: { // type is int16s
             MN::MaxCoolSetpointLimit::TypeInfo::Type value;
-            UN::MaxCoolSetpointLimit::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinSetpointDeadBand::Id: { // type is int8s
             MN::MinSetpointDeadBand::TypeInfo::Type value;
-            UN::MinSetpointDeadBand::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RemoteSensing::Id: { // type is bitmap8
             MN::RemoteSensing::TypeInfo::Type value;
-            UN::RemoteSensing::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ControlSequenceOfOperation::Id: { // type is ThermostatControlSequence
             MN::ControlSequenceOfOperation::TypeInfo::Type value;
-            UN::ControlSequenceOfOperation::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SystemMode::Id: { // type is enum8
             MN::SystemMode::TypeInfo::Type value;
-            UN::SystemMode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ThermostatRunningMode::Id: { // type is enum8
             MN::ThermostatRunningMode::TypeInfo::Type value;
-            UN::ThermostatRunningMode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::StartOfWeek::Id: { // type is enum8
             MN::StartOfWeek::TypeInfo::Type value;
-            UN::StartOfWeek::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfWeeklyTransitions::Id: { // type is int8u
             MN::NumberOfWeeklyTransitions::TypeInfo::Type value;
-            UN::NumberOfWeeklyTransitions::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfDailyTransitions::Id: { // type is int8u
             MN::NumberOfDailyTransitions::TypeInfo::Type value;
-            UN::NumberOfDailyTransitions::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::TemperatureSetpointHold::Id: { // type is enum8
             MN::TemperatureSetpointHold::TypeInfo::Type value;
-            UN::TemperatureSetpointHold::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::TemperatureSetpointHoldDuration::Id: { // type is int16u
             MN::TemperatureSetpointHoldDuration::TypeInfo::Type value;
-            UN::TemperatureSetpointHoldDuration::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ThermostatProgrammingOperationMode::Id: { // type is bitmap8
             MN::ThermostatProgrammingOperationMode::TypeInfo::Type value;
-            UN::ThermostatProgrammingOperationMode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ThermostatRunningState::Id: { // type is bitmap16
             MN::ThermostatRunningState::TypeInfo::Type value;
-            UN::ThermostatRunningState::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SetpointChangeSource::Id: { // type is enum8
             MN::SetpointChangeSource::TypeInfo::Type value;
-            UN::SetpointChangeSource::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SetpointChangeAmount::Id: { // type is int16s
             MN::SetpointChangeAmount::TypeInfo::Type value;
-            UN::SetpointChangeAmount::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SetpointChangeSourceTimestamp::Id: { // type is epoch_s
             MN::SetpointChangeSourceTimestamp::TypeInfo::Type value;
-            UN::SetpointChangeSourceTimestamp::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OccupiedSetback::Id: { // type is int8u
             MN::OccupiedSetback::TypeInfo::Type value;
-            UN::OccupiedSetback::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OccupiedSetbackMin::Id: { // type is int8u
             MN::OccupiedSetbackMin::TypeInfo::Type value;
-            UN::OccupiedSetbackMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OccupiedSetbackMax::Id: { // type is int8u
             MN::OccupiedSetbackMax::TypeInfo::Type value;
-            UN::OccupiedSetbackMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UnoccupiedSetback::Id: { // type is int8u
             MN::UnoccupiedSetback::TypeInfo::Type value;
-            UN::UnoccupiedSetback::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UnoccupiedSetbackMin::Id: { // type is int8u
             MN::UnoccupiedSetbackMin::TypeInfo::Type value;
-            UN::UnoccupiedSetbackMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UnoccupiedSetbackMax::Id: { // type is int8u
             MN::UnoccupiedSetbackMax::TypeInfo::Type value;
-            UN::UnoccupiedSetbackMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::EmergencyHeatDelta::Id: { // type is int8u
             MN::EmergencyHeatDelta::TypeInfo::Type value;
-            UN::EmergencyHeatDelta::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ACType::Id: { // type is enum8
             MN::ACType::TypeInfo::Type value;
-            UN::ACType::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ACCapacity::Id: { // type is int16u
             MN::ACCapacity::TypeInfo::Type value;
-            UN::ACCapacity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ACRefrigerantType::Id: { // type is enum8
             MN::ACRefrigerantType::TypeInfo::Type value;
-            UN::ACRefrigerantType::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ACCompressorType::Id: { // type is enum8
             MN::ACCompressorType::TypeInfo::Type value;
-            UN::ACCompressorType::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ACErrorCode::Id: { // type is bitmap32
             MN::ACErrorCode::TypeInfo::Type value;
-            UN::ACErrorCode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ACLouverPosition::Id: { // type is enum8
             MN::ACLouverPosition::TypeInfo::Type value;
-            UN::ACLouverPosition::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ACCoilTemperature::Id: { // type is int16s
             MN::ACCoilTemperature::TypeInfo::Type value;
-            UN::ACCoilTemperature::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ACCapacityformat::Id: { // type is enum8
             MN::ACCapacityformat::TypeInfo::Type value;
-            UN::ACCapacityformat::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -2824,7 +2962,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LocalTemperature attribute value is %s", unify_value.dump().c_str());
-            UN::LocalTemperature::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::LocalTemperature::Id);
         }
         break;
@@ -2836,7 +2974,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OutdoorTemperature attribute value is %s", unify_value.dump().c_str());
-            UN::OutdoorTemperature::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OutdoorTemperature::Id);
         }
         break;
@@ -2848,7 +2986,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Occupancy attribute value is %s", unify_value.dump().c_str());
-            UN::Occupancy::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::Occupancy::Id);
         }
         break;
@@ -2860,7 +2998,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AbsMinHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
-            UN::AbsMinHeatSetpointLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMinHeatSetpointLimit::Id);
         }
         break;
@@ -2872,7 +3010,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AbsMaxHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
-            UN::AbsMaxHeatSetpointLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMaxHeatSetpointLimit::Id);
         }
         break;
@@ -2884,7 +3022,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AbsMinCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
-            UN::AbsMinCoolSetpointLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMinCoolSetpointLimit::Id);
         }
         break;
@@ -2896,7 +3034,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AbsMaxCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
-            UN::AbsMaxCoolSetpointLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMaxCoolSetpointLimit::Id);
         }
         break;
@@ -2908,7 +3046,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PICoolingDemand attribute value is %s", unify_value.dump().c_str());
-            UN::PICoolingDemand::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::PICoolingDemand::Id);
         }
         break;
@@ -2920,7 +3058,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PIHeatingDemand attribute value is %s", unify_value.dump().c_str());
-            UN::PIHeatingDemand::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::PIHeatingDemand::Id);
         }
         break;
@@ -2932,7 +3070,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "HVACSystemTypeConfiguration attribute value is %s", unify_value.dump().c_str());
-            UN::HVACSystemTypeConfiguration::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::HVACSystemTypeConfiguration::Id);
         }
@@ -2945,7 +3083,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LocalTemperatureCalibration attribute value is %s", unify_value.dump().c_str());
-            UN::LocalTemperatureCalibration::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::LocalTemperatureCalibration::Id);
         }
@@ -2958,7 +3096,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedCoolingSetpoint attribute value is %s", unify_value.dump().c_str());
-            UN::OccupiedCoolingSetpoint::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedCoolingSetpoint::Id);
         }
         break;
@@ -2970,7 +3108,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedHeatingSetpoint attribute value is %s", unify_value.dump().c_str());
-            UN::OccupiedHeatingSetpoint::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedHeatingSetpoint::Id);
         }
         break;
@@ -2982,7 +3120,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedCoolingSetpoint attribute value is %s", unify_value.dump().c_str());
-            UN::UnoccupiedCoolingSetpoint::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::UnoccupiedCoolingSetpoint::Id);
         }
@@ -2995,7 +3133,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedHeatingSetpoint attribute value is %s", unify_value.dump().c_str());
-            UN::UnoccupiedHeatingSetpoint::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::UnoccupiedHeatingSetpoint::Id);
         }
@@ -3008,7 +3146,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
-            UN::MinHeatSetpointLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinHeatSetpointLimit::Id);
         }
         break;
@@ -3020,7 +3158,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
-            UN::MaxHeatSetpointLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MaxHeatSetpointLimit::Id);
         }
         break;
@@ -3032,7 +3170,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
-            UN::MinCoolSetpointLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinCoolSetpointLimit::Id);
         }
         break;
@@ -3044,7 +3182,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
-            UN::MaxCoolSetpointLimit::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MaxCoolSetpointLimit::Id);
         }
         break;
@@ -3056,7 +3194,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinSetpointDeadBand attribute value is %s", unify_value.dump().c_str());
-            UN::MinSetpointDeadBand::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinSetpointDeadBand::Id);
         }
         break;
@@ -3068,7 +3206,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RemoteSensing attribute value is %s", unify_value.dump().c_str());
-            UN::RemoteSensing::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::RemoteSensing::Id);
         }
         break;
@@ -3080,7 +3218,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ControlSequenceOfOperation attribute value is %s", unify_value.dump().c_str());
-            UN::ControlSequenceOfOperation::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::ControlSequenceOfOperation::Id);
         }
@@ -3093,7 +3231,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SystemMode attribute value is %s", unify_value.dump().c_str());
-            UN::SystemMode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SystemMode::Id);
         }
         break;
@@ -3105,7 +3243,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ThermostatRunningMode attribute value is %s", unify_value.dump().c_str());
-            UN::ThermostatRunningMode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ThermostatRunningMode::Id);
         }
         break;
@@ -3117,7 +3255,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartOfWeek attribute value is %s", unify_value.dump().c_str());
-            UN::StartOfWeek::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::StartOfWeek::Id);
         }
         break;
@@ -3129,7 +3267,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfWeeklyTransitions attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfWeeklyTransitions::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::NumberOfWeeklyTransitions::Id);
         }
@@ -3142,7 +3280,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfDailyTransitions attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfDailyTransitions::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::NumberOfDailyTransitions::Id);
         }
@@ -3155,7 +3293,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TemperatureSetpointHold attribute value is %s", unify_value.dump().c_str());
-            UN::TemperatureSetpointHold::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::TemperatureSetpointHold::Id);
         }
         break;
@@ -3167,7 +3305,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TemperatureSetpointHoldDuration attribute value is %s", unify_value.dump().c_str());
-            UN::TemperatureSetpointHoldDuration::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::TemperatureSetpointHoldDuration::Id);
         }
@@ -3180,7 +3318,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ThermostatProgrammingOperationMode attribute value is %s", unify_value.dump().c_str());
-            UN::ThermostatProgrammingOperationMode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::ThermostatProgrammingOperationMode::Id);
         }
@@ -3193,7 +3331,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ThermostatRunningState attribute value is %s", unify_value.dump().c_str());
-            UN::ThermostatRunningState::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ThermostatRunningState::Id);
         }
         break;
@@ -3205,7 +3343,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SetpointChangeSource attribute value is %s", unify_value.dump().c_str());
-            UN::SetpointChangeSource::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SetpointChangeSource::Id);
         }
         break;
@@ -3217,7 +3355,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SetpointChangeAmount attribute value is %s", unify_value.dump().c_str());
-            UN::SetpointChangeAmount::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SetpointChangeAmount::Id);
         }
         break;
@@ -3229,7 +3367,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SetpointChangeSourceTimestamp attribute value is %s", unify_value.dump().c_str());
-            UN::SetpointChangeSourceTimestamp::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
                 MN::SetpointChangeSourceTimestamp::Id);
         }
@@ -3242,7 +3380,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedSetback attribute value is %s", unify_value.dump().c_str());
-            UN::OccupiedSetback::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetback::Id);
         }
         break;
@@ -3254,7 +3392,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedSetbackMin attribute value is %s", unify_value.dump().c_str());
-            UN::OccupiedSetbackMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetbackMin::Id);
         }
         break;
@@ -3266,7 +3404,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedSetbackMax attribute value is %s", unify_value.dump().c_str());
-            UN::OccupiedSetbackMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetbackMax::Id);
         }
         break;
@@ -3278,7 +3416,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedSetback attribute value is %s", unify_value.dump().c_str());
-            UN::UnoccupiedSetback::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetback::Id);
         }
         break;
@@ -3290,7 +3428,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedSetbackMin attribute value is %s", unify_value.dump().c_str());
-            UN::UnoccupiedSetbackMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetbackMin::Id);
         }
         break;
@@ -3302,7 +3440,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedSetbackMax attribute value is %s", unify_value.dump().c_str());
-            UN::UnoccupiedSetbackMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetbackMax::Id);
         }
         break;
@@ -3314,7 +3452,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EmergencyHeatDelta attribute value is %s", unify_value.dump().c_str());
-            UN::EmergencyHeatDelta::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::EmergencyHeatDelta::Id);
         }
         break;
@@ -3326,7 +3464,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACType attribute value is %s", unify_value.dump().c_str());
-            UN::ACType::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACType::Id);
         }
         break;
@@ -3338,7 +3476,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACCapacity attribute value is %s", unify_value.dump().c_str());
-            UN::ACCapacity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCapacity::Id);
         }
         break;
@@ -3350,7 +3488,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACRefrigerantType attribute value is %s", unify_value.dump().c_str());
-            UN::ACRefrigerantType::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACRefrigerantType::Id);
         }
         break;
@@ -3362,7 +3500,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACCompressorType attribute value is %s", unify_value.dump().c_str());
-            UN::ACCompressorType::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCompressorType::Id);
         }
         break;
@@ -3374,7 +3512,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACErrorCode attribute value is %s", unify_value.dump().c_str());
-            UN::ACErrorCode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACErrorCode::Id);
         }
         break;
@@ -3386,7 +3524,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACLouverPosition attribute value is %s", unify_value.dump().c_str());
-            UN::ACLouverPosition::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACLouverPosition::Id);
         }
         break;
@@ -3398,7 +3536,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACCoilTemperature attribute value is %s", unify_value.dump().c_str());
-            UN::ACCoilTemperature::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCoilTemperature::Id);
         }
         break;
@@ -3410,7 +3548,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACCapacityformat attribute value is %s", unify_value.dump().c_str());
-            UN::ACCapacityformat::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCapacityformat::Id);
         }
         break;
@@ -3443,68 +3581,81 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
         switch (aPath.mAttributeId) {
         case MN::FanMode::Id: { // type is FanModeType
             MN::FanMode::TypeInfo::Type value;
-            UN::FanMode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FanModeSequence::Id: { // type is FanModeSequenceType
             MN::FanModeSequence::TypeInfo::Type value;
-            UN::FanModeSequence::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PercentSetting::Id: { // type is int8u
             MN::PercentSetting::TypeInfo::Type value;
-            UN::PercentSetting::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PercentCurrent::Id: { // type is int8u
             MN::PercentCurrent::TypeInfo::Type value;
-            UN::PercentCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SpeedMax::Id: { // type is int8u
             MN::SpeedMax::TypeInfo::Type value;
-            UN::SpeedMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SpeedSetting::Id: { // type is int8u
             MN::SpeedSetting::TypeInfo::Type value;
-            UN::SpeedSetting::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::SpeedCurrent::Id: { // type is int8u
             MN::SpeedCurrent::TypeInfo::Type value;
-            UN::SpeedCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RockSupport::Id: { // type is bitmap8
             MN::RockSupport::TypeInfo::Type value;
-            UN::RockSupport::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RockSetting::Id: { // type is bitmap8
             MN::RockSetting::TypeInfo::Type value;
-            UN::RockSetting::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::WindSupport::Id: { // type is bitmap8
             MN::WindSupport::TypeInfo::Type value;
-            UN::WindSupport::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::WindSetting::Id: { // type is bitmap8
             MN::WindSetting::TypeInfo::Type value;
-            UN::WindSetting::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -3602,7 +3753,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "FanMode attribute value is %s", unify_value.dump().c_str());
-            UN::FanMode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FanMode::Id);
         }
         break;
@@ -3614,7 +3765,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint* ep, con
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "FanModeSequence attribute value is %s", unify_value.dump().c_str());
-            UN::FanModeSequence::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FanModeSequence::Id);
         }
         break;
@@ -3647,28 +3798,33 @@ ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttr
         switch (aPath.mAttributeId) {
         case MN::TemperatureDisplayMode::Id: { // type is enum8
             MN::TemperatureDisplayMode::TypeInfo::Type value;
-            UN::TemperatureDisplayMode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::KeypadLockout::Id: { // type is enum8
             MN::KeypadLockout::TypeInfo::Type value;
-            UN::KeypadLockout::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ScheduleProgrammingVisibility::Id: { // type is enum8
             MN::ScheduleProgrammingVisibility::TypeInfo::Type value;
-            UN::ScheduleProgrammingVisibility::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -3770,7 +3926,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TemperatureDisplayMode attribute value is %s", unify_value.dump().c_str());
-            UN::TemperatureDisplayMode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
                 MN::TemperatureDisplayMode::Id);
         }
@@ -3783,7 +3939,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "KeypadLockout attribute value is %s", unify_value.dump().c_str());
-            UN::KeypadLockout::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
                 MN::KeypadLockout::Id);
         }
@@ -3796,7 +3952,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ScheduleProgrammingVisibility attribute value is %s", unify_value.dump().c_str());
-            UN::ScheduleProgrammingVisibility::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
                 MN::ScheduleProgrammingVisibility::Id);
         }
@@ -3830,273 +3986,327 @@ ColorControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
         switch (aPath.mAttributeId) {
         case MN::CurrentHue::Id: { // type is int8u
             MN::CurrentHue::TypeInfo::Type value;
-            UN::CurrentHue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CurrentSaturation::Id: { // type is int8u
             MN::CurrentSaturation::TypeInfo::Type value;
-            UN::CurrentSaturation::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RemainingTime::Id: { // type is int16u
             MN::RemainingTime::TypeInfo::Type value;
-            UN::RemainingTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CurrentX::Id: { // type is int16u
             MN::CurrentX::TypeInfo::Type value;
-            UN::CurrentX::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CurrentY::Id: { // type is int16u
             MN::CurrentY::TypeInfo::Type value;
-            UN::CurrentY::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DriftCompensation::Id: { // type is enum8
             MN::DriftCompensation::TypeInfo::Type value;
-            UN::DriftCompensation::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CompensationText::Id: { // type is char_string
             MN::CompensationText::TypeInfo::Type value;
-            UN::CompensationText::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorTemperatureMireds::Id: { // type is int16u
             MN::ColorTemperatureMireds::TypeInfo::Type value;
-            UN::ColorTemperatureMireds::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorMode::Id: { // type is enum8
             MN::ColorMode::TypeInfo::Type value;
-            UN::ColorMode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Options::Id: { // type is bitmap8
             MN::Options::TypeInfo::Type value;
-            UN::Options::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NumberOfPrimaries::Id: { // type is int8u
             MN::NumberOfPrimaries::TypeInfo::Type value;
-            UN::NumberOfPrimaries::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary1X::Id: { // type is int16u
             MN::Primary1X::TypeInfo::Type value;
-            UN::Primary1X::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary1Y::Id: { // type is int16u
             MN::Primary1Y::TypeInfo::Type value;
-            UN::Primary1Y::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary1Intensity::Id: { // type is int8u
             MN::Primary1Intensity::TypeInfo::Type value;
-            UN::Primary1Intensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary2X::Id: { // type is int16u
             MN::Primary2X::TypeInfo::Type value;
-            UN::Primary2X::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary2Y::Id: { // type is int16u
             MN::Primary2Y::TypeInfo::Type value;
-            UN::Primary2Y::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary2Intensity::Id: { // type is int8u
             MN::Primary2Intensity::TypeInfo::Type value;
-            UN::Primary2Intensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary3X::Id: { // type is int16u
             MN::Primary3X::TypeInfo::Type value;
-            UN::Primary3X::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary3Y::Id: { // type is int16u
             MN::Primary3Y::TypeInfo::Type value;
-            UN::Primary3Y::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary3Intensity::Id: { // type is int8u
             MN::Primary3Intensity::TypeInfo::Type value;
-            UN::Primary3Intensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary4X::Id: { // type is int16u
             MN::Primary4X::TypeInfo::Type value;
-            UN::Primary4X::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary4Y::Id: { // type is int16u
             MN::Primary4Y::TypeInfo::Type value;
-            UN::Primary4Y::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary4Intensity::Id: { // type is int8u
             MN::Primary4Intensity::TypeInfo::Type value;
-            UN::Primary4Intensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary5X::Id: { // type is int16u
             MN::Primary5X::TypeInfo::Type value;
-            UN::Primary5X::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary5Y::Id: { // type is int16u
             MN::Primary5Y::TypeInfo::Type value;
-            UN::Primary5Y::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary5Intensity::Id: { // type is int8u
             MN::Primary5Intensity::TypeInfo::Type value;
-            UN::Primary5Intensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary6X::Id: { // type is int16u
             MN::Primary6X::TypeInfo::Type value;
-            UN::Primary6X::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary6Y::Id: { // type is int16u
             MN::Primary6Y::TypeInfo::Type value;
-            UN::Primary6Y::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Primary6Intensity::Id: { // type is int8u
             MN::Primary6Intensity::TypeInfo::Type value;
-            UN::Primary6Intensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::WhitePointX::Id: { // type is int16u
             MN::WhitePointX::TypeInfo::Type value;
-            UN::WhitePointX::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::WhitePointY::Id: { // type is int16u
             MN::WhitePointY::TypeInfo::Type value;
-            UN::WhitePointY::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointRX::Id: { // type is int16u
             MN::ColorPointRX::TypeInfo::Type value;
-            UN::ColorPointRX::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointRY::Id: { // type is int16u
             MN::ColorPointRY::TypeInfo::Type value;
-            UN::ColorPointRY::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointRIntensity::Id: { // type is int8u
             MN::ColorPointRIntensity::TypeInfo::Type value;
-            UN::ColorPointRIntensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointGX::Id: { // type is int16u
             MN::ColorPointGX::TypeInfo::Type value;
-            UN::ColorPointGX::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointGY::Id: { // type is int16u
             MN::ColorPointGY::TypeInfo::Type value;
-            UN::ColorPointGY::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointGIntensity::Id: { // type is int8u
             MN::ColorPointGIntensity::TypeInfo::Type value;
-            UN::ColorPointGIntensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointBX::Id: { // type is int16u
             MN::ColorPointBX::TypeInfo::Type value;
-            UN::ColorPointBX::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointBY::Id: { // type is int16u
             MN::ColorPointBY::TypeInfo::Type value;
-            UN::ColorPointBY::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorPointBIntensity::Id: { // type is int8u
             MN::ColorPointBIntensity::TypeInfo::Type value;
-            UN::ColorPointBIntensity::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::EnhancedCurrentHue::Id: { // type is int16u
             MN::EnhancedCurrentHue::TypeInfo::Type value;
-            UN::EnhancedCurrentHue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::EnhancedColorMode::Id: { // type is enum8
             MN::EnhancedColorMode::TypeInfo::Type value;
-            UN::EnhancedColorMode::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorLoopActive::Id: { // type is int8u
             MN::ColorLoopActive::TypeInfo::Type value;
-            UN::ColorLoopActive::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorLoopDirection::Id: { // type is int8u
             MN::ColorLoopDirection::TypeInfo::Type value;
-            UN::ColorLoopDirection::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorLoopTime::Id: { // type is int16u
             MN::ColorLoopTime::TypeInfo::Type value;
-            UN::ColorLoopTime::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorLoopStartEnhancedHue::Id: { // type is int16u
             MN::ColorLoopStartEnhancedHue::TypeInfo::Type value;
-            UN::ColorLoopStartEnhancedHue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorLoopStoredEnhancedHue::Id: { // type is int16u
             MN::ColorLoopStoredEnhancedHue::TypeInfo::Type value;
-            UN::ColorLoopStoredEnhancedHue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorCapabilities::Id: { // type is bitmap16
             MN::ColorCapabilities::TypeInfo::Type value;
-            UN::ColorCapabilities::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorTempPhysicalMinMireds::Id: { // type is int16u
             MN::ColorTempPhysicalMinMireds::TypeInfo::Type value;
-            UN::ColorTempPhysicalMinMireds::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ColorTempPhysicalMaxMireds::Id: { // type is int16u
             MN::ColorTempPhysicalMaxMireds::TypeInfo::Type value;
-            UN::ColorTempPhysicalMaxMireds::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CoupleColorTempToLevelMinMireds::Id: { // type is int16u
             MN::CoupleColorTempToLevelMinMireds::TypeInfo::Type value;
-            UN::CoupleColorTempToLevelMinMireds::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::StartUpColorTemperatureMireds::Id: { // type is int16u
             MN::StartUpColorTemperatureMireds::TypeInfo::Type value;
-            UN::StartUpColorTemperatureMireds::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -4305,7 +4515,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentHue attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentHue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentHue::Id);
         }
         break;
@@ -4317,7 +4527,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentSaturation attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentSaturation::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentSaturation::Id);
         }
         break;
@@ -4329,7 +4539,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RemainingTime attribute value is %s", unify_value.dump().c_str());
-            UN::RemainingTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::RemainingTime::Id);
         }
         break;
@@ -4341,7 +4551,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentX attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentX::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentX::Id);
         }
         break;
@@ -4353,7 +4563,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentY attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentY::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentY::Id);
         }
         break;
@@ -4365,7 +4575,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DriftCompensation attribute value is %s", unify_value.dump().c_str());
-            UN::DriftCompensation::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::DriftCompensation::Id);
         }
         break;
@@ -4377,7 +4587,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CompensationText attribute value is %s", unify_value.dump().c_str());
-            UN::CompensationText::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CompensationText::Id);
         }
         break;
@@ -4389,7 +4599,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorTemperatureMireds attribute value is %s", unify_value.dump().c_str());
-            UN::ColorTemperatureMireds::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
                 MN::ColorTemperatureMireds::Id);
         }
@@ -4397,12 +4607,12 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
     }
         // type is enum8
     case MN::ColorMode::Id: {
-        using T = MN::ColorMode::TypeInfo::Type;
+        using T = chip::app::Clusters::ColorControl::ColorMode;
         std::optional<T> value = from_json<T>(unify_value);
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorMode attribute value is %s", unify_value.dump().c_str());
-            UN::ColorMode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorMode::Id);
         }
         break;
@@ -4414,7 +4624,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Options attribute value is %s", unify_value.dump().c_str());
-            UN::Options::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Options::Id);
         }
         break;
@@ -4426,7 +4636,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfPrimaries attribute value is %s", unify_value.dump().c_str());
-            UN::NumberOfPrimaries::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::NumberOfPrimaries::Id);
         }
         break;
@@ -4438,7 +4648,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary1X attribute value is %s", unify_value.dump().c_str());
-            UN::Primary1X::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1X::Id);
         }
         break;
@@ -4450,7 +4660,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary1Y attribute value is %s", unify_value.dump().c_str());
-            UN::Primary1Y::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1Y::Id);
         }
         break;
@@ -4462,7 +4672,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary1Intensity attribute value is %s", unify_value.dump().c_str());
-            UN::Primary1Intensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1Intensity::Id);
         }
         break;
@@ -4474,7 +4684,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary2X attribute value is %s", unify_value.dump().c_str());
-            UN::Primary2X::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2X::Id);
         }
         break;
@@ -4486,7 +4696,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary2Y attribute value is %s", unify_value.dump().c_str());
-            UN::Primary2Y::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2Y::Id);
         }
         break;
@@ -4498,7 +4708,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary2Intensity attribute value is %s", unify_value.dump().c_str());
-            UN::Primary2Intensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2Intensity::Id);
         }
         break;
@@ -4510,7 +4720,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary3X attribute value is %s", unify_value.dump().c_str());
-            UN::Primary3X::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3X::Id);
         }
         break;
@@ -4522,7 +4732,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary3Y attribute value is %s", unify_value.dump().c_str());
-            UN::Primary3Y::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3Y::Id);
         }
         break;
@@ -4534,7 +4744,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary3Intensity attribute value is %s", unify_value.dump().c_str());
-            UN::Primary3Intensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3Intensity::Id);
         }
         break;
@@ -4546,7 +4756,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary4X attribute value is %s", unify_value.dump().c_str());
-            UN::Primary4X::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4X::Id);
         }
         break;
@@ -4558,7 +4768,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary4Y attribute value is %s", unify_value.dump().c_str());
-            UN::Primary4Y::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4Y::Id);
         }
         break;
@@ -4570,7 +4780,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary4Intensity attribute value is %s", unify_value.dump().c_str());
-            UN::Primary4Intensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4Intensity::Id);
         }
         break;
@@ -4582,7 +4792,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary5X attribute value is %s", unify_value.dump().c_str());
-            UN::Primary5X::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5X::Id);
         }
         break;
@@ -4594,7 +4804,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary5Y attribute value is %s", unify_value.dump().c_str());
-            UN::Primary5Y::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5Y::Id);
         }
         break;
@@ -4606,7 +4816,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary5Intensity attribute value is %s", unify_value.dump().c_str());
-            UN::Primary5Intensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5Intensity::Id);
         }
         break;
@@ -4618,7 +4828,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary6X attribute value is %s", unify_value.dump().c_str());
-            UN::Primary6X::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6X::Id);
         }
         break;
@@ -4630,7 +4840,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary6Y attribute value is %s", unify_value.dump().c_str());
-            UN::Primary6Y::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6Y::Id);
         }
         break;
@@ -4642,7 +4852,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary6Intensity attribute value is %s", unify_value.dump().c_str());
-            UN::Primary6Intensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6Intensity::Id);
         }
         break;
@@ -4654,7 +4864,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "WhitePointX attribute value is %s", unify_value.dump().c_str());
-            UN::WhitePointX::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::WhitePointX::Id);
         }
         break;
@@ -4666,7 +4876,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "WhitePointY attribute value is %s", unify_value.dump().c_str());
-            UN::WhitePointY::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::WhitePointY::Id);
         }
         break;
@@ -4678,7 +4888,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointRX attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointRX::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRX::Id);
         }
         break;
@@ -4690,7 +4900,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointRY attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointRY::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRY::Id);
         }
         break;
@@ -4702,7 +4912,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointRIntensity attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointRIntensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRIntensity::Id);
         }
         break;
@@ -4714,7 +4924,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointGX attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointGX::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGX::Id);
         }
         break;
@@ -4726,7 +4936,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointGY attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointGY::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGY::Id);
         }
         break;
@@ -4738,7 +4948,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointGIntensity attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointGIntensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGIntensity::Id);
         }
         break;
@@ -4750,7 +4960,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointBX attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointBX::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBX::Id);
         }
         break;
@@ -4762,7 +4972,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointBY attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointBY::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBY::Id);
         }
         break;
@@ -4774,7 +4984,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointBIntensity attribute value is %s", unify_value.dump().c_str());
-            UN::ColorPointBIntensity::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBIntensity::Id);
         }
         break;
@@ -4786,7 +4996,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnhancedCurrentHue attribute value is %s", unify_value.dump().c_str());
-            UN::EnhancedCurrentHue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::EnhancedCurrentHue::Id);
         }
         break;
@@ -4798,7 +5008,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnhancedColorMode attribute value is %s", unify_value.dump().c_str());
-            UN::EnhancedColorMode::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::EnhancedColorMode::Id);
         }
         break;
@@ -4810,7 +5020,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopActive attribute value is %s", unify_value.dump().c_str());
-            UN::ColorLoopActive::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopActive::Id);
         }
         break;
@@ -4822,7 +5032,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopDirection attribute value is %s", unify_value.dump().c_str());
-            UN::ColorLoopDirection::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopDirection::Id);
         }
         break;
@@ -4834,7 +5044,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopTime attribute value is %s", unify_value.dump().c_str());
-            UN::ColorLoopTime::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopTime::Id);
         }
         break;
@@ -4846,7 +5056,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopStartEnhancedHue attribute value is %s", unify_value.dump().c_str());
-            UN::ColorLoopStartEnhancedHue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
                 MN::ColorLoopStartEnhancedHue::Id);
         }
@@ -4859,7 +5069,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopStoredEnhancedHue attribute value is %s", unify_value.dump().c_str());
-            UN::ColorLoopStoredEnhancedHue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
                 MN::ColorLoopStoredEnhancedHue::Id);
         }
@@ -4867,12 +5077,12 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
     }
         // type is bitmap16
     case MN::ColorCapabilities::Id: {
-        using T = MN::ColorCapabilities::TypeInfo::Type;
+        using T = chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilities>;
         std::optional<T> value = from_json<T>(unify_value);
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorCapabilities attribute value is %s", unify_value.dump().c_str());
-            UN::ColorCapabilities::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorCapabilities::Id);
         }
         break;
@@ -4884,7 +5094,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorTempPhysicalMinMireds attribute value is %s", unify_value.dump().c_str());
-            UN::ColorTempPhysicalMinMireds::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
                 MN::ColorTempPhysicalMinMireds::Id);
         }
@@ -4897,7 +5107,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorTempPhysicalMaxMireds attribute value is %s", unify_value.dump().c_str());
-            UN::ColorTempPhysicalMaxMireds::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
                 MN::ColorTempPhysicalMaxMireds::Id);
         }
@@ -4910,7 +5120,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CoupleColorTempToLevelMinMireds attribute value is %s", unify_value.dump().c_str());
-            UN::CoupleColorTempToLevelMinMireds::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
                 MN::CoupleColorTempToLevelMinMireds::Id);
         }
@@ -4923,7 +5133,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartUpColorTemperatureMireds attribute value is %s", unify_value.dump().c_str());
-            UN::StartUpColorTemperatureMireds::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
                 MN::StartUpColorTemperatureMireds::Id);
         }
@@ -4957,38 +5167,45 @@ IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16u
             MN::MeasuredValue::TypeInfo::Type value;
-            UN::MeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
-            UN::MinMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
-            UN::MaxMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
-            UN::Tolerance::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::LightSensorType::Id: { // type is enum8
             MN::LightSensorType::TypeInfo::Type value;
-            UN::LightSensorType::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5072,7 +5289,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
                 MN::MeasuredValue::Id);
         }
@@ -5085,7 +5302,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MinMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
                 MN::MinMeasuredValue::Id);
         }
@@ -5098,7 +5315,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MaxMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
                 MN::MaxMeasuredValue::Id);
         }
@@ -5111,7 +5328,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
-            UN::Tolerance::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, MN::Tolerance::Id);
         }
         break;
@@ -5123,7 +5340,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LightSensorType attribute value is %s", unify_value.dump().c_str());
-            UN::LightSensorType::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
                 MN::LightSensorType::Id);
         }
@@ -5157,33 +5374,39 @@ TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16s
             MN::MeasuredValue::TypeInfo::Type value;
-            UN::MeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinMeasuredValue::Id: { // type is int16s
             MN::MinMeasuredValue::TypeInfo::Type value;
-            UN::MinMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxMeasuredValue::Id: { // type is int16s
             MN::MaxMeasuredValue::TypeInfo::Type value;
-            UN::MaxMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
-            UN::Tolerance::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5266,7 +5489,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
                 MN::MeasuredValue::Id);
         }
@@ -5279,7 +5502,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MinMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
                 MN::MinMeasuredValue::Id);
         }
@@ -5292,7 +5515,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MaxMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
                 MN::MaxMeasuredValue::Id);
         }
@@ -5305,7 +5528,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
-            UN::Tolerance::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, MN::Tolerance::Id);
         }
         break;
@@ -5338,58 +5561,69 @@ PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath,
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16s
             MN::MeasuredValue::TypeInfo::Type value;
-            UN::MeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinMeasuredValue::Id: { // type is int16s
             MN::MinMeasuredValue::TypeInfo::Type value;
-            UN::MinMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxMeasuredValue::Id: { // type is int16s
             MN::MaxMeasuredValue::TypeInfo::Type value;
-            UN::MaxMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
-            UN::Tolerance::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ScaledValue::Id: { // type is int16s
             MN::ScaledValue::TypeInfo::Type value;
-            UN::ScaledValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinScaledValue::Id: { // type is int16s
             MN::MinScaledValue::TypeInfo::Type value;
-            UN::MinScaledValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxScaledValue::Id: { // type is int16s
             MN::MaxScaledValue::TypeInfo::Type value;
-            UN::MaxScaledValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ScaledTolerance::Id: { // type is int16u
             MN::ScaledTolerance::TypeInfo::Type value;
-            UN::ScaledTolerance::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Scale::Id: { // type is int8s
             MN::Scale::TypeInfo::Type value;
-            UN::Scale::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5477,7 +5711,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MeasuredValue::Id);
         }
         break;
@@ -5489,7 +5723,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MinMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
                 MN::MinMeasuredValue::Id);
         }
@@ -5502,7 +5736,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MaxMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
                 MN::MaxMeasuredValue::Id);
         }
@@ -5515,7 +5749,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
-            UN::Tolerance::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::Tolerance::Id);
         }
         break;
@@ -5527,7 +5761,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ScaledValue attribute value is %s", unify_value.dump().c_str());
-            UN::ScaledValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::ScaledValue::Id);
         }
         break;
@@ -5539,7 +5773,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinScaledValue attribute value is %s", unify_value.dump().c_str());
-            UN::MinScaledValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MinScaledValue::Id);
         }
         break;
@@ -5551,7 +5785,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxScaledValue attribute value is %s", unify_value.dump().c_str());
-            UN::MaxScaledValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MaxScaledValue::Id);
         }
         break;
@@ -5563,7 +5797,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ScaledTolerance attribute value is %s", unify_value.dump().c_str());
-            UN::ScaledTolerance::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
                 MN::ScaledTolerance::Id);
         }
@@ -5576,7 +5810,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Scale attribute value is %s", unify_value.dump().c_str());
-            UN::Scale::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::Scale::Id);
         }
         break;
@@ -5609,33 +5843,39 @@ FlowMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Att
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16u
             MN::MeasuredValue::TypeInfo::Type value;
-            UN::MeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
-            UN::MinMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
-            UN::MaxMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
-            UN::Tolerance::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5718,7 +5958,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MeasuredValue::Id);
         }
         break;
@@ -5730,7 +5970,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MinMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MinMeasuredValue::Id);
         }
         break;
@@ -5742,7 +5982,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MaxMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MaxMeasuredValue::Id);
         }
         break;
@@ -5754,7 +5994,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
-            UN::Tolerance::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::Tolerance::Id);
         }
         break;
@@ -5787,33 +6027,39 @@ RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16u
             MN::MeasuredValue::TypeInfo::Type value;
-            UN::MeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
-            UN::MinMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
-            UN::MaxMeasuredValue::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
-            UN::Tolerance::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5897,7 +6143,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
                 MN::MeasuredValue::Id);
         }
@@ -5910,7 +6156,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MinMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
                 MN::MinMeasuredValue::Id);
         }
@@ -5923,7 +6169,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
-            UN::MaxMeasuredValue::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
                 MN::MaxMeasuredValue::Id);
         }
@@ -5936,7 +6182,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
-            UN::Tolerance::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
                 MN::Tolerance::Id);
         }
@@ -5970,73 +6216,87 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath& aPath, At
         switch (aPath.mAttributeId) {
         case MN::Occupancy::Id: { // type is bitmap8
             MN::Occupancy::TypeInfo::Type value;
-            UN::Occupancy::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OccupancySensorType::Id: { // type is enum8
             MN::OccupancySensorType::TypeInfo::Type value;
-            UN::OccupancySensorType::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OccupancySensorTypeBitmap::Id: { // type is bitmap8
             MN::OccupancySensorTypeBitmap::TypeInfo::Type value;
-            UN::OccupancySensorTypeBitmap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PIROccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::PIROccupiedToUnoccupiedDelay::TypeInfo::Type value;
-            UN::PIROccupiedToUnoccupiedDelay::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PIRUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::PIRUnoccupiedToOccupiedDelay::TypeInfo::Type value;
-            UN::PIRUnoccupiedToOccupiedDelay::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PIRUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::PIRUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
-            UN::PIRUnoccupiedToOccupiedThreshold::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UltrasonicOccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::Type value;
-            UN::UltrasonicOccupiedToUnoccupiedDelay::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UltrasonicUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::Type value;
-            UN::UltrasonicUnoccupiedToOccupiedDelay::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::UltrasonicUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
-            UN::UltrasonicUnoccupiedToOccupiedThreshold::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PhysicalContactOccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::Type value;
-            UN::PhysicalContactOccupiedToUnoccupiedDelay::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PhysicalContactUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::Type value;
-            UN::PhysicalContactUnoccupiedToOccupiedDelay::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
-            UN::PhysicalContactUnoccupiedToOccupiedThreshold::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -6181,7 +6441,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Occupancy attribute value is %s", unify_value.dump().c_str());
-            UN::Occupancy::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id, MN::Occupancy::Id);
         }
         break;
@@ -6193,7 +6453,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupancySensorType attribute value is %s", unify_value.dump().c_str());
-            UN::OccupancySensorType::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::OccupancySensorType::Id);
         }
@@ -6206,7 +6466,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupancySensorTypeBitmap attribute value is %s", unify_value.dump().c_str());
-            UN::OccupancySensorTypeBitmap::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::OccupancySensorTypeBitmap::Id);
         }
@@ -6219,7 +6479,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PIROccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
-            UN::PIROccupiedToUnoccupiedDelay::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::PIROccupiedToUnoccupiedDelay::Id);
         }
@@ -6232,7 +6492,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PIRUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
-            UN::PIRUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::PIRUnoccupiedToOccupiedDelay::Id);
         }
@@ -6245,7 +6505,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PIRUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
-            UN::PIRUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::PIRUnoccupiedToOccupiedThreshold::Id);
         }
@@ -6258,7 +6518,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UltrasonicOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
-            UN::UltrasonicOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::UltrasonicOccupiedToUnoccupiedDelay::Id);
         }
@@ -6271,7 +6531,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UltrasonicUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
-            UN::UltrasonicUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::UltrasonicUnoccupiedToOccupiedDelay::Id);
         }
@@ -6284,7 +6544,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UltrasonicUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
-            UN::UltrasonicUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::UltrasonicUnoccupiedToOccupiedThreshold::Id);
         }
@@ -6297,7 +6557,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PhysicalContactOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
-            UN::PhysicalContactOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::PhysicalContactOccupiedToUnoccupiedDelay::Id);
         }
@@ -6310,7 +6570,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PhysicalContactUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
-            UN::PhysicalContactUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::PhysicalContactUnoccupiedToOccupiedDelay::Id);
         }
@@ -6323,7 +6583,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PhysicalContactUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
-            UN::PhysicalContactUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
                 MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id);
         }
@@ -6357,653 +6617,783 @@ ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPat
         switch (aPath.mAttributeId) {
         case MN::MeasurementType::Id: { // type is bitmap32
             MN::MeasurementType::TypeInfo::Type value;
-            UN::MeasurementType::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcVoltage::Id: { // type is int16s
             MN::DcVoltage::TypeInfo::Type value;
-            UN::DcVoltage::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcVoltageMin::Id: { // type is int16s
             MN::DcVoltageMin::TypeInfo::Type value;
-            UN::DcVoltageMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcVoltageMax::Id: { // type is int16s
             MN::DcVoltageMax::TypeInfo::Type value;
-            UN::DcVoltageMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcCurrent::Id: { // type is int16s
             MN::DcCurrent::TypeInfo::Type value;
-            UN::DcCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcCurrentMin::Id: { // type is int16s
             MN::DcCurrentMin::TypeInfo::Type value;
-            UN::DcCurrentMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcCurrentMax::Id: { // type is int16s
             MN::DcCurrentMax::TypeInfo::Type value;
-            UN::DcCurrentMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcPower::Id: { // type is int16s
             MN::DcPower::TypeInfo::Type value;
-            UN::DcPower::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcPowerMin::Id: { // type is int16s
             MN::DcPowerMin::TypeInfo::Type value;
-            UN::DcPowerMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcPowerMax::Id: { // type is int16s
             MN::DcPowerMax::TypeInfo::Type value;
-            UN::DcPowerMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcVoltageMultiplier::Id: { // type is int16u
             MN::DcVoltageMultiplier::TypeInfo::Type value;
-            UN::DcVoltageMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcVoltageDivisor::Id: { // type is int16u
             MN::DcVoltageDivisor::TypeInfo::Type value;
-            UN::DcVoltageDivisor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcCurrentMultiplier::Id: { // type is int16u
             MN::DcCurrentMultiplier::TypeInfo::Type value;
-            UN::DcCurrentMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcCurrentDivisor::Id: { // type is int16u
             MN::DcCurrentDivisor::TypeInfo::Type value;
-            UN::DcCurrentDivisor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcPowerMultiplier::Id: { // type is int16u
             MN::DcPowerMultiplier::TypeInfo::Type value;
-            UN::DcPowerMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::DcPowerDivisor::Id: { // type is int16u
             MN::DcPowerDivisor::TypeInfo::Type value;
-            UN::DcPowerDivisor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcFrequency::Id: { // type is int16u
             MN::AcFrequency::TypeInfo::Type value;
-            UN::AcFrequency::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcFrequencyMin::Id: { // type is int16u
             MN::AcFrequencyMin::TypeInfo::Type value;
-            UN::AcFrequencyMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcFrequencyMax::Id: { // type is int16u
             MN::AcFrequencyMax::TypeInfo::Type value;
-            UN::AcFrequencyMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::NeutralCurrent::Id: { // type is int16u
             MN::NeutralCurrent::TypeInfo::Type value;
-            UN::NeutralCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::TotalActivePower::Id: { // type is int32s
             MN::TotalActivePower::TypeInfo::Type value;
-            UN::TotalActivePower::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::TotalReactivePower::Id: { // type is int32s
             MN::TotalReactivePower::TypeInfo::Type value;
-            UN::TotalReactivePower::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::TotalApparentPower::Id: { // type is int32u
             MN::TotalApparentPower::TypeInfo::Type value;
-            UN::TotalApparentPower::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Measured1stHarmonicCurrent::Id: { // type is int16s
             MN::Measured1stHarmonicCurrent::TypeInfo::Type value;
-            UN::Measured1stHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Measured3rdHarmonicCurrent::Id: { // type is int16s
             MN::Measured3rdHarmonicCurrent::TypeInfo::Type value;
-            UN::Measured3rdHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Measured5thHarmonicCurrent::Id: { // type is int16s
             MN::Measured5thHarmonicCurrent::TypeInfo::Type value;
-            UN::Measured5thHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Measured7thHarmonicCurrent::Id: { // type is int16s
             MN::Measured7thHarmonicCurrent::TypeInfo::Type value;
-            UN::Measured7thHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Measured9thHarmonicCurrent::Id: { // type is int16s
             MN::Measured9thHarmonicCurrent::TypeInfo::Type value;
-            UN::Measured9thHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::Measured11thHarmonicCurrent::Id: { // type is int16s
             MN::Measured11thHarmonicCurrent::TypeInfo::Type value;
-            UN::Measured11thHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MeasuredPhase1stHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase1stHarmonicCurrent::TypeInfo::Type value;
-            UN::MeasuredPhase1stHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MeasuredPhase3rdHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase3rdHarmonicCurrent::TypeInfo::Type value;
-            UN::MeasuredPhase3rdHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MeasuredPhase5thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase5thHarmonicCurrent::TypeInfo::Type value;
-            UN::MeasuredPhase5thHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MeasuredPhase7thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase7thHarmonicCurrent::TypeInfo::Type value;
-            UN::MeasuredPhase7thHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MeasuredPhase9thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase9thHarmonicCurrent::TypeInfo::Type value;
-            UN::MeasuredPhase9thHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::MeasuredPhase11thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase11thHarmonicCurrent::TypeInfo::Type value;
-            UN::MeasuredPhase11thHarmonicCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcFrequencyMultiplier::Id: { // type is int16u
             MN::AcFrequencyMultiplier::TypeInfo::Type value;
-            UN::AcFrequencyMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcFrequencyDivisor::Id: { // type is int16u
             MN::AcFrequencyDivisor::TypeInfo::Type value;
-            UN::AcFrequencyDivisor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PowerMultiplier::Id: { // type is int32u
             MN::PowerMultiplier::TypeInfo::Type value;
-            UN::PowerMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PowerDivisor::Id: { // type is int32u
             MN::PowerDivisor::TypeInfo::Type value;
-            UN::PowerDivisor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::HarmonicCurrentMultiplier::Id: { // type is int8s
             MN::HarmonicCurrentMultiplier::TypeInfo::Type value;
-            UN::HarmonicCurrentMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PhaseHarmonicCurrentMultiplier::Id: { // type is int8s
             MN::PhaseHarmonicCurrentMultiplier::TypeInfo::Type value;
-            UN::PhaseHarmonicCurrentMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::InstantaneousVoltage::Id: { // type is int16s
             MN::InstantaneousVoltage::TypeInfo::Type value;
-            UN::InstantaneousVoltage::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::InstantaneousLineCurrent::Id: { // type is int16u
             MN::InstantaneousLineCurrent::TypeInfo::Type value;
-            UN::InstantaneousLineCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::InstantaneousActiveCurrent::Id: { // type is int16s
             MN::InstantaneousActiveCurrent::TypeInfo::Type value;
-            UN::InstantaneousActiveCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::InstantaneousReactiveCurrent::Id: { // type is int16s
             MN::InstantaneousReactiveCurrent::TypeInfo::Type value;
-            UN::InstantaneousReactiveCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::InstantaneousPower::Id: { // type is int16s
             MN::InstantaneousPower::TypeInfo::Type value;
-            UN::InstantaneousPower::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltage::Id: { // type is int16u
             MN::RmsVoltage::TypeInfo::Type value;
-            UN::RmsVoltage::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageMin::Id: { // type is int16u
             MN::RmsVoltageMin::TypeInfo::Type value;
-            UN::RmsVoltageMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageMax::Id: { // type is int16u
             MN::RmsVoltageMax::TypeInfo::Type value;
-            UN::RmsVoltageMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrent::Id: { // type is int16u
             MN::RmsCurrent::TypeInfo::Type value;
-            UN::RmsCurrent::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrentMin::Id: { // type is int16u
             MN::RmsCurrentMin::TypeInfo::Type value;
-            UN::RmsCurrentMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrentMax::Id: { // type is int16u
             MN::RmsCurrentMax::TypeInfo::Type value;
-            UN::RmsCurrentMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePower::Id: { // type is int16s
             MN::ActivePower::TypeInfo::Type value;
-            UN::ActivePower::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePowerMin::Id: { // type is int16s
             MN::ActivePowerMin::TypeInfo::Type value;
-            UN::ActivePowerMin::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePowerMax::Id: { // type is int16s
             MN::ActivePowerMax::TypeInfo::Type value;
-            UN::ActivePowerMax::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ReactivePower::Id: { // type is int16s
             MN::ReactivePower::TypeInfo::Type value;
-            UN::ReactivePower::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ApparentPower::Id: { // type is int16u
             MN::ApparentPower::TypeInfo::Type value;
-            UN::ApparentPower::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PowerFactor::Id: { // type is int8s
             MN::PowerFactor::TypeInfo::Type value;
-            UN::PowerFactor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsVoltageMeasurementPeriod::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriod::TypeInfo::Type value;
-            UN::AverageRmsVoltageMeasurementPeriod::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsUnderVoltageCounter::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounter::TypeInfo::Type value;
-            UN::AverageRmsUnderVoltageCounter::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsExtremeOverVoltagePeriod::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriod::TypeInfo::Type value;
-            UN::RmsExtremeOverVoltagePeriod::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsExtremeUnderVoltagePeriod::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriod::TypeInfo::Type value;
-            UN::RmsExtremeUnderVoltagePeriod::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageSagPeriod::Id: { // type is int16u
             MN::RmsVoltageSagPeriod::TypeInfo::Type value;
-            UN::RmsVoltageSagPeriod::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageSwellPeriod::Id: { // type is int16u
             MN::RmsVoltageSwellPeriod::TypeInfo::Type value;
-            UN::RmsVoltageSwellPeriod::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcVoltageMultiplier::Id: { // type is int16u
             MN::AcVoltageMultiplier::TypeInfo::Type value;
-            UN::AcVoltageMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcVoltageDivisor::Id: { // type is int16u
             MN::AcVoltageDivisor::TypeInfo::Type value;
-            UN::AcVoltageDivisor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcCurrentMultiplier::Id: { // type is int16u
             MN::AcCurrentMultiplier::TypeInfo::Type value;
-            UN::AcCurrentMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcCurrentDivisor::Id: { // type is int16u
             MN::AcCurrentDivisor::TypeInfo::Type value;
-            UN::AcCurrentDivisor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcPowerMultiplier::Id: { // type is int16u
             MN::AcPowerMultiplier::TypeInfo::Type value;
-            UN::AcPowerMultiplier::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcPowerDivisor::Id: { // type is int16u
             MN::AcPowerDivisor::TypeInfo::Type value;
-            UN::AcPowerDivisor::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::OverloadAlarmsMask::Id: { // type is bitmap8
             MN::OverloadAlarmsMask::TypeInfo::Type value;
-            UN::OverloadAlarmsMask::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::VoltageOverload::Id: { // type is int16s
             MN::VoltageOverload::TypeInfo::Type value;
-            UN::VoltageOverload::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::CurrentOverload::Id: { // type is int16s
             MN::CurrentOverload::TypeInfo::Type value;
-            UN::CurrentOverload::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcOverloadAlarmsMask::Id: { // type is bitmap16
             MN::AcOverloadAlarmsMask::TypeInfo::Type value;
-            UN::AcOverloadAlarmsMask::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcVoltageOverload::Id: { // type is int16s
             MN::AcVoltageOverload::TypeInfo::Type value;
-            UN::AcVoltageOverload::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcCurrentOverload::Id: { // type is int16s
             MN::AcCurrentOverload::TypeInfo::Type value;
-            UN::AcCurrentOverload::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcActivePowerOverload::Id: { // type is int16s
             MN::AcActivePowerOverload::TypeInfo::Type value;
-            UN::AcActivePowerOverload::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AcReactivePowerOverload::Id: { // type is int16s
             MN::AcReactivePowerOverload::TypeInfo::Type value;
-            UN::AcReactivePowerOverload::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsOverVoltage::Id: { // type is int16s
             MN::AverageRmsOverVoltage::TypeInfo::Type value;
-            UN::AverageRmsOverVoltage::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsUnderVoltage::Id: { // type is int16s
             MN::AverageRmsUnderVoltage::TypeInfo::Type value;
-            UN::AverageRmsUnderVoltage::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsExtremeOverVoltage::Id: { // type is int16s
             MN::RmsExtremeOverVoltage::TypeInfo::Type value;
-            UN::RmsExtremeOverVoltage::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsExtremeUnderVoltage::Id: { // type is int16s
             MN::RmsExtremeUnderVoltage::TypeInfo::Type value;
-            UN::RmsExtremeUnderVoltage::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageSag::Id: { // type is int16s
             MN::RmsVoltageSag::TypeInfo::Type value;
-            UN::RmsVoltageSag::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageSwell::Id: { // type is int16s
             MN::RmsVoltageSwell::TypeInfo::Type value;
-            UN::RmsVoltageSwell::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::LineCurrentPhaseB::Id: { // type is int16u
             MN::LineCurrentPhaseB::TypeInfo::Type value;
-            UN::LineCurrentPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActiveCurrentPhaseB::Id: { // type is int16s
             MN::ActiveCurrentPhaseB::TypeInfo::Type value;
-            UN::ActiveCurrentPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ReactiveCurrentPhaseB::Id: { // type is int16s
             MN::ReactiveCurrentPhaseB::TypeInfo::Type value;
-            UN::ReactiveCurrentPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltagePhaseB::Id: { // type is int16u
             MN::RmsVoltagePhaseB::TypeInfo::Type value;
-            UN::RmsVoltagePhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageMinPhaseB::Id: { // type is int16u
             MN::RmsVoltageMinPhaseB::TypeInfo::Type value;
-            UN::RmsVoltageMinPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageMaxPhaseB::Id: { // type is int16u
             MN::RmsVoltageMaxPhaseB::TypeInfo::Type value;
-            UN::RmsVoltageMaxPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrentPhaseB::Id: { // type is int16u
             MN::RmsCurrentPhaseB::TypeInfo::Type value;
-            UN::RmsCurrentPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrentMinPhaseB::Id: { // type is int16u
             MN::RmsCurrentMinPhaseB::TypeInfo::Type value;
-            UN::RmsCurrentMinPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrentMaxPhaseB::Id: { // type is int16u
             MN::RmsCurrentMaxPhaseB::TypeInfo::Type value;
-            UN::RmsCurrentMaxPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePowerPhaseB::Id: { // type is int16s
             MN::ActivePowerPhaseB::TypeInfo::Type value;
-            UN::ActivePowerPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePowerMinPhaseB::Id: { // type is int16s
             MN::ActivePowerMinPhaseB::TypeInfo::Type value;
-            UN::ActivePowerMinPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePowerMaxPhaseB::Id: { // type is int16s
             MN::ActivePowerMaxPhaseB::TypeInfo::Type value;
-            UN::ActivePowerMaxPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ReactivePowerPhaseB::Id: { // type is int16s
             MN::ReactivePowerPhaseB::TypeInfo::Type value;
-            UN::ReactivePowerPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ApparentPowerPhaseB::Id: { // type is int16u
             MN::ApparentPowerPhaseB::TypeInfo::Type value;
-            UN::ApparentPowerPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PowerFactorPhaseB::Id: { // type is int8s
             MN::PowerFactorPhaseB::TypeInfo::Type value;
-            UN::PowerFactorPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::Type value;
-            UN::AverageRmsVoltageMeasurementPeriodPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsOverVoltageCounterPhaseB::Id: { // type is int16u
             MN::AverageRmsOverVoltageCounterPhaseB::TypeInfo::Type value;
-            UN::AverageRmsOverVoltageCounterPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsUnderVoltageCounterPhaseB::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounterPhaseB::TypeInfo::Type value;
-            UN::AverageRmsUnderVoltageCounterPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsExtremeOverVoltagePeriodPhaseB::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo::Type value;
-            UN::RmsExtremeOverVoltagePeriodPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsExtremeUnderVoltagePeriodPhaseB::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo::Type value;
-            UN::RmsExtremeUnderVoltagePeriodPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageSagPeriodPhaseB::Id: { // type is int16u
             MN::RmsVoltageSagPeriodPhaseB::TypeInfo::Type value;
-            UN::RmsVoltageSagPeriodPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageSwellPeriodPhaseB::Id: { // type is int16u
             MN::RmsVoltageSwellPeriodPhaseB::TypeInfo::Type value;
-            UN::RmsVoltageSwellPeriodPhaseB::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::LineCurrentPhaseC::Id: { // type is int16u
             MN::LineCurrentPhaseC::TypeInfo::Type value;
-            UN::LineCurrentPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActiveCurrentPhaseC::Id: { // type is int16s
             MN::ActiveCurrentPhaseC::TypeInfo::Type value;
-            UN::ActiveCurrentPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ReactiveCurrentPhaseC::Id: { // type is int16s
             MN::ReactiveCurrentPhaseC::TypeInfo::Type value;
-            UN::ReactiveCurrentPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltagePhaseC::Id: { // type is int16u
             MN::RmsVoltagePhaseC::TypeInfo::Type value;
-            UN::RmsVoltagePhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageMinPhaseC::Id: { // type is int16u
             MN::RmsVoltageMinPhaseC::TypeInfo::Type value;
-            UN::RmsVoltageMinPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageMaxPhaseC::Id: { // type is int16u
             MN::RmsVoltageMaxPhaseC::TypeInfo::Type value;
-            UN::RmsVoltageMaxPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrentPhaseC::Id: { // type is int16u
             MN::RmsCurrentPhaseC::TypeInfo::Type value;
-            UN::RmsCurrentPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrentMinPhaseC::Id: { // type is int16u
             MN::RmsCurrentMinPhaseC::TypeInfo::Type value;
-            UN::RmsCurrentMinPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsCurrentMaxPhaseC::Id: { // type is int16u
             MN::RmsCurrentMaxPhaseC::TypeInfo::Type value;
-            UN::RmsCurrentMaxPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePowerPhaseC::Id: { // type is int16s
             MN::ActivePowerPhaseC::TypeInfo::Type value;
-            UN::ActivePowerPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePowerMinPhaseC::Id: { // type is int16s
             MN::ActivePowerMinPhaseC::TypeInfo::Type value;
-            UN::ActivePowerMinPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ActivePowerMaxPhaseC::Id: { // type is int16s
             MN::ActivePowerMaxPhaseC::TypeInfo::Type value;
-            UN::ActivePowerMaxPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ReactivePowerPhaseC::Id: { // type is int16s
             MN::ReactivePowerPhaseC::TypeInfo::Type value;
-            UN::ReactivePowerPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ApparentPowerPhaseC::Id: { // type is int16u
             MN::ApparentPowerPhaseC::TypeInfo::Type value;
-            UN::ApparentPowerPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::PowerFactorPhaseC::Id: { // type is int8s
             MN::PowerFactorPhaseC::TypeInfo::Type value;
-            UN::PowerFactorPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo::Type value;
-            UN::AverageRmsVoltageMeasurementPeriodPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsOverVoltageCounterPhaseC::Id: { // type is int16u
             MN::AverageRmsOverVoltageCounterPhaseC::TypeInfo::Type value;
-            UN::AverageRmsOverVoltageCounterPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::AverageRmsUnderVoltageCounterPhaseC::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounterPhaseC::TypeInfo::Type value;
-            UN::AverageRmsUnderVoltageCounterPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsExtremeOverVoltagePeriodPhaseC::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo::Type value;
-            UN::RmsExtremeOverVoltagePeriodPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsExtremeUnderVoltagePeriodPhaseC::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo::Type value;
-            UN::RmsExtremeUnderVoltagePeriodPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageSagPeriodPhaseC::Id: { // type is int16u
             MN::RmsVoltageSagPeriodPhaseC::TypeInfo::Type value;
-            UN::RmsVoltageSagPeriodPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::RmsVoltageSwellPeriodPhaseC::Id: { // type is int16u
             MN::RmsVoltageSwellPeriodPhaseC::TypeInfo::Type value;
-            UN::RmsVoltageSwellPeriodPhaseC::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atr_path, value);
-            return aEncoder.Encode(value);
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
         }
         }
     } catch (const std::out_of_range& e) {
@@ -7258,7 +7648,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasurementType attribute value is %s", unify_value.dump().c_str());
-            UN::MeasurementType::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::MeasurementType::Id);
         }
@@ -7271,7 +7661,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltage attribute value is %s", unify_value.dump().c_str());
-            UN::DcVoltage::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltage::Id);
         }
         break;
@@ -7283,7 +7673,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltageMin attribute value is %s", unify_value.dump().c_str());
-            UN::DcVoltageMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltageMin::Id);
         }
         break;
@@ -7295,7 +7685,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltageMax attribute value is %s", unify_value.dump().c_str());
-            UN::DcVoltageMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltageMax::Id);
         }
         break;
@@ -7307,7 +7697,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::DcCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrent::Id);
         }
         break;
@@ -7319,7 +7709,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrentMin attribute value is %s", unify_value.dump().c_str());
-            UN::DcCurrentMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrentMin::Id);
         }
         break;
@@ -7331,7 +7721,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrentMax attribute value is %s", unify_value.dump().c_str());
-            UN::DcCurrentMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrentMax::Id);
         }
         break;
@@ -7343,7 +7733,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPower attribute value is %s", unify_value.dump().c_str());
-            UN::DcPower::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPower::Id);
         }
         break;
@@ -7355,7 +7745,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPowerMin attribute value is %s", unify_value.dump().c_str());
-            UN::DcPowerMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPowerMin::Id);
         }
         break;
@@ -7367,7 +7757,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPowerMax attribute value is %s", unify_value.dump().c_str());
-            UN::DcPowerMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPowerMax::Id);
         }
         break;
@@ -7379,7 +7769,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltageMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::DcVoltageMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::DcVoltageMultiplier::Id);
         }
@@ -7392,7 +7782,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltageDivisor attribute value is %s", unify_value.dump().c_str());
-            UN::DcVoltageDivisor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::DcVoltageDivisor::Id);
         }
@@ -7405,7 +7795,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::DcCurrentMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::DcCurrentMultiplier::Id);
         }
@@ -7418,7 +7808,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrentDivisor attribute value is %s", unify_value.dump().c_str());
-            UN::DcCurrentDivisor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::DcCurrentDivisor::Id);
         }
@@ -7431,7 +7821,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPowerMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::DcPowerMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::DcPowerMultiplier::Id);
         }
@@ -7444,7 +7834,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPowerDivisor attribute value is %s", unify_value.dump().c_str());
-            UN::DcPowerDivisor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::DcPowerDivisor::Id);
         }
@@ -7457,7 +7847,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequency attribute value is %s", unify_value.dump().c_str());
-            UN::AcFrequency::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::AcFrequency::Id);
         }
         break;
@@ -7469,7 +7859,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequencyMin attribute value is %s", unify_value.dump().c_str());
-            UN::AcFrequencyMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcFrequencyMin::Id);
         }
@@ -7482,7 +7872,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequencyMax attribute value is %s", unify_value.dump().c_str());
-            UN::AcFrequencyMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcFrequencyMax::Id);
         }
@@ -7495,7 +7885,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NeutralCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::NeutralCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::NeutralCurrent::Id);
         }
@@ -7508,7 +7898,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TotalActivePower attribute value is %s", unify_value.dump().c_str());
-            UN::TotalActivePower::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::TotalActivePower::Id);
         }
@@ -7521,7 +7911,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TotalReactivePower attribute value is %s", unify_value.dump().c_str());
-            UN::TotalReactivePower::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::TotalReactivePower::Id);
         }
@@ -7534,7 +7924,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TotalApparentPower attribute value is %s", unify_value.dump().c_str());
-            UN::TotalApparentPower::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::TotalApparentPower::Id);
         }
@@ -7547,7 +7937,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured1stHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::Measured1stHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::Measured1stHarmonicCurrent::Id);
         }
@@ -7560,7 +7950,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured3rdHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::Measured3rdHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::Measured3rdHarmonicCurrent::Id);
         }
@@ -7573,7 +7963,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured5thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::Measured5thHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::Measured5thHarmonicCurrent::Id);
         }
@@ -7586,7 +7976,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured7thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::Measured7thHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::Measured7thHarmonicCurrent::Id);
         }
@@ -7599,7 +7989,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured9thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::Measured9thHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::Measured9thHarmonicCurrent::Id);
         }
@@ -7612,7 +8002,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured11thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::Measured11thHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::Measured11thHarmonicCurrent::Id);
         }
@@ -7625,7 +8015,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase1stHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredPhase1stHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::MeasuredPhase1stHarmonicCurrent::Id);
         }
@@ -7638,7 +8028,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase3rdHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredPhase3rdHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::MeasuredPhase3rdHarmonicCurrent::Id);
         }
@@ -7651,7 +8041,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase5thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredPhase5thHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::MeasuredPhase5thHarmonicCurrent::Id);
         }
@@ -7664,7 +8054,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase7thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredPhase7thHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::MeasuredPhase7thHarmonicCurrent::Id);
         }
@@ -7677,7 +8067,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase9thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredPhase9thHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::MeasuredPhase9thHarmonicCurrent::Id);
         }
@@ -7690,7 +8080,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase11thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::MeasuredPhase11thHarmonicCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::MeasuredPhase11thHarmonicCurrent::Id);
         }
@@ -7703,7 +8093,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequencyMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::AcFrequencyMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcFrequencyMultiplier::Id);
         }
@@ -7716,7 +8106,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequencyDivisor attribute value is %s", unify_value.dump().c_str());
-            UN::AcFrequencyDivisor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcFrequencyDivisor::Id);
         }
@@ -7729,7 +8119,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::PowerMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::PowerMultiplier::Id);
         }
@@ -7742,7 +8132,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerDivisor attribute value is %s", unify_value.dump().c_str());
-            UN::PowerDivisor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::PowerDivisor::Id);
         }
         break;
@@ -7754,7 +8144,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "HarmonicCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::HarmonicCurrentMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::HarmonicCurrentMultiplier::Id);
         }
@@ -7767,7 +8157,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PhaseHarmonicCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::PhaseHarmonicCurrentMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::PhaseHarmonicCurrentMultiplier::Id);
         }
@@ -7780,7 +8170,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "InstantaneousLineCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::InstantaneousLineCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::InstantaneousLineCurrent::Id);
         }
@@ -7793,7 +8183,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "InstantaneousActiveCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::InstantaneousActiveCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::InstantaneousActiveCurrent::Id);
         }
@@ -7806,7 +8196,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "InstantaneousReactiveCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::InstantaneousReactiveCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::InstantaneousReactiveCurrent::Id);
         }
@@ -7819,7 +8209,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltage attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltage::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsVoltage::Id);
         }
         break;
@@ -7831,7 +8221,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMin attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageMin::Id);
         }
@@ -7844,7 +8234,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMax attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageMax::Id);
         }
@@ -7857,7 +8247,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrent attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrent::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsCurrent::Id);
         }
         break;
@@ -7869,7 +8259,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMin attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrentMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsCurrentMin::Id);
         }
@@ -7882,7 +8272,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMax attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrentMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsCurrentMax::Id);
         }
@@ -7895,7 +8285,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePower attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePower::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::ActivePower::Id);
         }
         break;
@@ -7907,7 +8297,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMin attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePowerMin::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActivePowerMin::Id);
         }
@@ -7920,7 +8310,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMax attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePowerMax::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActivePowerMax::Id);
         }
@@ -7933,7 +8323,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactivePower attribute value is %s", unify_value.dump().c_str());
-            UN::ReactivePower::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ReactivePower::Id);
         }
@@ -7946,7 +8336,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ApparentPower attribute value is %s", unify_value.dump().c_str());
-            UN::ApparentPower::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ApparentPower::Id);
         }
@@ -7959,7 +8349,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerFactor attribute value is %s", unify_value.dump().c_str());
-            UN::PowerFactor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::PowerFactor::Id);
         }
         break;
@@ -7971,7 +8361,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriod attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsVoltageMeasurementPeriod::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsVoltageMeasurementPeriod::Id);
         }
@@ -7984,7 +8374,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounter attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsUnderVoltageCounter::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsUnderVoltageCounter::Id);
         }
@@ -7997,7 +8387,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriod attribute value is %s", unify_value.dump().c_str());
-            UN::RmsExtremeOverVoltagePeriod::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsExtremeOverVoltagePeriod::Id);
         }
@@ -8010,7 +8400,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriod attribute value is %s", unify_value.dump().c_str());
-            UN::RmsExtremeUnderVoltagePeriod::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsExtremeUnderVoltagePeriod::Id);
         }
@@ -8023,7 +8413,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriod attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageSagPeriod::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageSagPeriod::Id);
         }
@@ -8036,7 +8426,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriod attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageSwellPeriod::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageSwellPeriod::Id);
         }
@@ -8049,7 +8439,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcVoltageMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::AcVoltageMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcVoltageMultiplier::Id);
         }
@@ -8062,7 +8452,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcVoltageDivisor attribute value is %s", unify_value.dump().c_str());
-            UN::AcVoltageDivisor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcVoltageDivisor::Id);
         }
@@ -8075,7 +8465,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::AcCurrentMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcCurrentMultiplier::Id);
         }
@@ -8088,7 +8478,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcCurrentDivisor attribute value is %s", unify_value.dump().c_str());
-            UN::AcCurrentDivisor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcCurrentDivisor::Id);
         }
@@ -8101,7 +8491,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcPowerMultiplier attribute value is %s", unify_value.dump().c_str());
-            UN::AcPowerMultiplier::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcPowerMultiplier::Id);
         }
@@ -8114,7 +8504,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcPowerDivisor attribute value is %s", unify_value.dump().c_str());
-            UN::AcPowerDivisor::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcPowerDivisor::Id);
         }
@@ -8127,7 +8517,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OverloadAlarmsMask attribute value is %s", unify_value.dump().c_str());
-            UN::OverloadAlarmsMask::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::OverloadAlarmsMask::Id);
         }
@@ -8140,7 +8530,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "VoltageOverload attribute value is %s", unify_value.dump().c_str());
-            UN::VoltageOverload::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::VoltageOverload::Id);
         }
@@ -8153,7 +8543,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentOverload attribute value is %s", unify_value.dump().c_str());
-            UN::CurrentOverload::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::CurrentOverload::Id);
         }
@@ -8166,7 +8556,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcOverloadAlarmsMask attribute value is %s", unify_value.dump().c_str());
-            UN::AcOverloadAlarmsMask::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcOverloadAlarmsMask::Id);
         }
@@ -8179,7 +8569,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcVoltageOverload attribute value is %s", unify_value.dump().c_str());
-            UN::AcVoltageOverload::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcVoltageOverload::Id);
         }
@@ -8192,7 +8582,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcCurrentOverload attribute value is %s", unify_value.dump().c_str());
-            UN::AcCurrentOverload::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcCurrentOverload::Id);
         }
@@ -8205,7 +8595,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcActivePowerOverload attribute value is %s", unify_value.dump().c_str());
-            UN::AcActivePowerOverload::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcActivePowerOverload::Id);
         }
@@ -8218,7 +8608,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcReactivePowerOverload attribute value is %s", unify_value.dump().c_str());
-            UN::AcReactivePowerOverload::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AcReactivePowerOverload::Id);
         }
@@ -8231,7 +8621,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltage attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsOverVoltage::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsOverVoltage::Id);
         }
@@ -8244,7 +8634,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltage attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsUnderVoltage::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsUnderVoltage::Id);
         }
@@ -8257,7 +8647,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltage attribute value is %s", unify_value.dump().c_str());
-            UN::RmsExtremeOverVoltage::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsExtremeOverVoltage::Id);
         }
@@ -8270,7 +8660,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltage attribute value is %s", unify_value.dump().c_str());
-            UN::RmsExtremeUnderVoltage::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsExtremeUnderVoltage::Id);
         }
@@ -8283,7 +8673,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSag attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageSag::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageSag::Id);
         }
@@ -8296,7 +8686,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSwell attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageSwell::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageSwell::Id);
         }
@@ -8309,7 +8699,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LineCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::LineCurrentPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::LineCurrentPhaseB::Id);
         }
@@ -8322,7 +8712,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActiveCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::ActiveCurrentPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActiveCurrentPhaseB::Id);
         }
@@ -8335,7 +8725,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactiveCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::ReactiveCurrentPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ReactiveCurrentPhaseB::Id);
         }
@@ -8348,7 +8738,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltagePhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltagePhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltagePhaseB::Id);
         }
@@ -8361,7 +8751,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMinPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageMinPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageMinPhaseB::Id);
         }
@@ -8374,7 +8764,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMaxPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageMaxPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageMaxPhaseB::Id);
         }
@@ -8387,7 +8777,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrentPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsCurrentPhaseB::Id);
         }
@@ -8400,7 +8790,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMinPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrentMinPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsCurrentMinPhaseB::Id);
         }
@@ -8413,7 +8803,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMaxPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrentMaxPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsCurrentMaxPhaseB::Id);
         }
@@ -8426,7 +8816,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePowerPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActivePowerPhaseB::Id);
         }
@@ -8439,7 +8829,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMinPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePowerMinPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActivePowerMinPhaseB::Id);
         }
@@ -8452,7 +8842,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMaxPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePowerMaxPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActivePowerMaxPhaseB::Id);
         }
@@ -8465,7 +8855,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactivePowerPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::ReactivePowerPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ReactivePowerPhaseB::Id);
         }
@@ -8478,7 +8868,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ApparentPowerPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::ApparentPowerPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ApparentPowerPhaseB::Id);
         }
@@ -8491,7 +8881,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerFactorPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::PowerFactorPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::PowerFactorPhaseB::Id);
         }
@@ -8504,7 +8894,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsVoltageMeasurementPeriodPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id);
         }
@@ -8517,7 +8907,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltageCounterPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsOverVoltageCounterPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsOverVoltageCounterPhaseB::Id);
         }
@@ -8530,7 +8920,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounterPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsUnderVoltageCounterPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsUnderVoltageCounterPhaseB::Id);
         }
@@ -8543,7 +8933,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriodPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsExtremeOverVoltagePeriodPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsExtremeOverVoltagePeriodPhaseB::Id);
         }
@@ -8556,7 +8946,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriodPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsExtremeUnderVoltagePeriodPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsExtremeUnderVoltagePeriodPhaseB::Id);
         }
@@ -8569,7 +8959,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageSagPeriodPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageSagPeriodPhaseB::Id);
         }
@@ -8582,7 +8972,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageSwellPeriodPhaseB::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageSwellPeriodPhaseB::Id);
         }
@@ -8595,7 +8985,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LineCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::LineCurrentPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::LineCurrentPhaseC::Id);
         }
@@ -8608,7 +8998,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActiveCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::ActiveCurrentPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActiveCurrentPhaseC::Id);
         }
@@ -8621,7 +9011,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactiveCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::ReactiveCurrentPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ReactiveCurrentPhaseC::Id);
         }
@@ -8634,7 +9024,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltagePhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltagePhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltagePhaseC::Id);
         }
@@ -8647,7 +9037,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMinPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageMinPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageMinPhaseC::Id);
         }
@@ -8660,7 +9050,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMaxPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageMaxPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageMaxPhaseC::Id);
         }
@@ -8673,7 +9063,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrentPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsCurrentPhaseC::Id);
         }
@@ -8686,7 +9076,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMinPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrentMinPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsCurrentMinPhaseC::Id);
         }
@@ -8699,7 +9089,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMaxPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsCurrentMaxPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsCurrentMaxPhaseC::Id);
         }
@@ -8712,7 +9102,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePowerPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActivePowerPhaseC::Id);
         }
@@ -8725,7 +9115,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMinPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePowerMinPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActivePowerMinPhaseC::Id);
         }
@@ -8738,7 +9128,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMaxPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::ActivePowerMaxPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ActivePowerMaxPhaseC::Id);
         }
@@ -8751,7 +9141,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactivePowerPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::ReactivePowerPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ReactivePowerPhaseC::Id);
         }
@@ -8764,7 +9154,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ApparentPowerPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::ApparentPowerPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::ApparentPowerPhaseC::Id);
         }
@@ -8777,7 +9167,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerFactorPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::PowerFactorPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::PowerFactorPhaseC::Id);
         }
@@ -8790,7 +9180,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsVoltageMeasurementPeriodPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id);
         }
@@ -8803,7 +9193,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltageCounterPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsOverVoltageCounterPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsOverVoltageCounterPhaseC::Id);
         }
@@ -8816,7 +9206,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounterPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::AverageRmsUnderVoltageCounterPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::AverageRmsUnderVoltageCounterPhaseC::Id);
         }
@@ -8829,7 +9219,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriodPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsExtremeOverVoltagePeriodPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsExtremeOverVoltagePeriodPhaseC::Id);
         }
@@ -8842,7 +9232,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriodPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsExtremeUnderVoltagePeriodPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsExtremeUnderVoltagePeriodPhaseC::Id);
         }
@@ -8855,7 +9245,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageSagPeriodPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageSagPeriodPhaseC::Id);
         }
@@ -8868,7 +9258,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
-            UN::RmsVoltageSwellPeriodPhaseC::Set(attrpath, value.value());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                 MN::RmsVoltageSwellPeriodPhaseC::Id);
         }

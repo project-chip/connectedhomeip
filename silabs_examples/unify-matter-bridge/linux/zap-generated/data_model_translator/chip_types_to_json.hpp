@@ -1261,7 +1261,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::IlluminanceMeasurement:
     case LightSensorType::kPhotodiode:
         return "Photodiode";
     case LightSensorType::kCmos:
-        return "Cmos";
+        return "CMOS";
     default:
         return "{}";
     }

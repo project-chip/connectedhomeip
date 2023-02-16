@@ -45,17 +45,7 @@
             "path": "attribute_translator.hpp.zapt",
             "name": "Attribute Translator Header",
             "output": "attribute_translator.hpp"
-        },
-        {
-            "path": "unify_accessors.hpp.zapt",
-            "name": "Attribute Accessor Header",
-            "output": "unify_accessors.hpp"
-        },
-        {
-            "path": "unify_accessors.cpp.zapt",
-            "name": "Attribute Accessor Source",
-            "output": "unify_accessors.cpp"
-        },
+        },        
         {
             "path": "attribute_type_size.hpp.zapt",
             "name": "Attribute Type/Size Header",

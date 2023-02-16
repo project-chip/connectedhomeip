@@ -12,7 +12,7 @@
  *****************************************************************************/
 #include "attribute_state_cache.hpp"
 
-attribute_state_cache instance;
+static attribute_state_cache instance;
 attribute_state_cache & attribute_state_cache::get_instance()
 {
     return instance;

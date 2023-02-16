@@ -1,5 +1,5 @@
 exports.model = {
-{{#zcl_clusters}} 
+{{#zcl_clusters}}
   {{#if (supportedMappedClusterCode code)}}
   {{code}}: {
     name: "{{asUpperCamelCase label}}",
@@ -18,13 +18,13 @@ exports.model = {
       {{code}} : "{{asUpperCamelCase label}}",
       {{/zcl_attributes_server}}
     },
-  },  
+  },
   {{/if}}
 {{/zcl_clusters}}
 
 enums: {
   {{#zcl_enums}}
-  "{{asUpperCamelCase label}}" : [{{#zcl_enum_items}}"{{asUpperCamelCase label}}",{{/zcl_enum_items}}]  , // {{parent.parent.code}}
+  "{{asUpperCamelCase label}}" : [{{#zcl_enum_items}}"{{label}}",{{/zcl_enum_items}}]  , // {{parent.parent.code}}
   {{/zcl_enums}}
 },
 
@@ -32,7 +32,7 @@ bitmaps: {
   {{#zcl_bitmaps}}
   "{{asUpperCamelCase label}}" : {
     {{#zcl_bitmap_items}}
-    {{mask}} : "{{asUpperCamelCase label}}",
+    {{mask}} : "{{label}}",
     {{/zcl_bitmap_items}}
   },
   {{/zcl_bitmaps}}

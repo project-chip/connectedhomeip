@@ -81,6 +81,37 @@ function unifyTypeExists(matter_name) {
   }
 }
 
+function unifyCanPassThroughEnumValue(cluster_name, attribute_id) {
+  // List of Cluster (and array of attributes) whose values enum values
+  // can be mapped directly to matter because they have an enum available.
+  // These attributes need to have an enum defined under cluster-enums.h, e.g. here
+  // ColorMode can be in the list because we have
+  // 'enum class ColorMode : uint8_t' in cluster-enums.h
+  const pass_through_enum_values = new Map([
+    ["Color Control" , [8]], // ColorControl::ColorMode
+  ]);
+
+  if ((pass_through_enum_values.get(cluster_name) !== undefined) &&
+       pass_through_enum_values.get(cluster_name).includes(attribute_id)) {
+    return true;
+  }
+  return false;
+}
+
+function unifyCanUseChipBitMap(cluster_name, attribute_id) {
+  // List of Cluster (and array of attributes) whose values bitmap values
+  // can be mapped using the chip::BitMask type.
+  const can_use_chip_bitmask = new Map([
+    ["Color Control" , [0x400A]], // ColorControl::ColorCapabilities
+  ]);
+
+  if ((can_use_chip_bitmask.get(cluster_name) !== undefined) &&
+  can_use_chip_bitmask.get(cluster_name).includes(attribute_id)) {
+    return true;
+  }
+  return false;
+}
+
 exports.unifySupportedCluster = unifySupportedCluster
 exports.unifyClusterName = unifyClusterName
 exports.unifySupportedClusterCommand = unifySupportedClusterCommand
@@ -91,3 +122,5 @@ exports.unifyEnumValName = unifyEnumValName
 exports.unifyBitmapValName = unifyBitmapValName
 exports.unifyClusterCommandArgument = unifyClusterCommandArgument
 exports.unifyTypeExists = unifyTypeExists
+exports.unifyCanPassThroughEnumValue = unifyCanPassThroughEnumValue
+exports.unifyCanUseChipBitMap = unifyCanUseChipBitMap

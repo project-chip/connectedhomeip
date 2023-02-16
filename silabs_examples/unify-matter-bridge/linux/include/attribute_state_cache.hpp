@@ -29,27 +29,17 @@
 #include <string>
 #include <variant>
 
+#include "chip_type_traits.hpp"
 #include "matter.h"
 #include <algorithm>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/Optional.h>
 #include <string.h>
 #include <type_traits>
+
 using value_t    = std::variant<bool, float, int8_t, uint8_t, int16_t, uint16_t, uint32_t, uint64_t, int, std::string,
                              std::vector<char>, std::vector<uint8_t>>;
 using AttrPath_t = chip::app::ConcreteAttributePath;
-
-
-
-namespace unify::matter_bridge {
-    //This is template is used to compile time determine if type is a chip::Span<>
-    // This is done using a SFINAE pattern
-    template <typename T>
-    struct is_span : std::false_type {};
-
-    template <typename T>
-    struct is_span<chip::Span<T>> : std::true_type {};
-}
 
 class attribute_state_cache
 {
@@ -72,33 +62,27 @@ public:
         if constexpr (std::is_enum<T>::value)
         {
             attribute_state_container[attributePath] = static_cast<std::underlying_type_t<T>>(data);
-        } else if constexpr (unify::matter_bridge::is_span<T>::value) {
+        }
+        else if constexpr (unify::matter_bridge::is_span<T>::value)
+        {
             std::vector<uint8_t> v(data.size());
             std::copy(data.begin(), data.end(), std::back_inserter(v));
             set(attributePath, v);
         }
+        else if constexpr (unify::matter_bridge::is_bitmask<T>::value)
+        {
+            set(attributePath, data.Raw());
+        }
+        else if constexpr (unify::matter_bridge::is_nullable<T>::value)
+        {
+            if (data.HasValidValue())
+            {
+                set(attributePath, data.Value());
+            }
+        }
         else
         {
             attribute_state_container[attributePath] = data;
-        }
-    }
-
-
-    /**
-     * @brief Setter for Nullable
-     * 
-     * If the object does not have a value this is a NOP
-     * 
-     * @tparam T 
-     * @param attributePath 
-     * @param data 
-     */
-    template <typename T>
-    void set(const AttrPath_t & attributePath, const chip::app::DataModel::Nullable<T> & data)
-    {
-        if (data.HasValidValue())
-        {
-            set(attributePath, data.Value());
         }
     }
 
@@ -122,14 +106,14 @@ public:
     }
 
     /**
-     * @brief Generic getter for all all attribute types, the stored value will be 
+     * @brief Generic getter for all all attribute types, the stored value will be
      * copied to value
-     * 
-     * @tparam T 
-     * @param attributePath 
-     * @param value 
-     * @return true 
-     * @return false 
+     *
+     * @tparam T
+     * @param attributePath
+     * @param value
+     * @return true
+     * @return false
      */
     template <typename T>
     bool inline get(const AttrPath_t & attributePath, T & value) const
@@ -145,9 +129,28 @@ public:
             else if constexpr (std::is_array<T>::value)
             {
                 return get_array(attributePath, value);
-            } else if constexpr (unify::matter_bridge::is_span<T>::value) 
+            }
+            else if constexpr (unify::matter_bridge::is_span<T>::value)
             {
-                return false; //TODO this should really be a check for is_chip_span
+                auto v = std::get<std::vector<uint8_t>>(iter->second);
+                value  = T((typename T::pointer) v.data(), v.size());
+                return true;
+            }
+            else if constexpr (unify::matter_bridge::is_nullable<T>::value)
+            {
+                typename T::UnderlyingType v;
+                if (get(attributePath, v))
+                {
+                    value.SetNonNull(v);
+                }
+            }
+            else if constexpr (unify::matter_bridge::is_bitmask<T>::value)
+            {
+                typename T::IntegerType v;
+                if (get(attributePath, v))
+                {
+                    value.SetRaw(v);
+                }
             }
             else
             {
@@ -157,20 +160,27 @@ public:
         }
         else
         {
-            return false;
+            if constexpr (unify::matter_bridge::is_nullable<T>::value)
+            {
+                value.SetNull();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
-
 
 private:
     /**
      * @brief Getter for an array type
-     * 
-     * @tparam T 
-     * @tparam N 
-     * @param attributePath 
-     * @return true 
-     * @return false 
+     *
+     * @tparam T
+     * @tparam N
+     * @param attributePath
+     * @return true
+     * @return false
      */
     template <typename T, std::size_t N>
     bool inline get_array(const AttrPath_t & attributePath, T (&value)[N]) const

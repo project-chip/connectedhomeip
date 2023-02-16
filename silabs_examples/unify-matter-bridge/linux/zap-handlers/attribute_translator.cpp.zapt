@@ -36,7 +36,6 @@ using namespace unify::matter_bridge;
 
 #include "chip_types_to_json.hpp"
 #include "chip_types_from_json.hpp"
-#include "unify_accessors.hpp"
 
 {{#zcl_clusters}}
 {{#if (unifySupportedCluster code)}}
@@ -61,11 +60,11 @@ CHIP_ERROR
                                                         aPath.mClusterId,
                                                         aPath.mAttributeId);
 
-  
+
   if( m_node_state_monitor.emulator().is_attribute_emulated(aPath) ) {
     return m_node_state_monitor.emulator().read_attribute(aPath,aEncoder);
   }
-  
+
   try {
     switch (aPath.mAttributeId) {
     {{#zcl_attributes_server}}
@@ -73,8 +72,9 @@ CHIP_ERROR
     {{else if (canHaveSimpleAccessors this)}}
     case MN::{{asUpperCamelCase label}}::Id: {     // type is {{type}}
       MN::{{asUpperCamelCase label}}::TypeInfo::Type value;
-      UN::{{asUpperCamelCase label}}::Get(atr_path, value);
-      return aEncoder.Encode(value);
+      if(attribute_state_cache::get_instance().get(atr_path,value)) {
+        return aEncoder.Encode(value);
+      }
     }
     {{/if_is_struct}}
     {{/zcl_attributes_server}}
@@ -171,12 +171,18 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
     {{else if (canHaveSimpleAccessors this)}}
     // type is {{type}}
     case MN::{{asUpperCamelCase label}}::Id: {
+      {{#if (unifyCanUseChipBitMap parent.label code)}}
+      using T = chip::BitMask<chip::app::Clusters::{{asUpperCamelCase parent.label}}::{{asUpperCamelCase label}}>;
+      {{else if (unifyCanPassThroughEnumValue parent.label code)}}
+      using T = chip::app::Clusters::{{asUpperCamelCase parent.label}}::{{asUpperCamelCase label}};
+      {{else}}
       using T = MN::{{asUpperCamelCase label}}::TypeInfo::Type;
+      {{/if}}
       std::optional<T> value = from_json<T>(unify_value);
-      
-      if( value.has_value()) {
+
+      if (value.has_value()) {
         sl_log_debug(LOG_TAG,"{{asUpperCamelCase label}} attribute value is %s",unify_value.dump().c_str());
-        UN::{{asUpperCamelCase label}}::Set(attrpath, value.value());
+        attribute_state_cache::get_instance().set<T>(attrpath,value.value());
         MatterReportingAttributeChangeCallback(
           node_matter_endpoint,
           Clusters::{{asUpperCamelCase parent.label}}::Id,

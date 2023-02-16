@@ -12,15 +12,8 @@
  *
  ******************************************************************************/
 #include "app/data-model/NullObject.h"
+#include "chip_type_traits.hpp"
 #include "zcl_global_types.hpp"
-
-template <typename T>
-struct is_nullable : std::false_type {
-};
-
-template <typename T>
-struct is_nullable<chip::app::DataModel::Nullable<T>> : std::true_type {
-};
 
 // Default translation
 template <typename T>
@@ -1193,7 +1186,7 @@ inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nl
 {
     const std::map<std::string, IlluminanceMeasurement::LightSensorType> table = {
         { "Photodiode", IlluminanceMeasurement::LightSensorType::kPhotodiode },
-        { "Cmos", IlluminanceMeasurement::LightSensorType::kCmos },
+        { "CMOS", IlluminanceMeasurement::LightSensorType::kCmos },
     };
 
     auto i = table.find(value);

@@ -1,8 +1,7 @@
 // Unify bridge components
 #include "attribute_translator.hpp"
 #include "matter_device_translator.hpp"
-#include "unify_accessors.hpp"
-
+#include "attribute_state_cache.hpp"
 // Unify SDK components
 #include "sl_log.h"
 
@@ -83,10 +82,9 @@ void TestTemperatureMeasurementAttributes(nlTestSuite * inSuite, void * aContext
         chip::app::ConcreteAttributePath(unify_node->matter_endpoint, chip::app::Clusters::TemperatureMeasurement::Id,
                                          chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Id);
     chip::app::DataModel::Nullable<int16_t> test_attribute_value;
-    auto result = unify::matter_bridge::TemperatureMeasurement::Attributes::MeasuredValue::Get(test_correct_attribute_id_path,
-                                                                                               test_attribute_value);
+    auto result = attribute_state_cache::get_instance().get(test_correct_attribute_id_path,test_attribute_value);
 
-    NL_TEST_ASSERT(inSuite, result == EMBER_ZCL_STATUS_SUCCESS);
+    NL_TEST_ASSERT(inSuite, result == true);
     NL_TEST_ASSERT(inSuite, test_attribute_value.Value() == 55);
 }
 

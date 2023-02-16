@@ -2,7 +2,7 @@
 
 if [ -z "${UCL_XML_PATH}" ]
 then
-  echo "Please dirrect the environment variable UCL_XML_PATH to the location of the Unify DotDot XML files."
+  echo "Please direct the environment variable UCL_XML_PATH to the location of the Unify DotDot XML files."
   exit 1
 fi
 
