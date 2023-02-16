@@ -25,8 +25,6 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
-#include <zap-generated/gen_config.h>
-
 #include "MediaPlaybackManager.h"
 
 using namespace chip;

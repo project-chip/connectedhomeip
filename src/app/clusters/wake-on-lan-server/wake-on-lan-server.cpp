@@ -32,8 +32,6 @@
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#include <zap-generated/gen_config.h>
-
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WakeOnLan;

@@ -18,8 +18,6 @@
 #include "MediaPlaybackManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 
-#include <zap-generated/gen_config.h>
-
 using namespace std;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;

@@ -1,7 +1,5 @@
 #include <static-supported-modes-manager.h>
 
-#include <zap-generated/gen_config.h>
-
 using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;

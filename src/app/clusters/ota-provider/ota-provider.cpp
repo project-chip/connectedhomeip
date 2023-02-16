@@ -25,8 +25,6 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <zap-generated/gen_config.h>
-
 #include <lib/support/Span.h>
 
 #include "ota-provider-delegate.h"

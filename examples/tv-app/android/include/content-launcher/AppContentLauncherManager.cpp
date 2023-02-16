@@ -20,8 +20,6 @@
 #include "../../java/ContentAppAttributeDelegate.h"
 #include <json/json.h>
 
-#include <zap-generated/gen_config.h>
-
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters;

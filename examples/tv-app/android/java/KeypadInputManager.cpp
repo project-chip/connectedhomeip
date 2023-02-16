@@ -23,8 +23,6 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 
-#include <zap-generated/gen_config.h>
-
 using namespace chip;
 using namespace chip::app::Clusters::KeypadInput;
 

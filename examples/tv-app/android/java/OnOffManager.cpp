@@ -24,8 +24,6 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
-#include <zap-generated/gen_config.h>
-
 using namespace chip;
 
 static constexpr size_t kOnffManagerTableSize = EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;

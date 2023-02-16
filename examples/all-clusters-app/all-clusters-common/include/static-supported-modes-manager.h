@@ -22,8 +22,6 @@
 #include <app/util/af.h>
 #include <cstring>
 
-#include <zap-generated/gen_config.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {

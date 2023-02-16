@@ -19,8 +19,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <vector>
 
-#include <zap-generated/gen_config.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Channel;
