@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 import enum
-import functools
 import glob
 import io
 from typing import List, Optional
@@ -244,18 +243,6 @@ class SpecDefinitions:
 
 
 def SpecDefinitionsFromPaths(paths: str, pseudo_clusters: Optional[PseudoClusters] = PseudoClusters([])):
-    def sort_with_global_attribute_first(a, b):
-        if a.endswith('global-attributes.xml'):
-            return -1
-        elif b.endswith('global-attributes.xml'):
-            return 1
-        elif a > b:
-            return 1
-        elif a == b:
-            return 0
-        elif a < b:
-            return -1
-
     filenames = []
     for path in paths:
         if '*' in path or '?' in path:
@@ -263,7 +250,6 @@ def SpecDefinitionsFromPaths(paths: str, pseudo_clusters: Optional[PseudoCluster
         else:
             filenames.append(path)
 
-    filenames.sort(key=functools.cmp_to_key(sort_with_global_attribute_first))
     sources = [ParseSource(source=name) for name in filenames]
 
     for pseudo_cluster in pseudo_clusters.clusters:
