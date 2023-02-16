@@ -71,6 +71,7 @@ void ARM_USART_SignalEvent(uint32_t event)
     case ARM_USART_EVENT_DSR:
     case ARM_USART_EVENT_DCD:
     case ARM_USART_EVENT_RI:
+        break;
     }
 }
 
