@@ -918,6 +918,29 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "StartUp",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ShutDown",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "Leave",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -2422,6 +2445,15 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "BootReason",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -2849,6 +2881,29 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "Disconnection",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "AssociationFailure",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ConnectionStatus",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
