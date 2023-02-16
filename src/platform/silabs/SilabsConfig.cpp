@@ -506,9 +506,11 @@ exit:;
 bool SILABSConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the Matter nvm3 reserved key range.
+    // or if the key is in the User Domain key range
     // Additional check validates that the user consciously defined the expected key range
-    if ((key >= kMatterNvm3KeyLoLimit) && (key <= kMatterNvm3KeyHiLimit) && (key >= kMinConfigKey_MatterFactory) &&
-        (key <= kMaxConfigKey_MatterKvs))
+    if (((key >= kMatterNvm3KeyLoLimit) && (key <= kMatterNvm3KeyHiLimit) && (key >= kMinConfigKey_MatterFactory) &&
+         (key <= kMaxConfigKey_MatterKvs)) ||
+        ((key >= kUserNvm3KeyDomainLoLimit) && (key <= kUserNvm3KeyDomainHiLimit)))
     {
         return true;
     }
