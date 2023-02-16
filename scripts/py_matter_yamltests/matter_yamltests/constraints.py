@@ -27,14 +27,17 @@ class ConstraintParseError(Exception):
 class BaseConstraint(ABC):
     '''Constraint Interface'''
 
-    def __init__(self, types: list, is_null_allowed: bool = False):
+    def __init__(self, types: list):
         '''An empty type list provided that indicates any type is accepted'''
         self._types = types
-        self._is_null_allowed = is_null_allowed
 
     def is_met(self, value, value_type_name):
         if value is None:
-            return self._is_null_allowed
+            # To be in alignment with codegen, whenever something that is optional
+            # is not provided we are supposed to not enforce the constraint. The
+            # only constraion that we are supposed to check is has value, which
+            # overrides is_met.
+            return True
 
         response_type = type(value)
         if self._types:
@@ -68,7 +71,7 @@ class _ConstraintHasValue(BaseConstraint):
 
 class _ConstraintType(BaseConstraint):
     def __init__(self, type):
-        super().__init__(types=[], is_null_allowed=True)
+        super().__init__(types=[])
         self._type = type
 
     def check_response(self, value, value_type_name) -> bool:
@@ -265,7 +268,7 @@ class _ConstraintIsLowerCase(BaseConstraint):
 
 class _ConstraintMinValue(BaseConstraint):
     def __init__(self, min_value):
-        super().__init__(types=[int, float], is_null_allowed=True)
+        super().__init__(types=[int, float])
         self._min_value = min_value
 
     def check_response(self, value, value_type_name) -> bool:
@@ -274,7 +277,7 @@ class _ConstraintMinValue(BaseConstraint):
 
 class _ConstraintMaxValue(BaseConstraint):
     def __init__(self, max_value):
-        super().__init__(types=[int, float], is_null_allowed=True)
+        super().__init__(types=[int, float])
         self._max_value = max_value
 
     def check_response(self, value, value_type_name) -> bool:
@@ -319,7 +322,7 @@ class _ConstraintHasMaskClear(BaseConstraint):
 
 class _ConstraintNotValue(BaseConstraint):
     def __init__(self, not_value):
-        super().__init__(types=[], is_null_allowed=True)
+        super().__init__(types=[])
         self._not_value = not_value
 
     def check_response(self, value, value_type_name) -> bool:
