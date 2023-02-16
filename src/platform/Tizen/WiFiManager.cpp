@@ -31,6 +31,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "MainLoop.h"
+#include "platform/PlatformManager.h"
 
 namespace {
 static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
@@ -277,8 +278,11 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
         ChipLogProgress(DeviceLayer, "WiFi is connected");
         if (sInstance.mpConnectCallback != nullptr)
         {
+
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
             sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             sInstance.mpConnectCallback = nullptr;
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     }
     else
@@ -286,8 +290,10 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
         ChipLogError(DeviceLayer, "FAIL: connect WiFi [%s]", get_error_message(wifiErr));
         if (sInstance.mpConnectCallback != nullptr)
         {
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
             sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
             sInstance.mpConnectCallback = nullptr;
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     }
 
