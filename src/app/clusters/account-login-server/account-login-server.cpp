@@ -28,11 +28,14 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+#include <app/util/config.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;

@@ -31,12 +31,15 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/util/config.h>
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceConfig.h>
+
+#include <app/util/config.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;

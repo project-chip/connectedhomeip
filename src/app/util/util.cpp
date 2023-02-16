@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <app/util/generic-callbacks.h>
 

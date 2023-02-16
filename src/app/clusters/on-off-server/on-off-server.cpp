@@ -22,6 +22,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <app/util/util.h>
 
