@@ -39,6 +39,7 @@ import chip.interaction_model as IM
 import chip.native
 from chip import ChipDeviceCtrl
 from chip.ChipStack import *
+from chip.crypto import p256keypair
 from chip.utils import CommissioningBuildingBlocks
 
 logger = logging.getLogger('PythonMatterControllerTEST')
@@ -190,7 +191,7 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
+    def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False, keypair: p256keypair.P256Keypair = None):
         chip.native.Init()
 
         self.chipStack = ChipStack('/tmp/repl_storage.json')
@@ -198,7 +199,7 @@ class BaseTestHelper:
         self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
         self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         self.devCtrl = self.fabricAdmin.NewController(
-            nodeid, paaTrustStorePath, testCommissioner)
+            nodeid, paaTrustStorePath, testCommissioner, keypair=keypair)
         self.controllerNodeId = nodeid
         self.logger = logger
         self.paaTrustStorePath = paaTrustStorePath

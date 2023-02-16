@@ -1,0 +1,118 @@
+import abc
+import hashlib
+from ctypes import *
+from typing import *
+
+from chip import native
+from ecdsa import ECDH, NIST256p, SigningKey
+
+_pychip_P256Keypair_ECDSA_sign_msg_func = CFUNCTYPE(
+    c_bool, py_object, POINTER(c_uint8), c_size_t, POINTER(c_uint8), POINTER(c_size_t))
+
+_pychip_P256Keypair_ECDH_derive_secret_func = CFUNCTYPE(c_bool, py_object, POINTER(c_uint8), POINTER(c_uint8), POINTER(c_size_t))
+
+P256_PUBLIC_KEY_LENGTH = 2 * 32 + 1
+
+
+@ _pychip_P256Keypair_ECDSA_sign_msg_func
+def _pychip_ECDSA_sign_msg(self_: 'P256Keypair', message_buf: POINTER(c_uint8), message_size: int, signature_buf: POINTER(c_uint8), signature_buf_size: POINTER(c_uint32)) -> bool:
+    res = self_.ECDSA_sign_msg(string_at(message_buf, message_size)[:])
+    memmove(signature_buf, res, len(res))
+    signature_buf_size.content = len(res)
+    return True
+
+
+@ _pychip_P256Keypair_ECDH_derive_secret_func
+def _pychip_ECDH_derive_secret(self_: 'P256Keypair', remote_pubkey: POINTER(c_uint8), out_secret_buf: POINTER(c_uint8), out_secret_buf_size: POINTER(c_uint32)) -> bool:
+    res = self_.ECDH_derive_secret(string_at(remote_pubkey, P256_PUBLIC_KEY_LENGTH)[:])
+    memmove(out_secret_buf, res, len(res))
+    out_secret_buf_size.content = len(res)
+    return True
+
+
+class P256Keypair:
+    def __init__(self):
+        self._native_obj = None
+
+    def _create_native_object(self) -> c_void_p:
+        handle = native.GetLibraryHandle()
+        if not handle.pychip_NewP256Keypair.argtypes:
+            setter = native.NativeLibraryHandleMethodArguments(handle)
+            setter.Set("pychip_NewP256Keypair", c_void_p, [py_object,
+                       _pychip_P256Keypair_ECDSA_sign_msg_func, _pychip_P256Keypair_ECDH_derive_secret_func])
+            setter.Set("pychip_P256Keypair_UpdatePubkey", None, [c_void_p])
+        self._native_obj = handle.pychip_NewP256Keypair(
+            py_object(self), _pychip_ECDSA_sign_msg, _pychip_ECDH_derive_secret)
+
+        pythonapi.Py_IncRef(py_object(self))
+
+        self.UpdatePublicKey()
+        return self._native_obj
+
+    @property
+    def native_object(self) -> c_void_p:
+        if self._native_obj is None:
+            return self._create_native_object()
+        return self._native_obj
+
+    def UpdatePublicKey(self) -> None:
+        ''' Update the PublicKey in the underlying C++ object.
+
+        This function should be called when the implementation
+        generates a new keypair.
+        '''
+        handle = native.GetLibraryHandle()
+        handle.pychip_P256Keypair_UpdatePubkey(c_void_p(self.native_object), self.public_key)
+
+    @ abc.abstractproperty
+    def public_key(self) -> bytes:
+        ''' Returns the public key of the key pair
+
+        The return value should conform with the uncompressed format of
+        Section 2.3.3 of the SECG SEC 1 ("Elliptic Curve Cryptography")
+        standard. (i.e. 0x04 || X || Y)
+
+        For P256Keypair, the output length should be exactly 65 bytes.
+        '''
+        raise NotImplementedError()
+
+    @ abc.abstractmethod
+    def ECDSA_sign_msg(self, message: bytes) -> bytes:
+        raise NotImplementedError()
+
+    @ abc.abstractmethod
+    def ECDH_derive_secret(self, remote_pubkey: bytes) -> bytes:
+        ''' Derive shared secret from the local private key and remote public key.
+
+        remote_pubkey will be a public key conforms with the uncompressed
+        format of section 2.3.3 of the SECG SEC 1 standard.
+        '''
+        raise NotImplementedError()
+
+
+class TestP256Keypair(P256Keypair):
+    ''' The P256Keypair for testing purpose. It is not safe for any productions use
+    '''
+
+    def __init__(self, private_key: SigningKey = None):
+        super().__init__()
+
+        if private_key is None:
+            self._key = SigningKey.generate(NIST256p)
+        else:
+            self._key = private_key
+
+        self._pubkey = self._key.verifying_key.to_string(encoding='uncompressed')
+
+    @property
+    def public_key(self) -> bytes:
+        return self._pubkey
+
+    def ECDSA_sign_msg(self, message: bytes) -> bytes:
+        return self._key.sign_deterministic(message, hashfunc=hashlib.sha256)
+
+    def ECDH_derive_secret(self, remote_pubkey: bytes) -> bytes:
+        ecdh = ECDH(curve=NIST256p)
+        ecdh.load_private_key(self._key)
+        ecdh.load_received_public_key_bytes(remote_pubkey[1:])
+        return ecdh.ecdh1.generate_sharedsecret_bytes()
