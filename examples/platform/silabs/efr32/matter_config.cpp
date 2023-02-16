@@ -150,8 +150,6 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
 #endif
-    SetDeviceInstanceInfoProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
 
     //==============================================
     // Init Matter Stack
@@ -160,6 +158,9 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     // Init Chip memory management before the stack
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
+
+    SetDeviceInstanceInfoProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
+    SetCommissionableDataProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 

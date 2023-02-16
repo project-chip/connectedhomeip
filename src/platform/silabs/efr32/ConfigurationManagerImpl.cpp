@@ -49,15 +49,22 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
+    CHIP_ERROR err;
+
+    // Initialize the generic implementation base class.
+    err = Internal::GenericConfigurationManagerImpl<SILABSConfig>::Init();
+    SuccessOrExit(err);
+
     // TODO: Initialize the global GroupKeyStore object here (#1626)
 
     IncreaseBootCount();
-    // It is possible to configure the possible reset sources with RMU_ResetControl
-    // In this case, we keep Reset control at default setting
     rebootCause = RMU_ResetCauseGet();
     RMU_ResetCauseClear();
 
-    return CHIP_NO_ERROR;
+    err = CHIP_NO_ERROR;
+
+exit:
+    return err;
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
