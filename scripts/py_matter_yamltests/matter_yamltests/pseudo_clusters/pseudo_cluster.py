@@ -44,7 +44,7 @@ class PseudoCluster(ABC):
               - name: "MyCustomParameter"
                 value: "this_is_a_custom_value"
 
-    A pseudo cluster can optionally declare a definition in order to benefits
+    A pseudo cluster can optionally declare a definition in order to benefit
     from automatic command names checking and argument names validation.
 
     For example, the 'CustomCommands' pseudo cluster can be implemented as:
