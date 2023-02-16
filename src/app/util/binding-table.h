@@ -26,6 +26,9 @@
 #include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
+#include <zap-generated/endpoint_config.h>
+#include <zap-generated/gen_config.h>
+
 namespace chip {
 
 class BindingTable
