@@ -26,6 +26,9 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
     ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
 
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
+
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
