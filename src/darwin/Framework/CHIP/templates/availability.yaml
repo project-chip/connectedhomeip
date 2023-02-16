@@ -6675,6 +6675,8 @@
               - IntentEnum
               - StatusEnum
               - TransferProtocolEnum
+          OccupancySensing:
+              - OccupancySensorTypeEnum
       enum values:
           DoorLock:
               LockDataTypeEnum:
@@ -6693,6 +6695,24 @@
               TransferProtocolEnum:
                   - ResponsePayload
                   - BDX
+          OccupancySensing:
+              OccupancySensorTypeEnum:
+                  - PIR
+                  - Ultrasonic
+                  - PIRAndUltrasonic
+                  - PhysicalContact
+      bitmaps:
+          OccupancySensing:
+              - OccupancyBitmap
+              - OccupancySensorTypeBitmap
+      bitmap values:
+          OccupancySensing:
+              OccupancyBitmap:
+                  - Occupied
+              OccupancySensorTypeBitmap:
+                  - PIR
+                  - Ultrasonic
+                  - PhysicalContact
   deprecated:
       attributes:
           TimeSynchronization:
