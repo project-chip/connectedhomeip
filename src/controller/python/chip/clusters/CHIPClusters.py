@@ -2159,7 +2159,7 @@ class ChipClusters:
                     "args": {
                         "intent": "int",
                         "requestedProtocol": "int",
-                        "transferFileDesignator": "bytes",
+                        "transferFileDesignator": "str",
                     },
                 },
             },

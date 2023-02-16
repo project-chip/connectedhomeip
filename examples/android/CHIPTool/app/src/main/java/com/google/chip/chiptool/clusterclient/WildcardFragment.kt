@@ -22,20 +22,15 @@ import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.databinding.WildcardFragmentBinding
 import java.lang.StringBuilder
-import kotlinx.android.synthetic.main.wildcard_fragment.attributeIdEd
-import kotlinx.android.synthetic.main.wildcard_fragment.clusterIdEd
-import kotlinx.android.synthetic.main.wildcard_fragment.endpointIdEd
-import kotlinx.android.synthetic.main.wildcard_fragment.eventIdEd
-import kotlinx.android.synthetic.main.wildcard_fragment.outputTv
-import kotlinx.android.synthetic.main.wildcard_fragment.view.readBtn
-import kotlinx.android.synthetic.main.wildcard_fragment.view.readEventBtn
-import kotlinx.android.synthetic.main.wildcard_fragment.view.subscribeBtn
-import kotlinx.android.synthetic.main.wildcard_fragment.view.subscribeEventBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class WildcardFragment : Fragment() {
+  private var _binding: WildcardFragmentBinding? = null
+  private val binding get() = _binding!!
+
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
@@ -60,7 +55,7 @@ class WildcardFragment : Fragment() {
 
       val debugString = nodeStateToDebugString(nodeState)
       Log.i(TAG, debugString)
-      requireActivity().runOnUiThread { outputTv.text = debugString }
+      requireActivity().runOnUiThread { binding.outputTv.text = debugString }
     }
 
     override fun onDone() {
@@ -73,16 +68,22 @@ class WildcardFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View {
+    _binding = WildcardFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
-    return inflater.inflate(R.layout.wildcard_fragment, container, false).apply {
-      subscribeBtn.setOnClickListener { scope.launch { showSubscribeDialog(ATTRIBUTE) } }
-      readBtn.setOnClickListener { scope.launch { showReadDialog(ATTRIBUTE) } }
-      subscribeEventBtn.setOnClickListener { scope.launch { showSubscribeDialog(EVENT) } }
-      readEventBtn.setOnClickListener { scope.launch { showReadDialog(EVENT) } }
+    binding.subscribeBtn.setOnClickListener { scope.launch { showSubscribeDialog(ATTRIBUTE) } }
+    binding.readBtn.setOnClickListener { scope.launch { showReadDialog(ATTRIBUTE) } }
+    binding.subscribeEventBtn.setOnClickListener { scope.launch { showSubscribeDialog(EVENT) } }
+    binding.readEventBtn.setOnClickListener { scope.launch { showReadDialog(EVENT) } }
 
-      addressUpdateFragment =
-        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
-    }
+    addressUpdateFragment =
+      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   private fun nodeStateToDebugString(nodeState: NodeState): String {
@@ -121,10 +122,10 @@ class WildcardFragment : Fragment() {
       ResubscriptionAttemptCallback { terminationCause, nextResubscribeIntervalMsec
                                      -> Log.i(TAG, "ResubscriptionAttempt terminationCause:$terminationCause, nextResubscribeIntervalMsec:$nextResubscribeIntervalMsec") }
 
-    val endpointId = getChipPathIdForText(endpointIdEd.text.toString())
-    val clusterId = getChipPathIdForText(clusterIdEd.text.toString())
-    val attributeId = getChipPathIdForText(attributeIdEd.text.toString())
-    val eventId = getChipPathIdForText(eventIdEd.text.toString())
+    val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
+    val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
+    val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
+    val eventId = getChipPathIdForText(binding.eventIdEd.text.toString())
 
     if (type == ATTRIBUTE) {
       val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
@@ -156,10 +157,10 @@ class WildcardFragment : Fragment() {
   }
 
   private suspend fun read(type: Int, isFabricFiltered: Boolean) {
-    val endpointId = getChipPathIdForText(endpointIdEd.text.toString())
-    val clusterId = getChipPathIdForText(clusterIdEd.text.toString())
-    val attributeId = getChipPathIdForText(attributeIdEd.text.toString())
-    val eventId = getChipPathIdForText(eventIdEd.text.toString())
+    val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
+    val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
+    val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
+    val eventId = getChipPathIdForText(binding.eventIdEd.text.toString())
 
     if (type == ATTRIBUTE) {
       val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)

@@ -28,40 +28,42 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.chip.chiptool.databinding.SelectActionFragmentBinding
 import com.google.chip.chiptool.util.FragmentUtil
-import kotlinx.android.synthetic.main.select_action_fragment.provisionThreadCredentialsBtn
-import kotlinx.android.synthetic.main.select_action_fragment.provisionWiFiCredentialsBtn
-import kotlinx.android.synthetic.main.select_action_fragment.view.*
 
 /** Fragment to select from various options to interact with a CHIP device. */
 class SelectActionFragment : Fragment() {
+  private var _binding: SelectActionFragmentBinding? = null
+  private val binding get() = _binding!!
 
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View {
-    return inflater.inflate(R.layout.select_action_fragment, container, false).apply {
-      scanQrBtn.setOnClickListener { getCallback()?.handleScanQrCodeClicked() }
-      provisionWiFiCredentialsBtn.apply {
-        isEnabled = hasLocationPermission()
-        setOnClickListener { getCallback()?.handleProvisionWiFiCredentialsClicked() }
-      }
-      provisionThreadCredentialsBtn.apply {
-        isEnabled = hasLocationPermission()
-        setOnClickListener { getCallback()?.handleProvisionThreadCredentialsClicked() }
-      }
-      onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
-      sensorClustersBtn.setOnClickListener { getCallback()?.handleSensorClicked() }
-      multiAdminClusterBtn.setOnClickListener { getCallback()?.handleMultiAdminClicked() }
-      opCredClustersBtn.setOnClickListener { getCallback()?.handleOpCredClicked() }
-      basicClusterBtn.setOnClickListener { getCallback()?.handleBasicClicked() }
-      attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
-      clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
-      provisionCustomFlowBtn.setOnClickListener{  getCallback()?.handleProvisionCustomFlowClicked() }
-      wildcardBtn.setOnClickListener { getCallback()?.handleWildcardClicked() }
-      unpairDeviceBtn.setOnClickListener{ getCallback()?.handleUnpairDeviceClicked() }
+    _binding = SelectActionFragmentBinding.inflate(inflater, container, false)
+
+    binding.scanQrBtn.setOnClickListener { getCallback()?.handleScanQrCodeClicked() }
+    binding.provisionWiFiCredentialsBtn.apply {
+      isEnabled = hasLocationPermission()
+      setOnClickListener { getCallback()?.handleProvisionWiFiCredentialsClicked() }
     }
+    binding.provisionThreadCredentialsBtn.apply {
+      isEnabled = hasLocationPermission()
+      setOnClickListener { getCallback()?.handleProvisionThreadCredentialsClicked() }
+    }
+    binding.onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
+    binding.sensorClustersBtn.setOnClickListener { getCallback()?.handleSensorClicked() }
+    binding.multiAdminClusterBtn.setOnClickListener { getCallback()?.handleMultiAdminClicked() }
+    binding.opCredClustersBtn.setOnClickListener { getCallback()?.handleOpCredClicked() }
+    binding.basicClusterBtn.setOnClickListener { getCallback()?.handleBasicClicked() }
+    binding.attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
+    binding.clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
+    binding.provisionCustomFlowBtn.setOnClickListener{  getCallback()?.handleProvisionCustomFlowClicked() }
+    binding.wildcardBtn.setOnClickListener { getCallback()?.handleWildcardClicked() }
+    binding.unpairDeviceBtn.setOnClickListener{ getCallback()?.handleUnpairDeviceClicked() }
+
+    return binding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,11 +82,11 @@ class SelectActionFragment : Fragment() {
           }
         }
         if (granted) {
-          provisionWiFiCredentialsBtn.isEnabled = true
-          provisionThreadCredentialsBtn.isEnabled = true
+          binding.provisionWiFiCredentialsBtn.isEnabled = true
+          binding.provisionThreadCredentialsBtn.isEnabled = true
         } else {
-          provisionWiFiCredentialsBtn.isEnabled = false
-          provisionThreadCredentialsBtn.isEnabled = false
+          binding.provisionWiFiCredentialsBtn.isEnabled = false
+          binding.provisionThreadCredentialsBtn.isEnabled = false
 
           AlertDialog.Builder(requireContext())
             .setTitle(R.string.location_permission_denied_title)
@@ -107,6 +109,11 @@ class SelectActionFragment : Fragment() {
         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
       }
     permissionRequest.launch(permissions)
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   private fun hasLocationPermission(): Boolean {

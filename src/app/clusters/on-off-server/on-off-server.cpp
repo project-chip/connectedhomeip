@@ -22,6 +22,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <app/util/error-mapping.h>
 #include <app/util/util.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -35,6 +36,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
+using chip::Protocols::InteractionModel::Status;
 
 /**********************************************************
  * Attributes Definition
@@ -324,27 +326,27 @@ EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bo
     return status;
 }
 
-bool OnOffServer::offCommand(const app::ConcreteCommandPath & commandPath)
+bool OnOffServer::offCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Off::Id, false);
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     return true;
 }
 
-bool OnOffServer::onCommand(const app::ConcreteCommandPath & commandPath)
+bool OnOffServer::onCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::On::Id, false);
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     return true;
 }
 
-bool OnOffServer::toggleCommand(const app::ConcreteCommandPath & commandPath)
+bool OnOffServer::toggleCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Toggle::Id, false);
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     return true;
 }
 
@@ -354,7 +356,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
     OnOffEffectIdentifier effectId = commandData.effectIdentifier;
     uint8_t effectVariant          = commandData.effectVariant;
     chip::EndpointId endpoint      = commandPath.mEndpointId;
-    EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
+    Status status                  = Status::Success;
 
     if (SupportsLightingApplications(endpoint))
     {
@@ -397,25 +399,24 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
             }
         }
 
-        status = setOnOffValue(endpoint, Commands::Off::Id, false);
+        status = app::ToInteractionModelStatus(setOnOffValue(endpoint, Commands::Off::Id, false));
     }
     else
     {
-        status = EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND;
+        status = Status::UnsupportedCommand;
     }
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
 bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
     chip::EndpointId endpoint = commandPath.mEndpointId;
-    EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
 
     if (!SupportsLightingApplications(endpoint))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
         return true;
     }
 
@@ -428,7 +429,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
 
     if (globalSceneControl)
     {
-        emberAfSendImmediateDefaultResponse(status);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -445,7 +446,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
     setOnOffValue(endpoint, Commands::On::Id, false);
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 
@@ -469,28 +470,28 @@ uint32_t OnOffServer::calculateNextWaitTimeMS()
     return (uint32_t) waitTime.count();
 }
 
-bool OnOffServer::OnWithTimedOffCommand(const app::ConcreteCommandPath & commandPath,
+bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                         const Commands::OnWithTimedOff::DecodableType & commandData)
 {
     BitFlags<OnOffControl> onOffControl = commandData.onOffControl;
     uint16_t onTime                     = commandData.onTime;
     uint16_t offWaitTime                = commandData.offWaitTime;
-    EmberAfStatus status                = EMBER_ZCL_STATUS_SUCCESS;
+    Status status                       = Status::Success;
     chip::EndpointId endpoint           = commandPath.mEndpointId;
     bool isOn                           = false;
     uint16_t currentOffWaitTime         = MAX_TIME_VALUE;
     uint16_t currentOnTime              = 0;
 
     EmberEventControl * event = configureEventControl(endpoint);
-    VerifyOrExit(event != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
-    VerifyOrExit(SupportsLightingApplications(endpoint), status = EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+    VerifyOrExit(event != nullptr, status = Status::UnsupportedEndpoint);
+    VerifyOrExit(SupportsLightingApplications(endpoint), status = Status::UnsupportedCommand);
 
     OnOff::Attributes::OnOff::Get(endpoint, &isOn);
 
     // OnOff is off and the commands is only accepted if on
     if (onOffControl.Has(OnOffControl::kAcceptOnlyWhenOn) && !isOn)
     {
-        emberAfSendImmediateDefaultResponse(status);
+        commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
 
@@ -525,7 +526,7 @@ bool OnOffServer::OnWithTimedOffCommand(const app::ConcreteCommandPath & command
     }
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -704,19 +705,19 @@ OnOffEffect::~OnOffEffect()
 bool emberAfOnOffClusterOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                     const Commands::Off::DecodableType & commandData)
 {
-    return OnOffServer::Instance().offCommand(commandPath);
+    return OnOffServer::Instance().offCommand(commandObj, commandPath);
 }
 
 bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                    const Commands::On::DecodableType & commandData)
 {
-    return OnOffServer::Instance().onCommand(commandPath);
+    return OnOffServer::Instance().onCommand(commandObj, commandPath);
 }
 
 bool emberAfOnOffClusterToggleCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::Toggle::DecodableType & commandData)
 {
-    return OnOffServer::Instance().toggleCommand(commandPath);
+    return OnOffServer::Instance().toggleCommand(commandObj, commandPath);
 }
 
 bool emberAfOnOffClusterOffWithEffectCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -735,7 +736,7 @@ bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(app::CommandHandler * co
 bool emberAfOnOffClusterOnWithTimedOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::OnWithTimedOff::DecodableType & commandData)
 {
-    return OnOffServer::Instance().OnWithTimedOffCommand(commandPath, commandData);
+    return OnOffServer::Instance().OnWithTimedOffCommand(commandObj, commandPath, commandData);
 }
 
 void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint)

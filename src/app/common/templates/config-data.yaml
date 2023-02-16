@@ -1,7 +1,4 @@
-LegacyStructs:
-    # List of structs for which we output a legacy definition in af-structs.h
-    # Ideally this list should become empty.
-    - CredentialStruct
+LegacyStructs: [] # Will be removed together with af-structs.h
 
 WeakEnums:
     # Allow-list of enums that we generate as enums, not enum classes.

@@ -56,7 +56,8 @@ public:
 
     SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
 
-    EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType ** dataPtr) const override;
+    Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
+                                                            const ModeOptionStructType ** dataPtr) const override;
 
     ~StaticSupportedModesManager(){};
 

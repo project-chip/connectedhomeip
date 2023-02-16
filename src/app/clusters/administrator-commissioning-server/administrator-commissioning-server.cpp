@@ -41,6 +41,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
 using namespace chip::Protocols;
+using chip::Protocols::InteractionModel::Status;
 
 class AdministratorCommissioningAttrAccess : public AttributeAccessInterface
 {
@@ -199,7 +200,7 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     {
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
         ChipLogProgress(Zcl, "Commissioning window is now closed");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
     }
     return true;
 }

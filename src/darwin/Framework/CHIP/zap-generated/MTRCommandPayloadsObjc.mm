@@ -3446,7 +3446,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _requestedProtocol = @(0);
 
-        _transferFileDesignator = [NSData data];
+        _transferFileDesignator = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -3469,8 +3469,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: intent:%@; requestedProtocol:%@; transferFileDesignator:%@; >",
-                                             NSStringFromClass([self class]), _intent, _requestedProtocol,
-                                             [_transferFileDesignator base64EncodedStringWithOptions:0]];
+                                             NSStringFromClass([self class]), _intent, _requestedProtocol, _transferFileDesignator];
     return descriptionString;
 }
 

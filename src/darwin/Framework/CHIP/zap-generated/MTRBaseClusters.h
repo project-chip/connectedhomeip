@@ -20130,24 +20130,64 @@ typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
     = 0x10,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRDiagnosticLogsIntent) {
+    MTRDiagnosticLogsIntentEndUserSupport MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDiagnosticLogsIntentNetworkDiag MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDiagnosticLogsIntentCrashLogs MTR_NEWLY_AVAILABLE = 0x02,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsIntent) {
-    MTRDiagnosticLogsLogsIntentEndUserSupport API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDiagnosticLogsLogsIntentNetworkDiag API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDiagnosticLogsLogsIntentCrashLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDiagnosticLogsLogsIntentEndUserSupport API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentEndUserSupport")
+    = 0x00,
+    MTRDiagnosticLogsLogsIntentNetworkDiag API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentNetworkDiag")
+    = 0x01,
+    MTRDiagnosticLogsLogsIntentCrashLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentCrashLogs")
+    = 0x02,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntent");
+
+typedef NS_ENUM(uint8_t, MTRDiagnosticLogsStatus) {
+    MTRDiagnosticLogsStatusSuccess MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDiagnosticLogsStatusExhausted MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDiagnosticLogsStatusNoLogs MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDiagnosticLogsStatusBusy MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDiagnosticLogsStatusDenied MTR_NEWLY_AVAILABLE = 0x04,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsStatus) {
-    MTRDiagnosticLogsLogsStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDiagnosticLogsLogsStatusExhausted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDiagnosticLogsLogsStatusNoLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDiagnosticLogsLogsStatusBusy API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDiagnosticLogsLogsStatusDenied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDiagnosticLogsLogsStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusSuccess")
+    = 0x00,
+    MTRDiagnosticLogsLogsStatusExhausted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusExhausted")
+    = 0x01,
+    MTRDiagnosticLogsLogsStatusNoLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusNoLogs")
+    = 0x02,
+    MTRDiagnosticLogsLogsStatusBusy API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusBusy")
+    = 0x03,
+    MTRDiagnosticLogsLogsStatusDenied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusDenied")
+    = 0x04,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatus");
+
+typedef NS_ENUM(uint8_t, MTRDiagnosticLogsTransferProtocol) {
+    MTRDiagnosticLogsTransferProtocolResponsePayload MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDiagnosticLogsTransferProtocolBDX MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsTransferProtocol) {
-    MTRDiagnosticLogsLogsTransferProtocolResponsePayload API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDiagnosticLogsLogsTransferProtocolBDX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDiagnosticLogsLogsTransferProtocolResponsePayload API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocolResponsePayload")
+    = 0x00,
+    MTRDiagnosticLogsLogsTransferProtocolBDX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocolBDX")
+    = 0x01,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocol");
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsBootReason) {
     MTRGeneralDiagnosticsBootReasonUnspecified API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,

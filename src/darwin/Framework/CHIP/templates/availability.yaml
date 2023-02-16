@@ -1855,7 +1855,6 @@
               RetrieveLogsRequest:
                   - intent
                   - requestedProtocol
-                  - transferFileDesignator
               RetrieveLogsResponse:
                   - status
                   - content
@@ -6652,6 +6651,11 @@
               - EventList
           FaultInjection:
               - EventList
+      command fields:
+          DiagnosticLogs:
+              RetrieveLogsRequest:
+                  # Not really usable in earlier releases: wrong type.
+                  - transferFileDesignator
       structs:
           TimeSynchronization:
               - DSTOffsetStruct
@@ -6666,10 +6670,29 @@
                   - offset
                   - validAt
                   - name
+      enums:
+          DiagnosticLogs:
+              - IntentEnum
+              - StatusEnum
+              - TransferProtocolEnum
       enum values:
           DoorLock:
               LockDataTypeEnum:
                   - FingerVein
+          DiagnosticLogs:
+              IntentEnum:
+                  - EndUserSupport
+                  - NetworkDiag
+                  - CrashLogs
+              StatusEnum:
+                  - Success
+                  - Exhausted
+                  - NoLogs
+                  - Busy
+                  - Denied
+              TransferProtocolEnum:
+                  - ResponsePayload
+                  - BDX
   deprecated:
       attributes:
           TimeSynchronization:
@@ -6678,6 +6701,11 @@
           TimeSynchronization:
               - DstOffsetType
               - TimeZoneType
+      enums:
+          DiagnosticLogs:
+              - LogsIntent
+              - LogsStatus
+              - LogsTransferProtocol
   removed:
       enum values:
           DoorLock:
@@ -6686,10 +6714,15 @@
                   # exposing it.  It's exposed for LockDataTypeEnum
                   - FingerVein
   renames:
+      attributes:
+          TimeSynchronization:
+              DSTOffset: DstOffset
       structs:
           TimeSynchronization:
               DSTOffsetStruct: DstOffsetType
               TimeZoneStruct: TimeZoneType
-      attributes:
-          TimeSynchronization:
-              DSTOffset: DstOffset
+      enums:
+          DiagnosticLogs:
+              IntentEnum: LogsIntent
+              StatusEnum: LogsStatus
+              TransferProtocolEnum: LogsTransferProtocol
