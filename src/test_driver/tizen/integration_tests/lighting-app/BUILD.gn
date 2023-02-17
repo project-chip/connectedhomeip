@@ -12,16 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/tizen.gni")
 
 import("${tizen_sdk_build_root}/tizen_sdk.gni")
-import("../../assets.gni")
 
 tizen_qemu_mkisofs("test-runner") {
   runner = "runner.sh"
+
+  # Build applications used in the test.
+  deps = [
+    "${chip_root}/examples/chip-tool:chip-tool",
+    "${chip_root}/examples/lighting-app/tizen:chip-lighting-app:tpk",
+  ]
+
+  # Use artifacts created by the dependencies.
   assets = [
-    "${tizen_chip_tool}",
-    "${tizen_lighting_app_tpk}",
+    rebase_path("${root_build_dir}/chip-tool"),
+    rebase_path(
+        "${root_build_dir}/org.tizen.matter.example.lighting/out/org.tizen.matter.example.lighting-1.0.0.tpk"),
   ]
 }
 

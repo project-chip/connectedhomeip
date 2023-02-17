@@ -458,8 +458,7 @@ def BuildTizenTarget():
     # board
     target.AppendFixedTargets([
         TargetPart('arm', board=TizenBoard.ARM),
-        # QEMU does not support Bluetooth, so build all apps without BLE
-        TargetPart('qemu', board=TizenBoard.QEMU, enable_ble=False),
+        TargetPart('qemu', board=TizenBoard.QEMU),
     ])
 
     # apps

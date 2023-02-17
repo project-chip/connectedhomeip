@@ -66,11 +66,6 @@ class TizenApp(Enum):
         return isinstance(self.value, App)
 
     @property
-    def is_test(self):
-        """If True, this app is a test driver."""
-        return isinstance(self.value, TestDriver)
-
-    @property
     def package_name(self):
         return self.manifest.get('package')
 
