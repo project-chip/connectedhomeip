@@ -61,7 +61,7 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     *window     = SDL_CreateWindow("Light UI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
@@ -155,8 +155,19 @@ void ImguiUi::RunMainLoop()
     EventLoop(this);
 
     // ensure shutdown events are generated (generally basic cluster
-    // will send a shutdown event to subscribers)
-    chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown(); });
+    // will send a shutdown event to subscribers).
+    //
+    // We attempt to wait for finish as the event will be sent sync.
+    // Since the Main loop is stopped, there will be no MRP, however at least
+    // one event is attempted to be sent.
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t arg) {
+            chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown();
+            sem_t * semaphore = reinterpret_cast<sem_t *>(arg);
+            sem_post(semaphore); // notify complete
+        },
+        reinterpret_cast<intptr_t>(&mChipLoopWaitSemaphore));
+    sem_wait(&mChipLoopWaitSemaphore);
 
     // Stop the chip main loop as well. This is expected to
     // wait for the task to finish.
