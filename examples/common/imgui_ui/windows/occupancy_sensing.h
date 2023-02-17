@@ -14,46 +14,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "boolean_state.h"
+#pragma once
 
-#include <imgui.h>
+#include "window.h"
 
-#include <math.h>
+#include <stdint.h>
+#include <string>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
+
 #include <app-common/zap-generated/cluster-enums.h>
 
 namespace example {
 namespace Ui {
 namespace Windows {
 
-void BooleanState::UpdateState()
+class OccupancySensing : public Window
 {
-    if (mTargetState.HasValue())
-    {
-        chip::app::Clusters::BooleanState::Attributes::StateValue::Set(mEndpointId, mTargetState.Value());
-        mTargetState.ClearValue();
-    }
+public:
+    OccupancySensing(chip::EndpointId endpointId, const char * title) : mEndpointId(endpointId), mTitle(title) {}
 
-    chip::app::Clusters::BooleanState::Attributes::StateValue::Get(mEndpointId, &mState);
-}
+    void UpdateState() override;
+    void Render() override;
 
-void BooleanState::Render()
-{
-    ImGui::Begin(mTitle.c_str());
-    ImGui::Text("On Endpoint %d", mEndpointId);
+private:
+    const chip::EndpointId mEndpointId;
+    const std::string mTitle;
 
-    bool uiState = mState;
-    ImGui::Checkbox("State Value", &uiState);
+    using BitMask = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>;
 
-    if (uiState != mState)
-    {
-        // toggle value on the next 'UpdateState' call
-        mTargetState.SetValue(uiState);
-    }
-
-    ImGui::End();
-}
+    BitMask mOccupancy;
+    chip::Optional<BitMask> mTargetOccupancy;
+};
 
 } // namespace Windows
 } // namespace Ui

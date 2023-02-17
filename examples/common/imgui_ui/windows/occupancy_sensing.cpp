@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "boolean_state.h"
+#include "occupancy_sensing.h"
 
 #include <imgui.h>
 
@@ -27,29 +27,33 @@ namespace example {
 namespace Ui {
 namespace Windows {
 
-void BooleanState::UpdateState()
+using chip::app::Clusters::OccupancySensing::OccupancyBitmap;
+
+void OccupancySensing::UpdateState()
 {
-    if (mTargetState.HasValue())
+    if (mTargetOccupancy.HasValue())
     {
-        chip::app::Clusters::BooleanState::Attributes::StateValue::Set(mEndpointId, mTargetState.Value());
-        mTargetState.ClearValue();
+        chip::app::Clusters::OccupancySensing::Attributes::Occupancy::Set(mEndpointId, mTargetOccupancy.Value());
+        mTargetOccupancy.ClearValue();
     }
 
-    chip::app::Clusters::BooleanState::Attributes::StateValue::Get(mEndpointId, &mState);
+    chip::app::Clusters::OccupancySensing::Attributes::Occupancy::Get(mEndpointId, &mOccupancy);
 }
 
-void BooleanState::Render()
+void OccupancySensing::Render()
 {
     ImGui::Begin(mTitle.c_str());
     ImGui::Text("On Endpoint %d", mEndpointId);
 
-    bool uiState = mState;
-    ImGui::Checkbox("State Value", &uiState);
+    bool occupied = mOccupancy.Has(OccupancyBitmap::kOccupied);
+    bool uiState  = occupied;
+    ImGui::Checkbox("Occupancy Value", &uiState);
 
-    if (uiState != mState)
+    if (uiState != occupied)
     {
         // toggle value on the next 'UpdateState' call
-        mTargetState.SetValue(uiState);
+        // Occupancy is just a single bit, update it as such
+        mTargetOccupancy.SetValue(uiState ? BitMask(OccupancyBitmap::kOccupied) : BitMask());
     }
 
     ImGui::End();
