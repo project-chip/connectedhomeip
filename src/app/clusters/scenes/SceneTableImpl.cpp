@@ -237,11 +237,11 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         return CHIP_ERROR_NOT_FOUND;
     }
     /// @brief Finds the index where to insert current scene by going through the whole table and looking if the scene is already in
-    /// there and for the first empty index
-    /// @param storage Storage delegate in use
-    /// @param fabric Fabric in use
+    /// there. If the target is not in the table, sets idx to the first empty space
     /// @param target_scene Storage Id of scene to store
-    /// @return CHIP_NO_ERROR if managed to find a suitable storage location, false otherwise
+    /// @param idx Index where target or space is found
+    /// @return CHIP_NO_ERROR if managed to find the target scene, CHIP_ERROR_NOT_FOUND if not found and space left
+    ///         CHIP_ERROR_NO_MEMORY if target was not found and table is full
     CHIP_ERROR Find(SceneStorageId target_scene, SceneIndex & idx)
     {
         SceneIndex firstFreeIdx = kUndefinedSceneIndex; // storage index if scene not found
@@ -267,7 +267,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
             return CHIP_ERROR_NOT_FOUND;
         }
 
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_NO_MEMORY;
     }
     CHIP_ERROR Save(PersistentStorageDelegate * storage) override
     {
@@ -402,19 +402,19 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fa
 /// @param ID ID of the cluster used to fill the extension fields set
 /// @param get_function pointer to function to call to get the extension fiels set from the cluster
 /// @param set_function pointer to function to call send an extension field to the cluster
-/// @return CHIP_ERROR_BUFFER_TO_SMALL if couldn't insert the handler, otherwise CHIP_NO_ERROR
-CHIP_ERROR DefaultSceneTableImpl::registerHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function)
+/// @return CHIP_ERROR_NO_MEMORY if couldn't insert the handler, otherwise CHIP_NO_ERROR
+CHIP_ERROR DefaultSceneTableImpl::RegisterHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function)
 {
-    CHIP_ERROR err     = CHIP_ERROR_INVALID_LIST_LENGTH;
+    CHIP_ERROR err     = CHIP_ERROR_NO_MEMORY;
     uint8_t idPosition = 0xff, fisrtEmptyPosition = 0xff;
     for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
     {
-        if (this->handlers[i].getID() == ID)
+        if (this->handlers[i].GetID() == ID)
         {
             idPosition = i;
             break;
         }
-        if (!this->handlers[i].isInitialized() && fisrtEmptyPosition == 0xff)
+        if (!this->handlers[i].IsInitialized() && fisrtEmptyPosition == 0xff)
         {
             fisrtEmptyPosition = i;
         }
@@ -423,12 +423,12 @@ CHIP_ERROR DefaultSceneTableImpl::registerHandler(ClusterId ID, clusterFieldsHan
     // if found, insert at found position, otherwise at first free possition, otherwise return error
     if (idPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
     {
-        this->handlers[idPosition].initSceneHandler(ID, get_function, set_function);
+        this->handlers[idPosition].InitSceneHandler(ID, get_function, set_function);
         err = CHIP_NO_ERROR;
     }
     else if (fisrtEmptyPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
     {
-        this->handlers[fisrtEmptyPosition].initSceneHandler(ID, get_function, set_function);
+        this->handlers[fisrtEmptyPosition].InitSceneHandler(ID, get_function, set_function);
         this->handlerNum++;
         err = CHIP_NO_ERROR;
     }
@@ -436,15 +436,15 @@ CHIP_ERROR DefaultSceneTableImpl::registerHandler(ClusterId ID, clusterFieldsHan
     return err;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::unregisterHandler(uint8_t position)
+CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(uint8_t position)
 {
-    if (!handlerListEmpty())
+    if (!HandlerListEmpty())
     {
         if (position < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
         {
-            if (this->handlers[position].isInitialized())
+            if (this->handlers[position].IsInitialized())
             {
-                this->handlers[position].clearSceneHandler();
+                this->handlers[position].ClearSceneHandler();
                 this->handlerNum--;
             }
         }
@@ -460,14 +460,14 @@ CHIP_ERROR DefaultSceneTableImpl::unregisterHandler(uint8_t position)
 CHIP_ERROR DefaultSceneTableImpl::EFSValuesFromCluster(ExtensionFieldsSetsImpl & fieldSets)
 {
     ExtensionFieldsSet EFS;
-    if (!this->handlerListEmpty())
+    if (!this->HandlerListEmpty())
     {
         for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
         {
-            if (this->handlers[i].isInitialized())
+            if (this->handlers[i].IsInitialized())
             {
-                ReturnErrorOnFailure(this->handlers[i].getClusterEFS(EFS));
-                ReturnErrorOnFailure(fieldSets.insertField(EFS));
+                ReturnErrorOnFailure(this->handlers[i].GetClusterEFS(EFS));
+                ReturnErrorOnFailure(fieldSets.InsertFieldSet(EFS));
             }
         }
     }
@@ -478,19 +478,19 @@ CHIP_ERROR DefaultSceneTableImpl::EFSValuesFromCluster(ExtensionFieldsSetsImpl &
 CHIP_ERROR DefaultSceneTableImpl::EFSValuesToCluster(ExtensionFieldsSetsImpl & fieldSets)
 {
     ExtensionFieldsSet EFS;
-    if (!this->handlerListEmpty())
+    if (!this->HandlerListEmpty())
     {
         for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
         {
-            fieldSets.getFieldAtPosition(EFS, i);
+            fieldSets.GetFieldSetAtPosition(EFS, i);
 
-            if (!EFS.is_empty())
+            if (!EFS.IsEmpty())
             {
                 for (uint8_t j = 0; j < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; j++)
                 {
-                    if (EFS.mID == this->handlers[j].getID())
+                    if (EFS.mID == this->handlers[j].GetID())
                     {
-                        ReturnErrorOnFailure(this->handlers[j].setClusterEFS(EFS));
+                        ReturnErrorOnFailure(this->handlers[j].SetClusterEFS(EFS));
                     }
                 }
             }

@@ -30,13 +30,12 @@ typedef uint16_t SceneTransitionTime;
 typedef uint8_t TransitionTime100ms;
 
 static constexpr uint8_t kMaxScenePerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
+static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
+static constexpr size_t kSceneNameMax       = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
 
 class SceneTable
 {
 public:
-    static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
-    static constexpr size_t kSceneNameMax = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
-
     /// @brief struct used to identify a scene in storage by 3 ids, endpoint, group and scene
     struct SceneStorageId
     {
@@ -44,7 +43,7 @@ public:
         static constexpr TLV::Tag TagFirstSceneGroupID() { return TLV::ContextTag(2); }
         static constexpr TLV::Tag TagFirstSceneID() { return TLV::ContextTag(3); }
 
-        // Identifies endpoint to which this scene applies to
+        // Identifies endpoint to which this scene applies
         EndpointId mSceneEndpointId = kInvalidEndpointId;
         // Identifies group within the scope of the given fabric
         SceneGroupID mSceneGroupId = kGlobalGroupSceneId;
@@ -113,28 +112,28 @@ public:
         char mName[kSceneNameMax]                = { 0 };
         size_t mNameLength                       = 0;
         SceneTransitionTime mSceneTransitionTime = 0;
-        ExtensionFieldsSetsImpl mExtentsionFieldsSets;
-        TransitionTime100ms mTransitionTime100 = 0;
+        ExtensionFieldsSetsImpl mExtensionFieldsSets;
+        TransitionTime100ms mTransitionTime100ms = 0;
         CharSpan mNameSpan;
 
         SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0, TransitionTime100ms time100ms = 0) :
-            mSceneTransitionTime(time), mTransitionTime100(time100ms)
+            mSceneTransitionTime(time), mTransitionTime100ms(time100ms)
         {
             this->SetName(sceneName);
         }
         SceneData(ExtensionFieldsSetsImpl fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
                   TransitionTime100ms time100ms = 0) :
             mSceneTransitionTime(time),
-            mTransitionTime100(time100ms)
+            mTransitionTime100ms(time100ms)
         {
             this->SetName(sceneName);
-            mExtentsionFieldsSets = fields;
+            mExtensionFieldsSets = fields;
         }
         SceneData(const SceneData & other) :
-            mSceneTransitionTime(other.mSceneTransitionTime), mTransitionTime100(other.mTransitionTime100)
+            mSceneTransitionTime(other.mSceneTransitionTime), mTransitionTime100ms(other.mTransitionTime100ms)
         {
             this->SetName(other.mNameSpan);
-            mExtentsionFieldsSets = other.mExtentsionFieldsSets;
+            mExtensionFieldsSets = other.mExtensionFieldsSets;
         }
         ~SceneData(){};
 
@@ -150,8 +149,8 @@ public:
             }
 
             ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime(), static_cast<uint16_t>(this->mSceneTransitionTime)));
-            ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime100(), static_cast<uint8_t>(this->mTransitionTime100)));
-            ReturnErrorOnFailure(this->mExtentsionFieldsSets.Serialize(writer));
+            ReturnErrorOnFailure(writer.Put(TagSceneTransitionTime100(), static_cast<uint8_t>(this->mTransitionTime100ms)));
+            ReturnErrorOnFailure(this->mExtensionFieldsSets.Serialize(writer));
 
             return writer.EndContainer(container);
         }
@@ -175,8 +174,8 @@ public:
 
             ReturnErrorOnFailure(reader.Get(this->mSceneTransitionTime));
             ReturnErrorOnFailure(reader.Next(TagSceneTransitionTime100()));
-            ReturnErrorOnFailure(reader.Get(this->mTransitionTime100));
-            ReturnErrorOnFailure(this->mExtentsionFieldsSets.Deserialize(reader));
+            ReturnErrorOnFailure(reader.Get(this->mTransitionTime100ms));
+            ReturnErrorOnFailure(this->mExtensionFieldsSets.Deserialize(reader));
 
             return reader.ExitContainer(container);
         }
@@ -190,8 +189,9 @@ public:
             }
             else
             {
-                Platform::CopyString(mName, sceneName);
-                mNameLength = sceneName.size();
+                size_t maxChars = std::min(sceneName.size(), kSceneNameMax);
+                memcpy(mName, sceneName.data(), maxChars);
+                mNameLength = maxChars;
             }
             mNameSpan = CharSpan(mName, mNameLength);
         }
@@ -200,23 +200,23 @@ public:
         {
             this->SetName(CharSpan());
             mSceneTransitionTime = 0;
-            mTransitionTime100   = 0;
-            mExtentsionFieldsSets.Clear();
+            mTransitionTime100ms = 0;
+            mExtensionFieldsSets.Clear();
         }
 
         bool operator==(const SceneData & other)
         {
             return (this->mNameSpan.data_equal(other.mNameSpan) && (this->mSceneTransitionTime == other.mSceneTransitionTime) &&
-                    (this->mTransitionTime100 == other.mTransitionTime100) &&
-                    (this->mExtentsionFieldsSets == other.mExtentsionFieldsSets));
+                    (this->mTransitionTime100ms == other.mTransitionTime100ms) &&
+                    (this->mExtensionFieldsSets == other.mExtensionFieldsSets));
         }
 
         void operator=(const SceneData & other)
         {
             this->SetName(other.mNameSpan);
-            this->mExtentsionFieldsSets = other.mExtentsionFieldsSets;
-            this->mSceneTransitionTime  = other.mSceneTransitionTime;
-            this->mTransitionTime100    = other.mTransitionTime100;
+            this->mExtensionFieldsSets = other.mExtensionFieldsSets;
+            this->mSceneTransitionTime = other.mSceneTransitionTime;
+            this->mTransitionTime100ms = other.mTransitionTime100ms;
         }
     };
 

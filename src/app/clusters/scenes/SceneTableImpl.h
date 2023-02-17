@@ -47,7 +47,7 @@ public:
     };
     ~SceneHandler(){};
 
-    void initSceneHandler(ClusterId Id, clusterFieldsHandle getEFSHandle, clusterFieldsHandle setEFSHandle)
+    void InitSceneHandler(ClusterId Id, clusterFieldsHandle getEFSHandle, clusterFieldsHandle setEFSHandle)
     {
         if (getEFSHandle != nullptr && setEFSHandle != nullptr && Id != kInvalidClusterId)
         {
@@ -58,7 +58,7 @@ public:
         }
     }
 
-    void clearSceneHandler()
+    void ClearSceneHandler()
     {
         getEFS      = nullptr;
         setEFS      = nullptr;
@@ -66,18 +66,18 @@ public:
         initialized = false;
     }
 
-    CHIP_ERROR getClusterEFS(ExtensionFieldsSet & clusterFields)
+    CHIP_ERROR GetClusterEFS(ExtensionFieldsSet & clusterFields)
     {
-        if (this->isInitialized())
+        if (this->IsInitialized())
         {
             ReturnErrorOnFailure(getEFS(clusterFields));
         }
 
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR setClusterEFS(ExtensionFieldsSet & clusterFields)
+    CHIP_ERROR SetClusterEFS(ExtensionFieldsSet & clusterFields)
     {
-        if (this->isInitialized())
+        if (this->IsInitialized())
         {
             ReturnErrorOnFailure(setEFS(clusterFields));
         }
@@ -85,9 +85,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    bool isInitialized() const { return this->initialized; }
+    bool IsInitialized() const { return this->initialized; }
 
-    ClusterId getID() { return cID; }
+    ClusterId GetID() { return cID; }
 
     bool operator==(const SceneHandler & other)
     {
@@ -135,8 +135,8 @@ public:
     CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx) override;
 
     // SceneHandlers
-    CHIP_ERROR registerHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function);
-    CHIP_ERROR unregisterHandler(uint8_t position);
+    CHIP_ERROR RegisterHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function);
+    CHIP_ERROR UnregisterHandler(uint8_t position);
 
     // Extension field sets operation
     CHIP_ERROR EFSValuesFromCluster(ExtensionFieldsSetsImpl & fieldSets);
@@ -148,9 +148,9 @@ public:
     // Iterators
     SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) override;
 
-    bool handlerListEmpty() { return (handlerNum == 0); }
-    bool handlerListFull() { return (handlerNum >= CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES); }
-    uint8_t getHandlerNum() { return this->handlerNum; }
+    bool HandlerListEmpty() { return (handlerNum == 0); }
+    bool HandlerListFull() { return (handlerNum >= CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES); }
+    uint8_t GetHandlerNum() { return this->handlerNum; }
 
 protected:
     class SceneEntryIteratorImpl : public SceneEntryIterator
