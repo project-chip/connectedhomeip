@@ -86,6 +86,7 @@ class AndroidApp(Enum):
 
     def AppGnArgs(self):
         gn_args = {}
+
         if self == AndroidApp.TV_SERVER:
             gn_args["chip_config_network_layer_ble"] = False
         elif self == AndroidApp.TV_CASTING_APP:
@@ -107,11 +108,31 @@ class AndroidApp(Enum):
             return None
 
 
+class AndroidProfile(Enum):
+    RELEASE = auto()
+    DEBUG = auto()
+
+    @property
+    def ProfileName(self):
+        if self == AndroidProfile.RELEASE:
+            return 'release'
+        elif self == AndroidProfile.DEBUG:
+            return 'debug'
+        else:
+            raise Exception('Unknown profile type: %r' % self)
+
+
 class AndroidBuilder(Builder):
-    def __init__(self, root, runner, board: AndroidBoard, app: AndroidApp):
+    def __init__(self,
+                 root,
+                 runner,
+                 board: AndroidBoard,
+                 app: AndroidApp,
+                 profile: AndroidProfile = AndroidProfile.DEBUG):
         super(AndroidBuilder, self).__init__(root, runner)
         self.board = board
         self.app = app
+        self.profile = profile
 
     def validate_build_environment(self):
         for k in ["ANDROID_NDK_HOME", "ANDROID_HOME"]:
@@ -258,6 +279,7 @@ class AndroidBuilder(Builder):
         )
 
     def gradlewBuildExampleAndroid(self):
+
         # Example compilation
         if self.app.Modules():
             for module in self.app.Modules():
@@ -311,6 +333,8 @@ class AndroidBuilder(Builder):
             gn_args["target_cpu"] = self.board.TargetCpuName()
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
+            if self.profile != AndroidProfile.DEBUG:
+                gn_args["is_debug"] = False
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
@@ -367,6 +391,22 @@ class AndroidBuilder(Builder):
                 )
 
             app_dir = os.path.join(self.root, "examples/", self.app.AppName())
+
+    def stripSymbols(self):
+        output_libs_dir = os.path.join(
+            self.output_dir,
+            "lib",
+            "jni",
+            self.board.AbiName())
+        for lib in os.listdir(output_libs_dir):
+            if (lib.endswith(".so")):
+                self._Execute(
+                    ["llvm-strip",
+                     "-s",
+                     os.path.join(output_libs_dir, lib)
+                     ],
+                    "Stripping symbols from " + lib
+                )
 
     def _build(self):
         if self.board.IsIde():
@@ -442,6 +482,9 @@ class AndroidBuilder(Builder):
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
+            if (self.profile != AndroidProfile.DEBUG):
+                self.stripSymbols()
+
     def build_outputs(self):
         if self.board.IsIde():
             outputs = {
@@ -465,15 +508,13 @@ class AndroidBuilder(Builder):
                 }
             else:
                 outputs = {
-                    self.app.AppName()
-                    + "app-debug.apk": os.path.join(
+                    self.app.AppName() + "app-debug.apk": os.path.join(
                         self.output_dir, "outputs", "apk", "debug", "app-debug.apk"
                     )
                 }
         else:
             outputs = {
-                self.app.AppName()
-                + "app-debug.apk": os.path.join(
+                self.app.AppName() + "app-debug.apk": os.path.join(
                     self.output_dir, "outputs", "apk", "debug", "app-debug.apk"
                 ),
                 "CHIPController.jar": os.path.join(

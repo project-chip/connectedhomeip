@@ -1,5 +1,5 @@
 ameba-amebad-{all-clusters,all-clusters-minimal,light,light-switch,pigweed}
-android-{arm,arm64,x86,x64,androidstudio-arm,androidstudio-arm64,androidstudio-x86,androidstudio-x64}-{chip-tool,chip-test,tv-server,tv-casting-app,java-matter-controller}
+android-{arm,arm64,x86,x64,androidstudio-arm,androidstudio-arm64,androidstudio-x86,androidstudio-x64}-{chip-tool,chip-test,tv-server,tv-casting-app,java-matter-controller}[-no-debug]
 bouffalolab-{bl602-iot-matter-v1,bl602-iot-dvk-3s,bl602-night-light,xt-zb6-devkit,bl706-iot-dvk,bl706-night-light}-light[-shell][-115200][-rpc]
 cc13x2x7_26x2x7-{all-clusters,all-clusters-minimal,lock,pump,pump-controller,shell}[-ftd][-mtd]
 cc32xx-lock
