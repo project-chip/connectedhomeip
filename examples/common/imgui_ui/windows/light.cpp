@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 
+#include <app/clusters/level-control/level-control.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 
 namespace example {
@@ -85,7 +86,14 @@ void Light::UpdateState()
     // Level Control
     if (mTargetLevel.HasValue())
     {
-        LevelControl::Attributes::CurrentLevel::Set(mEndpointId, mTargetLevel.Value());
+        LevelControl::Commands::MoveToLevel::DecodableType data;
+
+        data.level = mTargetLevel.Value();
+        data.optionsMask.Set(LevelControl::LevelControlOptions::kExecuteIfOff);
+        data.optionsOverride.Set(LevelControl::LevelControlOptions::kExecuteIfOff);
+
+        (void) LevelControlServer::MoveToLevel(mEndpointId, data);
+
         mTargetLevel.ClearValue();
     }
 
@@ -147,11 +155,10 @@ void Light::Render()
     ImGui::Text("Color Control:");
     ImGui::Indent();
     const char * mode = // based on ColorMode attribute: spec 3.2.7.9
-        (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION)
-        ? "Hue/Saturation"
-        : (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)
-            ? "X/Y"
-            : (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE) ? "Temperature/Mireds" : "UNKNOWN";
+        (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION) ? "Hue/Saturation"
+        : (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)          ? "X/Y"
+        : (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE)                ? "Temperature/Mireds"
+                                                                                : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
 
