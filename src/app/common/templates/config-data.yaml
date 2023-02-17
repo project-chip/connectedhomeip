@@ -18,7 +18,6 @@ WeakEnums:
     - IdentifyEffectVariant
     - IdentifyIdentifyType
     - InterfaceTypeEnum
-    - KeypadLockout
     - LevelControlOptions
     - MoveMode
     - NetworkFaultEnum
@@ -28,7 +27,6 @@ WeakEnums:
     - SaturationMoveMode
     - SaturationStepMode
     - StepMode
-    - TemperatureDisplayMode
 
 DefineBitmaps:
     # Allow-list of bitmaps that we generates as #define as well as enum classes.
