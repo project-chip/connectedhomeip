@@ -200,7 +200,7 @@ void ImguiUi::ChipLoopUpdateCallback(intptr_t self)
 void ImguiUi::UpdateState()
 {
     chip::DeviceLayer::PlatformMgr().ScheduleWork(&ChipLoopUpdateCallback, reinterpret_cast<intptr_t>(this));
-    // ensure update is done when existing
+    // ensure update is done when exiting
     if (sem_trywait(&mChipLoopWaitSemaphore) != 0)
     {
         if (!gUiRunning.load())
