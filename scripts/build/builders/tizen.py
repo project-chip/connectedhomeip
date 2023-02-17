@@ -66,6 +66,10 @@ class TizenApp(Enum):
         return isinstance(self.value, App)
 
     @property
+    def package(self):
+        return f'{self.package_name}-{self.package_version}.tpk'
+
+    @property
     def package_name(self):
         return self.manifest.get('package')
 
@@ -149,7 +153,8 @@ class TizenBuilder(GnBuilder):
     def flashbundle(self):
         if not self.app.is_tpk:
             return {}
-        tpk = f'{self.app.package_name}-{self.app.package_version}.tpk'
         return {
-            tpk: os.path.join(self.output_dir, 'package', 'out', tpk),
+            self.app.package: os.path.join(self.output_dir,
+                                           self.app.package_name, 'out',
+                                           self.app.package),
         }
