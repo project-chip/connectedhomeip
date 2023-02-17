@@ -25,6 +25,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage-null-handling.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER

@@ -24,6 +24,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/util/config.h>
 #include <jni.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPJNIError.h>

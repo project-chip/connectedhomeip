@@ -27,9 +27,6 @@
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 
-#include <zap-generated/endpoint_config.h>
-#include <zap-generated/gen_config.h>
-
 /**
  * @brief Defines binding types.
  */
