@@ -96,7 +96,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Return the single MTRDeviceControllerFactory we support existing.  It starts off
  * in a "not started" state.
  */
-+ (instancetype)sharedInstance;
++ (MTRDeviceControllerFactory *)sharedInstance;
 
 /**
  * If true, the factory is in a state where it can create controllers:
@@ -167,7 +167,7 @@ API_DEPRECATED(
 API_DEPRECATED("Please use MTRDeviceControllerFactory", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRControllerFactory : NSObject
 @property (readonly, nonatomic) BOOL isRunning;
-+ (instancetype)sharedInstance;
++ (MTRControllerFactory *)sharedInstance;
 - (BOOL)startup:(MTRControllerFactoryParams *)startupParams;
 - (void)shutdown;
 - (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams;
