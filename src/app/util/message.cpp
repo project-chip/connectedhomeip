@@ -31,7 +31,6 @@ using namespace chip;
 // only result in a single call to emberIncomingMsgHandler. If the device
 // receives multiple ZCL messages, the stack will queue these and hand
 // these to the application via emberIncomingMsgHandler one at a time.
-EmberApsFrame emberAfResponseApsFrame;
 Messaging::ExchangeContext * emberAfResponseDestination;
 uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 uint16_t appResponseLength;
@@ -52,7 +51,6 @@ void emberAfClearResponseData()
     emberAfResponseDestination = nullptr /* emberAfGetNodeId() */;
     memset(appResponseData, 0, EMBER_AF_RESPONSE_BUFFER_LEN);
     appResponseLength = 0;
-    memset(&emberAfResponseApsFrame, 0, sizeof(EmberApsFrame));
 }
 
 uint8_t * emberAfPutInt8uInResp(uint8_t value)
@@ -127,21 +125,6 @@ uint8_t * emberAfPutStringInResp(const uint8_t * buffer)
 {
     uint8_t length = emberAfStringLength(buffer);
     return emberAfPutBlockInResp(buffer, static_cast<uint16_t>(length + 1));
-}
-
-uint8_t * emberAfPutDateInResp(EmberAfDate * value)
-{
-    uint8_t * a = emberAfPutInt8uInResp(value->year);
-    uint8_t * b = emberAfPutInt8uInResp(value->month);
-    uint8_t * c = emberAfPutInt8uInResp(value->dayOfMonth);
-    uint8_t * d = emberAfPutInt8uInResp(value->dayOfWeek);
-
-    if (a && b && c && d)
-    {
-        return a;
-    }
-
-    return nullptr;
 }
 
 void emberAfPutInt16sInResp(int16_t value)

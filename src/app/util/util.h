@@ -18,7 +18,6 @@
 #pragma once
 
 #include <inttypes.h>
-#include <messaging/ExchangeMgr.h>
 
 // User asserts can override SLAB_ASSERT and should be defined as follows:
 // void userAssert (int file, int line);                   // declaration
@@ -42,31 +41,6 @@ extern const EmberAfClusterName zclClusterNames[];
 
 #include <app/util/af.h>
 
-// Override APS retry: 0 - don't touch, 1 - always set, 2 - always unset
-typedef enum
-{
-    EMBER_AF_RETRY_OVERRIDE_NONE  = 0,
-    EMBER_AF_RETRY_OVERRIDE_SET   = 1,
-    EMBER_AF_RETRY_OVERRIDE_UNSET = 2
-} EmberAfRetryOverride;
-
-// The default APS retry flag value is controlled by EMBER_AF_DEFAULT_APS_OPTIONS
-// and is usually 1. In high traffic, low bandwidth networks (e.g. sub-GHz),
-// the app may want to override this. Two methods are available for apps that
-// may wants to do this dynamically per message:
-// 1. Call emberAfSetRetryOverride each time before filling the message buffer;
-// 2. Call emberAfSetRetryOverride once with a value covering most messages and
-//    then toggling the flag as necessary in emberAfPreMessageSendCallback.
-void emberAfSetRetryOverride(EmberAfRetryOverride value);
-
-// Return the current override status
-EmberAfRetryOverride emberAfGetRetryOverride(void);
-
-// This function applies the curent override value to the APS options.
-// It is called internally by the framework in the final stages of filling the
-// message buffer.
-void emAfApplyRetryOverride(EmberApsOption * options);
-
 // Override Disable Default Response flag in the ZCL Frame Control
 typedef enum
 {
@@ -89,17 +63,10 @@ EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse(void);
 // message buffer.
 void emAfApplyDisableDefaultResponse(uint8_t * frame_control);
 
-// Returns a mfg code from current command.
-// This should only be used within the command parsing context.
-// Wraps emberAfCurrentCommand(), and assumes that the current comamnd
-// is either the current valid command or NULL
-// In the case of NULL, then it returns EMBER_AF_NULL_MANUFACTURER_CODE
-uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
-
 // EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH is defined in config.h
 #define EMBER_AF_RESPONSE_BUFFER_LEN EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH
 
-void emberAfInit(chip::Messaging::ExchangeManager * exchangeContext);
+void emberAfInit();
 void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
 void emberAfStackDown(void);
@@ -133,7 +100,6 @@ uint32_t * emberAfPutInt32uInResp(uint32_t value);
 uint32_t * emberAfPutInt24uInResp(uint32_t value);
 uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length);
 uint8_t * emberAfPutStringInResp(const uint8_t * buffer);
-uint8_t * emberAfPutDateInResp(EmberAfDate * value);
 void emberAfPutInt16sInResp(int16_t value);
 void emberAfPutStatusInResp(EmberAfStatus value);
 
@@ -184,7 +150,3 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
  * storage).
  */
 bool emberAfIsKnownVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
-
-namespace chip {
-chip::Messaging::ExchangeManager * ExchangeManager();
-} // namespace chip

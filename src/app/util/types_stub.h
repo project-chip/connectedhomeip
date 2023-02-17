@@ -19,8 +19,6 @@
 
 #include <string.h> // For mem* functions.
 
-#include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
-
 #include <app/util/basic-types.h>
 #include <lib/core/Optional.h>
 
@@ -67,34 +65,6 @@ enum
 };
 
 /**
- * @brief Options to use when sending a message.
- *
- * The discover-route, APS-retry, and APS-indirect options may be used together.
- * Poll response cannot be combined with any other options.
- */
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberApsOption
-#else
-typedef uint16_t EmberApsOption;
-enum
-#endif
-{
-    /** Resend the message using the APS retry mechanism.
-        This option and the enable route discovery option must be enabled for
-        an existing route to be repaired automatically. */
-    EMBER_APS_OPTION_RETRY = 0x0040,
-    /** Send the message with the NWK 'enable route discovery' flag, which
-        causes a route discovery to be initiated if no route to the destination
-        is known.  Note that in the mesh stack, this option and the APS retry
-        option must be enabled an existing route to be repaired
-        automatically. */
-    EMBER_APS_OPTION_ENABLE_ROUTE_DISCOVERY = 0x0100,
-    /** Send a ZDO request to discover the node ID of the destination if it is
-        not already known. */
-    EMBER_APS_OPTION_ENABLE_ADDRESS_DISCOVERY = 0x1000,
-};
-
-/**
  * @brief Size of EUI64 (an IEEE address) in bytes (8).
  */
 #define EUI64_SIZE 8
@@ -113,30 +83,6 @@ typedef uint16_t EmberNodeId;
  * @brief 802.15.4 PAN ID.
  */
 typedef uint16_t EmberPanId;
-
-/**
- * @brief Defines the possible incoming message types.
- */
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberIncomingMessageType
-#else
-typedef uint8_t EmberIncomingMessageType;
-enum
-#endif
-{
-    /** Unicast. */
-    EMBER_INCOMING_UNICAST,
-    /** Unicast reply. */
-    EMBER_INCOMING_UNICAST_REPLY,
-    /** Multicast. */
-    EMBER_INCOMING_MULTICAST,
-    /** Multicast sent by the local device. */
-    EMBER_INCOMING_MULTICAST_LOOPBACK,
-    /** Broadcast. */
-    EMBER_INCOMING_BROADCAST,
-    /** Broadcast sent by the local device. */
-    EMBER_INCOMING_BROADCAST_LOOPBACK
-};
 
 /** @brief Defines an entry in the binding table.
  *
