@@ -355,12 +355,6 @@ void emberAfGetEui64(EmberEUI64 returnEui64);
  */
 EmberNodeId emberAfGetNodeId(void);
 
-/**
- * @brief Returns the current network state.  This call caches the results
- *   on the host to prevent frequent EZSP transactions.
- */
-EmberNetworkStatus emberAfNetworkState(void);
-
 /** @} END Miscellaneous */
 
 /** @name Sleep Control */

@@ -34,9 +34,9 @@ void emAfPluginScenesServerPrintInfo(void);
 
 extern uint8_t emberAfPluginScenesServerEntriesInUse;
 #if defined(EMBER_AF_PLUGIN_SCENES_USE_TOKENS) && !defined(EZSP_HOST)
-// In this case, we use token storage
-#define emberAfPluginScenesServerRetrieveSceneEntry(entry, i) halCommonGetIndexedToken(&entry, TOKEN_SCENES_TABLE, i)
-#define emberAfPluginScenesServerSaveSceneEntry(entry, i) halCommonSetIndexedToken(TOKEN_SCENES_TABLE, i, &entry)
+// TODO: Make the storage bits actually work
+#define emberAfPluginScenesServerRetrieveSceneEntry(entry, i)
+#define emberAfPluginScenesServerSaveSceneEntry(entry, i)
 #define emberAfPluginScenesServerNumSceneEntriesInUse()                                                                            \
     (halCommonGetToken(&emberAfPluginScenesServerEntriesInUse, TOKEN_SCENES_NUM_ENTRIES), emberAfPluginScenesServerEntriesInUse)
 #define emberAfPluginScenesServerSetNumSceneEntriesInUse(x)                                                                        \
