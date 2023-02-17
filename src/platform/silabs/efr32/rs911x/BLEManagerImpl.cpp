@@ -27,10 +27,12 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <platform/internal/BLEManager.h>
-#define RSI_BLE_ENABLE 1
 
-//#include "rail.h"
+#include "rail.h"
+
+#ifdef __cplusplus
 extern "C" {
+#endif
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
@@ -41,7 +43,10 @@ extern "C" {
 #include <rsi_driver.h>
 #include <rsi_utils.h>
 #include <stdbool.h>
+#ifdef __cplusplus
 }
+#endif
+
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -53,7 +58,6 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-// static int32_t handleTxConfirmationFlag = 0;
 extern uint16_t rsi_ble_measurement_hndl;
 extern rsi_ble_event_conn_status_t conn_event_to_app;
 extern sl_wfx_msg_t event_msg;
@@ -67,6 +71,7 @@ StackType_t wfxBLETaskStack[WFX_RSI_TASK_SZ] = { 0 };
 
 using namespace ::chip;
 using namespace ::chip::Ble;
+using namespace ::chip::DeviceLayer::Internal;
 
 void sl_ble_init()
 {
@@ -80,7 +85,7 @@ void sl_ble_init()
     rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, rsi_ble_on_gatt_write_event, NULL, NULL, NULL,
                                     rsi_ble_on_mtu_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                                     rsi_ble_on_event_indication_confirmation, NULL);
-    rsi_semaphore_create(&sl_ble_event_sem, 0);
+
     WFX_RSI_LOG("registering rsi_ble_add_service");
 
     //  Exchange of GATT info with BLE stack
@@ -99,7 +104,7 @@ void sl_ble_event_handling_task(void)
     int32_t event_id;
 
     WFX_RSI_LOG("%s starting", __func__);
-    rsi_semaphore_create(&sl_rs_ble_init_sem, 0);
+
     //! This semaphore is waiting for wifi module initialization.
     rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
 
@@ -108,25 +113,23 @@ void sl_ble_event_handling_task(void)
     // Application event map
     while (1)
     {
+        //! This semaphore is waiting for next ble event task
+        rsi_semaphore_wait(&sl_ble_event_sem, 0);
+
         // checking for events list
         event_id = rsi_ble_app_get_event();
-        if (event_id == -1)
-        {
-            rsi_semaphore_wait(&sl_ble_event_sem, 0);
-            continue;
-        }
         switch (event_id)
         {
         case RSI_BLE_CONN_EVENT: {
             rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
-            chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectEvent();
+            BLEMgrImpl().HandleConnectEvent();
             WFX_RSI_LOG("%s Module got connected", __func__);
         }
         break;
         case RSI_BLE_DISCONN_EVENT: {
             // event invokes when disconnection was completed
             WFX_RSI_LOG("%s Module got Disconnected", __func__);
-            chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
+            BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
         }
@@ -134,7 +137,7 @@ void sl_ble_event_handling_task(void)
         case RSI_BLE_MTU_EVENT: {
             // event invokes when write/notification events received
             WFX_RSI_LOG("%s RSI_BLE_MTU_EVENT", __func__);
-            chip::DeviceLayer::Internal::BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
+            BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
         }
@@ -142,20 +145,20 @@ void sl_ble_event_handling_task(void)
         case RSI_BLE_GATT_WRITE_EVENT: {
             // event invokes when write/notification events received
             WFX_RSI_LOG("%s RSI_BLE_GATT_WRITE_EVENT", __func__);
-            chip::DeviceLayer::Internal::BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
+            BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
         }
         break;
         case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
             WFX_RSI_LOG("%s indication confirmation", __func__);
-            chip::DeviceLayer::Internal::BLEMgrImpl().HandleTxConfirmationEvent(1);
+            BLEMgrImpl().HandleTxConfirmationEvent(1);
             rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
         }
         break;
 
         case RSI_BLE_RESP_ATT_VALUE: {
-            WFX_RSI_LOG("RSI_BLE : RESP_ATT confirmation");
+            WFX_RSI_LOG("%s RESP_ATT confirmation", __func__);
         }
         default:
             break;
@@ -228,6 +231,8 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
+    rsi_semaphore_create(&sl_rs_ble_init_sem, 0);
+    rsi_semaphore_create(&sl_ble_event_sem, 0);
     ChipLogProgress(DeviceLayer, "%s Start ", __func__);
 
     wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL, 1,
@@ -256,7 +261,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
     ChipLogProgress(DeviceLayer, "%s END ", __func__);
@@ -286,7 +290,6 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -307,7 +310,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kRestartAdvertising);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+
     return CHIP_NO_ERROR;
 }
 
@@ -345,7 +348,6 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     {
         mDeviceName[0] = 0;
     }
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
     ChipLogProgress(DeviceLayer, "_SetDeviceName Ended");
     return CHIP_NO_ERROR;
 }
@@ -469,6 +471,7 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     // Nothing to do
 }
 
+// TODO: Need to add RSI BLE STATUS codes
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
     switch (bleErr)
@@ -493,9 +496,6 @@ void BLEManagerImpl::DriveBLEState(void)
 
     ChipLogProgress(DeviceLayer, "DriveBLEState starting");
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Check if BLE stack is initialized
-    // VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized), /* */);
 
     ChipLogProgress(DeviceLayer, "Start advertising if needed...");
     // Start advertising if needed...
@@ -540,6 +540,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint32_t index              = 0;
     uint32_t mDeviceNameLength  = 0;
     uint8_t mDeviceIdInfoLength = 0;
+    err                         = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
 
     ChipLogProgress(DeviceLayer, "ConfigureAdvertisingData start");
 
@@ -548,7 +549,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     memset(responseData, 0, MAX_RESPONSE_DATA_LEN);
     memset(advData, 0, MAX_ADV_DATA_LEN);
 
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     SuccessOrExit(err);
 
     if (!mFlags.Has(Flags::kDeviceNameSet))
@@ -590,7 +590,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     result = rsi_ble_set_advertise_data(advData, index);
     if (result != SL_STATUS_OK)
     {
-        err = MapBLEError(result);
+        //    err = MapBLEError(result);
         ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() failed: %ld", result);
         ExitNow();
     }
@@ -599,7 +599,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: %ld", result);
     }
 
-    err = MapBLEError(result);
+    // err = MapBLEError(result);
 
     ChipLogProgress(DeviceLayer, "ConfigureAdvertisingData End");
 exit:
@@ -616,7 +616,11 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // If already advertising, stop it, before changing values
     if (mFlags.Has(Flags::kAdvertising))
     {
-        // sl_bt_advertiser_stop(advertising_set_handle);
+        status = rsi_ble_stop_advertising();
+        if (status != RSI_SUCCESS)
+        {
+            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx ", status);
+        }
     }
     else
     {
@@ -657,12 +661,16 @@ exit:
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    // sl_status_t ret;
-
+    int32_t status = 0;
     if (mFlags.Has(Flags::kAdvertising))
     {
         mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        status = rsi_ble_stop_advertising();
+        if (status != RSI_SUCCESS)
+        {
+            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
+        }
         advertising_set_handle = 0xff;
         CancelBleAdvTimeoutTimer();
     }
@@ -697,18 +705,14 @@ void BLEManagerImpl::UpdateMtu(rsi_ble_event_mtu_t evt)
 void BLEManagerImpl::HandleBootEvent(void)
 {
     mFlags.Set(Flags::kEFRBLEStackInitialized);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectEvent(void)
 {
     ChipLogProgress(DeviceLayer, "Connect Event for handle : %d", event_msg.connectionHandle);
     AddConnection(event_msg.connectionHandle, event_msg.bondingHandle);
-
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
-// TODO:: Implementation need to be done.
 void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
 {
     uint8_t connHandle = 1;
@@ -764,7 +768,6 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
     }
 }
 
-// TODO:: Need to implement this
 void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
@@ -785,14 +788,14 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
         // whether the client is enabling or disabling indications.
         {
             event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
-            event.CHIPoBLESubscribe.ConId = 1;
+            event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
             err                           = PlatformMgr().PostEvent(&event);
         }
     }
     else
     {
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
-        event.CHIPoBLESubscribe.ConId = 1;
+        event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
         err                           = PlatformMgr().PostEvent(&event);
     }
 }
@@ -835,7 +838,6 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
     PlatformMgr().PostEventOrDie(&event);
 }
 
-// TODO:: Need to Implement
 void BLEManagerImpl::HandleSoftTimerEvent(void)
 {
     // TODO:: Need to Implement
@@ -933,14 +935,7 @@ exit:
 }
 
 // TODO:: Need the
-void BLEManagerImpl::HandleC3ReadRequest(void)
-{
-
-    //    if (ret != SL_STATUS_OK)
-    //    {
-    //        ChipLogDetail(DeviceLayer, "Failed to send read response, err:%ld", ret);
-    //    }
-}
+void BLEManagerImpl::HandleC3ReadRequest(void) {}
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 
 uint8_t BLEManagerImpl::GetTimerHandle(uint8_t connectionHandle, bool allocate)

@@ -307,7 +307,6 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
 {
     rsi_ble_req_add_att_t new_att = { 0 };
 
-    memset(&new_att, 0, sizeof(rsi_ble_req_add_att_t));
     //! preparing the attributes
     new_att.serv_handler  = serv_handler;
     new_att.handle        = handle;
