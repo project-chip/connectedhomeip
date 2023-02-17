@@ -3072,9 +3072,7 @@ LockDataTypeEnum DoorLockServer::credentialTypeToLockDataType(CredentialTypeEnum
     case CredentialTypeEnum::kFingerVein:
         return LockDataTypeEnum::kFingerVein;
     case CredentialTypeEnum::kFace:
-        // So far there's no distinct data type for face credentials.
-        // See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6272
-        return LockDataTypeEnum::kUnspecified;
+        return LockDataTypeEnum::kFace;
     case CredentialTypeEnum::kUnknownEnumValue:
         return LockDataTypeEnum::kUnspecified;
     }
