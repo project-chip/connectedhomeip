@@ -462,7 +462,8 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
     mLockState                         = lockState;
     LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, uint16_t(credentialIndex) } };
     auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
-    DoorLockServer::Instance().SetLockState(mEndpointId, mLockState, opSource, Nullable<uint16_t>(userIndex + 1), userCredentials);
+    DoorLockServer::Instance().SetLockState(mEndpointId, mLockState, opSource, MakeNullable(static_cast<uint16_t>(userIndex + 1)),
+                                            userCredentials);
 
     return true;
 }
