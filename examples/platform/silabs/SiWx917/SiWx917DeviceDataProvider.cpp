@@ -34,7 +34,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSetupDiscriminator(uint16_t & setupDiscri
     CHIP_ERROR err;
     uint32_t setupDiscriminator32;
 
-    err = SILABSConfig::ReadConfigValue(SILABSConfig::kConfigKey_SetupDiscriminator, setupDiscriminator32);
+    err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_SetupDiscriminator, setupDiscriminator32);
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -50,7 +50,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSetupDiscriminator(uint16_t & setupDiscri
 
 CHIP_ERROR EFR32DeviceDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-    CHIP_ERROR err = SILABSConfig::ReadConfigValue(SILABSConfig::kConfigKey_Spake2pIterationCount, iterationCount);
+    CHIP_ERROR err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Spake2pIterationCount, iterationCount);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -70,7 +70,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
     size_t saltB64Len                       = 0;
 
-    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
+    err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -103,7 +103,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verifie
     char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
     size_t verifierB64Len                                     = 0;
 
-    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64),
+    err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64),
                                            verifierB64Len);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
@@ -133,7 +133,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBuf
     uint8_t payloadBitSet[kTotalPayloadDataSizeInBytes] = { 0 };
     size_t bitSetLen                                    = 0;
 
-    err = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_SetupPayloadBitSet, payloadBitSet, kTotalPayloadDataSizeInBytes,
+    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_SetupPayloadBitSet, payloadBitSet, kTotalPayloadDataSizeInBytes,
                                            bitSetLen);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
@@ -170,7 +170,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBuf
 CHIP_ERROR EFR32DeviceDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     size_t vendorNameLen = 0; // without counting null-terminator
-    return SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
 }
 
 CHIP_ERROR EFR32DeviceDataProvider::GetVendorId(uint16_t & vendorId)
@@ -178,7 +178,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetVendorId(uint16_t & vendorId)
     ChipError err       = CHIP_NO_ERROR;
     uint32_t vendorId32 = 0;
 
-    err = SILABSConfig::ReadConfigValue(SILABSConfig::kConfigKey_VendorId, vendorId32);
+    err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_VendorId, vendorId32);
 
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID) && CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -196,7 +196,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetVendorId(uint16_t & vendorId)
 CHIP_ERROR EFR32DeviceDataProvider::GetProductName(char * buf, size_t bufSize)
 {
     size_t productNameLen = 0; // without counting null-terminator
-    return SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_ProductName, buf, bufSize, productNameLen);
+    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ProductName, buf, bufSize, productNameLen);
 }
 
 CHIP_ERROR EFR32DeviceDataProvider::GetProductId(uint16_t & productId)
@@ -204,7 +204,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetProductId(uint16_t & productId)
     ChipError err        = CHIP_NO_ERROR;
     uint32_t productId32 = 0;
 
-    err = SILABSConfig::ReadConfigValue(SILABSConfig::kConfigKey_ProductId, productId32);
+    err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_ProductId, productId32);
 
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID) && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -223,7 +223,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetHardwareVersionString(char * buf, size_t 
 {
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
     CHIP_ERROR err =
-        SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
+        SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -239,7 +239,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetHardwareVersion(uint16_t & hardwareVersio
     CHIP_ERROR err;
     uint32_t hardwareVersion32;
 
-    err = SILABSConfig::ReadConfigValue(SILABSConfig::kConfigKey_HardwareVersion, hardwareVersion32);
+    err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_HardwareVersion, hardwareVersion32);
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -261,7 +261,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan 
 
     size_t uniqueIdLen = 0;
     err =
-        SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+        SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
 #ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -283,7 +283,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan 
 CHIP_ERROR EFR32DeviceDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
     size_t serialNumberLen = 0; // without counting null-terminator
-    return SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_SerialNum, buf, bufSize, serialNumberLen);
+    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_SerialNum, buf, bufSize, serialNumberLen);
 }
 
 CHIP_ERROR EFR32DeviceDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
@@ -294,7 +294,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetManufacturingDate(uint16_t & year, uint8_
     size_t dateLen;
     char * parseEnd;
 
-    err = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_ManufacturingDate, reinterpret_cast<uint8_t *>(dateStr),
+    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_ManufacturingDate, reinterpret_cast<uint8_t *>(dateStr),
                                            sizeof(dateStr), dateLen);
     SuccessOrExit(err);
 
