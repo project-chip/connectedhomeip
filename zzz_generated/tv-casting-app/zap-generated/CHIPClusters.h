@@ -30,129 +30,108 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT OnOffCluster : public ClusterBase
+{
+public:
+    OnOffCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::OnOff::Id, endpoint) {}
+    ~OnOffCluster() {}
+};
+
 class DLL_EXPORT LevelControlCluster : public ClusterBase
 {
 public:
-    LevelControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::LevelControl::Id, endpoint)
-    {}
+    LevelControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::LevelControl::Id, endpoint) {}
     ~LevelControlCluster() {}
 };
 
 class DLL_EXPORT DescriptorCluster : public ClusterBase
 {
 public:
-    DescriptorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::Descriptor::Id, endpoint)
-    {}
+    DescriptorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::Descriptor::Id, endpoint) {}
     ~DescriptorCluster() {}
 };
 
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase
 {
 public:
-    WakeOnLanCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::WakeOnLan::Id, endpoint)
-    {}
+    WakeOnLanCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::WakeOnLan::Id, endpoint) {}
     ~WakeOnLanCluster() {}
 };
 
 class DLL_EXPORT ChannelCluster : public ClusterBase
 {
 public:
-    ChannelCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::Channel::Id, endpoint)
-    {}
+    ChannelCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::Channel::Id, endpoint) {}
     ~ChannelCluster() {}
 };
 
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
 {
 public:
-    TargetNavigatorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::TargetNavigator::Id, endpoint)
-    {}
+    TargetNavigatorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::TargetNavigator::Id, endpoint) {}
     ~TargetNavigatorCluster() {}
 };
 
 class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
 {
 public:
-    MediaPlaybackCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::MediaPlayback::Id, endpoint)
-    {}
+    MediaPlaybackCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::MediaPlayback::Id, endpoint) {}
     ~MediaPlaybackCluster() {}
 };
 
 class DLL_EXPORT MediaInputCluster : public ClusterBase
 {
 public:
-    MediaInputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::MediaInput::Id, endpoint)
-    {}
+    MediaInputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::MediaInput::Id, endpoint) {}
     ~MediaInputCluster() {}
 };
 
 class DLL_EXPORT LowPowerCluster : public ClusterBase
 {
 public:
-    LowPowerCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::LowPower::Id, endpoint)
-    {}
+    LowPowerCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::LowPower::Id, endpoint) {}
     ~LowPowerCluster() {}
 };
 
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
 {
 public:
-    KeypadInputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::KeypadInput::Id, endpoint)
-    {}
+    KeypadInputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::KeypadInput::Id, endpoint) {}
     ~KeypadInputCluster() {}
 };
 
 class DLL_EXPORT ContentLauncherCluster : public ClusterBase
 {
 public:
-    ContentLauncherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::ContentLauncher::Id, endpoint)
-    {}
+    ContentLauncherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::ContentLauncher::Id, endpoint) {}
     ~ContentLauncherCluster() {}
 };
 
 class DLL_EXPORT AudioOutputCluster : public ClusterBase
 {
 public:
-    AudioOutputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::AudioOutput::Id, endpoint)
-    {}
+    AudioOutputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::AudioOutput::Id, endpoint) {}
     ~AudioOutputCluster() {}
 };
 
 class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
 {
 public:
-    ApplicationLauncherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::ApplicationLauncher::Id, endpoint)
-    {}
+    ApplicationLauncherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::ApplicationLauncher::Id, endpoint) {}
     ~ApplicationLauncherCluster() {}
 };
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
 {
 public:
-    ApplicationBasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::ApplicationBasic::Id, endpoint)
-    {}
+    ApplicationBasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::ApplicationBasic::Id, endpoint) {}
     ~ApplicationBasicCluster() {}
 };
 
 class DLL_EXPORT AccountLoginCluster : public ClusterBase
 {
 public:
-    AccountLoginCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::AccountLogin::Id, endpoint)
-    {}
+    AccountLoginCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::AccountLogin::Id, endpoint) {}
     ~AccountLoginCluster() {}
 };
 
