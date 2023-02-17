@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-efr32_project_dir = "${chip_root}/silabs_examples/occupancy-sensor/efr32"
+efr32_project_dir = "${chip_root}/silabs_examples/silabs-sensors/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
@@ -70,8 +70,8 @@ efr32_sdk("sdk") {
   }
 }
 
-efr32_executable("occupancy_app") {
-  output_name = "chip-efr32-occupancy-example.out"
+efr32_executable("sensors_app") {
+  output_name = "chip-efr32-sensors-example.out"
   include_dirs = [ "include" ]
   defines = []
 
@@ -83,6 +83,7 @@ efr32_executable("occupancy_app") {
     "src/AppTask.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
+    "src/SensorsCallbacks.cpp"
   ]
 
   deps = [
@@ -159,7 +160,7 @@ efr32_executable("occupancy_app") {
 }
 
 group("efr32") {
-  deps = [ ":occupancy_app" ]
+  deps = [ ":sensors_app" ]
 }
 
 group("default") {

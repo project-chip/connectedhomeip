@@ -1,10 +1,10 @@
-# Silabs Matter Occupancy Sensor Example
+# Silabs Matter Sensor Example
 
 An example showing the use of Matter on the Silicon Labs EFR32 MG12 and MG24.
 
 <hr>
 
--   [Matter EFR32 Occupancy Sensor Example](#matter-efr32-occupancy-sensor-example)
+-   [Matter EFR32 Sensor Example](#matter-efr32-occupancy-sensor-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
@@ -32,7 +32,7 @@ An example showing the use of Matter on the Silicon Labs EFR32 MG12 and MG24.
 
 ## Introduction
 
-The occupancy sensor example provides a baseline demonstration of a occupancy sensor
+The Sensor example provides a baseline demonstration of a Sensor
 device, built using Matter and the Silicon Labs gecko SDK. It can be controlled
 by a Chip controller over an Openthread or Wifi network..
 
@@ -45,11 +45,38 @@ If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The occupancy sensor example is intended to serve both as a means to explore the
+The Sensor example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
 
 ## Building
+
+### Note 1 examples 3 Devices type
+
+This example differs from other Silicon Labs as it got 3 different device type sharing the same common code.
+With this example you can build :
+
+- Occupancy Sensor
+- Temperature Sensor
+- Contact Sensor
+
+All sensors behave in the same way. A Press of BTN1 will trigger a state change. For the Temperature sensor this will trigger a change in a preset array of temperature.
+
+The goal here is really to demonstrate the bare minimum for a Matter Sensor Application. Feel free to modify the SensorCallbacks.cpp to add real sensors and your own logic.
+
+By default if no extra arguments are provided to the build script, the occupancy sensor will be build.
+
+to change the sensor type just use one of the following arguments :
+
+    - "is_temperature_sensor=true"
+    - "is_contact_sensor=true"
+    - "is_occupancy_sensor=true"
+
+example :
+
+    - ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensor/efr32/ ./out/temperature-sensor BRD4187C "is_temperature_sensor=true"
+___
+
 
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
@@ -100,7 +127,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/occupancy-sensor/efr32/ ./out/occupancy-app BRD4187C
+          ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32/ ./out/occupancy-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
@@ -109,7 +136,7 @@ Silicon Labs platform.
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/occupancy-sensor/efr32
+          $ cd ~/connectedhomeip/examples/silabs-sensors/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export silabs_board=BRD4187C
@@ -118,12 +145,12 @@ Silicon Labs platform.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/occupancy-sensor/efr32
+          $ cd ~/connectedhomeip/examples/silabs-sensors/efr32
           $ rm -rf out/
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/occupancy-sensor/efr32/ ./out/occupancy-sensor_SED BRD4187C --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32/ ./out/occupancy-sensor_SED BRD4187C --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
@@ -131,11 +158,11 @@ Silicon Labs platform.
 
 *   Build the example with pigweed RPC
 
-          $ ./scripts/examples/gn_efr32_example.sh examples/occupancy-sensor/efr32/ out/occupancy_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_efr32_example.sh examples/silabs-sensors/efr32/ out/occupancy_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/occupancy-sensor/efr32
+          $ cd ~/connectedhomeip/examples/silabs-sensors/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export silabs_board=BRD4187C
@@ -153,7 +180,7 @@ arguments
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/occupancy-sensor/efr32
+          $ cd ~/connectedhomeip/examples/silabs-sensors/efr32
           $ python3 out/debug/chip-efr32-occupancy-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
@@ -342,19 +369,19 @@ passed to the build scripts.
 
 `chip_progress_logging, chip_detail_logging, chip_automation_logging`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/occupancy-sensor/efr32 ./out/occupancy-sensor BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32 ./out/occupancy-sensor BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
 
 ### Debug build / release build
 
 `is_debug`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/occupancy-sensor/efr32 ./out/occupancy-sensor BRD4164A "is_debug=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32 ./out/occupancy-sensor BRD4164A "is_debug=false"
 
 ### Disabling LCD
 
 `show_qr_code`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/occupancy-sensor/efr32 ./out/occupancy-sensor BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32 ./out/occupancy-sensor BRD4164A "show_qr_code=false"
 
 ### KVS maximum entry count
 
@@ -363,4 +390,4 @@ passed to the build scripts.
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/occupancy-sensor/efr32 ./out/occupancy-sensor BRD4164A kvs_max_entries=50
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32 ./out/occupancy-sensor BRD4164A kvs_max_entries=50

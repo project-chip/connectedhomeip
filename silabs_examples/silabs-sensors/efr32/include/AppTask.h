@@ -69,6 +69,8 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
+    static void SetAppLED(bool state);
+
     CHIP_ERROR StartAppTask();
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     /**
@@ -99,10 +101,6 @@ public:
 
 private:
     static AppTask sAppTask;
-
-    static void SensorActionEventHandler(AppEvent * aEvent);
-
-    static void UpdateClusterState(intptr_t context);
 
     /**
      * @brief AppTask initialisation function

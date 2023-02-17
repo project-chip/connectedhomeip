@@ -35,7 +35,9 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif
 
-#define BLE_DEV_NAME "SL-OCC-SENSOR"
+#ifndef BLE_DEV_NAME
+#define BLE_DEV_NAME "SL-SENSOR"
+#endif
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;

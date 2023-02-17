@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "SensorsCallbacks.h"
 
 #ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
@@ -27,9 +28,6 @@
 #endif // ENABLE_WSTK_LEDS
 
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
-#include <app/clusters/occupancy-sensor-server/occupancy-hal.h>
-
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -67,8 +65,6 @@ LEDWidget sSensorLED;
 #endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-
-static bool isSensorTriggered = false;
 
 /**********************************************************
  * Identify Callbacks
@@ -142,7 +138,7 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Occupancy-App");
+    GetLCD().Init((uint8_t *) SENSOR_NAME);
 #endif
 
     err = BaseApplication::Init(&gIdentify);
@@ -154,12 +150,13 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef ENABLE_WSTK_LEDS
     sSensorLED.Init(SENSOR_LED);
-    sSensorLED.Set(isSensorTriggered);
+    sSensorLED.Set(false);
 #endif // ENABLE_WSTK_LEDS
+
+    SilabsSensors::InitSensor();
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
-    GetLCD().WriteDemoUI(isSensorTriggered);
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
@@ -227,37 +224,6 @@ void AppTask::OnIdentifyStop(Identify * identify)
 #endif
 }
 
-void AppTask::SensorActionEventHandler(AppEvent * aEvent)
-{
-
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        if(aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
-        {
-            isSensorTriggered = true;
-            // TODO update CLuster
-        } 
-        else if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_RELEASED)
-        {
-            isSensorTriggered = false;
-            // TODO update CLuster
-        }
-
-#ifdef ENABLE_WSTK_LEDS
-        sSensorLED.Set(isSensorTriggered);
-#endif // ENABLE_WSTK_LEDS
-
-#ifdef DISPLAY_ENABLED
-        sAppTask.GetLCD().WriteDemoUI(isSensorTriggered);
-#endif
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        halOccupancyStateChangedCallback(1, static_cast<HalOccupancyState>(isSensorTriggered));
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    }
-#endif
-
-}
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
 {
@@ -272,7 +238,7 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
 
     if (buttonHandle == APP_SENSOR_SWITCH)
     {
-        button_event.Handler = SensorActionEventHandler;
+        button_event.Handler = SilabsSensors::ActionTriggered;
         sAppTask.PostEvent(&button_event);
     }
     else if (buttonHandle == APP_FUNCTION_BUTTON)
@@ -281,5 +247,11 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
         sAppTask.PostEvent(&button_event);
     }
 }
+#endif
 
+#ifdef ENABLE_WSTK_LEDS
+void AppTask::SetAppLED(bool state)
+{
+    sSensorLED.Set(state);
+}
 #endif
