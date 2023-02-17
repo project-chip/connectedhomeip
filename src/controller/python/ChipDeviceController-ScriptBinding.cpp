@@ -60,6 +60,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <inet/IPAddress.h>
 #include <lib/core/TLV.h>
 #include <lib/dnssd/Resolver.h>
@@ -102,6 +103,7 @@ chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptPairingDeviceDiscoveryDelegate sPairingDeviceDiscoveryDelegate;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
+chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -231,8 +233,10 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     FactoryInitParams factoryParams;
 
     factoryParams.fabricIndependentStorage = storageAdapter;
+    factoryParams.sessionKeystore          = &sSessionKeystore;
 
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
+    sGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
     PyReturnErrorOnFailure(ToPyChipError(sGroupDataProvider.Init()));
     factoryParams.groupDataProvider = &sGroupDataProvider;
 

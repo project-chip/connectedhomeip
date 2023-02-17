@@ -199,11 +199,15 @@ template("efr32_sdk") {
           "SL_WFX_USE_SPI",
           "EFX32_RS911X=1",
           "RS911X_WIFI",
-          "SiWx917_WIFI",
           "RSI_WLAN_ENABLE",
           "RSI_SPI_INTERFACE",
           "RSI_WITH_OS",
         ]
+      }
+      if (use_SiWx917) {
+        #Added this flag only for SiwX917 NCP board
+        #TODO: Remove when rsi_wlan_ext_stats gets implemented using Wisemcu SDK
+        defines += [ "SiWx917_WIFI" ]
       } else if (use_wf200) {
         defines += [
           "SL_HEAP_SIZE=24576",

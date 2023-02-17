@@ -22,15 +22,11 @@ WeakEnums:
     - LevelControlOptions
     - MoveMode
     - NetworkFaultEnum
-    - OnOffDelayedAllOffEffectVariant
-    - OnOffDyingLightEffectVariant
-    - OnOffEffectIdentifier
     - PHYRateEnum
     - RadioFaultEnum
     - RoutingRole
     - SaturationMoveMode
     - SaturationStepMode
-    - SecurityType
     - StepMode
     - TemperatureDisplayMode
 
@@ -68,3 +64,5 @@ ClustersWithPreAttributeChangeFunctions:
     - Mode Select
     - Fan Control
     - Thermostat
+
+ClustersWithShutdownFunctions: []

@@ -69,6 +69,7 @@ source_set("public_headers") {
   sources = [
     "CHIPCryptoPAL.h",
     "OperationalKeystore.h",
+    "SessionKeystore.h",
   ]
 
   public_deps = [
@@ -126,9 +127,7 @@ if (chip_crypto == "openssl") {
     ]
     public_deps = [ ":public_headers" ]
 
-    external_mbedtls = current_os == "zephyr"
-
-    if (!external_mbedtls) {
+    if (!chip_external_mbedtls) {
       public_deps += [ "${mbedtls_root}:mbedtls" ]
     }
   }
@@ -139,11 +138,24 @@ static_library("crypto") {
 
   sources = [
     "CHIPCryptoPAL.cpp",
+    "DefaultSessionKeystore.h",
     "PersistentStorageOperationalKeystore.cpp",
     "PersistentStorageOperationalKeystore.h",
     "RandUtils.cpp",
     "RandUtils.h",
   ]
+
+  if (chip_crypto == "psa") {
+    sources += [
+      "PSASessionKeystore.cpp",
+      "PSASessionKeystore.h",
+    ]
+  } else {
+    sources += [
+      "RawKeySessionKeystore.cpp",
+      "RawKeySessionKeystore.h",
+    ]
+  }
 
   public_configs = []
 

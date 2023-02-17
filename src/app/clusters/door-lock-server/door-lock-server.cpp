@@ -436,82 +436,58 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfPluginDoorLockUserInfo user;
-    VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user), err = CHIP_ERROR_INTERNAL);
+    if (!emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user))
     {
-        chip::app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::GetUserResponse::Id };
-        chip::TLV::TLVWriter * writer;
-        SuccessOrExit(err = commandObj->PrepareCommand(path));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(
-            err = writer->Put(chip::TLV::ContextTag(to_underlying(Commands::GetUserResponse::Fields::kUserIndex)), userIndex));
-
-        using ResponseFields = Commands::GetUserResponse::Fields;
-
-        // appclusters, 5.2.4.36: we should not add user-specific field if the user status is set to Available
-        if (UserStatusEnum::kAvailable != user.userStatus)
-        {
-            emberAfDoorLockClusterPrintln("Found user in storage: "
-                                          "[userIndex=%d,userName=\"%.*s\",userStatus=%u,userType=%u"
-                                          ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                                          userIndex, static_cast<int>(user.userName.size()), user.userName.data(),
-                                          to_underlying(user.userStatus), to_underlying(user.userType),
-                                          to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
-
-            SuccessOrExit(err = writer->PutString(TLV::ContextTag(to_underlying(ResponseFields::kUserName)), user.userName));
-            if (0xFFFFFFFFU != user.userUniqueId)
-            {
-                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserUniqueID)), user.userUniqueId));
-            }
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserStatus)), user.userStatus));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserType)), user.userType));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialRule)), user.credentialRule));
-            if (!user.credentials.empty())
-            {
-                TLV::TLVType credentialsContainer;
-                SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(to_underlying(ResponseFields::kCredentials)),
-                                                           TLV::kTLVType_Array, credentialsContainer));
-                for (size_t i = 0; i < user.credentials.size(); ++i)
-                {
-                    SuccessOrExit(err = user.credentials.data()[i].Encode(*writer, TLV::AnonymousTag()));
-                }
-                SuccessOrExit(err = writer->EndContainer(credentialsContainer));
-            }
-            // Append fabric IDs only if the user was created/modified by matter
-            if (user.creationSource == DlAssetSource::kMatterIM)
-            {
-                SuccessOrExit(err =
-                                  writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCreatorFabricIndex)), user.createdBy));
-            }
-            if (user.modificationSource == DlAssetSource::kMatterIM)
-            {
-                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kLastModifiedFabricIndex)),
-                                                user.lastModifiedBy));
-            }
-        }
-        else
-        {
-            emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
-        }
-
-        // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
-        uint16_t nextAvailableUserIndex = 0;
-        if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
-        {
-            SuccessOrExit(err =
-                              writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextUserIndex)), nextAvailableUserIndex));
-        }
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-
-exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(Zcl, "[GetUser] Command processing failed [endpointId=%d,userIndex=%d,err=\"%s\"]", commandPath.mEndpointId,
-                     userIndex, err.AsString());
+        emberAfDoorLockClusterPrintln("[GetUser] Could not get user info [userIndex=%d]", userIndex);
         commandObj->AddStatus(commandPath, Status::Failure);
+        return;
     }
+
+    Commands::GetUserResponse::Type response;
+    response.userIndex = userIndex;
+
+    // appclusters, 5.2.4.36: we should not set user-specific fields to non-null if the user status is set to Available
+    if (UserStatusEnum::kAvailable != user.userStatus)
+    {
+        emberAfDoorLockClusterPrintln("Found user in storage: "
+                                      "[userIndex=%d,userName=\"%.*s\",userStatus=%u,userType=%u"
+                                      ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
+                                      userIndex, static_cast<int>(user.userName.size()), user.userName.data(),
+                                      to_underlying(user.userStatus), to_underlying(user.userType),
+                                      to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
+
+        response.userName.SetNonNull(user.userName);
+        if (0xFFFFFFFFU != user.userUniqueId)
+        {
+            response.userUniqueID.SetNonNull(user.userUniqueId);
+        }
+        response.userStatus.SetNonNull(user.userStatus);
+        response.userType.SetNonNull(user.userType);
+        response.credentialRule.SetNonNull(user.credentialRule);
+        response.credentials.SetNonNull(user.credentials);
+        // Set fabric indices only if the user was created/modified by matter.
+        if (user.creationSource == DlAssetSource::kMatterIM)
+        {
+            response.creatorFabricIndex.SetNonNull(user.createdBy);
+        }
+        if (user.modificationSource == DlAssetSource::kMatterIM)
+        {
+            response.lastModifiedFabricIndex.SetNonNull(user.lastModifiedBy);
+        }
+    }
+    else
+    {
+        emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
+    }
+
+    // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
+    uint16_t nextAvailableUserIndex = 0;
+    if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
+    {
+        response.nextUserIndex.SetNonNull(nextAvailableUserIndex);
+    }
+    commandObj->AddResponse(commandPath, response);
 }
 
 void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * commandObj,

@@ -817,7 +817,7 @@ constexpr size_t GroupDataProviderImpl::kIteratorsMax;
 
 CHIP_ERROR GroupDataProviderImpl::Init()
 {
-    if (mStorage == nullptr)
+    if (mStorage == nullptr || mSessionKeystore == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -1747,9 +1747,7 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
             Crypto::GroupOperationalCredentials * creds = keyset.GetCurrentGroupCredentials();
             if (nullptr != creds)
             {
-                return mGroupKeyContexPool.CreateObject(
-                    *this, ByteSpan(creds->encryption_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES), creds->hash,
-                    ByteSpan(creds->privacy_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
+                return mGroupKeyContexPool.CreateObject(*this, creds->encryption_key, creds->hash, creds->privacy_key);
             }
         }
     }
@@ -1789,8 +1787,7 @@ CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet 
 
 void GroupDataProviderImpl::GroupKeyContext::Release()
 {
-    memset(mEncryptionKey, 0, sizeof(mEncryptionKey));
-    memset(mPrivacyKey, 0, sizeof(mPrivacyKey));
+    ReleaseKeys();
     mProvider.mGroupKeyContexPool.ReleaseObject(this);
 }
 
@@ -1799,8 +1796,8 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::MessageEncrypt(const ByteSpan
                                                                   MutableByteSpan & ciphertext) const
 {
     uint8_t * output = ciphertext.data();
-    return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mEncryptionKey,
-                                   Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output, mic.data(), mic.size());
+    return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mEncryptionKey, nonce.data(),
+                                   nonce.size(), output, mic.data(), mic.size());
 }
 
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::MessageDecrypt(const ByteSpan & ciphertext, const ByteSpan & aad,
@@ -1809,21 +1806,19 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::MessageDecrypt(const ByteSpan
 {
     uint8_t * output = plaintext.data();
     return Crypto::AES_CCM_decrypt(ciphertext.data(), ciphertext.size(), aad.data(), aad.size(), mic.data(), mic.size(),
-                                   mEncryptionKey, Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output);
+                                   mEncryptionKey, nonce.data(), nonce.size(), output);
 }
 
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
-    return Crypto::AES_CTR_crypt(input.data(), input.size(), mPrivacyKey, Crypto::kAES_CCM128_Key_Length, nonce.data(),
-                                 nonce.size(), output.data());
+    return Crypto::AES_CTR_crypt(input.data(), input.size(), mPrivacyKey, nonce.data(), nonce.size(), output.data());
 }
 
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
-    return Crypto::AES_CTR_crypt(input.data(), input.size(), mPrivacyKey, Crypto::kAES_CCM128_Key_Length, nonce.data(),
-                                 nonce.size(), output.data());
+    return Crypto::AES_CTR_crypt(input.data(), input.size(), mPrivacyKey, nonce.data(), nonce.size(), output.data());
 }
 
 GroupDataProviderImpl::GroupSessionIterator * GroupDataProviderImpl::IterateGroupSessions(uint16_t session_id)
@@ -1928,8 +1923,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         Crypto::GroupOperationalCredentials & creds = keyset.operational_keys[mKeyIndex++];
         if (creds.hash == mSessionId)
         {
-            mGroupKeyContext.SetKey(ByteSpan(creds.encryption_key, sizeof(creds.encryption_key)), mSessionId);
-            mGroupKeyContext.SetPrivacyKey(ByteSpan(creds.privacy_key, sizeof(creds.privacy_key)));
+            mGroupKeyContext.Initialize(creds.encryption_key, mSessionId, creds.privacy_key);
             output.fabric_index    = fabric.fabric_index;
             output.group_id        = mapping.group_id;
             output.security_policy = keyset.policy;
@@ -1943,6 +1937,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
 
 void GroupDataProviderImpl::GroupSessionIteratorImpl::Release()
 {
+    mGroupKeyContext.ReleaseKeys();
     mProvider.mGroupSessionsIterator.ReleaseObject(this);
 }
 

@@ -344,22 +344,6 @@ typedef struct
     uint16_t endpointSize;
 } EmberAfEndpointType;
 
-#ifdef EZSP_HOST
-typedef EzspDecisionId EmberAfTcLinkKeyRequestPolicy;
-typedef EzspDecisionId EmberAfAppLinkKeyRequestPolicy;
-#define EMBER_AF_ALLOW_TC_KEY_REQUESTS EZSP_ALLOW_TC_KEY_REQUESTS_AND_SEND_CURRENT_KEY
-#define EMBER_AF_DENY_TC_KEY_REQUESTS EZSP_DENY_TC_KEY_REQUESTS
-#define EMBER_AF_ALLOW_APP_KEY_REQUESTS EZSP_ALLOW_APP_KEY_REQUESTS
-#define EMBER_AF_DENY_APP_KEY_REQUESTS EZSP_DENY_APP_KEY_REQUESTS
-#else
-typedef EmberTcLinkKeyRequestPolicy EmberAfTcLinkKeyRequestPolicy;
-typedef EmberAppLinkKeyRequestPolicy EmberAfAppLinkKeyRequestPolicy;
-#define EMBER_AF_ALLOW_TC_KEY_REQUESTS EMBER_ALLOW_TC_LINK_KEY_REQUEST_AND_SEND_CURRENT_KEY
-#define EMBER_AF_DENY_TC_KEY_REQUESTS EMBER_DENY_TC_LINK_KEY_REQUESTS
-#define EMBER_AF_ALLOW_APP_KEY_REQUESTS EMBER_ALLOW_APP_LINK_KEY_REQUEST
-#define EMBER_AF_DENY_APP_KEY_REQUESTS EMBER_DENY_APP_LINK_KEY_REQUESTS
-#endif
-
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum EmberAfEndpointBitmask;
 #else
@@ -406,62 +390,6 @@ struct EmberAfDefinedEndpoint
 };
 
 // Cluster specific types
-
-/**
- * @brief Bitmask data type for storing one bit of information for each ESI in
- * the ESI table.
- */
-#if (EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE <= 8)
-typedef uint8_t EmberAfPluginEsiManagementBitmask;
-#elif (EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE <= 16)
-typedef uint16_t EmberAfPluginEsiManagementBitmask;
-#elif (EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE <= 32)
-typedef uint32_t EmberAfPluginEsiManagementBitmask;
-#else
-#error "EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE cannot exceed 32"
-#endif
-
-/**
- * @brief Struct that describes a load control event.
- *
- * This is used in the load control event callback and
- * within the demand response load control cluster code.
- */
-typedef struct
-{
-    uint32_t eventId;
-#ifdef EMBER_AF_PLUGIN_DRLC_SERVER
-    EmberEUI64 source;
-    chip::EndpointId sourceEndpoint;
-#endif // EMBER_AF_PLUGIN_DRLC_SERVER
-
-#ifdef EMBER_AF_PLUGIN_DRLC
-    EmberAfPluginEsiManagementBitmask esiBitmask;
-#endif // EMBER_AF_PLUGIN_DRLC
-
-    chip::EndpointId destinationEndpoint;
-    uint16_t deviceClass;
-    uint8_t utilityEnrollmentGroup;
-    /**
-     * Start time in seconds
-     */
-    uint32_t startTime;
-    /**
-     * Duration in minutes
-     */
-    uint16_t duration;
-    uint8_t criticalityLevel;
-    uint8_t coolingTempOffset;
-    uint8_t heatingTempOffset;
-    int16_t coolingTempSetPoint;
-    int16_t heatingTempSetPoint;
-    int8_t avgLoadPercentage;
-    uint8_t dutyCycle;
-    uint8_t eventControl;
-    uint32_t startRand;
-    uint32_t durationRand;
-    uint8_t optionControl;
-} EmberAfLoadControlEvent;
 
 /**
  * @brief This is an enum used to indicate the result of the
@@ -727,119 +655,6 @@ typedef void (*EmberAfEndpointEventHandler)(chip::EndpointId endpoint);
  * @brief The scene identifier for the global scene.
  */
 #define ZCL_SCENES_GLOBAL_SCENE_SCENE_ID 0x00
-/**
- * @brief A structure used to store scene table entries in RAM or in storage,
- * depending on a plugin setting.  If endpoint field is
- * ::EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID, the entry is unused.
- */
-typedef struct
-{
-    chip::EndpointId endpoint; // 0x00 when this record is not in use
-    chip::GroupId groupId;     // 0x0000 if not associated with a group
-    uint8_t sceneId;
-#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
-    uint8_t name[ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH + 1];
-#endif
-    uint16_t transitionTime;     // in seconds
-    uint8_t transitionTime100ms; // in tenths of a seconds
-#ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
-    bool hasOnOffValue;
-    bool onOffValue;
-#endif
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-    bool hasCurrentLevelValue;
-    chip::app::DataModel::Nullable<uint8_t> currentLevelValue;
-#endif
-#ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-    bool hasOccupiedCoolingSetpointValue;
-    int16_t occupiedCoolingSetpointValue;
-    bool hasOccupiedHeatingSetpointValue;
-    int16_t occupiedHeatingSetpointValue;
-    bool hasSystemModeValue;
-    uint8_t systemModeValue;
-#endif
-#ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-    bool hasCurrentXValue;
-    uint16_t currentXValue;
-    bool hasCurrentYValue;
-    uint16_t currentYValue;
-    bool hasEnhancedCurrentHueValue;
-    uint16_t enhancedCurrentHueValue;
-    bool hasCurrentSaturationValue;
-    uint8_t currentSaturationValue;
-    bool hasColorLoopActiveValue;
-    uint8_t colorLoopActiveValue;
-    bool hasColorLoopDirectionValue;
-    uint8_t colorLoopDirectionValue;
-    bool hasColorLoopTimeValue;
-    uint16_t colorLoopTimeValue;
-    bool hasColorTemperatureMiredsValue;
-    uint16_t colorTemperatureMiredsValue;
-#endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-#ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-    bool hasLockStateValue;
-    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> lockStateValue;
-#endif
-#ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-    bool hasCurrentPositionLiftPercentageValue;
-    chip::app::DataModel::Nullable<chip::Percent> currentPositionLiftPercentageValue;
-    bool hasCurrentPositionTiltPercentageValue;
-    chip::app::DataModel::Nullable<chip::Percent> currentPositionTiltPercentageValue;
-    bool hasTargetPositionLiftPercent100thsValue;
-    chip::app::DataModel::Nullable<chip::Percent100ths> targetPositionLiftPercent100thsValue;
-    bool hasTargetPositionTiltPercent100thsValue;
-    chip::app::DataModel::Nullable<chip::Percent100ths> targetPositionTiltPercent100thsValue;
-#endif
-} EmberAfSceneTableEntry;
-
-#if !defined(EMBER_AF_PLUGIN_MESSAGING_CLIENT)
-// In order to be able to forward declare callbacks regardless of whether the plugin
-// is enabled, we need to define all data structures.  In order to be able to define
-// the messaging client data struct, we need to declare this variable.
-#define EMBER_AF_PLUGIN_MESSAGING_CLIENT_MESSAGE_SIZE 0
-#endif
-
-typedef struct
-{
-    bool valid;
-    bool active;
-    EmberAfPluginEsiManagementBitmask esiBitmask;
-    chip::EndpointId clientEndpoint;
-    uint32_t messageId;
-    uint8_t messageControl;
-    uint32_t startTime;
-    uint32_t endTime;
-    uint16_t durationInMinutes;
-    uint8_t message[EMBER_AF_PLUGIN_MESSAGING_CLIENT_MESSAGE_SIZE + 1];
-} EmberAfPluginMessagingClientMessage;
-
-#define ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH 11
-typedef struct
-{
-    bool valid;
-    bool active;
-    chip::EndpointId clientEndpoint;
-    uint32_t providerId;
-    uint8_t rateLabel[ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1];
-    uint32_t issuerEventId;
-    uint32_t currentTime;
-    uint8_t unitOfMeasure;
-    uint16_t currency;
-    uint8_t priceTrailingDigitAndPriceTier;
-    uint8_t numberOfPriceTiersAndRegisterTier;
-    uint32_t startTime;
-    uint32_t endTime;
-    uint16_t durationInMinutes;
-    uint32_t price;
-    uint8_t priceRatio;
-    uint32_t generationPrice;
-    uint8_t generationPriceRatio;
-    uint32_t alternateCostDelivered;
-    uint8_t alternateCostUnit;
-    uint8_t alternateCostTrailingDigit;
-    uint8_t numberOfBlockThresholds;
-    uint8_t priceControl;
-} EmberAfPluginPriceClientPrice;
 
 /**
  * @brief Specifies CPP Authorization values
@@ -1142,37 +957,6 @@ typedef struct
     uint16_t messageLength;
     bool broadcast;
 } EmberAfMessageStruct;
-
-/**
- * @brief A data struct for a link key backup.
- *
- * Each entry notes the EUI64 of the device it is paired to and the key data.
- *   This key may be hashed and not the actual link key currently in use.
- */
-
-typedef struct
-{
-    EmberEUI64 deviceId;
-    EmberKeyData key;
-} EmberAfLinkKeyBackupData;
-
-/**
- * @brief A data struct for all the trust center backup data.
- *
- * The 'keyList' pointer must point to an array and 'maxKeyListLength'
- * must be populated with the maximum number of entries the array can hold.
- *
- * Functions that modify this data structure will populate 'keyListLength'
- * indicating how many keys were actually written into 'keyList'.
- */
-
-typedef struct
-{
-    EmberEUI64 extendedPanId;
-    uint8_t keyListLength;
-    uint8_t maxKeyListLength;
-    EmberAfLinkKeyBackupData * keyList;
-} EmberAfTrustCenterBackupData;
 
 /**
  * @brief The length of the hardware tag in the Ember Bootloader Query

@@ -183,27 +183,6 @@ enum EmberAfNetworkFaultEnum : uint8_t
     EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED = 3,
 };
 
-// Enum for OnOffDelayedAllOffEffectVariant
-enum EmberAfOnOffDelayedAllOffEffectVariant : uint8_t
-{
-    EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS                                        = 0,
-    EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE                                                           = 1,
-    EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS = 2,
-};
-
-// Enum for OnOffDyingLightEffectVariant
-enum EmberAfOnOffDyingLightEffectVariant : uint8_t
-{
-    EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND = 0,
-};
-
-// Enum for OnOffEffectIdentifier
-enum EmberAfOnOffEffectIdentifier : uint8_t
-{
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF = 0,
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT     = 1,
-};
-
 // Enum for PHYRateEnum
 enum EmberAfPHYRateEnum : uint8_t
 {
@@ -256,17 +235,6 @@ enum EmberAfSaturationStepMode : uint8_t
 {
     EMBER_ZCL_SATURATION_STEP_MODE_UP   = 1,
     EMBER_ZCL_SATURATION_STEP_MODE_DOWN = 3,
-};
-
-// Enum for SecurityType
-enum EmberAfSecurityType : uint8_t
-{
-    EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED = 0,
-    EMBER_ZCL_SECURITY_TYPE_NONE        = 1,
-    EMBER_ZCL_SECURITY_TYPE_WEP         = 2,
-    EMBER_ZCL_SECURITY_TYPE_WPA         = 3,
-    EMBER_ZCL_SECURITY_TYPE_WPA2        = 4,
-    EMBER_ZCL_SECURITY_TYPE_WPA3        = 5,
 };
 
 // Enum for StepMode

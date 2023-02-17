@@ -40,6 +40,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
@@ -59,6 +60,7 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
 static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
+static NSString * const kErrorSessionKeystoreInit = @"Init failure while initializing session keystore";
 
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory]; }
@@ -70,6 +72,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (readonly) MTRPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 @property (readonly) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
+@property (readonly) Crypto::RawKeySessionKeystore * sessionKeystore;
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
 // our group data provider impl.  We initialize this store correctly on every
 // controller startup, so don't need to actually persist it.
@@ -115,6 +118,11 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
 
+    _sessionKeystore = new chip::Crypto::RawKeySessionKeystore();
+    if ([self checkForInitError:(_sessionKeystore != nullptr) logMsg:kErrorSessionKeystoreInit]) {
+        return nil;
+    }
+
     _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
     if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
         return nil;
@@ -127,6 +135,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 
     _groupDataProvider->SetStorageDelegate(_groupStorageDelegate);
+    _groupDataProvider->SetSessionKeystore(_sessionKeystore);
     CHIP_ERROR errorCode = _groupDataProvider->Init();
     if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGroupProviderInit]) {
         return nil;
@@ -185,6 +194,11 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     if (_groupStorageDelegate) {
         delete _groupStorageDelegate;
         _groupStorageDelegate = nullptr;
+    }
+
+    if (_sessionKeystore) {
+        delete _sessionKeystore;
+        _sessionKeystore = nullptr;
     }
 }
 
@@ -375,6 +389,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         }
 
         params.groupDataProvider = _groupDataProvider;
+        params.sessionKeystore = _sessionKeystore;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         params.operationalKeystore = _keystore;
         params.opCertStore = _opCertStore;

@@ -22,6 +22,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <app/util/util.h>
 
@@ -353,10 +354,10 @@ bool OnOffServer::toggleCommand(app::CommandHandler * commandObj, const app::Con
 bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::OffWithEffect::DecodableType & commandData)
 {
-    OnOffEffectIdentifier effectId = commandData.effectIdentifier;
-    uint8_t effectVariant          = commandData.effectVariant;
-    chip::EndpointId endpoint      = commandPath.mEndpointId;
-    Status status                  = Status::Success;
+    auto effectId             = commandData.effectIdentifier;
+    auto effectVariant        = commandData.effectVariant;
+    chip::EndpointId endpoint = commandPath.mEndpointId;
+    Status status             = Status::Success;
 
     if (SupportsLightingApplications(endpoint))
     {
@@ -393,7 +394,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
             if (effect != nullptr && effect->mOffWithEffectTrigger != nullptr)
             {
                 effect->mEffectIdentifier = effectId;
-                effect->mEffectVariant    = effectVariant;
+                effect->mEffectVariant    = to_underlying(effectVariant);
 
                 effect->mOffWithEffectTrigger(effect);
             }

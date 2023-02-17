@@ -33,6 +33,7 @@
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <app/util/config.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>

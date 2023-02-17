@@ -58,7 +58,7 @@ public:
 
 #if SL_WIFI
     CHIP_ERROR GetWiFiBssId(ByteSpan & BssId) override;
-    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType) override;
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
     CHIP_ERROR GetWiFiVersion(uint8_t & wifiVersion) override;
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
