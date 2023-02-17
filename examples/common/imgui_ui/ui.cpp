@@ -154,6 +154,10 @@ void ImguiUi::RunMainLoop()
     // exit (generally by clicking the window close icon).
     EventLoop(this);
 
+    // ensure shutdown events are generated (generally basic cluster
+    // will send a shutdown event to subscribers)
+    Server::GetInstance().GenerateShutDownEvent();
+
     // Stop the chip main loop as well. This is expected to
     // wait for the task to finish.
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
