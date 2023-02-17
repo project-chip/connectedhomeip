@@ -35,7 +35,7 @@ tests:
 
           ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -c
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -44,14 +44,15 @@ tests:
 
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable.
-          Set ImageURI to the location where the image is located."
+          QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable'. Set ImageURI to the location where the image is
+          located."
       verification: |
           "Run the OTA Provider App using the command:
 
           ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q updateAvailable
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -63,8 +64,9 @@ tests:
 
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable.
-          Set ImageURI with the https url of the software image."
+          QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable'. Set ImageURI with the https url of the software
+          image."
       PICS: MCORE.OTA.HTTPS
       verification: |
           Out of scope for V1.0
@@ -77,7 +79,7 @@ tests:
           the value as Idle. Initiate another QueryImage Command from DUT to the
           TH/OTA-P."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -117,7 +119,7 @@ tests:
 
 
           Relaunch the OTA Provider App and initiate another query
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           Verify that the DUT starts a new transfer of software image when sending another QueryImage request i.e. Start Offset field in ReceiveInit message received on OTA Provider side is 0
 

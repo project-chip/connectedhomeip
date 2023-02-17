@@ -64,46 +64,46 @@ tests:
     - label: "TH_CR1 sends command to TH_CE to read the list of Fabrics"
       PICS: OPCREDS.C.A0001
       verification: |
-          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.
 
           On TH_CR1 send the below command
 
           ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
+          [1676355303.608991][997145:997145] CHIP:IM: Received Read request
+          [1676355303.609044][997145:997145] CHIP:DMG: ReadRequestMessage =
+          [1676355303.609054][997145:997145] CHIP:DMG: {
+          [1676355303.609062][997145:997145] CHIP:DMG:         AttributePathIBs =
+          [1676355303.609072][997145:997145] CHIP:DMG:         [
+          [1676355303.609080][997145:997145] CHIP:DMG:                 AttributePathIB =
+          [1676355303.609090][997145:997145] CHIP:DMG:                 {
+          [1676355303.609129][997145:997145] CHIP:DMG:                         Endpoint = 0x0,
+          [1676355303.609141][997145:997145] CHIP:DMG:                         Cluster = 0x3e,
+          [1676355303.609150][997145:997145] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1676355303.609158][997145:997145] CHIP:DMG:                 }
+          [1676355303.609168][997145:997145] CHIP:DMG:
+          [1676355303.609175][997145:997145] CHIP:DMG:         ],
+          [1676355303.609186][997145:997145] CHIP:DMG:
+          [1676355303.609196][997145:997145] CHIP:DMG:         isFabricFiltered = false,
+          [1676355303.609206][997145:997145] CHIP:DMG:         InteractionModelRevision = 1
+          [1676355303.609214][997145:997145] CHIP:DMG: },
+          [1676355303.609271][997145:997145] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1676355303.609309][997145:997145] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-          Verify TH_CE reports 1 entry in fabrics list
 
 
-          [1661486369.837260][7071:7071] CHIP:DMG:                 AttributeReportIB =
-          [1661486369.837292][7071:7071] CHIP:DMG:                 {
-          [1661486369.837317][7071:7071] CHIP:DMG:                         AttributeDataIB =
-          [1661486369.837343][7071:7071] CHIP:DMG:                         {
-          [1661486369.837371][7071:7071] CHIP:DMG:                                 DataVersion = 0x8d915768,
-          [1661486369.837398][7071:7071] CHIP:DMG:                                 AttributePathIB =
-          [1661486369.837426][7071:7071] CHIP:DMG:                                 {
-          [1661486369.837455][7071:7071] CHIP:DMG:                                         Endpoint = 0x0,
-          [1661486369.837485][7071:7071] CHIP:DMG:                                         Cluster = 0x3e,
-          [1661486369.837515][7071:7071] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1661486369.837544][7071:7071] CHIP:DMG:                                         ListIndex = Null,
-          [1661486369.837572][7071:7071] CHIP:DMG:                                 }
-          [1661486369.837601][7071:7071] CHIP:DMG:
-          [1661486369.837629][7071:7071] CHIP:DMG:                                 Data =
-          [1661486369.837656][7071:7071] CHIP:DMG:                                 {
-          [1661486369.837685][7071:7071] CHIP:DMG:                                         0x1 = [
-          [1661486369.837731][7071:7071] CHIP:DMG:                                                         0x4, 0xb5, 0xc1, 0xfd, 0xdd, 0x6a, 0xdd, 0xc3, 0xa1, 0x3d, 0xee, 0x39, 0xa2, 0xe, 0x66, 0x7, 0xa2, 0x3a, 0x6d, 0x4a, 0x86, 0x57, 0x36, 0xf7, 0x1f, 0x20, 0x7c, 0x9d, 0xe8, 0x8, 0xa, 0xd5, 0xf2, 0x9c, 0x9d, 0x1b, 0x14, 0x5f, 0xbc, 0x60, 0xb9, 0xe7, 0xee, 0xb3, 0x4c, 0x2, 0xf4, 0x7b, 0x21, 0xdb, 0x74, 0x4e, 0xb1, 0x65, 0x22, 0xd3, 0xe0, 0x32, 0xbd, 0xbe, 0xde, 0x43, 0xfe, 0x26, 0xd6,
-          [1661486369.837769][7071:7071] CHIP:DMG:                                         ] (65 bytes)
-          [1661486369.837799][7071:7071] CHIP:DMG:                                         0x2 = 65521,
-          [1661486369.837830][7071:7071] CHIP:DMG:                                         0x3 = 1,
-          [1661486369.837861][7071:7071] CHIP:DMG:                                         0x4 = 1,
-          [1661486369.837893][7071:7071] CHIP:DMG:                                         0x5 = "" (0 chars),
-          [1661486369.837923][7071:7071] CHIP:DMG:                                         0xfe = 1,
-          [1661486369.837953][7071:7071] CHIP:DMG:                                 },
-          [1661486369.837979][7071:7071] CHIP:DMG:                         },
-          [1661486369.838010][7071:7071] CHIP:DMG:
-          [1661486369.838034][7071:7071] CHIP:DMG:                 },
-          [1661486369.838064][7071:7071] CHIP:DMG:
-          [1661486369.838084][7071:7071] CHIP:DMG:         ],
-          [1661486369.838116][7071:7071] CHIP:DMG:
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent  1 entry in the Fabrics list attribute reports and that this entry matches the first commissioning’s information.
+          [1676355303.610452][997160:997162] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 784275529
+          [1676355303.610499][997160:997162] CHIP:TOO:   Fabrics: 1 entries
+          [1676355303.610525][997160:997162] CHIP:TOO:     [1]: {
+          [1676355303.610538][997160:997162] CHIP:TOO:       RootPublicKey: 04E8581EC896E1F4C0C460F03B20B5F785669CEA9C950487F564F8AFEDD6414F92B47F7B3EF810454DFC8D912C77A8F477378207908941C5E1225609DF4E7751C7
+          [1676355303.610557][997160:997162] CHIP:TOO:       VendorID: 65521
+          [1676355303.610563][997160:997162] CHIP:TOO:       FabricID: 1
+          [1676355303.610569][997160:997162] CHIP:TOO:       NodeID: 1
+          [1676355303.610576][997160:997162] CHIP:TOO:       Label:
+          [1676355303.610582][997160:997162] CHIP:TOO:       FabricIndex: 1
+          [1676355303.610588][997160:997162] CHIP:TOO:      }
+          [1676355303.610660][997160:997162] CHIP:EM: <<< [E:41653i S:27265 M:61334885 (Ack:214003320)] (S) Msg TX to 1:0000000000000001 [6193] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label: "DUT_CR2 starts a commissioning process with TH_CE"
@@ -128,7 +128,10 @@ tests:
 
           On TH_CR1 send the below command
 
-          avahi-browse -rt _matter._tcp
+          ubuntu@ubuntu:~/may10_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+
+
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app is now discoverable over DNS-SD with two SRV Records commissioning’s information.
 
           +   eth0 IPv6 E0AF53B23E580769-0000000000000002             _matter._tcp         local
           +   eth0 IPv6 7FF84D214A19B581-0000000000000001             _matter._tcp         local
@@ -153,7 +156,7 @@ tests:
 
           On DUT_CR2 send the below command
 
-          ./chip-tool  basicinformation write  node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool basicinformation write  node-label te5new 2 0 --commissioner-name beta
 
           On TH2(all-clusters-app) Log
 
@@ -175,7 +178,7 @@ tests:
           [1660894021.902302][2871:2871] CHIP:DMG:                                 Endpoint = 0x0,
 
 
-          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
+          ./chip-tool basicinformation read node-label 2 0 --commissioner-name beta
 
           Verify read request on TH_CE(all-clusters-app) Log
 
@@ -202,66 +205,48 @@ tests:
           On DUT_CR2 send the below command
 
           ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0 --commissioner-name beta
+           [1676359089.319707][999199:999199] CHIP:IM: Received Read request
+          [1676359089.319728][999199:999199] CHIP:DMG: ReadRequestMessage =
+          [1676359089.319731][999199:999199] CHIP:DMG: {
+          [1676359089.319734][999199:999199] CHIP:DMG:         AttributePathIBs =
+          [1676359089.319737][999199:999199] CHIP:DMG:         [
+          [1676359089.319739][999199:999199] CHIP:DMG:                 AttributePathIB =
+          [1676359089.319743][999199:999199] CHIP:DMG:                 {
+          [1676359089.319745][999199:999199] CHIP:DMG:                         Endpoint = 0x0,
+          [1676359089.319748][999199:999199] CHIP:DMG:                         Cluster = 0x3e,
+          [1676359089.319752][999199:999199] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1676359089.319754][999199:999199] CHIP:DMG:                 }
+          [1676359089.319757][999199:999199] CHIP:DMG:
+          [1676359089.319759][999199:999199] CHIP:DMG:         ],
+          [1676359089.319763][999199:999199] CHIP:DMG:
+          [1676359089.319765][999199:999199] CHIP:DMG:         isFabricFiltered = false,
+          [1676359089.319768][999199:999199] CHIP:DMG:         InteractionModelRevision = 1
+          [1676359089.319770][999199:999199] CHIP:DMG: },
+          [1676359089.319787][999199:999199] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1676359089.319799][999199:999199] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-          Verify 2 entries in TH_CE log
 
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent  1 entry in the Fabrics list attribute reports andand that these entries match the commissioning state to date.
 
-          [1661481567.477399][6453:6453] CHIP:DMG:                 AttributeReportIB =
-          [1661481567.477428][6453:6453] CHIP:DMG:                 {
-          [1661481567.477450][6453:6453] CHIP:DMG:                         AttributeDataIB =
-          [1661481567.477475][6453:6453] CHIP:DMG:                         {
-          [1661481567.477503][6453:6453] CHIP:DMG:                                 DataVersion = 0x482f8cf0,
-          [1661481567.477530][6453:6453] CHIP:DMG:                                 AttributePathIB =
-          [1661481567.477558][6453:6453] CHIP:DMG:                                 {
-          [1661481567.477586][6453:6453] CHIP:DMG:                                         Endpoint = 0x0,
-          [1661481567.477616][6453:6453] CHIP:DMG:                                         Cluster = 0x3e,
-          [1661481567.477649][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1661481567.477678][6453:6453] CHIP:DMG:                                         ListIndex = Null,
-          [1661481567.477706][6453:6453] CHIP:DMG:                                 }
-          [1661481567.477735][6453:6453] CHIP:DMG:
-          [1661481567.477762][6453:6453] CHIP:DMG:                                 Data =
-          [1661481567.477791][6453:6453] CHIP:DMG:                                 {
-          [1661481567.477823][6453:6453] CHIP:DMG:                                         0x1 = [
-          [1661481567.477871][6453:6453] CHIP:DMG:                                                         0x4, 0xb5, 0xc1, 0xfd, 0xdd, 0x6a, 0xdd, 0xc3, 0xa1, 0x3d, 0xee, 0x39, 0xa2, 0xe, 0x66, 0x7, 0xa2, 0x3a, 0x6d, 0x4a, 0x86, 0x57, 0x36, 0xf7, 0x1f, 0x20, 0x7c, 0x9d, 0xe8, 0x8, 0xa, 0xd5, 0xf2, 0x9c, 0x9d, 0x1b, 0x14, 0x5f, 0xbc, 0x60, 0xb9, 0xe7, 0xee, 0xb3, 0x4c, 0x2, 0xf4, 0x7b, 0x21, 0xdb, 0x74, 0x4e, 0xb1, 0x65, 0x22, 0xd3, 0xe0, 0x32, 0xbd, 0xbe, 0xde, 0x43, 0xfe, 0x26, 0xd6,
-          [1661481567.477909][6453:6453] CHIP:DMG:                                         ] (65 bytes)
-          [1661481567.477942][6453:6453] CHIP:DMG:                                         0x2 = 65521,
-          [1661481567.477974][6453:6453] CHIP:DMG:                                         0x3 = 1,
-          [1661481567.478007][6453:6453] CHIP:DMG:                                         0x4 = 1,
-          [1661481567.478096][6453:6453] CHIP:DMG:                                         0x5 = "" (0 chars),
-          [1661481567.478129][6453:6453] CHIP:DMG:                                         0xfe = 1,
-          [1661481567.478160][6453:6453] CHIP:DMG:                                 },
-          [1661481567.478187][6453:6453] CHIP:DMG:                         },
-          [1661481567.478217][6453:6453] CHIP:DMG:
-          [1661481567.478241][6453:6453] CHIP:DMG:                 },
-          [1661481567.478278][6453:6453] CHIP:DMG:
-          [1661481567.478298][6453:6453] CHIP:DMG:                 AttributeReportIB =
-          [1661481567.478330][6453:6453] CHIP:DMG:                 {
-          [1661481567.478354][6453:6453] CHIP:DMG:                         AttributeDataIB =
-          [1661481567.478380][6453:6453] CHIP:DMG:                         {
-          [1661481567.478406][6453:6453] CHIP:DMG:                                 DataVersion = 0x482f8cf0,
-          [1661481567.478433][6453:6453] CHIP:DMG:                                 AttributePathIB =
-          [1661481567.478461][6453:6453] CHIP:DMG:                                 {
-          [1661481567.478489][6453:6453] CHIP:DMG:                                         Endpoint = 0x0,
-          [1661481567.478522][6453:6453] CHIP:DMG:                                         Cluster = 0x3e,
-          [1661481567.478554][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1661481567.478584][6453:6453] CHIP:DMG:                                         ListIndex = Null,
-          [1661481567.478612][6453:6453] CHIP:DMG:                                 }
-          [1661481567.478643][6453:6453] CHIP:DMG:
-          [1661481567.478672][6453:6453] CHIP:DMG:                                 Data =
-          [1661481567.478702][6453:6453] CHIP:DMG:                                 {
-          [1661481567.478732][6453:6453] CHIP:DMG:                                         0x1 = [
-          [1661481567.478777][6453:6453] CHIP:DMG:                                                         0x4, 0x7b, 0x5b, 0x9a, 0x2a, 0xd1, 0x4e, 0x1e, 0x8d, 0xf4, 0xca, 0xea, 0xde, 0x1c, 0xbe, 0xa7, 0xf6, 0xd4, 0xa1, 0xe8, 0xf0, 0x20, 0x9f, 0x6c, 0x38, 0x30, 0x31, 0x88, 0xb5, 0x89, 0x69, 0xd4, 0x7, 0x17, 0x16, 0x85, 0x25, 0x55, 0x8f, 0x5b, 0xed, 0x58, 0x68, 0x27, 0xde, 0x5e, 0xf6, 0xf9, 0xf8, 0x99, 0x54, 0x92, 0x8e, 0x33, 0xa6, 0xf4, 0xb0, 0x5a, 0xc1, 0xa6, 0x1a, 0xf5, 0x2, 0xb4, 0x4f,
-          [1661481567.478815][6453:6453] CHIP:DMG:                                         ] (65 bytes)
-          [1661481567.478848][6453:6453] CHIP:DMG:                                         0x2 = 65521,
-          [1661481567.478877][6453:6453] CHIP:DMG:                                         0x3 = 2,
-          [1661481567.478907][6453:6453] CHIP:DMG:                                         0x4 = 1,
-          [1661481567.478938][6453:6453] CHIP:DMG:                                         0x5 = "" (0 chars),
-          [1661481567.478968][6453:6453] CHIP:DMG:                                         0xfe = 2,
-          [1661481567.478999][6453:6453] CHIP:DMG:                                 },
-          [1661481567.479026][6453:6453] CHIP:DMG:                         },
-          [1661481567.479056][6453:6453] CHIP:DMG:
-          [1661481567.479079][6453:6453] CHIP:DMG:                 },
-          [1661481567.479107][6453:6453] CHIP:DMG:
+          [1676359089.320184][999284:999286] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 277955638
+          [1676359089.320212][999284:999286] CHIP:TOO:   Fabrics: 2 entries
+          [1676359089.320222][999284:999286] CHIP:TOO:     [1]: {
+          [1676359089.320226][999284:999286] CHIP:TOO:       RootPublicKey: 041A8688563FB58D7CBEC5FE07ACF350C5A8C7B5C2F21BC16C713D02845C6EB0017818F25A422762FA1E1F8563A6D9DF99C7A34B0DC9B8F04A669739EFE98EEBD1
+          [1676359089.320234][999284:999286] CHIP:TOO:       VendorID: 65521
+          [1676359089.320236][999284:999286] CHIP:TOO:       FabricID: 1
+          [1676359089.320238][999284:999286] CHIP:TOO:       NodeID: 1
+          [1676359089.320240][999284:999286] CHIP:TOO:       Label:
+          [1676359089.320243][999284:999286] CHIP:TOO:       FabricIndex: 1
+          [1676359089.320244][999284:999286] CHIP:TOO:      }
+          [1676359089.320248][999284:999286] CHIP:TOO:     [2]: {
+          [1676359089.320251][999284:999286] CHIP:TOO:       RootPublicKey: 048260812572CCEAE7F21DDA78D205ADF06E04F8240DAA7A97BD531BF6B5A9983BA53A446E126B6DAB72DC6AE3D2E85BC740770A90047B3A43CF6E8CF993D98A11
+          [1676359089.320253][999284:999286] CHIP:TOO:       VendorID: 65521
+          [1676359089.320255][999284:999286] CHIP:TOO:       FabricID: 2
+          [1676359089.320257][999284:999286] CHIP:TOO:       NodeID: 2
+          [1676359089.320258][999284:999286] CHIP:TOO:       Label:
+          [1676359089.320260][999284:999286] CHIP:TOO:       FabricIndex: 2
+          [1676359089.320262][999284:999286] CHIP:TOO:      }
+          [1676359089.320282][999284:999286] CHIP:EM: <<< [E:47443i S:6334 M:207103685 (Ack:267947381)] (S) Msg TX to 2:0000000000000002 [5F40] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label:
@@ -272,7 +257,7 @@ tests:
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
-          ./chip-tool  basicinformation write node-label te8 1 0
+          ./chip-tool basicinformation write node-label te8 1 0
 
           Verify the Write request On TH_CE(all-clusters-app) Log
 
@@ -288,7 +273,7 @@ tests:
           [1660894538.805196][2871:2871] CHIP:DMG:         [
 
 
-          ./chip-tool  basicinformation read node-label 1 0
+          ./chip-tool basicinformation read node-label 1 0
 
           Verify the Read request On TH_CE(all-clusters-app) Log
 
@@ -320,7 +305,7 @@ tests:
           On DUT_CR2 send the below command
 
 
-          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
+          ./chip-tool basicinformation read node-label 2 0 --commissioner-name beta
 
           Verify the Read request On TH_CE(all-clusters-app) Log
 
@@ -341,7 +326,7 @@ tests:
 
 
 
-          ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool basicinformation write node-label te5new 2 0 --commissioner-name beta
 
 
           Verify the Write request On TH_CE(all-clusters-app) Log
@@ -370,7 +355,7 @@ tests:
 
 
 
-          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
+          ./chip-tool basicinformation read node-label 2 0 --commissioner-name beta
 
           Verify the Read request On TH_CE(all-clusters-app) Log
 
@@ -436,17 +421,37 @@ tests:
           with TH_CE"
       PICS: CADMIN.C
       verification: |
-          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.
 
           On TH_CR3 send the below command
 
-          ./chip-tool pairing onnetwork 3 20202021 --commissioner-name gamma
+          ./chip-tool pairing code 3  20202021  --commissioner-name gamma
 
-          verify you got the following message in the TH_CR3(chip-tool) log
+          verify you got the following message in the TH_CR3(all-clusters-app) log
 
-          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
-          CHIP:TOO: Secure Pairing Failed
-          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
+
+
+
+          If the DUT has to provision to verify the logs,  Verify that either no _matterc._udp commissionable records exist matching the previously obtained discriminator, or that TH_CE refuses to allow a PASE with the provided passcode from the onboarding payload.
+
+          [1676356124.529686][997434:997434] CHIP:TS: Reverted Last Known Good Time to previous value
+          [1676356124.529707][997434:997434] CHIP:CTL: Shutting down the commissioner
+          [1676356124.529711][997434:997434] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1676356124.529728][997434:997434] CHIP:CTL: Shutting down the controller
+          [1676356124.529732][997434:997434] CHIP:CTL: Shutting down the System State, this will teardown the CHIP Stack
+          [1676356124.530546][997434:997434] CHIP:DMG: All ReadHandler-s are clean, clear GlobalDirtySet
+          [1676356124.530584][997434:997434] CHIP:BLE: BleConnectionDelegate::CancelConnection is not implemented.
+          [1676356124.530603][997434:997434] CHIP:FP: Shutting down FabricTable
+          [1676356124.530617][997434:997434] CHIP:TS: Pending Last Known Good Time: 2023-02-13T11:57:54
+          [1676356124.530729][997434:997434] CHIP:TS: Previous Last Known Good Time: 2023-02-13T11:57:54
+          [1676356124.530736][997434:997434] CHIP:TS: Reverted Last Known Good Time to previous value
+          [1676356124.530884][997434:997434] CHIP:DL: writing settings to file (/tmp/chip_counters.ini-G154Fy)
+          [1676356124.531158][997434:997434] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
+          [1676356124.531183][997434:997434] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
+          [1676356124.531192][997434:997434] CHIP:DL: Inet Layer shutdown
+          [1676356124.531199][997434:997434] CHIP:DL: BLE shutdown
+          [1676356124.531204][997434:997434] CHIP:DL: System Layer shutdown
+          [1676356124.531299][997434:997434] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:196: CHIP Error 0x00000003: Incorrect state
       disabled: true
 
     - label:
@@ -458,7 +463,7 @@ tests:
 
           On DUT_CR2 send the below command
 
-          ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool basicinformation write node-label te5new 2 0 --commissioner-name beta
 
           Verify the Write request On TH_CE(all-clusters-app) Log
 
@@ -473,7 +478,7 @@ tests:
 
           [1660902144.915374][3045:3045] CHIP:DMG:
 
-          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
+          ./chip-tool basicinformation read node-label 2 0 --commissioner-name beta
 
           Verify the Read request On TH_CE(all-clusters-app) Log
 
@@ -539,12 +544,28 @@ tests:
 
           On TH_CR1 send the below command
 
-          ./chip-tool pairing onnetwork 1 20202021
+           (considering 34995354639 as the manual code generated by DUT)
+          ./chip-tool pairing code 1 20202021
+          [1676358083.879096][997283:997283] CHIP:SVR: Failsafe timer expired
+          [1676358083.879098][997283:997283] CHIP:IN: SecureSession[0x563d5294d7b0]: MarkForEviction Type:1 LSID:55630
+          [1676358083.879100][997283:997283] CHIP:SC: SecureSession[0x563d5294d7b0]: Moving from state "kActive" --> "kPendingEviction"
+          [1676358083.879109][997283:997283] CHIP:IN: SecureSession[0x563d5294d7b0]: Released - Type:1 LSID:55630
+          [1676358083.879113][997283:997283] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:77: CHIP Error 0x00000032: Timeout
+          [1676358083.879123][997283:997283] CHIP:IN: SecureSession[0x563d5294d7b0]: Allocated Type:1 LSID:55631
+          [1676358083.879127][997283:997283] CHIP:SC: Assigned local session key ID 55631
+          [1676358083.879129][997283:997283] CHIP:SC: Waiting for PBKDF param request
+          [1676358083.879131][997283:997283] CHIP:DIS: Updating services using commissioning mode 2
+          [1676358083.879233][997283:997283] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1676358083.880559][997283:997283] CHIP:DL: Using wifi MAC for hostname
 
-          Verify the OperationalCert error 9 in TH_CE(all-clusters-app) Log
 
-          [1660902716.613196][3045:3045] CHIP:DMG: Command handler moving to [AddedComma]
-          [1660902716.613274][3045:3045] CHIP:ZCL: OpCreds: Failed AddNOC request (err=../../examples/all-clusters-app/linux/third_party/connectedhomeip/src/credentials/FabricTable.cpp:1692: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists) with OperationalCert error 9
-          [1660902716.613394][3045:3045] CHIP:DMG: Decreasing reference count for CommandHandler, remaining 0
-          [1660902716.613497][3045:3045] CHIP:EM: Piggybacking Ack for MessageCounter:176866087 on exchange: 56605r
+          If the DUT has to provision to verify the logs,  Verify the OperationalCert error 9 in TH_CE(all-clusters-app) Log
+          [1676358083.879250][998226:998228] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1676358083.879258][998226:998228] CHIP:CTL: Failsafe disarmed
+          [1676358083.879264][998226:998228] CHIP:CTL: Successfully finished commissioning step "Cleanup"
+          [1676358083.879274][998226:998228] CHIP:TOO: Device commissioning Failure: ../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1365: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
+          [1676358083.879284][998226:998228] CHIP:IN: SecureSession[0x7fe26000eec0]: MarkForEviction Type:1 LSID:21508
+          [1676358083.879287][998226:998228] CHIP:SC: SecureSession[0x7fe26000eec0]: Moving from state "kActive" --> "kPendingEviction"
+          [1676358083.879312][998226:998228] CHIP:EM: Failed to send Solitary ack for MessageCounter:80598822 on exchange 54053i:../../third_party/connectedhomeip/src/messaging/ExchangeContext.cpp:144: CHIP Error 0x00000002: Connection aborted
+          [1676358083.879325][998226:998228] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true

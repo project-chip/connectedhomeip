@@ -20,12 +20,12 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "User Label"
-    endpoint: 0
+    endpoint: 1
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "Read attribute: LabelList"
       PICS: ULABEL.C.A0000
