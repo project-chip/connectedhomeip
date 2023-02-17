@@ -25,6 +25,45 @@ from .pics_checker import PICSChecker
 from .yaml_loader import YamlLoader
 
 
+class UnknownPathQualifierError(TestStepError):
+    """Raise when an attribute/command/event name is not found in the definitions."""
+
+    def __init__(self, content, target_type, target_name, candidate_names=[]):
+        if candidate_names:
+            message = f'Unknown {target_type}: "{target_name}". Candidates are: "{candidate_names}"'
+
+            for candidate_name in candidate_names:
+                if candidate_name.lower() == target_name.lower():
+                    message = f'Unknown {target_type}: "{target_name}". Did you mean "{candidate_name}" ?'
+                    break
+        else:
+            message = f'The cluster does not have any {target_type}s.'
+
+        super().__init__(message)
+        self.tag_key_with_error(content, target_type)
+
+
+class TestStepAttributeKeyError(UnknownPathQualifierError):
+    """Raise when an attribute name is not found in the definitions."""
+
+    def __init__(self, content, target_name, candidate_names=[]):
+        super().__init__(content, 'attribute', target_name, candidate_names)
+
+
+class TestStepCommandKeyError(UnknownPathQualifierError):
+    """Raise when a command name is not found in the definitions."""
+
+    def __init__(self, content, target_name, candidate_names=[]):
+        super().__init__(content, 'command', target_name, candidate_names)
+
+
+class TestStepEventKeyError(UnknownPathQualifierError):
+    """Raise when an event name is not found in the definitions."""
+
+    def __init__(self, content, target_name, candidate_names=[]):
+        super().__init__(content, 'event', target_name, candidate_names)
+
+
 class PostProcessCheckStatus(Enum):
     '''Indicates the post processing check step status.'''
     SUCCESS = 'success',
@@ -177,42 +216,7 @@ class _TestStepWithPlaceholders:
             self._convert_single_value_to_values(response)
         self.responses_with_placeholders = responses
 
-        argument_mapping = None
-        response_mapping = None
-        response_mapping_name = None
-
-        if definitions is not None:
-            if self.is_attribute:
-                attribute = definitions.get_attribute_by_name(
-                    self.cluster, self.attribute)
-                if attribute:
-                    attribute_mapping = self._as_mapping(definitions, self.cluster,
-                                                         attribute.definition.data_type.name)
-                    argument_mapping = attribute_mapping
-                    response_mapping = attribute_mapping
-                    response_mapping_name = attribute.definition.data_type.name
-            elif self.is_event:
-                event = definitions.get_event_by_name(
-                    self.cluster, self.event)
-                if event:
-                    event_mapping = self._as_mapping(definitions, self.cluster,
-                                                     event.name)
-                    argument_mapping = event_mapping
-                    response_mapping = event_mapping
-                    response_mapping_name = event.name
-            else:
-                command = definitions.get_command_by_name(
-                    self.cluster, self.command)
-                if command:
-                    argument_mapping = self._as_mapping(
-                        definitions, self.cluster, command.input_param)
-                    response_mapping = self._as_mapping(
-                        definitions, self.cluster, command.output_param)
-                    response_mapping_name = command.output_param
-
-        self.argument_mapping = argument_mapping
-        self.response_mapping = response_mapping
-        self.response_mapping_name = response_mapping_name
+        self._update_mappings(test, definitions)
         self.update_arguments(self.arguments_with_placeholders)
         self.update_responses(self.responses_with_placeholders)
 
@@ -226,6 +230,89 @@ class _TestStepWithPlaceholders:
                 if 'constraints' not in value:
                     continue
                 get_constraints(value['constraints'])
+
+    def _update_mappings(self, test: dict, definitions: SpecDefinitions):
+        cluster_name = self.cluster
+        if definitions is None or not definitions.has_cluster_by_name(cluster_name):
+            self.argument_mapping = None
+            self.response_mapping = None
+            self.response_mapping_name = None
+            return
+
+        argument_mapping = None
+        response_mapping = None
+        response_mapping_name = None
+
+        if self.is_attribute:
+            attribute_name = self.attribute
+            attribute = definitions.get_attribute_by_name(
+                cluster_name,
+                attribute_name
+            )
+
+            if not attribute:
+                targets = definitions.get_attribute_names(cluster_name)
+                raise TestStepAttributeKeyError(test, attribute_name, targets)
+
+            attribute_mapping = self._as_mapping(
+                definitions,
+                cluster_name,
+                attribute.definition.data_type.name
+            )
+
+            argument_mapping = attribute_mapping
+            response_mapping = attribute_mapping
+            response_mapping_name = attribute.definition.data_type.name
+        elif self.is_event:
+            event_name = self.event
+            event = definitions.get_event_by_name(
+                cluster_name,
+                event_name
+            )
+
+            if not event:
+                targets = definitions.get_event_names(cluster_name)
+                raise TestStepEventKeyError(test, event_name, targets)
+
+            event_mapping = self._as_mapping(
+                definitions,
+                cluster_name,
+                event_name
+            )
+
+            argument_mapping = event_mapping
+            response_mapping = event_mapping
+            response_mapping_name = event.name
+        else:
+            command_name = self.command
+            command = definitions.get_command_by_name(
+                cluster_name,
+                command_name
+            )
+
+            if not command:
+                targets = definitions.get_command_names(cluster_name)
+                raise TestStepCommandKeyError(test, command_name, targets)
+
+            if command.input_param is None:
+                argument_mapping = {}
+            else:
+                argument_mapping = self._as_mapping(
+                    definitions,
+                    cluster_name,
+                    command.input_param
+                )
+
+            response_mapping = self._as_mapping(
+                definitions,
+                cluster_name,
+                command.output_param
+            )
+            response_mapping_name = command.output_param
+
+        self.argument_mapping = argument_mapping
+        self.response_mapping = response_mapping
+        self.response_mapping_name = response_mapping_name
 
     def _convert_single_value_to_values(self, container):
         if container is None or 'values' in container:
@@ -274,7 +361,7 @@ class _TestStepWithPlaceholders:
                 response, self.response_mapping)
 
     def _update_with_definition(self, container: dict, mapping_type):
-        if not container or not mapping_type:
+        if not container or mapping_type is None:
             return
 
         values = container['values']
