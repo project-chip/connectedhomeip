@@ -16,15 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Example project configuration file for CHIP.
- *
- *          This is a place to put application or project-specific overrides
- *          to the default configuration values for general CHIP features.
- *
- */
-
 #pragma once
 
 // include the CHIPProjectConfig from config/standalone
@@ -39,7 +30,7 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE 1
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 257 // 0x0101 = 257 = Dimmable Bulb
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x0015 // Contact sensor
 
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME 1
 
