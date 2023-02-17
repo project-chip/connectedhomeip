@@ -1624,14 +1624,19 @@ client cluster ThreadNetworkDiagnostics = 53 {
 }
 
 client cluster WiFiNetworkDiagnostics = 54 {
-  enum AssociationFailureCause : ENUM8 {
+  enum AssociationFailureCauseEnum : ENUM8 {
     kUnknown = 0;
     kAssociationFailed = 1;
     kAuthenticationFailed = 2;
     kSsidNotFound = 3;
   }
 
-  enum SecurityType : ENUM8 {
+  enum ConnectionStatusEnum : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  enum SecurityTypeEnum : ENUM8 {
     kUnspecified = 0;
     kNone = 1;
     kWep = 2;
@@ -1640,12 +1645,7 @@ client cluster WiFiNetworkDiagnostics = 54 {
     kWpa3 = 5;
   }
 
-  enum WiFiConnectionStatus : ENUM8 {
-    kConnected = 0;
-    kNotConnected = 1;
-  }
-
-  enum WiFiVersionType : ENUM8 {
+  enum WiFiVersionEnum : ENUM8 {
     kA = 0;
     kB = 1;
     kG = 2;
@@ -1664,17 +1664,17 @@ client cluster WiFiNetworkDiagnostics = 54 {
   }
 
   info event AssociationFailure = 1 {
-    AssociationFailureCause associationFailure = 0;
+    AssociationFailureCauseEnum associationFailure = 0;
     INT16U status = 1;
   }
 
   info event ConnectionStatus = 2 {
-    WiFiConnectionStatus connectionStatus = 0;
+    ConnectionStatusEnum connectionStatus = 0;
   }
 
   readonly attribute nullable octet_string<6> bssid = 0;
-  readonly attribute nullable SecurityType securityType = 1;
-  readonly attribute nullable WiFiVersionType wiFiVersion = 2;
+  readonly attribute nullable SecurityTypeEnum securityType = 1;
+  readonly attribute nullable WiFiVersionEnum wiFiVersion = 2;
   readonly attribute nullable int16u channelNumber = 3;
   readonly attribute nullable int8s rssi = 4;
   readonly attribute nullable int32u beaconLostCount = 5;

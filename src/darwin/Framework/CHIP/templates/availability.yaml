@@ -3100,8 +3100,14 @@
               - RoutingRole
               - ThreadConnectionStatus
           WiFiNetworkDiagnostics:
-              - AssociationFailureCause
-              - SecurityType
+              # AssociationFailureCauseEnum was originally just named
+              # AssociationFailureCause, but we generate the same API for both
+              # of those names, so the name can just change here.
+              - AssociationFailureCauseEnum
+              # SecurityTypeEnum was originally just named SecurityType, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - SecurityTypeEnum
               - WiFiConnectionStatus
               - WiFiVersionType
           EthernetNetworkDiagnostics:
@@ -3480,12 +3486,18 @@
                   - Connected
                   - NotConnected
           WiFiNetworkDiagnostics:
-              AssociationFailureCause:
+              # AssociationFailureCauseEnum was originally just named
+              # AssociationFailureCause, but we generate the same API for both
+              # of those names, so the name can just change here.
+              AssociationFailureCauseEnum:
                   - Unknown
                   - AssociationFailed
                   - AuthenticationFailed
                   - SsidNotFound
-              SecurityType:
+              # SecurityTypeEnum was originally just named SecurityType, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              SecurityTypeEnum:
                   - Unspecified
                   - None
                   - WEP
@@ -6677,6 +6689,9 @@
               - TransferProtocolEnum
           OccupancySensing:
               - OccupancySensorTypeEnum
+          WiFiNetworkDiagnostics:
+              - ConnectionStatusEnum
+              - WiFiVersionEnum
       enum values:
           DoorLock:
               LockDataTypeEnum:
@@ -6701,6 +6716,17 @@
                   - Ultrasonic
                   - PIRAndUltrasonic
                   - PhysicalContact
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
+              WiFiVersionEnum:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
       bitmaps:
           OccupancySensing:
               - OccupancyBitmap
@@ -6726,6 +6752,9 @@
               - LogsIntent
               - LogsStatus
               - LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              - WiFiConnectionStatus
+              - WiFiVersionType
   removed:
       enum values:
           DoorLock:
@@ -6746,3 +6775,6 @@
               IntentEnum: LogsIntent
               StatusEnum: LogsStatus
               TransferProtocolEnum: LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum: WiFiConnectionStatus
+              WiFiVersionEnum: WiFiVersionType

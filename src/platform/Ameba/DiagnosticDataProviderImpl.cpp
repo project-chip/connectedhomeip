@@ -273,12 +273,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
 {
     // Support 802.11a/n Wi-Fi in AmebaD chipset
-    wifiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType::kN);
+    wifiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     unsigned int _auth_type;
     unsigned short _security = 0;
     rtw_wifi_setting_t setting;
@@ -286,29 +288,28 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
 #ifdef CONFIG_PLATFORM_8721D
     if (wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password) < 0)
     {
-        securityType = 0;
+        securityType = SecurityTypeEnum::kUnspecified;
     }
     else
     {
         switch (_security)
         {
         case IW_ENCODE_ALG_NONE:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_NONE;
+            securityType = SecurityTypeEnum::kNone;
             break;
         case IW_ENCODE_ALG_WEP:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_WEP;
+            securityType = SecurityTypeEnum::kWep;
             break;
         case IW_ENCODE_ALG_TKIP:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA;
+            securityType = SecurityTypeEnum::kWpa;
             break;
         case IW_ENCODE_ALG_CCMP:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA2;
+            securityType = SecurityTypeEnum::kWpa2;
             break;
         default:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+            securityType = SecurityTypeEnum::kUnspecified;
             break;
         }
-        securityType = setting.security_type;
     }
 #else
     wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password);
@@ -321,30 +322,29 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
         switch (_security)
         {
         case IW_ENCODE_ALG_NONE:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_NONE;
+            securityType = SecurityTypeEnum::kNone;
             break;
         case IW_ENCODE_ALG_WEP:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_WEP;
+            securityType = SecurityTypeEnum::kWep;
             break;
         case IW_ENCODE_ALG_TKIP:
             if (_auth_type == WPA_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA;
+                securityType = SecurityTypeEnum::kWpa;
             else if (_auth_type == WPA2_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA2;
+                securityType = SecurityTypeEnum::kWpa2;
             break;
         case IW_ENCODE_ALG_CCMP:
             if (_auth_type == WPA_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA;
+                securityType = SecurityTypeEnum::kWpa;
             else if (_auth_type == WPA2_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA2;
+                securityType = SecurityTypeEnum::kWpa2;
             else if (_auth_type == WPA3_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA3;
+                securityType = SecurityTypeEnum::kWpa3;
             break;
         default:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+            securityType = SecurityTypeEnum::Unspecified;
             break;
         }
-        securityType = setting.security_type;
     }
 #endif
 

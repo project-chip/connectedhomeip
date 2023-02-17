@@ -209,42 +209,44 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     int ret = wlan_get_current_network(&sta_network);
     if (ret != WM_SUCCESS)
     {
         // Set as no security by default
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
         return CHIP_NO_ERROR;
     }
     switch (sta_network.security.type)
     {
     case WLAN_SECURITY_WEP_OPEN:
     case WLAN_SECURITY_WEP_SHARED:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+        securityType = SecurityTypeEnum::kWep;
         break;
     case WLAN_SECURITY_WPA:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+        securityType = SecurityTypeEnum::kWpa;
         break;
     case WLAN_SECURITY_WPA2:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+        securityType = SecurityTypeEnum::kWpa2;
         break;
     case WLAN_SECURITY_WPA3_SAE:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+        securityType = SecurityTypeEnum::kWpa3;
         break;
     case WLAN_SECURITY_NONE:
     default: // Default: No_security
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
     }
 
-    ChipLogProgress(DeviceLayer, "GetWiFiSecurityType: %u", securityType);
+    ChipLogProgress(DeviceLayer, "GetWiFiSecurityType: %u", to_underlying(securityType));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
 {
-    wiFiVersion = to_underlying(WiFiVersionType::kN);
+    wiFiVersion = to_underlying(WiFiVersionEnum::kN);
     ChipLogProgress(DeviceLayer, "GetWiFiVersion: %u", wiFiVersion);
     return CHIP_NO_ERROR;
 }
@@ -371,23 +373,23 @@ bool ConnectivityManagerImpl::_GetBssInfo(const uint8_t sid, NetworkCommissionin
     // => security
     if (res.wep)
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WEP);
+        result.security.Set(WiFiSecurity::kWep);
     }
     else if (res.wpa)
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA);
+        result.security.Set(WiFiSecurity::kWpaPersonal);
     }
     else if ((res.wpa2) || (res.wpa2_entp))
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA2);
+        result.security.Set(WiFiSecurity::kWpa2Personal);
     }
     else if (res.wpa3_sae)
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA3);
+        result.security.Set(WiFiSecurity::kWpa3Personal);
     }
     else
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_NONE);
+        result.security.Set(WiFiSecurity::kUnencrypted);
     }
 
     return true;

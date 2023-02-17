@@ -202,8 +202,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     cy_wcm_associated_ap_info_t ap_info;
     cy_rslt_t result = CY_RSLT_SUCCESS;
     CHIP_ERROR err   = CHIP_NO_ERROR;
@@ -216,27 +218,27 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
     }
     if (ap_info.security == CY_WCM_SECURITY_OPEN)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
     }
     else if (ap_info.security & WPA3_SECURITY)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+        securityType = SecurityTypeEnum::kWpa3;
     }
     else if (ap_info.security & WPA2_SECURITY)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+        securityType = SecurityTypeEnum::kWpa2;
     }
     else if (ap_info.security & WPA_SECURITY)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+        securityType = SecurityTypeEnum::kWpa;
     }
     else if (ap_info.security & WEP_ENABLED)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+        securityType = SecurityTypeEnum::kWep;
     }
     else
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+        securityType = SecurityTypeEnum::kUnspecified;
     }
 
 exit:
@@ -260,17 +262,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     /* VHT Capable */
     if (bss_info.vht_cap)
     {
-        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType::kAc);
+        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kAc);
     }
     /* HT Capable */
     else if (bss_info.n_cap)
     {
-        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType::kN);
+        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN);
     }
     /* 11g Capable */
     else
     {
-        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType::kG);
+        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kG);
     }
 
 exit:
