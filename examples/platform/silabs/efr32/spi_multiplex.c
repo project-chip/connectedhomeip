@@ -19,13 +19,13 @@
 #include "sl_wfx.h"
 #endif /* EFR32MG24 && WF200_WIFI */
 
-#include "spi_multiplex.h"
 #include "dmadrv.h"
 #include "em_bus.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
+#include "spi_multiplex.h"
 
 /****************************************************************************
  * @fn  void spi_drv_reinit()
@@ -182,13 +182,13 @@ void pre_uart_transfer(void)
         // UART is initialized before host SPI interface
         // spi_sem_sync_hdl will not be initalized during execution
         GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
-        return ;
+        return;
     }
     sl_wfx_disable_irq();
     sl_wfx_host_disable_platform_interrupt();
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
-        return ;
+        return;
     }
     GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
 }
@@ -203,7 +203,7 @@ void post_uart_transfer(void)
 {
     if (spi_sem_sync_hdl == NULL)
     {
-        return ;
+        return;
     }
     GPIO_PinModeSet(gpioPortA, 8, gpioModeInputPull, 1);
     set_spi_baudrate(EXP_HDR);
