@@ -23,6 +23,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 
+#include <app/clusters/on-off-server/on-off-server.h>
+
 namespace example {
 namespace Ui {
 namespace Windows {
@@ -65,14 +67,24 @@ ImVec4 HueSaturationToColor(float hueDegrees, float saturationPercent)
 
 void Light::UpdateState()
 {
-    if (mTargetLightIsOn.HasValue()) {
-        OnOff::Attributes::OnOff::Set(mEndpointId, mTargetLightIsOn.Value());
+    if (mTargetLightIsOn.HasValue())
+    {
+        EmberAfStatus status = OnOffServer::Instance().setOnOffValue(
+            mEndpointId, mTargetLightIsOn.Value() ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id,
+            false /* initiatedByLevelChange */);
+
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(AppServer, "Failed to set on/off value: %d", status);
+        }
+
         mTargetLightIsOn.ClearValue();
     }
     OnOff::Attributes::OnOff::Get(mEndpointId, &mLightIsOn);
 
     // Level Control
-    if (mTargetLevel.HasValue()) {
+    if (mTargetLevel.HasValue())
+    {
         LevelControl::Attributes::CurrentLevel::Set(mEndpointId, mTargetLevel.Value());
         mTargetLevel.ClearValue();
     }
