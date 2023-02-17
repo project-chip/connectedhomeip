@@ -199,17 +199,15 @@ void ImguiUi::ChipLoopUpdateCallback(intptr_t self)
 
 void ImguiUi::UpdateState()
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(&ChipLoopUpdateCallback, reinterpret_cast<intptr_t>(this));
-    // ensure update is done when exiting
-    if (sem_trywait(&mChipLoopWaitSemaphore) != 0)
-    {
-        if (!gUiRunning.load())
-        {
-            // UI should stop, no need to wait, probably chip main loop is stopped
-            return;
-        }
-        std::this_thread::yield();
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(&ChipLoopUpdateCallback, reinterpret_cast<intptr_t>(this));
+
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "Failed to schedule state update: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
     }
+
+    // ensure update is done when exiting
+    sem_wait(&mChipLoopWaitSemaphore);
 }
 
 } // namespace Ui
