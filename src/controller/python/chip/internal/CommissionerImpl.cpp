@@ -25,6 +25,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
@@ -98,6 +99,7 @@ ScriptDevicePairingDelegate gPairingDelegate;
 chip::Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore gPersistentStorageOpCertStore;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
+chip::Crypto::RawKeySessionKeystore gSessionKeystore;
 
 } // namespace
 
@@ -132,9 +134,11 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
+        factoryParams.sessionKeystore          = &gSessionKeystore;
 
         // Initialize group data provider for local group key state and IPKs
         gGroupDataProvider.SetStorageDelegate(&gServerStorage);
+        gGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
         err = gGroupDataProvider.Init();
         SuccessOrExit(err);
         factoryParams.groupDataProvider = &gGroupDataProvider;

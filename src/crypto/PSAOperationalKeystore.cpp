@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ namespace Crypto {
 
 PSAOperationalKeystore::PersistentP256Keypair::PersistentP256Keypair(FabricIndex fabricIndex)
 {
-    toPSAContext(mKeypair).key_id = MakeOperationalKeyId(fabricIndex);
+    ToPsaContext(mKeypair).key_id = MakeOperationalKeyId(fabricIndex);
     mInitialized                  = true;
 }
 
@@ -34,12 +34,12 @@ PSAOperationalKeystore::PersistentP256Keypair::~PersistentP256Keypair()
 {
     // This class requires explicit control of the key lifetime. Therefore, clear the key ID
     // to prevent it from being destroyed by the base class destructor.
-    toPSAContext(mKeypair).key_id = 0;
+    ToPsaContext(mKeypair).key_id = 0;
 }
 
 inline psa_key_id_t PSAOperationalKeystore::PersistentP256Keypair::GetKeyId() const
 {
-    return toConstPSAContext(mKeypair).key_id;
+    return ToConstPsaContext(mKeypair).key_id;
 }
 
 bool PSAOperationalKeystore::PersistentP256Keypair::Exists() const
