@@ -187,7 +187,7 @@ class BarcodeFragment : Fragment() {
             Log.e(TAG, "Unrecognized QR Code", ex)
             Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
         }
-        FragmentUtil.getHost(this, Callback::class.java)
+        FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
             ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
     }
 
@@ -201,7 +201,7 @@ class BarcodeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
                 return@post
             }
-            FragmentUtil.getHost(this, Callback::class.java)
+            FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
                 ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
         }
     }
