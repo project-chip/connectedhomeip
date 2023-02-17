@@ -62,12 +62,13 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 #endif // Use tokens
 
 bool emberAfPluginScenesServerParseAddScene(
-    chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, chip::GroupId groupId, uint8_t sceneId,
-    uint16_t transitionTime, const chip::CharSpan & sceneName,
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::GroupId groupId,
+    uint8_t sceneId, uint16_t transitionTime, const chip::CharSpan & sceneName,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType> &
         extensionFieldSets);
-bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
-                                             chip::GroupId groupId, uint8_t sceneId);
+bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj,
+                                             const chip::app::ConcreteCommandPath & commandPath, chip::GroupId groupId,
+                                             uint8_t sceneId);
 
 /** @brief Scenes Cluster Recall Saved Scene
  *
