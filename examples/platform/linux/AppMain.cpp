@@ -140,7 +140,8 @@ void StopSignalHandler(int signal)
     }
     else
     {
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
+        Server::GetInstance().GenerateShutDownEvent();
+        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     }
 }
 #endif // !defined(ENABLE_CHIP_SHELL)

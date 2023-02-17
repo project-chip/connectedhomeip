@@ -162,7 +162,8 @@ void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReas
 {
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) != CHIP_NO_ERROR)
     {
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
+        Server::GetInstance().GenerateShutDownEvent();
+        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     }
     else
     {

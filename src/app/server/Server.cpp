@@ -70,15 +70,6 @@ using chip::Transport::UdpListenParameters;
 
 namespace {
 
-void StopEventLoop(intptr_t arg)
-{
-    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Stopping event loop: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
-
 class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
 {
 public:
@@ -451,10 +442,9 @@ void Server::RejoinExistingMulticastGroups()
     }
 }
 
-void Server::DispatchShutDownAndStopEventLoop()
+void Server::GenerateShutDownEvent()
 {
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
-    PlatformMgr().ScheduleWork(StopEventLoop);
 }
 
 void Server::ScheduleFactoryReset()

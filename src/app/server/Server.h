@@ -312,7 +312,7 @@ private:
  * after `Server::Shutdown()` is called.
  *
  * TODO: Separate lifecycle ownership for some more capabilities that should not belong to
- *       common logic, such as `DispatchShutDownAndStopEventLoop`.
+ *       common logic, such as `GenerateShutDownEvent`.
  *
  * TODO: Replace all uses of GetInstance() to "reach in" to this state from all cluster
  *       server common logic that deal with global node state with either a common NodeState
@@ -370,10 +370,10 @@ public:
     app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
     /**
-     * This function send the ShutDown event before stopping
-     * the event loop.
+     * This function causes the ShutDown event to be generated async on the
+     * Matter event loop.  Should be called before stopping the event loop.
      */
-    void DispatchShutDownAndStopEventLoop();
+    void GenerateShutDownEvent();
 
     void Shutdown();
 
