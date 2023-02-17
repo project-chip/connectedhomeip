@@ -80,7 +80,7 @@ tests:
 
           ./chip-tool onoff read global-scene-control 1 1
 
-          verify the " global-scene-control response" on the TH (all-cluster-app) log:
+          Verify TH receives global-scene-control attribute response on the TH(all-clusters-app) Log:
 
           [...]
           ReportDataMessage =
@@ -98,21 +98,21 @@ tests:
           [1667452789.247614][2466:2466] CHIP:DMG:                                         Cluster = 0x6,
           [1667452789.247664][2466:2466] CHIP:DMG:                                         Attribute = 0x0000_4000,
           [1667452789.247711][2466:2466] CHIP:DMG:                                 }
-          [1667452789.247760][2466:2466] CHIP:DMG:
-          [1667452789.247809][2466:2466] CHIP:DMG:                                 Data = true,
+          [1667452789.247760][2466:2466] CHIP:DMG:                                         
+          [1667452789.247809][2466:2466] CHIP:DMG:                                 Data = true, 
           [1667452789.247855][2466:2466] CHIP:DMG:                         },
-          [1667452789.247893][2466:2466] CHIP:DMG:
+          [1667452789.247893][2466:2466] CHIP:DMG:                         
           [1667452789.247926][2466:2466] CHIP:DMG:                 },
-          [1667452789.247968][2466:2466] CHIP:DMG:
+          [1667452789.247968][2466:2466] CHIP:DMG:                 
           [1667452789.247998][2466:2466] CHIP:DMG:         ],
-          [1667452789.248034][2466:2466] CHIP:DMG:
-          [1667452789.248065][2466:2466] CHIP:DMG:         SuppressResponse = true,
+          [1667452789.248034][2466:2466] CHIP:DMG:         
+          [1667452789.248065][2466:2466] CHIP:DMG:         SuppressResponse = true, 
           [1667452789.248105][2466:2466] CHIP:DMG:         InteractionModelRevision = 1
           [1667452789.248134][2466:2466] CHIP:DMG: }
 
           ./chip-tool onoff read on-time 1 1
 
-          verify the " on-time response" on the TH (all-cluster-app) log:
+          Verify TH receives on-time attribute response on the TH(all-clusters-app) Log:
 
           [...]
           [ReportDataMessage =
@@ -130,22 +130,22 @@ tests:
           [1667452828.778238][2466:2466] CHIP:DMG:                                         Cluster = 0x6,
           [1667452828.778263][2466:2466] CHIP:DMG:                                         Attribute = 0x0000_4001,
           [1667452828.778292][2466:2466] CHIP:DMG:                                 }
-          [1667452828.778325][2466:2466] CHIP:DMG:
-          [1667452828.778358][2466:2466] CHIP:DMG:                                 Data = 0,
+          [1667452828.778325][2466:2466] CHIP:DMG:                                         
+          [1667452828.778358][2466:2466] CHIP:DMG:                                 Data = 0, 
           [1667452828.778388][2466:2466] CHIP:DMG:                         },
-          [1667452828.778413][2466:2466] CHIP:DMG:
+          [1667452828.778413][2466:2466] CHIP:DMG:                         
           [1667452828.778434][2466:2466] CHIP:DMG:                 },
-          [1667452828.778462][2466:2466] CHIP:DMG:
+          [1667452828.778462][2466:2466] CHIP:DMG:                 
           [1667452828.778481][2466:2466] CHIP:DMG:         ],
-          [1667452828.778506][2466:2466] CHIP:DMG:
-          [1667452828.778532][2466:2466] CHIP:DMG:         SuppressResponse = true,
+          [1667452828.778506][2466:2466] CHIP:DMG:         
+          [1667452828.778532][2466:2466] CHIP:DMG:         SuppressResponse = true, 
           [1667452828.778554][2466:2466] CHIP:DMG:         InteractionModelRevision = 1
           [1667452828.778574][2466:2466] CHIP:DMG: }
 
 
           ./chip-tool onoff read off-wait-time 1 1
 
-          verify the " off-wait-time response" on the TH (all-cluster-app) log:
+          Verify TH receives off-wait-time attribute response on the TH(all-clusters-app) Log:
 
           [...]
           ReportDataMessage =
@@ -178,7 +178,7 @@ tests:
 
           ./chip-tool onoff read start-up-on-off 1 1
 
-          verify the " start-up-on-off response" on the TH (all-cluster-app) log:
+          Verify TH recieves  " start-up-on-off response" on the TH (all-cluster-app) log: 
 
           [...]
           ReportDataMessage =
@@ -226,7 +226,7 @@ tests:
 
           ./chip-tool onoff write on-time 1 1 1
 
-          verify the WriteResponseMessage of " on-time" on the TH (all-cluster-app) log:
+          Verify the WriteResponseMessage of " on-time" on the TH (all-cluster-app) log:
 
           [1666941297.380594][9718:9718] CHIP:DMG: WriteResponseMessage =
           [1666941297.380596][9718:9718] CHIP:DMG: {
@@ -240,22 +240,22 @@ tests:
           [1666941297.380619][9718:9718] CHIP:DMG:                                 Cluster = 0x6,
           [1666941297.380622][9718:9718] CHIP:DMG:                                 Attribute = 0x0000_4001,
           [1666941297.380624][9718:9718] CHIP:DMG:                         }
-          [1666941297.380628][9718:9718] CHIP:DMG:
+          [1666941297.380628][9718:9718] CHIP:DMG:                                 
           [1666941297.380630][9718:9718] CHIP:DMG:                         StatusIB =
           [1666941297.380634][9718:9718] CHIP:DMG:                         {
           [1666941297.380636][9718:9718] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1666941297.380639][9718:9718] CHIP:DMG:                         },
-          [1666941297.380641][9718:9718] CHIP:DMG:
+          [1666941297.380641][9718:9718] CHIP:DMG:                         
           [1666941297.380643][9718:9718] CHIP:DMG:                 },
-          [1666941297.380647][9718:9718] CHIP:DMG:
+          [1666941297.380647][9718:9718] CHIP:DMG:                 
           [1666941297.380649][9718:9718] CHIP:DMG:         ],
-          [1666941297.380652][9718:9718] CHIP:DMG:
+          [1666941297.380652][9718:9718] CHIP:DMG:         
           [1666941297.380655][9718:9718] CHIP:DMG:         InteractionModelRevision = 1
 
 
           ./chip-tool onoff write off-wait-time 22 1 1
 
-          verify the WriteResponseMessage of " off-wait-time" on the TH (all-cluster-app) log:
+          Verify the WriteResponseMessage of " off-wait-time" on the TH (all-cluster-app) log: 
           [1666941329.582813][9718:9718] CHIP:DMG: WriteResponseMessage =
           [1666941329.582820][9718:9718] CHIP:DMG: {
           [1666941329.582828][9718:9718] CHIP:DMG:         AttributeStatusIBs =
@@ -285,7 +285,7 @@ tests:
 
           ./chip-tool onoff write start-up-on-off 2 1 1
 
-          verify the WriteResponseMessage of " start-up-on-off " on the TH (all-cluster-app) log:
+          Verify the WriteResponseMessage of " start-up-on-off " on the TH (all-cluster-app) log:
 
           [1666941347.639597][9718:9718] CHIP:DMG: WriteResponseMessage =
           [1666941347.639609][9718:9718] CHIP:DMG: {
@@ -322,7 +322,7 @@ tests:
 
           ./chip-tool onoff read attribute-list 1 1
 
-          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
+          Verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
 
           [1666943616.274425][12769:12769] CHIP:DMG:
           [1666943616.274453][12769:12769] CHIP:DMG: ReportDataMessage =
@@ -340,14 +340,14 @@ tests:
           [1666943616.274494][12769:12769] CHIP:DMG:                                         Cluster = 0x6,
           [1666943616.274498][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943616.274501][12769:12769] CHIP:DMG:                                 }
-          [1666943616.274505][12769:12769] CHIP:DMG:
+          [1666943616.274505][12769:12769] CHIP:DMG:                                         
           [1666943616.274508][12769:12769] CHIP:DMG:                                 Data = [
-          [1666943616.274511][12769:12769] CHIP:DMG:
+          [1666943616.274511][12769:12769] CHIP:DMG:                                                 
           [1666943616.274515][12769:12769] CHIP:DMG:                                 ],
           [1666943616.274518][12769:12769] CHIP:DMG:                         },
-          [1666943616.274522][12769:12769] CHIP:DMG:
+          [1666943616.274522][12769:12769] CHIP:DMG:                         
           [1666943616.274525][12769:12769] CHIP:DMG:                 },
-          [1666943616.274531][12769:12769] CHIP:DMG:
+          [1666943616.274531][12769:12769] CHIP:DMG:                 
           [1666943616.274533][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943616.274538][12769:12769] CHIP:DMG:                 {
           [1666943616.274541][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -360,12 +360,12 @@ tests:
           [1666943616.274564][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943616.274567][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943616.274570][12769:12769] CHIP:DMG:                                 }
-          [1666943616.274574][12769:12769] CHIP:DMG:
-          [1666943616.274577][12769:12769] CHIP:DMG:                                 Data = 0,
+          [1666943616.274574][12769:12769] CHIP:DMG:                                         
+          [1666943616.274577][12769:12769] CHIP:DMG:                                 Data = 0, 
           [1666943616.274580][12769:12769] CHIP:DMG:                         },
-          [1666943616.274584][12769:12769] CHIP:DMG:
+          [1666943616.274584][12769:12769] CHIP:DMG:                         
           [1666943616.274587][12769:12769] CHIP:DMG:                 },
-          [1666943616.274593][12769:12769] CHIP:DMG:
+          [1666943616.274593][12769:12769] CHIP:DMG:                 
           [1666943616.274595][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943616.274599][12769:12769] CHIP:DMG:                 {
           [1666943616.274602][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -378,12 +378,12 @@ tests:
           [1666943616.274624][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943616.274627][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943616.274630][12769:12769] CHIP:DMG:                                 }
-          [1666943616.274634][12769:12769] CHIP:DMG:
-          [1666943616.274637][12769:12769] CHIP:DMG:                                 Data = 65528,
+          [1666943616.274634][12769:12769] CHIP:DMG:                                         
+          [1666943616.274637][12769:12769] CHIP:DMG:                                 Data = 65528, 
           [1666943616.274640][12769:12769] CHIP:DMG:                         },
-          [1666943616.274644][12769:12769] CHIP:DMG:
+          [1666943616.274644][12769:12769] CHIP:DMG:                         
           [1666943616.274647][12769:12769] CHIP:DMG:                 },
-          [1666943616.274653][12769:12769] CHIP:DMG:
+          [1666943616.274653][12769:12769] CHIP:DMG:                 
           [1666943616.274655][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943616.274660][12769:12769] CHIP:DMG:                 {
           [1666943616.274663][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -396,12 +396,12 @@ tests:
           [1666943616.274685][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943616.274689][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943616.274693][12769:12769] CHIP:DMG:                                 }
-          [1666943616.274696][12769:12769] CHIP:DMG:
-          [1666943616.274700][12769:12769] CHIP:DMG:                                 Data = 65529,
+          [1666943616.274696][12769:12769] CHIP:DMG:                                         
+          [1666943616.274700][12769:12769] CHIP:DMG:                                 Data = 65529, 
           [1666943616.274702][12769:12769] CHIP:DMG:                         },
-          [1666943616.274707][12769:12769] CHIP:DMG:
+          [1666943616.274707][12769:12769] CHIP:DMG:                         
           [1666943616.274709][12769:12769] CHIP:DMG:                 },
-          [1666943616.274715][12769:12769] CHIP:DMG:
+          [1666943616.274715][12769:12769] CHIP:DMG:                 
           [1666943616.274718][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943616.274722][12769:12769] CHIP:DMG:                 {
           [1666943616.274725][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -414,12 +414,12 @@ tests:
           [1666943616.274747][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943616.274750][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943616.274753][12769:12769] CHIP:DMG:                                 }
-          [1666943616.274757][12769:12769] CHIP:DMG:
-          [1666943616.274760][12769:12769] CHIP:DMG:                                 Data = 65531,
+          [1666943616.274757][12769:12769] CHIP:DMG:                                         
+          [1666943616.274760][12769:12769] CHIP:DMG:                                 Data = 65531, 
           [1666943616.274763][12769:12769] CHIP:DMG:                         },
-          [1666943616.274768][12769:12769] CHIP:DMG:
+          [1666943616.274768][12769:12769] CHIP:DMG:                         
           [1666943616.274770][12769:12769] CHIP:DMG:                 },
-          [1666943616.274776][12769:12769] CHIP:DMG:
+          [1666943616.274776][12769:12769] CHIP:DMG:                 
           [1666943616.274779][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943616.274783][12769:12769] CHIP:DMG:                 {
           [1666943616.274786][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -432,12 +432,12 @@ tests:
           [1666943616.274808][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943616.274813][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943616.274817][12769:12769] CHIP:DMG:                                 }
-          [1666943616.274821][12769:12769] CHIP:DMG:
-          [1666943616.274824][12769:12769] CHIP:DMG:                                 Data = 65532,
+          [1666943616.274821][12769:12769] CHIP:DMG:                                         
+          [1666943616.274824][12769:12769] CHIP:DMG:                                 Data = 65532, 
           [1666943616.274827][12769:12769] CHIP:DMG:                         },
-          [1666943616.274831][12769:12769] CHIP:DMG:
+          [1666943616.274831][12769:12769] CHIP:DMG:                         
           [1666943616.274834][12769:12769] CHIP:DMG:                 },
-          [1666943616.274840][12769:12769] CHIP:DMG:
+          [1666943616.274840][12769:12769] CHIP:DMG:                 
           [1666943616.274842][12769:12769] CHIP:DMG:                 AttributeReportIB =
           [1666943616.274847][12769:12769] CHIP:DMG:                 {
           [1666943616.274849][12769:12769] CHIP:DMG:                         AttributeDataIB =
@@ -450,22 +450,22 @@ tests:
           [1666943616.274871][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
           [1666943616.274874][12769:12769] CHIP:DMG:                                         ListIndex = Null,
           [1666943616.274878][12769:12769] CHIP:DMG:                                 }
-          [1666943616.274881][12769:12769] CHIP:DMG:
-          [1666943616.274885][12769:12769] CHIP:DMG:                                 Data = 65533,
+          [1666943616.274881][12769:12769] CHIP:DMG:                                         
+          [1666943616.274885][12769:12769] CHIP:DMG:                                 Data = 65533, 
           [1666943616.274888][12769:12769] CHIP:DMG:                         },
-          [1666943616.274892][12769:12769] CHIP:DMG:
+          [1666943616.274892][12769:12769] CHIP:DMG:                         
           [1666943616.274894][12769:12769] CHIP:DMG:                 },
-          [1666943616.274898][12769:12769] CHIP:DMG:
+          [1666943616.274898][12769:12769] CHIP:DMG:                 
           [1666943616.274901][12769:12769] CHIP:DMG:         ],
-          [1666943616.274913][12769:12769] CHIP:DMG:
-          [1666943616.274916][12769:12769] CHIP:DMG:         SuppressResponse = true,
+          [1666943616.274913][12769:12769] CHIP:DMG:         
+          [1666943616.274916][12769:12769] CHIP:DMG:         SuppressResponse = true, 
           [1666943616.274919][12769:12769] CHIP:DMG:         InteractionModelRevision = 1
           [1666943616.274921][12769:12769] CHIP:DMG: }
 
 
           ./chip-tool onoff read feature-map  1 1
 
-          verify the "  feature-map response" on the TH (all-cluster-minimal-app) log:
+          Verify the "  feature-map response" on the TH (all-cluster-minimal-app) log:
 
           [1666943673.928358][12769:12769] CHIP:DMG: ReportDataMessage =
           [1666943673.928360][12769:12769] CHIP:DMG: {
@@ -482,22 +482,22 @@ tests:
           [1666943673.928395][12769:12769] CHIP:DMG:                                         Cluster = 0x6,
           [1666943673.928398][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_FFFC,
           [1666943673.928401][12769:12769] CHIP:DMG:                                 }
-          [1666943673.928404][12769:12769] CHIP:DMG:
-          [1666943673.928407][12769:12769] CHIP:DMG:                                 Data = 0,
+          [1666943673.928404][12769:12769] CHIP:DMG:                                         
+          [1666943673.928407][12769:12769] CHIP:DMG:                                 Data = 0, 
           [1666943673.928410][12769:12769] CHIP:DMG:                         },
-          [1666943673.928413][12769:12769] CHIP:DMG:
+          [1666943673.928413][12769:12769] CHIP:DMG:                         
           [1666943673.928416][12769:12769] CHIP:DMG:                 },
-          [1666943673.928419][12769:12769] CHIP:DMG:
+          [1666943673.928419][12769:12769] CHIP:DMG:                 
           [1666943673.928422][12769:12769] CHIP:DMG:         ],
-          [1666943673.928425][12769:12769] CHIP:DMG:
-          [1666943673.928428][12769:12769] CHIP:DMG:         SuppressResponse = true,
+          [1666943673.928425][12769:12769] CHIP:DMG:         
+          [1666943673.928428][12769:12769] CHIP:DMG:         SuppressResponse = true, 
           [1666943673.928430][12769:12769] CHIP:DMG:         InteractionModelRevision = 1
           [1666943673.928432][12769:12769] CHIP:DMG: }
 
 
           ./chip-tool onoff read on-off 1 1
 
-          verify the " on-off response" on the TH (all-cluster-minimal-app) log:
+          Verify the " on-off response" on the TH (all-cluster-minimal-app) log:
 
           [1666943688.655282][12769:12769] CHIP:DMG: ReportDataMessage =
           [1666943688.655285][12769:12769] CHIP:DMG: {
@@ -514,15 +514,15 @@ tests:
           [1666943688.655309][12769:12769] CHIP:DMG:                                         Cluster = 0x6,
           [1666943688.655312][12769:12769] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1666943688.655314][12769:12769] CHIP:DMG:                                 }
-          [1666943688.655316][12769:12769] CHIP:DMG:
-          [1666943688.655319][12769:12769] CHIP:DMG:                                 Data = false,
+          [1666943688.655316][12769:12769] CHIP:DMG:                                         
+          [1666943688.655319][12769:12769] CHIP:DMG:                                 Data = false, 
           [1666943688.655321][12769:12769] CHIP:DMG:                         },
-          [1666943688.655323][12769:12769] CHIP:DMG:
+          [1666943688.655323][12769:12769] CHIP:DMG:                         
           [1666943688.655325][12769:12769] CHIP:DMG:                 },
-          [1666943688.655328][12769:12769] CHIP:DMG:
+          [1666943688.655328][12769:12769] CHIP:DMG:                 
           [1666943688.655330][12769:12769] CHIP:DMG:         ],
-          [1666943688.655333][12769:12769] CHIP:DMG:
-          [1666943688.655335][12769:12769] CHIP:DMG:         SuppressResponse = true,
+          [1666943688.655333][12769:12769] CHIP:DMG:         
+          [1666943688.655335][12769:12769] CHIP:DMG:         SuppressResponse = true, 
           [1666943688.655336][12769:12769] CHIP:DMG:         InteractionModelRevision = 1
           [1666943688.655338][12769:12769] CHIP:DMG: }
       disabled: true

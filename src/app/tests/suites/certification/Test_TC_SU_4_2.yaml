@@ -31,16 +31,17 @@ tests:
       verification: |
           Verify that the OTA Requestor App receives the write command and does not reject the value as invalid.
 
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]" 321 0
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders "[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]" 321 0
 
-          verify on TH [OTA-REQ] Logs:
+
+          Verify write request for the DefaultOTAProviders attribute on TH [OTA-REQ] Logs:
 
           [1662651310.444641][30167:30167] CHIP:IM: Received Write request
           [1662651310.444820][30167:30167] CHIP:DMG: IM WH moving to [Initialized]
           [1662651310.444952][30167:30167] CHIP:DMG: WriteRequestMessage =
           [1662651310.445036][30167:30167] CHIP:DMG: {
-          [1662651310.445112][30167:30167] CHIP:DMG:         suppressResponse = false,
-          [1662651310.445225][30167:30167] CHIP:DMG:         timedRequest = false,
+          [1662651310.445112][30167:30167] CHIP:DMG:         suppressResponse = false, 
+          [1662651310.445225][30167:30167] CHIP:DMG:         timedRequest = false, 
           [1662651310.445335][30167:30167] CHIP:DMG:         AttributeDataIBs =
           [1662651310.445455][30167:30167] CHIP:DMG:         [
           [1662651310.445565][30167:30167] CHIP:DMG:                 AttributeDataIB =
@@ -51,12 +52,12 @@ tests:
           [1662651310.446289][30167:30167] CHIP:DMG:                                 Cluster = 0x2a,
           [1662651310.446457][30167:30167] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1662651310.446620][30167:30167] CHIP:DMG:                         }
-          [1662651310.446772][30167:30167] CHIP:DMG:
+          [1662651310.446772][30167:30167] CHIP:DMG:                                 
           [1662651310.446905][30167:30167] CHIP:DMG:                         Data = [
-          [1662651310.447049][30167:30167] CHIP:DMG:
+          [1662651310.447049][30167:30167] CHIP:DMG:                                         
           [1662651310.447158][30167:30167] CHIP:DMG:                         ],
           [1662651310.447246][30167:30167] CHIP:DMG:                 },
-          [1662651310.447338][30167:30167] CHIP:DMG:
+          [1662651310.447338][30167:30167] CHIP:DMG:                 
           [1662651310.447410][30167:30167] CHIP:DMG:                 AttributeDataIB =
           [1662651310.447490][30167:30167] CHIP:DMG:                 {
           [1662651310.447570][30167:30167] CHIP:DMG:                         AttributePathIB =
@@ -66,17 +67,17 @@ tests:
           [1662651310.447955][30167:30167] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1662651310.448054][30167:30167] CHIP:DMG:                                 ListIndex = Null,
           [1662651310.448171][30167:30167] CHIP:DMG:                         }
-          [1662651310.448270][30167:30167] CHIP:DMG:
-          [1662651310.448360][30167:30167] CHIP:DMG:                         Data =
+          [1662651310.448270][30167:30167] CHIP:DMG:                                 
+          [1662651310.448360][30167:30167] CHIP:DMG:                         Data = 
           [1662651310.448449][30167:30167] CHIP:DMG:                         {
-          [1662651310.448540][30167:30167] CHIP:DMG:                                 0x1 = 123,
-          [1662651310.448641][30167:30167] CHIP:DMG:                                 0x2 = 0,
+          [1662651310.448540][30167:30167] CHIP:DMG:                                 0x1 = 123, 
+          [1662651310.448641][30167:30167] CHIP:DMG:                                 0x2 = 0, 
           [1662651310.448742][30167:30167] CHIP:DMG:                         },
           [1662651310.448831][30167:30167] CHIP:DMG:                 },
-          [1662651310.448913][30167:30167] CHIP:DMG:
+          [1662651310.448913][30167:30167] CHIP:DMG:                 
           [1662651310.448979][30167:30167] CHIP:DMG:         ],
-          [1662651310.449053][30167:30167] CHIP:DMG:
-          [1662651310.449111][30167:30167] CHIP:DMG:         moreChunkedMessages = false,
+          [1662651310.449053][30167:30167] CHIP:DMG:         
+          [1662651310.449111][30167:30167] CHIP:DMG:         moreChunkedMessages = false, 
           [1662651310.449178][30167:30167] CHIP:DMG:         InteractionModelRevision = 1
           [1662651310.449244][30167:30167] CHIP:DMG: },
           [1662651310.449361][30167:30167] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002A e=0 p=o
@@ -90,9 +91,9 @@ tests:
           Verify that the OTA Requestor App responds to the read command
 
 
-           ./chip-tool otasoftwareupdaterequestor read default-ota-providers 321 0
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0
 
-          verify on TH [OTA-REQ] Logs:
+          Verify read request for the DefaultOTAProviders attribute on TH [OTA-REQ] Logs:
           [1662651381.708529][30167:30167] CHIP:IM: Received Read request
           [1662651381.708619][30167:30167] CHIP:DMG: ReadRequestMessage =
           [1662651381.708648][30167:30167] CHIP:DMG: {
@@ -104,10 +105,10 @@ tests:
           [1662651381.708920][30167:30167] CHIP:DMG:                         Cluster = 0x2a,
           [1662651381.708975][30167:30167] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1662651381.709027][30167:30167] CHIP:DMG:                 }
-          [1662651381.709079][30167:30167] CHIP:DMG:
+          [1662651381.709079][30167:30167] CHIP:DMG:                         
           [1662651381.709127][30167:30167] CHIP:DMG:         ],
-          [1662651381.709159][30167:30167] CHIP:DMG:
-          [1662651381.709189][30167:30167] CHIP:DMG:         isFabricFiltered = true,
+          [1662651381.709159][30167:30167] CHIP:DMG:                 
+          [1662651381.709189][30167:30167] CHIP:DMG:         isFabricFiltered = true, 
           [1662651381.709216][30167:30167] CHIP:DMG:         InteractionModelRevision = 1
           [1662651381.709240][30167:30167] CHIP:DMG: },
           [1662651381.709323][30167:30167] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -126,7 +127,7 @@ tests:
 
           ./chip-tool otasoftwareupdaterequestor read update-possible 321 0
 
-          verify on TH [OTA-REQ] Logs:
+          Verify UpdatePossible attribute on TH [OTA-REQ] Logs:
 
           [1662651426.055059][30167:30167] CHIP:IM: Received Read request
           [1662651426.055180][30167:30167] CHIP:DMG: ReadRequestMessage =
@@ -139,10 +140,10 @@ tests:
           [1662651426.055500][30167:30167] CHIP:DMG:                         Cluster = 0x2a,
           [1662651426.055553][30167:30167] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1662651426.055603][30167:30167] CHIP:DMG:                 }
-          [1662651426.055654][30167:30167] CHIP:DMG:
+          [1662651426.055654][30167:30167] CHIP:DMG:                         
           [1662651426.055701][30167:30167] CHIP:DMG:         ],
-          [1662651426.055747][30167:30167] CHIP:DMG:
-          [1662651426.055828][30167:30167] CHIP:DMG:         isFabricFiltered = true,
+          [1662651426.055747][30167:30167] CHIP:DMG:                 
+          [1662651426.055828][30167:30167] CHIP:DMG:         isFabricFiltered = true, 
           [1662651426.055877][30167:30167] CHIP:DMG:         InteractionModelRevision = 1
           [1662651426.055918][30167:30167] CHIP:DMG: },
           [1662651426.056030][30167:30167] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -152,14 +153,14 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a read request to read the UpdateState attribute from the
+          "DUT sends a read request to read the UpdateState Attribute from the
           TH."
       verification: |
           Verify that the OTA Requestor App responds to the read command
 
           ./chip-tool otasoftwareupdaterequestor read update-state 321 0
 
-          verify on TH [OTA-REQ] Logs:
+          Verify UpdateState attribute on TH [OTA-REQ] Logs:
 
           [1662651459.324406][30167:30167] CHIP:IM: Received Read request
           [1662651459.324545][30167:30167] CHIP:DMG: ReadRequestMessage =
@@ -172,10 +173,10 @@ tests:
           [1662651459.324973][30167:30167] CHIP:DMG:                         Cluster = 0x2a,
           [1662651459.325030][30167:30167] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1662651459.325083][30167:30167] CHIP:DMG:                 }
-          [1662651459.325138][30167:30167] CHIP:DMG:
+          [1662651459.325138][30167:30167] CHIP:DMG:                         
           [1662651459.325188][30167:30167] CHIP:DMG:         ],
-          [1662651459.325240][30167:30167] CHIP:DMG:
-          [1662651459.325292][30167:30167] CHIP:DMG:         isFabricFiltered = true,
+          [1662651459.325240][30167:30167] CHIP:DMG:                 
+          [1662651459.325292][30167:30167] CHIP:DMG:         isFabricFiltered = true, 
           [1662651459.325341][30167:30167] CHIP:DMG:         InteractionModelRevision = 1
           [1662651459.325386][30167:30167] CHIP:DMG: },
           [1662651459.325513][30167:30167] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -195,7 +196,8 @@ tests:
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [321], "targets": null}]" 123 0
 
           Run the announce ota provider command to start the software update and check the UpdateStateProgress
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 123 0 0 0 321 0
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
 
           where 321  is OTA Requestor node ID and 123 is OTA Provider node ID
 
@@ -203,7 +205,7 @@ tests:
 
            ./chip-tool otasoftwareupdaterequestor read update-state-progress 321 0
 
-          verify on TH [OTA-REQ] Logs:
+          Verify UpdateStateProgress attribute on TH [OTA-REQ] Logs:
 
           [1662651648.244248][30167:30167] CHIP:IM: Received Read request
           [1662651648.244329][30167:30167] CHIP:DMG: ReadRequestMessage =
@@ -216,10 +218,10 @@ tests:
           [1662651648.244523][30167:30167] CHIP:DMG:                         Cluster = 0x2a,
           [1662651648.244558][30167:30167] CHIP:DMG:                         Attribute = 0x0000_0003,
           [1662651648.244584][30167:30167] CHIP:DMG:                 }
-          [1662651648.244618][30167:30167] CHIP:DMG:
+          [1662651648.244618][30167:30167] CHIP:DMG:                         
           [1662651648.244643][30167:30167] CHIP:DMG:         ],
-          [1662651648.244676][30167:30167] CHIP:DMG:
-          [1662651648.244700][30167:30167] CHIP:DMG:         isFabricFiltered = true,
+          [1662651648.244676][30167:30167] CHIP:DMG:                 
+          [1662651648.244700][30167:30167] CHIP:DMG:         isFabricFiltered = true, 
           [1662651648.244721][30167:30167] CHIP:DMG:         InteractionModelRevision = 1
           [1662651648.244749][30167:30167] CHIP:DMG: },
           [1662651648.244822][30167:30167] CHIP:DMG: IM RH moving to [GeneratingReports]
