@@ -40,8 +40,8 @@ source scripts/activate.sh
 ### Generate and run test target
 
 As for now, Tizen QEMU-based test driver does not support BLE. In order to
-disable BLE, one needs to pass `chip_config_network_layer_ble=false` to the
-args argument of the `gn gen` command.
+disable BLE, one needs to pass `chip_config_network_layer_ble=false` to the args
+argument of the `gn gen` command.
 
 ```sh
 # Generate test target
