@@ -490,8 +490,14 @@ def AndroidTargets():
     yield target.Extend('arm-tv-server', board=AndroidBoard.ARM, app=AndroidApp.TV_SERVER)
     yield target.Extend('x86-tv-server', board=AndroidBoard.X86, app=AndroidApp.TV_SERVER)
     yield target.Extend('x64-tv-server', board=AndroidBoard.X64, app=AndroidApp.TV_SERVER)
+    yield target.Extend('arm64-tv-server-no-debug', board=AndroidBoard.ARM64, app=AndroidApp.TV_SERVER, is_debug=False)
+    yield target.Extend('arm-tv-server-no-debug', board=AndroidBoard.ARM, app=AndroidApp.TV_SERVER, is_debug=False)
+    yield target.Extend('x86-tv-server-no-debug', board=AndroidBoard.X86, app=AndroidApp.TV_SERVER, is_debug=False)
+    yield target.Extend('x64-tv-server-no-debug', board=AndroidBoard.X64, app=AndroidApp.TV_SERVER, is_debug=False)
     yield target.Extend('arm64-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.TV_CASTING_APP)
     yield target.Extend('arm-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.TV_CASTING_APP)
+    yield target.Extend('arm64-tv-casting-app-no-debug', board=AndroidBoard.ARM64, app=AndroidApp.TV_CASTING_APP, is_debug=False)
+    yield target.Extend('arm-tv-casting-app-no-debug', board=AndroidBoard.ARM, app=AndroidApp.TV_CASTING_APP, is_debug=False)
 
 
 def MbedTargets():
