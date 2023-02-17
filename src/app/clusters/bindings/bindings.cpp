@@ -52,7 +52,9 @@ private:
     CHIP_ERROR ReadBindingTable(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
 
-    CHIP_ERROR NotifyBindingsChanged(FabricIndex accessingFabricIndex);
+    CHIP_ERROR NotifyBindingsChanged();
+
+    FabricIndex mAccessingFabricIndex;
 };
 
 BindingTableAccess gAttrAccess;
@@ -190,24 +192,24 @@ CHIP_ERROR BindingTableAccess::Write(const ConcreteDataAttributePath & path, Att
 void BindingTableAccess::OnListWriteEnd(const app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful)
 {
     // Notify binding table has changed
-    LogErrorOnFailure(NotifyBindingsChanged(0));
+    LogErrorOnFailure(NotifyBindingsChanged());
 }
 
 CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
 {
-    FabricIndex accessingFabricIndex = decoder.AccessingFabricIndex();
+    mAccessingFabricIndex = decoder.AccessingFabricIndex();
     if (!path.IsListOperation() || path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
         DecodableBindingListType newBindingList;
 
         ReturnErrorOnFailure(decoder.Decode(newBindingList));
-        ReturnErrorOnFailure(CheckValidBindingList(path.mEndpointId, newBindingList, accessingFabricIndex));
+        ReturnErrorOnFailure(CheckValidBindingList(path.mEndpointId, newBindingList, mAccessingFabricIndex));
 
         // Clear all entries for the current accessing fabric and endpoint
         auto bindingTableIter = BindingTable::GetInstance().begin();
         while (bindingTableIter != BindingTable::GetInstance().end())
         {
-            if (bindingTableIter->local == path.mEndpointId && bindingTableIter->fabricIndex == accessingFabricIndex)
+            if (bindingTableIter->local == path.mEndpointId && bindingTableIter->fabricIndex == mAccessingFabricIndex)
             {
                 if (bindingTableIter->type == EMBER_UNICAST_BINDING)
                 {
@@ -233,7 +235,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         if (!path.IsListOperation())
         {
             // Notify binding table has changed
-            LogErrorOnFailure(NotifyBindingsChanged(accessingFabricIndex));
+            LogErrorOnFailure(NotifyBindingsChanged());
         }
         return CHIP_NO_ERROR;
     }
@@ -251,11 +253,11 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
 
-CHIP_ERROR BindingTableAccess::NotifyBindingsChanged(FabricIndex accessingFabricIndex)
+CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
 {
     DeviceLayer::ChipDeviceEvent event;
     event.Type                        = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
-    event.BindingsChanged.fabricIndex = accessingFabricIndex;
+    event.BindingsChanged.fabricIndex = mAccessingFabricIndex;
     return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
 }
 
