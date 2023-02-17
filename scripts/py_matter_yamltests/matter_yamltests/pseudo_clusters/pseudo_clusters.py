@@ -20,7 +20,7 @@ from .pseudo_cluster import PseudoCluster
 
 class PseudoClusters:
     def __init__(self, clusters: list[PseudoCluster]):
-        self.__clusters = clusters
+        self.clusters = clusters
 
     def supports(self, request) -> bool:
         return False if self.__get_command(request) is None else True
@@ -38,7 +38,7 @@ class PseudoClusters:
         return status, []
 
     def __get_command(self, request):
-        for cluster in self.__clusters:
+        for cluster in self.clusters:
             if request.cluster == cluster.name and getattr(cluster, request.command, None):
                 return getattr(cluster, request.command)
         return None

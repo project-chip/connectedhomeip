@@ -25,15 +25,15 @@ config:
     nodeId2:
         type: node_id
         defaultValue: 0xCAFE
-    TH1CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
-    TH2CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
     D_OK_EMPTY:
         type: octet_string
         defaultValue: "hex:1718"
@@ -50,6 +50,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Read the TH1 commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH1CommissionerNodeId
+
     - label:
           "Step 2:TH1 reads OperationalCredentials cluster CurrentFabricIndex
           attribute"
@@ -59,16 +67,22 @@ tests:
       response:
           saveAs: TH1FabricIndex
 
-    - label:
-          "Step 3:TH1 puts DUT into commissioning mode, TH2 commissions DUT
-          using admin node ID N2"
+    - label: "Step 3:TH1 puts DUT into commissioning mode"
       cluster: "Administrator Commissioning"
-      command: "OpenBasicCommissioningWindow"
+      command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
 
     - label: "Step 4:TH2 starts a commissioning process with DUT"
       identity: "beta"
@@ -89,6 +103,15 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId2
+
+    - label: "Read the TH2 commissioner node ID"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH2CommissionerNodeId
 
     - label:
           "Step 5:TH2 reads OperationalCredentials cluster CurrentFabricIndex

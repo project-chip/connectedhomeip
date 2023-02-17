@@ -24,6 +24,6 @@ public enum PairingModeType {
   CODE_PASE_ONLY,
   BLE,
   SOFT_AP,
-  ETHERNET,
+  ALREADY_DISCOVERED,
   ON_NETWORK;
 }

@@ -1,4 +1,4 @@
-> !!!!!!!!!! Please delete the instructions below and replace with PR desription
+> !!!!!!!!!! Please delete the instructions below and replace with PR description
 >
 > If you have an issue number, please use a syntax of
 > `Fixes #12345` and a brief change description

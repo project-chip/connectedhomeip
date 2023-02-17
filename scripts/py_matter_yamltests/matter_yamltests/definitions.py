@@ -14,12 +14,14 @@
 #    limitations under the License.
 
 import enum
-import functools
 import glob
-from typing import List
+import io
+from typing import List, Optional
 
 from matter_idl.matter_idl_types import *
 from matter_idl.zapxml import ParseSource, ParseXmls
+
+from .pseudo_clusters.pseudo_clusters import PseudoClusters
 
 
 class _ItemType(enum.Enum):
@@ -141,11 +143,19 @@ class SpecDefinitions:
         if struct:
             return struct
 
+        event = self.get_event_by_name(cluster_name, target_name)
+        if event:
+            return event
+
         return None
 
     def is_fabric_scoped(self, target) -> bool:
-        if hasattr(target, 'qualities'):
+        if isinstance(target, Event):
+            return bool(target.is_fabric_sensitive)
+
+        if isinstance(target, Struct) and hasattr(target, 'qualities'):
             return bool(target.qualities & StructQuality.FABRIC_SCOPED)
+
         return False
 
     def is_nullable(self, target) -> bool:
@@ -232,19 +242,7 @@ class SpecDefinitions:
                     f'Unknown target {target_name}. Did you mean {name} ?')
 
 
-def SpecDefinitionsFromPaths(paths: str):
-    def sort_with_global_attribute_first(a, b):
-        if a.endswith('global-attributes.xml'):
-            return -1
-        elif b.endswith('global-attributes.xml'):
-            return 1
-        elif a > b:
-            return 1
-        elif a == b:
-            return 0
-        elif a < b:
-            return -1
-
+def SpecDefinitionsFromPaths(paths: str, pseudo_clusters: Optional[PseudoClusters] = PseudoClusters([])):
     filenames = []
     for path in paths:
         if '*' in path or '?' in path:
@@ -252,6 +250,13 @@ def SpecDefinitionsFromPaths(paths: str):
         else:
             filenames.append(path)
 
-    filenames.sort(key=functools.cmp_to_key(sort_with_global_attribute_first))
     sources = [ParseSource(source=name) for name in filenames]
+
+    for pseudo_cluster in pseudo_clusters.clusters:
+        if pseudo_cluster.definition is not None:
+            name = pseudo_cluster.name
+            definition = pseudo_cluster.definition
+            sources = (
+                sources + [ParseSource(source=io.StringIO(definition), name=name)])
+
     return SpecDefinitions(sources)

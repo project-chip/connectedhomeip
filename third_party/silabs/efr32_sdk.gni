@@ -38,7 +38,9 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
-  sleep_time_ms = 3300000  # 55 mins sleep
+  sleep_time_ms = 30000  # 30 seconds sleep
+
+  silabs_log_enabled = true
 
   # Enable Sleepy end device
   enable_sleepy_device = false
@@ -165,7 +167,7 @@ template("efr32_sdk") {
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
-      "SILABS_LOG_ENABLED=1",
+      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -190,13 +192,14 @@ template("efr32_sdk") {
     ]
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-      if (use_rs911x) {
+      if (use_rs9116 || use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",
           "SL_WIFI=1",
           "SL_WFX_USE_SPI",
           "EFX32_RS911X=1",
           "RS911X_WIFI",
+          "SiWx917_WIFI",
           "RSI_WLAN_ENABLE",
           "RSI_SPI_INTERFACE",
           "RSI_WITH_OS",
@@ -212,7 +215,7 @@ template("efr32_sdk") {
       }
 
       if (use_wf200 || !use_rs911x_sockets) {
-        import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
+        import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
         if (lwip_ipv4) {
@@ -297,7 +300,7 @@ template("efr32_sdk") {
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) ||
-        show_qr_code || disable_lcd || use_external_flash) {
+        show_qr_code || !disable_lcd || use_external_flash) {
       defines += [ "CONFIG_ENABLE_UART" ]
 
       if (use_external_flash) {
@@ -455,8 +458,8 @@ template("efr32_sdk") {
     # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
     # edited.
     sources = [
-      "${chip_root}/src/platform/silabs/EFR32/efr32-chip-mbedtls-config.h",
-      "${chip_root}/src/platform/silabs/EFR32/psa_crypto_config.h",
+      "${chip_root}/src/platform/silabs/efr32/efr32-chip-mbedtls-config.h",
+      "${chip_root}/src/platform/silabs/efr32/psa_crypto_config.h",
     ]
 
     public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]

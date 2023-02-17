@@ -79,6 +79,7 @@ tests:
                   19,
                   0xFFF8, # GeneratedCommandList
                   0xFFF9, # AcceptedCommandList
+                  0xFFFA, # EventList
                   0xFFFB, # AttributeList
                   0xFFFC, # FeatureMap
                   0xFFFD, # ClusterRevision

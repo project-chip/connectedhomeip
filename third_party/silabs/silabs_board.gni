@@ -32,7 +32,8 @@ declare_args() {
 
   # WIFI rcp boards options for wifi apps.
   use_wf200 = false
-  use_rs911x = false
+  use_rs9116 = false
+  use_SiWx917 = false
   use_rs911x_sockets = false
 }
 
@@ -87,7 +88,7 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4170A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P433F1024GM68"
-} else if (silabs_board == "BRD4325A") {
+} else if (silabs_board == "BRD4325B") {
   silabs_family = "SiWx917"
   silabs_mcu = "EFR32MG12P432F1024GL125"
   disable_lcd = true

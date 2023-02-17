@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <app/data-model/Nullable.h>
 
@@ -115,7 +116,7 @@ uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
 uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
 void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
-EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status GetMotionLockStatus(chip::EndpointId endpoint);
 
 /**
  * @brief PostAttributeChange is called when an Attribute is modified.

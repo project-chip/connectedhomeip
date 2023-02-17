@@ -1855,7 +1855,6 @@
               RetrieveLogsRequest:
                   - intent
                   - requestedProtocol
-                  - transferFileDesignator
               RetrieveLogsResponse:
                   - status
                   - content
@@ -6001,7 +6000,7 @@
               - DlOperationSource
               - DlUserStatus
               - DlUserType
-              # The enums after this come from the silabs types-silabs.xml, not the
+              # The enums after this come from the draft/types/door-lock.xml, not the
               # door lock cluster XML
               #
               # DoorLockUserStatus is not marked deprecated here because the
@@ -6503,5 +6502,227 @@
                   HeatSetpointPresent: HeatSetpointFieldPresent
                   CoolSetpointPresent: CoolSetpointFieldPresent
 
-- release: "Future"
+- release: "First after major API revamp"
   versions: "future"
+  introduced:
+      global attributes:
+          - EventList
+      attributes:
+          Scenes:
+              - EventList
+          OnOff:
+              - EventList
+          OnOffSwitchConfiguration:
+              - EventList
+          LevelControl:
+              - EventList
+          BinaryInputBasic:
+              - EventList
+          PulseWidthModulation:
+              - EventList
+          Descriptor:
+              - EventList
+          Binding:
+              - EventList
+          Identify:
+              - EventList
+          AccessControl:
+              - EventList
+          Actions:
+              - EventList
+          BasicInformation:
+              - EventList
+          OTASoftwareUpdateProvider:
+              - EventList
+          OTASoftwareUpdateRequestor:
+              - EventList
+          LocalizationConfiguration:
+              - EventList
+          TimeFormatLocalization:
+              - EventList
+          UnitLocalization:
+              - EventList
+          PowerSourceConfiguration:
+              - EventList
+          PowerSource:
+              - EventList
+          GeneralCommissioning:
+              - EventList
+          NetworkCommissioning:
+              - EventList
+          DiagnosticLogs:
+              - EventList
+          GeneralDiagnostics:
+              - EventList
+          SoftwareDiagnostics:
+              - EventList
+          ThreadNetworkDiagnostics:
+              - EventList
+          WiFiNetworkDiagnostics:
+              - EventList
+          EthernetNetworkDiagnostics:
+              - EventList
+          TimeSynchronization:
+              - EventList
+              - DSTOffset
+          BridgedDeviceBasicInformation:
+              - EventList
+          Switch:
+              - EventList
+          AdministratorCommissioning:
+              - EventList
+          OperationalCredentials:
+              - EventList
+          GroupKeyManagement:
+              - EventList
+          FixedLabel:
+              - EventList
+          UserLabel:
+              - EventList
+          ProxyConfiguration:
+              - EventList
+          ProxyDiscovery:
+              - EventList
+          ProxyValid:
+              - EventList
+          BooleanState:
+              - EventList
+          ModeSelect:
+              - EventList
+          DoorLock:
+              - EventList
+          WindowCovering:
+              - EventList
+          BarrierControl:
+              - EventList
+          PumpConfigurationAndControl:
+              - EventList
+          FanControl:
+              - EventList
+          ThermostatUserInterfaceConfiguration:
+              - EventList
+          ColorControl:
+              - EventList
+          BallastConfiguration:
+              - EventList
+          IlluminanceMeasurement:
+              - EventList
+          TemperatureMeasurement:
+              - EventList
+          PressureMeasurement:
+              - EventList
+          Thermostat:
+              - EventList
+          FlowMeasurement:
+              - EventList
+          RelativeHumidityMeasurement:
+              - EventList
+          OccupancySensing:
+              - EventList
+          WakeOnLAN:
+              - EventList
+          Channel:
+              - EventList
+          Groups:
+              - EventList
+          TargetNavigator:
+              - EventList
+          MediaPlayback:
+              - EventList
+          MediaInput:
+              - EventList
+          LowPower:
+              - EventList
+          KeypadInput:
+              - EventList
+          ContentLauncher:
+              - EventList
+          AudioOutput:
+              - EventList
+          ApplicationLauncher:
+              - EventList
+          ApplicationBasic:
+              - EventList
+          AccountLogin:
+              - EventList
+          ElectricalMeasurement:
+              - EventList
+          UnitTesting:
+              - EventList
+          FaultInjection:
+              - EventList
+      command fields:
+          DiagnosticLogs:
+              RetrieveLogsRequest:
+                  # Not really usable in earlier releases: wrong type.
+                  - transferFileDesignator
+      structs:
+          TimeSynchronization:
+              - DSTOffsetStruct
+              - TimeZoneStruct
+      struct fields:
+          TimeSynchronization:
+              DSTOffsetStruct:
+                  - offset
+                  - validStarting
+                  - validUntil
+              TimeZoneStruct:
+                  - offset
+                  - validAt
+                  - name
+      enums:
+          DiagnosticLogs:
+              - IntentEnum
+              - StatusEnum
+              - TransferProtocolEnum
+      enum values:
+          DoorLock:
+              LockDataTypeEnum:
+                  - FingerVein
+          DiagnosticLogs:
+              IntentEnum:
+                  - EndUserSupport
+                  - NetworkDiag
+                  - CrashLogs
+              StatusEnum:
+                  - Success
+                  - Exhausted
+                  - NoLogs
+                  - Busy
+                  - Denied
+              TransferProtocolEnum:
+                  - ResponsePayload
+                  - BDX
+  deprecated:
+      attributes:
+          TimeSynchronization:
+              - DstOffset
+      structs:
+          TimeSynchronization:
+              - DstOffsetType
+              - TimeZoneType
+      enums:
+          DiagnosticLogs:
+              - LogsIntent
+              - LogsStatus
+              - LogsTransferProtocol
+  removed:
+      enum values:
+          DoorLock:
+              DlLockDataType:
+                  # This value never existed for this enum name so, don't start
+                  # exposing it.  It's exposed for LockDataTypeEnum
+                  - FingerVein
+  renames:
+      attributes:
+          TimeSynchronization:
+              DSTOffset: DstOffset
+      structs:
+          TimeSynchronization:
+              DSTOffsetStruct: DstOffsetType
+              TimeZoneStruct: TimeZoneType
+      enums:
+          DiagnosticLogs:
+              IntentEnum: LogsIntent
+              StatusEnum: LogsStatus
+              TransferProtocolEnum: LogsTransferProtocol

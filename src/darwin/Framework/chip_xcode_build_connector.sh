@@ -81,7 +81,10 @@ for arch in "${archs[@]}"; do
 done
 
 [[ $ENABLE_BITCODE == YES ]] && {
-    target_cflags+=',"-flto"'
+    if [ -n "$target_cflags" ]; then
+        target_cflags+=','
+    fi
+    target_cflags+='"-flto"'
 }
 
 declare -a args=(

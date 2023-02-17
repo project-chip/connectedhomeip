@@ -15,15 +15,7 @@ import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import kotlinx.android.synthetic.main.basic_client_fragment.attributeNameSpinner
-import kotlinx.android.synthetic.main.basic_client_fragment.basicClusterCommandStatus
-import kotlinx.android.synthetic.main.basic_client_fragment.locationEd
-import kotlinx.android.synthetic.main.basic_client_fragment.nodeLabelEd
-import kotlinx.android.synthetic.main.basic_client_fragment.view.attributeNameSpinner
-import kotlinx.android.synthetic.main.basic_client_fragment.view.readAttributeBtn
-import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocalConfigDisabledSwitch
-import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocationBtn
-import kotlinx.android.synthetic.main.basic_client_fragment.view.writeNodeLabelBtn
+import com.google.chip.chiptool.databinding.BasicClientFragmentBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -35,34 +27,43 @@ class BasicClientFragment : Fragment() {
 
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
+  private var _binding: BasicClientFragmentBinding? = null
+  private val binding get() = _binding!!
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    _binding = BasicClientFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
 
-    return inflater.inflate(R.layout.basic_client_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+    deviceController.setCompletionListener(ChipControllerCallback())
 
-      addressUpdateFragment =
-        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+    addressUpdateFragment =
+      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-      writeNodeLabelBtn.setOnClickListener { scope.launch {
-        sendWriteNodeLabelAttribute()
-        nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
-      }}
-      writeLocationBtn.setOnClickListener { scope.launch {
-        sendWriteLocationAttribute()
-        locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
-      }}
-      writeLocalConfigDisabledSwitch.setOnCheckedChangeListener { _, isChecked ->
-        scope.launch { sendWriteLocalConfigDisabledAttribute(isChecked) }
-      }
-      makeAttributeList()
-      attributeNameSpinner.adapter = makeAttributeNamesAdapter()
-      readAttributeBtn.setOnClickListener { scope.launch { readAttributeButtonClick() }}
+    binding.writeNodeLabelBtn.setOnClickListener { scope.launch {
+      sendWriteNodeLabelAttribute()
+      binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+    }}
+    binding.writeLocationBtn.setOnClickListener { scope.launch {
+      sendWriteLocationAttribute()
+      binding.locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+    }}
+    binding.writeLocalConfigDisabledSwitch.setOnCheckedChangeListener { _, isChecked ->
+      scope.launch { sendWriteLocalConfigDisabledAttribute(isChecked) }
     }
+    makeAttributeList()
+    binding.attributeNameSpinner.adapter = makeAttributeNamesAdapter()
+    binding.readAttributeBtn.setOnClickListener { scope.launch { readAttributeButtonClick() }}
+
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -98,7 +99,7 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun readAttributeButtonClick() {
     try {
-      readBasicClusters(attributeNameSpinner.selectedItemPosition)
+      readBasicClusters(binding.attributeNameSpinner.selectedItemPosition)
     } catch (ex: Exception) {
       showMessage("readBasicCluster failed: $ex")
     }
@@ -244,7 +245,7 @@ class BasicClientFragment : Fragment() {
         showMessage("Write NodeLabel failure $ex")
         Log.e(TAG, "Write NodeLabel failure", ex)
       }
-    }, nodeLabelEd.text.toString())
+    }, binding.nodeLabelEd.text.toString())
   }
 
   private suspend fun sendReadLocationAttribute() {
@@ -271,7 +272,7 @@ class BasicClientFragment : Fragment() {
         showMessage("Write Location failure $ex")
         Log.e(TAG, "Write Location failure", ex)
       }
-    }, locationEd.text.toString())
+    }, binding.locationEd.text.toString())
   }
 
   private suspend fun sendReadHardwareVersionAttribute() {
@@ -457,7 +458,7 @@ class BasicClientFragment : Fragment() {
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
-      basicClusterCommandStatus.text = msg
+      binding.basicClusterCommandStatus.text = msg
     }
   }
 

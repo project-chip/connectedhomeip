@@ -43,12 +43,21 @@
 
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
 
+// Enable usage of custom factory data provider
+#ifndef CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+#define CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER 0
+#endif
+
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+#ifndef CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS
+// Set to 3: default number of custom Ids from CustomFactoryDataProvider example
+#define CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS 3
+#endif
+#endif
+
 // VID/PID for product => will be used by Basic Information Cluster
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x1037
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xA220
-
-// set it to 0 for the moment
-#define CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER 0
 
 #ifndef CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 //-> format_version = 1

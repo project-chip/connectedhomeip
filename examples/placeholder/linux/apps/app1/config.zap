@@ -1,5 +1,5 @@
 {
-  "featureLevel": 89,
+  "featureLevel": 90,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -959,7 +959,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "HourFormat",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -975,7 +975,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "CalendarType",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -9034,5 +9034,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 258
     }
-  ]
+  ],
+  "log": []
 }

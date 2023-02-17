@@ -771,8 +771,8 @@ enum class WiFiSecurity : uint8_t
 
 namespace DiagnosticLogs {
 
-// Enum for LogsIntent
-enum class LogsIntent : uint8_t
+// Enum for IntentEnum
+enum class IntentEnum : uint8_t
 {
     kEndUserSupport = 0x00,
     kNetworkDiag    = 0x01,
@@ -784,8 +784,8 @@ enum class LogsIntent : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for LogsStatus
-enum class LogsStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess   = 0x00,
     kExhausted = 0x01,
@@ -799,8 +799,8 @@ enum class LogsStatus : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for LogsTransferProtocol
-enum class LogsTransferProtocol : uint8_t
+// Enum for TransferProtocolEnum
+enum class TransferProtocolEnum : uint8_t
 {
     kResponsePayload = 0x00,
     kBdx             = 0x01,
@@ -1049,9 +1049,6 @@ enum class WiFiConnectionStatus : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
@@ -1067,10 +1064,6 @@ enum class WiFiVersionType : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WiFiVersionType                                                                  = EmberAfWiFiVersionType;
-static WiFiVersionType __attribute__((unused)) kWiFiVersionTypekUnknownEnumValue       = static_cast<WiFiVersionType>(6);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for WiFiNetworkDiagnosticsFeature
 enum class WiFiNetworkDiagnosticsFeature : uint32_t
@@ -1192,9 +1185,6 @@ enum class CommissioningWindowStatusEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
@@ -1207,10 +1197,6 @@ enum class StatusCode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StatusCode                                                                       = EmberAfStatusCode;
-static StatusCode __attribute__((unused)) kStatusCodekUnknownEnumValue                 = static_cast<StatusCode>(0);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace AdministratorCommissioning
 
 namespace OperationalCredentials {
@@ -1511,11 +1497,12 @@ enum class LockDataTypeEnum : uint8_t
     kPin             = 0x06,
     kRfid            = 0x07,
     kFingerprint     = 0x08,
+    kFingerVein      = 0x09,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 9,
+    kUnknownEnumValue = 10,
 };
 
 // Enum for LockOperationTypeEnum

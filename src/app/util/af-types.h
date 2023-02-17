@@ -108,6 +108,17 @@ typedef struct
      * is a response to client command request. Can be nullptr or terminated by 0xFFFF_FFFF.
      */
     const chip::CommandId * generatedCommandList;
+
+    /**
+     * Pointer to an array of event IDs of the events supported by the cluster instance.
+     * Can be nullptr.
+     */
+    const chip::EventId * eventList;
+
+    /**
+     * Total number of events supported by the cluster instance (in eventList array).
+     */
+    uint16_t eventCount;
 } EmberAfCluster;
 
 /**

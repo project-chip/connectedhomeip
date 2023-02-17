@@ -26,7 +26,6 @@
 
 #ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
@@ -36,7 +35,6 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -56,16 +54,12 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef ENABLE_WSTK_LEDS
-#define SYSTEM_STATE_LED &sl_led_led0
-#define LOCK_STATE_LED &sl_led_led1
+#define LOCK_STATE_LED 1
 #endif // ENABLE_WSTK_LEDS
 
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_LOCK_SWITCH &sl_button_btn1
-
 using chip::app::Clusters::DoorLock::DlLockState;
-using chip::app::Clusters::DoorLock::DlOperationError;
-using chip::app::Clusters::DoorLock::DlOperationSource;
+using chip::app::Clusters::DoorLock::OperationErrorEnum;
+using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -352,20 +346,23 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    if (buttonHandle == NULL)
-    {
-        return;
-    }
 
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    SILABS_LOG("### Lock button #### ");
-    button_event.Handler = BaseApplication::ButtonHandler;
-    sAppTask.PostEvent(&button_event);
+    if (button == SIWx917_BTN1 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    {
+        button_event.Handler = LockActionEventHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    else if (button == SIWx917_BTN0)
+    {
+        button_event.Handler = BaseApplication::ButtonHandler;
+        sAppTask.PostEvent(&button_event);
+    }
 }
 
 void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
@@ -425,7 +422,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     bool unlocked        = LockMgr().NextState();
     DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
 
-    DlOperationSource source = DlOperationSource::kUnspecified;
+    OperationSourceEnum source = OperationSourceEnum::kUnspecified;
 
     // write the new lock value
     EmberAfStatus status =

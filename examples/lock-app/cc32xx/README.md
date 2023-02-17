@@ -58,9 +58,9 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.12.1_2446-setup.run
-    $ chmod +x sysconfig-1.12.1_2446-setup.run
-    $ ./sysconfig-1.12.1_2446-setup.run
+    $ wget https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.13.0_2553-setup.run
+    $ chmod +x sysconfig-1.13.0_2553-setup.run
+    $ ./sysconfig-1.13.0_2553-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
@@ -85,16 +85,22 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux the
     Sysconfig is located in a `ti` folder in the user's home directory, and you
     must provide the absolute path for it. For example
-    `/home/username/ti/sysconfig_1.12.1`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.13.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
 
     ```
     $ cd ~/connectedhomeip/examples/lock-app/cc32xx
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.12.1\""
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.13.0\""
     $ ninja -C out/debug
     ```
+
+## Adding DAC Certificates
+
+To add custom DAC Certificates, the `CC32XXDeviceAttestationCreds.cpp` file in
+`examples/platform/cc32xx` can be modified. The private key, public key, DAC
+cert and PAI cert arrays all need to be replaced.
 
 ## Programming
 
@@ -159,12 +165,6 @@ the device is connected to the local AP, commissioning can be triggered using
 #### Bluetooth LE Provisioning
 
 BLE provisioning is not supported currently.
-
-### CHIP tool changes needed for Wi-Fi example
-
-The timeout for the CHIP tool needs to be increased from 10 to 15 seconds. This
-can be done in `chip::System::Clock::Timeout GetWaitDuration` in
-`connectedhomeip/examples/chip-tool/commands/clusters/ModelCommand.h`
 
 ## TI Support
 

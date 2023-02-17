@@ -34,9 +34,6 @@ class PseudoCluster(ABC):
         async def MyCustomMethod(self, request):
             pass
 
-        async def MyCustomMethod(self, request):
-            pass
-
     It can then be called from any test step as:
 
     - label: "Call a custom method"
@@ -46,8 +43,37 @@ class PseudoCluster(ABC):
           values:
               - name: "MyCustomParameter"
                 value: "this_is_a_custom_value"
+
+    A pseudo cluster can optionally declare a definition in order to benefit
+    from automatic command names checking and argument names validation.
+
+    For example, the 'CustomCommands' pseudo cluster can be implemented as:
+
+        _DEFINITION = '''<?xml version="1.0"?>
+        <configurator>
+          <cluster>
+            <name>CustomCommands</name>
+            <code>0xFFF1FD00</code>
+
+            <command source="client" code="0" name="MyCustomMethod">
+                <arg name="MyCustomParameter" type="char_string"/>
+            </command>
+          </cluster>
+        </configurator>
+        '''
+
+    class CustomCommand(PseudoCluster):
+        name = 'CustomCommands'
+        definition = _DEFINITION
+
+        async def MyCustomMethod(self, request):
+            pass
     """
 
     @abstractproperty
     def name(self):
         pass
+
+    @property
+    def definition(self):
+        return None

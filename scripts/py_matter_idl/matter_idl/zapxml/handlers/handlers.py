@@ -456,9 +456,18 @@ class ClusterGlobalAttributeHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
-    def EndProcessing(self):
+    def FinalizeProcessing(self, idl: Idl):
+        for attribute in self._cluster.attributes:
+            if attribute.definition.code == self._code:
+                # NOTE: For now the value is ignored, but if needed it could
+                #       be updated here.
+                return
+
         self._cluster.attributes.append(
             self.context.GetGlobalAttribute(self._code))
+
+    def EndProcessing(self):
+        self.context.AddIdlPostProcessor(self)
 
 
 class ClusterHandler(BaseHandler):
@@ -581,6 +590,14 @@ class GlobalHandler(BaseHandler):
             return GlobalAttributeHandler(self.context, AttrsToAttribute(attrs))
         else:
             return BaseHandler(self.context)
+
+    def FinalizeProcessing(self, idl: Idl):
+        global_attributes = self.context.GetGlobalAttributes()
+        for cluster in idl.clusters:
+            cluster.attributes += global_attributes
+
+    def EndProcessing(self):
+        self.context.AddIdlPostProcessor(self, True)
 
 
 class ConfiguratorHandler(BaseHandler):

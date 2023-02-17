@@ -16,6 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -83,10 +84,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRCommissioningParameters (Deprecated)
 
-@property (nonatomic, copy, nullable) NSData * CSRNonce API_DEPRECATED(
-    "Please use csrNonce", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs API_DEPRECATED(
-    "Please use failSafeTimeout", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable) NSData * CSRNonce MTR_DEPRECATED_WITH_REPLACEMENT(
+    "csrNonce", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs MTR_DEPRECATED_WITH_REPLACEMENT(
+    "failSafeTimeout", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 

@@ -39,8 +39,8 @@ using namespace ::chip::DeviceLayer;
 void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                                                      uint8_t type, uint16_t size, uint8_t * value)
 {
-    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
-             endpointId, attributeId);
+    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%" PRIx32 "', EndPoint ID: '0x%x', Attribute ID: '0x%" PRIx32 "'",
+             clusterId, endpointId, attributeId);
 
     switch (clusterId)
     {
@@ -49,7 +49,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
         break;
 
     default:
-        ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
+        ESP_LOGI(TAG, "Unhandled cluster ID: %" PRIu32, clusterId);
         break;
     }
 
@@ -59,7 +59,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id,
-                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%" PRIx32, attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (*value)
     {

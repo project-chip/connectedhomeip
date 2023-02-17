@@ -106,11 +106,6 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-// For now, just define emberAfWriteServerAttribute to emberAfWriteAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfWriteServerAttribute emberAfWriteAttribute
-
 /**
  * @brief Read the attribute value, performing all the checks.
  *
@@ -122,11 +117,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                    uint8_t * dataPtr, uint16_t readLength);
-
-// For now, just define emberAfReadServerAttribute to emberAfReadAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfReadServerAttribute emberAfReadAttribute
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -511,37 +501,6 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
 
 /** @name Messaging */
 // @{
-
-/**
- * @brief Sends a default response to a cluster command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param cmd The cluster command to which to respond.
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status);
-
-/**
- * @brief Sends a default response to a cluster command using the
- * current command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
-
-/**
- * @brief Access to client API APS frame.
- */
-EmberApsFrame * emberAfGetCommandApsFrame(void);
 
 /**
  * @brief Set the source and destination endpoints in the client API APS frame.

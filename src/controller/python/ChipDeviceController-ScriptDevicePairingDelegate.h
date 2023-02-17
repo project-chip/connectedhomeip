@@ -59,6 +59,7 @@ public:
     void SetCommissioningSuccessCallback(DevicePairingDelegate_OnCommissioningSuccessFunct callback);
     void SetCommissioningFailureCallback(DevicePairingDelegate_OnCommissioningFailureFunct callback);
     void SetCommissioningWindowOpenCallback(DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
+    void OnStatusUpdate(Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
     void OnCommissioningSuccess(PeerId peerId) override;
@@ -68,6 +69,7 @@ public:
     Callback::Callback<Controller::OnOpenCommissioningWindow> *
     GetOpenWindowCallback(Controller::CommissioningWindowOpener * context);
     void OnOpenCommissioningWindow(NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
+    void SetExpectingPairingComplete(bool value) { expectingPairingComplete = value; }
 
 private:
     DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback                     = nullptr;
@@ -78,6 +80,7 @@ private:
     DevicePairingDelegate_OnCommissioningStatusUpdateFunct mOnCommissioningStatusUpdateCallback = nullptr;
     Callback::Callback<Controller::OnOpenCommissioningWindow> mOpenWindowCallback;
     Controller::CommissioningWindowOpener * mWindowOpener = nullptr;
+    bool expectingPairingComplete                         = false;
 };
 
 } // namespace Controller

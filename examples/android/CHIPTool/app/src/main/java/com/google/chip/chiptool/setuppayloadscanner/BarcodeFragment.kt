@@ -29,13 +29,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
@@ -44,12 +41,12 @@ import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.SelectActionFragment
+import com.google.chip.chiptool.databinding.BarcodeFragmentBinding
 import com.google.chip.chiptool.util.FragmentUtil
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import kotlinx.android.synthetic.main.barcode_fragment.view.inputAddressBtn
 import java.util.concurrent.Executors
 import kotlin.math.abs
 import kotlin.math.max
@@ -57,10 +54,8 @@ import kotlin.math.min
 
 /** Launches the camera to scan for QR code. */
 class BarcodeFragment : Fragment() {
-
-    private lateinit var previewView: PreviewView
-    private var manualCodeEditText: EditText? = null
-    private var manualCodeBtn: Button? = null
+    private var _binding: BarcodeFragmentBinding? = null
+    private val binding get() = _binding!!
 
     private fun aspectRatio(width: Int, height: Int): Int {
         val previewRatio = max(width, height).toDouble() / min(width, height)
@@ -82,18 +77,22 @@ class BarcodeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.barcode_fragment, container, false).apply {
-            previewView = findViewById(R.id.camera_view)
-            manualCodeEditText = findViewById(R.id.manualCodeEditText)
-            manualCodeBtn = findViewById(R.id.manualCodeBtn)
-            startCamera()
-            inputAddressBtn.setOnClickListener {
-                FragmentUtil.getHost(
-                    this@BarcodeFragment,
-                    SelectActionFragment.Callback::class.java
-                )?.onShowDeviceAddressInput()
-            }
+        _binding = BarcodeFragmentBinding.inflate(inflater, container, false)
+
+        startCamera()
+        binding.inputAddressBtn.setOnClickListener {
+            FragmentUtil.getHost(
+                this@BarcodeFragment,
+                SelectActionFragment.Callback::class.java
+            )?.onShowDeviceAddressInput()
         }
+
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     @SuppressLint("UnsafeOptInUsageError")
@@ -101,19 +100,19 @@ class BarcodeFragment : Fragment() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity())
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            val metrics = DisplayMetrics().also { previewView.display?.getRealMetrics(it) }
+            val metrics = DisplayMetrics().also { binding.cameraView.display?.getRealMetrics(it) }
             val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
             // Preview
             val preview: Preview = Preview.Builder()
                 .setTargetAspectRatio(screenAspectRatio)
-                .setTargetRotation(previewView.display.rotation)
+                .setTargetRotation(binding.cameraView.display.rotation)
                 .build()
-            preview.setSurfaceProvider(previewView.surfaceProvider)
+            preview.setSurfaceProvider(binding.cameraView.surfaceProvider)
 
             // Setup barcode scanner
             val imageAnalysis = ImageAnalysis.Builder()
                 .setTargetAspectRatio(screenAspectRatio)
-                .setTargetRotation(previewView.display.rotation)
+                .setTargetRotation(binding.cameraView.display.rotation)
                 .build()
             val cameraExecutor = Executors.newSingleThreadExecutor()
             val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
@@ -135,8 +134,8 @@ class BarcodeFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireActivity()))
 
         //workaround: can not use gms to scan the code in China, added a EditText to debug
-        manualCodeBtn?.setOnClickListener {
-            val qrCode = manualCodeEditText?.text.toString()
+        binding.manualCodeBtn.setOnClickListener {
+            val qrCode = binding.manualCodeEditText.text.toString()
             Log.d(TAG, "Submit Code:$qrCode")
             handleInputQrCode(qrCode)
         }

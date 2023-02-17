@@ -49,7 +49,7 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/silabs/EFR32",
+    "${chip_root}/src/platform/silabs/efr32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
@@ -72,7 +72,6 @@ efr32_sdk("sdk") {
 
 efr32_executable("lock_app") {
   output_name = "chip-efr32-lock-example.out"
-  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   include_dirs = [ "include" ]
   defines = []
 

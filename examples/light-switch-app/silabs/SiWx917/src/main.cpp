@@ -33,7 +33,7 @@
 
 #define BLE_DEV_NAME "SiLabs-Light-Switch"
 
-extern "C" void sl_button_on_change();
+extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -81,7 +81,7 @@ int main(void)
     appError(CHIP_ERROR_INTERNAL);
 }
 
-void sl_button_on_change()
+void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
-    AppTask::GetAppTask().ButtonEventHandler(APP_LIGHT_SWITCH, SL_SIMPLE_BUTTON_PRESSED);
+    AppTask::GetAppTask().ButtonEventHandler(btn, btnAction);
 }

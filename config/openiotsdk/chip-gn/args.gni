@@ -35,4 +35,4 @@ chip_external_mbedtls = true
 
 custom_toolchain = "${chip_root}/config/openiotsdk/chip-gn/toolchain:openiotsdk"
 
-pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]

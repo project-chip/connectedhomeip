@@ -482,7 +482,7 @@ as an additional argument. To do this, complete the following steps:
     - Install the `jsonschema` module together with all dependencies for Matter:
 
         ```
-        $ python -m pip install -r ./scripts/requirements.nrfconnect.txt
+        $ python -m pip install -r ./scripts/setup/requirements.nrfconnect.txt
         ```
 
 2. Run the following command (remember to replace the _<path_to_schema>_

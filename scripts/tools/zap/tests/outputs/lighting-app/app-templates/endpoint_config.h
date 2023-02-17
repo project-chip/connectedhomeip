@@ -548,6 +548,40 @@
 
 #define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 
+// clang-format off
+#define GENERATED_EVENT_COUNT 15
+#define GENERATED_EVENTS { \
+  /* Endpoint: 0, Cluster: Access Control (server) */ \
+  /* EventList (index=0) */ \
+  0x00000000, /* AccessControlEntryChanged */ \
+  0x00000001, /* AccessControlExtensionChanged */ \
+  /* Endpoint: 0, Cluster: Basic Information (server) */ \
+  /* EventList (index=2) */ \
+  0x00000000, /* StartUp */ \
+  0x00000001, /* ShutDown */ \
+  0x00000002, /* Leave */ \
+  /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */ \
+  /* EventList (index=5) */ \
+  0x00000000, /* StateTransition */ \
+  0x00000001, /* VersionApplied */ \
+  0x00000002, /* DownloadError */ \
+  /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
+  /* EventList (index=8) */ \
+  0x00000000, /* HardwareFaultChange */ \
+  0x00000001, /* RadioFaultChange */ \
+  0x00000002, /* NetworkFaultChange */ \
+  0x00000003, /* BootReason */ \
+  /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
+  /* EventList (index=12) */ \
+  0x00000000, /* Disconnection */ \
+  0x00000001, /* AssociationFailure */ \
+  0x00000002, /* ConnectionStatus */ \
+}
+
+// clang-format on
+
+#define ZAP_GENERATED_EVENTS_INDEX(index) (&generatedEvents[index])
+
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
     const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
@@ -766,6 +800,8 @@
       .functions = chipFuncArrayGroupsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 7 ) ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Descriptor (server) */ \
@@ -777,6 +813,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Access Control (server) */ \
@@ -788,6 +826,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 0 ), \
+      .eventCount = 2, \
     },\
   { \
       /* Endpoint: 0, Cluster: Basic Information (server) */ \
@@ -799,6 +839,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 2 ), \
+      .eventCount = 3, \
     },\
   { \
       /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */ \
@@ -810,6 +852,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */ \
@@ -821,6 +865,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 12 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 5 ), \
+      .eventCount = 3, \
     },\
   { \
       /* Endpoint: 0, Cluster: Localization Configuration (server) */ \
@@ -832,6 +878,8 @@
       .functions = chipFuncArrayLocalizationConfigurationServer, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Time Format Localization (server) */ \
@@ -843,6 +891,8 @@
       .functions = chipFuncArrayTimeFormatLocalizationServer, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: General Commissioning (server) */ \
@@ -854,6 +904,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 14 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 18 ) ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
@@ -865,6 +917,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 22 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 29 ) ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Diagnostic Logs (server) */ \
@@ -876,6 +930,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 33 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 35 ) ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
@@ -887,6 +943,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 37 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 8 ), \
+      .eventCount = 4, \
     },\
   { \
       /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
@@ -898,6 +956,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 39 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
@@ -909,6 +969,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 41 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
@@ -920,6 +982,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 43 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 12 ), \
+      .eventCount = 3, \
     },\
   { \
       /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */ \
@@ -931,6 +995,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 45 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Switch (server) */ \
@@ -942,6 +1008,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Administrator Commissioning (server) */ \
@@ -953,6 +1021,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 47 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
@@ -964,6 +1034,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 51 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 60 ) ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Group Key Management (server) */ \
@@ -975,6 +1047,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 65 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 70 ) ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
@@ -986,6 +1060,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: User Label (server) */ \
@@ -997,6 +1073,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Identify (server) */ \
@@ -1008,6 +1086,8 @@
       .functions = chipFuncArrayIdentifyServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 73 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Groups (server) */ \
@@ -1019,6 +1099,8 @@
       .functions = chipFuncArrayGroupsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 76 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 83 ) ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: On/Off (server) */ \
@@ -1030,6 +1112,8 @@
       .functions = chipFuncArrayOnOffServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 88 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Level Control (server) */ \
@@ -1041,6 +1125,8 @@
       .functions = chipFuncArrayLevelControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 95 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Descriptor (server) */ \
@@ -1052,6 +1138,8 @@
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Color Control (server) */ \
@@ -1063,6 +1151,8 @@
       .functions = chipFuncArrayColorControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 104 ) ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 1, Cluster: Occupancy Sensing (server) */ \
@@ -1074,6 +1164,8 @@
       .functions = chipFuncArrayOccupancySensingServer, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
 }
 

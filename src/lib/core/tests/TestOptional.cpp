@@ -45,6 +45,8 @@ struct Count
     Count(Count && o) : m(o.m) { ++created; }
     Count & operator=(Count &&) = default;
 
+    bool operator==(const Count & o) const { return m == o.m; }
+
     int m;
 
     static void ResetCounter()
@@ -74,26 +76,43 @@ int Count::destroyed;
 
 static void TestBasic(nlTestSuite * inSuite, void * inContext)
 {
+    // Set up our test Count objects, which will mess with counts, before we reset the
+    // counts.
+    Count c100(100), c101(101), c102(102);
+
     Count::ResetCounter();
 
     {
         auto testOptional = Optional<Count>::Value(100);
         NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 0);
         NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 100);
+        NL_TEST_ASSERT(inSuite, testOptional == c100);
+        NL_TEST_ASSERT(inSuite, testOptional != c101);
+        NL_TEST_ASSERT(inSuite, testOptional != c102);
 
         testOptional.ClearValue();
         NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 1);
         NL_TEST_ASSERT(inSuite, !testOptional.HasValue());
+        NL_TEST_ASSERT(inSuite, testOptional != c100);
+        NL_TEST_ASSERT(inSuite, testOptional != c101);
+        NL_TEST_ASSERT(inSuite, testOptional != c102);
 
         testOptional.SetValue(Count(101));
         NL_TEST_ASSERT(inSuite, Count::created == 3 && Count::destroyed == 2);
         NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 101);
+        NL_TEST_ASSERT(inSuite, testOptional != c100);
+        NL_TEST_ASSERT(inSuite, testOptional == c101);
+        NL_TEST_ASSERT(inSuite, testOptional != c102);
 
         testOptional.Emplace(102);
         NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 3);
         NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 102);
+        NL_TEST_ASSERT(inSuite, testOptional != c100);
+        NL_TEST_ASSERT(inSuite, testOptional != c101);
+        NL_TEST_ASSERT(inSuite, testOptional == c102);
     }
 
+    // Our test Count objects are still in scope here.
     NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 4);
 }
 

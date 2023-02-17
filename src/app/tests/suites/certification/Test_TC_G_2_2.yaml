@@ -44,7 +44,8 @@ tests:
           [1674543469.444257][19260:19262] CHIP:TOO:   MaxGroupsPerFabric: 4
       disabled: true
 
-    - label: "Precondition: If maxgroups>1, proceed with the following steps
+    - label: |
+          Precondition: If maxgroups>1, proceed with the following steps,
 
           TH generates fabric-unique GroupID, GroupName, random key, EpochKey0
           and GroupKeySetID.
@@ -66,7 +67,7 @@ tests:
 
           TH binds GroupId(0x0001 to (maxgroups+1)) with GroupKeySetID in the
           GroupKeyMap attribute list on GroupKeyManagement cluster with the
-          values provided in the above steps"
+          values provided in the above steps
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 

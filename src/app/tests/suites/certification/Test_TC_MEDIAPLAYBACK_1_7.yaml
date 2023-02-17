@@ -76,7 +76,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 65528, 65529, 65531, 65532, 65533]
+              contains: [0, 65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "Read the optional attribute(StartTime) in AttributeList"
       PICS: MEDIAPLAYBACK.S.A0001
@@ -204,7 +204,7 @@ tests:
               contains: [9]
 
     - label: "Read the optional command(Seek) in AcceptedCommandList"
-      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
