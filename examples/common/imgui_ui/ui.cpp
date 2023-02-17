@@ -201,7 +201,8 @@ void ImguiUi::UpdateState()
 {
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(&ChipLoopUpdateCallback, reinterpret_cast<intptr_t>(this));
 
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(AppServer, "Failed to schedule state update: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
