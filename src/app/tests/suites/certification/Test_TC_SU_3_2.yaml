@@ -36,7 +36,7 @@ tests:
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
           Verify on the OTA Requestor logs receives QueryImageResponse which contains the following
-          Status - UpdateAvailable 
+          Status - UpdateAvailable
           DelayedActionTime if present should be of type uint32.
           ImageURI - contain a URI where the OTA Requestor SHOULD download a Software Image
           SoftwareVersion is the same as the new software image version.

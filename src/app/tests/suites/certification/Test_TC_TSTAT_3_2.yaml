@@ -35,7 +35,7 @@ tests:
           reasonable positive value that is supported by the DUT."
       PICS: TSTAT.C.C00.Tx
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool thermostat setpoint-raise-lower 0 10 1 1
 
@@ -46,8 +46,8 @@ tests:
           [1666952425.387487][5547:5547] CHIP:EM: Handling via exchange: 27004r, Delegate: 0xaaaabacd6d38
           [1666952425.387637][5547:5547] CHIP:DMG: InvokeRequestMessage =
           [1666952425.387704][5547:5547] CHIP:DMG: {
-          [1666952425.387762][5547:5547] CHIP:DMG:         suppressResponse = false, 
-          [1666952425.387829][5547:5547] CHIP:DMG:         timedRequest = false, 
+          [1666952425.387762][5547:5547] CHIP:DMG:         suppressResponse = false,
+          [1666952425.387829][5547:5547] CHIP:DMG:         timedRequest = false,
           [1666952425.387892][5547:5547] CHIP:DMG:         InvokeRequests =
           [1666952425.387972][5547:5547] CHIP:DMG:         [
           [1666952425.388035][5547:5547] CHIP:DMG:                 CommandDataIB =
@@ -58,16 +58,16 @@ tests:
           [1666952425.388652][5547:5547] CHIP:DMG:                                 ClusterId = 0x201,
           [1666952425.388845][5547:5547] CHIP:DMG:                                 CommandId = 0x0,
           [1666952425.388976][5547:5547] CHIP:DMG:                         },
-          [1666952425.389114][5547:5547] CHIP:DMG:                         
-          [1666952425.389233][5547:5547] CHIP:DMG:                         CommandFields = 
+          [1666952425.389114][5547:5547] CHIP:DMG:
+          [1666952425.389233][5547:5547] CHIP:DMG:                         CommandFields =
           [1666952425.389359][5547:5547] CHIP:DMG:                         {
-          [1666952425.389489][5547:5547] CHIP:DMG:                                 0x0 = 0, 
-          [1666952425.389627][5547:5547] CHIP:DMG:                                 0x1 = 10, 
+          [1666952425.389489][5547:5547] CHIP:DMG:                                 0x0 = 0,
+          [1666952425.389627][5547:5547] CHIP:DMG:                                 0x1 = 10,
           [1666952425.389761][5547:5547] CHIP:DMG:                         },
           [1666952425.389879][5547:5547] CHIP:DMG:                 },
-          [1666952425.389961][5547:5547] CHIP:DMG:                 
+          [1666952425.389961][5547:5547] CHIP:DMG:
           [1666952425.390022][5547:5547] CHIP:DMG:         ],
-          [1666952425.390098][5547:5547] CHIP:DMG:         
+          [1666952425.390098][5547:5547] CHIP:DMG:
           [1666952425.390160][5547:5547] CHIP:DMG:         InteractionModelRevision = 1
           [1666952425.390221][5547:5547] CHIP:DMG: },
           [1666952425.390372][5547:5547] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0201 e=1 p=o
@@ -89,16 +89,16 @@ tests:
           [1666952425.393159][5547:5547] CHIP:DMG:         NeedsAck = true
           [1666952425.393214][5547:5547] CHIP:DMG:     }
           [1666952425.393288][5547:5547] CHIP:DMG: }
-          [1666952425.393344][5547:5547] CHIP:DMG:  
+          [1666952425.393344][5547:5547] CHIP:DMG:
           [1666952425.393652][5547:5547] CHIP:DMG: Encrypted Payload (68 bytes) =
           [1666952425.393713][5547:5547] CHIP:DMG: {
           [1666952425.393769][5547:5547] CHIP:DMG:     data = 00db96001b9d2f061a5283fe539d0ab227e8402081ad97fe7dcec774b9b04200be88b10f5628db9ff0c0e8cb50f1d813ccb5eb5ebbc7f29c72ed9fa7ca00674cd52a5066
           [1666952425.393827][5547:5547] CHIP:DMG:     buffer_ptr = 187650847961216
           [1666952425.393881][5547:5547] CHIP:DMG: }
-          [1666952425.393933][5547:5547] CHIP:DMG:  
+          [1666952425.393933][5547:5547] CHIP:DMG:
           [1666952425.394180][5547:5547] CHIP:DMG: InvokeResponseMessage =
           [1666952425.394249][5547:5547] CHIP:DMG: {
-          [1666952425.394310][5547:5547] CHIP:DMG:         suppressResponse = false, 
+          [1666952425.394310][5547:5547] CHIP:DMG:         suppressResponse = false,
           [1666952425.394372][5547:5547] CHIP:DMG:         InvokeResponseIBs =
           [1666952425.394452][5547:5547] CHIP:DMG:         [
           [1666952425.394515][5547:5547] CHIP:DMG:                 InvokeResponseIB =
@@ -111,12 +111,12 @@ tests:
           [1666952425.395772][5547:5547] CHIP:DMG:                                         ClusterId = 0x201,
           [1666952425.395910][5547:5547] CHIP:DMG:                                         CommandId = 0x0,
           [1666952425.396041][5547:5547] CHIP:DMG:                                 },
-          [1666952425.396186][5547:5547] CHIP:DMG:                                 
+          [1666952425.396186][5547:5547] CHIP:DMG:
           [1666952425.396314][5547:5547] CHIP:DMG:                                 StatusIB =
           [1666952425.396452][5547:5547] CHIP:DMG:                                 {
           [1666952425.396589][5547:5547] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1666952425.396721][5547:5547] CHIP:DMG:                                 },
-          [1666952425.396855][5547:5547] CHIP:DMG:                                 
+          [1666952425.396855][5547:5547] CHIP:DMG:
           [1666952425.396982][5547:5547] CHIP:DMG:                         },
           [1666952425.397120][5547:5547] CHIP:DMG:
       disabled: true
@@ -127,7 +127,7 @@ tests:
           reasonable negative value that is supported by the DUT."
       PICS: TSTAT.C.C00.Tx
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool thermostat setpoint-raise-lower 0 -10 1 1
 
@@ -136,8 +136,8 @@ tests:
           [1666952478.420042][5547:5547] CHIP:EM: Handling via exchange: 59365r, Delegate: 0xaaaabacd6d38
           [1666952478.420209][5547:5547] CHIP:DMG: InvokeRequestMessage =
           [1666952478.420276][5547:5547] CHIP:DMG: {
-          [1666952478.420358][5547:5547] CHIP:DMG:         suppressResponse = false, 
-          [1666952478.420425][5547:5547] CHIP:DMG:         timedRequest = false, 
+          [1666952478.420358][5547:5547] CHIP:DMG:         suppressResponse = false,
+          [1666952478.420425][5547:5547] CHIP:DMG:         timedRequest = false,
           [1666952478.420507][5547:5547] CHIP:DMG:         InvokeRequests =
           [1666952478.420592][5547:5547] CHIP:DMG:         [
           [1666952478.420654][5547:5547] CHIP:DMG:                 CommandDataIB =
@@ -148,16 +148,16 @@ tests:
           [1666952478.421130][5547:5547] CHIP:DMG:                                 ClusterId = 0x201,
           [1666952478.421216][5547:5547] CHIP:DMG:                                 CommandId = 0x0,
           [1666952478.421318][5547:5547] CHIP:DMG:                         },
-          [1666952478.421404][5547:5547] CHIP:DMG:                         
-          [1666952478.421503][5547:5547] CHIP:DMG:                         CommandFields = 
+          [1666952478.421404][5547:5547] CHIP:DMG:
+          [1666952478.421503][5547:5547] CHIP:DMG:                         CommandFields =
           [1666952478.421585][5547:5547] CHIP:DMG:                         {
-          [1666952478.421692][5547:5547] CHIP:DMG:                                 0x0 = 0, 
-          [1666952478.421782][5547:5547] CHIP:DMG:                                 0x1 = -10, 
+          [1666952478.421692][5547:5547] CHIP:DMG:                                 0x0 = 0,
+          [1666952478.421782][5547:5547] CHIP:DMG:                                 0x1 = -10,
           [1666952478.421893][5547:5547] CHIP:DMG:                         },
           [1666952478.421971][5547:5547] CHIP:DMG:                 },
-          [1666952478.422072][5547:5547] CHIP:DMG:                 
+          [1666952478.422072][5547:5547] CHIP:DMG:
           [1666952478.422135][5547:5547] CHIP:DMG:         ],
-          [1666952478.422233][5547:5547] CHIP:DMG:         
+          [1666952478.422233][5547:5547] CHIP:DMG:
           [1666952478.422297][5547:5547] CHIP:DMG:         InteractionModelRevision = 1
           [1666952478.422357][5547:5547] CHIP:DMG: },
           [1666952478.422526][5547:5547] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0201 e=1 p=o
@@ -179,16 +179,16 @@ tests:
           [1666952478.425276][5547:5547] CHIP:DMG:         NeedsAck = true
           [1666952478.425332][5547:5547] CHIP:DMG:     }
           [1666952478.425407][5547:5547] CHIP:DMG: }
-          [1666952478.425484][5547:5547] CHIP:DMG:  
+          [1666952478.425484][5547:5547] CHIP:DMG:
           [1666952478.425555][5547:5547] CHIP:DMG: Encrypted Payload (68 bytes) =
           [1666952478.425612][5547:5547] CHIP:DMG: {
           [1666952478.425692][5547:5547] CHIP:DMG:     data = 00213c00eb4b2204135eaaecf67917a20a9072b9cd23bc2f2408b71f50ba1df4f1b33cf95b2ee9ca89e92f8bcc5a76088aae25902e488c2ae7604e4149c724230afdbf5f
           [1666952478.425749][5547:5547] CHIP:DMG:     buffer_ptr = 187650847966352
           [1666952478.425804][5547:5547] CHIP:DMG: }
-          [1666952478.425880][5547:5547] CHIP:DMG:  
+          [1666952478.425880][5547:5547] CHIP:DMG:
           [1666952478.426064][5547:5547] CHIP:DMG: InvokeResponseMessage =
           [1666952478.426131][5547:5547] CHIP:DMG: {
-          [1666952478.426192][5547:5547] CHIP:DMG:         suppressResponse = false, 
+          [1666952478.426192][5547:5547] CHIP:DMG:         suppressResponse = false,
           [1666952478.426269][5547:5547] CHIP:DMG:         InvokeResponseIBs =
           [1666952478.426377][5547:5547] CHIP:DMG:         [
           [1666952478.426441][5547:5547] CHIP:DMG:                 InvokeResponseIB =
@@ -201,14 +201,14 @@ tests:
           [1666952478.427146][5547:5547] CHIP:DMG:                                         ClusterId = 0x201,
           [1666952478.427258][5547:5547] CHIP:DMG:                                         CommandId = 0x0,
           [1666952478.427365][5547:5547] CHIP:DMG:                                 },
-          [1666952478.427465][5547:5547] CHIP:DMG:                                 
+          [1666952478.427465][5547:5547] CHIP:DMG:
           [1666952478.427565][5547:5547] CHIP:DMG:                                 StatusIB =
           [1666952478.427655][5547:5547] CHIP:DMG:                                 {
           [1666952478.427761][5547:5547] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1666952478.427848][5547:5547] CHIP:DMG:                                 },
-          [1666952478.427954][5547:5547] CHIP:DMG:                                 
+          [1666952478.427954][5547:5547] CHIP:DMG:
           [1666952478.428033][5547:5547] CHIP:DMG:                         },
-          [1666952478.428140][5547:5547] CHIP:DMG:                         
+          [1666952478.428140][5547:5547] CHIP:DMG:
           [1666952478.428206][5547:5547] CHIP:DMG:                 },
       disabled: true
 
