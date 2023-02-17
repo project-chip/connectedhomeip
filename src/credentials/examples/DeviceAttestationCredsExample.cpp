@@ -52,7 +52,11 @@ public:
 
 CHIP_ERROR ExampleDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
 {
+#if 0x8000 <= CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID <= 0x801F
     return CopySpanToMutableSpan(DevelopmentCerts::kDacCert, out_dac_buffer);
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // 0x8000 <= CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID <= 0x801F
 }
 
 CHIP_ERROR ExampleDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
@@ -122,6 +126,7 @@ CHIP_ERROR ExampleDACProvider::GetFirmwareInformation(MutableByteSpan & out_firm
 CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
                                                             MutableByteSpan & out_signature_buffer)
 {
+#if 0x8000 <= CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID <= 0x801F
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
@@ -135,6 +140,9 @@ CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & mes
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // 0x8000 <= CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID <= 0x801F
 }
 
 } // namespace
